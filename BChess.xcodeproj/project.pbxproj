@@ -8,6 +8,9 @@
 
 /* Begin PBXBuildFile section */
 		A7AFCCAA1FB4E40D00AE3D85 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7AFCCA91FB4E40D00AE3D85 /* main.swift */; };
+		A7AFCCB11FB4E4DF00AE3D85 /* ConsoleUI.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7AFCCB01FB4E4DF00AE3D85 /* ConsoleUI.swift */; };
+		A7AFCCB31FB5091000AE3D85 /* Board.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7AFCCB21FB5091000AE3D85 /* Board.swift */; };
+		A7AFCCB51FB5170900AE3D85 /* Analysis.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7AFCCB41FB5170900AE3D85 /* Analysis.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -25,6 +28,9 @@
 /* Begin PBXFileReference section */
 		A7AFCCA61FB4E40D00AE3D85 /* BChess */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = BChess; sourceTree = BUILT_PRODUCTS_DIR; };
 		A7AFCCA91FB4E40D00AE3D85 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
+		A7AFCCB01FB4E4DF00AE3D85 /* ConsoleUI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleUI.swift; sourceTree = "<group>"; };
+		A7AFCCB21FB5091000AE3D85 /* Board.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Board.swift; sourceTree = "<group>"; };
+		A7AFCCB41FB5170900AE3D85 /* Analysis.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Analysis.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -58,6 +64,9 @@
 			isa = PBXGroup;
 			children = (
 				A7AFCCA91FB4E40D00AE3D85 /* main.swift */,
+				A7AFCCB01FB4E4DF00AE3D85 /* ConsoleUI.swift */,
+				A7AFCCB21FB5091000AE3D85 /* Board.swift */,
+				A7AFCCB41FB5170900AE3D85 /* Analysis.swift */,
 			);
 			path = BChess;
 			sourceTree = "<group>";
@@ -121,6 +130,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				A7AFCCAA1FB4E40D00AE3D85 /* main.swift in Sources */,
+				A7AFCCB51FB5170900AE3D85 /* Analysis.swift in Sources */,
+				A7AFCCB11FB4E4DF00AE3D85 /* ConsoleUI.swift in Sources */,
+				A7AFCCB31FB5091000AE3D85 /* Board.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
