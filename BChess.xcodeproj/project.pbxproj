@@ -10,7 +10,7 @@
 		A7AFCCAA1FB4E40D00AE3D85 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7AFCCA91FB4E40D00AE3D85 /* main.swift */; };
 		A7AFCCB11FB4E4DF00AE3D85 /* ConsoleUI.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7AFCCB01FB4E4DF00AE3D85 /* ConsoleUI.swift */; };
 		A7AFCCB31FB5091000AE3D85 /* Board.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7AFCCB21FB5091000AE3D85 /* Board.swift */; };
-		A7AFCCB51FB5170900AE3D85 /* Analysis.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7AFCCB41FB5170900AE3D85 /* Analysis.swift */; };
+		A7AFCCB51FB5170900AE3D85 /* MoveGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7AFCCB41FB5170900AE3D85 /* MoveGenerator.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -30,7 +30,7 @@
 		A7AFCCA91FB4E40D00AE3D85 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		A7AFCCB01FB4E4DF00AE3D85 /* ConsoleUI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleUI.swift; sourceTree = "<group>"; };
 		A7AFCCB21FB5091000AE3D85 /* Board.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Board.swift; sourceTree = "<group>"; };
-		A7AFCCB41FB5170900AE3D85 /* Analysis.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Analysis.swift; sourceTree = "<group>"; };
+		A7AFCCB41FB5170900AE3D85 /* MoveGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoveGenerator.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -66,7 +66,7 @@
 				A7AFCCA91FB4E40D00AE3D85 /* main.swift */,
 				A7AFCCB01FB4E4DF00AE3D85 /* ConsoleUI.swift */,
 				A7AFCCB21FB5091000AE3D85 /* Board.swift */,
-				A7AFCCB41FB5170900AE3D85 /* Analysis.swift */,
+				A7AFCCB41FB5170900AE3D85 /* MoveGenerator.swift */,
 			);
 			path = BChess;
 			sourceTree = "<group>";
@@ -130,7 +130,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				A7AFCCAA1FB4E40D00AE3D85 /* main.swift in Sources */,
-				A7AFCCB51FB5170900AE3D85 /* Analysis.swift in Sources */,
+				A7AFCCB51FB5170900AE3D85 /* MoveGenerator.swift in Sources */,
 				A7AFCCB11FB4E4DF00AE3D85 /* ConsoleUI.swift in Sources */,
 				A7AFCCB31FB5091000AE3D85 /* Board.swift in Sources */,
 			);

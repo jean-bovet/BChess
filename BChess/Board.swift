@@ -48,7 +48,7 @@ struct Piece: CustomStringConvertible {
         let pieceName: String
         switch type {
         case .none:
-            pieceName = "-"
+            pieceName = "."
         case .pawn:
             pieceName = "p"
         case .rook:
@@ -69,12 +69,17 @@ struct Piece: CustomStringConvertible {
         }
     }
     
+    var isEmpty: Bool {
+        return type == .none
+    }
+    
     static func empty() -> Piece {
         return Piece(type: .none, color: .white)
     }
 }
 
 struct Board: CustomStringConvertible {
+    
     var cells = [Piece](repeating: Piece.empty(), count: 64)
     
     subscript(cursor: Cursor) -> Piece {
@@ -114,9 +119,13 @@ struct Cursor {
     var file = 0
     
     func offsetBy(rank rankValue: Int) -> Cursor {
-        return Cursor(rank: rank + rankValue, file: file)
+        return offsetBy(rank: rankValue, file: 0)
     }
     
+    func offsetBy(rank rankValue: Int, file fileValue: Int) -> Cursor {
+        return Cursor(rank: rank + rankValue, file: file + fileValue)
+    }
+
     var isValid: Bool {
         return rank >= 0 && rank <= 7 && file >= 0 && file <= 7
     }
