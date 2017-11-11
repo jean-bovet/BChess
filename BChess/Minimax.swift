@@ -65,37 +65,47 @@ struct EvaluatedMove: CustomStringConvertible {
     }
 }
 
+struct Evaluation {
+    let move: EvaluatedMove
+    let line: [Move]
+    var moveCount: Int
+}
+
 class Minimax {
     
-    func bestMove(board: Board, color: Color) -> (EvaluatedMove, [Move]) {
+    func bestMove(board: Board, color: Color) -> Evaluation {
         return evaluate(board: board, color: color, depth: 1, evaluater: .Maximize)
     }
     
-    func evaluate(board: Board, color: Color, depth: Int, evaluater: Evaluater) -> (EvaluatedMove, [Move]) {
+    func evaluate(board: Board, color: Color, depth: Int, evaluater: Evaluater) -> Evaluation {
         let generator = MoveGenerator()
         let moves = generator.generateMoves(board: board, color: color)
-        var bestMove = EvaluatedMove(move: nil, value: evaluater.startValue)
-        var bestLine = [Move]()
+        var moveCount = moves.count
+        var bestEvaluation = Evaluation(move: EvaluatedMove(move: nil, value: evaluater.startValue), line: [], moveCount: 0)
         for move in moves {
             let board = board.move(from: move.from, to: move.to)
-            if depth < 3 {
+            if depth < 4 {
                 // We haven't reached the final depth yet, so continue to evaluate each position
-                let (evaluation, line) = evaluate(board: board, color: color.inverse(), depth: depth+1, evaluater: evaluater.inverse)
-                if evaluater.isBestValue(current: bestMove.value, new: evaluation.value) {
-                    bestMove = EvaluatedMove(move: move, value: evaluation.value)
-                    bestLine = [move] + line
+                let evaluation = evaluate(board: board, color: color.inverse(), depth: depth+1, evaluater: evaluater.inverse)
+                moveCount += evaluation.moveCount
+                if evaluater.isBestValue(current: bestEvaluation.move.value, new: evaluation.move.value) {
+                    let bestMove = EvaluatedMove(move: move, value: evaluation.move.value)
+                    let bestLine = [move] + evaluation.line
+                    bestEvaluation = Evaluation(move: bestMove, line: bestLine, moveCount: 0)
                 }
-//                print("Depth \(depth), \(evaluater), \(move), \(evaluation.value)")
             } else {
                 // We reached the leaf nodes, let's evaluate each of them to determine the best one
-                let boardValue = evaluatePosition(board: board, color: color)
-                if evaluater.isBestValue(current: bestMove.value, new: boardValue) {
-                    bestMove = EvaluatedMove(move: move, value: boardValue)
-                    bestLine = [move]
+//                let boardValue = evaluatePosition(board: board, color: color)
+                let boardValue = evaluatePosition(board: board, color: .white)
+                if evaluater.isBestValue(current: bestEvaluation.move.value, new: boardValue) {
+                    let bestMove = EvaluatedMove(move: move, value: boardValue)
+                    let bestLine = [move]
+                    bestEvaluation = Evaluation(move: bestMove, line: bestLine, moveCount: 0)
                 }
             }
         }
-        return (bestMove, bestLine)
+        bestEvaluation.moveCount = moveCount
+        return bestEvaluation
     }
     
     func evaluatePosition(board: Board, color: Color) -> Int {

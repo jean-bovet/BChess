@@ -37,9 +37,8 @@ func evaluate(fen: String) {
     let parser = FENParser(fen: fen)
     if let board = parser.parse() {
         let minimax = Minimax()
-        let eval = minimax.evaluatePosition(board: board, color: .white)
-        let (move, line) = minimax.bestMove(board: board, color: .white)
-        print("Eval is \(eval) for current position. Best move is \(move) with \(line)")
+        let evaluation = minimax.bestMove(board: board, color: .white)
+        print("Best move is \(evaluation.move) with \(evaluation.line) and \(evaluation.moveCount) moves evaluated.")
     }
 }
 
@@ -56,6 +55,7 @@ if CommandLine.arguments.count > 1 {
         
         //        evaluate(fen: "8/8/8/3k4/1q6/2P5/8/4K3 w - - 0 1")
         //        evaluate(fen: "8/8/8/1q1k4/8/2P5/2N5/4K3 w - - 0 1")
+//        evaluate(fen: "8/8/8/8/2k5/8/8/4K3 w - - 0 3")
         evaluate(fen: "8/8/8/1q1k4/8/2P5/1N6/4K3 w - - 0 1")
         exit(0)
     }
