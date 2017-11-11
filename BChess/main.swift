@@ -54,8 +54,9 @@ if CommandLine.arguments.count > 1 {
 //        generateMoves(fen: "8/8/8/8/4K3/8/8/8 w - - 0 1")
 //        generateMoves(fen: "8/8/8/3P4/8/4N3/8/8 w - - 0 1")
         
-        evaluate(fen: "8/8/8/3k4/1q6/2P5/8/4K3 w - - 0 1")
-//        let parser = FENParser(fen: "8/8/8/1q1k4/8/2P5/2N5/4K3 w - - 0 1")
+        //        evaluate(fen: "8/8/8/3k4/1q6/2P5/8/4K3 w - - 0 1")
+        //        evaluate(fen: "8/8/8/1q1k4/8/2P5/2N5/4K3 w - - 0 1")
+        evaluate(fen: "8/8/8/1q1k4/8/2P5/1N6/4K3 w - - 0 1")
         exit(0)
     }
 }

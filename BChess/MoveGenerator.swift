@@ -11,22 +11,27 @@ import Foundation
 class MoveGenerator {
     
     func generateMoves(board: Board, color: Color) -> [Move] {
+        let checked = board.isCheck(color: color)
         var moves = [Move]()
-        for rank in 0...7 {
-            for file in 0...7 {
-                let piece = board[rank, file]
-                if !piece.isEmpty && piece.color == color {
-                    moves.append(contentsOf: generateMoves(board: board, color: color, cursor: Cursor(rank: rank, file: file)))
-                }
+        for (piece, cursor) in board {
+            if !piece.isEmpty && piece.color == color {
+                moves.append(contentsOf: generateMoves(board: board, color: color, cursor: cursor, checked: checked))
             }
         }
         return moves
     }
     
-    func generateMoves(board: Board, color: Color, cursor: Cursor) -> [Move] {
+    func generateMoves(board: Board, color: Color, cursor: Cursor, checked: Bool) -> [Move] {
         var moves = [Move]()
         let cursors = generateMoves(board: board, cursor: cursor, color: color)
         for c in cursors {
+            if checked {
+                // The new position needs to clear the check otherwise it is invalid
+                let board = board.move(from: cursor, to: c)
+                if board.isCheck(color: color) {
+                   continue // skip this position because the knight is still in check
+                }
+            }
             moves.append(Move(from: cursor, to: c))
         }
         return moves
@@ -71,26 +76,36 @@ class MoveGenerator {
 
     func generateKnightCursors(board: Board, cursor: Cursor, color: Color) -> [Cursor] {
         var cursors = [Cursor]()
-        
-        // Top
-        cursors.append(cursor.offsetBy(rank: 2, file: -1), board: board, color: color)
-        cursors.append(cursor.offsetBy(rank: 2, file: 1), board: board, color: color)
 
-        // Right
-        cursors.append(cursor.offsetBy(rank: 1, file: 2), board: board, color: color)
-        cursors.append(cursor.offsetBy(rank: -1, file: 2), board: board, color: color)
-
-        // Bottom
-        cursors.append(cursor.offsetBy(rank: -2, file: -1), board: board, color: color)
-        cursors.append(cursor.offsetBy(rank: -2, file: 1), board: board, color: color)
-
-        // Left
-        cursors.append(cursor.offsetBy(rank: 1, file: -2), board: board, color: color)
-        cursors.append(cursor.offsetBy(rank: -1, file: -2), board: board, color: color)
+        for cursor in MoveGenerator.knightCursors(at: cursor) {
+            cursors.append(cursor, board: board, color: color)
+        }
 
         return cursors
     }
 
+    static func knightCursors(at cursor: Cursor) -> [Cursor] {
+        var cursors = [Cursor]()
+        
+        // Top
+        cursors.append(cursor.offsetBy(rank: 2, file: -1))
+        cursors.append(cursor.offsetBy(rank: 2, file: 1))
+        
+        // Right
+        cursors.append(cursor.offsetBy(rank: 1, file: 2))
+        cursors.append(cursor.offsetBy(rank: -1, file: 2))
+        
+        // Bottom
+        cursors.append(cursor.offsetBy(rank: -2, file: -1))
+        cursors.append(cursor.offsetBy(rank: -2, file: 1))
+        
+        // Left
+        cursors.append(cursor.offsetBy(rank: 1, file: -2))
+        cursors.append(cursor.offsetBy(rank: -1, file: -2))
+        
+        return cursors
+    }
+    
     typealias DirectionsType = [(Int, Int)]
     
     var bishopDirections: DirectionsType {

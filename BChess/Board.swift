@@ -209,13 +209,15 @@ extension Cursor: CustomStringConvertible {
 
 struct BoardIterator: IteratorProtocol {
 
+    let board: Board
     var cursor: Cursor
     
-    init(cursor: Cursor) {
+    init(board: Board, cursor: Cursor) {
+        self.board = board
         self.cursor = cursor
     }
     
-    mutating func next() -> Cursor? {
+    mutating func next() -> (Piece, Cursor)? {
         cursor.file += 1
         if cursor.file > 7 {
             cursor.file = 0
@@ -224,14 +226,14 @@ struct BoardIterator: IteratorProtocol {
                 return nil
             }
         }
-        return cursor
+        return (board[cursor], cursor)
     }
 }
 
 extension Board: Sequence {
 
     func makeIterator() -> BoardIterator {
-        return BoardIterator(cursor: Cursor(rank: 0, file: 0))
+        return BoardIterator(board: self, cursor: Cursor(rank: 0, file: 0))
     }
     
     func move(from c1: Cursor, to c2: Cursor) -> Board {
@@ -239,6 +241,63 @@ extension Board: Sequence {
         newBoard[c2] = newBoard[c1]
         newBoard[c1] = Piece.empty()
         return newBoard
+    }
+
+    func isCheck(color: Color) -> Bool {
+        // Find the king
+        for (piece, cursor) in self {
+            guard piece.type == .king && piece.color == color else {
+                continue
+            }
+            
+            // Find out if the king is attacked
+            return isAttacked(cursor: cursor)
+        }
+        
+        return false
+    }
+    
+    func isAttacked(cursor: Cursor) -> Bool {
+        let piece = self[cursor]
+        let color = piece.color
+        let attackingColor = piece.color.inverse()
+        
+        if color == .white {
+            // Is piece attacked by black pawns?
+        } else {
+            // Is piece attacked by white pawns?
+            if pawn(at: cursor.offsetBy(rank: -1, file: -1), color: attackingColor) {
+                return true
+            }
+            if pawn(at: cursor.offsetBy(rank: -1, file: 1), color: attackingColor) {
+                return true
+            }
+        }
+
+        // Attacked by knight?
+        let knightCursors = MoveGenerator.knightCursors(at: cursor)
+        for cursor in knightCursors {
+            if cursor.isValid && knight(at: cursor, color: attackingColor) {
+                return true
+            }
+        }
+
+        // Attacked by bishop, rook or queen?
+        
+        return false
+    }
+    
+    func pawn(at cursor: Cursor, color: Color) -> Bool {
+        return piece(at: cursor, type: .pawn, color: color)
+    }
+    
+    func knight(at cursor: Cursor, color: Color) -> Bool {
+        return piece(at: cursor, type: .knight, color: color)
+    }
+
+    func piece(at cursor: Cursor, type: PieceType, color: Color) -> Bool {
+        let piece = self[cursor]
+        return piece.type == type && piece.color == color
     }
 
 }

@@ -77,7 +77,7 @@ class Minimax {
         var bestMove = EvaluatedMove(move: nil, value: evaluater.startValue)
         for move in moves {
             let board = board.move(from: move.from, to: move.to)
-            if depth < 1 {
+            if depth < 3 {
                 // We haven't reached the final depth yet, so continue to evaluate each position
                 let evaluation = evaluate(board: board, color: color.inverse(), depth: depth+1, evaluater: evaluater.inverse)
                 if evaluater.isBestValue(current: bestMove.value, new: evaluation.value) {
@@ -96,8 +96,7 @@ class Minimax {
     
     func evaluatePosition(board: Board, color: Color) -> Int {
         var piecesValue = 0
-        for cursor in board {
-            let piece = board[cursor]
+        for (piece, _) in board {
             if piece.isEmpty {
                 continue
             }
