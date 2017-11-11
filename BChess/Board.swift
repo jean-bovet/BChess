@@ -39,11 +39,36 @@ func ==(lhs: Piece, rhs: Piece) -> Bool {
 struct Piece: CustomStringConvertible {
     let type: PieceType
     let color: Color
+
+    var white: Bool {
+        return color == .white
+    }
     
     var description: String {
         return "\(type) \(color)"
     }
 
+    var unicodeString: String {
+        let pieceName: String
+        switch type {
+        case .none:
+            pieceName = "."
+        case .pawn:
+            pieceName = white ? "♙" : "♟"
+        case .rook:
+            pieceName = white ? "♖" : "♜"
+        case .knight:
+            pieceName = white ? "♘" : "♞"
+        case .bishop:
+            pieceName = white ? "♗" : "♝"
+        case .queen:
+            pieceName = white ? "♕" : "♛"
+        case .king:
+            pieceName = white ? "♔" : "♚"
+        }
+        return pieceName
+    }
+    
     var fenString: String {
         let pieceName: String
         switch type {
@@ -66,6 +91,25 @@ struct Piece: CustomStringConvertible {
             return pieceName.uppercased()
         } else {
             return pieceName
+        }
+    }
+    
+    var value: Int {
+        switch type {
+        case .none:
+            return 0
+        case .pawn:
+            return 1
+        case .rook:
+            return 5
+        case .knight:
+            return 3
+        case .bishop:
+            return 3
+        case .queen:
+            return 9
+        case .king:
+            return 0
         }
     }
     
@@ -105,7 +149,8 @@ struct Board: CustomStringConvertible {
         for rank in (0...7).reversed() {
             for file in 0...7 {
                 let piece = self[rank, file]
-                text += piece.fenString
+//                text += piece.fenString
+                text += piece.unicodeString
             }
             text += "\n"
         }
@@ -131,8 +176,64 @@ struct Cursor {
     }
 }
 
-extension Board {
+func letter(forFile file: Int) -> String {
+    switch file {
+    case 0:
+        return "a"
+    case 1:
+        return "b"
+    case 2:
+        return "c"
+    case 3:
+        return "d"
+    case 4:
+        return "e"
+    case 5:
+        return "f"
+    case 6:
+        return "g"
+    case 7:
+        return "h"
+    default:
+        return "?"
+    }
+}
 
+extension Cursor: CustomStringConvertible {
+    
+    var description: String {
+        let fileLetter = letter(forFile: file)
+        return "\(fileLetter)\(rank+1)"
+    }
+}
+
+struct BoardIterator: IteratorProtocol {
+
+    var cursor: Cursor
+    
+    init(cursor: Cursor) {
+        self.cursor = cursor
+    }
+    
+    mutating func next() -> Cursor? {
+        cursor.file += 1
+        if cursor.file > 7 {
+            cursor.file = 0
+            cursor.rank += 1
+            if cursor.rank > 7 {
+                return nil
+            }
+        }
+        return cursor
+    }
+}
+
+extension Board: Sequence {
+
+    func makeIterator() -> BoardIterator {
+        return BoardIterator(cursor: Cursor(rank: 0, file: 0))
+    }
+    
     func move(from c1: Cursor, to c2: Cursor) -> Board {
         var newBoard = Board(cells: Array(cells))
         newBoard[c2] = newBoard[c1]

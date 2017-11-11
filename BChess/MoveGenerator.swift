@@ -10,32 +10,32 @@ import Foundation
 
 class MoveGenerator {
     
-    func generateMoves(board: Board, color: Color) -> [Board] {
-        var boards = [Board]()
+    func generateMoves(board: Board, color: Color) -> [Move] {
+        var moves = [Move]()
         for rank in 0...7 {
             for file in 0...7 {
                 let piece = board[rank, file]
-                if piece.color == color {
-                    boards.append(contentsOf: generateMoves(board: board, color: color, cursor: Cursor(rank: rank, file: file)))
+                if !piece.isEmpty && piece.color == color {
+                    moves.append(contentsOf: generateMoves(board: board, color: color, cursor: Cursor(rank: rank, file: file)))
                 }
             }
         }
-        return boards
+        return moves
     }
     
-    func generateMoves(board: Board, color: Color, cursor: Cursor) -> [Board] {
-        var boards = [Board]()
+    func generateMoves(board: Board, color: Color, cursor: Cursor) -> [Move] {
+        var moves = [Move]()
         let cursors = generateMoves(board: board, cursor: cursor, color: color)
         for c in cursors {
-            boards.append(board.move(from: cursor, to: c))
+            moves.append(Move(from: cursor, to: c))
         }
-        return boards
+        return moves
     }
 
     func generateMoves(board: Board, cursor: Cursor, color: Color) -> [Cursor] {
         switch board[cursor].type {
-//        case .pawn:
-//            return generatePawnCursors(board: board, cursor: cursor, color: color)
+        case .pawn:
+            return generatePawnCursors(board: board, cursor: cursor, color: color)
         case .bishop:
             return generateBishopCursors(board: board, cursor: cursor, color: color)
         case .rook:
@@ -44,8 +44,9 @@ class MoveGenerator {
             return generateQueenCursors(board: board, cursor: cursor, color: color)
         case .king:
             return generateKingCursors(board: board, cursor: cursor, color: color)
-        default:
-            print("Unknown moves")
+        case .knight:
+            return generateKnightCursors(board: board, cursor: cursor, color: color)
+        case .none:
             return []
         }
     }
@@ -53,15 +54,43 @@ class MoveGenerator {
     func generatePawnCursors(board: Board, cursor: Cursor, color: Color) -> [Cursor] {
         var cursors = [Cursor]()
         if color == .white {
-            cursors.append(cursor.offsetBy(rank: 1), board: board, color: color)
-            cursors.append(cursor.offsetBy(rank: 2), board: board, color: color)
+            cursors.append(cursor.offsetBy(rank: 1, file: -1), board: board, color: color, canEat: true, onlyEat: true)
+            cursors.append(cursor.offsetBy(rank: 1, file: 1), board: board, color: color, canEat: true, onlyEat: true)
+
+            cursors.append(cursor.offsetBy(rank: 1), board: board, color: color, canEat: false, onlyEat: false)
+            cursors.append(cursor.offsetBy(rank: 2), board: board, color: color, canEat: false, onlyEat: false)
         } else {
-            cursors.append(cursor.offsetBy(rank: -1), board: board, color: color)
-            cursors.append(cursor.offsetBy(rank: -2), board: board, color: color)
+            cursors.append(cursor.offsetBy(rank: -1, file: -1), board: board, color: color, canEat: true, onlyEat: true)
+            cursors.append(cursor.offsetBy(rank: -1, file: 1), board: board, color: color, canEat: true, onlyEat: true)
+
+            cursors.append(cursor.offsetBy(rank: -1), board: board, color: color, canEat: false, onlyEat: false)
+            cursors.append(cursor.offsetBy(rank: -2), board: board, color: color, canEat: false, onlyEat: false)
         }
         return cursors
     }
-    
+
+    func generateKnightCursors(board: Board, cursor: Cursor, color: Color) -> [Cursor] {
+        var cursors = [Cursor]()
+        
+        // Top
+        cursors.append(cursor.offsetBy(rank: 2, file: -1), board: board, color: color)
+        cursors.append(cursor.offsetBy(rank: 2, file: 1), board: board, color: color)
+
+        // Right
+        cursors.append(cursor.offsetBy(rank: 1, file: 2), board: board, color: color)
+        cursors.append(cursor.offsetBy(rank: -1, file: 2), board: board, color: color)
+
+        // Bottom
+        cursors.append(cursor.offsetBy(rank: -2, file: -1), board: board, color: color)
+        cursors.append(cursor.offsetBy(rank: -2, file: 1), board: board, color: color)
+
+        // Left
+        cursors.append(cursor.offsetBy(rank: 1, file: -2), board: board, color: color)
+        cursors.append(cursor.offsetBy(rank: -1, file: -2), board: board, color: color)
+
+        return cursors
+    }
+
     typealias DirectionsType = [(Int, Int)]
     
     var bishopDirections: DirectionsType {
@@ -109,24 +138,29 @@ class MoveGenerator {
 
 }
 
+enum MoveConstraint {
+    case canEat
+    case onlyEat
+}
+
 extension Array where Iterator.Element == Cursor {
     
     // Returns true if the square was empty before moving the piece there
     // which indicates the move generation can certainly continue for
     // bishop, rook and queen.
-    @discardableResult mutating func append(_ c: Cursor, board: Board, color: Color) -> Bool {
+    @discardableResult mutating func append(_ c: Cursor, board: Board, color: Color, canEat: Bool = true, onlyEat: Bool = false) -> Bool {
         guard c.isValid else {
             return false
         }
                 
         let piece = board[c]
         
-        if piece.isEmpty {
+        if piece.isEmpty && !onlyEat {
             append(c)
             return true
         }
         
-        if piece.color == color.inverse() {
+        if piece.color == color.inverse() && (canEat || onlyEat) {
             append(c)
             return false
         }
