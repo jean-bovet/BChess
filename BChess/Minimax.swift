@@ -67,31 +67,35 @@ struct EvaluatedMove: CustomStringConvertible {
 
 class Minimax {
     
-    func bestMove(board: Board, color: Color) -> EvaluatedMove {
+    func bestMove(board: Board, color: Color) -> (EvaluatedMove, [Move]) {
         return evaluate(board: board, color: color, depth: 1, evaluater: .Maximize)
     }
     
-    func evaluate(board: Board, color: Color, depth: Int, evaluater: Evaluater) -> EvaluatedMove {
+    func evaluate(board: Board, color: Color, depth: Int, evaluater: Evaluater) -> (EvaluatedMove, [Move]) {
         let generator = MoveGenerator()
         let moves = generator.generateMoves(board: board, color: color)
         var bestMove = EvaluatedMove(move: nil, value: evaluater.startValue)
+        var bestLine = [Move]()
         for move in moves {
             let board = board.move(from: move.from, to: move.to)
             if depth < 3 {
                 // We haven't reached the final depth yet, so continue to evaluate each position
-                let evaluation = evaluate(board: board, color: color.inverse(), depth: depth+1, evaluater: evaluater.inverse)
+                let (evaluation, line) = evaluate(board: board, color: color.inverse(), depth: depth+1, evaluater: evaluater.inverse)
                 if evaluater.isBestValue(current: bestMove.value, new: evaluation.value) {
                     bestMove = EvaluatedMove(move: move, value: evaluation.value)
+                    bestLine = [move] + line
                 }
+//                print("Depth \(depth), \(evaluater), \(move), \(evaluation.value)")
             } else {
                 // We reached the leaf nodes, let's evaluate each of them to determine the best one
                 let boardValue = evaluatePosition(board: board, color: color)
                 if evaluater.isBestValue(current: bestMove.value, new: boardValue) {
                     bestMove = EvaluatedMove(move: move, value: boardValue)
+                    bestLine = [move]
                 }
             }
         }
-        return bestMove
+        return (bestMove, bestLine)
     }
     
     func evaluatePosition(board: Board, color: Color) -> Int {

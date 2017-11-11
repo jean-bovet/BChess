@@ -38,8 +38,8 @@ func evaluate(fen: String) {
     if let board = parser.parse() {
         let minimax = Minimax()
         let eval = minimax.evaluatePosition(board: board, color: .white)
-        let move = minimax.bestMove(board: board, color: .white)
-        print("Eval is \(eval) for current position. Best move is \(move)")
+        let (move, line) = minimax.bestMove(board: board, color: .white)
+        print("Eval is \(eval) for current position. Best move is \(move) with \(line)")
     }
 }
 
