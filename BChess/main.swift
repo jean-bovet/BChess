@@ -23,8 +23,7 @@ func write(_ what: String) {
 func generateMoves(fen: String) {
     let parser = FENParser(fen: fen)
     if let board = parser.parse() {
-        let generator = MoveGenerator()
-        let moves = generator.generateMoves(board: board, color: .white)
+        let moves = MoveGenerator.generateMoves(board: board, color: .white)
         
         for move in moves {
             let newBoard = board.move(move: move)
@@ -36,8 +35,8 @@ func generateMoves(fen: String) {
 func evaluate(fen: String) {
     let parser = FENParser(fen: fen)
     if let board = parser.parse() {
-        let minimax = Minimax()
-        let evaluation = minimax.bestMove(board: board, color: .white)
+        let minimax = Analysis()
+        let evaluation = minimax.searchBestMove(board: board, color: .white)
         
 //        print(board)
 //        

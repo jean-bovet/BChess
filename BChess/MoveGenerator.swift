@@ -10,7 +10,7 @@ import Foundation
 
 class MoveGenerator {
     
-    func generateMoves(board: Board, color: Color) -> [Move] {
+    static func generateMoves(board: Board, color: Color) -> [Move] {
         var moves = [Move]()
         for (piece, cursor) in board {
             if !piece.isEmpty && piece.color == color {
@@ -20,7 +20,7 @@ class MoveGenerator {
         return moves
     }
     
-    func generateMoves(board: Board, color: Color, cursor: Coordinate) -> [Move] {
+    static func generateMoves(board: Board, color: Color, cursor: Coordinate) -> [Move] {
         var moves = [Move]()
         let cursors = generateMoves(board: board, cursor: cursor, color: color)
         for c in cursors {
@@ -36,7 +36,7 @@ class MoveGenerator {
         return moves
     }
 
-    func generateMoves(board: Board, cursor: Coordinate, color: Color) -> [Coordinate] {
+    static func generateMoves(board: Board, cursor: Coordinate, color: Color) -> [Coordinate] {
         switch board[cursor].type {
         case .pawn:
             return generatePawnCursors(board: board, cursor: cursor, color: color)
@@ -55,7 +55,7 @@ class MoveGenerator {
         }
     }
     
-    func generatePawnCursors(board: Board, cursor: Coordinate, color: Color) -> [Coordinate] {
+    static func generatePawnCursors(board: Board, cursor: Coordinate, color: Color) -> [Coordinate] {
         var cursors = [Coordinate]()
         if color == .white {
             cursors.append(cursor.offsetBy(rank: 1, file: -1), board: board, color: color, canEat: true, onlyEat: true)
@@ -73,7 +73,7 @@ class MoveGenerator {
         return cursors
     }
 
-    func generateKnightCursors(board: Board, cursor: Coordinate, color: Color) -> [Coordinate] {
+    static func generateKnightCursors(board: Board, cursor: Coordinate, color: Color) -> [Coordinate] {
         var cursors = [Coordinate]()
 
         for cursor in MoveGenerator.knightCursors(at: cursor) {
@@ -107,37 +107,37 @@ class MoveGenerator {
     
     typealias DirectionsType = [(Int, Int)]
     
-    var bishopDirections: DirectionsType {
+    static var bishopDirections: DirectionsType {
         return [ (-1, -1), (1, -1),
                  (-1, 1), (1, 1) ]
     }
 
-    var rookDirections: DirectionsType {
+    static var rookDirections: DirectionsType {
         return [ (-1, 0), (0, 1),
                  (1, 0), (0, -1) ]
     }
 
-    var queenDirections: DirectionsType {
+    static var queenDirections: DirectionsType {
         return bishopDirections + rookDirections
     }
     
-    func generateBishopCursors(board: Board, cursor: Coordinate, color: Color) -> [Coordinate] {
+    static func generateBishopCursors(board: Board, cursor: Coordinate, color: Color) -> [Coordinate] {
         return generateCursors(forDirections: bishopDirections, board: board, cursor: cursor, color: color)
     }
 
-    func generateRookCursors(board: Board, cursor: Coordinate, color: Color) -> [Coordinate] {
+    static func generateRookCursors(board: Board, cursor: Coordinate, color: Color) -> [Coordinate] {
         return generateCursors(forDirections: rookDirections, board: board, cursor: cursor, color: color)
     }
     
-    func generateQueenCursors(board: Board, cursor: Coordinate, color: Color) -> [Coordinate] {
+    static func generateQueenCursors(board: Board, cursor: Coordinate, color: Color) -> [Coordinate] {
         return generateCursors(forDirections: queenDirections, board: board, cursor: cursor, color: color)
     }
 
-    func generateKingCursors(board: Board, cursor: Coordinate, color: Color) -> [Coordinate] {
+    static func generateKingCursors(board: Board, cursor: Coordinate, color: Color) -> [Coordinate] {
         return generateCursors(forDirections: queenDirections, board: board, cursor: cursor, color: color, length: 1)
     }
 
-    func generateCursors(forDirections directions: DirectionsType, board: Board, cursor: Coordinate, color: Color, length: Int = Board.size) -> [Coordinate] {
+    static func generateCursors(forDirections directions: DirectionsType, board: Board, cursor: Coordinate, color: Color, length: Int = Board.size) -> [Coordinate] {
         var cursors = [Coordinate]()
         for (dx, dy) in directions {
             for distance in 1...length {

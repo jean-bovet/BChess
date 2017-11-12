@@ -50,16 +50,20 @@ struct Evaluation: CustomStringConvertible {
     }
 }
 
-class Minimax {
+// Minim algorithm with alpha-beta pruning and iterative deepening first search
+// http://www.geeksforgeeks.org/minimax-algorithm-in-game-theory-set-1-introduction/
+// http://www.geeksforgeeks.org/minimax-algorithm-in-game-theory-set-4-alpha-beta-pruning/
+// https://en.wikipedia.org/wiki/Iterative_deepening_depth-first_search
+class Analysis {
     
     var evaluateCount = 0
     
-    func bestMove(board: Board, color: Color) -> Evaluation {
+    func searchBestMove(board: Board, color: Color) -> Evaluation {
         // minimax(0, 0, true, -INFINITY, +INFINITY)
         var evaluation = Evaluation(move: Move.invalid(), value: 0, line: [])
         for maxDepth in 2...7 {
             evaluateCount = 0
-            let now = DispatchTime.now()
+            let before = DispatchTime.now()
             evaluation = evaluate(board: board,
                                   color: color,
                                   depth: 1,
@@ -69,7 +73,8 @@ class Minimax {
                                   alpha: Int.min,
                                   beta: Int.max)
             let after = DispatchTime.now()
-            let diff = after.uptimeNanoseconds - now.uptimeNanoseconds
+            
+            let diff = after.uptimeNanoseconds - before.uptimeNanoseconds
             let movesPerSingleNanosecond = Double(evaluateCount) / Double(diff)
             let movesPerSecond = Int(movesPerSingleNanosecond * 1e9)
             print("Best move is \(evaluation.move) with \(evaluation.line) and \(evaluateCount) moves evaluated in \(movesPerSecond) move/sec")
@@ -77,9 +82,6 @@ class Minimax {
         return evaluation
     }
     
-    // Minim algorithm with alpha-beta pruning
-    // http://www.geeksforgeeks.org/minimax-algorithm-in-game-theory-set-1-introduction/
-    // http://www.geeksforgeeks.org/minimax-algorithm-in-game-theory-set-4-alpha-beta-pruning/
     func evaluate(board: Board,
                   color: Color,
                   depth: Int,
@@ -93,18 +95,21 @@ class Minimax {
         var alpha = _alpha
         var beta = _beta
         
-        let generator = MoveGenerator()
-        var moves = generator.generateMoves(board: board, color: color)
-
+        let moves = MoveGenerator.generateMoves(board: board, color: color)
+        var lineMove: Move? = nil
+        
         if depth - 1 < line.count {
-            let lineMove = line[depth - 1]
-            if evaluateAlphaBeta(board, lineMove, color, depth, maxDepth, evaluater, line, &alpha, &beta, &bestEvaluation) {
+            lineMove = line[depth - 1]
+            if evaluateAlphaBeta(board, lineMove!, color, depth, maxDepth, evaluater, line, &alpha, &beta, &bestEvaluation) {
                 return bestEvaluation
             }
-            moves = moves.filter({ $0 != lineMove })
         }
         
         for move in moves {
+            guard move != lineMove else {
+                continue
+            }
+            
             if evaluateAlphaBeta(board, move, color, depth, maxDepth, evaluater, [], &alpha, &beta, &bestEvaluation) {
                 break
             }
@@ -122,13 +127,15 @@ class Minimax {
                            _ alpha: inout Int,
                            _ beta: inout Int,
                            _ bestEvaluation: inout Evaluation) -> Bool {
-        
+
         if depth == maxDepth {
-            let boardValue = evaluatePosition(board: board, color: .white)
+            let boardValue = positionEvaluation(board: board, color: .white)
             bestEvaluation = Evaluation(move: move, value: boardValue, line: [])
             return true
         }
-        
+
+        evaluateCount += 1
+
         let board = board.move(move: move)
         let evaluation = evaluate(board: board,
                                   color: color.opposite,
@@ -153,9 +160,7 @@ class Minimax {
         return beta <= alpha
     }
     
-    func evaluatePosition(board: Board, color: Color) -> Int {
-        evaluateCount += 1
-        
+    func positionEvaluation(board: Board, color: Color) -> Int {
         var piecesValue = 0
         for (piece, _) in board {
             if piece.isEmpty {
