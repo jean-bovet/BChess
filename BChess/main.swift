@@ -39,13 +39,13 @@ func evaluate(fen: String) {
         let minimax = Minimax()
         let evaluation = minimax.bestMove(board: board, color: .white)
         
-        print(board)
-        
-        var lineBoard = board
-        for move in evaluation.line {
-            lineBoard = lineBoard.move(move: move)
-            print(lineBoard)
-        }
+//        print(board)
+//        
+//        var lineBoard = board
+//        for move in evaluation.line {
+//            lineBoard = lineBoard.move(move: move)
+//            print(lineBoard)
+//        }
         
         print("Best move is \(evaluation.move) with \(evaluation.line) and \(minimax.evaluateCount) moves evaluated.")
     }

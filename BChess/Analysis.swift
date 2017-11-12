@@ -53,79 +53,88 @@ struct Evaluation: CustomStringConvertible {
 class Minimax {
     
     var evaluateCount = 0
-
+    
     func bestMove(board: Board, color: Color) -> Evaluation {
         // minimax(0, 0, true, -INFINITY, +INFINITY)
         var evaluation = Evaluation(move: Move.invalid(), value: 0, line: [])
         for maxDepth in 2...7 {
             evaluateCount = 0
+            let now = DispatchTime.now()
             evaluation = evaluate(board: board,
                                   color: color,
                                   depth: 1,
                                   maxDepth: maxDepth,
                                   evaluater: .Maximize,
-                                  move: Move.invalid(),
                                   line: evaluation.line,
                                   alpha: Int.min,
                                   beta: Int.max)
-            print("Best move is \(evaluation.move) with \(evaluation.line) and \(evaluateCount) moves evaluated.")
+            let after = DispatchTime.now()
+            let diff = after.uptimeNanoseconds - now.uptimeNanoseconds
+            let movesPerSingleNanosecond = Double(evaluateCount) / Double(diff)
+            let movesPerSecond = Int(movesPerSingleNanosecond * 1e9)
+            print("Best move is \(evaluation.move) with \(evaluation.line) and \(evaluateCount) moves evaluated in \(movesPerSecond) move/sec")
         }
         return evaluation
     }
-
+    
     // Minim algorithm with alpha-beta pruning
     // http://www.geeksforgeeks.org/minimax-algorithm-in-game-theory-set-1-introduction/
     // http://www.geeksforgeeks.org/minimax-algorithm-in-game-theory-set-4-alpha-beta-pruning/
-    func evaluate(board: Board, color: Color, depth: Int, maxDepth: Int, evaluater: Evaluater, move: Move, line: [Move], alpha _alpha: Int, beta _beta: Int) -> Evaluation {
-        if depth == maxDepth {
-            let boardValue = evaluatePosition(board: board, color: .white)
-            return Evaluation(move: move, value: boardValue, line: [])
-        }
+    func evaluate(board: Board,
+                  color: Color,
+                  depth: Int,
+                  maxDepth: Int,
+                  evaluater: Evaluater,
+                  line: [Move],
+                  alpha _alpha: Int,
+                  beta _beta: Int) -> Evaluation {
         
-        var moves = generateMoves(board: board, color: color, line: line, depth: depth)
         var bestEvaluation = Evaluation(move: Move.invalid(), value: evaluater.startValue, line: [])
         var alpha = _alpha
         var beta = _beta
         
+        let generator = MoveGenerator()
+        var moves = generator.generateMoves(board: board, color: color)
+
         if depth - 1 < line.count {
             let lineMove = line[depth - 1]
-            evaluate(board, lineMove, color, depth, maxDepth, evaluater, line, &alpha, &beta, &bestEvaluation)
-            moves = moves.filter({ $0 != lineMove })
-            if beta <= alpha {
+            if evaluateAlphaBeta(board, lineMove, color, depth, maxDepth, evaluater, line, &alpha, &beta, &bestEvaluation) {
                 return bestEvaluation
             }
+            moves = moves.filter({ $0 != lineMove })
         }
-
+        
         for move in moves {
-            evaluate(board, move, color, depth, maxDepth, evaluater, [], &alpha, &beta, &bestEvaluation)
-            
-            if beta <= alpha {
+            if evaluateAlphaBeta(board, move, color, depth, maxDepth, evaluater, [], &alpha, &beta, &bestEvaluation) {
                 break
             }
         }
         return bestEvaluation
     }
     
-    func generateMoves(board: Board, color: Color, line: [Move], depth: Int) -> [Move] {
-        let generator = MoveGenerator()
-        let moves = generator.generateMoves(board: board, color: color)
-            
-        if depth - 1 < line.count {
-            let lineMove = line[depth - 1]
-            return [lineMove] + moves.filter({ $0 != lineMove })
-        } else {
-            return moves
+    func evaluateAlphaBeta(_ board: Board,
+                           _ move: Move,
+                           _ color: Color,
+                           _ depth: Int,
+                           _ maxDepth: Int,
+                           _ evaluater: Evaluater,
+                           _ line: [Move],
+                           _ alpha: inout Int,
+                           _ beta: inout Int,
+                           _ bestEvaluation: inout Evaluation) -> Bool {
+        
+        if depth == maxDepth {
+            let boardValue = evaluatePosition(board: board, color: .white)
+            bestEvaluation = Evaluation(move: move, value: boardValue, line: [])
+            return true
         }
-    }
-    
-    func evaluate(_ board: Board, _ move: Move, _ color: Color, _ depth: Int, _ maxDepth: Int, _ evaluater: Evaluater, _ line: [Move], _ alpha: inout Int, _ beta: inout Int, _ bestEvaluation: inout Evaluation) {
+        
         let board = board.move(move: move)
         let evaluation = evaluate(board: board,
                                   color: color.opposite,
                                   depth: depth+1,
                                   maxDepth: maxDepth,
                                   evaluater: evaluater.inverse,
-                                  move: move,
                                   line: line,
                                   alpha: alpha,
                                   beta: beta)
@@ -139,6 +148,9 @@ class Minimax {
         } else {
             beta = min(beta, bestEvaluation.value)
         }
+        
+        // Returns true if the evaluation can stop because the best move has been found
+        return beta <= alpha
     }
     
     func evaluatePosition(board: Board, color: Color) -> Int {
@@ -158,5 +170,5 @@ class Minimax {
         }
         return piecesValue
     }
-
+    
 }
