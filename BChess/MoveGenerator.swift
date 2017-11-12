@@ -14,17 +14,17 @@ class MoveGenerator {
         var moves = [Move]()
         for (piece, cursor) in board {
             if !piece.isEmpty && piece.color == color {
-                moves.append(contentsOf: generateMoves(board: board, color: color, cursor: cursor))
+                moves.append(contentsOf: generateMoves(board: board, color: color, position: cursor))
             }
         }
         return moves
     }
     
-    static func generateMoves(board: Board, color: Color, cursor: Coordinate) -> [Move] {
+    static func generateMoves(board: Board, color: Color, position: Coordinate) -> [Move] {
         var moves = [Move]()
-        let cursors = generateMoves(board: board, cursor: cursor, color: color)
-        for c in cursors {
-            let move = Move(from: cursor, to: c)
+        let coordinates = generateMoves(board: board, cursor: position, color: color)
+        for coordinate in coordinates {
+            let move = Move(from: position, to: coordinate)
             // The new position should not have the king in check (of the color that is moving)
             let board = board.move(move: move)
             if board.isCheck(color: color) {
@@ -62,13 +62,17 @@ class MoveGenerator {
             cursors.append(cursor.offsetBy(rank: 1, file: 1), board: board, color: color, canEat: true, onlyEat: true)
 
             cursors.append(cursor.offsetBy(rank: 1), board: board, color: color, canEat: false, onlyEat: false)
-            cursors.append(cursor.offsetBy(rank: 2), board: board, color: color, canEat: false, onlyEat: false)
+            if cursor.rank == 1 {
+                cursors.append(cursor.offsetBy(rank: 2), board: board, color: color, canEat: false, onlyEat: false)
+            }
         } else {
             cursors.append(cursor.offsetBy(rank: -1, file: -1), board: board, color: color, canEat: true, onlyEat: true)
             cursors.append(cursor.offsetBy(rank: -1, file: 1), board: board, color: color, canEat: true, onlyEat: true)
 
             cursors.append(cursor.offsetBy(rank: -1), board: board, color: color, canEat: false, onlyEat: false)
-            cursors.append(cursor.offsetBy(rank: -2), board: board, color: color, canEat: false, onlyEat: false)
+            if cursor.rank == 7 {
+                cursors.append(cursor.offsetBy(rank: -2), board: board, color: color, canEat: false, onlyEat: false)
+            }
         }
         return cursors
     }
@@ -95,12 +99,12 @@ class MoveGenerator {
         cursors.append(cursor.offsetBy(rank: -1, file: 2))
         
         // Bottom
-        cursors.append(cursor.offsetBy(rank: -2, file: -1))
         cursors.append(cursor.offsetBy(rank: -2, file: 1))
+        cursors.append(cursor.offsetBy(rank: -2, file: -1))
         
         // Left
-        cursors.append(cursor.offsetBy(rank: 1, file: -2))
         cursors.append(cursor.offsetBy(rank: -1, file: -2))
+        cursors.append(cursor.offsetBy(rank: 1, file: -2))
         
         return cursors
     }

@@ -84,4 +84,10 @@ class FENParser {
     }
 }
 
+extension String {
+    func board() -> Board? {
+        return FENParser(fen: self).parse()
+    }
+}
+
 let StartPosFEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"

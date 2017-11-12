@@ -47,6 +47,12 @@ struct Board: CustomStringConvertible {
 
 }
 
+extension Board: Equatable {
+    static func == (lhs: Board, rhs: Board) -> Bool {
+        return lhs.cells == rhs.cells
+    }
+}
+
 extension Board {
     
     func move(move: Move) -> Board {

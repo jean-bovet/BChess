@@ -8,10 +8,6 @@
 
 import Foundation
 
-func ==(lhs: Piece, rhs: Piece) -> Bool {
-    return lhs.type == rhs.type && lhs.color == rhs.color
-}
-
 struct Piece {
     let type: PieceType
     let color: Color
@@ -28,6 +24,12 @@ struct Piece {
         return Piece(type: .none, color: .white)
     }
 
+}
+
+extension Piece: Equatable {
+    static func ==(lhs: Piece, rhs: Piece) -> Bool {
+        return lhs.type == rhs.type && lhs.color == rhs.color
+    }
 }
 
 extension Piece: CustomStringConvertible {

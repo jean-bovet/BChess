@@ -7,6 +7,17 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		A7712D171FB916E900E7E802 /* BChessTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7712D161FB916E900E7E802 /* BChessTests.swift */; };
+		A7712D1C1FB9179300E7E802 /* Color.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7AFCCB81FB6CD3700AE3D85 /* Color.swift */; };
+		A7712D1D1FB9179300E7E802 /* PieceType.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7AFCCBA1FB6CD7800AE3D85 /* PieceType.swift */; };
+		A7712D1E1FB9179300E7E802 /* Piece.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7AFCCBC1FB6CDB000AE3D85 /* Piece.swift */; };
+		A7712D1F1FB9179300E7E802 /* Coordinate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7AFCCBE1FB6CE6B00AE3D85 /* Coordinate.swift */; };
+		A7712D201FB9179300E7E802 /* Move.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7AFCCC41FB6D01400AE3D85 /* Move.swift */; };
+		A7712D211FB9179500E7E802 /* Board.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7AFCCB21FB5091000AE3D85 /* Board.swift */; };
+		A7712D221FB9179500E7E802 /* BoardIterator.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7AFCCC21FB6CFCB00AE3D85 /* BoardIterator.swift */; };
+		A7712D231FB9179900E7E802 /* MoveGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7AFCCB41FB5170900AE3D85 /* MoveGenerator.swift */; };
+		A7712D241FB9179900E7E802 /* Analysis.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7AFCCB61FB62DBA00AE3D85 /* Analysis.swift */; };
+		A7712D261FB917DF00E7E802 /* FEN.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7AFCCC01FB6CE9E00AE3D85 /* FEN.swift */; };
 		A7AFCCAA1FB4E40D00AE3D85 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7AFCCA91FB4E40D00AE3D85 /* main.swift */; };
 		A7AFCCB11FB4E4DF00AE3D85 /* ConsoleUI.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7AFCCB01FB4E4DF00AE3D85 /* ConsoleUI.swift */; };
 		A7AFCCB31FB5091000AE3D85 /* Board.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7AFCCB21FB5091000AE3D85 /* Board.swift */; };
@@ -34,6 +45,9 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		A7712D141FB916E900E7E802 /* BChessTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BChessTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		A7712D161FB916E900E7E802 /* BChessTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BChessTests.swift; sourceTree = "<group>"; };
+		A7712D181FB916E900E7E802 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		A7AFCCA61FB4E40D00AE3D85 /* BChess */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = BChess; sourceTree = BUILT_PRODUCTS_DIR; };
 		A7AFCCA91FB4E40D00AE3D85 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		A7AFCCB01FB4E4DF00AE3D85 /* ConsoleUI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleUI.swift; sourceTree = "<group>"; };
@@ -50,6 +64,13 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		A7712D111FB916E900E7E802 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		A7AFCCA31FB4E40D00AE3D85 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -60,10 +81,20 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		A7712D151FB916E900E7E802 /* BChessTests */ = {
+			isa = PBXGroup;
+			children = (
+				A7712D161FB916E900E7E802 /* BChessTests.swift */,
+				A7712D181FB916E900E7E802 /* Info.plist */,
+			);
+			path = BChessTests;
+			sourceTree = "<group>";
+		};
 		A7AFCC9D1FB4E40D00AE3D85 = {
 			isa = PBXGroup;
 			children = (
 				A7AFCCA81FB4E40D00AE3D85 /* BChess */,
+				A7712D151FB916E900E7E802 /* BChessTests */,
 				A7AFCCA71FB4E40D00AE3D85 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -72,6 +103,7 @@
 			isa = PBXGroup;
 			children = (
 				A7AFCCA61FB4E40D00AE3D85 /* BChess */,
+				A7712D141FB916E900E7E802 /* BChessTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -83,9 +115,9 @@
 				A7AFCCB01FB4E4DF00AE3D85 /* ConsoleUI.swift */,
 				A7AFCCB41FB5170900AE3D85 /* MoveGenerator.swift */,
 				A7AFCCB61FB62DBA00AE3D85 /* Analysis.swift */,
+				A7AFCCC01FB6CE9E00AE3D85 /* FEN.swift */,
 				A7AFCCC71FB7CBE500AE3D85 /* Board */,
 				A7AFCCC61FB7CA6900AE3D85 /* Types */,
-				A7AFCCC01FB6CE9E00AE3D85 /* FEN.swift */,
 			);
 			path = BChess;
 			sourceTree = "<group>";
@@ -114,6 +146,23 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		A7712D131FB916E900E7E802 /* BChessTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A7712D191FB916E900E7E802 /* Build configuration list for PBXNativeTarget "BChessTests" */;
+			buildPhases = (
+				A7712D101FB916E900E7E802 /* Sources */,
+				A7712D111FB916E900E7E802 /* Frameworks */,
+				A7712D121FB916E900E7E802 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = BChessTests;
+			productName = BChessTests;
+			productReference = A7712D141FB916E900E7E802 /* BChessTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 		A7AFCCA51FB4E40D00AE3D85 /* BChess */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = A7AFCCAD1FB4E40D00AE3D85 /* Build configuration list for PBXNativeTarget "BChess" */;
@@ -141,6 +190,10 @@
 				LastUpgradeCheck = 0910;
 				ORGANIZATIONNAME = "Jean Bovet";
 				TargetAttributes = {
+					A7712D131FB916E900E7E802 = {
+						CreatedOnToolsVersion = 9.1;
+						ProvisioningStyle = Automatic;
+					};
 					A7AFCCA51FB4E40D00AE3D85 = {
 						CreatedOnToolsVersion = 9.1;
 						ProvisioningStyle = Automatic;
@@ -160,11 +213,40 @@
 			projectRoot = "";
 			targets = (
 				A7AFCCA51FB4E40D00AE3D85 /* BChess */,
+				A7712D131FB916E900E7E802 /* BChessTests */,
 			);
 		};
 /* End PBXProject section */
 
+/* Begin PBXResourcesBuildPhase section */
+		A7712D121FB916E900E7E802 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
+		A7712D101FB916E900E7E802 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A7712D221FB9179500E7E802 /* BoardIterator.swift in Sources */,
+				A7712D1E1FB9179300E7E802 /* Piece.swift in Sources */,
+				A7712D231FB9179900E7E802 /* MoveGenerator.swift in Sources */,
+				A7712D171FB916E900E7E802 /* BChessTests.swift in Sources */,
+				A7712D1D1FB9179300E7E802 /* PieceType.swift in Sources */,
+				A7712D1C1FB9179300E7E802 /* Color.swift in Sources */,
+				A7712D211FB9179500E7E802 /* Board.swift in Sources */,
+				A7712D201FB9179300E7E802 /* Move.swift in Sources */,
+				A7712D1F1FB9179300E7E802 /* Coordinate.swift in Sources */,
+				A7712D241FB9179900E7E802 /* Analysis.swift in Sources */,
+				A7712D261FB917DF00E7E802 /* FEN.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		A7AFCCA21FB4E40D00AE3D85 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -187,6 +269,34 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin XCBuildConfiguration section */
+		A7712D1A1FB916E900E7E802 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = 28XRU7S6GA;
+				INFOPLIST_FILE = BChessTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "ch.arizona-software.BChessTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 4.0;
+			};
+			name = Debug;
+		};
+		A7712D1B1FB916E900E7E802 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = 28XRU7S6GA;
+				INFOPLIST_FILE = BChessTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "ch.arizona-software.BChessTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 4.0;
+			};
+			name = Release;
+		};
 		A7AFCCAB1FB4E40D00AE3D85 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -316,6 +426,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		A7712D191FB916E900E7E802 /* Build configuration list for PBXNativeTarget "BChessTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A7712D1A1FB916E900E7E802 /* Debug */,
+				A7712D1B1FB916E900E7E802 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		A7AFCCA11FB4E40D00AE3D85 /* Build configuration list for PBXProject "BChess" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

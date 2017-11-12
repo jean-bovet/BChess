@@ -12,6 +12,8 @@ struct Coordinate {
     var rank = 0
     var file = 0
     
+    static let letters = ["a", "b", "c", "d", "e", "f", "g", "h"]
+
     func offsetBy(rank rankValue: Int) -> Coordinate {
         return offsetBy(rank: rankValue, file: 0)
     }
@@ -42,11 +44,30 @@ extension Coordinate: CustomStringConvertible {
     }
 }
 
+extension String {
+    var coordinate: Coordinate? {
+        guard count == 2 else {
+            return nil
+        }
+        
+        let fileIndex = self.index(self.startIndex, offsetBy: 0)
+        let rankIndex = self.index(self.startIndex, offsetBy: 1)
+
+        let file = Coordinate.letters.index(of: String(self[fileIndex]))
+        let rank = Int(String(self[rankIndex]))
+        
+        guard let f = file, let r = rank else {
+            return nil
+        }
+        
+        return Coordinate(rank: r - 1, file: f)
+    }
+}
+
 extension Int {
     var letter: String {
-        let letters = ["a", "b", "c", "d", "e", "f", "g", "h"]
-        if self >= 0 && self < letters.count {
-            return letters[self]
+        if self >= 0 && self < Coordinate.letters.count {
+            return Coordinate.letters[self]
         } else {
             return "?"
         }

@@ -34,7 +34,7 @@ struct BoardIterator: IteratorProtocol {
 extension Board: Sequence {
     
     func makeIterator() -> BoardIterator {
-        return BoardIterator(board: self, cursor: Coordinate(rank: 0, file: 0))
+        return BoardIterator(board: self, cursor: Coordinate(rank: 0, file: -1))
     }
 }
 
