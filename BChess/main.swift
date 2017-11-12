@@ -27,7 +27,7 @@ func generateMoves(fen: String) {
         let moves = generator.generateMoves(board: board, color: .white)
         
         for move in moves {
-            let newBoard = board.move(from: move.from, to: move.to)
+            let newBoard = board.move(move: move)
             print("\(newBoard)\n")
         }
     }
@@ -39,6 +39,14 @@ func evaluate(fen: String) {
         let minimax = Minimax()
         let evaluation = minimax.bestMove(board: board, color: .white)
         print("Best move is \(evaluation.move) with \(evaluation.line) and \(evaluation.moveCount) moves evaluated.")
+        
+        print(board)
+        
+        var lineBoard = board
+        for move in evaluation.line {
+            lineBoard = lineBoard.move(move: move)
+            print(lineBoard)
+        }
     }
 }
 
