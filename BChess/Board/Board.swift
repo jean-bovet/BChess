@@ -108,6 +108,9 @@ extension Board {
     }
 
     func piece(at cursor: Coordinate, type: PieceType, color: Color) -> Bool {
+        guard cursor.isValid else {
+            return false
+        }
         let piece = self[cursor]
         return piece.type == type && piece.color == color
     }

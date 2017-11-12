@@ -29,6 +29,12 @@ struct Coordinate {
     }
 }
 
+extension Coordinate: Equatable {
+    static func == (lhs: Coordinate, rhs: Coordinate) -> Bool {
+        return lhs.rank == rhs.rank && lhs.file == rhs.file
+    }
+}
+
 extension Coordinate: CustomStringConvertible {
     
     var description: String {

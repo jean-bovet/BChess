@@ -17,6 +17,12 @@ struct Move {
     }
 }
 
+extension Move: Equatable {
+    static func == (lhs: Move, rhs: Move) -> Bool {
+        return lhs.from == rhs.from && lhs.to == rhs.to
+    }
+}
+
 extension Move: CustomStringConvertible {
     
     var description: String {
