@@ -173,9 +173,13 @@ extension Array where Iterator.Element == Coordinate {
                 
         let piece = board[c]
         
-        if piece.isEmpty && !onlyEat {
-            append(c)
-            return true
+        if piece.isEmpty {
+            if onlyEat {
+                return false
+            } else {
+                append(c)
+                return true
+            }
         }
         
         if piece.color == color.opposite && (canEat || onlyEat) {

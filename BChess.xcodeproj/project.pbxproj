@@ -113,8 +113,8 @@
 			children = (
 				A7AFCCA91FB4E40D00AE3D85 /* main.swift */,
 				A7AFCCB01FB4E4DF00AE3D85 /* ConsoleUI.swift */,
-				A7AFCCB41FB5170900AE3D85 /* MoveGenerator.swift */,
 				A7AFCCB61FB62DBA00AE3D85 /* Analysis.swift */,
+				A7AFCCB41FB5170900AE3D85 /* MoveGenerator.swift */,
 				A7AFCCC01FB6CE9E00AE3D85 /* FEN.swift */,
 				A7AFCCC71FB7CBE500AE3D85 /* Board */,
 				A7AFCCC61FB7CA6900AE3D85 /* Types */,

@@ -48,6 +48,10 @@ struct Evaluation: CustomStringConvertible {
     var description: String {
         return "\(move)[\(value)]"
     }
+    
+    var lineInfo: String {
+        return line.map { $0.description }.joined(separator: " ")
+    }
 }
 
 // Minim algorithm with alpha-beta pruning and iterative deepening first search
@@ -57,17 +61,35 @@ struct Evaluation: CustomStringConvertible {
 class Analysis {
     
     var evaluateCount = 0
+    var analyze = false
     
-    func searchBestMove(board: Board, color: Color) -> Evaluation {
-        // minimax(0, 0, true, -INFINITY, +INFINITY)
+    struct Info {
+        let depth: Int
+        let time: Int
+        let evaluation: Evaluation
+        let nodeEvaluated: Int
+        let movesPerSecond: Int
+    }
+    
+    typealias SearchBestMoveCallback = (Info) -> Void
+    
+    func searchBestMove(board: Board, color: Color, maxDepth: Int, callback: SearchBestMoveCallback) -> Info {
+        analyze = true
+        
         var evaluation = Evaluation(move: Move.invalid(), value: 0, line: [])
-        for maxDepth in 2...7 {
+        var info = Info(depth: 0, time: 0, evaluation: evaluation, nodeEvaluated: 0, movesPerSecond: 0)
+        
+        for curMaxDepth in 2...maxDepth {
+            guard analyze else {
+                break
+            }
+            
             evaluateCount = 0
             let before = DispatchTime.now()
             evaluation = evaluate(board: board,
                                   color: color,
                                   depth: 1,
-                                  maxDepth: maxDepth,
+                                  maxDepth: curMaxDepth,
                                   evaluater: .Maximize,
                                   line: evaluation.line,
                                   alpha: Int.min,
@@ -77,9 +99,15 @@ class Analysis {
             let diff = after.uptimeNanoseconds - before.uptimeNanoseconds
             let movesPerSingleNanosecond = Double(evaluateCount) / Double(diff)
             let movesPerSecond = Int(movesPerSingleNanosecond * 1e9)
-            print("Best move is \(evaluation.move) with \(evaluation.line) and \(evaluateCount) moves evaluated in \(movesPerSecond) move/sec")
+            
+            info = Info(depth: curMaxDepth,
+                        time: Int(Double(diff)/1e9),
+                        evaluation: evaluation,
+                        nodeEvaluated: evaluateCount,
+                        movesPerSecond: movesPerSecond)
+            callback(info)
         }
-        return evaluation
+        return info
     }
     
     func evaluate(board: Board,
@@ -90,14 +118,18 @@ class Analysis {
                   line: [Move],
                   alpha _alpha: Int,
                   beta _beta: Int) -> Evaluation {
-        
         var bestEvaluation = Evaluation(move: Move.invalid(), value: evaluater.startValue, line: [])
+        
+        guard analyze else {
+            return bestEvaluation
+        }
+
         var alpha = _alpha
         var beta = _beta
         
         let moves = MoveGenerator.generateMoves(board: board, color: color)
         var lineMove: Move? = nil
-        
+
         if depth - 1 < line.count {
             lineMove = line[depth - 1]
             if evaluateAlphaBeta(board, lineMove!, color, depth, maxDepth, evaluater, line, &alpha, &beta, &bestEvaluation) {
@@ -106,6 +138,10 @@ class Analysis {
         }
         
         for move in moves {
+            guard analyze else {
+                break
+            }
+
             guard move != lineMove else {
                 continue
             }
@@ -114,6 +150,7 @@ class Analysis {
                 break
             }
         }
+        
         return bestEvaluation
     }
     
