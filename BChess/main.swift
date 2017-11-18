@@ -20,6 +20,7 @@ class UCI {
     
     let log: OSLog
     let minimax = Analysis()
+    var xcodeMode = false
     
     init() {
         log = OSLog(subsystem: "ch.arizona-software.BChess", category: "uci")
@@ -48,24 +49,37 @@ class UCI {
         }
     }
     
-    func evaluate(fen: String, depth: Int) {
+    func evaluate(fen: String, depth: Int, async: Bool = true) {
         let parser = FENParser(fen: fen)
         if let board = parser.parse() {
-            minimax.analyze = false
-            DispatchQueue.global(qos: .userInitiated).async { // 1
+            if xcodeMode {
+                print(board)
+            }
+            
+            minimax.analyzing = false
+            let evaluateBlock = {
                 let info = self.minimax.searchBestMove(board: board, color: .white, maxDepth: depth) { info in
                     // info depth 2 score cp 214 time 1242 nodes 2124 nps 34928 pv e2e4 e7e5 g1f3
                     // info depth 5 seldepth 29 time 5 nodes 13401 nps 2543 score cp -1 pv b1a3 a7b6 a2a4 a8a4
                     let message = info.uciInfoMessage
                     print(message)
-                    os_log("Info: %{public}@", log: self.log, message)
+                    if !self.xcodeMode {
+                        os_log("Info: %{public}@", log: self.log, message)
+                    }
                 }
                 
                 let message = info.uciInfoMessage
                 print(message)
-                os_log("Done: %{public}@", log: self.log, message)
+                if !self.xcodeMode {
+                    os_log("Done: %{public}@", log: self.log, message)
+                }
             }
             
+            if async {
+                DispatchQueue.global(qos: .userInitiated).async(execute: evaluateBlock)
+            } else {
+                evaluateBlock()
+            }
             //        print(board)
             //
             //        var lineBoard = board
@@ -80,11 +94,14 @@ class UCI {
 
     func run() {
         if CommandLine.arguments.count > 1 {
-            let arg = CommandLine.arguments[1]
+            var arg = CommandLine.arguments[1]
+            xcodeMode = arg == "xcode=true"
+            
+            arg = CommandLine.arguments[2]
             if arg.hasPrefix("fen=") {
-                evaluate(fen: "8/8/8/1q1k4/8/2P5/1N6/4K3 w - - 0 1", depth: 7)
+                evaluate(fen: "8/8/8/1q1k4/8/2P5/1N6/4K3 w - - 0 1", depth: 7, async: false)
             } else if arg == "go infinite" {
-                evaluate(fen: StartPosFEN, depth: Int.max)
+                evaluate(fen: StartPosFEN, depth: Int.max, async: false)
             }
             exit(0)
         }
@@ -116,10 +133,22 @@ class UCI {
                     evaluate(fen: StartPosFEN, depth: Int.max)
                     break
                 case "stop":
-                    minimax.analyze = false
+                    minimax.analyzing = false
                     break
                 default:
-                    write("Unknown command \(line)")
+                    let positionFen = "position fen"
+                    if line.hasPrefix(positionFen){
+                        // position fen 8/8/8/1q1k4/8/2P5/1N6/4K3 w - - 0 1
+                        let fenIndex = line.index(line.startIndex, offsetBy: positionFen.count)
+                        let fen = line[fenIndex...]
+                        evaluate(fen: String(fen), depth: Int.max)
+                    } else {
+                        if xcodeMode {
+                            write("Unknown command \(line)")
+                        } else {
+                            os_log("Unknown command: %{public}@", log: log, line)
+                        }
+                    }
                 }
             }
         }

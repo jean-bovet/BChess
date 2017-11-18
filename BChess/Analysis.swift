@@ -61,7 +61,7 @@ struct Evaluation: CustomStringConvertible {
 class Analysis {
     
     var evaluateCount = 0
-    var analyze = false
+    var analyzing = false
     
     struct Info {
         let depth: Int
@@ -74,13 +74,13 @@ class Analysis {
     typealias SearchBestMoveCallback = (Info) -> Void
     
     func searchBestMove(board: Board, color: Color, maxDepth: Int, callback: SearchBestMoveCallback) -> Info {
-        analyze = true
+        analyzing = true
         
         var evaluation = Evaluation(move: Move.invalid(), value: 0, line: [])
         var info = Info(depth: 0, time: 0, evaluation: evaluation, nodeEvaluated: 0, movesPerSecond: 0)
         
         for curMaxDepth in 2...maxDepth {
-            guard analyze else {
+            guard analyzing else {
                 break
             }
             
@@ -120,7 +120,7 @@ class Analysis {
                   beta _beta: Int) -> Evaluation {
         var bestEvaluation = Evaluation(move: Move.invalid(), value: evaluater.startValue, line: [])
         
-        guard analyze else {
+        guard analyzing else {
             return bestEvaluation
         }
 
@@ -138,7 +138,7 @@ class Analysis {
         }
         
         for move in moves {
-            guard analyze else {
+            guard analyzing else {
                 break
             }
 
@@ -166,7 +166,7 @@ class Analysis {
                            _ bestEvaluation: inout Evaluation) -> Bool {
 
         if depth == maxDepth {
-            let boardValue = positionEvaluation(board: board, color: .white)
+            let boardValue = Evaluate.evaluate(board: board, color: .white)
             bestEvaluation = Evaluation(move: move, value: boardValue, line: [])
             return true
         }
@@ -195,22 +195,6 @@ class Analysis {
         
         // Returns true if the evaluation can stop because the best move has been found
         return beta <= alpha
-    }
-    
-    func positionEvaluation(board: Board, color: Color) -> Int {
-        var piecesValue = 0
-        for (piece, _) in board {
-            if piece.isEmpty {
-                continue
-            }
-            
-            if piece.color == color {
-                piecesValue += piece.type.value
-            } else {
-                piecesValue -= piece.type.value
-            }
-        }
-        return piecesValue
     }
     
 }
