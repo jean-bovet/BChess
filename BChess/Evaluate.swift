@@ -28,6 +28,7 @@ class Evaluate {
         
         // Evaluate the number of pieces being attacked
         let attackingBonus = 3
+        let checkingBonus = 5
         let moves = MoveGenerator.generateMoves(board: board, color: color)
         for move in moves {
             let colorIsAttacking = board[move.from].color == color
@@ -42,10 +43,18 @@ class Evaluate {
             // Note: the move generator should already do that
             assert(targetSquare.color != color, "Target square should be of the opposite color")
             
-            if colorIsAttacking {
-                value += attackingBonus
+            if targetSquare.type == .king {
+                if colorIsAttacking {
+                    value += checkingBonus
+                } else {
+                    value -= checkingBonus
+                }
             } else {
-                value -= attackingBonus
+                if colorIsAttacking {
+                    value += attackingBonus
+                } else {
+                    value -= attackingBonus
+                }
             }
         }
         return value

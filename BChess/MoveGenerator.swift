@@ -10,25 +10,28 @@ import Foundation
 
 class MoveGenerator {
     
-    static func generateMoves(board: Board, color: Color) -> [Move] {
+    static func generateMoves(board: Board, color: Color, verifyCheck: Bool = true) -> [Move] {
         var moves = [Move]()
         for (piece, cursor) in board {
             if !piece.isEmpty && piece.color == color {
-                moves.append(contentsOf: generateMoves(board: board, color: color, position: cursor))
+                moves.append(contentsOf: generateMoves(board: board, color: color, position: cursor, verifyCheck: verifyCheck))
             }
         }
         return moves
     }
     
-    static func generateMoves(board: Board, color: Color, position: Coordinate) -> [Move] {
+    static func generateMoves(board: Board, color: Color, position: Coordinate, verifyCheck: Bool = true) -> [Move] {
         var moves = [Move]()
         let coordinates = generateMoves(board: board, cursor: position, color: color)
         for coordinate in coordinates {
             let move = Move(from: position, to: coordinate)
-            // The new position should not have the king in check (of the color that is moving)
-            let board = board.move(move: move)
-            if board.isCheck(color: color) {
-                continue // skip this position because the knight is still in check
+            
+            if verifyCheck {
+                // The new position should not have the king in check (of the color that is moving)
+                let board = board.move(move: move)
+                if board.isCheck(color: color) {
+                    continue // skip this position because the knight is still in check
+                }
             }
             
             moves.append(move)

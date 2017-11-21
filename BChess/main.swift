@@ -20,7 +20,10 @@ class UCI {
     
     let log: OSLog
     let minimax = Analysis()
+    
     var xcodeMode = false
+    
+    var positionFen = StartPosFEN
     
     init() {
         log = OSLog(subsystem: "ch.arizona-software.BChess", category: "uci")
@@ -99,7 +102,9 @@ class UCI {
             
             arg = CommandLine.arguments[2]
             if arg.hasPrefix("fen=") {
-                evaluate(fen: "8/8/8/1q1k4/8/2P5/1N6/4K3 w - - 0 1", depth: 7, async: false)
+                // Best move is rook to check the black king: 4k3/8/8/8/8/8/2R5/4K3 w - - 0 1
+                // Best move is the pawn to check both the queen and the king: 8/8/8/1q1k4/8/2P5/1N6/4K3 w - - 0 1
+                evaluate(fen: "4k3/8/8/8/8/8/2R5/4K3 w - - 0 1", depth: 7, async: false)
             } else if arg == "go infinite" {
                 evaluate(fen: StartPosFEN, depth: Int.max, async: false)
             }
@@ -124,24 +129,30 @@ class UCI {
                 case "quit":
                     exit(0)
                     break
+                    
                 case "isready":
                     write("readyok")
                     break
+                    
                 case "position startpos":
+                    positionFen = StartPosFEN
                     break
+                    
                 case "go infinite":
-                    evaluate(fen: StartPosFEN, depth: Int.max)
+                    evaluate(fen: positionFen, depth: Int.max)
                     break
+                    
                 case "stop":
                     minimax.analyzing = false
                     break
+                    
                 default:
-                    let positionFen = "position fen"
-                    if line.hasPrefix(positionFen){
+                    let cmd = "position fen"
+                    if line.hasPrefix(cmd){
                         // position fen 8/8/8/1q1k4/8/2P5/1N6/4K3 w - - 0 1
-                        let fenIndex = line.index(line.startIndex, offsetBy: positionFen.count)
+                        let fenIndex = line.index(line.startIndex, offsetBy: cmd.count)
                         let fen = line[fenIndex...]
-                        evaluate(fen: String(fen), depth: Int.max)
+                        positionFen = String(fen)
                     } else {
                         if xcodeMode {
                             write("Unknown command \(line)")

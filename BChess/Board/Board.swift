@@ -63,57 +63,15 @@ extension Board {
     }
 
     func isCheck(color: Color) -> Bool {
-        // Find the king
-        for (piece, cursor) in self {
+        let moves = MoveGenerator.generateMoves(board: self, color: color.opposite, verifyCheck: false)
+        for move in moves {
+            let piece = self[move.to]
             guard piece.type == .king && piece.color == color else {
                 continue
             }
-            
-            // Find out if the king is attacked
-            return isAttacked(cursor: cursor)
-        }
-        
-        return false
-    }
-    
-    func isAttacked(cursor: Coordinate) -> Bool {
-        let piece = self[cursor]
-        let color = piece.color
-        let attackingColor = piece.color.opposite        
-        if color == .white {
-            // Is piece attacked by black pawns?
-            if pawn(at: cursor.offsetBy(rank: 1, file: -1), color: attackingColor) {
-                return true
-            }
-            if pawn(at: cursor.offsetBy(rank: 1, file: 1), color: attackingColor) {
-                return true
-            }
-        } else {
-            // Is piece attacked by white pawns?
-            if pawn(at: cursor.offsetBy(rank: -1, file: -1), color: attackingColor) {
-                return true
-            }
-            if pawn(at: cursor.offsetBy(rank: -1, file: 1), color: attackingColor) {
-                return true
-            }
-        }
 
-        // Attacked by knight?
-        let knightCursors = MoveGenerator.knightCursors(at: cursor)
-        for cursor in knightCursors {
-            if cursor.isValid && knight(at: cursor, color: attackingColor) {
-                return true
-            }
+            return true
         }
-
-        // Attacked by bishop, rook or queen?
-//        let knightCursors = MoveGenerator.generateKingCursors(board: board, cursor: cursor, color: color)
-//        for cursor in knightCursors {
-//            if cursor.isValid && knight(at: cursor, color: attackingColor) {
-//                return true
-//            }
-//        }
-
         return false
     }
     
