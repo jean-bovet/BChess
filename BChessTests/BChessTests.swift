@@ -58,14 +58,14 @@ class BChessTests: XCTestCase {
     func assertMoves(_ initial: String, _ expected: [String], _ coordinate: String? = nil) {
         let initialBoard = initial.board()!
         let expectedBoards = expected.map { $0.board()! }
-        
+        let generator = MoveGenerator(board: initialBoard, color: .white)
         if let coordinate = coordinate?.coordinate {
-            let moves = MoveGenerator.generateMoves(board: initialBoard, color: .white, position: coordinate)
+            let moves = generator.generateMoves(position: coordinate)
             let boards = moves.map { initialBoard.move(move: $0) }
             
             assert(expectedBoards == boards)
         } else {
-            let moves = MoveGenerator.generateMoves(board: initialBoard, color: .white)
+            let moves = generator.generateMoves()
             let boards = moves.map { initialBoard.move(move: $0) }
             
             assert(expectedBoards == boards)

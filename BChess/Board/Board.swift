@@ -63,7 +63,8 @@ extension Board {
     }
 
     func isCheck(color: Color) -> Bool {
-        let moves = MoveGenerator.generateMoves(board: self, color: color.opposite, verifyCheck: false)
+        let generator = MoveGenerator(board: self, color: color.opposite, verifyCheck: false)
+        let moves = generator.generateMoves()
         for move in moves {
             let piece = self[move.to]
             guard piece.type == .king && piece.color == color else {

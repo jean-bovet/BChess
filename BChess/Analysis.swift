@@ -127,7 +127,8 @@ class Analysis {
         var alpha = _alpha
         var beta = _beta
         
-        let moves = MoveGenerator.generateMoves(board: board, color: color)
+        let generator = MoveGenerator(board: board, color: color)
+        let moves = generator.generateMoves()
         var lineMove: Move? = nil
 
         if depth - 1 < line.count {

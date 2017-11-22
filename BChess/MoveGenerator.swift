@@ -10,187 +10,193 @@ import Foundation
 
 class MoveGenerator {
     
-    static func generateMoves(board: Board, color: Color, verifyCheck: Bool = true) -> [Move] {
+    let board: Board
+    let color: Color
+    let verifyCheck: Bool
+    
+    init(board: Board, color: Color, verifyCheck: Bool = true) {
+        self.board = board
+        self.color = color
+        self.verifyCheck = verifyCheck
+    }
+    
+    func generateMoves() -> [Move] {
         var moves = [Move]()
         for (piece, cursor) in board {
             if !piece.isEmpty && piece.color == color {
-                moves.append(contentsOf: generateMoves(board: board, color: color, position: cursor, verifyCheck: verifyCheck))
+                moves.append(contentsOf: generateMoves(position: cursor))
             }
         }
         return moves
     }
     
-    static func generateMoves(board: Board, color: Color, position: Coordinate, verifyCheck: Bool = true) -> [Move] {
-        var moves = [Move]()
-        let coordinates = generateMoves(board: board, cursor: position, color: color)
-        for coordinate in coordinates {
-            let move = Move(from: position, to: coordinate)
-            
-            if verifyCheck {
-                // The new position should not have the king in check (of the color that is moving)
-                let board = board.move(move: move)
-                if board.isCheck(color: color) {
-                    continue // skip this position because the knight is still in check
-                }
-            }
-            
-            moves.append(move)
-        }
-        return moves
-    }
-
-    static func generateMoves(board: Board, cursor: Coordinate, color: Color) -> [Coordinate] {
-        switch board[cursor].type {
+    func generateMoves(position: Coordinate) -> [Move] {
+        switch board[position].type {
         case .pawn:
-            return generatePawnCursors(board: board, cursor: cursor, color: color)
+            return generatePawnMoves(position: position)
         case .bishop:
-            return generateBishopCursors(board: board, cursor: cursor, color: color)
+            return generateBishopMoves(position: position)
         case .rook:
-            return generateRookCursors(board: board, cursor: cursor, color: color)
+            return generateRookMoves(position: position)
         case .queen:
-            return generateQueenCursors(board: board, cursor: cursor, color: color)
+            return generateQueenMoves(position: position)
         case .king:
-            return generateKingCursors(board: board, cursor: cursor, color: color)
+            return generateKingMoves(position: position)
         case .knight:
-            return generateKnightCursors(board: board, cursor: cursor, color: color)
+            return generateKnightCursors(position: position)
         case .none:
             return []
         }
     }
     
-    static func generatePawnCursors(board: Board, cursor: Coordinate, color: Color) -> [Coordinate] {
-        var cursors = [Coordinate]()
-        if color == .white {
-            cursors.append(cursor.offsetBy(rank: 1, file: -1), board: board, color: color, canEat: true, onlyEat: true)
-            cursors.append(cursor.offsetBy(rank: 1, file: 1), board: board, color: color, canEat: true, onlyEat: true)
+    // MARK: - Pawn
 
-            cursors.append(cursor.offsetBy(rank: 1), board: board, color: color, canEat: false, onlyEat: false)
-            if cursor.rank == 1 {
-                cursors.append(cursor.offsetBy(rank: 2), board: board, color: color, canEat: false, onlyEat: false)
+    func generatePawnMoves(position: Coordinate) -> [Move] {
+        var moves = [Move]()
+        if color == .white {
+            moves.appendMove(generator: self, from: position, to: position.offsetBy(rank: 1, file: -1), canEat: true, mustEat: true)
+            moves.appendMove(generator: self, from: position, to: position.offsetBy(rank: 1, file: 1), canEat: true, mustEat: true)
+
+            moves.appendMove(generator: self, from: position, to: position.offsetBy(rank: 1), canEat: false, mustEat: false)
+            if position.rank == 1 {
+                moves.appendMove(generator: self, from: position, to: position.offsetBy(rank: 2), canEat: false, mustEat: false)
             }
         } else {
-            cursors.append(cursor.offsetBy(rank: -1, file: -1), board: board, color: color, canEat: true, onlyEat: true)
-            cursors.append(cursor.offsetBy(rank: -1, file: 1), board: board, color: color, canEat: true, onlyEat: true)
+            moves.appendMove(generator: self, from: position, to: position.offsetBy(rank: -1, file: -1), canEat: true, mustEat: true)
+            moves.appendMove(generator: self, from: position, to: position.offsetBy(rank: -1, file: 1), canEat: true, mustEat: true)
 
-            cursors.append(cursor.offsetBy(rank: -1), board: board, color: color, canEat: false, onlyEat: false)
-            if cursor.rank == 7 {
-                cursors.append(cursor.offsetBy(rank: -2), board: board, color: color, canEat: false, onlyEat: false)
+            moves.appendMove(generator: self, from: position, to: position.offsetBy(rank: -1), canEat: false, mustEat: false)
+            if position.rank == 7 {
+                moves.appendMove(generator: self, from: position, to: position.offsetBy(rank: -2), canEat: false, mustEat: false)
             }
         }
-        return cursors
+        return moves
     }
 
-    static func generateKnightCursors(board: Board, cursor: Coordinate, color: Color) -> [Coordinate] {
-        var cursors = [Coordinate]()
+    // MARK: - Knight
 
-        for cursor in MoveGenerator.knightCursors(at: cursor) {
-            cursors.append(cursor, board: board, color: color)
+    func generateKnightCursors(position: Coordinate) -> [Move] {
+        var moves = [Move]()
+
+        for cursor in knightCoordinates(at: position) {
+            moves.appendMove(generator: self, from: position, to: cursor)
         }
 
-        return cursors
+        return moves
     }
 
-    static func knightCursors(at cursor: Coordinate) -> [Coordinate] {
-        var cursors = [Coordinate]()
+    func knightCoordinates(at position: Coordinate) -> [Coordinate] {
+        var coordinates = [Coordinate]()
         
         // Top
-        cursors.append(cursor.offsetBy(rank: 2, file: -1))
-        cursors.append(cursor.offsetBy(rank: 2, file: 1))
+        coordinates.append(position.offsetBy(rank: 2, file: -1))
+        coordinates.append(position.offsetBy(rank: 2, file: 1))
         
         // Right
-        cursors.append(cursor.offsetBy(rank: 1, file: 2))
-        cursors.append(cursor.offsetBy(rank: -1, file: 2))
+        coordinates.append(position.offsetBy(rank: 1, file: 2))
+        coordinates.append(position.offsetBy(rank: -1, file: 2))
         
         // Bottom
-        cursors.append(cursor.offsetBy(rank: -2, file: 1))
-        cursors.append(cursor.offsetBy(rank: -2, file: -1))
+        coordinates.append(position.offsetBy(rank: -2, file: 1))
+        coordinates.append(position.offsetBy(rank: -2, file: -1))
         
         // Left
-        cursors.append(cursor.offsetBy(rank: -1, file: -2))
-        cursors.append(cursor.offsetBy(rank: 1, file: -2))
+        coordinates.append(position.offsetBy(rank: -1, file: -2))
+        coordinates.append(position.offsetBy(rank: 1, file: -2))
         
-        return cursors
+        return coordinates
     }
     
     typealias DirectionsType = [(Int, Int)]
     
-    static var bishopDirections: DirectionsType {
+    // MARK: - Bishop
+    
+    var bishopDirections: DirectionsType {
         return [ (-1, -1), (1, -1),
                  (-1, 1), (1, 1) ]
     }
 
-    static var rookDirections: DirectionsType {
+    func generateBishopMoves(position: Coordinate) -> [Move] {
+        return generateMoves(forDirections: bishopDirections, position: position)
+    }
+    
+    // MARK: - Rook
+
+    var rookDirections: DirectionsType {
         return [ (-1, 0), (0, 1),
                  (1, 0), (0, -1) ]
     }
 
-    static var queenDirections: DirectionsType {
+    func generateRookMoves(position: Coordinate) -> [Move] {
+        return generateMoves(forDirections: rookDirections, position: position)
+    }
+    
+    // MARK: - Queen
+
+    var queenDirections: DirectionsType {
         return bishopDirections + rookDirections
     }
     
-    static func generateBishopCursors(board: Board, cursor: Coordinate, color: Color) -> [Coordinate] {
-        return generateCursors(forDirections: bishopDirections, board: board, cursor: cursor, color: color)
+    func generateQueenMoves(position: Coordinate) -> [Move] {
+        return generateMoves(forDirections: queenDirections, position: position)
     }
 
-    static func generateRookCursors(board: Board, cursor: Coordinate, color: Color) -> [Coordinate] {
-        return generateCursors(forDirections: rookDirections, board: board, cursor: cursor, color: color)
-    }
-    
-    static func generateQueenCursors(board: Board, cursor: Coordinate, color: Color) -> [Coordinate] {
-        return generateCursors(forDirections: queenDirections, board: board, cursor: cursor, color: color)
+    // MARK: - King
+
+    func generateKingMoves(position: Coordinate) -> [Move] {
+        return generateMoves(forDirections: queenDirections, position: position, length: 1)
     }
 
-    static func generateKingCursors(board: Board, cursor: Coordinate, color: Color) -> [Coordinate] {
-        return generateCursors(forDirections: queenDirections, board: board, cursor: cursor, color: color, length: 1)
-    }
+    // MARK: - Helpers
 
-    static func generateCursors(forDirections directions: DirectionsType, board: Board, cursor: Coordinate, color: Color, length: Int = Board.size) -> [Coordinate] {
-        var cursors = [Coordinate]()
+    func generateMoves(forDirections directions: DirectionsType, position: Coordinate, length: Int = Board.size) -> [Move] {
+        var moves = [Move]()
         for (dx, dy) in directions {
             for distance in 1...length {
-                let newCursor = cursor.offsetBy(rank: dy*distance, file: dx*distance)
-                guard cursors.append(newCursor, board: board, color: color) else {
+                let newPosition = position.offsetBy(rank: dy*distance, file: dx*distance)
+                guard moves.appendMove(generator: self, from: position, to: newPosition) else {
                     break
                 }
             }
         }
-        return cursors
+        return moves
     }
 
 }
 
-enum MoveConstraint {
-    case canEat
-    case onlyEat
-}
-
-extension Array where Iterator.Element == Coordinate {
+extension Array where Iterator.Element == Move {
     
-    // Returns true if the square was empty before moving the piece there
-    // which indicates the move generation can certainly continue for
-    // bishop, rook and queen.
-    @discardableResult mutating func append(_ c: Coordinate, board: Board, color: Color, canEat: Bool = true, onlyEat: Bool = false) -> Bool {
-        guard c.isValid else {
+    @discardableResult mutating func appendMove(generator: MoveGenerator, from: Coordinate, to: Coordinate, canEat: Bool = true, mustEat: Bool = false) -> Bool {
+        guard to.isValid else {
             return false
         }
-                
-        let piece = board[c]
+        
+        let piece = generator.board[to]
         
         if piece.isEmpty {
-            if onlyEat {
-                return false
-            } else {
-                append(c)
-                return true
+            if !mustEat && isCheckValidated(generator: generator, from: from, to: to) {
+                append(Move(from: from, to: to))
             }
-        }
-        
-        if piece.color == color.opposite && (canEat || onlyEat) {
-            append(c)
+            return true
+        } else {
+            if piece.color == generator.color.opposite && (canEat || mustEat) && isCheckValidated(generator: generator, from: from, to: to) {
+                append(Move(from: from, to: to))
+            }
             return false
         }
-        
-        return false
     }
-
+    
+    func isCheckValidated(generator: MoveGenerator, from: Coordinate, to: Coordinate) -> Bool {
+        guard generator.verifyCheck else {
+            return true
+        }
+        // The new position should not have the king in check (of the color that is moving)
+        let newBoard = generator.board.move(move: Move(from: from, to: to))
+        if newBoard.isCheck(color: generator.color) {
+            return false
+        } else {
+            return true
+        }
+    }
 }
+

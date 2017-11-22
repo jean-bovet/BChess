@@ -43,7 +43,8 @@ class UCI {
     func generateMoves(fen: String) {
         let parser = FENParser(fen: fen)
         if let board = parser.parse() {
-            let moves = MoveGenerator.generateMoves(board: board, color: .white)
+            let generator = MoveGenerator(board: board, color: .white)
+            let moves = generator.generateMoves()
             
             for move in moves {
                 let newBoard = board.move(move: move)

@@ -29,7 +29,8 @@ class Evaluate {
         // Evaluate the number of pieces being attacked
         let attackingBonus = 3
         let checkingBonus = 5
-        let moves = MoveGenerator.generateMoves(board: board, color: color)
+        let generator = MoveGenerator(board: board, color: color)
+        let moves = generator.generateMoves()
         for move in moves {
             let colorIsAttacking = board[move.from].color == color
             let targetSquare = board[move.to]
