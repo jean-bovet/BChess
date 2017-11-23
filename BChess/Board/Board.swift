@@ -12,7 +12,7 @@ struct Board: CustomStringConvertible {
 
     static let size = 8
 
-    var cells = [Piece](repeating: Piece.empty(), count: size*size)
+    var cells = [Piece](repeating: Piece.none(), count: size*size)
     
     subscript(cursor: Coordinate) -> Piece {
         get {
@@ -58,7 +58,7 @@ extension Board {
     func move(move: Move) -> Board {
         var newBoard = Board(cells: Array(cells))
         newBoard[move.to] = newBoard[move.from]
-        newBoard[move.from] = Piece.empty()
+        newBoard[move.from] = Piece.none()
         return newBoard
     }
 

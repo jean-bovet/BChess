@@ -20,7 +20,7 @@ struct Piece {
         return type == .none
     }
     
-    static func empty() -> Piece {
+    static func none() -> Piece {
         return Piece(type: .none, color: .white)
     }
 
