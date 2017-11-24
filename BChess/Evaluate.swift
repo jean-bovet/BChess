@@ -10,7 +10,8 @@ import Foundation
 
 class Evaluate {
     
-    static func evaluate(board: Board, color: Color) -> Int {
+    static func evaluate(board: Board) -> Int {
+        let color = Color.white // always evaluate from a white point of view
         var value = 0
         for (piece, _) in board {
             if piece.isEmpty {

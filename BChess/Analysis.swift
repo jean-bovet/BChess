@@ -90,7 +90,7 @@ class Analysis {
                                   color: color,
                                   depth: 1,
                                   maxDepth: curMaxDepth,
-                                  evaluater: .Maximize,
+                                  evaluater: (color == .white) ? .Maximize : .Minimize,
                                   line: evaluation.line,
                                   alpha: Int.min,
                                   beta: Int.max)
@@ -167,7 +167,7 @@ class Analysis {
                            _ bestEvaluation: inout Evaluation) -> Bool {
 
         if depth == maxDepth {
-            let boardValue = Evaluate.evaluate(board: board, color: .white)
+            let boardValue = Evaluate.evaluate(board: board)
             bestEvaluation = Evaluation(move: move, value: boardValue, line: [])
             return true
         }
