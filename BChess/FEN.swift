@@ -8,6 +8,8 @@
 
 import Foundation
 
+let StartPosFEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
+
 class FENParser {
     
     let fen: String
@@ -34,7 +36,7 @@ class FENParser {
             for p in rank {
                 if let emptySquares = Int(String(p)) {
                     cursor.file = cursor.file + emptySquares
-                } else if let piece = piece(for: p) {
+                } else if let piece = p.toPiece() {
                     board[cursor] = piece
                     cursor.file += 1
                 } else {
@@ -49,11 +51,57 @@ class FENParser {
         let sideToMove = fields.removeFirst()
         board.color = (sideToMove == "w") ? .white : .black
         
+        // KQkq
+        let castlingAvailability = fields.removeFirst()
+        board.castling.fen = String(castlingAvailability)
+
         return board
     }
     
-    func piece(for p: Character) -> Piece? {
-        switch p {
+}
+
+extension Castling {
+    
+    var fen: String {
+        get {
+            var s = ""
+            if whiteKingSide {
+                s += "K"
+            }
+            if whiteQueenSide {
+                s += "Q"
+            }
+            if blackKingSide {
+                s += "k"
+            }
+            if blackQueenSide {
+                s += "q"
+            }
+            if s.isEmpty {
+                return "-"
+            } else {
+                return s
+            }
+        }
+        set (value) {
+            whiteKingSide = value.contains("K")
+            whiteQueenSide = value.contains("Q")
+            blackKingSide = value.contains("k")
+            blackQueenSide = value.contains("q")
+        }
+    }
+    
+}
+
+extension String {
+    func board() -> Board? {
+        return FENParser(fen: self).parse()
+    }
+}
+
+extension Character {
+    func toPiece() -> Piece? {
+        switch self {
         case "p":
             return Piece(type: .pawn, color: .black)
         case "P":
@@ -90,10 +138,88 @@ class FENParser {
     }
 }
 
-extension String {
-    func board() -> Board? {
-        return FENParser(fen: self).parse()
+extension Piece {
+    
+    var fen: String {
+        let pieceName: String
+        switch type {
+        case .none:
+            pieceName = "."
+        case .pawn:
+            pieceName = "p"
+        case .rook:
+            pieceName = "r"
+        case .knight:
+            pieceName = "n"
+        case .bishop:
+            pieceName = "b"
+        case .queen:
+            pieceName = "q"
+        case .king:
+            pieceName = "k"
+        }
+        if color == .white {
+            return pieceName.uppercased()
+        } else {
+            return pieceName
+        }
+    }
+    
+}
+extension Board {
+    
+    func toFEN() -> String {
+        // https://en.wikipedia.org/wiki/Forsyth–Edwards_Notation
+        // "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
+        var fen = ""
+        for rank in (0...7).reversed() {
+            var emptyCount = 0
+            for file in 0...7 {
+                let piece = self[rank, file]
+                if piece.isEmpty {
+                    emptyCount += 1
+                } else {
+                    if emptyCount > 0 {
+                        fen += String(emptyCount)
+                        emptyCount = 0
+                    }
+                    fen += piece.fen
+                }
+            }
+            
+            if emptyCount > 0 {
+                fen += String(emptyCount)
+                emptyCount = 0
+            }
+
+            if rank > 0 {
+                fen += "/"
+            }
+        }
+        
+        // Color to move
+        if color == .white {
+            fen += " w"
+        } else {
+            fen += " b"
+        }
+        
+        // Castling availability
+        fen += " \(castling.fen)"
+        
+        // En passant
+        // TODO
+        fen += " -"
+        
+        // Halfmove
+        // TODO
+        fen += " 0"
+        
+        // Full move number (starting at 1)
+        // TODO
+        fen += " 1"
+        
+        return fen
     }
 }
 
-let StartPosFEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"

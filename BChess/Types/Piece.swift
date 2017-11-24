@@ -55,31 +55,6 @@ extension Piece: CustomStringConvertible {
         return pieceName
     }
     
-    var fenString: String {
-        let pieceName: String
-        switch type {
-        case .none:
-            pieceName = "."
-        case .pawn:
-            pieceName = "p"
-        case .rook:
-            pieceName = "r"
-        case .knight:
-            pieceName = "n"
-        case .bishop:
-            pieceName = "b"
-        case .queen:
-            pieceName = "q"
-        case .king:
-            pieceName = "k"
-        }
-        if color == .white {
-            return pieceName.uppercased()
-        } else {
-            return pieceName
-        }
-    }
-    
     var description: String {
         return "\(type) \(color)"
     }

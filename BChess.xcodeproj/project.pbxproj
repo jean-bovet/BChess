@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		A7712D171FB916E900E7E802 /* BChessTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7712D161FB916E900E7E802 /* BChessTests.swift */; };
+		A7712D171FB916E900E7E802 /* MoveTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7712D161FB916E900E7E802 /* MoveTests.swift */; };
 		A7712D1C1FB9179300E7E802 /* Color.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7AFCCB81FB6CD3700AE3D85 /* Color.swift */; };
 		A7712D1D1FB9179300E7E802 /* PieceType.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7AFCCBA1FB6CD7800AE3D85 /* PieceType.swift */; };
 		A7712D1E1FB9179300E7E802 /* Piece.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7AFCCBC1FB6CDB000AE3D85 /* Piece.swift */; };
@@ -23,6 +23,10 @@
 		A7712D2B1FC7C1FA00E7E802 /* Helper.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7712D2A1FC7C1FA00E7E802 /* Helper.swift */; };
 		A7712D2D1FC7C22000E7E802 /* UCIEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7712D2C1FC7C22000E7E802 /* UCIEngine.swift */; };
 		A7712D2F1FC7C4CD00E7E802 /* UCI.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7712D2E1FC7C4CD00E7E802 /* UCI.swift */; };
+		A7712D331FC8957500E7E802 /* GamesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7712D321FC8957500E7E802 /* GamesTests.swift */; };
+		A7712D341FC895D100E7E802 /* UCI.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7712D2E1FC7C4CD00E7E802 /* UCI.swift */; };
+		A7712D351FC895D300E7E802 /* UCIEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7712D2C1FC7C22000E7E802 /* UCIEngine.swift */; };
+		A7712D371FC899D200E7E802 /* FENTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7712D361FC899D200E7E802 /* FENTests.swift */; };
 		A7AFCCAA1FB4E40D00AE3D85 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7AFCCA91FB4E40D00AE3D85 /* main.swift */; };
 		A7AFCCB31FB5091000AE3D85 /* Board.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7AFCCB21FB5091000AE3D85 /* Board.swift */; };
 		A7AFCCB51FB5170900AE3D85 /* MoveGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7AFCCB41FB5170900AE3D85 /* MoveGenerator.swift */; };
@@ -50,13 +54,15 @@
 
 /* Begin PBXFileReference section */
 		A7712D141FB916E900E7E802 /* BChessTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BChessTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		A7712D161FB916E900E7E802 /* BChessTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BChessTests.swift; sourceTree = "<group>"; };
+		A7712D161FB916E900E7E802 /* MoveTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoveTests.swift; sourceTree = "<group>"; };
 		A7712D181FB916E900E7E802 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		A7712D271FBAC47A00E7E802 /* Evaluate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Evaluate.swift; sourceTree = "<group>"; };
 		A7712D2A1FC7C1FA00E7E802 /* Helper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Helper.swift; sourceTree = "<group>"; };
 		A7712D2C1FC7C22000E7E802 /* UCIEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UCIEngine.swift; sourceTree = "<group>"; };
 		A7712D2E1FC7C4CD00E7E802 /* UCI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UCI.swift; sourceTree = "<group>"; };
 		A7712D311FC7C5CF00E7E802 /* ToDo.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = ToDo.md; sourceTree = "<group>"; };
+		A7712D321FC8957500E7E802 /* GamesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GamesTests.swift; sourceTree = "<group>"; };
+		A7712D361FC899D200E7E802 /* FENTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FENTests.swift; sourceTree = "<group>"; };
 		A7AFCCA61FB4E40D00AE3D85 /* BChess */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = BChess; sourceTree = BUILT_PRODUCTS_DIR; };
 		A7AFCCA91FB4E40D00AE3D85 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		A7AFCCB21FB5091000AE3D85 /* Board.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Board.swift; sourceTree = "<group>"; };
@@ -92,7 +98,9 @@
 		A7712D151FB916E900E7E802 /* BChessTests */ = {
 			isa = PBXGroup;
 			children = (
-				A7712D161FB916E900E7E802 /* BChessTests.swift */,
+				A7712D361FC899D200E7E802 /* FENTests.swift */,
+				A7712D161FB916E900E7E802 /* MoveTests.swift */,
+				A7712D321FC8957500E7E802 /* GamesTests.swift */,
 				A7712D181FB916E900E7E802 /* Info.plist */,
 			);
 			path = BChessTests;
@@ -255,12 +263,16 @@
 			files = (
 				A7712D221FB9179500E7E802 /* BoardIterator.swift in Sources */,
 				A7712D1E1FB9179300E7E802 /* Piece.swift in Sources */,
+				A7712D331FC8957500E7E802 /* GamesTests.swift in Sources */,
 				A7712D231FB9179900E7E802 /* MoveGenerator.swift in Sources */,
-				A7712D171FB916E900E7E802 /* BChessTests.swift in Sources */,
+				A7712D171FB916E900E7E802 /* MoveTests.swift in Sources */,
+				A7712D371FC899D200E7E802 /* FENTests.swift in Sources */,
+				A7712D341FC895D100E7E802 /* UCI.swift in Sources */,
 				A7712D1D1FB9179300E7E802 /* PieceType.swift in Sources */,
 				A7712D1C1FB9179300E7E802 /* Color.swift in Sources */,
 				A7712D211FB9179500E7E802 /* Board.swift in Sources */,
 				A7712D201FB9179300E7E802 /* Move.swift in Sources */,
+				A7712D351FC895D300E7E802 /* UCIEngine.swift in Sources */,
 				A7712D291FBAC4B700E7E802 /* Evaluate.swift in Sources */,
 				A7712D1F1FB9179300E7E802 /* Coordinate.swift in Sources */,
 				A7712D241FB9179900E7E802 /* Analysis.swift in Sources */,

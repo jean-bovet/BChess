@@ -152,26 +152,30 @@ class MoveGenerator {
 
     func generateKingCastles(position: Coordinate) -> [Move] {
         var moves = [Move]()
-        if board.whiteCanCastle && color == .white && position == Coordinate.E1 {
+        if board.castling.whiteKingSide && color == .white && position == Coordinate.E1 {
             // King-side: e1 to g1 and Rook h1 to f1
             if board.isEmpty(at: Coordinate.F1) && board.isEmpty(at: Coordinate.G1) {
                 moves.appendMove(generator: self, from: Coordinate.E1, to: Coordinate.G1)
                 moves.appendMove(generator: self, from: Coordinate.H1, to: Coordinate.F1)
             }
-            
+        }
+        
+        if board.castling.whiteQueenSide && color == .white && position == Coordinate.E1 {
             // Queen side
             if board.isEmpty(at: Coordinate.B1) && board.isEmpty(at: Coordinate.C1) && board.isEmpty(at: Coordinate.D1) {
                 moves.appendMove(generator: self, from: Coordinate.E1, to: Coordinate.C1)
                 moves.appendMove(generator: self, from: Coordinate.A1, to: Coordinate.D1)
             }
         }
-        if board.blackCanCastle && color == .black && position == Coordinate.E8 {
+        if board.castling.blackKingSide && color == .black && position == Coordinate.E8 {
             // King-side: e8 to g8 and Rook h8 to f8
             if board.isEmpty(at: Coordinate.F8) && board.isEmpty(at: Coordinate.G8) {
                 moves.appendMove(generator: self, from: Coordinate.E8, to: Coordinate.G8)
                 moves.appendMove(generator: self, from: Coordinate.H8, to: Coordinate.F8)
             }
-            
+        }
+        
+        if board.castling.blackQueenSide && color == .black && position == Coordinate.E8 {
             // Queen side
             if board.isEmpty(at: Coordinate.B8) && board.isEmpty(at: Coordinate.C8) && board.isEmpty(at: Coordinate.D8) {
                 moves.appendMove(generator: self, from: Coordinate.E8, to: Coordinate.C8)

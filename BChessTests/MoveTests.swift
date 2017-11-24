@@ -8,7 +8,7 @@
 
 import XCTest
 
-class BChessTests: XCTestCase {
+class MoveTests: XCTestCase {
     
     func testPawnMoves() {
         assertMoves("8/8/8/8/8/8/2P5/8 w - - 0 1",

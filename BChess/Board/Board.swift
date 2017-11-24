@@ -8,6 +8,13 @@
 
 import Foundation
 
+struct Castling {
+    var whiteKingSide = true
+    var whiteQueenSide = true
+    var blackKingSide = true
+    var blackQueenSide = true    
+}
+
 struct Board: CustomStringConvertible {
 
     static let size = 8
@@ -15,8 +22,7 @@ struct Board: CustomStringConvertible {
     var cells = [Piece](repeating: Piece.none(), count: size*size)
     var color = Color.white
     
-    var whiteCanCastle = true
-    var blackCanCastle = true
+    var castling = Castling()
     
     subscript(cursor: Coordinate) -> Piece {
         get {
@@ -41,7 +47,6 @@ struct Board: CustomStringConvertible {
         for rank in (0...Board.size-1).reversed() {
             for file in 0...Board.size-1 {
                 let piece = self[rank, file]
-//                text += piece.fenString
                 text += piece.unicodeString
             }
             text += "\n"
@@ -68,13 +73,6 @@ extension Board {
  The king moves through a square that is attacked by a piece of the opponent.
  The king would be in check after castling.
 */
-        guard whiteCanCastle else {
-            return
-        }
-        
-        guard blackCanCastle else {
-            return
-        }
     }
 }
 
@@ -83,15 +81,14 @@ extension Board {
     func move(move: Move) -> Board {
         var newBoard = Board()
         newBoard.color = color.opposite
-        newBoard.whiteCanCastle = whiteCanCastle
-        newBoard.blackCanCastle = blackCanCastle
+        newBoard.castling = castling
         newBoard.cells = Array(cells)
         
         newBoard.inlineMove(move.from, move.to)
         
         if move.equals(.E1, .G1) {
             // White castle king side, need to move the rook
-            newBoard.inlineMove(.F1, .H1)
+            newBoard.inlineMove(.H1, .F1)
         }
         if move.equals(.E1, .C1) {
             // White castle queen side, need to move the rook
@@ -99,7 +96,7 @@ extension Board {
         }
         if move.equals(.E8, .G8) {
             // White castle king side, need to move the rook
-            newBoard.inlineMove(.F8, .H8)
+            newBoard.inlineMove(.H8, .F8)
         }
         if move.equals(.E8, .C8) {
             // White castle queen side, need to move the rook

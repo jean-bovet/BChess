@@ -20,7 +20,7 @@ extension Analysis.Info {
     }
 }
 
-class UCI: UCIEngineDelegate {
+class UCI {
     
     let log: OSLog
     let engine: UCIEngine
@@ -31,7 +31,6 @@ class UCI: UCIEngineDelegate {
         log = OSLog(subsystem: "ch.arizona-software.BChess", category: "uci")
         
         engine = UCIEngine()
-        engine.delegate = self
         
         // Disable output buffering otherwise the GUI won't receive any command
         setbuf(__stdoutp, nil)
@@ -100,10 +99,14 @@ class UCI: UCIEngineDelegate {
         // go wtime 300000 btime 300000
         let cmd = tokens.removeFirst()
         
-        if cmd == "infinite" {
-            engine.evaluate(depth: Int.max)
-        } else {
-            engine.evaluate(depth: 3)
+        let depth = (cmd == "infinite") ? Int.max : UCIEngine.defaultDepth
+        
+        engine.evaluate(depth: depth) { (info, completed) in
+            if completed {
+                self.engineOutput(info.uciBestMove)
+            } else {
+                self.engineOutput(info.uciInfoMessage)
+            }
         }
     }
     
