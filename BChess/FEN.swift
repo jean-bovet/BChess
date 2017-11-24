@@ -158,7 +158,7 @@ extension Board {
             fen += " 0"
             
             // Full move number (starting at 1)
-            fen += " \(moveCount)"
+            fen += " \(fullMoveCount)"
             
             return fen
         }
@@ -207,7 +207,7 @@ extension Board {
             
             // Full move
             let fullMove = fields.removeFirst()
-            moveCount = Int(fullMove)!
+            fullMoveCount = Int(fullMove)!
         }
     }
 }

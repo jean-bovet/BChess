@@ -24,7 +24,8 @@ struct Board: CustomStringConvertible {
     
     var castling = Castling()
     
-    var moveCount = 1
+    // Fullmove number: The number of the full move. It starts at 1, and is incremented after Black's move
+    var fullMoveCount = 1
     
     subscript(cursor: Coordinate) -> Piece {
         get {
@@ -84,9 +85,13 @@ extension Board {
         var newBoard = Board()
         newBoard.color = color.opposite
         newBoard.castling = castling
-        newBoard.moveCount = moveCount
+        newBoard.fullMoveCount = fullMoveCount
         newBoard.cells = Array(cells)
         
+        if color == .black {
+            newBoard.fullMoveCount += 1
+        }
+
         newBoard.inlineMove(move.from, move.to)
         
         if move.equals(.E1, .G1) {
@@ -113,7 +118,6 @@ extension Board {
     mutating func inlineMove(_ from: Coordinate, _ to: Coordinate) {
         self[to] = self[from]
         self[from] = .none()
-        moveCount += 1
     }
     
     func isCheck(color: Color) -> Bool {
