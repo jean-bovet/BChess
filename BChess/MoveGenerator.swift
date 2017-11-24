@@ -75,38 +75,27 @@ class MoveGenerator {
 
     // MARK: - Knight
 
+    static let KnightOffsets = [
+        // Top
+        (2, -1), (2, 1),
+        // Right
+        (1, 2), (-1, 2),
+        // Bottom
+        (-2, 1), (-2, -1),
+        // Left
+        (-1, -2), (1, -2)
+    ]
+    
     func generateKnightCursors(position: Coordinate) -> [Move] {
         var moves = [Move]()
 
-        for cursor in knightCoordinates(at: position) {
-            moves.appendMove(generator: self, from: position, to: cursor)
+        for (deltaRank, deltaFile) in MoveGenerator.KnightOffsets {
+            moves.appendMove(generator: self, from: position, to: position.offsetBy(rank: deltaRank, file: deltaFile))
         }
-
+        
         return moves
     }
 
-    func knightCoordinates(at position: Coordinate) -> [Coordinate] {
-        var coordinates = [Coordinate]()
-        
-        // Top
-        coordinates.append(position.offsetBy(rank: 2, file: -1))
-        coordinates.append(position.offsetBy(rank: 2, file: 1))
-        
-        // Right
-        coordinates.append(position.offsetBy(rank: 1, file: 2))
-        coordinates.append(position.offsetBy(rank: -1, file: 2))
-        
-        // Bottom
-        coordinates.append(position.offsetBy(rank: -2, file: 1))
-        coordinates.append(position.offsetBy(rank: -2, file: -1))
-        
-        // Left
-        coordinates.append(position.offsetBy(rank: -1, file: -2))
-        coordinates.append(position.offsetBy(rank: 1, file: -2))
-        
-        return coordinates
-    }
-    
     typealias DirectionsType = [(Int, Int)]
     
     // MARK: - Bishop
