@@ -63,12 +63,12 @@ class MoveTests: XCTestCase {
         let generator = MoveGenerator(board: initialBoard, color: .white)
         if let coordinate = coordinate?.coordinate {
             let moves = generator.generateMoves(position: coordinate)
-            let boards = moves.map { initialBoard.move(move: $0) }
+            let boards = moves.map { initialBoard.newBoard(withMove: $0) }
             
             assert(expectedBoards == boards)
         } else {
             let moves = generator.generateMoves()
-            let boards = moves.map { initialBoard.move(move: $0) }
+            let boards = moves.map { initialBoard.newBoard(withMove: $0) }
             
             assert(expectedBoards == boards)
         }

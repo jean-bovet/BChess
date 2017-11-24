@@ -89,7 +89,7 @@ class UCI {
                 return
             }
             let move = Move(from: from, to: to)
-            engine.board = engine.board.move(move: move)
+            engine.board.move(move: move)
         }
         tokens.removeAll()
     }

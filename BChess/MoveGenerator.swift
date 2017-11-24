@@ -229,7 +229,7 @@ extension Array where Iterator.Element == Move {
             return true
         }
         // The new position should not have the king in check (of the color that is moving)
-        let newBoard = generator.board.move(move: Move(from: from, to: to))
+        let newBoard = generator.board.newBoard(withMove: Move(from: from, to: to))
         if newBoard.isCheck(color: generator.color) {
             return false
         } else {

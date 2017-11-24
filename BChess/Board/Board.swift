@@ -81,41 +81,42 @@ extension Board {
 
 extension Board {
     
-    func move(move: Move) -> Board {
-        var newBoard = Board()
-        newBoard.color = color.opposite
-        newBoard.castling = castling
-        newBoard.fullMoveCount = fullMoveCount
-        newBoard.cells = Array(cells)
-        
+    func newBoard(withMove move: Move) -> Board {
+        var newBoard = self
+        newBoard.move(move: move)
+        return newBoard
+    }
+    
+    mutating func move(move: Move) {
         if color == .black {
-            newBoard.fullMoveCount += 1
+            fullMoveCount += 1
         }
 
-        newBoard.inlineMove(move.from, move.to)
+        color = color.opposite
+        
+        applyMove(move.from, move.to)
         
         if move.equals(.E1, .G1) {
             // White castle king side, need to move the rook
-            newBoard.inlineMove(.H1, .F1)
+            applyMove(.H1, .F1)
         }
         if move.equals(.E1, .C1) {
             // White castle queen side, need to move the rook
-            newBoard.inlineMove(.A1, .D1)
+            applyMove(.A1, .D1)
         }
         if move.equals(.E8, .G8) {
             // White castle king side, need to move the rook
-            newBoard.inlineMove(.H8, .F8)
+            applyMove(.H8, .F8)
         }
         if move.equals(.E8, .C8) {
             // White castle queen side, need to move the rook
-            newBoard.inlineMove(.A8, .D8)
+            applyMove(.A8, .D8)
         }
 
-        newBoard.evaluateCastling(move: move)
-        return newBoard
+        evaluateCastling(move: move)
     }
 
-    mutating func inlineMove(_ from: Coordinate, _ to: Coordinate) {
+    private mutating func applyMove(_ from: Coordinate, _ to: Coordinate) {
         self[to] = self[from]
         self[from] = .none()
     }

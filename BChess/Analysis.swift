@@ -174,8 +174,7 @@ class Analysis {
 
         evaluateCount += 1
 
-        let board = board.move(move: move)
-        let evaluation = evaluate(board: board,
+        let evaluation = evaluate(board: board.newBoard(withMove: move),
                                   color: color.opposite,
                                   depth: depth+1,
                                   maxDepth: maxDepth,

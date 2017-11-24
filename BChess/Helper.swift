@@ -17,7 +17,7 @@ class Helper {
         let moves = generator.generateMoves()
         
         for move in moves {
-            let newBoard = board.move(move: move)
+            let newBoard = board.newBoard(withMove: move)
             print("\(newBoard)\n")
         }
     }
