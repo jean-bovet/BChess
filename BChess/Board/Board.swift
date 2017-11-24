@@ -24,6 +24,8 @@ struct Board: CustomStringConvertible {
     
     var castling = Castling()
     
+    var moveCount = 1
+    
     subscript(cursor: Coordinate) -> Piece {
         get {
             return cells[cursor.rank*Board.size+cursor.file]
@@ -82,6 +84,7 @@ extension Board {
         var newBoard = Board()
         newBoard.color = color.opposite
         newBoard.castling = castling
+        newBoard.moveCount = moveCount
         newBoard.cells = Array(cells)
         
         newBoard.inlineMove(move.from, move.to)
@@ -110,6 +113,7 @@ extension Board {
     mutating func inlineMove(_ from: Coordinate, _ to: Coordinate) {
         self[to] = self[from]
         self[from] = .none()
+        moveCount += 1
     }
     
     func isCheck(color: Color) -> Bool {

@@ -158,8 +158,7 @@ extension Board {
             fen += " 0"
             
             // Full move number (starting at 1)
-            // TODO
-            fen += " 1"
+            fen += " \(moveCount)"
             
             return fen
         }
@@ -199,6 +198,16 @@ extension Board {
             // KQkq
             let castlingAvailability = fields.removeFirst()
             castling.fen = String(castlingAvailability)
+            
+            // En passant
+            fields.removeFirst()
+            
+            // Half move
+            fields.removeFirst()
+            
+            // Full move
+            let fullMove = fields.removeFirst()
+            moveCount = Int(fullMove)!
         }
     }
 }

@@ -46,7 +46,25 @@ class GamesTests: XCTestCase {
         assert(command: s, resultingFEN: fen, bestMove: "bestmove c3c4")
     }
     
-    func assert(command: String, resultingFEN: String, bestMove: String) {
+    /** Evaluate the following position with black to move.
+     Best move should be C8B7 (bishop capturing the pawn).
+     ♜.♝♛♚..♜
+     ♟♙.♟.♟♟♟
+     ...♟♟♙..
+     ........
+     ........
+     ♙.♘..♘.♙
+     .♙♙..♙♙.
+     ♖.♗.♔♗.♖
+ */
+    func testBlackToMoveC8B7() {
+        let s = "position fen r1bqk2r/pP1p1ppp/3ppP2/8/8/P1N2N1P/1PP2PP1/R1B1KB1R b KQkq - 0 12"
+        let fen = "r1bqk2r/pP1p1ppp/3ppP2/8/8/P1N2N1P/1PP2PP1/R1B1KB1R b KQkq - 0 12"
+        // Note: limit depth to 2 otherwise it takes several seconds to evaluate
+        assert(command: s, resultingFEN: fen, bestMove: "bestmove c8b7", depth: 2)
+    }
+    
+    func assert(command: String, resultingFEN: String, bestMove: String, depth: Int = UCIEngine.defaultDepth) {
         let uci = UCI()
         var tokens = command.split(separator: " ").map { String($0) }
         uci.process(&tokens)
@@ -58,7 +76,7 @@ class GamesTests: XCTestCase {
         
         let expectation = XCTestExpectation(description: "evaluation")
         var engineInfo: Analysis.Info? = nil
-        uci.engine.evaluate(depth: UCIEngine.defaultDepth) { (info, completed) in
+        uci.engine.evaluate(depth: depth) { (info, completed) in
             if completed {
                 engineInfo = info
                 expectation.fulfill()
@@ -66,7 +84,7 @@ class GamesTests: XCTestCase {
 //                print(info.uciInfoMessage)
             }
         }
-        wait(for: [expectation], timeout: 5)
+        wait(for: [expectation], timeout: 30)
         XCTAssertEqual(engineInfo?.uciBestMove, bestMove)
     }
 }
