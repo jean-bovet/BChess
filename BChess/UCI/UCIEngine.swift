@@ -25,7 +25,7 @@ class UCIEngine {
     func evaluate(depth: Int) {
         minimax.analyzing = false
         let evaluateBlock = {
-            let info = self.minimax.searchBestMove(board: self.board, color: .white, maxDepth: depth) { info in
+            let info = self.minimax.searchBestMove(board: self.board, color: self.board.color, maxDepth: depth) { info in
                 // info depth 2 score cp 214 time 1242 nodes 2124 nps 34928 pv e2e4 e7e5 g1f3
                 // info depth 5 seldepth 29 time 5 nodes 13401 nps 2543 score cp -1 pv b1a3 a7b6 a2a4 a8a4
                 let message = info.uciInfoMessage

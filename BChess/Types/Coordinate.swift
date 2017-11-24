@@ -13,6 +13,24 @@ struct Coordinate {
     var file = 0
     
     static let letters = ["a", "b", "c", "d", "e", "f", "g", "h"]
+    
+    static let A1 = "a1".coordinate!
+    static let B1 = "b1".coordinate!
+    static let C1 = "c1".coordinate!
+    static let D1 = "d1".coordinate!
+    static let E1 = "e1".coordinate!
+    static let F1 = "f1".coordinate!
+    static let G1 = "g1".coordinate!
+    static let H1 = "h1".coordinate!
+
+    static let A8 = "a8".coordinate!
+    static let B8 = "b8".coordinate!
+    static let C8 = "c8".coordinate!
+    static let D8 = "d8".coordinate!
+    static let E8 = "e8".coordinate!
+    static let F8 = "f8".coordinate!
+    static let G8 = "g8".coordinate!
+    static let H8 = "h8".coordinate!
 
     func offsetBy(rank rankValue: Int) -> Coordinate {
         return offsetBy(rank: rankValue, file: 0)

@@ -17,15 +17,18 @@ class FENParser {
     }
     
     func parse() -> Board? {
-        let fields = fen.split(separator: " ")
-        guard let pieces = fields.first else {
+        var fields = fen.split(separator: " ")
+        guard fields.count == 6 else {
             return nil
         }
+        
+        let pieces = fields.removeFirst()
         
         var board = Board()
         var cursor = Coordinate()
         cursor.rank = Board.size - 1
         
+        // 4k3/2r5/8/8/8/8/2R5/4K3 b - - 0 1
         let ranks = pieces.split(separator: "/")
         for rank in ranks {
             for p in rank {
@@ -42,6 +45,9 @@ class FENParser {
             cursor.rank -= 1
             cursor.file = 0
         }
+        
+        let sideToMove = fields.removeFirst()
+        board.color = (sideToMove == "w") ? .white : .black
         
         return board
     }

@@ -13,6 +13,10 @@ struct Board: CustomStringConvertible {
     static let size = 8
 
     var cells = [Piece](repeating: Piece.none(), count: size*size)
+    var color = Color.white
+    
+    var whiteCanCastle = true
+    var blackCanCastle = true
     
     subscript(cursor: Coordinate) -> Piece {
         get {
@@ -55,10 +59,36 @@ extension Board: Equatable {
 
 extension Board {
     
+    func evaluateCastling(move: Move) {
+        /*
+ Your king has been moved earlier in the game.
+ The rook that castles has been moved earlier in the game.
+ There are pieces standing between your king and rook.
+ The king is in check.
+ The king moves through a square that is attacked by a piece of the opponent.
+ The king would be in check after castling.
+*/
+        guard whiteCanCastle else {
+            return
+        }
+        
+        guard blackCanCastle else {
+            return
+        }
+    }
+}
+
+extension Board {
+    
     func move(move: Move) -> Board {
-        var newBoard = Board(cells: Array(cells))
+        var newBoard = Board()
+        newBoard.color = color.opposite
+        newBoard.whiteCanCastle = whiteCanCastle
+        newBoard.blackCanCastle = blackCanCastle
+        newBoard.cells = Array(cells)
         newBoard[move.to] = newBoard[move.from]
         newBoard[move.from] = Piece.none()
+        newBoard.evaluateCastling(move: move)
         return newBoard
     }
 
@@ -84,12 +114,20 @@ extension Board {
         return piece(at: cursor, type: .knight, color: color)
     }
 
+    func isEmpty(at coordinate: Coordinate) -> Bool {
+        return piece(at: coordinate, type: .none, color: .white)
+    }
+    
     func piece(at cursor: Coordinate, type: PieceType, color: Color) -> Bool {
         guard cursor.isValid else {
             return false
         }
         let piece = self[cursor]
-        return piece.type == type && piece.color == color
+        if type == .none {
+            return piece.type == type
+        } else {
+            return piece.type == type && piece.color == color
+        }
     }
 
 }
