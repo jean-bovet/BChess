@@ -121,16 +121,94 @@ extension Board {
         self[from] = .none()
     }
     
+    func position(ofPiece piece: Piece) -> Coordinate? {
+        for (p, coordinate) in self {
+            if p == piece {
+                return coordinate
+            }
+        }
+        return nil
+    }
+    
     func isCheck(color: Color) -> Bool {
-        let generator = MoveGenerator(board: self, color: color.opposite, verifyCheck: false)
-        let moves = generator.generateMoves()
-        for move in moves {
-            let piece = self[move.to]
-            guard piece.type == .king && piece.color == color else {
+        guard let kingPosition = position(ofPiece: Piece(type: .king, color: color)) else {
+            return false
+        }
+        
+        // TODO check by king
+
+        // Check if king is attacked by pawns
+        if color == .white {
+            // Note: we are looking at the black pawns from the point of the view
+            // of the king being attacked. We need to use the white pawns attack offsets for that!
+            if isAttackedBy(position: kingPosition, color: color, offsets: MoveGenerator.WhitePawnAttackOffsets, type: .pawn) {
+                return true
+            }
+        } else {
+            // Note: we are looking at the white pawns from the point of the view
+            // of the king being attacked. We need to use the black pawns attack offsets for that!
+            if isAttackedBy(position: kingPosition, color: color, offsets: MoveGenerator.BlackPawnAttackOffsets, type: .pawn) {
+                return true
+            }
+        }
+        
+        // Check if a knight can reach the king
+        if isAttackedBy(position: kingPosition, color: color, offsets: MoveGenerator.KnightOffsets, type: .knight) {
+            return true
+        }
+        
+        // Check if a bishop or queen can reach the king
+        if isAttackedBy(position: kingPosition, color: color, offsets: MoveGenerator.BishopOffsets, types: [.bishop, .queen]) {
+            return true
+        }
+
+        // Check if a rook or queen can reach the king
+        if isAttackedBy(position: kingPosition, color: color, offsets: MoveGenerator.RookOffsets, types: [.rook, .queen]) {
+            return true
+        }
+
+        return false
+    }
+    
+    func isAttackedBy(position: Coordinate, color: Color, offsets: [(Int, Int)], type: PieceType) -> Bool {
+        for (rank, file) in offsets {
+            let position = position.offsetBy(rank: rank, file: file)
+            guard position.isValid else {
                 continue
             }
-
-            return true
+            
+            let piece = self[position]
+            if piece.type == type && piece.color != color {
+                return true
+            }
+        }
+        return false
+    }
+    
+    func isAttackedBy(position: Coordinate, color: Color, offsets: [[(Int, Int)]], types: Set<PieceType>) -> Bool {
+        for directionOffsets in offsets {
+            for (rank, file) in directionOffsets {
+                let position = position.offsetBy(rank: rank, file: file)
+                guard position.isValid else {
+                    // no need to continue on that direction anymore if we are out of the board
+                    break
+                }
+                
+                let piece = self[position]
+                if piece.isEmpty {
+                    continue
+                }
+                
+                if piece.color == color {
+                    // no need to continue on that direction if we are hitting a piece from the same color
+                    break
+                } else {
+                    // Check if the piece is a bishop or queen in which case it is check
+                    if types.contains(piece.type) {
+                        return true
+                    }
+                }
+            }
         }
         return false
     }

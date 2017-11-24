@@ -12,12 +12,10 @@ class MoveGenerator {
     
     let board: Board
     let color: Color
-    let verifyCheck: Bool
     
-    init(board: Board, color: Color, verifyCheck: Bool = true) {
+    init(board: Board, color: Color) {
         self.board = board
         self.color = color
-        self.verifyCheck = verifyCheck
     }
     
     func generateMoves() -> [Move] {
@@ -50,6 +48,14 @@ class MoveGenerator {
     }
     
     // MARK: - Pawn
+
+    static let WhitePawnAttackOffsets = [
+        (1, -1), (1, 1)
+    ]
+
+    static let BlackPawnAttackOffsets = [
+        (-1, -1), (-1, 1)
+    ]
 
     func generatePawnMoves(position: Coordinate) -> [Move] {
         var moves = [Move]()
@@ -231,9 +237,6 @@ extension Array where Iterator.Element == Move {
     }
     
     func isCheckValidated(generator: MoveGenerator, from: Coordinate, to: Coordinate) -> Bool {
-        guard generator.verifyCheck else {
-            return true
-        }
         // The new position should not have the king in check (of the color that is moving)
         let newBoard = generator.board.newBoard(withMove: Move(from: from, to: to))
         if newBoard.isCheck(color: generator.color) {
