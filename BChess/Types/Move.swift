@@ -23,6 +23,13 @@ extension Move: Equatable {
     }
 }
 
+extension Move {
+    
+    func equals(_ from: Coordinate, _ to: Coordinate) -> Bool {
+        return self.from == from && self.to == to
+    }
+}
+
 extension Move: CustomStringConvertible {
     
     var description: String {

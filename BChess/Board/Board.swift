@@ -86,12 +86,35 @@ extension Board {
         newBoard.whiteCanCastle = whiteCanCastle
         newBoard.blackCanCastle = blackCanCastle
         newBoard.cells = Array(cells)
-        newBoard[move.to] = newBoard[move.from]
-        newBoard[move.from] = Piece.none()
+        
+        newBoard.inlineMove(move.from, move.to)
+        
+        if move.equals(.E1, .G1) {
+            // White castle king side, need to move the rook
+            newBoard.inlineMove(.F1, .H1)
+        }
+        if move.equals(.E1, .C1) {
+            // White castle queen side, need to move the rook
+            newBoard.inlineMove(.A1, .D1)
+        }
+        if move.equals(.E8, .G8) {
+            // White castle king side, need to move the rook
+            newBoard.inlineMove(.F8, .H8)
+        }
+        if move.equals(.E8, .C8) {
+            // White castle queen side, need to move the rook
+            newBoard.inlineMove(.A8, .D8)
+        }
+
         newBoard.evaluateCastling(move: move)
         return newBoard
     }
 
+    mutating func inlineMove(_ from: Coordinate, _ to: Coordinate) {
+        self[to] = self[from]
+        self[from] = .none()
+    }
+    
     func isCheck(color: Color) -> Bool {
         let generator = MoveGenerator(board: self, color: color.opposite, verifyCheck: false)
         let moves = generator.generateMoves()

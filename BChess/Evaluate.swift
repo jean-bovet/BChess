@@ -21,15 +21,15 @@ class Evaluate {
             let myColor = piece.color == color
             
             if myColor {
-                value += piece.type.value
+                value += piece.type.value * 100
             } else {
-                value -= piece.type.value
+                value -= piece.type.value * 100
             }
         }
         
         // Evaluate the number of pieces being attacked
-        let attackingBonus = 3
-        let checkingBonus = 5
+        let attackingBonus = 10
+        let checkingBonus = 100
         let generator = MoveGenerator(board: board, color: color)
         let moves = generator.generateMoves()
         for move in moves {
