@@ -8,57 +8,8 @@
 
 import Foundation
 
+// https://en.wikipedia.org/wiki/Forsyth–Edwards_Notation
 let StartPosFEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
-
-class FENParser {
-    
-    let fen: String
-    
-    init(fen: String) {
-        self.fen = fen
-    }
-    
-    func parse() -> Board? {
-        var fields = fen.split(separator: " ")
-        guard fields.count == 6 else {
-            return nil
-        }
-        
-        let pieces = fields.removeFirst()
-        
-        var board = Board()
-        var cursor = Coordinate()
-        cursor.rank = Board.size - 1
-        
-        // 4k3/2r5/8/8/8/8/2R5/4K3 b - - 0 1
-        let ranks = pieces.split(separator: "/")
-        for rank in ranks {
-            for p in rank {
-                if let emptySquares = Int(String(p)) {
-                    cursor.file = cursor.file + emptySquares
-                } else if let piece = p.toPiece() {
-                    board[cursor] = piece
-                    cursor.file += 1
-                } else {
-                    print("Invalid FEN entry \(p) with \(fen)")
-                    cursor.file += 1
-                }
-            }
-            cursor.rank -= 1
-            cursor.file = 0
-        }
-        
-        let sideToMove = fields.removeFirst()
-        board.color = (sideToMove == "w") ? .white : .black
-        
-        // KQkq
-        let castlingAvailability = fields.removeFirst()
-        board.castling.fen = String(castlingAvailability)
-
-        return board
-    }
-    
-}
 
 extension Castling {
     
@@ -93,14 +44,8 @@ extension Castling {
     
 }
 
-extension String {
-    func board() -> Board? {
-        return FENParser(fen: self).parse()
-    }
-}
-
 extension Character {
-    func toPiece() -> Piece? {
+    var piece: Piece? {
         switch self {
         case "p":
             return Piece(type: .pawn, color: .black)
@@ -140,86 +85,121 @@ extension Character {
 
 extension Piece {
     
-    var fen: String {
-        let pieceName: String
+    var fen: Character {
+        let pieceName: Character
         switch type {
         case .none:
             pieceName = "."
         case .pawn:
-            pieceName = "p"
+            pieceName = isWhite ? "P" : "p"
         case .rook:
-            pieceName = "r"
+            pieceName = isWhite ? "R" : "r"
         case .knight:
-            pieceName = "n"
+            pieceName = isWhite ? "N" : "n"
         case .bishop:
-            pieceName = "b"
+            pieceName = isWhite ? "B" : "b"
         case .queen:
-            pieceName = "q"
+            pieceName = isWhite ? "Q" : "q"
         case .king:
-            pieceName = "k"
+            pieceName = isWhite ? "K" : "k"
         }
-        if color == .white {
-            return pieceName.uppercased()
-        } else {
-            return pieceName
-        }
+        return pieceName
     }
     
 }
+
 extension Board {
     
-    func toFEN() -> String {
-        // https://en.wikipedia.org/wiki/Forsyth–Edwards_Notation
-        // "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
-        var fen = ""
-        for rank in (0...7).reversed() {
-            var emptyCount = 0
-            for file in 0...7 {
-                let piece = self[rank, file]
-                if piece.isEmpty {
-                    emptyCount += 1
-                } else {
-                    if emptyCount > 0 {
-                        fen += String(emptyCount)
-                        emptyCount = 0
+    var fen: String {
+        get {
+            // "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
+            var fen = ""
+            for rank in (0...7).reversed() {
+                var emptyCount = 0
+                for file in 0...7 {
+                    let piece = self[rank, file]
+                    if piece.isEmpty {
+                        emptyCount += 1
+                    } else {
+                        if emptyCount > 0 {
+                            fen += String(emptyCount)
+                            emptyCount = 0
+                        }
+                        fen += String(piece.fen)
                     }
-                    fen += piece.fen
+                }
+                
+                if emptyCount > 0 {
+                    fen += String(emptyCount)
+                    emptyCount = 0
+                }
+                
+                if rank > 0 {
+                    fen += "/"
                 }
             }
             
-            if emptyCount > 0 {
-                fen += String(emptyCount)
-                emptyCount = 0
+            // Color to move
+            if color == .white {
+                fen += " w"
+            } else {
+                fen += " b"
             }
-
-            if rank > 0 {
-                fen += "/"
+            
+            // Castling availability
+            fen += " \(castling.fen)"
+            
+            // En passant
+            // TODO
+            fen += " -"
+            
+            // Halfmove
+            // TODO
+            fen += " 0"
+            
+            // Full move number (starting at 1)
+            // TODO
+            fen += " 1"
+            
+            return fen
+        }
+        set {
+            var fields = newValue.split(separator: " ")
+            assert(fields.count == 6, "Expected 6 fields for FEN")
+            
+            let pieces = fields.removeFirst()
+            
+            var cursor = Coordinate()
+            cursor.rank = Board.size - 1
+            
+            // 4k3/2r5/8/8/8/8/2R5/4K3 b - - 0 1
+            let ranks = pieces.split(separator: "/")
+            for rank in ranks {
+                for p in rank {
+                    if let emptySquares = Int(String(p)) {
+                        for _ in 1...emptySquares {
+                            self[cursor] = .none()
+                            cursor.file += 1
+                        }
+                    } else if let piece = p.piece {
+                        self[cursor] = piece
+                        cursor.file += 1
+                    } else {
+                        print("Invalid FEN entry \(p) with \(fen)")
+                        cursor.file += 1
+                    }
+                }
+                cursor.rank -= 1
+                cursor.file = 0
             }
+            
+            let sideToMove = fields.removeFirst()
+            color = (sideToMove == "w") ? .white : .black
+            
+            // KQkq
+            let castlingAvailability = fields.removeFirst()
+            castling.fen = String(castlingAvailability)
         }
-        
-        // Color to move
-        if color == .white {
-            fen += " w"
-        } else {
-            fen += " b"
-        }
-        
-        // Castling availability
-        fen += " \(castling.fen)"
-        
-        // En passant
-        // TODO
-        fen += " -"
-        
-        // Halfmove
-        // TODO
-        fen += " 0"
-        
-        // Full move number (starting at 1)
-        // TODO
-        fen += " 1"
-        
-        return fen
     }
 }
 

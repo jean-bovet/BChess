@@ -53,7 +53,7 @@ class GamesTests: XCTestCase {
         
 //        print(uci.engine.board)
         
-        let fen = uci.engine.board.toFEN()
+        let fen = uci.engine.board.fen
         XCTAssertEqual(fen, resultingFEN)
         
         let expectation = XCTestExpectation(description: "evaluation")

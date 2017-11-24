@@ -56,8 +56,10 @@ class MoveTests: XCTestCase {
     }
 
     func assertMoves(_ initial: String, _ expected: [String], _ coordinate: String? = nil) {
-        let initialBoard = initial.board()!
-        let expectedBoards = expected.map { $0.board()! }
+        var initialBoard = Board()
+        initialBoard.fen = initial
+        
+        let expectedBoards: [Board] = expected.map { var board = Board(); board.fen = $0; return board }
         let generator = MoveGenerator(board: initialBoard, color: .white)
         if let coordinate = coordinate?.coordinate {
             let moves = generator.generateMoves(position: coordinate)

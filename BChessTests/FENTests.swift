@@ -11,13 +11,14 @@ import XCTest
 class FENTests: XCTestCase {
 
     func testInitialBoard() {
-        let board = StartPosFEN.board()
-        XCTAssertNotNil(board)
+        var board = Board()
+        board.fen = StartPosFEN
         
-        let fen = board?.toFEN()
+        let fen = board.fen
         XCTAssertEqual(fen, StartPosFEN)
         
-        let again = fen?.board()?.toFEN()
+        board.fen = fen
+        let again = board.fen
         XCTAssertEqual(again, StartPosFEN)
     }
 
