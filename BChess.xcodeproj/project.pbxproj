@@ -20,8 +20,10 @@
 		A7712D261FB917DF00E7E802 /* FEN.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7AFCCC01FB6CE9E00AE3D85 /* FEN.swift */; };
 		A7712D281FBAC47A00E7E802 /* Evaluate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7712D271FBAC47A00E7E802 /* Evaluate.swift */; };
 		A7712D291FBAC4B700E7E802 /* Evaluate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7712D271FBAC47A00E7E802 /* Evaluate.swift */; };
+		A7712D2B1FC7C1FA00E7E802 /* Helper.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7712D2A1FC7C1FA00E7E802 /* Helper.swift */; };
+		A7712D2D1FC7C22000E7E802 /* UCIEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7712D2C1FC7C22000E7E802 /* UCIEngine.swift */; };
+		A7712D2F1FC7C4CD00E7E802 /* UCI.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7712D2E1FC7C4CD00E7E802 /* UCI.swift */; };
 		A7AFCCAA1FB4E40D00AE3D85 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7AFCCA91FB4E40D00AE3D85 /* main.swift */; };
-		A7AFCCB11FB4E4DF00AE3D85 /* ConsoleUI.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7AFCCB01FB4E4DF00AE3D85 /* ConsoleUI.swift */; };
 		A7AFCCB31FB5091000AE3D85 /* Board.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7AFCCB21FB5091000AE3D85 /* Board.swift */; };
 		A7AFCCB51FB5170900AE3D85 /* MoveGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7AFCCB41FB5170900AE3D85 /* MoveGenerator.swift */; };
 		A7AFCCB71FB62DBA00AE3D85 /* Analysis.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7AFCCB61FB62DBA00AE3D85 /* Analysis.swift */; };
@@ -51,9 +53,12 @@
 		A7712D161FB916E900E7E802 /* BChessTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BChessTests.swift; sourceTree = "<group>"; };
 		A7712D181FB916E900E7E802 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		A7712D271FBAC47A00E7E802 /* Evaluate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Evaluate.swift; sourceTree = "<group>"; };
+		A7712D2A1FC7C1FA00E7E802 /* Helper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Helper.swift; sourceTree = "<group>"; };
+		A7712D2C1FC7C22000E7E802 /* UCIEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UCIEngine.swift; sourceTree = "<group>"; };
+		A7712D2E1FC7C4CD00E7E802 /* UCI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UCI.swift; sourceTree = "<group>"; };
+		A7712D311FC7C5CF00E7E802 /* ToDo.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = ToDo.md; sourceTree = "<group>"; };
 		A7AFCCA61FB4E40D00AE3D85 /* BChess */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = BChess; sourceTree = BUILT_PRODUCTS_DIR; };
 		A7AFCCA91FB4E40D00AE3D85 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
-		A7AFCCB01FB4E4DF00AE3D85 /* ConsoleUI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleUI.swift; sourceTree = "<group>"; };
 		A7AFCCB21FB5091000AE3D85 /* Board.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Board.swift; sourceTree = "<group>"; };
 		A7AFCCB41FB5170900AE3D85 /* MoveGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoveGenerator.swift; sourceTree = "<group>"; };
 		A7AFCCB61FB62DBA00AE3D85 /* Analysis.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Analysis.swift; sourceTree = "<group>"; };
@@ -93,9 +98,19 @@
 			path = BChessTests;
 			sourceTree = "<group>";
 		};
+		A7712D301FC7C4D300E7E802 /* UCI */ = {
+			isa = PBXGroup;
+			children = (
+				A7712D2E1FC7C4CD00E7E802 /* UCI.swift */,
+				A7712D2C1FC7C22000E7E802 /* UCIEngine.swift */,
+			);
+			path = UCI;
+			sourceTree = "<group>";
+		};
 		A7AFCC9D1FB4E40D00AE3D85 = {
 			isa = PBXGroup;
 			children = (
+				A7712D311FC7C5CF00E7E802 /* ToDo.md */,
 				A7AFCCA81FB4E40D00AE3D85 /* BChess */,
 				A7712D151FB916E900E7E802 /* BChessTests */,
 				A7AFCCA71FB4E40D00AE3D85 /* Products */,
@@ -115,11 +130,12 @@
 			isa = PBXGroup;
 			children = (
 				A7AFCCA91FB4E40D00AE3D85 /* main.swift */,
-				A7AFCCB01FB4E4DF00AE3D85 /* ConsoleUI.swift */,
+				A7712D301FC7C4D300E7E802 /* UCI */,
 				A7AFCCB61FB62DBA00AE3D85 /* Analysis.swift */,
 				A7712D271FBAC47A00E7E802 /* Evaluate.swift */,
 				A7AFCCB41FB5170900AE3D85 /* MoveGenerator.swift */,
 				A7AFCCC01FB6CE9E00AE3D85 /* FEN.swift */,
+				A7712D2A1FC7C1FA00E7E802 /* Helper.swift */,
 				A7AFCCC71FB7CBE500AE3D85 /* Board */,
 				A7AFCCC61FB7CA6900AE3D85 /* Types */,
 			);
@@ -257,14 +273,16 @@
 			buildActionMask = 2147483647;
 			files = (
 				A7AFCCAA1FB4E40D00AE3D85 /* main.swift in Sources */,
+				A7712D2B1FC7C1FA00E7E802 /* Helper.swift in Sources */,
 				A7AFCCBB1FB6CD7800AE3D85 /* PieceType.swift in Sources */,
 				A7712D281FBAC47A00E7E802 /* Evaluate.swift in Sources */,
 				A7AFCCB51FB5170900AE3D85 /* MoveGenerator.swift in Sources */,
+				A7712D2F1FC7C4CD00E7E802 /* UCI.swift in Sources */,
 				A7AFCCC11FB6CE9E00AE3D85 /* FEN.swift in Sources */,
 				A7AFCCC51FB6D01400AE3D85 /* Move.swift in Sources */,
-				A7AFCCB11FB4E4DF00AE3D85 /* ConsoleUI.swift in Sources */,
 				A7AFCCBD1FB6CDB000AE3D85 /* Piece.swift in Sources */,
 				A7AFCCBF1FB6CE6B00AE3D85 /* Coordinate.swift in Sources */,
+				A7712D2D1FC7C22000E7E802 /* UCIEngine.swift in Sources */,
 				A7AFCCC31FB6CFCB00AE3D85 /* BoardIterator.swift in Sources */,
 				A7AFCCB71FB62DBA00AE3D85 /* Analysis.swift in Sources */,
 				A7AFCCB31FB5091000AE3D85 /* Board.swift in Sources */,
