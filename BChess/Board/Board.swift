@@ -19,7 +19,7 @@ struct Board: CustomStringConvertible {
 
     static let size = 8
 
-    var cells = [Piece](repeating: Piece.none(), count: size*size)
+    var cells = [Piece](repeating: Piece.None, count: size*size)
     var color = Color.white
     
     var castling = Castling()
@@ -118,7 +118,7 @@ extension Board {
 
     private mutating func applyMove(_ from: Coordinate, _ to: Coordinate) {
         self[to] = self[from]
-        self[from] = .none()
+        self[from] = .None
     }
     
     func position(ofPiece piece: Piece) -> Coordinate? {
@@ -172,7 +172,7 @@ extension Board {
     
     func isAttackedBy(position: Coordinate, color: Color, offsets: [(Int, Int)], type: PieceType) -> Bool {
         for (rank, file) in offsets {
-            let position = position.offsetBy(rank: rank, file: file)
+            let position = position.newCoordinateByOffset(rank: rank, file: file)
             guard position.isValid else {
                 continue
             }
@@ -188,7 +188,7 @@ extension Board {
     func isAttackedBy(position: Coordinate, color: Color, offsets: [[(Int, Int)]], types: Set<PieceType>) -> Bool {
         for directionOffsets in offsets {
             for (rank, file) in directionOffsets {
-                let position = position.offsetBy(rank: rank, file: file)
+                let position = position.newCoordinateByOffset(rank: rank, file: file)
                 guard position.isValid else {
                     // no need to continue on that direction anymore if we are out of the board
                     break

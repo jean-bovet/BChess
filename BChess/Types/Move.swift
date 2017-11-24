@@ -12,9 +12,7 @@ struct Move {
     let from: Coordinate
     let to: Coordinate
     
-    static func invalid() -> Move {
-        return Move(from: Coordinate.invalid(), to: Coordinate.invalid())
-    }
+    static let Invalid = Move(from: Coordinate.Invalid, to: Coordinate.Invalid)
 }
 
 extension Move: Equatable {

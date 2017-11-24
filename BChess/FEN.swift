@@ -177,7 +177,7 @@ extension Board {
                 for p in rank {
                     if let emptySquares = Int(String(p)) {
                         for _ in 1...emptySquares {
-                            self[cursor] = .none()
+                            self[cursor] = .None
                             cursor.file += 1
                         }
                     } else if let piece = p.piece {

@@ -60,20 +60,22 @@ class MoveGenerator {
     func generatePawnMoves(position: Coordinate) -> [Move] {
         var moves = [Move]()
         if color == .white {
-            moves.appendMove(generator: self, from: position, to: position.offsetBy(rank: 1, file: -1), canEat: true, mustEat: true)
-            moves.appendMove(generator: self, from: position, to: position.offsetBy(rank: 1, file: 1), canEat: true, mustEat: true)
+            for (rank, file) in MoveGenerator.WhitePawnAttackOffsets {
+                moves.appendMove(generator: self, from: position, to: position.newCoordinateByOffset(rank: rank, file: file), canEat: true, mustEat: true)
+            }
 
-            moves.appendMove(generator: self, from: position, to: position.offsetBy(rank: 1), canEat: false, mustEat: false)
+            moves.appendMove(generator: self, from: position, to: position.newCoordinateByOffset(rank: 1, file: 0), canEat: false, mustEat: false)
             if position.rank == 1 {
-                moves.appendMove(generator: self, from: position, to: position.offsetBy(rank: 2), canEat: false, mustEat: false)
+                moves.appendMove(generator: self, from: position, to: position.newCoordinateByOffset(rank: 2, file: 0), canEat: false, mustEat: false)
             }
         } else {
-            moves.appendMove(generator: self, from: position, to: position.offsetBy(rank: -1, file: -1), canEat: true, mustEat: true)
-            moves.appendMove(generator: self, from: position, to: position.offsetBy(rank: -1, file: 1), canEat: true, mustEat: true)
+            for (rank, file) in MoveGenerator.BlackPawnAttackOffsets {
+                moves.appendMove(generator: self, from: position, to: position.newCoordinateByOffset(rank: rank, file: file), canEat: true, mustEat: true)
+            }
 
-            moves.appendMove(generator: self, from: position, to: position.offsetBy(rank: -1), canEat: false, mustEat: false)
+            moves.appendMove(generator: self, from: position, to: position.newCoordinateByOffset(rank: -1, file: 0), canEat: false, mustEat: false)
             if position.rank == 7 {
-                moves.appendMove(generator: self, from: position, to: position.offsetBy(rank: -2), canEat: false, mustEat: false)
+                moves.appendMove(generator: self, from: position, to: position.newCoordinateByOffset(rank: -2, file: 0), canEat: false, mustEat: false)
             }
         }
         return moves
@@ -96,7 +98,7 @@ class MoveGenerator {
         var moves = [Move]()
 
         for (deltaRank, deltaFile) in MoveGenerator.KnightOffsets {
-            moves.appendMove(generator: self, from: position, to: position.offsetBy(rank: deltaRank, file: deltaFile))
+            moves.appendMove(generator: self, from: position, to: position.newCoordinateByOffset(rank: deltaRank, file: deltaFile))
         }
         
         return moves
@@ -115,7 +117,7 @@ class MoveGenerator {
         var moves = [Move]()
         for directionOffsets in MoveGenerator.BishopOffsets {
             for offset in directionOffsets {
-                guard moves.appendMove(generator: self, from: position, to: position.offsetBy(rank: offset.0, file: offset.1)) else {
+                guard moves.appendMove(generator: self, from: position, to: position.newCoordinateByOffset(rank: offset.0, file: offset.1)) else {
                     break
                 }
             }
@@ -136,7 +138,7 @@ class MoveGenerator {
         var moves = [Move]()
         for directionOffsets in MoveGenerator.RookOffsets {
             for offset in directionOffsets {
-                guard moves.appendMove(generator: self, from: position, to: position.offsetBy(rank: offset.0, file: offset.1)) else {
+                guard moves.appendMove(generator: self, from: position, to: position.newCoordinateByOffset(rank: offset.0, file: offset.1)) else {
                     break
                 }
             }
@@ -152,7 +154,7 @@ class MoveGenerator {
         var moves = [Move]()
         for directionOffsets in MoveGenerator.QueenOffsets {
             for offset in directionOffsets {
-                guard moves.appendMove(generator: self, from: position, to: position.offsetBy(rank: offset.0, file: offset.1)) else {
+                guard moves.appendMove(generator: self, from: position, to: position.newCoordinateByOffset(rank: offset.0, file: offset.1)) else {
                     break
                 }
             }
@@ -171,7 +173,7 @@ class MoveGenerator {
     func generateKingMoves(position: Coordinate) -> [Move] {
         var moves = [Move]()
         for (deltaRank, deltaFile) in MoveGenerator.KingOffsets {
-            moves.appendMove(generator: self, from: position, to: position.offsetBy(rank: deltaRank, file: deltaFile))
+            moves.appendMove(generator: self, from: position, to: position.newCoordinateByOffset(rank: deltaRank, file: deltaFile))
         }
         moves.append(contentsOf: generateKingCastles(position: position))
         return moves

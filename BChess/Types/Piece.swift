@@ -12,6 +12,8 @@ struct Piece {
     let type: PieceType
     let color: Color
     
+    static let None = Piece(type: .none, color: .white)
+
     var isWhite: Bool {
         return color == .white
     }
@@ -20,10 +22,6 @@ struct Piece {
         return type == .none
     }
     
-    static func none() -> Piece {
-        return Piece(type: .none, color: .white)
-    }
-
 }
 
 extension Piece: Equatable {

@@ -12,6 +12,8 @@ struct Coordinate {
     var rank = 0
     var file = 0
     
+    static let Invalid = Coordinate(rank: Int.max, file: Int.max)
+
     static let letters = ["a", "b", "c", "d", "e", "f", "g", "h"]
     
     static let A1 = "a1".coordinate!
@@ -31,12 +33,8 @@ struct Coordinate {
     static let F8 = "f8".coordinate!
     static let G8 = "g8".coordinate!
     static let H8 = "h8".coordinate!
-
-    func offsetBy(rank rankValue: Int) -> Coordinate {
-        return offsetBy(rank: rankValue, file: 0)
-    }
     
-    func offsetBy(rank rankValue: Int, file fileValue: Int) -> Coordinate {
+    func newCoordinateByOffset(rank rankValue: Int, file fileValue: Int) -> Coordinate {
         return Coordinate(rank: rank + rankValue, file: file + fileValue)
     }
     
@@ -44,9 +42,6 @@ struct Coordinate {
         return rank >= 0 && rank < Board.size && file >= 0 && file < Board.size
     }
     
-    static func invalid() -> Coordinate {
-        return Coordinate(rank: Int.max, file: Int.max)
-    }
 }
 
 extension Coordinate: Equatable {

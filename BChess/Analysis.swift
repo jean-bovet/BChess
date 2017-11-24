@@ -76,7 +76,7 @@ class Analysis {
     func searchBestMove(board: Board, color: Color, maxDepth: Int, callback: SearchBestMoveCallback) -> Info {
         analyzing = true
         
-        var evaluation = Evaluation(move: Move.invalid(), value: 0, line: [])
+        var evaluation = Evaluation(move: Move.Invalid, value: 0, line: [])
         var info = Info(depth: 0, time: 0, evaluation: evaluation, nodeEvaluated: 0, movesPerSecond: 0)
         
         for curMaxDepth in 2...maxDepth {
@@ -118,7 +118,7 @@ class Analysis {
                   line: [Move],
                   alpha _alpha: Int,
                   beta _beta: Int) -> Evaluation {
-        var bestEvaluation = Evaluation(move: Move.invalid(), value: evaluater.startValue, line: [])
+        var bestEvaluation = Evaluation(move: Move.Invalid, value: evaluater.startValue, line: [])
         
         guard analyzing else {
             return bestEvaluation
