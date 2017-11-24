@@ -95,46 +95,78 @@ class MoveGenerator {
         
         return moves
     }
-
-    typealias DirectionsType = [(Int, Int)]
     
     // MARK: - Bishop
-    
-    var bishopDirections: DirectionsType {
-        return [ (-1, -1), (1, -1),
-                 (-1, 1), (1, 1) ]
-    }
 
+    static let BishopOffsets = [
+        [ (1, 1), (2, 2), (3, 3), (4, 4), (5, 5), (6, 6), (7, 7), (8, 8)],
+        [ (1, -1), (2, -2), (3, -3), (4, -4), (5, -5), (6, -6), (7, -7), (8, -8)],
+        [ (-1, -1), (-2, -2), (-3, -3), (-4, -4), (-5, -5), (-6, -6), (-7, -7), (-8, -8)],
+        [ (-1, 1), (-2, 2), (-3, 3), (-4, 4), (-5, 5), (-6, 6), (-7, 7), (-8, 8)],
+        ]
+    
     func generateBishopMoves(position: Coordinate) -> [Move] {
-        return generateMoves(forDirections: bishopDirections, position: position)
+        var moves = [Move]()
+        for directionOffsets in MoveGenerator.BishopOffsets {
+            for offset in directionOffsets {
+                guard moves.appendMove(generator: self, from: position, to: position.offsetBy(rank: offset.0, file: offset.1)) else {
+                    break
+                }
+            }
+        }
+        return moves
     }
     
     // MARK: - Rook
 
-    var rookDirections: DirectionsType {
-        return [ (-1, 0), (0, 1),
-                 (1, 0), (0, -1) ]
-    }
+    static let RookOffsets = [
+        [ (1, 0), (2, 0), (3, 0), (4, 0), (5, 0), (6, 0), (7, 0), (8, 0)],
+        [ (0, 1), (0, 2), (0, 3), (0, 4), (0, 5), (0, 6), (0, 7), (0, 8)],
+        [ (0, -1), (0, -2), (0, -3), (0, -4), (0, -5), (0, -6), (0, -7), (0, -8)],
+        [ (-1, 0), (-2, 0), (-3, 0), (-4, 0), (-5, 0), (-6, 0), (-7, 0), (-8, 0)],
+    ]
 
     func generateRookMoves(position: Coordinate) -> [Move] {
-        return generateMoves(forDirections: rookDirections, position: position)
+        var moves = [Move]()
+        for directionOffsets in MoveGenerator.RookOffsets {
+            for offset in directionOffsets {
+                guard moves.appendMove(generator: self, from: position, to: position.offsetBy(rank: offset.0, file: offset.1)) else {
+                    break
+                }
+            }
+        }
+        return moves
     }
     
     // MARK: - Queen
 
-    var queenDirections: DirectionsType {
-        return bishopDirections + rookDirections
-    }
+    static let QueenOffsets = MoveGenerator.BishopOffsets + MoveGenerator.RookOffsets
     
     func generateQueenMoves(position: Coordinate) -> [Move] {
-        return generateMoves(forDirections: queenDirections, position: position)
+        var moves = [Move]()
+        for directionOffsets in MoveGenerator.QueenOffsets {
+            for offset in directionOffsets {
+                guard moves.appendMove(generator: self, from: position, to: position.offsetBy(rank: offset.0, file: offset.1)) else {
+                    break
+                }
+            }
+        }
+        return moves
     }
 
     // MARK: - King
 
+    static let KingOffsets = [
+        (-1, -1), (-1, 0), (-1, 1),
+        (1, -1), (1, 0), (1, 1),
+        (0, 1), (0, -1)
+    ]
+    
     func generateKingMoves(position: Coordinate) -> [Move] {
         var moves = [Move]()
-        moves.append(contentsOf: generateMoves(forDirections: queenDirections, position: position, length: 1))
+        for (deltaRank, deltaFile) in MoveGenerator.KingOffsets {
+            moves.appendMove(generator: self, from: position, to: position.offsetBy(rank: deltaRank, file: deltaFile))
+        }
         moves.append(contentsOf: generateKingCastles(position: position))
         return moves
     }
@@ -174,21 +206,6 @@ class MoveGenerator {
         return moves
     }
     
-    // MARK: - Helpers
-
-    func generateMoves(forDirections directions: DirectionsType, position: Coordinate, length: Int = Board.size) -> [Move] {
-        var moves = [Move]()
-        for (dx, dy) in directions {
-            for distance in 1...length {
-                let newPosition = position.offsetBy(rank: dy*distance, file: dx*distance)
-                guard moves.appendMove(generator: self, from: position, to: newPosition) else {
-                    break
-                }
-            }
-        }
-        return moves
-    }
-
 }
 
 extension Array where Iterator.Element == Move {
