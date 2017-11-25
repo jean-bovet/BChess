@@ -93,7 +93,7 @@ class GamesTests: XCTestCase {
         XCTAssertEqual(fen, resultingFEN)
         
         let expectation = XCTestExpectation(description: "evaluation")
-        var engineInfo: Analysis.Info? = nil
+        var engineInfo: Minimax.Info? = nil
         uci.engine.evaluate(depth: depth) { (info, completed) in
             if completed {
                 engineInfo = info

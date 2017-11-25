@@ -231,7 +231,7 @@ extension Array where Iterator.Element == Move {
             }
             return true
         } else {
-            if piece.color == generator.color.opposite && (canEat || mustEat) && isCheckValidated(generator: generator, from: from, to: to) {
+            if piece.color != generator.color && (canEat || mustEat) && isCheckValidated(generator: generator, from: from, to: to) {
                 append(Move(from: from, to: to))
             }
             return false

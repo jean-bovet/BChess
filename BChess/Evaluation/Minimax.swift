@@ -8,57 +8,11 @@
 
 import Foundation
 
-enum Evaluater {
-    case Minimize
-    case Maximize
-    
-    var inverse: Evaluater {
-        switch self {
-        case .Maximize:
-            return .Minimize
-        case .Minimize:
-            return .Maximize
-        }
-    }
-    
-    var startValue: Int {
-        switch self {
-        case .Maximize:
-            return Int.min
-        case .Minimize:
-            return Int.max
-        }
-    }
-    
-    func isBestValue(current: Int, new: Int) -> Bool {
-        switch self {
-        case .Maximize:
-            return new > current
-        case .Minimize:
-            return new < current
-        }
-    }
-}
-
-struct Evaluation: CustomStringConvertible {
-    let move: Move
-    let value: Int
-    let line: [Move]
-    
-    var description: String {
-        return "\(move)[\(value)]"
-    }
-    
-    var lineInfo: String {
-        return line.map { $0.description }.joined(separator: " ")
-    }
-}
-
 // Minim algorithm with alpha-beta pruning and iterative deepening first search
 // http://www.geeksforgeeks.org/minimax-algorithm-in-game-theory-set-1-introduction/
 // http://www.geeksforgeeks.org/minimax-algorithm-in-game-theory-set-4-alpha-beta-pruning/
 // https://en.wikipedia.org/wiki/Iterative_deepening_depth-first_search
-class Analysis {
+class Minimax {
     
     var evaluateCount = 0
     var analyzing = false

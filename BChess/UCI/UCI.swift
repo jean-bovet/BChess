@@ -9,7 +9,7 @@
 import Foundation
 import os.log
 
-extension Analysis.Info {
+extension Minimax.Info {
     
     var uciInfoMessage: String {
         return "info depth \(depth) time \(time) nodes \(nodeEvaluated) nps \(movesPerSecond) score cp \(evaluation.value) pv \(evaluation.lineInfo)"

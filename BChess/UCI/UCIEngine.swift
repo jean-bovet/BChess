@@ -14,11 +14,11 @@ class UCIEngine {
     
     var board = Board()
 
-    let minimax = Analysis()
+    let minimax = Minimax()
     
     var async = true
     
-    typealias Callback = (_ info: Analysis.Info, _ completed: Bool) -> Void
+    typealias Callback = (_ info: Minimax.Info, _ completed: Bool) -> Void
 
     func evaluate(depth: Int, callback: @escaping Callback) {
         minimax.analyzing = false
