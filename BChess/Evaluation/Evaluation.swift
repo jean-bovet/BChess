@@ -13,6 +13,10 @@ struct Evaluation: CustomStringConvertible {
     let value: Int
     let line: [Move]
     
+    var isValid: Bool {
+        return move.isValid
+    }
+    
     var description: String {
         return "\(move)[\(value)]"
     }

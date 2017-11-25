@@ -13,6 +13,10 @@ struct Move {
     let to: Coordinate
     
     static let Invalid = Move(from: Coordinate.Invalid, to: Coordinate.Invalid)
+    
+    var isValid: Bool {
+        return from.isValid && to.isValid
+    }
 }
 
 extension Move: Equatable {

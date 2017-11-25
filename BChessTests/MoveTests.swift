@@ -55,12 +55,24 @@ class MoveTests: XCTestCase {
                   "d5")
     }
 
+    func testBlackKingCheckByKnight() {
+        assertMoves("3r3k/5Npp/8/8/2Q5/1B6/8/7K b - - 1 1", [ "3r2k1/5Npp/8/8/2Q5/1B6/8/7K w - - 2 2" ], "h8")
+    }
+    
+    func testBlackKingCheckByQueen() {
+        assertMoves("3r2Qk/6pp/8/6N1/8/1B6/8/7K b - - 1 1", [ "6rk/6pp/8/6N1/8/1B6/8/7K w - - 0 2"])
+    }
+    
+    func testBlackIsMate() {
+        assertMoves("6rk/5Npp/8/8/8/1B6/8/7K b - - 1 2", [])
+    }
+    
     func assertMoves(_ initial: String, _ expected: [String], _ coordinate: String? = nil) {
         var initialBoard = Board()
         initialBoard.fen = initial
         
         let expectedBoards: [Board] = expected.map { var board = Board(); board.fen = $0; return board }
-        let generator = MoveGenerator(board: initialBoard, color: .white)
+        let generator = MoveGenerator(board: initialBoard, color: initialBoard.color)
         if let coordinate = coordinate?.coordinate {
             let moves = generator.generateMoves(position: coordinate)
             let boards = moves.map { initialBoard.newBoard(withMove: $0) }

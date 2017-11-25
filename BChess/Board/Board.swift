@@ -206,6 +206,10 @@ extension Board {
                     // Check if the piece is a bishop or queen in which case it is check
                     if types.contains(piece.type) {
                         return true
+                    } else {
+                        // If the piece is something else, then we can stop in that direction
+                        // because there is no attack
+                        break
                     }
                 }
             }

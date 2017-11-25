@@ -41,6 +41,7 @@ class Minimax {
             evaluateCount = 0
             let before = DispatchTime.now()
             evaluation = evaluate(board: board,
+                                  move: Move.Invalid,
                                   color: color,
                                   depth: 1,
                                   maxDepth: curMaxDepth,
@@ -65,6 +66,7 @@ class Minimax {
     }
     
     func evaluate(board: Board,
+                  move: Move,
                   color: Color,
                   depth: Int,
                   maxDepth: Int,
@@ -83,6 +85,12 @@ class Minimax {
         
         let generator = MoveGenerator(board: board, color: color)
         let moves = generator.generateMoves()
+        if moves.isEmpty {
+            let boardValue = Evaluate.evaluate(board: board, moves: moves)
+            bestEvaluation = Evaluation(move: move, value: boardValue, line: [])
+            return bestEvaluation
+        }
+        
         var lineMove: Move? = nil
 
         if depth - 1 < line.count {
@@ -129,6 +137,7 @@ class Minimax {
         evaluateCount += 1
 
         let evaluation = evaluate(board: board.newBoard(withMove: move),
+                                  move: move,
                                   color: color.opposite,
                                   depth: depth+1,
                                   maxDepth: maxDepth,
@@ -136,15 +145,19 @@ class Minimax {
                                   line: line,
                                   alpha: alpha,
                                   beta: beta)
-        if evaluater.isBestValue(current: bestEvaluation.value, new: evaluation.value) {
-            let bestLine = [move] + evaluation.line
-            bestEvaluation = Evaluation(move: move, value: evaluation.value, line: bestLine)
-        }
-        
-        if evaluater == .Maximize {
-            alpha = max(alpha, bestEvaluation.value)
-        } else {
-            beta = min(beta, bestEvaluation.value)
+        if evaluation.isValid {
+            // Only evaluate valid evaluation. An evaluation can be invalid
+            // if the evaluation has been cancelled for example.
+            if evaluater.isBestValue(current: bestEvaluation.value, new: evaluation.value) {
+                let bestLine = [move] + evaluation.line
+                bestEvaluation = Evaluation(move: move, value: evaluation.value, line: bestLine)
+            }
+            
+            if evaluater == .Maximize {
+                alpha = max(alpha, bestEvaluation.value)
+            } else {
+                beta = min(beta, bestEvaluation.value)
+            }
         }
         
         // Returns true if the evaluation can stop because the best move has been found
