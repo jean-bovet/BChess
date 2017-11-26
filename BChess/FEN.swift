@@ -182,6 +182,7 @@ extension Board {
                         }
                     } else if let piece = p.piece {
                         self[cursor] = piece
+                        updatePositions(piece: piece, coordinate: cursor)
                         cursor.file += 1
                     } else {
                         print("Invalid FEN entry \(p) with \(fen)")

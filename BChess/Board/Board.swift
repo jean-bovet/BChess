@@ -15,6 +15,11 @@ struct Castling {
     var blackQueenSide = true    
 }
 
+struct PiecePositions {
+    var whiteKing = Coordinate.Invalid
+    var blackKing = Coordinate.Invalid
+}
+
 struct Board: CustomStringConvertible {
 
     static let size = 8
@@ -26,6 +31,8 @@ struct Board: CustomStringConvertible {
     
     // Fullmove number: The number of the full move. It starts at 1, and is incremented after Black's move
     var fullMoveCount = 1
+    
+    var positions = PiecePositions()
     
     subscript(cursor: Coordinate) -> Piece {
         get {
@@ -57,6 +64,20 @@ struct Board: CustomStringConvertible {
         return text
     }
 
+}
+
+extension Board {
+
+    mutating func updatePositions(piece: Piece, coordinate: Coordinate) {
+        if piece.type == .king {
+            if piece.isWhite {
+                positions.whiteKing = coordinate
+            } else {
+                positions.blackKing = coordinate
+            }
+        }
+    }
+    
 }
 
 extension Board: Equatable {
@@ -117,6 +138,9 @@ extension Board {
     }
 
     private mutating func applyMove(_ from: Coordinate, _ to: Coordinate) {
+        updatePositions(piece: self[from], coordinate: to)
+        updatePositions(piece: self[to], coordinate: Coordinate.Invalid)
+        
         self[to] = self[from]
         self[from] = .None
     }
@@ -131,9 +155,7 @@ extension Board {
     }
     
     func isCheck(color: Color) -> Bool {
-        guard let kingPosition = position(ofPiece: Piece(type: .king, color: color)) else {
-            return false
-        }
+        let kingPosition = color == .white ? positions.whiteKing : positions.blackKing
 
         // Check if king is attacked by the other king
         if isAttackedBy(position: kingPosition, color: color, offsets: MoveGenerator.KingOffsets, type: .king) {

@@ -35,7 +35,11 @@ struct Coordinate {
     static let H8 = "h8".coordinate!
     
     func newCoordinateByOffset(rank rankValue: Int, file fileValue: Int) -> Coordinate {
-        return Coordinate(rank: rank + rankValue, file: file + fileValue)
+        if isValid {
+            return Coordinate(rank: rank + rankValue, file: file + fileValue)
+        } else {
+            return .Invalid
+        }
     }
     
     var isValid: Bool {

@@ -143,6 +143,16 @@ class UCI {
     }
     
     func run() {
+        // Performance testing
+//        if true {
+//            let arguments = ["xcode", "position fen 3r3k/6pp/8/6N1/2Q5/1B6/8/7K w - - 0 1", "go wtime 300000 btime 300000"]
+//            for tokens in arguments {
+//                var t = tokens.split(separator: " ").map { String($0) }
+//                process(&t)
+//            }
+//            exit(0)
+//        }
+        
         if CommandLine.arguments.count > 1 {
             let arguments = CommandLine.arguments[1...].map { String($0) }
             for tokens in arguments.split(separator: "||") {
