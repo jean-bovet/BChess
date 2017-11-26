@@ -134,8 +134,11 @@ extension Board {
         guard let kingPosition = position(ofPiece: Piece(type: .king, color: color)) else {
             return false
         }
-        
-        // TODO check by king
+
+        // Check if king is attacked by the other king
+        if isAttackedBy(position: kingPosition, color: color, offsets: MoveGenerator.KingOffsets, type: .king) {
+            return true
+        }
 
         // Check if king is attacked by pawns
         if color == .white {
