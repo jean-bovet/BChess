@@ -30,6 +30,7 @@
 		A7712D3B1FC8E30400E7E802 /* Evaluation.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7712D3A1FC8E30400E7E802 /* Evaluation.swift */; };
 		A7712D3D1FC8E3A700E7E802 /* Evaluater.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7712D381FC8E2DD00E7E802 /* Evaluater.swift */; };
 		A7712D3E1FC8E3A700E7E802 /* Evaluation.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7712D3A1FC8E30400E7E802 /* Evaluation.swift */; };
+		A7712D421FCB97A900E7E802 /* magicmoves.c in Sources */ = {isa = PBXBuildFile; fileRef = A7712D411FCB97A900E7E802 /* magicmoves.c */; };
 		A7AFCCAA1FB4E40D00AE3D85 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7AFCCA91FB4E40D00AE3D85 /* main.swift */; };
 		A7AFCCB31FB5091000AE3D85 /* Board.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7AFCCB21FB5091000AE3D85 /* Board.swift */; };
 		A7AFCCB51FB5170900AE3D85 /* MoveGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7AFCCB41FB5170900AE3D85 /* MoveGenerator.swift */; };
@@ -67,6 +68,9 @@
 		A7712D361FC899D200E7E802 /* FENTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FENTests.swift; sourceTree = "<group>"; };
 		A7712D381FC8E2DD00E7E802 /* Evaluater.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Evaluater.swift; sourceTree = "<group>"; };
 		A7712D3A1FC8E30400E7E802 /* Evaluation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Evaluation.swift; sourceTree = "<group>"; };
+		A7712D3F1FCB97A800E7E802 /* BChess-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "BChess-Bridging-Header.h"; sourceTree = "<group>"; };
+		A7712D401FCB97A900E7E802 /* magicmoves.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = magicmoves.h; sourceTree = "<group>"; };
+		A7712D411FCB97A900E7E802 /* magicmoves.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = magicmoves.c; sourceTree = "<group>"; };
 		A7AFCCA61FB4E40D00AE3D85 /* BChess */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = BChess; sourceTree = BUILT_PRODUCTS_DIR; };
 		A7AFCCA91FB4E40D00AE3D85 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		A7AFCCB21FB5091000AE3D85 /* Board.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Board.swift; sourceTree = "<group>"; };
@@ -155,6 +159,9 @@
 				A7AFCCA91FB4E40D00AE3D85 /* main.swift */,
 				A7AFCCB41FB5170900AE3D85 /* MoveGenerator.swift */,
 				A7AFCCC01FB6CE9E00AE3D85 /* FEN.swift */,
+				A7712D3F1FCB97A800E7E802 /* BChess-Bridging-Header.h */,
+				A7712D401FCB97A900E7E802 /* magicmoves.h */,
+				A7712D411FCB97A900E7E802 /* magicmoves.c */,
 				A7712D301FC7C4D300E7E802 /* UCI */,
 				A7AFCCC71FB7CBE500AE3D85 /* Board */,
 				A7AFCCC61FB7CA6900AE3D85 /* Types */,
@@ -237,6 +244,7 @@
 					};
 					A7AFCCA51FB4E40D00AE3D85 = {
 						CreatedOnToolsVersion = 9.1;
+						LastSwiftMigration = 0910;
 						ProvisioningStyle = Automatic;
 					};
 				};
@@ -310,6 +318,7 @@
 				A7AFCCBF1FB6CE6B00AE3D85 /* Coordinate.swift in Sources */,
 				A7712D2D1FC7C22000E7E802 /* UCIEngine.swift in Sources */,
 				A7AFCCC31FB6CFCB00AE3D85 /* BoardIterator.swift in Sources */,
+				A7712D421FCB97A900E7E802 /* magicmoves.c in Sources */,
 				A7712D391FC8E2DD00E7E802 /* Evaluater.swift in Sources */,
 				A7AFCCB71FB62DBA00AE3D85 /* Minimax.swift in Sources */,
 				A7712D3B1FC8E30400E7E802 /* Evaluation.swift in Sources */,
@@ -458,9 +467,13 @@
 		A7AFCCAE1FB4E40D00AE3D85 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 28XRU7S6GA;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "BChess/BChess-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 4.0;
 			};
 			name = Debug;
@@ -468,9 +481,12 @@
 		A7AFCCAF1FB4E40D00AE3D85 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 28XRU7S6GA;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "BChess/BChess-Bridging-Header.h";
 				SWIFT_VERSION = 4.0;
 			};
 			name = Release;
