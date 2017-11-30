@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		A75683291FCD28A000CF1408 /* FBoardEngine.mm in Sources */ = {isa = PBXBuildFile; fileRef = A75683281FCD28A000CF1408 /* FBoardEngine.mm */; };
+		A756832D1FD0B3FE00CF1408 /* magicmoves.c in Sources */ = {isa = PBXBuildFile; fileRef = A7712D411FCB97A900E7E802 /* magicmoves.c */; };
 		A7712D171FB916E900E7E802 /* MoveTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7712D161FB916E900E7E802 /* MoveTests.swift */; };
 		A7712D1C1FB9179300E7E802 /* Color.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7AFCCB81FB6CD3700AE3D85 /* Color.swift */; };
 		A7712D1D1FB9179300E7E802 /* PieceType.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7AFCCBA1FB6CD7800AE3D85 /* PieceType.swift */; };
@@ -31,7 +32,6 @@
 		A7712D3B1FC8E30400E7E802 /* Evaluation.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7712D3A1FC8E30400E7E802 /* Evaluation.swift */; };
 		A7712D3D1FC8E3A700E7E802 /* Evaluater.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7712D381FC8E2DD00E7E802 /* Evaluater.swift */; };
 		A7712D3E1FC8E3A700E7E802 /* Evaluation.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7712D3A1FC8E30400E7E802 /* Evaluation.swift */; };
-		A7712D421FCB97A900E7E802 /* magicmoves.c in Sources */ = {isa = PBXBuildFile; fileRef = A7712D411FCB97A900E7E802 /* magicmoves.c */; };
 		A7712D441FCBBD9C00E7E802 /* Performance.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7712D431FCBBD9C00E7E802 /* Performance.swift */; };
 		A7712D471FCBC13100E7E802 /* FBoard.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A7712D451FCBC13100E7E802 /* FBoard.cpp */; };
 		A7AFCCAA1FB4E40D00AE3D85 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7AFCCA91FB4E40D00AE3D85 /* main.swift */; };
@@ -336,13 +336,13 @@
 				A7712D2F1FC7C4CD00E7E802 /* UCI.swift in Sources */,
 				A7AFCCC11FB6CE9E00AE3D85 /* FEN.swift in Sources */,
 				A7712D441FCBBD9C00E7E802 /* Performance.swift in Sources */,
+				A756832D1FD0B3FE00CF1408 /* magicmoves.c in Sources */,
 				A7712D471FCBC13100E7E802 /* FBoard.cpp in Sources */,
 				A7AFCCC51FB6D01400AE3D85 /* Move.swift in Sources */,
 				A7AFCCBD1FB6CDB000AE3D85 /* Piece.swift in Sources */,
 				A7AFCCBF1FB6CE6B00AE3D85 /* Coordinate.swift in Sources */,
 				A7712D2D1FC7C22000E7E802 /* UCIEngine.swift in Sources */,
 				A7AFCCC31FB6CFCB00AE3D85 /* BoardIterator.swift in Sources */,
-				A7712D421FCB97A900E7E802 /* magicmoves.c in Sources */,
 				A7712D391FC8E2DD00E7E802 /* Evaluater.swift in Sources */,
 				A7AFCCB71FB62DBA00AE3D85 /* Minimax.swift in Sources */,
 				A7712D3B1FC8E30400E7E802 /* Evaluation.swift in Sources */,

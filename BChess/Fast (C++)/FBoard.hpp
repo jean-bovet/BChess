@@ -74,6 +74,9 @@ struct Board {
     Bitboard blackPieces;
 };
 
+// Without this, the C file won't be linked
+extern "C" void initmagicmoves(void);
+
 static Bitboard WhitePawnAttacks[64];
 static Bitboard WhitePawnMoves[64];
 static Bitboard BlackPawnAttacks[64];
@@ -94,6 +97,7 @@ public:
     void generatePawnsMoves(Board &board, MoveList &moveList);
     void generateKingsMoves(Board &board, MoveList &moveList);
     void generateKnightsMoves(Board &board, MoveList &moveList);
+    void generateRooksMoves(Board &board, MoveList &moveList);
 };
 
 #endif /* FBoard_hpp */
