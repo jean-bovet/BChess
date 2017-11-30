@@ -13,7 +13,7 @@
 
 - (void)generatePositions {
     FastMoveGenerator generator;
-    generator.initPawnAttacks();
+    generator.generateMoves();
 }
 
 @end

@@ -9,6 +9,7 @@
 #include "FBoard.hpp"
 #include <bitstring.h>
 #include <iostream>
+#include <cassert>
 
 /**
 file
@@ -132,11 +133,28 @@ static Bitboard IBlackPawns = BB(0b\
 //}
 
 inline static int lsb(Bitboard bb) {
-    if (bb <= 0) {
-        return -1;
-    } else {
-        return __builtin_ctzll(bb);
+    assert(bb > 0);
+    return __builtin_ctzll(bb);
+}
+
+#pragma mark -
+
+void MoveList::addMoves(int from, Bitboard moves) {
+    if (moves > 0) {
+        //            bb_print(moves);
+        while (moves > 0) {
+            int to = lsb(moves);
+            bb_clear(moves, to);
+            
+            addMove(from, to);
+        }
     }
+}
+
+#pragma mark -
+
+FastMoveGenerator::FastMoveGenerator() {
+    initPawnAttacks();
 }
 
 void FastMoveGenerator::initPawnAttacks() {
@@ -168,29 +186,48 @@ void FastMoveGenerator::initPawnAttacks() {
 
 //    bb_print(IWhitePawns);
 //    bb_print(IBlackPawns);
-
-    Bitboard occupancy = IWhitePawns | IBlackPawns;
-    bb_print(occupancy);
-
-    // Generate white pawn moves
-    Bitboard whitePawns = IWhitePawns;
-    while (true) {
-        int square = lsb(whitePawns);
-        if (square < 0) break;
-        
-        bb_clear(whitePawns, square);
-        
-        Bitboard attacks = WhitePawnAttacks[square] & occupancy;
-        if (attacks > 0) {
-            bb_print(attacks);
-        }
-        
-        Bitboard moves = WhitePawnMoves[square] & ~occupancy;
-        if (moves > 0) {
-            bb_print(moves);
-        }
-
-//        std::cout << lsb(attacks) << std::endl;
-    }
     
 }
+
+void FastMoveGenerator::generateMoves() {
+    MoveList moveList;
+    generatePawnsMoves(moveList);
+    
+    for (int i=0; i<moveList.moveCount; i++) {
+        auto move = moveList.moves[i];
+        std::cout << SquareNames[move.from] << SquareNames[move.to] << std::endl;
+    }
+}
+
+void FastMoveGenerator::generatePawnsMoves(MoveList &moveList) {
+    Bitboard occupancy = IWhitePawns | IBlackPawns;
+    bb_print(occupancy);
+    
+    Bitboard whitePawns = IWhitePawns;
+    Bitboard emptySquares = ~occupancy;
+    
+    // Generate moves for each white pawn
+    while (whitePawns > 0) {
+        // Find the first white pawn starting from the least significant bit (that is, square a1)
+        int square = lsb(whitePawns);
+        
+        // Clear that bit so next time we can find the next white pawn
+        bb_clear(whitePawns, square);
+        
+        // Generate a bitboard for all the attacks that this white pawn
+        // can do. The attacks bitboard is masked with the occupancy bitboard
+        // because a pawn attack can only happen when there is a black piece
+        // in the target square.
+        // TODO: occupancy should actually be black occupancy
+        // Using white occupancy, we can detect which piece is protected!
+        Bitboard attacks = WhitePawnAttacks[square] & occupancy;
+        moveList.addMoves(square, attacks);
+        
+        // Generate a bitboard for all the moves that this white pawn can do.
+        // The move bitboard is masked with the empty bitboard which
+        // in other words ensures that the pawn can only move to unoccupied square.
+        Bitboard moves = WhitePawnMoves[square] & emptySquares;
+        moveList.addMoves(square, moves);
+    }
+}
+
