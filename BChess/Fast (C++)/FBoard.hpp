@@ -70,6 +70,8 @@ struct MoveList {
 
 struct Board {
     Bitboard pieces[Color::COUNT][Piece::COUNT];
+    Bitboard whitePieces;
+    Bitboard blackPieces;
 };
 
 static Bitboard WhitePawnAttacks[64];
@@ -77,14 +79,18 @@ static Bitboard WhitePawnMoves[64];
 static Bitboard BlackPawnAttacks[64];
 static Bitboard BlackPawnMoves[64];
 
+static Bitboard KnightMoves[64];
+
 class FastMoveGenerator {
 public:
     FastMoveGenerator();
     
-    void initPawnAttacks();
+    void initPawnMoves();
+    void initKnightMoves();
     
     void generateMoves();
-    void generatePawnsMoves(MoveList &moveList);
+    void generatePawnsMoves(Board &board, MoveList &moveList);
+    void generateKnightsMoves(Board &board, MoveList &moveList);
 };
 
 #endif /* FBoard_hpp */
