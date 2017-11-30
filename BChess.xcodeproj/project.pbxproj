@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		A75683291FCD28A000CF1408 /* FBoardEngine.mm in Sources */ = {isa = PBXBuildFile; fileRef = A75683281FCD28A000CF1408 /* FBoardEngine.mm */; };
 		A7712D171FB916E900E7E802 /* MoveTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7712D161FB916E900E7E802 /* MoveTests.swift */; };
 		A7712D1C1FB9179300E7E802 /* Color.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7AFCCB81FB6CD3700AE3D85 /* Color.swift */; };
 		A7712D1D1FB9179300E7E802 /* PieceType.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7AFCCBA1FB6CD7800AE3D85 /* PieceType.swift */; };
@@ -31,6 +32,8 @@
 		A7712D3D1FC8E3A700E7E802 /* Evaluater.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7712D381FC8E2DD00E7E802 /* Evaluater.swift */; };
 		A7712D3E1FC8E3A700E7E802 /* Evaluation.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7712D3A1FC8E30400E7E802 /* Evaluation.swift */; };
 		A7712D421FCB97A900E7E802 /* magicmoves.c in Sources */ = {isa = PBXBuildFile; fileRef = A7712D411FCB97A900E7E802 /* magicmoves.c */; };
+		A7712D441FCBBD9C00E7E802 /* Performance.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7712D431FCBBD9C00E7E802 /* Performance.swift */; };
+		A7712D471FCBC13100E7E802 /* FBoard.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A7712D451FCBC13100E7E802 /* FBoard.cpp */; };
 		A7AFCCAA1FB4E40D00AE3D85 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7AFCCA91FB4E40D00AE3D85 /* main.swift */; };
 		A7AFCCB31FB5091000AE3D85 /* Board.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7AFCCB21FB5091000AE3D85 /* Board.swift */; };
 		A7AFCCB51FB5170900AE3D85 /* MoveGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7AFCCB41FB5170900AE3D85 /* MoveGenerator.swift */; };
@@ -57,6 +60,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		A75683271FCD28A000CF1408 /* FBoardEngine.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FBoardEngine.h; sourceTree = "<group>"; };
+		A75683281FCD28A000CF1408 /* FBoardEngine.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = FBoardEngine.mm; sourceTree = "<group>"; };
 		A7712D141FB916E900E7E802 /* BChessTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BChessTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		A7712D161FB916E900E7E802 /* MoveTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoveTests.swift; sourceTree = "<group>"; };
 		A7712D181FB916E900E7E802 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -71,6 +76,9 @@
 		A7712D3F1FCB97A800E7E802 /* BChess-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "BChess-Bridging-Header.h"; sourceTree = "<group>"; };
 		A7712D401FCB97A900E7E802 /* magicmoves.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = magicmoves.h; sourceTree = "<group>"; };
 		A7712D411FCB97A900E7E802 /* magicmoves.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = magicmoves.c; sourceTree = "<group>"; };
+		A7712D431FCBBD9C00E7E802 /* Performance.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Performance.swift; sourceTree = "<group>"; };
+		A7712D451FCBC13100E7E802 /* FBoard.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = FBoard.cpp; sourceTree = "<group>"; };
+		A7712D461FCBC13100E7E802 /* FBoard.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = FBoard.hpp; sourceTree = "<group>"; };
 		A7AFCCA61FB4E40D00AE3D85 /* BChess */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = BChess; sourceTree = BUILT_PRODUCTS_DIR; };
 		A7AFCCA91FB4E40D00AE3D85 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		A7AFCCB21FB5091000AE3D85 /* Board.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Board.swift; sourceTree = "<group>"; };
@@ -134,6 +142,17 @@
 			path = Evaluation;
 			sourceTree = "<group>";
 		};
+		A7712D481FCBC13500E7E802 /* Fast (C++) */ = {
+			isa = PBXGroup;
+			children = (
+				A7712D461FCBC13100E7E802 /* FBoard.hpp */,
+				A7712D451FCBC13100E7E802 /* FBoard.cpp */,
+				A75683271FCD28A000CF1408 /* FBoardEngine.h */,
+				A75683281FCD28A000CF1408 /* FBoardEngine.mm */,
+			);
+			path = "Fast (C++)";
+			sourceTree = "<group>";
+		};
 		A7AFCC9D1FB4E40D00AE3D85 = {
 			isa = PBXGroup;
 			children = (
@@ -157,6 +176,7 @@
 			isa = PBXGroup;
 			children = (
 				A7AFCCA91FB4E40D00AE3D85 /* main.swift */,
+				A7712D431FCBBD9C00E7E802 /* Performance.swift */,
 				A7AFCCB41FB5170900AE3D85 /* MoveGenerator.swift */,
 				A7AFCCC01FB6CE9E00AE3D85 /* FEN.swift */,
 				A7712D3F1FCB97A800E7E802 /* BChess-Bridging-Header.h */,
@@ -166,6 +186,7 @@
 				A7AFCCC71FB7CBE500AE3D85 /* Board */,
 				A7AFCCC61FB7CA6900AE3D85 /* Types */,
 				A7712D3C1FC8E31B00E7E802 /* Evaluation */,
+				A7712D481FCBC13500E7E802 /* Fast (C++) */,
 			);
 			path = BChess;
 			sourceTree = "<group>";
@@ -308,11 +329,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				A7AFCCAA1FB4E40D00AE3D85 /* main.swift in Sources */,
+				A75683291FCD28A000CF1408 /* FBoardEngine.mm in Sources */,
 				A7AFCCBB1FB6CD7800AE3D85 /* PieceType.swift in Sources */,
 				A7712D281FBAC47A00E7E802 /* Evaluate.swift in Sources */,
 				A7AFCCB51FB5170900AE3D85 /* MoveGenerator.swift in Sources */,
 				A7712D2F1FC7C4CD00E7E802 /* UCI.swift in Sources */,
 				A7AFCCC11FB6CE9E00AE3D85 /* FEN.swift in Sources */,
+				A7712D441FCBBD9C00E7E802 /* Performance.swift in Sources */,
+				A7712D471FCBC13100E7E802 /* FBoard.cpp in Sources */,
 				A7AFCCC51FB6D01400AE3D85 /* Move.swift in Sources */,
 				A7AFCCBD1FB6CDB000AE3D85 /* Piece.swift in Sources */,
 				A7AFCCBF1FB6CE6B00AE3D85 /* Coordinate.swift in Sources */,
