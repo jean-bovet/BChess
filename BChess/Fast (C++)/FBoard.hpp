@@ -79,6 +79,7 @@ static Bitboard WhitePawnMoves[64];
 static Bitboard BlackPawnAttacks[64];
 static Bitboard BlackPawnMoves[64];
 
+static Bitboard KingMoves[64];
 static Bitboard KnightMoves[64];
 
 class FastMoveGenerator {
@@ -86,10 +87,12 @@ public:
     FastMoveGenerator();
     
     void initPawnMoves();
+    void initKingMoves();
     void initKnightMoves();
     
     void generateMoves();
     void generatePawnsMoves(Board &board, MoveList &moveList);
+    void generateKingsMoves(Board &board, MoveList &moveList);
     void generateKnightsMoves(Board &board, MoveList &moveList);
 };
 

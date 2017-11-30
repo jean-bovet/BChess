@@ -104,6 +104,28 @@ static Bitboard IBlackKnights = BB(0b\
 00000000\
 );
 
+static Bitboard IWhiteKing = BB(0b\
+00000000\
+00000000\
+00000000\
+00000000\
+00000000\
+00000000\
+00000000\
+00001000\
+);
+
+static Bitboard IBlackKing = BB(0b\
+00001000\
+00000000\
+00000000\
+00000000\
+00000000\
+00000000\
+00000000\
+00000000\
+);
+
 static Bitboard IWhitePawns = BB(0b\
 00000000\
 00000000\
@@ -146,6 +168,7 @@ void MoveList::addMoves(int from, Bitboard moves) {
 
 FastMoveGenerator::FastMoveGenerator() {
     initPawnMoves();
+    initKingMoves();
     initKnightMoves();
 }
 
@@ -169,6 +192,22 @@ void FastMoveGenerator::initPawnMoves() {
         // Black pawn moves
         bb_set(BlackPawnMoves[square], fileIndex-1, rankIndex);
         bb_set(BlackPawnMoves[square], fileIndex-2, rankIndex);
+    }
+}
+
+void FastMoveGenerator::initKingMoves() {
+    for (int square = 0; square < 64; square++) {
+        int fileIndex = file_index(square);
+        int rankIndex = rank_index(square);
+        
+        bb_set(KingMoves[square], fileIndex, rankIndex+1);
+        bb_set(KingMoves[square], fileIndex+1, rankIndex+1);
+        bb_set(KingMoves[square], fileIndex+1, rankIndex);
+        bb_set(KingMoves[square], fileIndex+1, rankIndex-1);
+        bb_set(KingMoves[square], fileIndex, rankIndex-1);
+        bb_set(KingMoves[square], fileIndex-1, rankIndex-1);
+        bb_set(KingMoves[square], fileIndex-1, rankIndex);
+        bb_set(KingMoves[square], fileIndex-1, rankIndex+1);
     }
 }
 
@@ -200,12 +239,14 @@ void FastMoveGenerator::generateMoves() {
     Board board;
     
     board.pieces[Color::WHITE][Piece::PAWN] = IWhitePawns;
+    board.pieces[Color::WHITE][Piece::KING] = IWhiteKing;
     board.pieces[Color::WHITE][Piece::KNIGHT] = IWhiteKnights;
 
-    board.whitePieces = IWhitePawns | IWhiteKnights;
-    board.blackPieces = IBlackPawns | IBlackKnights;
+    board.whitePieces = IWhitePawns | IWhiteKnights | IWhiteKing;
+    board.blackPieces = IBlackPawns | IBlackKnights | IBlackKing;
 
     generatePawnsMoves(board, moveList);
+    generateKingsMoves(board, moveList);
     generateKnightsMoves(board, moveList);
 
     for (int i=0; i<moveList.moveCount; i++) {
@@ -215,8 +256,8 @@ void FastMoveGenerator::generateMoves() {
 }
 
 void FastMoveGenerator::generatePawnsMoves(Board &board, MoveList &moveList) {
-    Bitboard whitePawns = board.pieces[Color::WHITE][Piece::PAWN];
-    Bitboard emptySquares = ~(board.whitePieces|board.blackPieces);
+    auto whitePawns = board.pieces[Color::WHITE][Piece::PAWN];
+    auto emptySquares = ~(board.whitePieces|board.blackPieces);
     
     // Generate moves for each white pawn
     while (whitePawns > 0) {
@@ -232,36 +273,53 @@ void FastMoveGenerator::generatePawnsMoves(Board &board, MoveList &moveList) {
         // in the target square.
         // TODO: occupancy should actually be black occupancy
         // Using white occupancy, we can detect which piece is protected!
-        Bitboard attacks = WhitePawnAttacks[square] & board.blackPieces;
+        auto attacks = WhitePawnAttacks[square] & board.blackPieces;
         moveList.addMoves(square, attacks);
         
         // Generate a bitboard for all the moves that this white pawn can do.
         // The move bitboard is masked with the empty bitboard which
         // in other words ensures that the pawn can only move to unoccupied square.
-        Bitboard moves = WhitePawnMoves[square] & emptySquares;
+        auto moves = WhitePawnMoves[square] & emptySquares;
+        moveList.addMoves(square, moves);
+    }
+}
+
+void FastMoveGenerator::generateKingsMoves(Board &board, MoveList &moveList) {
+    auto kings = board.pieces[Color::WHITE][Piece::KING];
+    auto emptyOrBlackSquares = ~(board.whitePieces|board.blackPieces) | board.blackPieces;
+    
+    // Generate moves for each white knight
+    while (kings > 0) {
+        // Find the first white knight starting from the least significant bit (that is, square a1)
+        int square = lsb(kings);
+        
+        // Clear that bit so next time we can find the next white knight
+        bb_clear(kings, square);
+        
+        // Generate a bitboard for all the moves that this white knight
+        // can do. The attacks bitboard is masked to ensure it can only
+        // happy on an empty square or a square with a piece of the opposite color.
+        auto moves = KingMoves[square] & emptyOrBlackSquares;
         moveList.addMoves(square, moves);
     }
 }
 
 void FastMoveGenerator::generateKnightsMoves(Board &board, MoveList &moveList) {
-    Bitboard whiteKnights = board.pieces[Color::WHITE][Piece::KNIGHT];
-    Bitboard emptyOrBlackSquares = ~(board.whitePieces|board.blackPieces) | board.blackPieces;
+    auto whiteKnights = board.pieces[Color::WHITE][Piece::KNIGHT];
+    auto emptyOrBlackSquares = ~(board.whitePieces|board.blackPieces) | board.blackPieces;
     
-    // Generate moves for each white pawn
+    // Generate moves for each white knight
     while (whiteKnights > 0) {
-        // Find the first white pawn starting from the least significant bit (that is, square a1)
+        // Find the first white knight starting from the least significant bit (that is, square a1)
         int square = lsb(whiteKnights);
         
-        // Clear that bit so next time we can find the next white pawn
+        // Clear that bit so next time we can find the next white knight
         bb_clear(whiteKnights, square);
         
-        // Generate a bitboard for all the attacks that this white pawn
-        // can do. The attacks bitboard is masked with the occupancy bitboard
-        // because a pawn attack can only happen when there is a black piece
-        // in the target square.
-        // TODO: occupancy should actually be black occupancy
-        // Using white occupancy, we can detect which piece is protected!
-        Bitboard moves = KnightMoves[square] & emptyOrBlackSquares;
+        // Generate a bitboard for all the moves that this white knight
+        // can do. The attacks bitboard is masked to ensure it can only
+        // happy on an empty square or a square with a piece of the opposite color.
+        auto moves = KnightMoves[square] & emptyOrBlackSquares;
         moveList.addMoves(square, moves);
     }
 }
