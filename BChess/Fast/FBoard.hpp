@@ -17,7 +17,7 @@ typedef uint64_t Bitboard;
 
 namespace Color {
     enum Color: int {
-        WHITE, BLACK, COUNT
+        WHITE, BLACK, COUNT        
     };
 }
 
@@ -69,9 +69,10 @@ struct MoveList {
 };
 
 struct Board {
-    Bitboard pieces[Color::COUNT][Piece::COUNT];
-    Bitboard whitePieces;
-    Bitboard blackPieces;
+    Bitboard pieces[Color::COUNT][Piece::COUNT] = { };
+    Bitboard allPieces(Color::Color color);
+    Bitboard occupancy();
+    Bitboard emptySquares();
 };
 
 // Without this, the C file won't be linked
@@ -94,10 +95,10 @@ public:
     void initKnightMoves();
     
     void generateMoves();
-    void generatePawnsMoves(Board &board, MoveList &moveList);
-    void generateKingsMoves(Board &board, MoveList &moveList);
-    void generateKnightsMoves(Board &board, MoveList &moveList);
-    void generateRooksMoves(Board &board, MoveList &moveList);
+    void generatePawnsMoves(Board &board, Color::Color color, MoveList &moveList);
+    void generateKingsMoves(Board &board, Color::Color color, MoveList &moveList);
+    void generateKnightsMoves(Board &board, Color::Color color, MoveList &moveList);
+    void generateRooksMoves(Board &board, Color::Color color, MoveList &moveList);
 };
 
 #endif /* FBoard_hpp */

@@ -189,6 +189,26 @@ void MoveList::addMoves(int from, Bitboard moves) {
 
 #pragma mark -
 
+Bitboard Board::allPieces(Color::Color color) {
+    Bitboard all = 0;
+    for (auto pieces : pieces[color]) {
+        all |= pieces;
+    }
+    return all;
+}
+
+Bitboard Board::occupancy() {
+    auto whitePieces = allPieces(Color::WHITE);
+    auto blackPieces = allPieces(Color::BLACK);
+    return whitePieces|blackPieces;
+}
+
+Bitboard Board::emptySquares() {
+    return ~occupancy();
+}
+
+#pragma mark -
+
 FastMoveGenerator::FastMoveGenerator() {
     initPawnMoves();
     initKingMoves();
@@ -268,13 +288,12 @@ void FastMoveGenerator::generateMoves() {
     board.pieces[Color::WHITE][Piece::ROOK] = IWhiteRooks;
     board.pieces[Color::WHITE][Piece::KNIGHT] = IWhiteKnights;
 
-    board.whitePieces = IWhitePawns | IWhiteKnights | IWhiteKing | IWhiteRooks;
-    board.blackPieces = IBlackPawns | IBlackKnights | IBlackKing | IBlackRooks;
-
-    generatePawnsMoves(board, moveList);
-    generateKingsMoves(board, moveList);
-    generateKnightsMoves(board, moveList);
-    generateRooksMoves(board, moveList);
+    auto color = Color::WHITE;
+    
+    generatePawnsMoves(board, color, moveList);
+    generateKingsMoves(board, color, moveList);
+    generateKnightsMoves(board, color, moveList);
+    generateRooksMoves(board, color, moveList);
 
     for (int i=0; i<moveList.moveCount; i++) {
         auto move = moveList.moves[i];
@@ -282,9 +301,20 @@ void FastMoveGenerator::generateMoves() {
     }
 }
 
-void FastMoveGenerator::generatePawnsMoves(Board &board, MoveList &moveList) {
-    auto whitePawns = board.pieces[Color::WHITE][Piece::PAWN];
-    auto emptySquares = ~(board.whitePieces|board.blackPieces);
+inline static Color::Color inverse(Color::Color color) {
+    switch (color) {
+        case Color::WHITE:
+            return Color::BLACK;
+        case Color::BLACK:
+            return Color::WHITE;
+        default:
+            assert(false);
+    }
+}
+void FastMoveGenerator::generatePawnsMoves(Board &board, Color::Color color, MoveList &moveList) {
+    auto whitePawns = board.pieces[color][Piece::PAWN];
+    auto emptySquares = board.emptySquares();
+    auto blackPieces = board.allPieces(inverse(color));
     
     // Generate moves for each white pawn
     while (whitePawns > 0) {
@@ -300,7 +330,7 @@ void FastMoveGenerator::generatePawnsMoves(Board &board, MoveList &moveList) {
         // in the target square.
         // TODO: occupancy should actually be black occupancy
         // Using white occupancy, we can detect which piece is protected!
-        auto attacks = WhitePawnAttacks[square] & board.blackPieces;
+        auto attacks = WhitePawnAttacks[square] & blackPieces;
         moveList.addMoves(square, attacks);
         
         // Generate a bitboard for all the moves that this white pawn can do.
@@ -311,10 +341,10 @@ void FastMoveGenerator::generatePawnsMoves(Board &board, MoveList &moveList) {
     }
 }
 
-void FastMoveGenerator::generateKingsMoves(Board &board, MoveList &moveList) {
-    auto kings = board.pieces[Color::WHITE][Piece::KING];
-    auto emptyOrBlackSquares = ~(board.whitePieces|board.blackPieces) | board.blackPieces;
-    
+void FastMoveGenerator::generateKingsMoves(Board &board, Color::Color color, MoveList &moveList) {
+    auto kings = board.pieces[color][Piece::KING];
+    auto emptyOrBlackSquares = ~board.allPieces(color);
+
     // Generate moves for each white knight
     while (kings > 0) {
         // Find the first white knight starting from the least significant bit (that is, square a1)
@@ -331,9 +361,9 @@ void FastMoveGenerator::generateKingsMoves(Board &board, MoveList &moveList) {
     }
 }
 
-void FastMoveGenerator::generateKnightsMoves(Board &board, MoveList &moveList) {
-    auto whiteKnights = board.pieces[Color::WHITE][Piece::KNIGHT];
-    auto emptyOrBlackSquares = ~board.whitePieces;
+void FastMoveGenerator::generateKnightsMoves(Board &board, Color::Color color, MoveList &moveList) {
+    auto whiteKnights = board.pieces[color][Piece::KNIGHT];
+    auto emptyOrBlackSquares = ~board.allPieces(color);
     
     // Generate moves for each white knight
     while (whiteKnights > 0) {
@@ -351,11 +381,11 @@ void FastMoveGenerator::generateKnightsMoves(Board &board, MoveList &moveList) {
     }
 }
 
-void FastMoveGenerator::generateRooksMoves(Board &board, MoveList &moveList) {
-    auto rooks = board.pieces[Color::WHITE][Piece::ROOK];
-    auto occupancy = board.whitePieces|board.blackPieces;
-    auto emptyOrBlackSquares = ~board.whitePieces;
-    
+void FastMoveGenerator::generateRooksMoves(Board &board, Color::Color color, MoveList &moveList) {
+    auto rooks = board.pieces[color][Piece::ROOK];
+    auto occupancy = board.occupancy();
+    auto emptyOrBlackSquares = ~board.allPieces(color);
+
     // Generate moves for each white knight
     while (rooks > 0) {
         // Find the first white knight starting from the least significant bit (that is, square a1)

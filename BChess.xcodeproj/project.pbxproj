@@ -142,7 +142,7 @@
 			path = Evaluation;
 			sourceTree = "<group>";
 		};
-		A7712D481FCBC13500E7E802 /* Fast (C++) */ = {
+		A7712D481FCBC13500E7E802 /* Fast */ = {
 			isa = PBXGroup;
 			children = (
 				A7712D461FCBC13100E7E802 /* FBoard.hpp */,
@@ -150,7 +150,7 @@
 				A75683271FCD28A000CF1408 /* FBoardEngine.h */,
 				A75683281FCD28A000CF1408 /* FBoardEngine.mm */,
 			);
-			path = "Fast (C++)";
+			path = Fast;
 			sourceTree = "<group>";
 		};
 		A7AFCC9D1FB4E40D00AE3D85 = {
@@ -186,7 +186,7 @@
 				A7AFCCC71FB7CBE500AE3D85 /* Board */,
 				A7AFCCC61FB7CA6900AE3D85 /* Types */,
 				A7712D3C1FC8E31B00E7E802 /* Evaluation */,
-				A7712D481FCBC13500E7E802 /* Fast (C++) */,
+				A7712D481FCBC13500E7E802 /* Fast */,
 			);
 			path = BChess;
 			sourceTree = "<group>";
