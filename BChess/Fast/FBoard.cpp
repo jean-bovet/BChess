@@ -40,17 +40,20 @@ inline static int rank_index(int square) {
     return square >> 3;
 }
 
-inline static bool bb_test(Bitboard bitboard, int file, int rank) {
-    uint64_t square = (uint64_t)1 << square_index(file, rank);
-    uint64_t test = bitboard & square;
+inline static bool bb_test(Bitboard bitboard, int square) {
+    uint64_t test = bitboard & (1UL << square);
     return test > 0;
 }
 
-inline static void bb_clear(Bitboard &bitboard, uint64_t square) {
+inline static bool bb_test(Bitboard bitboard, int file, int rank) {
+    return bb_test(bitboard, square_index(file, rank));
+}
+
+inline static void bb_clear(Bitboard &bitboard, int square) {
     bitboard &= ~(1UL << square);
 }
 
-inline static void bb_set(Bitboard &bitboard, uint64_t square) {
+inline static void bb_set(Bitboard &bitboard, int square) {
     bitboard |= 1UL << square;
 }
 
@@ -253,8 +256,48 @@ void Board::move(Move move) {
     bb_set(pieces[move.color][move.piece], move.to);
 }
 
+inline static char charForPiece(Color::Color color, Piece::Piece piece) {
+    auto white = color == Color::WHITE;
+    switch (piece) {
+        case Piece::PAWN:
+            return white ? 'P' : 'p';
+        case Piece::ROOK:
+            return white ? 'R' : 'r';
+        case Piece::KNIGHT:
+            return white ? 'N' : 'n';
+        case Piece::BISHOP:
+            return white ? 'B' : 'b';
+        case Piece::QUEEN:
+            return white ? 'Q' : 'q';
+        case Piece::KING:
+            return white ? 'K' : 'k';
+        case Piece::COUNT:
+            return '?';
+    }
+}
+
 void Board::print() {
-    bb_print(occupancy());
+    for (int rank = 7; rank >= 0; rank--) {
+        for (int file = 0; file < 8; file++) {
+            char c = '.';
+            
+            for (auto color=0; color<Color::COUNT; color++) {
+                for (auto piece=0; piece<Piece::COUNT; piece++) {
+                    if (bb_test(pieces[color][piece], file, rank)) {
+                        c = charForPiece((Color::Color)color, (Piece::Piece)piece);
+                    }
+                }
+            }
+            
+            std::cout << c;
+        }
+        std::cout << std::endl;
+    }
+    std::cout << std::endl;
+}
+
+void Board::set(Piece::Piece piece, Color::Color color, int file, int rank) {
+    bb_set(pieces[color][piece], file, rank);
 }
 
 Bitboard Board::allPieces(Color::Color color) {

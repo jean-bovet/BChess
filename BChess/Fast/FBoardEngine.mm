@@ -9,10 +9,13 @@
 #import "FBoardEngine.h"
 #import "FBoard.hpp"
 #import "FPerformance.hpp"
+#import "FFEN.hpp"
 
 @implementation FBoardEngine
 
-- (void)generatePositions {    
+- (void)generatePositions {
+    FFEN::createBoard("3r3k/5Npp/8/8/2Q5/1B6/8/7K b - - 1 1");
+    
     FastMoveGenerator generator;
     Board board;
     generator.generateMoves(board, Color::WHITE);

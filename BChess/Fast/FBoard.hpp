@@ -73,12 +73,18 @@ struct MoveList {
 };
 
 struct Board {
-    Board();
-    void move(Move move);
     Bitboard pieces[Color::COUNT][Piece::COUNT] = { };
+    
+    Board();
+    
+    void set(Piece::Piece piece, Color::Color color, int file, int rank);
+    
+    void move(Move move);
+    
     Bitboard allPieces(Color::Color color);
     Bitboard occupancy();
     Bitboard emptySquares();
+    
     void print();
 };
 

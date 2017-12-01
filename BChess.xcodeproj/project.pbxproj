@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		A70A61BB1FD132D200AFDF0E /* FFEN.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A70A61B91FD132D200AFDF0E /* FFEN.cpp */; };
 		A75683291FCD28A000CF1408 /* FBoardEngine.mm in Sources */ = {isa = PBXBuildFile; fileRef = A75683281FCD28A000CF1408 /* FBoardEngine.mm */; };
 		A756832D1FD0B3FE00CF1408 /* magicmoves.c in Sources */ = {isa = PBXBuildFile; fileRef = A7712D411FCB97A900E7E802 /* magicmoves.c */; };
 		A75683301FD0D96300CF1408 /* FPerformance.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A756832E1FD0D96300CF1408 /* FPerformance.cpp */; };
@@ -61,6 +62,9 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		A70A61B91FD132D200AFDF0E /* FFEN.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = FFEN.cpp; sourceTree = "<group>"; };
+		A70A61BA1FD132D200AFDF0E /* FFEN.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = FFEN.hpp; sourceTree = "<group>"; };
+		A70A61BC1FD1333300AFDF0E /* FUtility.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = FUtility.hpp; sourceTree = "<group>"; };
 		A75683271FCD28A000CF1408 /* FBoardEngine.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FBoardEngine.h; sourceTree = "<group>"; };
 		A75683281FCD28A000CF1408 /* FBoardEngine.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = FBoardEngine.mm; sourceTree = "<group>"; };
 		A756832E1FD0D96300CF1408 /* FPerformance.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = FPerformance.cpp; sourceTree = "<group>"; };
@@ -150,10 +154,13 @@
 			children = (
 				A7712D461FCBC13100E7E802 /* FBoard.hpp */,
 				A7712D451FCBC13100E7E802 /* FBoard.cpp */,
+				A70A61BA1FD132D200AFDF0E /* FFEN.hpp */,
+				A70A61B91FD132D200AFDF0E /* FFEN.cpp */,
 				A75683271FCD28A000CF1408 /* FBoardEngine.h */,
 				A75683281FCD28A000CF1408 /* FBoardEngine.mm */,
 				A756832F1FD0D96300CF1408 /* FPerformance.hpp */,
 				A756832E1FD0D96300CF1408 /* FPerformance.cpp */,
+				A70A61BC1FD1333300AFDF0E /* FUtility.hpp */,
 			);
 			path = Fast;
 			sourceTree = "<group>";
@@ -339,6 +346,7 @@
 				A7712D281FBAC47A00E7E802 /* Evaluate.swift in Sources */,
 				A7AFCCB51FB5170900AE3D85 /* MoveGenerator.swift in Sources */,
 				A7712D2F1FC7C4CD00E7E802 /* UCI.swift in Sources */,
+				A70A61BB1FD132D200AFDF0E /* FFEN.cpp in Sources */,
 				A7AFCCC11FB6CE9E00AE3D85 /* FEN.swift in Sources */,
 				A7712D441FCBBD9C00E7E802 /* Performance.swift in Sources */,
 				A756832D1FD0B3FE00CF1408 /* magicmoves.c in Sources */,
