@@ -127,6 +127,28 @@ static Bitboard IBlackRooks = BB(0b\
 00000000\
 );
 
+static Bitboard IWhiteBishops = BB(0b\
+00000000\
+00000000\
+00000000\
+00000000\
+00000000\
+00000000\
+00000000\
+00100100\
+);
+
+static Bitboard IBlackBishops = BB(0b\
+00100100\
+00000000\
+00000000\
+00000000\
+00000000\
+00000000\
+00000000\
+00000000\
+);
+
 static Bitboard IWhiteKing = BB(0b\
 00000000\
 00000000\
@@ -140,6 +162,28 @@ static Bitboard IWhiteKing = BB(0b\
 
 static Bitboard IBlackKing = BB(0b\
 00001000\
+00000000\
+00000000\
+00000000\
+00000000\
+00000000\
+00000000\
+00000000\
+);
+
+static Bitboard IWhiteQueen = BB(0b\
+00000000\
+00000000\
+00000000\
+00000000\
+00000000\
+00000000\
+00000000\
+00010000\
+);
+
+static Bitboard IBlackQueen = BB(0b\
+00010000\
 00000000\
 00000000\
 00000000\
@@ -285,15 +329,26 @@ void FastMoveGenerator::generateMoves() {
     
     board.pieces[Color::WHITE][Piece::PAWN] = IWhitePawns;
     board.pieces[Color::WHITE][Piece::KING] = IWhiteKing;
+    board.pieces[Color::WHITE][Piece::QUEEN] = IWhiteQueen;
     board.pieces[Color::WHITE][Piece::ROOK] = IWhiteRooks;
+    board.pieces[Color::WHITE][Piece::BISHOP] = IWhiteBishops;
     board.pieces[Color::WHITE][Piece::KNIGHT] = IWhiteKnights;
+
+    board.pieces[Color::BLACK][Piece::PAWN] = IBlackPawns;
+    board.pieces[Color::BLACK][Piece::KING] = IBlackKing;
+    board.pieces[Color::BLACK][Piece::QUEEN] = IBlackQueen;
+    board.pieces[Color::BLACK][Piece::ROOK] = IBlackRooks;
+    board.pieces[Color::BLACK][Piece::BISHOP] = IBlackBishops;
+    board.pieces[Color::BLACK][Piece::KNIGHT] = IBlackKnights;
 
     auto color = Color::WHITE;
     
     generatePawnsMoves(board, color, moveList);
     generateKingsMoves(board, color, moveList);
     generateKnightsMoves(board, color, moveList);
-    generateRooksMoves(board, color, moveList);
+    generateSlidingMoves(board, color, Piece::ROOK, moveList);
+    generateSlidingMoves(board, color, Piece::BISHOP, moveList);
+    generateSlidingMoves(board, color, Piece::QUEEN, moveList);
 
     for (int i=0; i<moveList.moveCount; i++) {
         auto move = moveList.moves[i];
@@ -381,21 +436,38 @@ void FastMoveGenerator::generateKnightsMoves(Board &board, Color::Color color, M
     }
 }
 
-void FastMoveGenerator::generateRooksMoves(Board &board, Color::Color color, MoveList &moveList) {
-    auto rooks = board.pieces[color][Piece::ROOK];
+void FastMoveGenerator::generateSlidingMoves(Board &board, Color::Color color, Piece::Piece piece, MoveList &moveList) {
+    auto slidingPieces = board.pieces[color][piece];
     auto occupancy = board.occupancy();
     auto emptyOrBlackSquares = ~board.allPieces(color);
 
-    // Generate moves for each white knight
-    while (rooks > 0) {
-        // Find the first white knight starting from the least significant bit (that is, square a1)
-        int square = lsb(rooks);
+    // Generate moves for each sliding piece
+    while (slidingPieces > 0) {
+        // Find the first sliding piece starting from the least significant bit (that is, square a1)
+        int square = lsb(slidingPieces);
         
-        // Clear that bit so next time we can find the next white knight
-        bb_clear(rooks, square);
+        // Clear that bit so next time we can find the next sliding piece
+        bb_clear(slidingPieces, square);
         
-        // Generate a bitboard for all the moves that this rook can do.
-        auto potentialMoves = Rmagic(square, occupancy);
+        // Generate a bitboard for all the moves that this sliding piece can do.
+        Bitboard potentialMoves;
+        switch (piece) {
+            case Piece::ROOK:
+                potentialMoves = Rmagic(square, occupancy);
+                break;
+                
+            case Piece::BISHOP:
+                potentialMoves = Bmagic(square, occupancy);
+                break;
+                
+            case Piece::QUEEN:
+                potentialMoves = Rmagic(square, occupancy) | Bmagic(square, occupancy);
+                break;
+                
+            default:
+                assert(false); // not a sliding piece
+                break;
+        }
         
         // Note: the occupancy bitboard has all the white and black pieces,
         // we need to filter out the moves that land into a piece of the same

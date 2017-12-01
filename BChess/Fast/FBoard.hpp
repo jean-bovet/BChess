@@ -98,7 +98,7 @@ public:
     void generatePawnsMoves(Board &board, Color::Color color, MoveList &moveList);
     void generateKingsMoves(Board &board, Color::Color color, MoveList &moveList);
     void generateKnightsMoves(Board &board, Color::Color color, MoveList &moveList);
-    void generateRooksMoves(Board &board, Color::Color color, MoveList &moveList);
+    void generateSlidingMoves(Board &board, Color::Color color, Piece::Piece piece, MoveList &moveList);
 };
 
 #endif /* FBoard_hpp */
