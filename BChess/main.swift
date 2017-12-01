@@ -11,11 +11,19 @@ import Foundation
 //let engine = FBoardEngine()
 //engine.generatePositions()
 
-let perf = PerformanceClassic()
-//let perf = PerformanceCpp()
-perf.generate(depth: 4)
+let formatter: NumberFormatter = {
+    let formatter = NumberFormatter()
+    formatter.numberStyle = .decimal
+    return formatter
+}()
 
-print("\(perf.moves) moves in \(perf.timeElapsed) seconds: \(perf.movesPerSecond) moves/s")
+func run(perf: Performance) {
+    perf.generate(depth: 4)
+    print("\(formatter.string(for: perf.moves)!) moves in \(perf.timeElapsed) seconds => \(formatter.string(for: perf.movesPerSecond)!) moves/s")
+}
+
+run(perf: PerformanceClassic())
+run(perf: PerformanceCpp())
 
 //let uci = UCI()
 //uci.run()

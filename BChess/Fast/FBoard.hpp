@@ -79,15 +79,14 @@ struct Board {
     Bitboard allPieces(Color::Color color);
     Bitboard occupancy();
     Bitboard emptySquares();
+    void print();
 };
 
 // Without this, the C file won't be linked
 extern "C" void initmagicmoves(void);
 
-static Bitboard WhitePawnAttacks[64];
-static Bitboard WhitePawnMoves[64];
-static Bitboard BlackPawnAttacks[64];
-static Bitboard BlackPawnMoves[64];
+static Bitboard PawnAttacks[2][64];
+static Bitboard PawnMoves[2][64];
 
 static Bitboard KingMoves[64];
 static Bitboard KnightMoves[64];

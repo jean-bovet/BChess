@@ -13,7 +13,7 @@
 #include "magicmoves.h"
 
 /**
-file
+rank
     8
     7
     6
@@ -22,22 +22,22 @@ file
     3
     2
     1 a1 b1 c1 d1 e1 f1 g1 h1
-      a  b  c  d  e  f  g  h  <- rank
+      a  b  c  d  e  f  g  h  <- file
     a1 = 0
     h1 = 2^7 = 128
     h8 = 2^63
  */
 
 inline static int square_index(int file, int rank) {
-    return 8 * file + rank;
+    return 8 * rank + file;
 }
 
 inline static int file_index(int square) {
-    return square >> 3;
+    return square & 7;
 }
 
 inline static int rank_index(int square) {
-    return square & 7;
+    return square >> 3;
 }
 
 inline static bool bb_test(Bitboard bitboard, int file, int rank) {
@@ -51,19 +51,18 @@ inline static void bb_clear(Bitboard &bitboard, uint64_t square) {
 }
 
 inline static void bb_set(Bitboard &bitboard, uint64_t square) {
-    bitboard |= square;
+    bitboard |= 1UL << square;
 }
 
 inline static void bb_set(Bitboard &bitboard, int file, int rank) {
     if (file >= 0 && file <= 7 && rank >= 0 && rank <= 7) {
-        uint64_t square = (uint64_t)1 << square_index(file, rank);
-        bb_set(bitboard, square);
+        bb_set(bitboard, square_index(file, rank));
     }
 }
 
 inline static void bb_print(Bitboard bitboard) {
-    for (int file = 7; file >= 0; file--) {
-        for (int rank = 0; rank < 8; rank++) {
+    for (int rank = 7; rank >= 0; rank--) {
+        for (int file = 0; file < 8; file++) {
             std::cout << (bb_test(bitboard, file, rank) > 0  ? "X" : ".");
         }
         std::cout << std::endl;
@@ -73,9 +72,9 @@ inline static void bb_print(Bitboard bitboard) {
 
 inline static Bitboard BB(Bitboard userDefined) {
     Bitboard reversed = 0;
-    for (int file = 0; file < 8; file++) {
-        for (int rank = 0; rank < 8; rank++) {
-            if (bb_test(userDefined, file, 7 - rank)) {
+    for (int rank = 0; rank < 8; rank++) {
+        for (int file = 0; file < 8; file++) {
+            if (bb_test(userDefined, 7 - file, rank)) {
                 bb_set(reversed, file, rank);
             }
         }
@@ -254,6 +253,10 @@ void Board::move(Move move) {
     bb_set(pieces[move.color][move.piece], move.to);
 }
 
+void Board::print() {
+    bb_print(occupancy());
+}
+
 Bitboard Board::allPieces(Color::Color color) {
     Bitboard all = 0;
     for (auto pieces : pieces[color]) {
@@ -286,21 +289,23 @@ void FastMoveGenerator::initPawnMoves() {
         int fileIndex = file_index(square);
         int rankIndex = rank_index(square);
 
+        assert(square_index(fileIndex, rankIndex) == square);
+        
         // White pawn attacks
-        bb_set(WhitePawnAttacks[square], fileIndex+1, rankIndex-1);
-        bb_set(WhitePawnAttacks[square], fileIndex+1, rankIndex+1);
+        bb_set(PawnAttacks[Color::WHITE][square], fileIndex-1, rankIndex+1);
+        bb_set(PawnAttacks[Color::WHITE][square], fileIndex+1, rankIndex+1);
         
         // White pawn moves
-        bb_set(WhitePawnMoves[square], fileIndex+1, rankIndex);
-        bb_set(WhitePawnMoves[square], fileIndex+2, rankIndex);
-        
+        bb_set(PawnMoves[Color::WHITE][square], fileIndex, rankIndex+1);
+        bb_set(PawnMoves[Color::WHITE][square], fileIndex, rankIndex+2);
+                
         // Black pawn attacks
-        bb_set(BlackPawnAttacks[square], fileIndex-1, rankIndex-1);
-        bb_set(BlackPawnAttacks[square], fileIndex-1, rankIndex+1);
+        bb_set(PawnAttacks[Color::BLACK][square], fileIndex-1, rankIndex-1);
+        bb_set(PawnAttacks[Color::BLACK][square], fileIndex+1, rankIndex-1);
         
         // Black pawn moves
-        bb_set(BlackPawnMoves[square], fileIndex-1, rankIndex);
-        bb_set(BlackPawnMoves[square], fileIndex-2, rankIndex);
+        bb_set(PawnMoves[Color::BLACK][square], fileIndex, rankIndex-1);
+        bb_set(PawnMoves[Color::BLACK][square], fileIndex, rankIndex-2);
     }
 }
 
@@ -355,24 +360,27 @@ MoveList FastMoveGenerator::generateMoves(Board board, Color::Color color) {
 
 //    for (int i=0; i<moveList.moveCount; i++) {
 //        auto move = moveList.moves[i];
-//        std::cout << SquareNames[move.from] << SquareNames[move.to] << std::endl;
+////        std::cout << SquareNames[move.from] << SquareNames[move.to] << std::endl;
+//        auto newBoard = board;
+//        newBoard.move(move);
+//        bb_print(newBoard.occupancy());
 //    }
     
     return moveList;
 }
 
 void FastMoveGenerator::generatePawnsMoves(Board &board, Color::Color color, MoveList &moveList) {
-    auto whitePawns = board.pieces[color][Piece::PAWN];
+    auto pawns = board.pieces[color][Piece::PAWN];
     auto emptySquares = board.emptySquares();
     auto blackPieces = board.allPieces(INVERSE(color));
     
     // Generate moves for each white pawn
-    while (whitePawns > 0) {
+    while (pawns > 0) {
         // Find the first white pawn starting from the least significant bit (that is, square a1)
-        int square = lsb(whitePawns);
+        int square = lsb(pawns);
         
         // Clear that bit so next time we can find the next white pawn
-        bb_clear(whitePawns, square);
+        bb_clear(pawns, square);
         
         // Generate a bitboard for all the attacks that this white pawn
         // can do. The attacks bitboard is masked with the occupancy bitboard
@@ -380,13 +388,13 @@ void FastMoveGenerator::generatePawnsMoves(Board &board, Color::Color color, Mov
         // in the target square.
         // TODO: occupancy should actually be black occupancy
         // Using white occupancy, we can detect which piece is protected!
-        auto attacks = WhitePawnAttacks[square] & blackPieces;
+        auto attacks = PawnAttacks[color][square] & blackPieces;
         moveList.addMoves(square, attacks, color, Piece::PAWN);
         
         // Generate a bitboard for all the moves that this white pawn can do.
         // The move bitboard is masked with the empty bitboard which
         // in other words ensures that the pawn can only move to unoccupied square.
-        auto moves = WhitePawnMoves[square] & emptySquares;
+        auto moves = PawnMoves[color][square] & emptySquares;
         moveList.addMoves(square, moves, color, Piece::PAWN);
     }
 }
