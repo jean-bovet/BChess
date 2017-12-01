@@ -10,6 +10,9 @@
 
 @interface FBoardEngine : NSObject
 
+@property (nonatomic, assign) int moveCount;
+
 - (void)generatePositions;
+- (void)generatePositions:(int)depth;
 
 @end

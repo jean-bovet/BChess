@@ -222,12 +222,12 @@ inline static int lsb(Bitboard bb) {
 
 #pragma mark -
 
-void MoveList::addMoves(int from, Bitboard moves) {
+void MoveList::addMoves(int from, Bitboard moves, Color::Color color, Piece::Piece piece) {
     while (moves > 0) {
         int to = lsb(moves);
         bb_clear(moves, to);
         
-        addMove(from, to);
+        addMove(from, to, color, piece);
     }
 }
 
@@ -247,6 +247,11 @@ Board::Board() {
     pieces[Color::BLACK][Piece::ROOK] = IBlackRooks;
     pieces[Color::BLACK][Piece::BISHOP] = IBlackBishops;
     pieces[Color::BLACK][Piece::KNIGHT] = IBlackKnights;
+}
+
+void Board::move(Move move) {
+    bb_clear(pieces[move.color][move.piece], move.from);
+    bb_set(pieces[move.color][move.piece], move.to);
 }
 
 Bitboard Board::allPieces(Color::Color color) {
@@ -348,28 +353,18 @@ MoveList FastMoveGenerator::generateMoves(Board board, Color::Color color) {
     generateSlidingMoves(board, color, Piece::BISHOP, moveList);
     generateSlidingMoves(board, color, Piece::QUEEN, moveList);
 
-    for (int i=0; i<moveList.moveCount; i++) {
-        auto move = moveList.moves[i];
-        std::cout << SquareNames[move.from] << SquareNames[move.to] << std::endl;
-    }
+//    for (int i=0; i<moveList.moveCount; i++) {
+//        auto move = moveList.moves[i];
+//        std::cout << SquareNames[move.from] << SquareNames[move.to] << std::endl;
+//    }
     
     return moveList;
 }
 
-inline static Color::Color inverse(Color::Color color) {
-    switch (color) {
-        case Color::WHITE:
-            return Color::BLACK;
-        case Color::BLACK:
-            return Color::WHITE;
-        default:
-            assert(false);
-    }
-}
 void FastMoveGenerator::generatePawnsMoves(Board &board, Color::Color color, MoveList &moveList) {
     auto whitePawns = board.pieces[color][Piece::PAWN];
     auto emptySquares = board.emptySquares();
-    auto blackPieces = board.allPieces(inverse(color));
+    auto blackPieces = board.allPieces(INVERSE(color));
     
     // Generate moves for each white pawn
     while (whitePawns > 0) {
@@ -386,13 +381,13 @@ void FastMoveGenerator::generatePawnsMoves(Board &board, Color::Color color, Mov
         // TODO: occupancy should actually be black occupancy
         // Using white occupancy, we can detect which piece is protected!
         auto attacks = WhitePawnAttacks[square] & blackPieces;
-        moveList.addMoves(square, attacks);
+        moveList.addMoves(square, attacks, color, Piece::PAWN);
         
         // Generate a bitboard for all the moves that this white pawn can do.
         // The move bitboard is masked with the empty bitboard which
         // in other words ensures that the pawn can only move to unoccupied square.
         auto moves = WhitePawnMoves[square] & emptySquares;
-        moveList.addMoves(square, moves);
+        moveList.addMoves(square, moves, color, Piece::PAWN);
     }
 }
 
@@ -412,7 +407,7 @@ void FastMoveGenerator::generateKingsMoves(Board &board, Color::Color color, Mov
         // can do. The attacks bitboard is masked to ensure it can only
         // happy on an empty square or a square with a piece of the opposite color.
         auto moves = KingMoves[square] & emptyOrBlackSquares;
-        moveList.addMoves(square, moves);
+        moveList.addMoves(square, moves, color, Piece::KING);
     }
 }
 
@@ -432,7 +427,7 @@ void FastMoveGenerator::generateKnightsMoves(Board &board, Color::Color color, M
         // can do. The attacks bitboard is masked to ensure it can only
         // happy on an empty square or a square with a piece of the opposite color.
         auto moves = KnightMoves[square] & emptyOrBlackSquares;
-        moveList.addMoves(square, moves);
+        moveList.addMoves(square, moves, color, Piece::KNIGHT);
     }
 }
 
@@ -474,7 +469,7 @@ void FastMoveGenerator::generateSlidingMoves(Board &board, Color::Color color, P
         // color because Rmagic will move to these squares anyway.
         auto moves = potentialMoves & emptyOrBlackSquares;
         
-        moveList.addMoves(square, moves);
+        moveList.addMoves(square, moves, color, piece);
     }
 }
 

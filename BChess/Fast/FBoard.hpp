@@ -21,6 +21,8 @@ namespace Color {
     };
 }
 
+#define INVERSE(color) ((color) == Color::WHITE ? Color::BLACK : Color::WHITE)
+
 namespace Piece {
     enum Piece: int {
         PAWN, ROOK, KNIGHT, BISHOP, QUEEN, KING, COUNT
@@ -52,6 +54,8 @@ static std::string SquareNames[64] = {
 struct Move {
     int from;
     int to;
+    Color::Color color;
+    Piece::Piece piece;
 };
 
 const int MAX_MOVES = 256;
@@ -60,16 +64,17 @@ struct MoveList {
     Move moves[MAX_MOVES];
     int moveCount = 0;
     
-    void addMove(int from, int to) {
-        moves[moveCount] = { from, to };
+    void addMove(int from, int to, Color::Color color, Piece::Piece piece) {
+        moves[moveCount] = { from, to, color, piece };
         moveCount++;
     }
     
-    void addMoves(int from, Bitboard moves);
+    void addMoves(int from, Bitboard moves, Color::Color color, Piece::Piece piece);
 };
 
 struct Board {
     Board();
+    void move(Move move);
     Bitboard pieces[Color::COUNT][Piece::COUNT] = { };
     Bitboard allPieces(Color::Color color);
     Bitboard occupancy();
