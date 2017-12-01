@@ -233,6 +233,22 @@ void MoveList::addMoves(int from, Bitboard moves) {
 
 #pragma mark -
 
+Board::Board() {
+    pieces[Color::WHITE][Piece::PAWN] = IWhitePawns;
+    pieces[Color::WHITE][Piece::KING] = IWhiteKing;
+    pieces[Color::WHITE][Piece::QUEEN] = IWhiteQueen;
+    pieces[Color::WHITE][Piece::ROOK] = IWhiteRooks;
+    pieces[Color::WHITE][Piece::BISHOP] = IWhiteBishops;
+    pieces[Color::WHITE][Piece::KNIGHT] = IWhiteKnights;
+    
+    pieces[Color::BLACK][Piece::PAWN] = IBlackPawns;
+    pieces[Color::BLACK][Piece::KING] = IBlackKing;
+    pieces[Color::BLACK][Piece::QUEEN] = IBlackQueen;
+    pieces[Color::BLACK][Piece::ROOK] = IBlackRooks;
+    pieces[Color::BLACK][Piece::BISHOP] = IBlackBishops;
+    pieces[Color::BLACK][Piece::KNIGHT] = IBlackKnights;
+}
+
 Bitboard Board::allPieces(Color::Color color) {
     Bitboard all = 0;
     for (auto pieces : pieces[color]) {
@@ -254,6 +270,7 @@ Bitboard Board::emptySquares() {
 #pragma mark -
 
 FastMoveGenerator::FastMoveGenerator() {
+    initmagicmoves();
     initPawnMoves();
     initKingMoves();
     initKnightMoves();
@@ -321,28 +338,9 @@ void FastMoveGenerator::initKnightMoves() {
     }
 }
 
-void FastMoveGenerator::generateMoves() {
+MoveList FastMoveGenerator::generateMoves(Board board, Color::Color color) {
     MoveList moveList;
-    Board board;
-    
-    initmagicmoves();
-    
-    board.pieces[Color::WHITE][Piece::PAWN] = IWhitePawns;
-    board.pieces[Color::WHITE][Piece::KING] = IWhiteKing;
-    board.pieces[Color::WHITE][Piece::QUEEN] = IWhiteQueen;
-    board.pieces[Color::WHITE][Piece::ROOK] = IWhiteRooks;
-    board.pieces[Color::WHITE][Piece::BISHOP] = IWhiteBishops;
-    board.pieces[Color::WHITE][Piece::KNIGHT] = IWhiteKnights;
-
-    board.pieces[Color::BLACK][Piece::PAWN] = IBlackPawns;
-    board.pieces[Color::BLACK][Piece::KING] = IBlackKing;
-    board.pieces[Color::BLACK][Piece::QUEEN] = IBlackQueen;
-    board.pieces[Color::BLACK][Piece::ROOK] = IBlackRooks;
-    board.pieces[Color::BLACK][Piece::BISHOP] = IBlackBishops;
-    board.pieces[Color::BLACK][Piece::KNIGHT] = IBlackKnights;
-
-    auto color = Color::WHITE;
-    
+        
     generatePawnsMoves(board, color, moveList);
     generateKingsMoves(board, color, moveList);
     generateKnightsMoves(board, color, moveList);
@@ -354,6 +352,8 @@ void FastMoveGenerator::generateMoves() {
         auto move = moveList.moves[i];
         std::cout << SquareNames[move.from] << SquareNames[move.to] << std::endl;
     }
+    
+    return moveList;
 }
 
 inline static Color::Color inverse(Color::Color color) {

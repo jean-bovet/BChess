@@ -69,6 +69,7 @@ struct MoveList {
 };
 
 struct Board {
+    Board();
     Bitboard pieces[Color::COUNT][Piece::COUNT] = { };
     Bitboard allPieces(Color::Color color);
     Bitboard occupancy();
@@ -94,7 +95,7 @@ public:
     void initKingMoves();
     void initKnightMoves();
     
-    void generateMoves();
+    MoveList generateMoves(Board board, Color::Color color);
     void generatePawnsMoves(Board &board, Color::Color color, MoveList &moveList);
     void generateKingsMoves(Board &board, Color::Color color, MoveList &moveList);
     void generateKnightsMoves(Board &board, Color::Color color, MoveList &moveList);

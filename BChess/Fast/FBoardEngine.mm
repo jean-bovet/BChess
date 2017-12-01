@@ -13,7 +13,8 @@
 
 - (void)generatePositions {
     FastMoveGenerator generator;
-    generator.generateMoves();
+    Board board;
+    generator.generateMoves(board, Color::WHITE);
 }
 
 @end
