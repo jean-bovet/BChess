@@ -23,6 +23,16 @@ public:
         testKnightInCorner();
         testKnightWithPawns();
         testEmptyBoard();
+        
+        testWhiteKingCheckWithKnight();
+        testWhiteKingCheckWithBishop();
+        testWhiteKingCheckWithRook();
+        testWhiteKingCheckWithQueenLikeBishop();
+        testWhiteKingCheckWithQueenLikeRook();
+        
+        testWhiteKingNotCheck();
+        
+        testBlackKingCheck();
     }
     
     static void testWhitePawnFromStartRank() {
@@ -79,6 +89,48 @@ public:
         assert(board.occupancy() == 0);
     }
     
+    static void testWhiteKingCheckWithKnight() {
+        auto board = FFEN::createBoard("8/2k5/8/8/8/2K5/4n3/8 w - - 0 1");
+        assert(board.isCheck(Color::WHITE));
+        assert(!board.isCheck(Color::BLACK));
+    }
+    
+    static void testWhiteKingCheckWithBishop() {
+        auto board = FFEN::createBoard("8/2k5/5b2/8/8/2K5/8/8 w - - 0 1");
+        assert(board.isCheck(Color::WHITE));
+        assert(!board.isCheck(Color::BLACK));
+    }
+    
+    static void testWhiteKingCheckWithRook() {
+        auto board = FFEN::createBoard("8/2k5/8/8/8/2K3r1/8/8 w - - 0 1");
+        assert(board.isCheck(Color::WHITE));
+        assert(!board.isCheck(Color::BLACK));
+    }
+
+    static void testWhiteKingCheckWithQueenLikeBishop() {
+        auto board = FFEN::createBoard("8/2k3q1/8/8/8/2K5/8/8 w - - 0 1");
+        assert(board.isCheck(Color::WHITE));
+        assert(!board.isCheck(Color::BLACK));
+    }
+
+    static void testWhiteKingCheckWithQueenLikeRook() {
+        auto board = FFEN::createBoard("8/2k5/8/8/8/2K3q1/8/8 w - - 0 1");
+        assert(board.isCheck(Color::WHITE));
+        assert(!board.isCheck(Color::BLACK));
+    }
+
+    static void testWhiteKingNotCheck() {
+        auto board = FFEN::createBoard("8/2k5/8/8/8/2K5/5n2/8 w - - 0 1");
+        assert(!board.isCheck(Color::WHITE));
+        assert(!board.isCheck(Color::BLACK));
+    }
+
+    static void testBlackKingCheck() {
+        auto board = FFEN::createBoard("8/2k5/4N3/8/8/2K5/5n2/8 w - - 0 1");
+        assert(!board.isCheck(Color::WHITE));
+        assert(board.isCheck(Color::BLACK));
+    }
+
 //    func testBlackKingCheckByKnight() {
 //        assertMoves("3r3k/5Npp/8/8/2Q5/1B6/8/7K b - - 1 1", [ "3r2k1/5Npp/8/8/2Q5/1B6/8/7K w - - 2 2" ], "h8")
 //    }

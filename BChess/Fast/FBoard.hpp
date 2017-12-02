@@ -97,6 +97,8 @@ struct Board {
     Bitboard occupancy();
     Bitboard emptySquares();
     
+    bool isCheck(Color::Color color);
+    
     void print();
 };
 

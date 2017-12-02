@@ -349,6 +349,35 @@ Bitboard Board::emptySquares() {
     return ~occupancy();
 }
 
+bool Board::isCheck(Color::Color color) {
+    // Locate the king
+    int kingSquare = lsb(pieces[color][Piece::KING]);
+    assert(kingSquare > 0);
+    
+    auto otherColor = INVERSE(color);
+//    auto blackPieces = allPieces(INVERSE(color));
+    
+    // Generate all the moves for a knight from the king position
+    // and keep only the ones that are actually hitting
+    // a black knight, meaning the king is attacked.
+    auto moves = KnightMoves[kingSquare] & pieces[otherColor][Piece::KNIGHT];
+    if (moves > 0) return true;
+    
+    // Same for bishop (and queen)
+    auto rawBishopMoves = Bmagic(kingSquare, occupancy());
+    auto bishopMoves = rawBishopMoves && (pieces[otherColor][Piece::BISHOP]|pieces[otherColor][Piece::QUEEN]);
+    if (bishopMoves > 0) return true;
+
+    // Same for rook (and queen)
+    auto rawRookMoves = Rmagic(kingSquare, occupancy());
+    auto rookMoves = rawRookMoves && (pieces[otherColor][Piece::ROOK]|pieces[otherColor][Piece::QUEEN]);
+    if (rookMoves > 0) return true;
+
+    // TODO: king, pawns
+    
+    return false;
+}
+
 #pragma mark -
 
 FastMoveGenerator::FastMoveGenerator() {
