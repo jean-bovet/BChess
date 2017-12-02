@@ -84,6 +84,10 @@ struct Board {
     
     Board();
     
+    void clear() {
+        memset(pieces, 0, sizeof(pieces));
+    }
+    
     Square get(int file, int rank);
     void set(Square square, int file, int rank);
     

@@ -22,8 +22,9 @@ public:
         testKnight();
         testKnightInCorner();
         testKnightWithPawns();
+        testEmptyBoard();
     }
-        
+    
     static void testWhitePawnFromStartRank() {
         assertMoves("8/8/8/8/8/8/2P5/8 w - - 0 1",
                     {
@@ -70,6 +71,14 @@ public:
                     "d5");
     }
 
+    static void testEmptyBoard() {
+        Board board;
+        assert(board.occupancy() > 0);
+        
+        board.clear();
+        assert(board.occupancy() == 0);
+    }
+    
 //    func testBlackKingCheckByKnight() {
 //        assertMoves("3r3k/5Npp/8/8/2Q5/1B6/8/7K b - - 1 1", [ "3r2k1/5Npp/8/8/2Q5/1B6/8/7K w - - 2 2" ], "h8")
 //    }

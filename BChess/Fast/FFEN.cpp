@@ -213,7 +213,7 @@ Board FFEN::createBoard(std::string fen) {
     split4(pieces, ranks, "/");
 
     Board board;
-    memset(board.pieces, 0, sizeof(board.pieces));
+    board.clear();
     
     Coordinate coord = { 7, 0 };
     for (std::string rank : ranks) {
