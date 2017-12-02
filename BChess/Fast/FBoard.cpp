@@ -53,6 +53,10 @@ inline static void bb_clear(Bitboard &bitboard, int square) {
     bitboard &= ~(1UL << square);
 }
 
+inline static void bb_clear(Bitboard &bitboard, int file, int rank) {
+    bb_clear(bitboard, square_index(file, rank));
+}
+
 inline static void bb_set(Bitboard &bitboard, int square) {
     bitboard |= 1UL << square;
 }
@@ -296,8 +300,35 @@ void Board::print() {
     std::cout << std::endl;
 }
 
-void Board::set(Piece::Piece piece, Color::Color color, int file, int rank) {
-    bb_set(pieces[color][piece], file, rank);
+Square Board::get(int file, int rank) {
+    Square square;
+    if (bb_test(occupancy(), file, rank)) {
+        for (auto color=0; color<Color::COUNT; color++) {
+            for (auto piece=0; piece<Piece::COUNT; piece++) {
+                if (bb_test(pieces[color][piece], file, rank)) {
+                    square.empty = false;
+                    square.color = Color::Color(color);
+                    square.piece = Piece::Piece(piece);
+                    return square;
+                }
+            }
+        }
+    } else {
+        square.empty = true;
+    }
+    return square;
+}
+
+void Board::set(Square square, int file, int rank) {
+    if (square.empty) {
+        for (auto color=0; color<Color::COUNT; color++) {
+            for (auto piece=0; piece<Piece::COUNT; piece++) {
+                bb_clear(pieces[color][piece], file, rank);
+            }
+        }
+    } else {
+        bb_set(pieces[square.color][square.piece], file, rank);
+    }
 }
 
 Bitboard Board::allPieces(Color::Color color) {
@@ -340,15 +371,19 @@ void FastMoveGenerator::initPawnMoves() {
         
         // White pawn moves
         bb_set(PawnMoves[Color::WHITE][square], fileIndex, rankIndex+1);
-        bb_set(PawnMoves[Color::WHITE][square], fileIndex, rankIndex+2);
-                
+        if (rankIndex == 1) {
+            bb_set(PawnMoves[Color::WHITE][square], fileIndex, rankIndex+2);
+        }
+        
         // Black pawn attacks
         bb_set(PawnAttacks[Color::BLACK][square], fileIndex-1, rankIndex-1);
         bb_set(PawnAttacks[Color::BLACK][square], fileIndex+1, rankIndex-1);
         
         // Black pawn moves
         bb_set(PawnMoves[Color::BLACK][square], fileIndex, rankIndex-1);
-        bb_set(PawnMoves[Color::BLACK][square], fileIndex, rankIndex-2);
+        if (rankIndex == 6) {
+            bb_set(PawnMoves[Color::BLACK][square], fileIndex, rankIndex-2);
+        }
     }
 }
 

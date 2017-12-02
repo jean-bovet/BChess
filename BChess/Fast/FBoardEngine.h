@@ -12,6 +12,7 @@
 
 @property (nonatomic, assign) int moveCount;
 
+- (void)runTests;
 - (void)generatePositions;
 - (void)generatePositions:(int)depth;
 

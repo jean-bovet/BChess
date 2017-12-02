@@ -51,6 +51,12 @@ static std::string SquareNames[64] = {
     "a8", "b8", "c8", "d8", "e8", "f8", "g8", "h8",
 };
 
+struct Square {
+    bool empty;
+    Color::Color color;
+    Piece::Piece piece;
+};
+
 struct Move {
     int from;
     int to;
@@ -73,11 +79,13 @@ struct MoveList {
 };
 
 struct Board {
+    Color::Color color = Color::WHITE;
     Bitboard pieces[Color::COUNT][Piece::COUNT] = { };
     
     Board();
     
-    void set(Piece::Piece piece, Color::Color color, int file, int rank);
+    Square get(int file, int rank);
+    void set(Square square, int file, int rank);
     
     void move(Move move);
     

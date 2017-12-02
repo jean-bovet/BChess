@@ -10,8 +10,13 @@
 #import "FBoard.hpp"
 #import "FPerformance.hpp"
 #import "FFEN.hpp"
+#import "FTests.hpp"
 
 @implementation FBoardEngine
+
+- (void)runTests {
+    FTests::runAll();
+}
 
 - (void)generatePositions {
     FFEN::createBoard("3r3k/5Npp/8/8/2Q5/1B6/8/7K b - - 1 1");

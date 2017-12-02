@@ -13,6 +13,7 @@
 
 class FFEN {
 public:
+    static std::string getFEN(Board board);
     static Board createBoard(std::string fen);
 };
 
