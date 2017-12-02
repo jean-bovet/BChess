@@ -113,11 +113,11 @@ public:
     void initKingMoves();
     void initKnightMoves();
     
-    MoveList generateMoves(Board board, Color::Color color);
-    void generatePawnsMoves(Board &board, Color::Color color, MoveList &moveList);
-    void generateKingsMoves(Board &board, Color::Color color, MoveList &moveList);
-    void generateKnightsMoves(Board &board, Color::Color color, MoveList &moveList);
-    void generateSlidingMoves(Board &board, Color::Color color, Piece::Piece piece, MoveList &moveList);
+    MoveList generateMoves(Board board, Color::Color color, int squareIndex = -1);
+    void generatePawnsMoves(Board &board, Color::Color color, MoveList &moveList, int squareIndex = -1);
+    void generateKingsMoves(Board &board, Color::Color color, MoveList &moveList, int squareIndex = -1);
+    void generateKnightsMoves(Board &board, Color::Color color, MoveList &moveList, int squareIndex = -1);
+    void generateSlidingMoves(Board &board, Color::Color color, Piece::Piece piece, MoveList &moveList, int squareIndex = -1);
 };
 
 #endif /* FBoard_hpp */

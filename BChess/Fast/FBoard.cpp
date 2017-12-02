@@ -426,15 +426,15 @@ void FastMoveGenerator::initKnightMoves() {
     }
 }
 
-MoveList FastMoveGenerator::generateMoves(Board board, Color::Color color) {
+MoveList FastMoveGenerator::generateMoves(Board board, Color::Color color, int squareIndex) {
     MoveList moveList;
         
-    generatePawnsMoves(board, color, moveList);
-    generateKingsMoves(board, color, moveList);
-    generateKnightsMoves(board, color, moveList);
-    generateSlidingMoves(board, color, Piece::ROOK, moveList);
-    generateSlidingMoves(board, color, Piece::BISHOP, moveList);
-    generateSlidingMoves(board, color, Piece::QUEEN, moveList);
+    generatePawnsMoves(board, color, moveList, squareIndex);
+    generateKingsMoves(board, color, moveList, squareIndex);
+    generateKnightsMoves(board, color, moveList, squareIndex);
+    generateSlidingMoves(board, color, Piece::ROOK, moveList, squareIndex);
+    generateSlidingMoves(board, color, Piece::BISHOP, moveList, squareIndex);
+    generateSlidingMoves(board, color, Piece::QUEEN, moveList, squareIndex);
 
 //    for (int i=0; i<moveList.moveCount; i++) {
 //        auto move = moveList.moves[i];
@@ -447,7 +447,7 @@ MoveList FastMoveGenerator::generateMoves(Board board, Color::Color color) {
     return moveList;
 }
 
-void FastMoveGenerator::generatePawnsMoves(Board &board, Color::Color color, MoveList &moveList) {
+void FastMoveGenerator::generatePawnsMoves(Board &board, Color::Color color, MoveList &moveList, int squareIndex) {
     auto pawns = board.pieces[color][Piece::PAWN];
     auto emptySquares = board.emptySquares();
     auto blackPieces = board.allPieces(INVERSE(color));
@@ -456,6 +456,11 @@ void FastMoveGenerator::generatePawnsMoves(Board &board, Color::Color color, Mov
     while (pawns > 0) {
         // Find the first white pawn starting from the least significant bit (that is, square a1)
         int square = lsb(pawns);
+        
+        // If the square index is specified, only generate move for that square
+        if (squareIndex > -1 && square != squareIndex) {
+            break;
+        }
         
         // Clear that bit so next time we can find the next white pawn
         bb_clear(pawns, square);
@@ -477,7 +482,7 @@ void FastMoveGenerator::generatePawnsMoves(Board &board, Color::Color color, Mov
     }
 }
 
-void FastMoveGenerator::generateKingsMoves(Board &board, Color::Color color, MoveList &moveList) {
+void FastMoveGenerator::generateKingsMoves(Board &board, Color::Color color, MoveList &moveList, int squareIndex) {
     auto kings = board.pieces[color][Piece::KING];
     auto emptyOrBlackSquares = ~board.allPieces(color);
 
@@ -486,6 +491,11 @@ void FastMoveGenerator::generateKingsMoves(Board &board, Color::Color color, Mov
         // Find the first white knight starting from the least significant bit (that is, square a1)
         int square = lsb(kings);
         
+        // If the square index is specified, only generate move for that square
+        if (squareIndex > -1 && square != squareIndex) {
+            break;
+        }
+
         // Clear that bit so next time we can find the next white knight
         bb_clear(kings, square);
         
@@ -497,7 +507,7 @@ void FastMoveGenerator::generateKingsMoves(Board &board, Color::Color color, Mov
     }
 }
 
-void FastMoveGenerator::generateKnightsMoves(Board &board, Color::Color color, MoveList &moveList) {
+void FastMoveGenerator::generateKnightsMoves(Board &board, Color::Color color, MoveList &moveList, int squareIndex) {
     auto whiteKnights = board.pieces[color][Piece::KNIGHT];
     auto emptyOrBlackSquares = ~board.allPieces(color);
     
@@ -506,6 +516,11 @@ void FastMoveGenerator::generateKnightsMoves(Board &board, Color::Color color, M
         // Find the first white knight starting from the least significant bit (that is, square a1)
         int square = lsb(whiteKnights);
         
+        // If the square index is specified, only generate move for that square
+        if (squareIndex > -1 && square != squareIndex) {
+            break;
+        }
+
         // Clear that bit so next time we can find the next white knight
         bb_clear(whiteKnights, square);
         
@@ -517,7 +532,7 @@ void FastMoveGenerator::generateKnightsMoves(Board &board, Color::Color color, M
     }
 }
 
-void FastMoveGenerator::generateSlidingMoves(Board &board, Color::Color color, Piece::Piece piece, MoveList &moveList) {
+void FastMoveGenerator::generateSlidingMoves(Board &board, Color::Color color, Piece::Piece piece, MoveList &moveList, int squareIndex) {
     auto slidingPieces = board.pieces[color][piece];
     auto occupancy = board.occupancy();
     auto emptyOrBlackSquares = ~board.allPieces(color);
@@ -527,6 +542,11 @@ void FastMoveGenerator::generateSlidingMoves(Board &board, Color::Color color, P
         // Find the first sliding piece starting from the least significant bit (that is, square a1)
         int square = lsb(slidingPieces);
         
+        // If the square index is specified, only generate move for that square
+        if (squareIndex > -1 && square != squareIndex) {
+            break;
+        }
+
         // Clear that bit so next time we can find the next sliding piece
         bb_clear(slidingPieces, square);
         

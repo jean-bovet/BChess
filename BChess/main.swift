@@ -23,8 +23,8 @@ func run(perf: Performance) {
     print("\(formatter.string(for: perf.moves)!) moves in \(perf.timeElapsed) seconds => \(formatter.string(for: perf.movesPerSecond)!) moves/s")
 }
 
-run(perf: PerformanceClassic())
-run(perf: PerformanceCpp())
+//run(perf: PerformanceClassic())
+//run(perf: PerformanceCpp())
 
 //let uci = UCI()
 //uci.run()
