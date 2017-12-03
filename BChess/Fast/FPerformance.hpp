@@ -18,7 +18,7 @@ class FPerformance {
 public:
     int moveCount = 0;
 
-    void generateMoves(Board board, Color::Color color, int depth);
+    void generateMoves(Board board, Color color, int depth);
 };
 
 #endif /* FPerformance_hpp */

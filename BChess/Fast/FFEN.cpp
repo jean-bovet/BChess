@@ -138,7 +138,7 @@ inline static char squareToChar(Square square) {
             return white ? 'Q' : 'q';
         case Piece::KING:
             return white ? 'K' : 'k';
-        case Piece::COUNT:
+        case Piece::PCOUNT:
             assert(false); // invalid
     }
 }

@@ -66,6 +66,8 @@
 		A70A61BA1FD132D200AFDF0E /* FFEN.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = FFEN.hpp; sourceTree = "<group>"; };
 		A70A61BC1FD1333300AFDF0E /* FUtility.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = FUtility.hpp; sourceTree = "<group>"; };
 		A70A61BD1FD3196400AFDF0E /* FTests.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = FTests.hpp; sourceTree = "<group>"; };
+		A70A61BE1FD38C7500AFDF0E /* FColor.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = FColor.hpp; sourceTree = "<group>"; };
+		A70A61BF1FD38D4100AFDF0E /* FPiece.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = FPiece.hpp; sourceTree = "<group>"; };
 		A75683271FCD28A000CF1408 /* FBoardEngine.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FBoardEngine.h; sourceTree = "<group>"; };
 		A75683281FCD28A000CF1408 /* FBoardEngine.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = FBoardEngine.mm; sourceTree = "<group>"; };
 		A756832E1FD0D96300CF1408 /* FPerformance.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = FPerformance.cpp; sourceTree = "<group>"; };
@@ -153,6 +155,8 @@
 		A7712D481FCBC13500E7E802 /* Fast */ = {
 			isa = PBXGroup;
 			children = (
+				A70A61BE1FD38C7500AFDF0E /* FColor.hpp */,
+				A70A61BF1FD38D4100AFDF0E /* FPiece.hpp */,
 				A7712D461FCBC13100E7E802 /* FBoard.hpp */,
 				A7712D451FCBC13100E7E802 /* FBoard.cpp */,
 				A70A61BA1FD132D200AFDF0E /* FFEN.hpp */,

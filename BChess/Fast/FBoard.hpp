@@ -6,28 +6,16 @@
 //  Copyright © 2017 Jean Bovet. All rights reserved.
 //
 
-#ifndef FBoard_hpp
-#define FBoard_hpp
+#pragma once
+
+#include "FColor.hpp"
+#include "FPiece.hpp"
 
 #include <stdio.h>
 #include <cstdint>
 #include <string>
 
 typedef uint64_t Bitboard;
-
-namespace Color {
-    enum Color: int {
-        WHITE, BLACK, COUNT        
-    };
-}
-
-#define INVERSE(color) ((color) == Color::WHITE ? Color::BLACK : Color::WHITE)
-
-namespace Piece {
-    enum Piece: int {
-        PAWN, ROOK, KNIGHT, BISHOP, QUEEN, KING, COUNT
-    };
-}
 
 enum enumSquare {
     a1, b1, c1, d1, e1, f1, g1, h1,
@@ -53,22 +41,22 @@ static std::string SquareNames[64] = {
 
 struct Square {
     bool empty;
-    Color::Color color;
-    Piece::Piece piece;
+    Color color;
+    Piece piece;
 };
 
 struct Move {
     int from;
     int to;
-    Color::Color color;
-    Piece::Piece piece;
+    Color color;
+    Piece piece;
 };
 
 const int MAX_MOVES = 256;
 
 struct Board {
-    Color::Color color = Color::WHITE;
-    Bitboard pieces[Color::COUNT][Piece::COUNT] = { };
+    Color color = Color::WHITE;
+    Bitboard pieces[Color::COUNT][Piece::PCOUNT] = { };
     
     Board();
     
@@ -81,11 +69,11 @@ struct Board {
     
     void move(Move move);
     
-    Bitboard allPieces(Color::Color color);
+    Bitboard allPieces(Color color);
     Bitboard occupancy();
     Bitboard emptySquares();
     
-    bool isCheck(Color::Color color);
+    bool isCheck(Color color);
     
     void print();
 };
@@ -94,8 +82,8 @@ struct MoveList {
     Move moves[MAX_MOVES];
     int moveCount = 0;
     
-    void addMove(Board &board, int from, int to, Color::Color color, Piece::Piece piece);
-    void addMoves(Board &board, int from, Bitboard moves, Color::Color color, Piece::Piece piece);
+    void addMove(Board &board, int from, int to, Color color, Piece piece);
+    void addMoves(Board &board, int from, Bitboard moves, Color color, Piece piece);
 };
 
 // Without this, the C file won't be linked
@@ -118,11 +106,10 @@ public:
     void initKingMoves();
     void initKnightMoves();
     
-    MoveList generateMoves(Board board, Color::Color color, int squareIndex = -1);
-    void generatePawnsMoves(Board &board, Color::Color color, MoveList &moveList, int squareIndex = -1);
-    void generateKingsMoves(Board &board, Color::Color color, MoveList &moveList, int squareIndex = -1);
-    void generateKnightsMoves(Board &board, Color::Color color, MoveList &moveList, int squareIndex = -1);
-    void generateSlidingMoves(Board &board, Color::Color color, Piece::Piece piece, MoveList &moveList, int squareIndex = -1);
+    MoveList generateMoves(Board board, Color color, int squareIndex = -1);
+    void generatePawnsMoves(Board &board, Color color, MoveList &moveList, int squareIndex = -1);
+    void generateKingsMoves(Board &board, Color color, MoveList &moveList, int squareIndex = -1);
+    void generateKnightsMoves(Board &board, Color color, MoveList &moveList, int squareIndex = -1);
+    void generateSlidingMoves(Board &board, Color color, Piece piece, MoveList &moveList, int squareIndex = -1);
 };
 
-#endif /* FBoard_hpp */

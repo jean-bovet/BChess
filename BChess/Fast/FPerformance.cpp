@@ -9,7 +9,7 @@
 #include "FPerformance.hpp"
 #include "FBoard.hpp"
 
-void FPerformance::generateMoves(Board board, Color::Color color, int depth) {
+void FPerformance::generateMoves(Board board, Color color, int depth) {
     if (depth == 0) {
         return;
     }

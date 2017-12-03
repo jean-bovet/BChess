@@ -29,7 +29,7 @@
 - (void)generatePositions:(int)depth {
     FPerformance performance;
     Board board;
-    Color::Color color = Color::WHITE;
+    Color color = Color::WHITE;
     performance.generateMoves(board, color, depth);
     self.moveCount = performance.moveCount;
 }

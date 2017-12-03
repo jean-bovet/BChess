@@ -228,7 +228,7 @@ inline static int lsb(Bitboard bb) {
 
 #pragma mark -
 
-void MoveList::addMove(Board &board, int from, int to, Color::Color color, Piece::Piece piece) {
+void MoveList::addMove(Board &board, int from, int to, Color color, Piece piece) {
     Move move = { from, to, color, piece };
     Board validBoard = board;
     validBoard.move(move);
@@ -238,7 +238,7 @@ void MoveList::addMove(Board &board, int from, int to, Color::Color color, Piece
     }
 }
 
-void MoveList::addMoves(Board &board, int from, Bitboard moves, Color::Color color, Piece::Piece piece) {
+void MoveList::addMoves(Board &board, int from, Bitboard moves, Color color, Piece piece) {
     while (moves > 0) {
         int to = lsb(moves);
         bb_clear(moves, to);
@@ -270,14 +270,14 @@ void Board::move(Move move) {
     bb_set(pieces[move.color][move.piece], move.to);
     
     // TODO optimize
-    for (auto piece=0; piece<Piece::COUNT; piece++) {
+    for (auto piece=0; piece<Piece::PCOUNT; piece++) {
         bb_clear(pieces[INVERSE(move.color)][piece], move.to);
     }
 
     color = INVERSE(color);
 }
 
-inline static char charForPiece(Color::Color color, Piece::Piece piece) {
+inline static char charForPiece(Color color, Piece piece) {
     auto white = color == Color::WHITE;
     switch (piece) {
         case Piece::PAWN:
@@ -292,7 +292,7 @@ inline static char charForPiece(Color::Color color, Piece::Piece piece) {
             return white ? 'Q' : 'q';
         case Piece::KING:
             return white ? 'K' : 'k';
-        case Piece::COUNT:
+        case Piece::PCOUNT:
             return '?';
     }
 }
@@ -303,9 +303,9 @@ void Board::print() {
             char c = '.';
             
             for (auto color=0; color<Color::COUNT; color++) {
-                for (auto piece=0; piece<Piece::COUNT; piece++) {
+                for (auto piece=0; piece<Piece::PCOUNT; piece++) {
                     if (bb_test(pieces[color][piece], file, rank)) {
-                        c = charForPiece((Color::Color)color, (Piece::Piece)piece);
+                        c = charForPiece((Color)color, (Piece)piece);
                     }
                 }
             }
@@ -321,11 +321,11 @@ Square Board::get(int file, int rank) {
     Square square;
     if (bb_test(occupancy(), file, rank)) {
         for (auto color=0; color<Color::COUNT; color++) {
-            for (auto piece=0; piece<Piece::COUNT; piece++) {
+            for (auto piece=0; piece<Piece::PCOUNT; piece++) {
                 if (bb_test(pieces[color][piece], file, rank)) {
                     square.empty = false;
-                    square.color = Color::Color(color);
-                    square.piece = Piece::Piece(piece);
+                    square.color = Color(color);
+                    square.piece = Piece(piece);
                     return square;
                 }
             }
@@ -339,7 +339,7 @@ Square Board::get(int file, int rank) {
 void Board::set(Square square, int file, int rank) {
     if (square.empty) {
         for (auto color=0; color<Color::COUNT; color++) {
-            for (auto piece=0; piece<Piece::COUNT; piece++) {
+            for (auto piece=0; piece<Piece::PCOUNT; piece++) {
                 bb_clear(pieces[color][piece], file, rank);
             }
         }
@@ -348,7 +348,7 @@ void Board::set(Square square, int file, int rank) {
     }
 }
 
-Bitboard Board::allPieces(Color::Color color) {
+Bitboard Board::allPieces(Color color) {
     Bitboard all = 0;
     for (auto pieces : pieces[color]) {
         all |= pieces;
@@ -366,7 +366,7 @@ Bitboard Board::emptySquares() {
     return ~occupancy();
 }
 
-bool Board::isCheck(Color::Color color) {
+bool Board::isCheck(Color color) {
     // Locate the king
     auto kingBoard = pieces[color][Piece::KING];
     if (kingBoard == 0) return false; // No king, can happen when testing    
@@ -484,7 +484,7 @@ void FastMoveGenerator::initKnightMoves() {
     }
 }
 
-MoveList FastMoveGenerator::generateMoves(Board board, Color::Color color, int squareIndex) {
+MoveList FastMoveGenerator::generateMoves(Board board, Color color, int squareIndex) {
     MoveList moveList;
         
     generatePawnsMoves(board, color, moveList, squareIndex);
@@ -505,7 +505,7 @@ MoveList FastMoveGenerator::generateMoves(Board board, Color::Color color, int s
     return moveList;
 }
 
-void FastMoveGenerator::generatePawnsMoves(Board &board, Color::Color color, MoveList &moveList, int squareIndex) {
+void FastMoveGenerator::generatePawnsMoves(Board &board, Color color, MoveList &moveList, int squareIndex) {
     auto pawns = board.pieces[color][Piece::PAWN];
     auto emptySquares = board.emptySquares();
     auto blackPieces = board.allPieces(INVERSE(color));
@@ -540,7 +540,7 @@ void FastMoveGenerator::generatePawnsMoves(Board &board, Color::Color color, Mov
     }
 }
 
-void FastMoveGenerator::generateKingsMoves(Board &board, Color::Color color, MoveList &moveList, int squareIndex) {
+void FastMoveGenerator::generateKingsMoves(Board &board, Color color, MoveList &moveList, int squareIndex) {
     auto kings = board.pieces[color][Piece::KING];
     auto emptyOrBlackSquares = ~board.allPieces(color);
 
@@ -565,7 +565,7 @@ void FastMoveGenerator::generateKingsMoves(Board &board, Color::Color color, Mov
     }
 }
 
-void FastMoveGenerator::generateKnightsMoves(Board &board, Color::Color color, MoveList &moveList, int squareIndex) {
+void FastMoveGenerator::generateKnightsMoves(Board &board, Color color, MoveList &moveList, int squareIndex) {
     auto whiteKnights = board.pieces[color][Piece::KNIGHT];
     auto emptyOrBlackSquares = ~board.allPieces(color);
     
@@ -590,7 +590,7 @@ void FastMoveGenerator::generateKnightsMoves(Board &board, Color::Color color, M
     }
 }
 
-void FastMoveGenerator::generateSlidingMoves(Board &board, Color::Color color, Piece::Piece piece, MoveList &moveList, int squareIndex) {
+void FastMoveGenerator::generateSlidingMoves(Board &board, Color color, Piece piece, MoveList &moveList, int squareIndex) {
     auto slidingPieces = board.pieces[color][piece];
     auto occupancy = board.occupancy();
     auto emptyOrBlackSquares = ~board.allPieces(color);

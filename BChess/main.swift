@@ -24,7 +24,7 @@ func run(perf: Performance) {
 }
 
 //run(perf: PerformanceClassic())
-run(perf: PerformanceCpp())
+//run(perf: PerformanceCpp())
 
 //let uci = UCI()
 //uci.run()
