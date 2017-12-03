@@ -197,6 +197,10 @@ Board::Board() {
 }
 
 void Board::move(Move move) {
+    if (color == BLACK) {
+        fullMoveCount += 1;
+    }
+
     bb_clear(pieces[move.color][move.piece], move.from);
     bb_set(pieces[move.color][move.piece], move.to);
     
@@ -329,7 +333,13 @@ bool Board::isCheck(Color color) {
     }
     
     // TODO: king, pawns
-    
+    // Pawns: we put a pawn of the opposite color at our king's location. That way, we can
+    // determine the attacks that a pawn from the opposite color would do.
+    auto pawnAttacks = PawnAttacks[color][kingSquare] & pieces[otherColor][Piece::PAWN];
+    if (pawnAttacks > 0) {
+        return true;
+    }
+
     return false;
 }
 

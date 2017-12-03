@@ -196,8 +196,7 @@ std::string FFEN::getFEN(Board board) {
     fen += " 0";
     
     // Full move number (starting at 1)
-    // TODO
-    fen += " 1";
+    fen += " "+std::to_string(board.fullMoveCount);
     
     return fen;
 }
@@ -248,7 +247,7 @@ Board FFEN::createBoard(std::string fen) {
     fields[4];
     
     // Full move
-    fields[5];
+    board.fullMoveCount = stoi(fields[5]);
     
     return board;
 }

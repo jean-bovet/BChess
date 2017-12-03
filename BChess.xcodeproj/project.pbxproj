@@ -10,6 +10,8 @@
 		A70A61BB1FD132D200AFDF0E /* FFEN.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A70A61B91FD132D200AFDF0E /* FFEN.cpp */; };
 		A70A61C41FD458DE00AFDF0E /* FMoveGenerator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A70A61C21FD458DE00AFDF0E /* FMoveGenerator.cpp */; };
 		A70A61C61FD4592700AFDF0E /* FMoveList.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A70A61C51FD4592700AFDF0E /* FMoveList.cpp */; };
+		A70A61CA1FD46E3C00AFDF0E /* FEvaluate.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A70A61C81FD46E3C00AFDF0E /* FEvaluate.cpp */; };
+		A70A61CD1FD4713500AFDF0E /* FMinimax.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A70A61CB1FD4713500AFDF0E /* FMinimax.cpp */; };
 		A75683291FCD28A000CF1408 /* FBoardEngine.mm in Sources */ = {isa = PBXBuildFile; fileRef = A75683281FCD28A000CF1408 /* FBoardEngine.mm */; };
 		A756832D1FD0B3FE00CF1408 /* magicmoves.c in Sources */ = {isa = PBXBuildFile; fileRef = A7712D411FCB97A900E7E802 /* magicmoves.c */; };
 		A75683301FD0D96300CF1408 /* FPerformance.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A756832E1FD0D96300CF1408 /* FPerformance.cpp */; };
@@ -75,6 +77,10 @@
 		A70A61C21FD458DE00AFDF0E /* FMoveGenerator.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = FMoveGenerator.cpp; sourceTree = "<group>"; };
 		A70A61C31FD458DE00AFDF0E /* FMoveGenerator.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = FMoveGenerator.hpp; sourceTree = "<group>"; };
 		A70A61C51FD4592700AFDF0E /* FMoveList.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = FMoveList.cpp; sourceTree = "<group>"; };
+		A70A61C81FD46E3C00AFDF0E /* FEvaluate.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = FEvaluate.cpp; sourceTree = "<group>"; };
+		A70A61C91FD46E3C00AFDF0E /* FEvaluate.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = FEvaluate.hpp; sourceTree = "<group>"; };
+		A70A61CB1FD4713500AFDF0E /* FMinimax.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = FMinimax.cpp; sourceTree = "<group>"; };
+		A70A61CC1FD4713500AFDF0E /* FMinimax.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = FMinimax.hpp; sourceTree = "<group>"; };
 		A75683271FCD28A000CF1408 /* FBoardEngine.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FBoardEngine.h; sourceTree = "<group>"; };
 		A75683281FCD28A000CF1408 /* FBoardEngine.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = FBoardEngine.mm; sourceTree = "<group>"; };
 		A756832E1FD0D96300CF1408 /* FPerformance.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = FPerformance.cpp; sourceTree = "<group>"; };
@@ -171,6 +177,10 @@
 				A70A61C21FD458DE00AFDF0E /* FMoveGenerator.cpp */,
 				A7712D461FCBC13100E7E802 /* FBoard.hpp */,
 				A7712D451FCBC13100E7E802 /* FBoard.cpp */,
+				A70A61C91FD46E3C00AFDF0E /* FEvaluate.hpp */,
+				A70A61C81FD46E3C00AFDF0E /* FEvaluate.cpp */,
+				A70A61CC1FD4713500AFDF0E /* FMinimax.hpp */,
+				A70A61CB1FD4713500AFDF0E /* FMinimax.cpp */,
 				A70A61BA1FD132D200AFDF0E /* FFEN.hpp */,
 				A70A61B91FD132D200AFDF0E /* FFEN.cpp */,
 				A75683271FCD28A000CF1408 /* FBoardEngine.h */,
@@ -360,6 +370,7 @@
 			files = (
 				A7AFCCAA1FB4E40D00AE3D85 /* main.swift in Sources */,
 				A75683291FCD28A000CF1408 /* FBoardEngine.mm in Sources */,
+				A70A61CD1FD4713500AFDF0E /* FMinimax.cpp in Sources */,
 				A7AFCCBB1FB6CD7800AE3D85 /* PieceType.swift in Sources */,
 				A7712D281FBAC47A00E7E802 /* Evaluate.swift in Sources */,
 				A7AFCCB51FB5170900AE3D85 /* MoveGenerator.swift in Sources */,
@@ -372,6 +383,7 @@
 				A7AFCCC51FB6D01400AE3D85 /* Move.swift in Sources */,
 				A7AFCCBD1FB6CDB000AE3D85 /* Piece.swift in Sources */,
 				A7AFCCBF1FB6CE6B00AE3D85 /* Coordinate.swift in Sources */,
+				A70A61CA1FD46E3C00AFDF0E /* FEvaluate.cpp in Sources */,
 				A7712D2D1FC7C22000E7E802 /* UCIEngine.swift in Sources */,
 				A7AFCCC31FB6CFCB00AE3D85 /* BoardIterator.swift in Sources */,
 				A7712D391FC8E2DD00E7E802 /* Evaluater.swift in Sources */,
