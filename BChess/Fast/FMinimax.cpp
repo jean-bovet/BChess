@@ -34,13 +34,13 @@ inline bool isBestValue(bool maximizing, int current, int newValue) {
     }
 }
 
-Minimax::Info Minimax::searchBestMove(Board board, Color color, int maxDepth) {
+Minimax::Info Minimax::searchBestMove(Board board, Color color, int maxDepth, SearchCallback callback) {
     analyzing = true;
     
     Evaluation evaluation;
     Info info;
 
-    for (int curMaxDepth=maxDepth; curMaxDepth<=maxDepth; curMaxDepth++) {
+    for (int curMaxDepth=2; curMaxDepth<=maxDepth; curMaxDepth++) {
         if (!analyzing) {
             break;
         }
@@ -65,15 +65,17 @@ Minimax::Info Minimax::searchBestMove(Board board, Color color, int maxDepth) {
         double diffMs = time_span.count();
 
         double movesPerSingleMs = evaluateCount / diffMs;
-        int movesPerSecond = int(movesPerSingleMs * 1e9);
+        int movesPerSecond = int(movesPerSingleMs * 1e3);
 
         info.depth = curMaxDepth;
-        info.time = int(diffMs/1e6);
+        info.time = int(diffMs/1e3);
         info.evaluation = evaluation;
         info.nodeEvaluated = evaluateCount;
         info.movesPerSecond = movesPerSecond;
-        // TODO
-//        callback(info)
+        
+        if (callback) {
+            callback(info);
+        }
     }
     return info;
 }

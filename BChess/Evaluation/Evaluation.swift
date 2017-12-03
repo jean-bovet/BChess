@@ -21,8 +21,5 @@ struct Evaluation: CustomStringConvertible {
         return "\(move)[\(value)]"
     }
     
-    var lineInfo: String {
-        return line.map { $0.description }.joined(separator: " ")
-    }
 }
 

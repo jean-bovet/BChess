@@ -12,7 +12,8 @@
 		A70A61C61FD4592700AFDF0E /* FMoveList.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A70A61C51FD4592700AFDF0E /* FMoveList.cpp */; };
 		A70A61CA1FD46E3C00AFDF0E /* FEvaluate.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A70A61C81FD46E3C00AFDF0E /* FEvaluate.cpp */; };
 		A70A61CD1FD4713500AFDF0E /* FMinimax.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A70A61CB1FD4713500AFDF0E /* FMinimax.cpp */; };
-		A75683291FCD28A000CF1408 /* FBoardEngine.mm in Sources */ = {isa = PBXBuildFile; fileRef = A75683281FCD28A000CF1408 /* FBoardEngine.mm */; };
+		A70A61D11FD4AA9600AFDF0E /* FEngineInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = A70A61D01FD4AA9600AFDF0E /* FEngineInfo.m */; };
+		A75683291FCD28A000CF1408 /* FEngine.mm in Sources */ = {isa = PBXBuildFile; fileRef = A75683281FCD28A000CF1408 /* FEngine.mm */; };
 		A756832D1FD0B3FE00CF1408 /* magicmoves.c in Sources */ = {isa = PBXBuildFile; fileRef = A7712D411FCB97A900E7E802 /* magicmoves.c */; };
 		A75683301FD0D96300CF1408 /* FPerformance.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A756832E1FD0D96300CF1408 /* FPerformance.cpp */; };
 		A7712D171FB916E900E7E802 /* MoveTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7712D161FB916E900E7E802 /* MoveTests.swift */; };
@@ -81,8 +82,10 @@
 		A70A61C91FD46E3C00AFDF0E /* FEvaluate.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = FEvaluate.hpp; sourceTree = "<group>"; };
 		A70A61CB1FD4713500AFDF0E /* FMinimax.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = FMinimax.cpp; sourceTree = "<group>"; };
 		A70A61CC1FD4713500AFDF0E /* FMinimax.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = FMinimax.hpp; sourceTree = "<group>"; };
-		A75683271FCD28A000CF1408 /* FBoardEngine.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FBoardEngine.h; sourceTree = "<group>"; };
-		A75683281FCD28A000CF1408 /* FBoardEngine.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = FBoardEngine.mm; sourceTree = "<group>"; };
+		A70A61CF1FD4AA9600AFDF0E /* FEngineInfo.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FEngineInfo.h; sourceTree = "<group>"; };
+		A70A61D01FD4AA9600AFDF0E /* FEngineInfo.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FEngineInfo.m; sourceTree = "<group>"; };
+		A75683271FCD28A000CF1408 /* FEngine.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FEngine.h; sourceTree = "<group>"; };
+		A75683281FCD28A000CF1408 /* FEngine.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = FEngine.mm; sourceTree = "<group>"; };
 		A756832E1FD0D96300CF1408 /* FPerformance.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = FPerformance.cpp; sourceTree = "<group>"; };
 		A756832F1FD0D96300CF1408 /* FPerformance.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = FPerformance.hpp; sourceTree = "<group>"; };
 		A7712D141FB916E900E7E802 /* BChessTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BChessTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -134,6 +137,17 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		A70A61CE1FD4AA8500AFDF0E /* Bridge */ = {
+			isa = PBXGroup;
+			children = (
+				A70A61CF1FD4AA9600AFDF0E /* FEngineInfo.h */,
+				A70A61D01FD4AA9600AFDF0E /* FEngineInfo.m */,
+				A75683271FCD28A000CF1408 /* FEngine.h */,
+				A75683281FCD28A000CF1408 /* FEngine.mm */,
+			);
+			path = Bridge;
+			sourceTree = "<group>";
+		};
 		A7712D151FB916E900E7E802 /* BChessTests */ = {
 			isa = PBXGroup;
 			children = (
@@ -183,8 +197,7 @@
 				A70A61CB1FD4713500AFDF0E /* FMinimax.cpp */,
 				A70A61BA1FD132D200AFDF0E /* FFEN.hpp */,
 				A70A61B91FD132D200AFDF0E /* FFEN.cpp */,
-				A75683271FCD28A000CF1408 /* FBoardEngine.h */,
-				A75683281FCD28A000CF1408 /* FBoardEngine.mm */,
+				A70A61CE1FD4AA8500AFDF0E /* Bridge */,
 				A756832F1FD0D96300CF1408 /* FPerformance.hpp */,
 				A756832E1FD0D96300CF1408 /* FPerformance.cpp */,
 				A70A61BC1FD1333300AFDF0E /* FUtility.hpp */,
@@ -369,7 +382,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				A7AFCCAA1FB4E40D00AE3D85 /* main.swift in Sources */,
-				A75683291FCD28A000CF1408 /* FBoardEngine.mm in Sources */,
+				A75683291FCD28A000CF1408 /* FEngine.mm in Sources */,
 				A70A61CD1FD4713500AFDF0E /* FMinimax.cpp in Sources */,
 				A7AFCCBB1FB6CD7800AE3D85 /* PieceType.swift in Sources */,
 				A7712D281FBAC47A00E7E802 /* Evaluate.swift in Sources */,
@@ -392,6 +405,7 @@
 				A70A61C41FD458DE00AFDF0E /* FMoveGenerator.cpp in Sources */,
 				A7AFCCB31FB5091000AE3D85 /* Board.swift in Sources */,
 				A7AFCCB91FB6CD3700AE3D85 /* Color.swift in Sources */,
+				A70A61D11FD4AA9600AFDF0E /* FEngineInfo.m in Sources */,
 				A75683301FD0D96300CF1408 /* FPerformance.cpp in Sources */,
 				A70A61C61FD4592700AFDF0E /* FMoveList.cpp in Sources */,
 			);

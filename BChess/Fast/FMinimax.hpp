@@ -26,14 +26,6 @@ public:
         bool isValid() {
             return move.isValid();
         }
-        
-//        var description: String {
-//            return "\(move)[\(value)]"
-//        }
-//
-//        var lineInfo: String {
-//            return line.map { $0.description }.joined(separator: " ")
-//        }
     };
     
     struct Info {
@@ -44,7 +36,9 @@ public:
         int movesPerSecond = 0;
     };
     
-    Info searchBestMove(Board board, Color color, int maxDepth);
+    typedef std::function<void(Info)> SearchCallback;
+    
+    Info searchBestMove(Board board, Color color, int maxDepth, SearchCallback callback);
 
     Evaluation evaluate(Board board, Move move, Color color, int depth, int maxDepth, bool maximizing, LineMove line, int alpha, int beta);
 

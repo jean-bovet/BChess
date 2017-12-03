@@ -180,7 +180,7 @@ public:
         assert(boardFEN == fen);
 
         Minimax minimax;
-        Minimax::Info info = minimax.searchBestMove(board, board.color, 4);
+        Minimax::Info info = minimax.searchBestMove(board, board.color, 4, nil);
         
         // Assert the best move
         assert(info.evaluation.move.description() == bestMove);
@@ -228,13 +228,5 @@ public:
         }
     }
     
-    static int squareIndexForName(std::string name) {
-        for (int i=0; i<64; i++) {
-            if (SquareNames[i] == name) {
-                return i;
-            }
-        }
-        return -1;
-    }
 };
 

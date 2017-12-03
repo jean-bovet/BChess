@@ -37,7 +37,7 @@ class Performance {
 class PerformanceCpp: Performance {
     
     override func _generate(depth: Int) -> Int {
-        let engine = FBoardEngine()
+        let engine = FEngine()
         engine.generatePositions(Int32(depth));
         return Int(engine.moveCount);
     }

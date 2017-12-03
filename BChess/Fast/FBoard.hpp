@@ -118,6 +118,7 @@ struct Board {
     void set(Square square, int file, int rank);
     
     void move(Move move);
+    void move(std::string from, std::string to, Color color);
     
     Bitboard allPieces(Color color);
     Bitboard occupancy();

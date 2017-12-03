@@ -212,6 +212,22 @@ void Board::move(Move move) {
     color = INVERSE(color);
 }
 
+void Board::move(std::string from, std::string to, Color color) {
+    Move m;
+    m.from = squareIndexForName(from);
+    m.to = squareIndexForName(to);
+    m.color = color;
+    
+    for (auto piece=0; piece<Piece::PCOUNT; piece++) {
+        if (bb_test(pieces[color][piece], m.from)) {
+            m.piece = Piece(piece);
+            break;
+        }
+    }
+
+    move(m);
+}
+
 inline static char charForPiece(Color color, Piece piece) {
     auto white = color == WHITE;
     switch (piece) {

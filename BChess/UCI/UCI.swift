@@ -10,13 +10,34 @@ import Foundation
 import os.log
 
 extension Minimax.Info {
+        
+    var engineInfo: FEngineInfo {
+        let info = FEngineInfo()
+        info.depth = UInt(depth)
+        info.time = UInt(time)
+        info.value = evaluation.value
+        info.nodeEvaluated = UInt(nodeEvaluated)
+        info.movesPerSecond = UInt(movesPerSecond)
+
+        var bestLine = [String]()
+        for move in evaluation.line {
+            bestLine.append(move.description)
+        }
+        info.bestLine = bestLine
+        
+        return info
+    }
+}
+
+extension FEngineInfo {
     
     var uciInfoMessage: String {
-        return "info depth \(depth) time \(time) nodes \(nodeEvaluated) nps \(movesPerSecond) score cp \(evaluation.value) pv \(evaluation.lineInfo)"
+        let lineInfo = bestLine.map { $0 }.joined(separator: " ")
+        return "info depth \(depth) time \(time) nodes \(nodeEvaluated) nps \(movesPerSecond) score cp \(value) pv \(lineInfo)"
     }
     
     var uciBestMove: String {
-        return "bestmove \(evaluation.move)"
+        return "bestmove \(bestLine[0])"
     }
 }
 
@@ -30,13 +51,14 @@ class UCI {
     init() {
         log = OSLog(subsystem: "ch.arizona-software.BChess", category: "uci")
         
-        engine = UCIEngine()
-        
+//        engine = UCIEngineClassic()
+        engine = UCIEngineFast()
+
         // Disable output buffering otherwise the GUI won't receive any command
         setbuf(__stdoutp, nil)
         
         // Initialize by default with the empty board
-        engine.board.fen = StartPosFEN
+        engine.set(fen: StartPosFEN)
     }
     
     func engineOutput(_ message: String) {
@@ -61,10 +83,10 @@ class UCI {
         let cmd = tokens.removeFirst()
         
         if cmd == "startpos" {
-            engine.board.fen = StartPosFEN
+            engine.set(fen: StartPosFEN)
         } else if cmd == "fen" {
             let fen = tokens[0...5].joined(separator: " ")
-            engine.board.fen = fen
+            engine.set(fen: fen)
             tokens.removeFirst(6)
         }
         
@@ -89,7 +111,7 @@ class UCI {
                 return
             }
             let move = Move(from: from, to: to)
-            engine.board.move(move: move)
+            engine.move(move: move)
         }
         tokens.removeAll()
     }
@@ -135,7 +157,7 @@ class UCI {
             processCmdGo(&tokens)
             
         case "stop":
-            engine.minimax.analyzing = false
+            engine.stop()
             
         default:
             engineOutput("Unknown command \(cmd)")

@@ -24,6 +24,15 @@ static std::string SquareNames[64] = {
     "a8", "b8", "c8", "d8", "e8", "f8", "g8", "h8",
 };
 
+static int squareIndexForName(std::string name) {
+    for (int i=0; i<64; i++) {
+        if (SquareNames[i] == name) {
+            return i;
+        }
+    }
+    return -1;
+}
+
 struct Move {
     int from = -1;
     int to = -1;

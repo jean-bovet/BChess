@@ -8,8 +8,8 @@
 
 import Foundation
 
-let engine = FBoardEngine()
-engine.runTests()
+//let engine = FEngine()
+//engine.runTests()
 
 let formatter: NumberFormatter = {
     let formatter = NumberFormatter()
@@ -25,6 +25,6 @@ func run(perf: Performance) {
 //run(perf: PerformanceClassic())
 //run(perf: PerformanceCpp())
 
-//let uci = UCI()
-//uci.run()
+let uci = UCI()
+uci.run()
 
