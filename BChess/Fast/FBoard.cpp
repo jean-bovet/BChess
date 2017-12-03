@@ -404,8 +404,13 @@ bool Board::isCheck(Color::Color color) {
 
 #pragma mark -
 
+bool FastMoveGenerator::magicInitialized = false;
+
 FastMoveGenerator::FastMoveGenerator() {
-    initmagicmoves();
+    if (!magicInitialized) {
+        initmagicmoves();
+        magicInitialized = true;
+    }
     initPawnMoves();
     initKingMoves();
     initKnightMoves();

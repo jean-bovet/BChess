@@ -108,6 +108,9 @@ static Bitboard KingMoves[64];
 static Bitboard KnightMoves[64];
 
 class FastMoveGenerator {
+private:
+    static bool magicInitialized;
+    
 public:
     FastMoveGenerator();
     
