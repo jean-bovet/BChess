@@ -228,12 +228,22 @@ inline static int lsb(Bitboard bb) {
 
 #pragma mark -
 
-void MoveList::addMoves(int from, Bitboard moves, Color::Color color, Piece::Piece piece) {
+void MoveList::addMove(Board &board, int from, int to, Color::Color color, Piece::Piece piece) {
+    Move move = { from, to, color, piece };
+    Board validBoard = board;
+    validBoard.move(move);
+    if (!validBoard.isCheck(color)) {
+        moves[moveCount] = move;
+        moveCount++;
+    }
+}
+
+void MoveList::addMoves(Board &board, int from, Bitboard moves, Color::Color color, Piece::Piece piece) {
     while (moves > 0) {
         int to = lsb(moves);
         bb_clear(moves, to);
         
-        addMove(from, to, color, piece);
+        addMove(board, from, to, color, piece);
     }
 }
 
@@ -258,6 +268,13 @@ Board::Board() {
 void Board::move(Move move) {
     bb_clear(pieces[move.color][move.piece], move.from);
     bb_set(pieces[move.color][move.piece], move.to);
+    
+    // TODO optimize
+    for (auto piece=0; piece<Piece::COUNT; piece++) {
+        bb_clear(pieces[INVERSE(move.color)][piece], move.to);
+    }
+
+    color = INVERSE(color);
 }
 
 inline static char charForPiece(Color::Color color, Piece::Piece piece) {
@@ -351,8 +368,9 @@ Bitboard Board::emptySquares() {
 
 bool Board::isCheck(Color::Color color) {
     // Locate the king
-    int kingSquare = lsb(pieces[color][Piece::KING]);
-    assert(kingSquare > 0);
+    auto kingBoard = pieces[color][Piece::KING];
+    if (kingBoard == 0) return false; // No king, can happen when testing    
+    int kingSquare = lsb(kingBoard);
     
     auto otherColor = INVERSE(color);
 //    auto blackPieces = allPieces(INVERSE(color));
@@ -361,18 +379,24 @@ bool Board::isCheck(Color::Color color) {
     // and keep only the ones that are actually hitting
     // a black knight, meaning the king is attacked.
     auto moves = KnightMoves[kingSquare] & pieces[otherColor][Piece::KNIGHT];
-    if (moves > 0) return true;
+    if (moves > 0) {
+        return true;
+    }
     
     // Same for bishop (and queen)
     auto rawBishopMoves = Bmagic(kingSquare, occupancy());
-    auto bishopMoves = rawBishopMoves && (pieces[otherColor][Piece::BISHOP]|pieces[otherColor][Piece::QUEEN]);
-    if (bishopMoves > 0) return true;
+    auto bishopMoves = rawBishopMoves & (pieces[otherColor][Piece::BISHOP]|pieces[otherColor][Piece::QUEEN]);
+    if (bishopMoves > 0) {
+        return true;
+    }
 
     // Same for rook (and queen)
     auto rawRookMoves = Rmagic(kingSquare, occupancy());
-    auto rookMoves = rawRookMoves && (pieces[otherColor][Piece::ROOK]|pieces[otherColor][Piece::QUEEN]);
-    if (rookMoves > 0) return true;
-
+    auto rookMoves = rawRookMoves & (pieces[otherColor][Piece::ROOK]|pieces[otherColor][Piece::QUEEN]);
+    if (rookMoves > 0) {
+        return true;
+    }
+    
     // TODO: king, pawns
     
     return false;
@@ -501,13 +525,13 @@ void FastMoveGenerator::generatePawnsMoves(Board &board, Color::Color color, Mov
         // TODO: occupancy should actually be black occupancy
         // Using white occupancy, we can detect which piece is protected!
         auto attacks = PawnAttacks[color][square] & blackPieces;
-        moveList.addMoves(square, attacks, color, Piece::PAWN);
+        moveList.addMoves(board, square, attacks, color, Piece::PAWN);
         
         // Generate a bitboard for all the moves that this white pawn can do.
         // The move bitboard is masked with the empty bitboard which
         // in other words ensures that the pawn can only move to unoccupied square.
         auto moves = PawnMoves[color][square] & emptySquares;
-        moveList.addMoves(square, moves, color, Piece::PAWN);
+        moveList.addMoves(board, square, moves, color, Piece::PAWN);
     }
 }
 
@@ -532,7 +556,7 @@ void FastMoveGenerator::generateKingsMoves(Board &board, Color::Color color, Mov
         // can do. The attacks bitboard is masked to ensure it can only
         // happy on an empty square or a square with a piece of the opposite color.
         auto moves = KingMoves[square] & emptyOrBlackSquares;
-        moveList.addMoves(square, moves, color, Piece::KING);
+        moveList.addMoves(board, square, moves, color, Piece::KING);
     }
 }
 
@@ -557,7 +581,7 @@ void FastMoveGenerator::generateKnightsMoves(Board &board, Color::Color color, M
         // can do. The attacks bitboard is masked to ensure it can only
         // happy on an empty square or a square with a piece of the opposite color.
         auto moves = KnightMoves[square] & emptyOrBlackSquares;
-        moveList.addMoves(square, moves, color, Piece::KNIGHT);
+        moveList.addMoves(board, square, moves, color, Piece::KNIGHT);
     }
 }
 
@@ -603,8 +627,7 @@ void FastMoveGenerator::generateSlidingMoves(Board &board, Color::Color color, P
         // we need to filter out the moves that land into a piece of the same
         // color because Rmagic will move to these squares anyway.
         auto moves = potentialMoves & emptyOrBlackSquares;
-        
-        moveList.addMoves(square, moves, color, piece);
+        moveList.addMoves(board, square, moves, color, piece);
     }
 }
 

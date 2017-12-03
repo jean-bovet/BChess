@@ -66,18 +66,6 @@ struct Move {
 
 const int MAX_MOVES = 256;
 
-struct MoveList {
-    Move moves[MAX_MOVES];
-    int moveCount = 0;
-    
-    void addMove(int from, int to, Color::Color color, Piece::Piece piece) {
-        moves[moveCount] = { from, to, color, piece };
-        moveCount++;
-    }
-    
-    void addMoves(int from, Bitboard moves, Color::Color color, Piece::Piece piece);
-};
-
 struct Board {
     Color::Color color = Color::WHITE;
     Bitboard pieces[Color::COUNT][Piece::COUNT] = { };
@@ -100,6 +88,14 @@ struct Board {
     bool isCheck(Color::Color color);
     
     void print();
+};
+
+struct MoveList {
+    Move moves[MAX_MOVES];
+    int moveCount = 0;
+    
+    void addMove(Board &board, int from, int to, Color::Color color, Piece::Piece piece);
+    void addMoves(Board &board, int from, Bitboard moves, Color::Color color, Piece::Piece piece);
 };
 
 // Without this, the C file won't be linked

@@ -203,12 +203,12 @@ std::string FFEN::getFEN(Board board) {
 }
 
 Board FFEN::createBoard(std::string fen) {
-    std::vector<std::string> words;
-    split4(fen, words);
-    assert(words.size() == 6);
+    std::vector<std::string> fields;
+    split4(fen, fields);
+    assert(fields.size() == 6);
     
     // 4k3/2r5/8/8/8/8/2R5/4K3
-    auto pieces = words[0];
+    auto pieces = fields[0];
     std::vector<std::string> ranks;
     split4(pieces, ranks, "/");
 
@@ -232,6 +232,23 @@ Board FFEN::createBoard(std::string fen) {
         coord.rank -= 1;
         coord.file = 0;
     }
-        
+    
+    auto sideToMove = fields[1];
+    board.color = (sideToMove == "w") ? Color::WHITE : Color::BLACK;
+    
+    // KQkq
+    auto castlingAvailability = fields[2];
+    // TODO
+//    castling.fen = String(castlingAvailability)
+    
+    // En passant
+    fields[3];
+    
+    // Half move
+    fields[4];
+    
+    // Full move
+    fields[5];
+    
     return board;
 }
