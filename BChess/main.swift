@@ -10,7 +10,6 @@ import Foundation
 
 let engine = FBoardEngine()
 engine.runTests()
-//engine.generatePositions()
 
 let formatter: NumberFormatter = {
     let formatter = NumberFormatter()

@@ -8,14 +8,77 @@
 
 #pragma once
 
-#include "FColor.hpp"
-#include "FPiece.hpp"
+#include "FMove.hpp"
 
 #include <stdio.h>
 #include <cstdint>
 #include <string>
+#include <iostream>
+#include <cassert>
+
+inline static int square_index(int file, int rank) {
+    return 8 * rank + file;
+}
+
+inline static int file_index(int square) {
+    return square & 7;
+}
+
+inline static int rank_index(int square) {
+    return square >> 3;
+}
+
+#pragma mark - Bitboard
 
 typedef uint64_t Bitboard;
+
+inline static bool bb_test(Bitboard bitboard, int square) {
+    uint64_t test = bitboard & (1UL << square);
+    return test > 0;
+}
+
+inline static bool bb_test(Bitboard bitboard, int file, int rank) {
+    return bb_test(bitboard, square_index(file, rank));
+}
+
+inline static void bb_clear(Bitboard &bitboard, int square) {
+    bitboard &= ~(1UL << square);
+}
+
+inline static void bb_clear(Bitboard &bitboard, int file, int rank) {
+    bb_clear(bitboard, square_index(file, rank));
+}
+
+inline static void bb_set(Bitboard &bitboard, int square) {
+    bitboard |= 1UL << square;
+}
+
+inline static void bb_set(Bitboard &bitboard, int file, int rank) {
+    if (file >= 0 && file <= 7 && rank >= 0 && rank <= 7) {
+        bb_set(bitboard, square_index(file, rank));
+    }
+}
+
+inline static void bb_print(Bitboard bitboard) {
+    for (int rank = 7; rank >= 0; rank--) {
+        for (int file = 0; file < 8; file++) {
+            std::cout << (bb_test(bitboard, file, rank) > 0  ? "X" : ".");
+        }
+        std::cout << std::endl;
+    }
+    std::cout << std::endl;
+}
+
+inline static int lsb(Bitboard bb) {
+    assert(bb > 0);
+    return __builtin_ctzll(bb);
+}
+
+extern Bitboard PawnAttacks[2][64];
+extern Bitboard PawnMoves[2][64];
+
+extern Bitboard KingMoves[64];
+extern Bitboard KnightMoves[64];
 
 enum enumSquare {
     a1, b1, c1, d1, e1, f1, g1, h1,
@@ -45,15 +108,6 @@ struct Square {
     Piece piece;
 };
 
-struct Move {
-    int from;
-    int to;
-    Color color;
-    Piece piece;
-};
-
-const int MAX_MOVES = 256;
-
 struct Board {
     Color color = Color::WHITE;
     Bitboard pieces[Color::COUNT][Piece::PCOUNT] = { };
@@ -76,40 +130,5 @@ struct Board {
     bool isCheck(Color color);
     
     void print();
-};
-
-struct MoveList {
-    Move moves[MAX_MOVES];
-    int moveCount = 0;
-    
-    void addMove(Board &board, int from, int to, Color color, Piece piece);
-    void addMoves(Board &board, int from, Bitboard moves, Color color, Piece piece);
-};
-
-// Without this, the C file won't be linked
-extern "C" void initmagicmoves(void);
-
-static Bitboard PawnAttacks[2][64];
-static Bitboard PawnMoves[2][64];
-
-static Bitboard KingMoves[64];
-static Bitboard KnightMoves[64];
-
-class FastMoveGenerator {
-private:
-    static bool magicInitialized;
-    
-public:
-    FastMoveGenerator();
-    
-    void initPawnMoves();
-    void initKingMoves();
-    void initKnightMoves();
-    
-    MoveList generateMoves(Board board, Color color, int squareIndex = -1);
-    void generatePawnsMoves(Board &board, Color color, MoveList &moveList, int squareIndex = -1);
-    void generateKingsMoves(Board &board, Color color, MoveList &moveList, int squareIndex = -1);
-    void generateKnightsMoves(Board &board, Color color, MoveList &moveList, int squareIndex = -1);
-    void generateSlidingMoves(Board &board, Color color, Piece piece, MoveList &moveList, int squareIndex = -1);
 };
 

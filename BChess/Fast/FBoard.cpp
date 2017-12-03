@@ -12,6 +12,12 @@
 #include <cassert>
 #include "magicmoves.h"
 
+Bitboard PawnAttacks[2][64];
+Bitboard PawnMoves[2][64];
+
+Bitboard KingMoves[64];
+Bitboard KnightMoves[64];
+
 /**
 rank
     8
@@ -27,55 +33,6 @@ rank
     h1 = 2^7 = 128
     h8 = 2^63
  */
-
-inline static int square_index(int file, int rank) {
-    return 8 * rank + file;
-}
-
-inline static int file_index(int square) {
-    return square & 7;
-}
-
-inline static int rank_index(int square) {
-    return square >> 3;
-}
-
-inline static bool bb_test(Bitboard bitboard, int square) {
-    uint64_t test = bitboard & (1UL << square);
-    return test > 0;
-}
-
-inline static bool bb_test(Bitboard bitboard, int file, int rank) {
-    return bb_test(bitboard, square_index(file, rank));
-}
-
-inline static void bb_clear(Bitboard &bitboard, int square) {
-    bitboard &= ~(1UL << square);
-}
-
-inline static void bb_clear(Bitboard &bitboard, int file, int rank) {
-    bb_clear(bitboard, square_index(file, rank));
-}
-
-inline static void bb_set(Bitboard &bitboard, int square) {
-    bitboard |= 1UL << square;
-}
-
-inline static void bb_set(Bitboard &bitboard, int file, int rank) {
-    if (file >= 0 && file <= 7 && rank >= 0 && rank <= 7) {
-        bb_set(bitboard, square_index(file, rank));
-    }
-}
-
-inline static void bb_print(Bitboard bitboard) {
-    for (int rank = 7; rank >= 0; rank--) {
-        for (int file = 0; file < 8; file++) {
-            std::cout << (bb_test(bitboard, file, rank) > 0  ? "X" : ".");
-        }
-        std::cout << std::endl;
-    }
-    std::cout << std::endl;
-}
 
 inline static Bitboard BB(Bitboard userDefined) {
     Bitboard reversed = 0;
@@ -221,32 +178,6 @@ static Bitboard IBlackPawns = BB(0b\
 00000000\
 );
 
-inline static int lsb(Bitboard bb) {
-    assert(bb > 0);
-    return __builtin_ctzll(bb);
-}
-
-#pragma mark -
-
-void MoveList::addMove(Board &board, int from, int to, Color color, Piece piece) {
-    Move move = { from, to, color, piece };
-    Board validBoard = board;
-    validBoard.move(move);
-    if (!validBoard.isCheck(color)) {
-        moves[moveCount] = move;
-        moveCount++;
-    }
-}
-
-void MoveList::addMoves(Board &board, int from, Bitboard moves, Color color, Piece piece) {
-    while (moves > 0) {
-        int to = lsb(moves);
-        bb_clear(moves, to);
-        
-        addMove(board, from, to, color, piece);
-    }
-}
-
 #pragma mark -
 
 Board::Board() {
@@ -278,21 +209,21 @@ void Board::move(Move move) {
 }
 
 inline static char charForPiece(Color color, Piece piece) {
-    auto white = color == Color::WHITE;
+    auto white = color == WHITE;
     switch (piece) {
-        case Piece::PAWN:
+        case PAWN:
             return white ? 'P' : 'p';
-        case Piece::ROOK:
+        case ROOK:
             return white ? 'R' : 'r';
-        case Piece::KNIGHT:
+        case KNIGHT:
             return white ? 'N' : 'n';
-        case Piece::BISHOP:
+        case BISHOP:
             return white ? 'B' : 'b';
-        case Piece::QUEEN:
+        case QUEEN:
             return white ? 'Q' : 'q';
-        case Piece::KING:
+        case KING:
             return white ? 'K' : 'k';
-        case Piece::PCOUNT:
+        case PCOUNT:
             return '?';
     }
 }
@@ -402,237 +333,4 @@ bool Board::isCheck(Color color) {
     return false;
 }
 
-#pragma mark -
-
-bool FastMoveGenerator::magicInitialized = false;
-
-FastMoveGenerator::FastMoveGenerator() {
-    if (!magicInitialized) {
-        initmagicmoves();
-        magicInitialized = true;
-    }
-    initPawnMoves();
-    initKingMoves();
-    initKnightMoves();
-}
-
-void FastMoveGenerator::initPawnMoves() {
-    for (int square = 8; square < 64-8; square++) {
-        int fileIndex = file_index(square);
-        int rankIndex = rank_index(square);
-
-        assert(square_index(fileIndex, rankIndex) == square);
-        
-        // White pawn attacks
-        bb_set(PawnAttacks[Color::WHITE][square], fileIndex-1, rankIndex+1);
-        bb_set(PawnAttacks[Color::WHITE][square], fileIndex+1, rankIndex+1);
-        
-        // White pawn moves
-        bb_set(PawnMoves[Color::WHITE][square], fileIndex, rankIndex+1);
-        if (rankIndex == 1) {
-            bb_set(PawnMoves[Color::WHITE][square], fileIndex, rankIndex+2);
-        }
-        
-        // Black pawn attacks
-        bb_set(PawnAttacks[Color::BLACK][square], fileIndex-1, rankIndex-1);
-        bb_set(PawnAttacks[Color::BLACK][square], fileIndex+1, rankIndex-1);
-        
-        // Black pawn moves
-        bb_set(PawnMoves[Color::BLACK][square], fileIndex, rankIndex-1);
-        if (rankIndex == 6) {
-            bb_set(PawnMoves[Color::BLACK][square], fileIndex, rankIndex-2);
-        }
-    }
-}
-
-void FastMoveGenerator::initKingMoves() {
-    for (int square = 0; square < 64; square++) {
-        int fileIndex = file_index(square);
-        int rankIndex = rank_index(square);
-        
-        bb_set(KingMoves[square], fileIndex, rankIndex+1);
-        bb_set(KingMoves[square], fileIndex+1, rankIndex+1);
-        bb_set(KingMoves[square], fileIndex+1, rankIndex);
-        bb_set(KingMoves[square], fileIndex+1, rankIndex-1);
-        bb_set(KingMoves[square], fileIndex, rankIndex-1);
-        bb_set(KingMoves[square], fileIndex-1, rankIndex-1);
-        bb_set(KingMoves[square], fileIndex-1, rankIndex);
-        bb_set(KingMoves[square], fileIndex-1, rankIndex+1);
-    }
-}
-
-void FastMoveGenerator::initKnightMoves() {
-    for (int square = 0; square < 64; square++) {
-        int fileIndex = file_index(square);
-        int rankIndex = rank_index(square);
-        
-        // Top
-        bb_set(KnightMoves[square], fileIndex-1, rankIndex+2);
-        bb_set(KnightMoves[square], fileIndex+1, rankIndex+2);
-
-        // Bottom
-        bb_set(KnightMoves[square], fileIndex-1, rankIndex-2);
-        bb_set(KnightMoves[square], fileIndex+1, rankIndex-2);
-        
-        // Left
-        bb_set(KnightMoves[square], fileIndex-2, rankIndex+1);
-        bb_set(KnightMoves[square], fileIndex-2, rankIndex-1);
-
-        // Right
-        bb_set(KnightMoves[square], fileIndex+2, rankIndex+1);
-        bb_set(KnightMoves[square], fileIndex+2, rankIndex-1);
-    }
-}
-
-MoveList FastMoveGenerator::generateMoves(Board board, Color color, int squareIndex) {
-    MoveList moveList;
-        
-    generatePawnsMoves(board, color, moveList, squareIndex);
-    generateKingsMoves(board, color, moveList, squareIndex);
-    generateKnightsMoves(board, color, moveList, squareIndex);
-    generateSlidingMoves(board, color, Piece::ROOK, moveList, squareIndex);
-    generateSlidingMoves(board, color, Piece::BISHOP, moveList, squareIndex);
-    generateSlidingMoves(board, color, Piece::QUEEN, moveList, squareIndex);
-
-//    for (int i=0; i<moveList.moveCount; i++) {
-//        auto move = moveList.moves[i];
-////        std::cout << SquareNames[move.from] << SquareNames[move.to] << std::endl;
-//        auto newBoard = board;
-//        newBoard.move(move);
-//        bb_print(newBoard.occupancy());
-//    }
-    
-    return moveList;
-}
-
-void FastMoveGenerator::generatePawnsMoves(Board &board, Color color, MoveList &moveList, int squareIndex) {
-    auto pawns = board.pieces[color][Piece::PAWN];
-    auto emptySquares = board.emptySquares();
-    auto blackPieces = board.allPieces(INVERSE(color));
-    
-    // Generate moves for each white pawn
-    while (pawns > 0) {
-        // Find the first white pawn starting from the least significant bit (that is, square a1)
-        int square = lsb(pawns);
-        
-        // If the square index is specified, only generate move for that square
-        if (squareIndex > -1 && square != squareIndex) {
-            break;
-        }
-        
-        // Clear that bit so next time we can find the next white pawn
-        bb_clear(pawns, square);
-        
-        // Generate a bitboard for all the attacks that this white pawn
-        // can do. The attacks bitboard is masked with the occupancy bitboard
-        // because a pawn attack can only happen when there is a black piece
-        // in the target square.
-        // TODO: occupancy should actually be black occupancy
-        // Using white occupancy, we can detect which piece is protected!
-        auto attacks = PawnAttacks[color][square] & blackPieces;
-        moveList.addMoves(board, square, attacks, color, Piece::PAWN);
-        
-        // Generate a bitboard for all the moves that this white pawn can do.
-        // The move bitboard is masked with the empty bitboard which
-        // in other words ensures that the pawn can only move to unoccupied square.
-        auto moves = PawnMoves[color][square] & emptySquares;
-        moveList.addMoves(board, square, moves, color, Piece::PAWN);
-    }
-}
-
-void FastMoveGenerator::generateKingsMoves(Board &board, Color color, MoveList &moveList, int squareIndex) {
-    auto kings = board.pieces[color][Piece::KING];
-    auto emptyOrBlackSquares = ~board.allPieces(color);
-
-    // Generate moves for each white knight
-    while (kings > 0) {
-        // Find the first white knight starting from the least significant bit (that is, square a1)
-        int square = lsb(kings);
-        
-        // If the square index is specified, only generate move for that square
-        if (squareIndex > -1 && square != squareIndex) {
-            break;
-        }
-
-        // Clear that bit so next time we can find the next white knight
-        bb_clear(kings, square);
-        
-        // Generate a bitboard for all the moves that this white knight
-        // can do. The attacks bitboard is masked to ensure it can only
-        // happy on an empty square or a square with a piece of the opposite color.
-        auto moves = KingMoves[square] & emptyOrBlackSquares;
-        moveList.addMoves(board, square, moves, color, Piece::KING);
-    }
-}
-
-void FastMoveGenerator::generateKnightsMoves(Board &board, Color color, MoveList &moveList, int squareIndex) {
-    auto whiteKnights = board.pieces[color][Piece::KNIGHT];
-    auto emptyOrBlackSquares = ~board.allPieces(color);
-    
-    // Generate moves for each white knight
-    while (whiteKnights > 0) {
-        // Find the first white knight starting from the least significant bit (that is, square a1)
-        int square = lsb(whiteKnights);
-        
-        // If the square index is specified, only generate move for that square
-        if (squareIndex > -1 && square != squareIndex) {
-            break;
-        }
-
-        // Clear that bit so next time we can find the next white knight
-        bb_clear(whiteKnights, square);
-        
-        // Generate a bitboard for all the moves that this white knight
-        // can do. The attacks bitboard is masked to ensure it can only
-        // happy on an empty square or a square with a piece of the opposite color.
-        auto moves = KnightMoves[square] & emptyOrBlackSquares;
-        moveList.addMoves(board, square, moves, color, Piece::KNIGHT);
-    }
-}
-
-void FastMoveGenerator::generateSlidingMoves(Board &board, Color color, Piece piece, MoveList &moveList, int squareIndex) {
-    auto slidingPieces = board.pieces[color][piece];
-    auto occupancy = board.occupancy();
-    auto emptyOrBlackSquares = ~board.allPieces(color);
-
-    // Generate moves for each sliding piece
-    while (slidingPieces > 0) {
-        // Find the first sliding piece starting from the least significant bit (that is, square a1)
-        int square = lsb(slidingPieces);
-        
-        // If the square index is specified, only generate move for that square
-        if (squareIndex > -1 && square != squareIndex) {
-            break;
-        }
-
-        // Clear that bit so next time we can find the next sliding piece
-        bb_clear(slidingPieces, square);
-        
-        // Generate a bitboard for all the moves that this sliding piece can do.
-        Bitboard potentialMoves;
-        switch (piece) {
-            case Piece::ROOK:
-                potentialMoves = Rmagic(square, occupancy);
-                break;
-                
-            case Piece::BISHOP:
-                potentialMoves = Bmagic(square, occupancy);
-                break;
-                
-            case Piece::QUEEN:
-                potentialMoves = Rmagic(square, occupancy) | Bmagic(square, occupancy);
-                break;
-                
-            default:
-                assert(false); // not a sliding piece
-                break;
-        }
-        
-        // Note: the occupancy bitboard has all the white and black pieces,
-        // we need to filter out the moves that land into a piece of the same
-        // color because Rmagic will move to these squares anyway.
-        auto moves = potentialMoves & emptyOrBlackSquares;
-        moveList.addMoves(board, square, moves, color, piece);
-    }
-}
 

@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		A70A61BB1FD132D200AFDF0E /* FFEN.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A70A61B91FD132D200AFDF0E /* FFEN.cpp */; };
+		A70A61C41FD458DE00AFDF0E /* FMoveGenerator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A70A61C21FD458DE00AFDF0E /* FMoveGenerator.cpp */; };
+		A70A61C61FD4592700AFDF0E /* FMoveList.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A70A61C51FD4592700AFDF0E /* FMoveList.cpp */; };
 		A75683291FCD28A000CF1408 /* FBoardEngine.mm in Sources */ = {isa = PBXBuildFile; fileRef = A75683281FCD28A000CF1408 /* FBoardEngine.mm */; };
 		A756832D1FD0B3FE00CF1408 /* magicmoves.c in Sources */ = {isa = PBXBuildFile; fileRef = A7712D411FCB97A900E7E802 /* magicmoves.c */; };
 		A75683301FD0D96300CF1408 /* FPerformance.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A756832E1FD0D96300CF1408 /* FPerformance.cpp */; };
@@ -68,6 +70,11 @@
 		A70A61BD1FD3196400AFDF0E /* FTests.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = FTests.hpp; sourceTree = "<group>"; };
 		A70A61BE1FD38C7500AFDF0E /* FColor.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = FColor.hpp; sourceTree = "<group>"; };
 		A70A61BF1FD38D4100AFDF0E /* FPiece.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = FPiece.hpp; sourceTree = "<group>"; };
+		A70A61C01FD4587B00AFDF0E /* FMove.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = FMove.hpp; sourceTree = "<group>"; };
+		A70A61C11FD4589800AFDF0E /* FMoveList.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = FMoveList.hpp; sourceTree = "<group>"; };
+		A70A61C21FD458DE00AFDF0E /* FMoveGenerator.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = FMoveGenerator.cpp; sourceTree = "<group>"; };
+		A70A61C31FD458DE00AFDF0E /* FMoveGenerator.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = FMoveGenerator.hpp; sourceTree = "<group>"; };
+		A70A61C51FD4592700AFDF0E /* FMoveList.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = FMoveList.cpp; sourceTree = "<group>"; };
 		A75683271FCD28A000CF1408 /* FBoardEngine.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FBoardEngine.h; sourceTree = "<group>"; };
 		A75683281FCD28A000CF1408 /* FBoardEngine.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = FBoardEngine.mm; sourceTree = "<group>"; };
 		A756832E1FD0D96300CF1408 /* FPerformance.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = FPerformance.cpp; sourceTree = "<group>"; };
@@ -157,6 +164,11 @@
 			children = (
 				A70A61BE1FD38C7500AFDF0E /* FColor.hpp */,
 				A70A61BF1FD38D4100AFDF0E /* FPiece.hpp */,
+				A70A61C01FD4587B00AFDF0E /* FMove.hpp */,
+				A70A61C11FD4589800AFDF0E /* FMoveList.hpp */,
+				A70A61C51FD4592700AFDF0E /* FMoveList.cpp */,
+				A70A61C31FD458DE00AFDF0E /* FMoveGenerator.hpp */,
+				A70A61C21FD458DE00AFDF0E /* FMoveGenerator.cpp */,
 				A7712D461FCBC13100E7E802 /* FBoard.hpp */,
 				A7712D451FCBC13100E7E802 /* FBoard.cpp */,
 				A70A61BA1FD132D200AFDF0E /* FFEN.hpp */,
@@ -365,9 +377,11 @@
 				A7712D391FC8E2DD00E7E802 /* Evaluater.swift in Sources */,
 				A7AFCCB71FB62DBA00AE3D85 /* Minimax.swift in Sources */,
 				A7712D3B1FC8E30400E7E802 /* Evaluation.swift in Sources */,
+				A70A61C41FD458DE00AFDF0E /* FMoveGenerator.cpp in Sources */,
 				A7AFCCB31FB5091000AE3D85 /* Board.swift in Sources */,
 				A7AFCCB91FB6CD3700AE3D85 /* Color.swift in Sources */,
 				A75683301FD0D96300CF1408 /* FPerformance.cpp in Sources */,
+				A70A61C61FD4592700AFDF0E /* FMoveList.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

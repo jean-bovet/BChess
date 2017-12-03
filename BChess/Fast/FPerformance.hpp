@@ -9,7 +9,7 @@
 #ifndef FPerformance_hpp
 #define FPerformance_hpp
 
-#include "FBoard.hpp"
+#include "FMoveGenerator.hpp"
 #include <stdio.h>
 
 class FPerformance {
