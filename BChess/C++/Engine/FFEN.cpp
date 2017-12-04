@@ -184,8 +184,7 @@ std::string FFEN::getFEN(Board board) {
     }
     
     // Castling availability
-//    fen += " \(castling.fen)"
-    fen += " -";
+    fen += " "+board.castling;
     
     // En passant
     // TODO
@@ -237,8 +236,7 @@ Board FFEN::createBoard(std::string fen) {
     
     // KQkq
     auto castlingAvailability = fields[2];
-    // TODO
-//    castling.fen = String(castlingAvailability)
+    board.castling = castlingAvailability;
     
     // En passant
     fields[3];

@@ -62,8 +62,7 @@ class GamesTests: XCTestCase {
     func testBlackToMoveC8B7() {
         let s = "position fen r1bqk2r/pP1p1ppp/3ppP2/8/8/P1N2N1P/1PP2PP1/R1B1KB1R b KQkq - 0 12"
         let fen = "r1bqk2r/pP1p1ppp/3ppP2/8/8/P1N2N1P/1PP2PP1/R1B1KB1R b KQkq - 0 12"
-        // Note: limit depth to 2 otherwise it takes several seconds to evaluate
-        assert(command: s, resultingFEN: fen, bestMove: "bestmove c8b7", depth: 2)
+        assert(command: s, resultingFEN: fen, bestMove: "bestmove c8b7")
     }
     
     /** Evaluate the following position with black to move.
@@ -83,7 +82,7 @@ class GamesTests: XCTestCase {
     }
     
     func assert(command: String, resultingFEN: String, bestMove: String, depth: Int = UCIEngine.defaultDepth) {
-        let uci = UCI(engine: UCIEngineClassic())
+        let uci = UCI(engine: UCIEngineFast())
         var tokens = command.split(separator: " ").map { String($0) }
         uci.process(&tokens)
         

@@ -66,6 +66,10 @@ class UCIEngineFast: UCIEngine {
         engine.setFEN(fen)
     }
     
+    override func get() -> String {
+        return engine.boardFEN();
+    }
+
     override func internalMove(move: Move) {
         engine.move(move.description)
     }
@@ -84,37 +88,38 @@ class UCIEngineFast: UCIEngine {
 
 }
 
-class UCIEngineClassic: UCIEngine {
- 
-    var board = Board()
-    
-    let minimax = Minimax()
-    
-    override func set(fen: String) {
-        board.fen = fen
-    }
+//class UCIEngineClassic: UCIEngine {
+// 
+//    var board = Board()
+//    
+//    let minimax = Minimax()
+//    
+//    override func set(fen: String) {
+//        board.fen = fen
+//    }
+//
+//    override func get() -> String {
+//        return board.fen
+//    }
+//    
+//    override func internalMove(move: Move) {
+//        board.move(move: move)
+//    }
+//    
+//    override func internalStopEvaluating() {
+//        minimax.analyzing = false
+//    }
+//    
+//    override func internalEvaluate(depth: Int, callback: @escaping Callback) {
+//        let info = self.minimax.searchBestMove(board: self.board, color: self.board.color, maxDepth: depth) { info in
+//            // info depth 2 score cp 214 time 1242 nodes 2124 nps 34928 pv e2e4 e7e5 g1f3
+//            // info depth 5 seldepth 29 time 5 nodes 13401 nps 2543 score cp -1 pv b1a3 a7b6 a2a4 a8a4
+//            callback(info.engineInfo, false)
+//        }
+//        
+//        // bestmove g1f3
+//        callback(info.engineInfo, true)
+//    }
+//
+//}
 
-    override func get() -> String {
-        return board.fen
-    }
-    
-    override func internalMove(move: Move) {
-        board.move(move: move)
-    }
-    
-    override func internalStopEvaluating() {
-        minimax.analyzing = false
-    }
-    
-    override func internalEvaluate(depth: Int, callback: @escaping Callback) {
-        let info = self.minimax.searchBestMove(board: self.board, color: self.board.color, maxDepth: depth) { info in
-            // info depth 2 score cp 214 time 1242 nodes 2124 nps 34928 pv e2e4 e7e5 g1f3
-            // info depth 5 seldepth 29 time 5 nodes 13401 nps 2543 score cp -1 pv b1a3 a7b6 a2a4 a8a4
-            callback(info.engineInfo, false)
-        }
-        
-        // bestmove g1f3
-        callback(info.engineInfo, true)
-    }
-
-}

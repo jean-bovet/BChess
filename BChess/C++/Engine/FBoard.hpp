@@ -108,6 +108,8 @@ struct Board {
     // Fullmove number: The number of the full move. It starts at 1, and is incremented after Black's move
     int fullMoveCount = 1;
 
+    std::string castling = "KQkq";
+    
     Board();
     
     void clear() {
