@@ -181,51 +181,50 @@ static Bitboard IBlackPawns = BB(0b\
 #pragma mark -
 
 Board::Board() {
-    pieces[Color::WHITE][Piece::PAWN] = IWhitePawns;
-    pieces[Color::WHITE][Piece::KING] = IWhiteKing;
-    pieces[Color::WHITE][Piece::QUEEN] = IWhiteQueen;
-    pieces[Color::WHITE][Piece::ROOK] = IWhiteRooks;
-    pieces[Color::WHITE][Piece::BISHOP] = IWhiteBishops;
-    pieces[Color::WHITE][Piece::KNIGHT] = IWhiteKnights;
+    pieces[WHITE][PAWN] = IWhitePawns;
+    pieces[WHITE][KING] = IWhiteKing;
+    pieces[WHITE][QUEEN] = IWhiteQueen;
+    pieces[WHITE][ROOK] = IWhiteRooks;
+    pieces[WHITE][BISHOP] = IWhiteBishops;
+    pieces[WHITE][KNIGHT] = IWhiteKnights;
     
-    pieces[Color::BLACK][Piece::PAWN] = IBlackPawns;
-    pieces[Color::BLACK][Piece::KING] = IBlackKing;
-    pieces[Color::BLACK][Piece::QUEEN] = IBlackQueen;
-    pieces[Color::BLACK][Piece::ROOK] = IBlackRooks;
-    pieces[Color::BLACK][Piece::BISHOP] = IBlackBishops;
-    pieces[Color::BLACK][Piece::KNIGHT] = IBlackKnights;
+    pieces[BLACK][PAWN] = IBlackPawns;
+    pieces[BLACK][KING] = IBlackKing;
+    pieces[BLACK][QUEEN] = IBlackQueen;
+    pieces[BLACK][ROOK] = IBlackRooks;
+    pieces[BLACK][BISHOP] = IBlackBishops;
+    pieces[BLACK][KNIGHT] = IBlackKnights;
 }
 
 void Board::move(Move move) {
     if (color == BLACK) {
-        fullMoveCount += 1;
+        fullMoveCount++;
     }
 
-    bb_clear(pieces[move.color][move.piece], move.from);
-    bb_set(pieces[move.color][move.piece], move.to);
+    auto moveColor = MOVE_COLOR(move);
+    auto movePiece = MOVE_PIECE(move);
+    
+    bb_clear(pieces[moveColor][movePiece], MOVE_FROM(move));
+    bb_set(pieces[moveColor][movePiece], MOVE_TO(move));
     
     // TODO optimize
+    auto otherColor = INVERSE(moveColor);
     for (auto piece=0; piece<Piece::PCOUNT; piece++) {
-        bb_clear(pieces[INVERSE(move.color)][piece], move.to);
+        bb_clear(pieces[otherColor][piece], MOVE_TO(move));
     }
 
     color = INVERSE(color);
 }
 
 void Board::move(std::string from, std::string to, Color color) {
-    Move m;
-    m.from = squareIndexForName(from);
-    m.to = squareIndexForName(to);
-    m.color = color;
-    
+    auto fromIndex = squareIndexForName(from);
     for (auto piece=0; piece<Piece::PCOUNT; piece++) {
-        if (bb_test(pieces[color][piece], m.from)) {
-            m.piece = Piece(piece);
+        if (bb_test(pieces[color][piece], fromIndex)) {
+            Move m = createMove(fromIndex, squareIndexForName(to), color, Piece(piece));
+            move(m);
             break;
         }
     }
-
-    move(m);
 }
 
 inline static char charForPiece(Color color, Piece piece) {
@@ -300,11 +299,12 @@ void Board::set(Square square, int file, int rank) {
 }
 
 Bitboard Board::allPieces(Color color) {
-    Bitboard all = 0;
-    for (auto pieces : pieces[color]) {
-        all |= pieces;
-    }
-    return all;
+    return pieces[color][PAWN]|
+    pieces[color][ROOK]|
+    pieces[color][KNIGHT]|
+    pieces[color][BISHOP]|
+    pieces[color][QUEEN]|
+    pieces[color][KING];    
 }
 
 Bitboard Board::occupancy() {
@@ -324,7 +324,6 @@ bool Board::isCheck(Color color) {
     int kingSquare = lsb(kingBoard);
     
     auto otherColor = INVERSE(color);
-//    auto blackPieces = allPieces(INVERSE(color));
     
     // Generate all the moves for a knight from the king position
     // and keep only the ones that are actually hitting
@@ -348,13 +347,14 @@ bool Board::isCheck(Color color) {
         return true;
     }
     
-    // TODO: king, pawns
     // Pawns: we put a pawn of the opposite color at our king's location. That way, we can
     // determine the attacks that a pawn from the opposite color would do.
     auto pawnAttacks = PawnAttacks[color][kingSquare] & pieces[otherColor][Piece::PAWN];
     if (pawnAttacks > 0) {
         return true;
     }
+
+    // TODO: king
 
     return false;
 }

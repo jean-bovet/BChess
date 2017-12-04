@@ -9,7 +9,7 @@
 #include "FMoveList.hpp"
 
 void MoveList::addMove(Board &board, int from, int to, Color color, Piece piece) {
-    Move move = { from, to, color, piece };
+    Move move = createMove(from, to, color, piece);
     Board validBoard = board;
     validBoard.move(move);
     if (!validBoard.isCheck(color)) {

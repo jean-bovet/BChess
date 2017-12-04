@@ -24,7 +24,7 @@ public:
         LineMove line;
 
         bool isValid() {
-            return move.isValid();
+            return MOVE_ISVALID(move);
         }
     };
     

@@ -53,7 +53,7 @@
     
     auto bestLine = [NSMutableArray array];
     for (auto move : info.evaluation.line) {
-        [bestLine addObject:[NSString stringWithUTF8String:move.description().c_str()]];
+        [bestLine addObject:[NSString stringWithUTF8String:MOVE_DESCRIPTION(move).c_str()]];
     }
     ei.bestLine = bestLine;
     return ei;

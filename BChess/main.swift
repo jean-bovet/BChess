@@ -8,8 +8,8 @@
 
 import Foundation
 
-//let engine = FEngine()
-//engine.runTests()
+let engine = FEngine()
+engine.runTests()
 
 let formatter: NumberFormatter = {
     let formatter = NumberFormatter()
@@ -18,13 +18,13 @@ let formatter: NumberFormatter = {
 }()
 
 func run(perf: Performance) {
-    perf.generate(depth: 4)
+    perf.generate(depth: 5)
     print("\(formatter.string(for: perf.moves)!) moves in \(perf.timeElapsed) seconds => \(formatter.string(for: perf.movesPerSecond)!) moves/s")
 }
 
 //run(perf: PerformanceClassic())
-//run(perf: PerformanceCpp())
+run(perf: PerformanceCpp())
 
-let uci = UCI()
-uci.run()
+//let uci = UCI()
+//uci.run()
 

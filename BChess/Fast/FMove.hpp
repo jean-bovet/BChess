@@ -33,33 +33,44 @@ static int squareIndexForName(std::string name) {
     return -1;
 }
 
-struct Move {
-    int from = -1;
-    int to = -1;
-    Color color = COUNT;
-    Piece piece = PCOUNT;
-    
-    bool isValid() {
-        return from >= 0 && to >=0 && from != to;
-    }
-    
-    bool operator==(const Move &other) const {
-        return from == other.from &&
-        to == other.to &&
-        color == other.color &&
-        piece == other.piece;
-    }
+/// A move needs 16 bits to be stored
+/// bit 0- 5: destination square (from 0 to 63)
+/// bit 6-11: origin square (from 0 to 63)
+/// bit 12: 1=BLACK, 0=WHITE
+/// bit 13-15: 3 bits for PIECE (from 0 to 6)
+typedef uint16_t Move;
 
-    bool operator!=(const Move &other) const {
-        return !(*this == other);
-    }
+inline static Move createMove(int from, int to, Color color, Piece piece) {
+    Move m = from | to << 6 | color << 12 | piece << 13;
+    return m;
+}
 
-    std::string description() {
-        auto fromSquare = SquareNames[from];
-        auto toSquare = SquareNames[to];
-        return fromSquare+toSquare;
-    }
+inline static bool MOVE_ISVALID(Move move) {
+    return move != 0;
+}
 
-};
+inline static Color MOVE_COLOR(Move move) {
+    uint16_t test = move & (1 << 12);
+    return test > 0 ? BLACK : WHITE;
+}
 
+inline static Piece MOVE_PIECE(Move move) {
+    uint8_t test = (move >> 13) & 7;
+    return Piece(test);
+}
 
+inline static uint8_t MOVE_FROM(Move move) {
+    uint8_t from = move & 63;
+    return from;
+}
+
+inline static uint8_t MOVE_TO(Move move) {
+    uint8_t to = (move >> 6) & 63;
+    return to;
+}
+
+inline static std::string MOVE_DESCRIPTION(Move move) {
+    auto fromSquare = SquareNames[MOVE_FROM(move)];
+    auto toSquare = SquareNames[MOVE_TO(move)];
+    return fromSquare+toSquare;
+}

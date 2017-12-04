@@ -19,6 +19,8 @@ class FTests {
 public:
     
     static void runAll() {
+        testMoves();
+        
         testWhitePawnFromStartRank();
         testWhitePawnFromMiddleRank();
         testKnight();
@@ -41,6 +43,14 @@ public:
         testBlackIsMate();
         
         testPawnForkQueenAndKing();
+    }
+    
+    static void testMoves() {
+        Move m = createMove(12, 62, BLACK, BISHOP);
+        assert(MOVE_FROM(m) == 12);
+        assert(MOVE_TO(m) == 62);
+        assert(MOVE_COLOR(m) == BLACK);
+        assert(MOVE_PIECE(m) == BISHOP);
     }
     
     static void testWhitePawnFromStartRank() {
@@ -183,12 +193,12 @@ public:
         Minimax::Info info = minimax.searchBestMove(board, board.color, 4, nil);
         
         // Assert the best move
-        assert(info.evaluation.move.description() == bestMove);
+        assert(MOVE_DESCRIPTION(info.evaluation.move) == bestMove);
 
         // Assert the best line
         std::vector<std::string> evaluatedLine;
         for (auto move : info.evaluation.line) {
-            evaluatedLine.push_back(move.description());
+            evaluatedLine.push_back(MOVE_DESCRIPTION(move));
         }
         assert(evaluatedLine.size() == bestLine.size());
         assert(evaluatedLine == bestLine);
