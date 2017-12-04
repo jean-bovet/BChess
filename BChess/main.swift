@@ -18,11 +18,11 @@ let formatter: NumberFormatter = {
 }()
 
 func run(perf: Performance) {
-    perf.generate(depth: 5)
+    perf.generate(depth: 4)
     print("\(formatter.string(for: perf.moves)!) moves in \(perf.timeElapsed) seconds => \(formatter.string(for: perf.movesPerSecond)!) moves/s")
 }
 
-//run(perf: PerformanceClassic())
+run(perf: PerformanceClassic())
 run(perf: PerformanceCpp())
 
 //let uci = UCI()

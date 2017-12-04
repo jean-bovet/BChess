@@ -101,7 +101,7 @@ Minimax::Evaluation Minimax::evaluate(Board board, Move move, Color color, int d
         return bestEvaluation;
     }
     
-    Move lineMove;
+    Move lineMove = 0;
 
     if (depth - 1 < line.size()) {
         lineMove = line[depth - 1];

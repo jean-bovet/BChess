@@ -32,8 +32,12 @@ class UCIEngine {
         
     }
     
+    func get() -> String {
+        return ""
+    }
+    
     func move(move: Move) {
-        
+        internalMove(move: move)
     }
     
     func stop() {
@@ -90,6 +94,10 @@ class UCIEngineClassic: UCIEngine {
         board.fen = fen
     }
 
+    override func get() -> String {
+        return board.fen
+    }
+    
     override func internalMove(move: Move) {
         board.move(move: move)
     }

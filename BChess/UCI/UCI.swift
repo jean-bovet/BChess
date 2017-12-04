@@ -48,11 +48,10 @@ class UCI {
     
     var xcodeMode = false
     
-    init() {
-        log = OSLog(subsystem: "ch.arizona-software.BChess", category: "uci")
+    init(engine: UCIEngine) {
+        self.engine = engine
         
-//        engine = UCIEngineClassic()
-        engine = UCIEngineFast()
+        log = OSLog(subsystem: "ch.arizona-software.BChess", category: "uci")
 
         // Disable output buffering otherwise the GUI won't receive any command
         setbuf(__stdoutp, nil)

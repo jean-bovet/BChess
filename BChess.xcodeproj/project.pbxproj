@@ -13,6 +13,16 @@
 		A70A61CA1FD46E3C00AFDF0E /* FEvaluate.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A70A61C81FD46E3C00AFDF0E /* FEvaluate.cpp */; };
 		A70A61CD1FD4713500AFDF0E /* FMinimax.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A70A61CB1FD4713500AFDF0E /* FMinimax.cpp */; };
 		A70A61D11FD4AA9600AFDF0E /* FEngineInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = A70A61D01FD4AA9600AFDF0E /* FEngineInfo.m */; };
+		A70A61D51FD4D42100AFDF0E /* FEngineInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = A70A61D01FD4AA9600AFDF0E /* FEngineInfo.m */; };
+		A70A61D61FD4D46D00AFDF0E /* FEngine.mm in Sources */ = {isa = PBXBuildFile; fileRef = A75683281FCD28A000CF1408 /* FEngine.mm */; };
+		A70A61D71FD4D48700AFDF0E /* FPerformance.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A756832E1FD0D96300CF1408 /* FPerformance.cpp */; };
+		A70A61D81FD4D49500AFDF0E /* FMoveList.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A70A61C51FD4592700AFDF0E /* FMoveList.cpp */; };
+		A70A61D91FD4D49500AFDF0E /* FMoveGenerator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A70A61C21FD458DE00AFDF0E /* FMoveGenerator.cpp */; };
+		A70A61DA1FD4D49500AFDF0E /* FBoard.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A7712D451FCBC13100E7E802 /* FBoard.cpp */; };
+		A70A61DB1FD4D49500AFDF0E /* FEvaluate.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A70A61C81FD46E3C00AFDF0E /* FEvaluate.cpp */; };
+		A70A61DC1FD4D49500AFDF0E /* FMinimax.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A70A61CB1FD4713500AFDF0E /* FMinimax.cpp */; };
+		A70A61DD1FD4D49500AFDF0E /* FFEN.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A70A61B91FD132D200AFDF0E /* FFEN.cpp */; };
+		A70A61DE1FD4D49F00AFDF0E /* magicmoves.c in Sources */ = {isa = PBXBuildFile; fileRef = A7712D411FCB97A900E7E802 /* magicmoves.c */; };
 		A75683291FCD28A000CF1408 /* FEngine.mm in Sources */ = {isa = PBXBuildFile; fileRef = A75683281FCD28A000CF1408 /* FEngine.mm */; };
 		A756832D1FD0B3FE00CF1408 /* magicmoves.c in Sources */ = {isa = PBXBuildFile; fileRef = A7712D411FCB97A900E7E802 /* magicmoves.c */; };
 		A75683301FD0D96300CF1408 /* FPerformance.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A756832E1FD0D96300CF1408 /* FPerformance.cpp */; };
@@ -148,6 +158,51 @@
 			path = Bridge;
 			sourceTree = "<group>";
 		};
+		A70A61D21FD4D36500AFDF0E /* Swift */ = {
+			isa = PBXGroup;
+			children = (
+				A7AFCCC71FB7CBE500AE3D85 /* Board */,
+				A7AFCCC61FB7CA6900AE3D85 /* Types */,
+				A7712D3C1FC8E31B00E7E802 /* Evaluation */,
+			);
+			path = Swift;
+			sourceTree = "<group>";
+		};
+		A70A61D31FD4D37600AFDF0E /* Helpers */ = {
+			isa = PBXGroup;
+			children = (
+				A7712D401FCB97A900E7E802 /* magicmoves.h */,
+				A7712D411FCB97A900E7E802 /* magicmoves.c */,
+				A756832F1FD0D96300CF1408 /* FPerformance.hpp */,
+				A756832E1FD0D96300CF1408 /* FPerformance.cpp */,
+				A70A61BC1FD1333300AFDF0E /* FUtility.hpp */,
+				A70A61BD1FD3196400AFDF0E /* FTests.hpp */,
+			);
+			path = Helpers;
+			sourceTree = "<group>";
+		};
+		A70A61D41FD4D37E00AFDF0E /* Engine */ = {
+			isa = PBXGroup;
+			children = (
+				A70A61BE1FD38C7500AFDF0E /* FColor.hpp */,
+				A70A61BF1FD38D4100AFDF0E /* FPiece.hpp */,
+				A70A61C01FD4587B00AFDF0E /* FMove.hpp */,
+				A70A61C11FD4589800AFDF0E /* FMoveList.hpp */,
+				A70A61C51FD4592700AFDF0E /* FMoveList.cpp */,
+				A70A61C31FD458DE00AFDF0E /* FMoveGenerator.hpp */,
+				A70A61C21FD458DE00AFDF0E /* FMoveGenerator.cpp */,
+				A7712D461FCBC13100E7E802 /* FBoard.hpp */,
+				A7712D451FCBC13100E7E802 /* FBoard.cpp */,
+				A70A61C91FD46E3C00AFDF0E /* FEvaluate.hpp */,
+				A70A61C81FD46E3C00AFDF0E /* FEvaluate.cpp */,
+				A70A61CC1FD4713500AFDF0E /* FMinimax.hpp */,
+				A70A61CB1FD4713500AFDF0E /* FMinimax.cpp */,
+				A70A61BA1FD132D200AFDF0E /* FFEN.hpp */,
+				A70A61B91FD132D200AFDF0E /* FFEN.cpp */,
+			);
+			path = Engine;
+			sourceTree = "<group>";
+		};
 		A7712D151FB916E900E7E802 /* BChessTests */ = {
 			isa = PBXGroup;
 			children = (
@@ -179,31 +234,14 @@
 			path = Evaluation;
 			sourceTree = "<group>";
 		};
-		A7712D481FCBC13500E7E802 /* Fast */ = {
+		A7712D481FCBC13500E7E802 /* C++ */ = {
 			isa = PBXGroup;
 			children = (
-				A70A61BE1FD38C7500AFDF0E /* FColor.hpp */,
-				A70A61BF1FD38D4100AFDF0E /* FPiece.hpp */,
-				A70A61C01FD4587B00AFDF0E /* FMove.hpp */,
-				A70A61C11FD4589800AFDF0E /* FMoveList.hpp */,
-				A70A61C51FD4592700AFDF0E /* FMoveList.cpp */,
-				A70A61C31FD458DE00AFDF0E /* FMoveGenerator.hpp */,
-				A70A61C21FD458DE00AFDF0E /* FMoveGenerator.cpp */,
-				A7712D461FCBC13100E7E802 /* FBoard.hpp */,
-				A7712D451FCBC13100E7E802 /* FBoard.cpp */,
-				A70A61C91FD46E3C00AFDF0E /* FEvaluate.hpp */,
-				A70A61C81FD46E3C00AFDF0E /* FEvaluate.cpp */,
-				A70A61CC1FD4713500AFDF0E /* FMinimax.hpp */,
-				A70A61CB1FD4713500AFDF0E /* FMinimax.cpp */,
-				A70A61BA1FD132D200AFDF0E /* FFEN.hpp */,
-				A70A61B91FD132D200AFDF0E /* FFEN.cpp */,
+				A70A61D41FD4D37E00AFDF0E /* Engine */,
 				A70A61CE1FD4AA8500AFDF0E /* Bridge */,
-				A756832F1FD0D96300CF1408 /* FPerformance.hpp */,
-				A756832E1FD0D96300CF1408 /* FPerformance.cpp */,
-				A70A61BC1FD1333300AFDF0E /* FUtility.hpp */,
-				A70A61BD1FD3196400AFDF0E /* FTests.hpp */,
+				A70A61D31FD4D37600AFDF0E /* Helpers */,
 			);
-			path = Fast;
+			path = "C++";
 			sourceTree = "<group>";
 		};
 		A7AFCC9D1FB4E40D00AE3D85 = {
@@ -233,13 +271,9 @@
 				A7AFCCB41FB5170900AE3D85 /* MoveGenerator.swift */,
 				A7AFCCC01FB6CE9E00AE3D85 /* FEN.swift */,
 				A7712D3F1FCB97A800E7E802 /* BChess-Bridging-Header.h */,
-				A7712D401FCB97A900E7E802 /* magicmoves.h */,
-				A7712D411FCB97A900E7E802 /* magicmoves.c */,
 				A7712D301FC7C4D300E7E802 /* UCI */,
-				A7AFCCC71FB7CBE500AE3D85 /* Board */,
-				A7AFCCC61FB7CA6900AE3D85 /* Types */,
-				A7712D3C1FC8E31B00E7E802 /* Evaluation */,
-				A7712D481FCBC13500E7E802 /* Fast */,
+				A70A61D21FD4D36500AFDF0E /* Swift */,
+				A7712D481FCBC13500E7E802 /* C++ */,
 			);
 			path = BChess;
 			sourceTree = "<group>";
@@ -356,8 +390,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A70A61DD1FD4D49500AFDF0E /* FFEN.cpp in Sources */,
 				A7712D221FB9179500E7E802 /* BoardIterator.swift in Sources */,
 				A7712D1E1FB9179300E7E802 /* Piece.swift in Sources */,
+				A70A61DC1FD4D49500AFDF0E /* FMinimax.cpp in Sources */,
 				A7712D331FC8957500E7E802 /* GamesTests.swift in Sources */,
 				A7712D231FB9179900E7E802 /* MoveGenerator.swift in Sources */,
 				A7712D171FB916E900E7E802 /* MoveTests.swift in Sources */,
@@ -365,15 +401,23 @@
 				A7712D341FC895D100E7E802 /* UCI.swift in Sources */,
 				A7712D1D1FB9179300E7E802 /* PieceType.swift in Sources */,
 				A7712D1C1FB9179300E7E802 /* Color.swift in Sources */,
+				A70A61DA1FD4D49500AFDF0E /* FBoard.cpp in Sources */,
+				A70A61DE1FD4D49F00AFDF0E /* magicmoves.c in Sources */,
 				A7712D3E1FC8E3A700E7E802 /* Evaluation.swift in Sources */,
 				A7712D211FB9179500E7E802 /* Board.swift in Sources */,
+				A70A61D51FD4D42100AFDF0E /* FEngineInfo.m in Sources */,
 				A7712D201FB9179300E7E802 /* Move.swift in Sources */,
+				A70A61DB1FD4D49500AFDF0E /* FEvaluate.cpp in Sources */,
 				A7712D3D1FC8E3A700E7E802 /* Evaluater.swift in Sources */,
+				A70A61D61FD4D46D00AFDF0E /* FEngine.mm in Sources */,
 				A7712D351FC895D300E7E802 /* UCIEngine.swift in Sources */,
 				A7712D291FBAC4B700E7E802 /* Evaluate.swift in Sources */,
+				A70A61D81FD4D49500AFDF0E /* FMoveList.cpp in Sources */,
 				A7712D1F1FB9179300E7E802 /* Coordinate.swift in Sources */,
+				A70A61D91FD4D49500AFDF0E /* FMoveGenerator.cpp in Sources */,
 				A7712D241FB9179900E7E802 /* Minimax.swift in Sources */,
 				A7712D261FB917DF00E7E802 /* FEN.swift in Sources */,
+				A70A61D71FD4D48700AFDF0E /* FPerformance.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -424,6 +468,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "ch.arizona-software.BChessTests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "BChess/BChess-Bridging-Header.h";
 				SWIFT_VERSION = 4.0;
 			};
 			name = Debug;
@@ -438,6 +483,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "ch.arizona-software.BChessTests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "BChess/BChess-Bridging-Header.h";
 				SWIFT_VERSION = 4.0;
 			};
 			name = Release;
