@@ -9,25 +9,8 @@
 import Foundation
 import os.log
 
-extension Minimax.Info {
-        
-    var engineInfo: FEngineInfo {
-        let info = FEngineInfo()
-        info.depth = UInt(depth)
-        info.time = UInt(time)
-        info.value = evaluation.value
-        info.nodeEvaluated = UInt(nodeEvaluated)
-        info.movesPerSecond = UInt(movesPerSecond)
-
-        var bestLine = [String]()
-        for move in evaluation.line {
-            bestLine.append(move.description)
-        }
-        info.bestLine = bestLine
-        
-        return info
-    }
-}
+// https://en.wikipedia.org/wiki/Forsyth–Edwards_Notation
+let StartPosFEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
 
 extension FEngineInfo {
     
@@ -101,16 +84,11 @@ class UCI {
             assert(moveToken.count == 4)
             let start = moveToken.startIndex
             let middle = moveToken.index(start, offsetBy: 1)
-            guard let from = String(moveToken[start...middle]).coordinate else {
-                return
-            }
+            let from = String(moveToken[start...middle])
             
             let secondToken = moveToken.index(start, offsetBy: 2)
-            guard let to = String(moveToken[secondToken...]).coordinate else {
-                return
-            }
-            let move = Move(from: from, to: to)
-            engine.move(move: move)
+            let to = String(moveToken[secondToken...])
+            engine.move(from: from, to: to)
         }
         tokens.removeAll()
     }

@@ -44,32 +44,3 @@ class PerformanceCpp: Performance {
     
 }
 
-class PerformanceClassic: Performance {
-    
-    var moveCount = 0
-    
-    override func _generate(depth: Int) -> Int {
-        var board = Board()
-        board.fen = StartPosFEN
-        
-        let generator = MoveGenerator(board: board, color: .white)
-        _generate(generator: generator, depth: depth)
-        
-        return moveCount
-    }
-    
-    func _generate(generator: MoveGenerator, depth: Int) {
-        if depth == 0 {
-            return
-        }
-        
-        let moves = generator.generateMoves()
-        for move in moves {
-            moveCount += 1
-            let newBoard = generator.board.newBoard(withMove: move)
-            let newGenerator = MoveGenerator(board: newBoard, color: newBoard.color)
-            _generate(generator: newGenerator, depth: depth - 1)
-        }
-    }
-
-}

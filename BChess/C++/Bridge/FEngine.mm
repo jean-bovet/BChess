@@ -31,10 +31,7 @@
     return [NSString stringWithUTF8String:fen.c_str()];
 }
 
-- (void)move:(NSString*)move {
-    // For example: c1b4
-    auto from = [move substringToIndex:2];
-    auto to = [move substringFromIndex:2];
+- (void)move:(NSString*)from to:(NSString*)to {
     currentBoard.move(std::string([from cStringUsingEncoding:NSUTF8StringEncoding]),
                       std::string([to cStringUsingEncoding:NSUTF8StringEncoding]));
 }
