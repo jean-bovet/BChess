@@ -8,6 +8,7 @@
 
 import Foundation
 
+/*
 let engine = FEngine()
 engine.runTests()
 
@@ -23,7 +24,8 @@ func run(perf: Performance) {
 }
 
 run(perf: PerformanceCpp())
+*/
 
-//let uci = UCI()
-//uci.run()
+let uci = UCI()
+uci.run()
 

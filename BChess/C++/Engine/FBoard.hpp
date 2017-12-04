@@ -105,10 +105,17 @@ struct Board {
     Color color = WHITE;
     Bitboard pieces[COUNT][PCOUNT] = { };
     
+    // Halfmove clock: This is the number of halfmoves since the last capture or pawn advance. This is used to determine if a draw can be claimed under the fifty-move rule.
+    int halfMoveClock = 0;
+
     // Fullmove number: The number of the full move. It starts at 1, and is incremented after Black's move
     int fullMoveCount = 1;
 
-    std::string castling = "KQkq";
+    // Castling availability (KQkq)
+    bool whiteCanCastleKingSide = true;
+    bool whiteCanCastleQueenSide = true;
+    bool blackCanCastleKingSide = true;
+    bool blackCanCastleQueenSide = true;
     
     Board();
     
@@ -128,6 +135,33 @@ struct Board {
     Bitboard emptySquares();
     
     bool isCheck(Color color);
+    
+    void setCastling(std::string castling) {
+        whiteCanCastleKingSide = castling.find('K') != std::string::npos;
+        whiteCanCastleQueenSide = castling.find('Q') != std::string::npos;
+        blackCanCastleKingSide = castling.find('k') != std::string::npos;
+        blackCanCastleQueenSide = castling.find('q') != std::string::npos;
+    }
+    
+    std::string getCastling() {
+        std::string castling = "";
+        if (whiteCanCastleKingSide) {
+            castling += "K";
+        }
+        if (whiteCanCastleQueenSide) {
+            castling += "Q";
+        }
+        if (blackCanCastleKingSide) {
+            castling += "k";
+        }
+        if (blackCanCastleQueenSide) {
+            castling += "q";
+        }
+        if (castling.size() == 0) {
+            castling = "-";
+        }
+        return castling;
+    }
     
     void print();
 };

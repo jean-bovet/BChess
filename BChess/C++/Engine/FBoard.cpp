@@ -201,6 +201,8 @@ void Board::move(Move move) {
         fullMoveCount++;
     }
 
+    halfMoveClock++;
+    
     auto moveColor = MOVE_COLOR(move);
     auto movePiece = MOVE_PIECE(move);
     
@@ -209,27 +211,51 @@ void Board::move(Move move) {
     
     Board::move(moveColor, movePiece, from, to);
     
-    if (from == e1 && to == g1) {
-        // White castle king side, need to move the rook
-        Board::move(moveColor, ROOK, h1, f1);
-    }
-    if (from == e1 && to == c1) {
-        // White castle queen side, need to move the rook
-        Board::move(moveColor, ROOK, a1, d1);
-    }
-    if (from == e8 && to == g8) {
-        // White castle king side, need to move the rook
-        Board::move(moveColor, ROOK, h8, f8);
-    }
-    if (from == e8 && to == c8) {
-        // White castle queen side, need to move the rook
-        Board::move(moveColor, ROOK, a8, d8);
+    if (movePiece == KING) {
+        if (moveColor == WHITE) {
+            whiteCanCastleKingSide = whiteCanCastleQueenSide = false;
+            
+            if (from == e1 && to == g1) {
+                // White castle king side, need to move the rook
+                Board::move(moveColor, ROOK, h1, f1);
+            }
+            if (from == e1 && to == c1) {
+                // White castle queen side, need to move the rook
+                Board::move(moveColor, ROOK, a1, d1);
+            }
+        } else {
+            blackCanCastleKingSide = blackCanCastleQueenSide = false;
+            
+            if (from == e8 && to == g8) {
+                // Black castle king side, need to move the rook
+                Board::move(moveColor, ROOK, h8, f8);
+            }
+            if (from == e8 && to == c8) {
+                // Black castle queen side, need to move the rook
+                Board::move(moveColor, ROOK, a8, d8);
+            }
+        }
     }
 
-    // TODO optimize
+    if (movePiece == PAWN) {
+        halfMoveClock = 0; // reset halfmove clock if a pawn is moved
+    }
+    
+    if (movePiece == ROOK) {
+        if (moveColor == WHITE) {
+            whiteCanCastleKingSide = whiteCanCastleQueenSide = false;
+        } else {
+            blackCanCastleKingSide = blackCanCastleQueenSide = false;
+        }
+    }
+    
     auto otherColor = INVERSE(moveColor);
     for (auto piece=0; piece<Piece::PCOUNT; piece++) {
-        bb_clear(pieces[otherColor][piece], MOVE_TO(move));
+        auto &bitboard = pieces[otherColor][piece];
+        if (bb_test(bitboard, to)) {
+            halfMoveClock = 0; // reset halfmove clock if capture is done
+            bb_clear(bitboard, to);
+        }
     }
 
     color = INVERSE(color);

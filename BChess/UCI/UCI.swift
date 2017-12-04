@@ -20,20 +20,22 @@ extension FEngineInfo {
     }
     
     var uciBestMove: String {
-        return "bestmove \(bestLine[0])"
+        if bestLine.isEmpty {
+            return "bestmove ??"
+        } else {
+            return "bestmove \(bestLine[0])"
+        }
     }
 }
 
 class UCI {
     
     let log: OSLog
-    let engine: UCIEngine
+    let engine = UCIEngine()
     
     var xcodeMode = false
     
-    init(engine: UCIEngine) {
-        self.engine = engine
-        
+    init() {        
         log = OSLog(subsystem: "ch.arizona-software.BChess", category: "uci")
 
         // Disable output buffering otherwise the GUI won't receive any command

@@ -12,55 +12,9 @@
 #include <vector>
 #include <cassert>
 
-/**
-             let pieces = fields.removeFirst()
- 
-            var cursor = Coordinate()
-            cursor.rank = Board.size - 1
- 
-            // 4k3/2r5/8/8/8/8/2R5/4K3 b - - 0 1
-            let ranks = pieces.split(separator: "/")
-            for rank in ranks {
-                for p in rank {
-                    if let emptySquares = Int(String(p)) {
-                        for _ in 1...emptySquares {
-                            self[cursor] = .None
-                            cursor.file += 1
-                        }
-                    } else if let piece = p.piece {
-                        self[cursor] = piece
-                        updatePositions(piece: piece, coordinate: cursor)
-                        cursor.file += 1
-                    } else {
-                        print("Invalid FEN entry \(p) with \(fen)")
-                        cursor.file += 1
-                    }
-                }
-                cursor.rank -= 1
-                cursor.file = 0
-            }
- 
-            let sideToMove = fields.removeFirst()
-            color = (sideToMove == "w") ? .white : .black
- 
-            // KQkq
-            let castlingAvailability = fields.removeFirst()
-            castling.fen = String(castlingAvailability)
- 
-            // En passant
-            fields.removeFirst()
- 
-            // Half move
-            fields.removeFirst()
- 
-            // Full move
-            let fullMove = fields.removeFirst()
-            fullMoveCount = Int(fullMove)!
-
- */
-
 inline static Square charToSquare(char p) {
     Square square;
+    square.empty = false;
     square.color = Color::WHITE;
     switch (p) {
         case 'p':
@@ -184,15 +138,14 @@ std::string FFEN::getFEN(Board board) {
     }
     
     // Castling availability
-    fen += " "+board.castling;
+    fen += " "+board.getCastling();
     
     // En passant
     // TODO
     fen += " -";
     
     // Halfmove
-    // TODO
-    fen += " 0";
+    fen += " "+std::to_string(board.halfMoveClock);
     
     // Full move number (starting at 1)
     fen += " "+std::to_string(board.fullMoveCount);
@@ -235,15 +188,14 @@ Board FFEN::createBoard(std::string fen) {
     board.color = (sideToMove == "w") ? WHITE : BLACK;
     
     // KQkq
-    auto castlingAvailability = fields[2];
-    board.castling = castlingAvailability;
+    board.setCastling(fields[2]);
     
     // En passant
     fields[3];
     
     // Half move
-    fields[4];
-    
+    board.halfMoveClock = stoi(fields[4]);
+
     // Full move
     board.fullMoveCount = stoi(fields[5]);
     
