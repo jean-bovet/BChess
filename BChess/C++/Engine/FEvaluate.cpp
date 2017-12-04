@@ -34,8 +34,9 @@ static int locationFactor[64] = {
 };
 
 int Evaluate::evaluate(Board board) {
-    FastMoveGenerator generator;
-    MoveList moves = generator.generateMoves(board, board.color);
+    // TODO: need to initialize it each time???
+    MoveGenerator generator;
+    MoveList moves = generator.generateMoves(board);
     return evaluate(board, moves);
 }
 

@@ -13,12 +13,12 @@
 #include <stdio.h>
 
 class FPerformance {
-    FastMoveGenerator generator;
+    MoveGenerator generator;
     
 public:
     int moveCount = 0;
 
-    void generateMoves(Board board, Color color, int depth);
+    void generateMoves(Board board, int depth);
 };
 
 #endif /* FPerformance_hpp */

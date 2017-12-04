@@ -232,7 +232,7 @@ Board FFEN::createBoard(std::string fen) {
     }
     
     auto sideToMove = fields[1];
-    board.color = (sideToMove == "w") ? Color::WHITE : Color::BLACK;
+    board.color = (sideToMove == "w") ? WHITE : BLACK;
     
     // KQkq
     auto castlingAvailability = fields[2];

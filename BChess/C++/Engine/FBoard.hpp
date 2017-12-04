@@ -102,8 +102,8 @@ struct Square {
 };
 
 struct Board {
-    Color color = Color::WHITE;
-    Bitboard pieces[Color::COUNT][Piece::PCOUNT] = { };
+    Color color = WHITE;
+    Bitboard pieces[COUNT][PCOUNT] = { };
     
     // Fullmove number: The number of the full move. It starts at 1, and is incremented after Black's move
     int fullMoveCount = 1;
@@ -120,7 +120,8 @@ struct Board {
     void set(Square square, int file, int rank);
     
     void move(Move move);
-    void move(std::string from, std::string to, Color color);
+    void move(Color color, Piece piece, int from, int to);
+    void move(std::string from, std::string to);
     
     Bitboard allPieces(Color color);
     Bitboard occupancy();

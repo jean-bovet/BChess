@@ -204,9 +204,28 @@ void Board::move(Move move) {
     auto moveColor = MOVE_COLOR(move);
     auto movePiece = MOVE_PIECE(move);
     
-    bb_clear(pieces[moveColor][movePiece], MOVE_FROM(move));
-    bb_set(pieces[moveColor][movePiece], MOVE_TO(move));
+    auto from = MOVE_FROM(move);
+    auto to = MOVE_TO(move);
     
+    Board::move(moveColor, movePiece, from, to);
+    
+    if (from == e1 && to == g1) {
+        // White castle king side, need to move the rook
+        Board::move(moveColor, ROOK, h1, f1);
+    }
+    if (from == e1 && to == c1) {
+        // White castle queen side, need to move the rook
+        Board::move(moveColor, ROOK, a1, d1);
+    }
+    if (from == e8 && to == g8) {
+        // White castle king side, need to move the rook
+        Board::move(moveColor, ROOK, h8, f8);
+    }
+    if (from == e8 && to == c8) {
+        // White castle queen side, need to move the rook
+        Board::move(moveColor, ROOK, a8, d8);
+    }
+
     // TODO optimize
     auto otherColor = INVERSE(moveColor);
     for (auto piece=0; piece<Piece::PCOUNT; piece++) {
@@ -216,11 +235,17 @@ void Board::move(Move move) {
     color = INVERSE(color);
 }
 
-void Board::move(std::string from, std::string to, Color color) {
+void Board::move(Color color, Piece piece, int from, int to) {
+    bb_clear(pieces[color][piece], from);
+    bb_set(pieces[color][piece], to);
+}
+
+void Board::move(std::string from, std::string to) {
     auto fromIndex = squareIndexForName(from);
+    auto toIndex = squareIndexForName(to);
     for (auto piece=0; piece<Piece::PCOUNT; piece++) {
         if (bb_test(pieces[color][piece], fromIndex)) {
-            Move m = createMove(fromIndex, squareIndexForName(to), color, Piece(piece));
+            Move m = createMove(fromIndex, toIndex, color, Piece(piece));
             move(m);
             break;
         }

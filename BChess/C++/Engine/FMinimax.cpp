@@ -34,7 +34,7 @@ inline bool isBestValue(bool maximizing, int current, int newValue) {
     }
 }
 
-Minimax::Info Minimax::searchBestMove(Board board, Color color, int maxDepth, SearchCallback callback) {
+Minimax::Info Minimax::searchBestMove(Board board, int maxDepth, SearchCallback callback) {
     analyzing = true;
     
     Evaluation evaluation;
@@ -51,10 +51,9 @@ Minimax::Info Minimax::searchBestMove(Board board, Color color, int maxDepth, Se
         
         evaluation = evaluate(board,
                               Move(),
-                              color,
                               1, /* depth */
                               curMaxDepth,
-                              (color == WHITE), /* maximize */
+                              (board.color == WHITE), /* maximize */
                               evaluation.line,
                               INT_MIN, /* alpha */
                               INT_MAX /* beta */
@@ -80,7 +79,7 @@ Minimax::Info Minimax::searchBestMove(Board board, Color color, int maxDepth, Se
     return info;
 }
 
-Minimax::Evaluation Minimax::evaluate(Board board, Move move, Color color, int depth, int maxDepth, bool maximizing, LineMove line, int _alpha, int _beta) {
+Minimax::Evaluation Minimax::evaluate(Board board, Move move, int depth, int maxDepth, bool maximizing, LineMove line, int _alpha, int _beta) {
     Evaluation bestEvaluation;
     bestEvaluation.value = startValue(maximizing);
 
@@ -91,8 +90,8 @@ Minimax::Evaluation Minimax::evaluate(Board board, Move move, Color color, int d
     int alpha = _alpha;
     int beta = _beta;
     
-    FastMoveGenerator generator;
-    MoveList moves = generator.generateMoves(board, color);
+    MoveGenerator generator;
+    MoveList moves = generator.generateMoves(board);
     if (moves.moveCount == 0) {
         int boardValue = Evaluate::evaluate(board, moves);
         bestEvaluation.move = move;
@@ -105,7 +104,7 @@ Minimax::Evaluation Minimax::evaluate(Board board, Move move, Color color, int d
 
     if (depth - 1 < line.size()) {
         lineMove = line[depth - 1];
-        if (evaluateAlphaBeta(board, lineMove, color, depth, maxDepth, maximizing, line, alpha, beta, bestEvaluation)) {
+        if (evaluateAlphaBeta(board, lineMove, depth, maxDepth, maximizing, line, alpha, beta, bestEvaluation)) {
             return bestEvaluation;
         }
     }
@@ -120,7 +119,7 @@ Minimax::Evaluation Minimax::evaluate(Board board, Move move, Color color, int d
             continue;
         }
         
-        if (evaluateAlphaBeta(board, move, color, depth, maxDepth, maximizing, { }, alpha, beta, bestEvaluation)) {
+        if (evaluateAlphaBeta(board, move, depth, maxDepth, maximizing, { }, alpha, beta, bestEvaluation)) {
             break;
         }
     }
@@ -128,7 +127,7 @@ Minimax::Evaluation Minimax::evaluate(Board board, Move move, Color color, int d
     return bestEvaluation;
 }
 
-bool Minimax::evaluateAlphaBeta(Board board, Move move, Color color, int depth, int maxDepth, bool maximizing, LineMove line, int &alpha, int &beta, Minimax::Evaluation &bestEvaluation) {
+bool Minimax::evaluateAlphaBeta(Board board, Move move, int depth, int maxDepth, bool maximizing, LineMove line, int &alpha, int &beta, Minimax::Evaluation &bestEvaluation) {
     if (depth == maxDepth) {
         int boardValue = Evaluate::evaluate(board);
         bestEvaluation.move = move;
@@ -141,7 +140,7 @@ bool Minimax::evaluateAlphaBeta(Board board, Move move, Color color, int depth, 
     
     Board newBoard = board;
     newBoard.move(move);
-    Evaluation evaluation = evaluate(newBoard, move, INVERSE(color), depth+1, maxDepth, !maximizing, line, alpha, beta);
+    Evaluation evaluation = evaluate(newBoard, move, depth+1, maxDepth, !maximizing, line, alpha, beta);
     if (evaluation.isValid()) {
         // Only evaluate valid evaluation. An evaluation can be invalid
         // if the evaluation has been cancelled for example.

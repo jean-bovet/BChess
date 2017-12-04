@@ -9,17 +9,17 @@
 #include "FPerformance.hpp"
 #include "FBoard.hpp"
 
-void FPerformance::generateMoves(Board board, Color color, int depth) {
+void FPerformance::generateMoves(Board board, int depth) {
     if (depth == 0) {
         return;
     }
     
-    MoveList moves = generator.generateMoves(board, color);
+    MoveList moves = generator.generateMoves(board);
     moveCount += moves.moveCount;
     for (int i=0; i<moves.moveCount; i++) {
         Move m = moves.moves[i];
         Board newBoard = board;
         newBoard.move(m);
-        generateMoves(newBoard, INVERSE(color), depth - 1);
+        generateMoves(newBoard, depth - 1);
     }
 }

@@ -38,10 +38,10 @@ public:
     
     typedef std::function<void(Info)> SearchCallback;
     
-    Info searchBestMove(Board board, Color color, int maxDepth, SearchCallback callback);
+    Info searchBestMove(Board board, int maxDepth, SearchCallback callback);
 
-    Evaluation evaluate(Board board, Move move, Color color, int depth, int maxDepth, bool maximizing, LineMove line, int alpha, int beta);
+    Evaluation evaluate(Board board, Move move, int depth, int maxDepth, bool maximizing, LineMove line, int alpha, int beta);
 
-    bool evaluateAlphaBeta(Board board, Move move, Color color, int depth, int maxDepth, bool maximizing, LineMove line, int &alpha, int &beta, Evaluation &bestEvaluation);
+    bool evaluateAlphaBeta(Board board, Move move, int depth, int maxDepth, bool maximizing, LineMove line, int &alpha, int &beta, Evaluation &bestEvaluation);
 
 };

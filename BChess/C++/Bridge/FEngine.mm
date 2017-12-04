@@ -32,11 +32,11 @@
 }
 
 - (void)move:(NSString*)move {
-    // c1b4    
+    // For example: c1b4
     auto from = [move substringToIndex:2];
     auto to = [move substringFromIndex:2];
     currentBoard.move(std::string([from cStringUsingEncoding:NSUTF8StringEncoding]),
-                      std::string([to cStringUsingEncoding:NSUTF8StringEncoding]), WHITE);
+                      std::string([to cStringUsingEncoding:NSUTF8StringEncoding]));
 }
 
 - (void)stop {
@@ -61,7 +61,7 @@
 
 - (FEngineInfo*)searchBestMove:(NSString*)boardFEN maxDepth:(NSUInteger)maxDepth callback:(FEngineSearchCallback)callback {    
     Board board = FFEN::createBoard(std::string([boardFEN UTF8String]));
-    Minimax::Info info = minimax.searchBestMove(board, board.color, (int)maxDepth, [self, callback](Minimax::Info info) {
+    Minimax::Info info = minimax.searchBestMove(board, (int)maxDepth, [self, callback](Minimax::Info info) {
         callback([self infoFor:info]);
     });
     return [self infoFor:info];
@@ -74,7 +74,7 @@
 - (void)generatePositions {
     FFEN::createBoard("3r3k/5Npp/8/8/2Q5/1B6/8/7K b - - 1 1");
     
-    FastMoveGenerator generator;
+    MoveGenerator generator;
     Board board;
     generator.generateMoves(board, Color::WHITE);
 }
@@ -82,8 +82,7 @@
 - (void)generatePositions:(int)depth {
     FPerformance performance;
     Board board;
-    Color color = Color::WHITE;
-    performance.generateMoves(board, color, depth);
+    performance.generateMoves(board, depth);
     self.moveCount = performance.moveCount;
 }
 

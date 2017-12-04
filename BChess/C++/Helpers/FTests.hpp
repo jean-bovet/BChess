@@ -190,7 +190,7 @@ public:
         assert(boardFEN == fen);
 
         Minimax minimax;
-        Minimax::Info info = minimax.searchBestMove(board, board.color, 4, nil);
+        Minimax::Info info = minimax.searchBestMove(board, 4, nil);
         
         // Assert the best move
         assert(MOVE_DESCRIPTION(info.evaluation.move) == bestMove);
@@ -219,8 +219,8 @@ public:
 
         int squareIndex = squareIndexForName(squareName);
                 
-        FastMoveGenerator generator;
-        MoveList moves = generator.generateMoves(board, board.color, squareIndex);
+        MoveGenerator generator;
+        MoveList moves = generator.generateMoves(board, squareIndex);
         assert(moves.moveCount == movesFen.size());
 
         std::set<std::string> expectedMovesFen(movesFen);
