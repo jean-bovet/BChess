@@ -15,16 +15,21 @@ typedef void(^FEngineSearchCallback)(FEngineInfo * _Nonnull info);
 
 @property (nonatomic, assign) int moveCount;
 
+- (id _Nonnull)init;
+
 - (void)setFEN:(NSString*_Nonnull)boardFEN;
 - ( NSString* _Nonnull )boardFEN;
 
 - (void)move:(NSString*_Nonnull)from to:(NSString*_Nonnull)to;
 - (void)stop;
 
-- (FEngineInfo*_Nonnull)searchBestMove:(NSString*_Nonnull)boardFEN maxDepth:(NSUInteger)maxDepth callback:(FEngineSearchCallback _Nonnull )callback;
+- (FEngineInfo*_Nonnull)searchBestMove:(NSString*_Nonnull)boardFEN
+                              maxDepth:(NSUInteger)maxDepth
+                              callback:(FEngineSearchCallback _Nonnull )callback;
+
+- (NSArray<NSString*>* _Nonnull)moveFENsFrom:(NSString* _Nonnull)startingFEN squareName:(NSString* _Nullable)squareName;
 
 - (void)runTests;
-- (void)generatePositions;
 - (void)generatePositions:(int)depth;
 
 @end

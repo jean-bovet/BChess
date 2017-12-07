@@ -371,7 +371,9 @@ Bitboard Board::emptySquares() {
 bool Board::isCheck(Color color) {
     // Locate the king
     auto kingBoard = pieces[color][Piece::KING];
-    if (kingBoard == 0) return false; // No king, can happen when testing    
+    if (kingBoard == 0) {
+        return false; // No king, can happen when testing
+    }
     int kingSquare = lsb(kingBoard);
     
     auto otherColor = INVERSE(color);

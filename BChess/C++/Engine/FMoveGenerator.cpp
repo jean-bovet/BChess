@@ -11,13 +11,8 @@
 
 #include <cassert>
 
-bool MoveGenerator::magicInitialized = false;
-
-MoveGenerator::MoveGenerator() {
-    if (!magicInitialized) {
-        initmagicmoves();
-        magicInitialized = true;
-    }
+void MoveGenerator::initialize() {
+    initmagicmoves();
     initPawnMoves();
     initKingMoves();
     initKnightMoves();

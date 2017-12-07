@@ -34,6 +34,8 @@
 		A7712D441FCBBD9C00E7E802 /* Performance.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7712D431FCBBD9C00E7E802 /* Performance.swift */; };
 		A7712D471FCBC13100E7E802 /* FBoard.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A7712D451FCBC13100E7E802 /* FBoard.cpp */; };
 		A7AFCCAA1FB4E40D00AE3D85 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7AFCCA91FB4E40D00AE3D85 /* main.swift */; };
+		A7B18F581FD9BAE500A605B8 /* MovesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7B18F571FD9BAE500A605B8 /* MovesTests.swift */; };
+		A7B18F5A1FD9BC8D00A605B8 /* CPPTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7B18F591FD9BC8D00A605B8 /* CPPTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -84,6 +86,8 @@
 		A7712D461FCBC13100E7E802 /* FBoard.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = FBoard.hpp; sourceTree = "<group>"; };
 		A7AFCCA61FB4E40D00AE3D85 /* BChess */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = BChess; sourceTree = BUILT_PRODUCTS_DIR; };
 		A7AFCCA91FB4E40D00AE3D85 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
+		A7B18F571FD9BAE500A605B8 /* MovesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MovesTests.swift; sourceTree = "<group>"; };
+		A7B18F591FD9BC8D00A605B8 /* CPPTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CPPTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -154,7 +158,9 @@
 			isa = PBXGroup;
 			children = (
 				A7712D321FC8957500E7E802 /* GamesTests.swift */,
+				A7B18F571FD9BAE500A605B8 /* MovesTests.swift */,
 				A7712D181FB916E900E7E802 /* Info.plist */,
+				A7B18F591FD9BC8D00A605B8 /* CPPTests.swift */,
 			);
 			path = BChessTests;
 			sourceTree = "<group>";
@@ -308,6 +314,8 @@
 				A70A61DE1FD4D49F00AFDF0E /* magicmoves.c in Sources */,
 				A70A61D51FD4D42100AFDF0E /* FEngineInfo.m in Sources */,
 				A70A61DB1FD4D49500AFDF0E /* FEvaluate.cpp in Sources */,
+				A7B18F5A1FD9BC8D00A605B8 /* CPPTests.swift in Sources */,
+				A7B18F581FD9BAE500A605B8 /* MovesTests.swift in Sources */,
 				A70A61D61FD4D46D00AFDF0E /* FEngine.mm in Sources */,
 				A7712D351FC895D300E7E802 /* UCIEngine.swift in Sources */,
 				A70A61D81FD4D49500AFDF0E /* FMoveList.cpp in Sources */,

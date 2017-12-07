@@ -14,24 +14,24 @@
 
 static int scoreMat = 90000;
 
-static int scorePieceFactor = 100; // Pawn=100, Queen=900
+//static int scorePieceFactor = 100; // Pawn=100, Queen=900
 
 // Bonus for each piece that is attacking or being attacked
-static int attackingBonus = 50;
+//static int attackingBonus = 50;
 
 // Bonus each time the king is in check
-static int checkingBonus = 100;
+//static int checkingBonus = 100;
 
-static int locationFactor[64] = {
-                                    0,  0,  0,  0,  0,  0,  0,  0,
-                                    0,  0,  0,  0,  0,  0,  0,  0,
-                                    0,  0,  2,  2,  2,  2,  0,  0,
-                                    0,  0,  2,  3,  3,  2,  0,  0,
-                                    0,  0,  2,  3,  3,  2,  0,  0,
-                                    0,  0,  2,  2,  2,  2,  0,  0,
-                                    0,  0,  0,  0,  0,  0,  0,  0,
-                                    0,  0,  0,  0,  0,  0,  0,  0,
-};
+//static int locationFactor[64] = {
+//                                    0,  0,  0,  0,  0,  0,  0,  0,
+//                                    0,  0,  0,  0,  0,  0,  0,  0,
+//                                    0,  0,  2,  2,  2,  2,  0,  0,
+//                                    0,  0,  2,  3,  3,  2,  0,  0,
+//                                    0,  0,  2,  3,  3,  2,  0,  0,
+//                                    0,  0,  2,  2,  2,  2,  0,  0,
+//                                    0,  0,  0,  0,  0,  0,  0,  0,
+//                                    0,  0,  0,  0,  0,  0,  0,  0,
+//};
 
 int Evaluate::evaluate(Board board) {
     // TODO: need to initialize it each time???

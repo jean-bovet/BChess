@@ -10,6 +10,7 @@
 #import "FBoard.hpp"
 #import "FPerformance.hpp"
 #import "FFEN.hpp"
+#import "FMove.hpp"
 #import "FTests.hpp"
 #import "FMinimax.hpp"
 
@@ -21,6 +22,13 @@
 @end
 
 @implementation FEngine
+
+- (id)init {
+    if (self = [super init]) {
+        MoveGenerator::initialize();
+    }
+    return self;
+}
 
 - (void)setFEN:(NSString*)boardFEN {
     currentBoard = FFEN::createBoard(std::string([boardFEN UTF8String]));
@@ -62,6 +70,35 @@
         callback([self infoFor:info]);
     });
     return [self infoFor:info];
+}
+
+- (NSArray<NSString*>* _Nonnull)moveFENsFrom:(NSString* _Nonnull)startingFEN squareName:(NSString* _Nullable)squareName {
+    auto fen = std::string([startingFEN UTF8String]);
+    Board board = FFEN::createBoard(fen);
+    std::string boardFEN = FFEN::getFEN(board);
+    assert(boardFEN == fen);
+    
+    int squareIndex;
+    if (squareName) {
+        auto square = std::string([squareName UTF8String]);
+        squareIndex = squareIndexForName(square);
+    } else {
+        squareIndex = -1;
+    }
+    
+    MoveGenerator generator;
+    MoveList moves = generator.generateMoves(board, squareIndex);
+    NSMutableArray<NSString*>* moveFENs = [NSMutableArray array];
+    for (int index=0; index<moves.moveCount; index++) {
+        auto move = moves.moves[index];
+
+        Board newBoard = board;
+        newBoard.move(move);
+        std::string moveFEN = FFEN::getFEN(newBoard);
+
+        [moveFENs addObject:[NSString stringWithUTF8String:moveFEN.c_str()]];
+    }
+    return moveFENs;
 }
 
 - (void)runTests {

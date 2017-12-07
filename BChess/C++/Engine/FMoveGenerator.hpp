@@ -16,15 +16,13 @@ extern "C" void initmagicmoves(void);
 
 class MoveGenerator {
 private:
-    static bool magicInitialized;
-    
+    static void initPawnMoves();
+    static void initKingMoves();
+    static void initKnightMoves();
+
 public:
-    MoveGenerator();
-    
-    void initPawnMoves();
-    void initKingMoves();
-    void initKnightMoves();
-    
+    static void initialize();
+        
     MoveList generateMoves(Board board, int squareIndex = -1);
     void generatePawnsMoves(Board &board, MoveList &moveList, int squareIndex = -1);
     void generateKingsMoves(Board &board, MoveList &moveList, int squareIndex = -1);
