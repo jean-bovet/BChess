@@ -121,8 +121,6 @@ void MoveGenerator::generatePawnsMoves(Board &board, MoveList &moveList, int squ
         // can do. The attacks bitboard is masked with the occupancy bitboard
         // because a pawn attack can only happen when there is a black piece
         // in the target square.
-        // TODO: occupancy should actually be black occupancy
-        // Using white occupancy, we can detect which piece is protected!
         auto attacks = PawnAttacks[board.color][square] & blackPieces;
         moveList.addMoves(board, square, attacks, PAWN);
         

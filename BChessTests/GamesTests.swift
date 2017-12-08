@@ -84,7 +84,7 @@ class GamesTests: XCTestCase {
     func testManyMovesIncludingCastleAndHalfMoveClock() {
         let s = "position startpos moves e2e4 a7a5 g1f3 a5a4 d2d4 b7b6 f1e2 c8b7 e1g1 b7e4 b1c3 e4c6 c1f4 a4a3 b2b3 b6b5 d4d5 c6b7 c3b5 b7a6 b5c3 a6b7 e2c4 e7e6 d5e6 f7e6 f1e1 g7g5 f4g5 b7f3 g5d8 f3d1 e1d1 e8d8 c4e6 g8f6 c3b5 f8c5 d1d3 h8e8 e6f5 e8g8 a1d1 c7c6 c2c4 c6b5 c4b5 d7d5 d3d5 f6d5 d1d5 d8e7 d5c5 e7d6 c5c1"
         let fen = "rn4r1/7p/3k4/1P3B2/8/pP6/P4PPP/2R3K1 b - - 2 28"
-        assert(command: s, resultingFEN: fen, bestMove: "bestmove h7h5")
+        assert(command: s, resultingFEN: fen, bestMove: "bestmove a8a5")
     }
     
     func assert(command: String, resultingFEN: String, bestMove: String, depth: Int = UCIEngine.defaultDepth) {
