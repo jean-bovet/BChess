@@ -54,7 +54,15 @@
     ei.time = info.time;
     ei.nodeEvaluated = info.nodeEvaluated;
     ei.movesPerSecond = info.movesPerSecond;
-    ei.value = info.evaluation.value;
+    
+    // For UCI, the value is always from the engine's point of view.
+    // Because the evaluation function always evaluate from WHITE's point of view,
+    // if the engine is playing black, make sure to inverse the value.
+    if (info.engineColor == BLACK) {
+        ei.value = -info.evaluation.value;
+    } else {
+        ei.value = info.evaluation.value;
+    }
     
     auto bestLine = [NSMutableArray array];
     for (auto move : info.evaluation.line) {

@@ -22,6 +22,7 @@ public:
         Move move;
         int value = 0;
         LineMove line;
+        Color color;
 
         bool isValid() {
             return MOVE_ISVALID(move);
@@ -31,6 +32,7 @@ public:
     struct Info {
         int depth = 0;
         int time = 0;
+        Color engineColor;
         Evaluation evaluation;
         int nodeEvaluated = 0;
         int movesPerSecond = 0;

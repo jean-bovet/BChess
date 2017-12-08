@@ -10,7 +10,7 @@ import Foundation
 
 class UCIEngine {
     
-    static let defaultDepth = 4
+    static let defaultDepth = 6
     
     let engine = FEngine()
 
