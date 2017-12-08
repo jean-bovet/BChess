@@ -49,12 +49,12 @@ public:
     
     static void testEmptyBoard() {
         Board board;
-        assert(board.occupancy() > 0);
+        assert(board.getOccupancy() > 0);
         assert(!board.isCheck(Color::WHITE));
         assert(!board.isCheck(Color::BLACK));
         
         board.clear();
-        assert(board.occupancy() == 0);
+        assert(board.getOccupancy() == 0);
         assert(!board.isCheck(Color::WHITE));
         assert(!board.isCheck(Color::BLACK));
     }

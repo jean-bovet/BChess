@@ -184,7 +184,7 @@ void MoveGenerator::generateKnightsMoves(Board &board, MoveList &moveList, int s
 
 void MoveGenerator::generateSlidingMoves(Board &board, Piece piece, MoveList &moveList, int squareIndex) {
     auto slidingPieces = board.pieces[board.color][piece];
-    auto occupancy = board.occupancy();
+    auto occupancy = board.getOccupancy();
     auto emptyOrBlackSquares = ~board.allPieces(board.color);
     
     // Generate moves for each sliding piece

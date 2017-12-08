@@ -102,7 +102,14 @@ struct Square {
 };
 
 struct Board {
+private:
+    Bitboard occupancy = 0;
+
+public:
     Color color = WHITE;
+    
+    bool occupancyDirty = false;
+    
     Bitboard pieces[COUNT][PCOUNT] = { };
     
     // Halfmove clock: This is the number of halfmoves since the last capture or pawn advance. This is used to determine if a draw can be claimed under the fifty-move rule.
@@ -121,6 +128,7 @@ struct Board {
     
     void clear() {
         memset(pieces, 0, sizeof(pieces));
+        occupancyDirty = true;
     }
     
     Square get(int file, int rank);
@@ -131,11 +139,12 @@ struct Board {
     void move(std::string from, std::string to);
     
     Bitboard allPieces(Color color);
-    Bitboard occupancy();
     Bitboard emptySquares();
     
-    bool isCheck(Color color);
+    Bitboard getOccupancy();
     
+    bool isCheck(Color color);
+        
     void setCastling(std::string castling) {
         whiteCanCastleKingSide = castling.find('K') != std::string::npos;
         whiteCanCastleQueenSide = castling.find('Q') != std::string::npos;

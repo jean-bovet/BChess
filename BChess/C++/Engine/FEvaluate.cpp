@@ -100,7 +100,7 @@ int Evaluate::evaluate(Board board, MoveList moves) {
         }
     }
 
-    auto occupancy = board.occupancy();
+    auto occupancy = board.getOccupancy();
 
     for (int color=0; color<COUNT; color++) {
         auto otherPieces = board.allPieces(INVERSE(color));

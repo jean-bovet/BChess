@@ -194,6 +194,8 @@ Board::Board() {
     pieces[BLACK][ROOK] = IBlackRooks;
     pieces[BLACK][BISHOP] = IBlackBishops;
     pieces[BLACK][KNIGHT] = IBlackKnights;
+    
+    occupancyDirty = true;
 }
 
 void Board::move(Move move) {
@@ -261,9 +263,20 @@ void Board::move(Move move) {
     color = INVERSE(color);
 }
 
+Bitboard Board::getOccupancy() {
+    if (occupancyDirty) {
+        auto whitePieces = allPieces(Color::WHITE);
+        auto blackPieces = allPieces(Color::BLACK);
+        occupancy = whitePieces|blackPieces;
+        occupancyDirty = false;
+    }
+    return occupancy;
+}
+
 void Board::move(Color color, Piece piece, int from, int to) {
     bb_clear(pieces[color][piece], from);
     bb_set(pieces[color][piece], to);
+    occupancyDirty = true;
 }
 
 void Board::move(std::string from, std::string to) {
@@ -320,7 +333,7 @@ void Board::print() {
 
 Square Board::get(int file, int rank) {
     Square square;
-    if (bb_test(occupancy(), file, rank)) {
+    if (bb_test(getOccupancy(), file, rank)) {
         for (auto color=0; color<Color::COUNT; color++) {
             for (auto piece=0; piece<Piece::PCOUNT; piece++) {
                 if (bb_test(pieces[color][piece], file, rank)) {
@@ -347,6 +360,7 @@ void Board::set(Square square, int file, int rank) {
     } else {
         bb_set(pieces[square.color][square.piece], file, rank);
     }
+    occupancyDirty = true;
 }
 
 Bitboard Board::allPieces(Color color) {
@@ -358,14 +372,8 @@ Bitboard Board::allPieces(Color color) {
     pieces[color][KING];    
 }
 
-Bitboard Board::occupancy() {
-    auto whitePieces = allPieces(Color::WHITE);
-    auto blackPieces = allPieces(Color::BLACK);
-    return whitePieces|blackPieces;
-}
-
 Bitboard Board::emptySquares() {
-    return ~occupancy();
+    return ~getOccupancy();
 }
 
 bool Board::isCheck(Color color) {
@@ -387,14 +395,14 @@ bool Board::isCheck(Color color) {
     }
     
     // Same for bishop (and queen)
-    auto rawBishopMoves = Bmagic(kingSquare, occupancy());
+    auto rawBishopMoves = Bmagic(kingSquare, getOccupancy());
     auto bishopMoves = rawBishopMoves & (pieces[otherColor][Piece::BISHOP]|pieces[otherColor][Piece::QUEEN]);
     if (bishopMoves > 0) {
         return true;
     }
 
     // Same for rook (and queen)
-    auto rawRookMoves = Rmagic(kingSquare, occupancy());
+    auto rawRookMoves = Rmagic(kingSquare, getOccupancy());
     auto rookMoves = rawRookMoves & (pieces[otherColor][Piece::ROOK]|pieces[otherColor][Piece::QUEEN]);
     if (rookMoves > 0) {
         return true;
