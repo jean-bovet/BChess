@@ -61,25 +61,41 @@ int Evaluate::evaluate(Board board, MoveList moves) {
             int pieceValue = 0;
             switch (Piece(piece)) {
                 case PAWN:
-                    pieceValue = count * 1;
+                    pieceValue = 1;
                     break;
                 case ROOK:
-                    pieceValue = count * 5;
+                    pieceValue = 5;
                     break;
                 case BISHOP:
                 case KNIGHT:
-                    pieceValue = count * 3;
+                    pieceValue = 3;
                     break;
                 case QUEEN:
-                    pieceValue = count * 9;
+                    pieceValue = 9;
                     break;
                 default:
                     break;
             }
+
             if (color == WHITE) { // Always evaluate from white point of view!!
-                value += pieceValue * scorePieceFactor;
+                value += pieceValue * count * scorePieceFactor;
             } else {
-                value -= pieceValue * scorePieceFactor;
+                value -= pieceValue * count * scorePieceFactor;
+            }
+            
+            // Now let's add some bonus for each piece that are closer
+            // to the center of the board.
+            // TODO: should only do that during openings and mid game?
+            while (pieces > 0) {
+                int square = lsb(pieces);
+                bb_clear(pieces, square);
+                auto locFactor = locationFactor[square];
+                auto pieceBonus = pieceValue * locFactor;
+                if (color == WHITE) { // Always evaluate from white point of view!!
+                    value += pieceBonus;
+                } else {
+                    value -= pieceBonus;
+                }
             }
         }
     }
@@ -154,53 +170,6 @@ int Evaluate::evaluate(Board board, MoveList moves) {
             }
         }
     }
-    
-//    std::cout << "Evaluate: " << value << ", color:" << board.color << std::endl;
-//    
-//    board.print();
-    
-//    for (piece, coordinate) in board {
-//        if piece.isEmpty {
-//            continue
-//        }
-//
-//        let locFactor = locationFactor[coordinate.rank*Board.size+coordinate.file]
-//        let pieceBonus = piece.type.value * locFactor
-//        if piece.color == .white {
-//            value += piece.type.value * scorePieceFactor + pieceBonus
-//        } else {
-//            value -= piece.type.value * scorePieceFactor + pieceBonus
-//        }
-//    }
-    
-    // Evaluate the number of pieces being attacked
-//    let whiteIsAttacking = board.color == .white
-//    for move in moves {
-//        let targetSquare = board[move.to]
-//
-//        // Ignore if the target square is empty
-//        guard !targetSquare.isEmpty else {
-//            continue
-//        }
-//
-//        // Check that the target square is of the opposite color
-//        // Note: the move generator should already do that
-//        assert(targetSquare.color != board.color, "Target square should be of the opposite color")
-//
-//        if targetSquare.type == .king {
-//            if whiteIsAttacking {
-//                value += checkingBonus
-//            } else {
-//                value -= checkingBonus
-//            }
-//        } else {
-//            if whiteIsAttacking {
-//                value += attackingBonus
-//            } else {
-//                value -= attackingBonus
-//            }
-//        }
-//    }
-    
+        
     return value;
 }

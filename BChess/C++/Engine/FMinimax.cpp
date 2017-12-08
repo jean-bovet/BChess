@@ -40,6 +40,10 @@ Minimax::Info Minimax::searchBestMove(Board board, int maxDepth, SearchCallback 
     Evaluation evaluation;
     Info info;
 
+    if (maxDepth == -1) {
+        maxDepth = INT_MAX; // infinite depth
+    }
+    
     for (int curMaxDepth=2; curMaxDepth<=maxDepth; curMaxDepth++) {
         if (!analyzing) {
             break;

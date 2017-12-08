@@ -100,7 +100,7 @@ class UCI {
         // go wtime 300000 btime 300000
         let cmd = tokens.removeFirst()
         
-        let depth = (cmd == "infinite") ? Int.max : UCIEngine.defaultDepth
+        let depth = (cmd == "infinite") ? -1 : UCIEngine.defaultDepth
         
         engine.evaluate(depth: depth) { (info, completed) in
             if completed {

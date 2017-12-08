@@ -64,7 +64,7 @@
     return ei;
 }
 
-- (FEngineInfo*)searchBestMove:(NSString*)boardFEN maxDepth:(NSUInteger)maxDepth callback:(FEngineSearchCallback)callback {    
+- (FEngineInfo*)searchBestMove:(NSString*)boardFEN maxDepth:(NSInteger)maxDepth callback:(FEngineSearchCallback)callback {
     Board board = FFEN::createBoard(std::string([boardFEN UTF8String]));
     Minimax::Info info = minimax.searchBestMove(board, (int)maxDepth, [self, callback](Minimax::Info info) {
         callback([self infoFor:info]);

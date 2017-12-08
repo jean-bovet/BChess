@@ -47,7 +47,7 @@ class UCIEngine {
     }
     
     fileprivate func internalEvaluate(depth: Int, callback: @escaping Callback) {
-        let info = engine.searchBestMove(engine.boardFEN(), maxDepth: UInt(depth)) { info in
+        let info = engine.searchBestMove(engine.boardFEN(), maxDepth: depth) { info in
             callback(info, false)
         }
         

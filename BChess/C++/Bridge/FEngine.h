@@ -24,7 +24,7 @@ typedef void(^FEngineSearchCallback)(FEngineInfo * _Nonnull info);
 - (void)stop;
 
 - (FEngineInfo*_Nonnull)searchBestMove:(NSString*_Nonnull)boardFEN
-                              maxDepth:(NSUInteger)maxDepth
+                              maxDepth:(NSInteger)maxDepth
                               callback:(FEngineSearchCallback _Nonnull )callback;
 
 - (NSArray<NSString*>* _Nonnull)moveFENsFrom:(NSString* _Nonnull)startingFEN squareName:(NSString* _Nullable)squareName;
