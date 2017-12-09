@@ -128,6 +128,12 @@ void MoveGenerator::generatePawnsMoves(Board &board, MoveList &moveList, int squ
         // The move bitboard is masked with the empty bitboard which
         // in other words ensures that the pawn can only move to unoccupied square.
         auto moves = PawnMoves[board.color][square] & emptySquares;
+        if (moves > 0) {
+            // Note: mask with Rook Moves to ensure the pawn doesn't "step" over
+            // a piece when moving 2 ranks at starting position.
+            auto rookMoves = Rmagic(square, board.getOccupancy());
+            moves &= rookMoves;
+        }
         moveList.addMoves(board, square, moves, PAWN);
     }
 }

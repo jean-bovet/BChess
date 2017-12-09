@@ -82,6 +82,13 @@ class MovesTests: XCTestCase {
         assertMoves("6rk/5Npp/8/8/8/1B6/8/7K b - - 0 1", []);
     }
     
+    func testPawnMoveNotOverPiece() {
+        assertMoves("7k/8/8/8/8/4n3/4P3/7K w - - 0 1", [
+            "7k/8/8/8/8/4n3/4P2K/8 b - - 1 1",
+            "7k/8/8/8/8/4n3/4P3/6K1 b - - 1 1"
+            ])
+    }
+    
     func assertMoves(_ startFEN: String, _ expectedMoveFENs: [String], _ squareName: String? = nil) {
         let engine = FEngine()
         let moveFENs = engine.moveFENs(from: startFEN, squareName: squareName)
