@@ -12,22 +12,6 @@ import os.log
 // https://en.wikipedia.org/wiki/Forsyth–Edwards_Notation
 let StartPosFEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
 
-extension FEngineInfo {
-    
-    var uciInfoMessage: String {
-        let lineInfo = bestLine.map { $0 }.joined(separator: " ")
-        return "info depth \(depth) time \(time) nodes \(nodeEvaluated) nps \(movesPerSecond) score cp \(value) pv \(lineInfo)"
-    }
-    
-    var uciBestMove: String {
-        if bestLine.isEmpty {
-            return "bestmove ??"
-        } else {
-            return "bestmove \(bestLine[0])"
-        }
-    }
-}
-
 class UCI {
     
     let log: OSLog

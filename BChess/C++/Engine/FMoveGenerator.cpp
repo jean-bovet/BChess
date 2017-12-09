@@ -33,21 +33,9 @@ void MoveGenerator::initPawnMoves() {
         bb_set(PawnAttacks[WHITE][square], fileIndex-1, rankIndex+1);
         bb_set(PawnAttacks[WHITE][square], fileIndex+1, rankIndex+1);
         
-        // White pawn moves
-        bb_set(PawnMoves[WHITE][square], fileIndex, rankIndex+1);
-        if (rankIndex == 1) {
-            bb_set(PawnMoves[WHITE][square], fileIndex, rankIndex+2);
-        }
-        
         // Black pawn attacks
         bb_set(PawnAttacks[BLACK][square], fileIndex-1, rankIndex-1);
         bb_set(PawnAttacks[BLACK][square], fileIndex+1, rankIndex-1);
-        
-        // Black pawn moves
-        bb_set(PawnMoves[BLACK][square], fileIndex, rankIndex-1);
-        if (rankIndex == 6) {
-            bb_set(PawnMoves[BLACK][square], fileIndex, rankIndex-2);
-        }
     }
 }
 
@@ -128,17 +116,36 @@ void MoveGenerator::generatePawnsMoves(Board &board, MoveList &moveList, int squ
         auto attacks = PawnAttacks[board.color][square] & blackPieces;
         moveList.addMoves(board, square, attacks, PAWN);
         
-        // Generate a bitboard for all the moves that this white pawn can do.
-        // The move bitboard is masked with the empty bitboard which
-        // in other words ensures that the pawn can only move to unoccupied square.
-        auto moves = PawnMoves[board.color][square] & emptySquares;
-        if (moves > 0) {
-            // Note: mask with Rook Moves to ensure the pawn doesn't "step" over
-            // a piece when moving 2 ranks at starting position.
-            auto rookMoves = Rmagic(square, board.getOccupancy());
-            moves &= rookMoves;
+        // Generate the move for the pawn:
+        // - Either one square or
+        // - Two squares if the pawn is in its initial rank
+        int oneSquareForward, twoSquaresForward;
+        int initialRank;
+        int currentRank = rank_index(square);
+        if (board.color == WHITE) {
+            if (currentRank == 7) {
+                continue; // cannot move anymore, we are on the last rank
+            }
+            initialRank = 1;
+            oneSquareForward = square + 8;
+            twoSquaresForward = square + 16;
+        } else {
+            if (currentRank == 1) {
+                continue; // cannot move anymore, we are on the last rank
+            }
+            initialRank = 6;
+            oneSquareForward = square - 8;
+            twoSquaresForward = square - 16;
         }
-        moveList.addMoves(board, square, moves, PAWN);
+        
+        // Can we move the pawn forward one square?
+        if (((1UL << oneSquareForward) & emptySquares) > 0) {
+            moveList.addMove(board, square, oneSquareForward, PAWN);
+            // Is pawn on the initial rank? Try two squares forward
+            if (currentRank == initialRank && ((1UL << twoSquaresForward) & emptySquares) > 0) {
+                moveList.addMove(board, square, twoSquaresForward, PAWN);
+            }
+        }
     }
 }
 

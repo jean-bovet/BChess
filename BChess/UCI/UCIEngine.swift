@@ -23,10 +23,10 @@ class UCIEngine {
                 
         if async {
             DispatchQueue.global(qos: .userInitiated).async {
-                self.internalEvaluate(depth: depth, callback: callback)
+                self.synchronousEvaluate(depth: depth, callback: callback)
             }
         } else {
-            internalEvaluate(depth: depth, callback: callback)
+            synchronousEvaluate(depth: depth, callback: callback)
         }
     }
     
@@ -46,7 +46,7 @@ class UCIEngine {
         engine.stop()
     }
     
-    fileprivate func internalEvaluate(depth: Int, callback: @escaping Callback) {
+    fileprivate func synchronousEvaluate(depth: Int, callback: @escaping Callback) {
         let info = engine.searchBestMove(engine.boardFEN(), maxDepth: depth) { info in
             callback(info, false)
         }

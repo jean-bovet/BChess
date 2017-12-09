@@ -34,7 +34,7 @@ inline static int squareIndexForName(std::string name) {
 }
 
 /// A move needs 16 bits to be stored
-/// bit 0- 5: destination square (from 0 to 63)
+/// bit 0-5: destination square (from 0 to 63)
 /// bit 6-11: origin square (from 0 to 63)
 /// bit 12: 1=BLACK, 0=WHITE
 /// bit 13-15: 3 bits for PIECE (from 0 to 6)

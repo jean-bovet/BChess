@@ -79,7 +79,6 @@ inline static int bb_count(Bitboard bb) {
 }
 
 extern Bitboard PawnAttacks[2][64];
-extern Bitboard PawnMoves[2][64];
 
 extern Bitboard KingMoves[64];
 extern Bitboard KnightMoves[64];

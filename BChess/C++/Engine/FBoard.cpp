@@ -13,7 +13,6 @@
 #include "magicmoves.h"
 
 Bitboard PawnAttacks[2][64];
-Bitboard PawnMoves[2][64];
 
 Bitboard KingMoves[64];
 Bitboard KnightMoves[64];
