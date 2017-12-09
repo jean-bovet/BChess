@@ -9,6 +9,6 @@
 #pragma once
 
 enum Piece: int {
-    PAWN, ROOK, KNIGHT, BISHOP, QUEEN, KING, PCOUNT
+    PAWN, KNIGHT, BISHOP, ROOK, QUEEN, KING, PCOUNT
 };
 

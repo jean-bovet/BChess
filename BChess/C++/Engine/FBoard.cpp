@@ -415,7 +415,11 @@ bool Board::isCheck(Color color) {
         return true;
     }
 
-    // TODO: king
+    // King
+    auto kingMoves = KingMoves[kingSquare] & pieces[otherColor][Piece::KING];
+    if (kingMoves > 0) {
+        return true;
+    }
 
     return false;
 }

@@ -14,5 +14,4 @@
 class Evaluate {
 public:
     static int evaluate(Board board);
-    static int evaluate(Board board, MoveList moves);
 };

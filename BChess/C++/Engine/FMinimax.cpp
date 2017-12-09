@@ -99,9 +99,14 @@ Minimax::Evaluation Minimax::evaluate(Board board, Move move, int depth, int max
     MoveGenerator generator;
     MoveList moves = generator.generateMoves(board);
     if (moves.moveCount == 0) {
-        int boardValue = Evaluate::evaluate(board, moves);
+        // It's either a draw or mat
+        if (board.isCheck(board.color)) {
+            bestEvaluation.value = board.color == WHITE ? INT_MIN : INT_MAX;
+        } else {
+            // TODO: is that a draw??
+            bestEvaluation.value = 0;
+        }
         bestEvaluation.move = move;
-        bestEvaluation.value = boardValue;
         bestEvaluation.color = board.color;
         bestEvaluation.line.clear();
         return bestEvaluation;

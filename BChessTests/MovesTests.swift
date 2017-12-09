@@ -89,6 +89,17 @@ class MovesTests: XCTestCase {
             ])
     }
     
+    func testOnlyOneMoveBecauseOfCheckFromH7() {
+        assertMoves("6k1/7P/p7/4p3/4b2K/5q2/6r1/8 b - - 0 45", [
+            "8/7k/p7/4p3/4b2K/5q2/6r1/8 w - - 0 46",
+            "6k1/7b/p7/4p3/7K/5q2/6r1/8 w - - 0 46",
+            "7k/7P/p7/4p3/4b2K/5q2/6r1/8 w - - 1 46",
+            "8/6kP/p7/4p3/4b2K/5q2/6r1/8 w - - 1 46",
+            "5k2/7P/p7/4p3/4b2K/5q2/6r1/8 w - - 1 46",
+            "8/5k1P/p7/4p3/4b2K/5q2/6r1/8 w - - 1 46",
+            ])
+    }
+    
     func assertMoves(_ startFEN: String, _ expectedMoveFENs: [String], _ squareName: String? = nil) {
         let engine = FEngine()
         let moveFENs = engine.moveFENs(from: startFEN, squareName: squareName)

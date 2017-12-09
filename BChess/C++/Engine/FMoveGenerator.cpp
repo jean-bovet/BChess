@@ -19,7 +19,11 @@ void MoveGenerator::initialize() {
 }
 
 void MoveGenerator::initPawnMoves() {
-    for (int square = 8; square < 64-8; square++) {
+    // Note: generate moves even for the first and last rank, because it
+    // is used by the some functions to determine if a piece is attacked
+    // by a pawn which might need white pawn in the first rank or a black
+    // pawn in the last rank to determine proper attack.
+    for (int square = 0; square < 64; square++) {
         int fileIndex = file_index(square);
         int rankIndex = rank_index(square);
         
