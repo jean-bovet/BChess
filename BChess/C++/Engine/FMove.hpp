@@ -33,20 +33,29 @@ inline static int squareIndexForName(std::string name) {
     return -1;
 }
 
-/// A move needs 16 bits to be stored
-/// bit 0-5: destination square (from 0 to 63)
-/// bit 6-11: origin square (from 0 to 63)
-/// bit 12: 1=BLACK, 0=WHITE
-/// bit 13-15: 3 bits for PIECE (from 0 to 6)
-typedef uint16_t Move;
+// A move needs 32 bits to be stored
+// bit 0-5: destination square (from 0 to 63)
+// bit 6-11: origin square (from 0 to 63)
+// bit 12: 1=BLACK, 0=WHITE
+// bit 13-15: 3 bits for PIECE (from 0 to 6)
+// bit 16: 0=move, 1=capture
+typedef uint32_t Move;
 
-inline static Move createMove(int from, int to, Color color, Piece piece) {
+inline static Move createMove(int from, int to, Color color, Piece piece, bool capture) {
     Move m = from | to << 6 | color << 12 | piece << 13;
+    if (capture) {
+        m |= 1UL << 16;
+    }
     return m;
 }
 
 inline static bool MOVE_ISVALID(Move move) {
     return move != 0;
+}
+
+inline static bool MOVE_IS_CAPTURE(Move move) {
+    uint32_t test = move & (1UL << 16);
+    return test > 0;
 }
 
 inline static Color MOVE_COLOR(Move move) {

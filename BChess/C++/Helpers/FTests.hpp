@@ -40,11 +40,13 @@ public:
     }
     
     static void testMoves() {
-        Move m = createMove(12, 62, BLACK, BISHOP);
+        Move m = createMove(12, 62, BLACK, BISHOP, true);
         assert(MOVE_FROM(m) == 12);
         assert(MOVE_TO(m) == 62);
         assert(MOVE_COLOR(m) == BLACK);
         assert(MOVE_PIECE(m) == BISHOP);
+        assert(MOVE_IS_CAPTURE(m));
+        assert(MOVE_ISVALID(m));
     }
     
     static void testEmptyBoard() {

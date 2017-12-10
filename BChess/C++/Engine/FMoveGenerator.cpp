@@ -114,7 +114,10 @@ void MoveGenerator::generatePawnsMoves(Board &board, MoveList &moveList, int squ
         // because a pawn attack can only happen when there is a black piece
         // in the target square.
         auto attacks = PawnAttacks[board.color][square] & blackPieces;
-        moveList.addMoves(board, square, attacks, PAWN);
+        if (attacks > 0) {
+            moveList.addMoves(board, square, attacks, PAWN, true);
+        }
+        
         
         // Generate the move for the pawn:
         // - Either one square or
@@ -140,10 +143,10 @@ void MoveGenerator::generatePawnsMoves(Board &board, MoveList &moveList, int squ
         
         // Can we move the pawn forward one square?
         if (((1UL << oneSquareForward) & emptySquares) > 0) {
-            moveList.addMove(board, square, oneSquareForward, PAWN);
+            moveList.addMove(board, square, oneSquareForward, PAWN, false);
             // Is pawn on the initial rank? Try two squares forward
             if (currentRank == initialRank && ((1UL << twoSquaresForward) & emptySquares) > 0) {
-                moveList.addMove(board, square, twoSquaresForward, PAWN);
+                moveList.addMove(board, square, twoSquaresForward, PAWN, false);
             }
         }
     }
@@ -151,7 +154,8 @@ void MoveGenerator::generatePawnsMoves(Board &board, MoveList &moveList, int squ
 
 void MoveGenerator::generateKingsMoves(Board &board, MoveList &moveList, int squareIndex) {
     auto kings = board.pieces[board.color][KING];
-    auto emptyOrBlackSquares = ~board.allPieces(board.color);
+    auto emptySquares = board.emptySquares();
+    auto blackSquares = board.allPieces(INVERSE(board.color));
     
     // Generate moves for each white knight
     while (kings > 0) {
@@ -169,15 +173,20 @@ void MoveGenerator::generateKingsMoves(Board &board, MoveList &moveList, int squ
         // Generate a bitboard for all the moves that this white knight
         // can do. The attacks bitboard is masked to ensure it can only
         // happy on an empty square or a square with a piece of the opposite color.
-        auto moves = KingMoves[square] & emptyOrBlackSquares;
-        moveList.addMoves(board, square, moves, KING);
+        auto moves = KingMoves[square] & emptySquares;
+        moveList.addMoves(board, square, moves, KING, false);
+
+        auto captures = KingMoves[square] & blackSquares;
+        moveList.addMoves(board, square, captures, KING, true);
+        
     }
 }
 
 void MoveGenerator::generateKnightsMoves(Board &board, MoveList &moveList, int squareIndex) {
     auto whiteKnights = board.pieces[board.color][KNIGHT];
-    auto emptyOrBlackSquares = ~board.allPieces(board.color);
-    
+    auto emptySquares = board.emptySquares();
+    auto blackSquares = board.allPieces(INVERSE(board.color));
+
     // Generate moves for each white knight
     while (whiteKnights > 0) {
         // Find the first white knight starting from the least significant bit (that is, square a1)
@@ -194,16 +203,20 @@ void MoveGenerator::generateKnightsMoves(Board &board, MoveList &moveList, int s
         // Generate a bitboard for all the moves that this white knight
         // can do. The attacks bitboard is masked to ensure it can only
         // happy on an empty square or a square with a piece of the opposite color.
-        auto moves = KnightMoves[square] & emptyOrBlackSquares;
-        moveList.addMoves(board, square, moves, KNIGHT);
+        auto moves = KnightMoves[square] & emptySquares;
+        moveList.addMoves(board, square, moves, KNIGHT, false);
+        
+        auto captures = KnightMoves[square] & blackSquares;
+        moveList.addMoves(board, square, captures, KNIGHT, true);
     }
 }
 
 void MoveGenerator::generateSlidingMoves(Board &board, Piece piece, MoveList &moveList, int squareIndex) {
     auto slidingPieces = board.pieces[board.color][piece];
     auto occupancy = board.getOccupancy();
-    auto emptyOrBlackSquares = ~board.allPieces(board.color);
-    
+    auto emptySquares = board.emptySquares();
+    auto blackSquares = board.allPieces(INVERSE(board.color));
+
     // Generate moves for each sliding piece
     while (slidingPieces > 0) {
         // Find the first sliding piece starting from the least significant bit (that is, square a1)
@@ -240,7 +253,10 @@ void MoveGenerator::generateSlidingMoves(Board &board, Piece piece, MoveList &mo
         // Note: the occupancy bitboard has all the white and black pieces,
         // we need to filter out the moves that land into a piece of the same
         // color because Rmagic will move to these squares anyway.
-        auto moves = potentialMoves & emptyOrBlackSquares;
-        moveList.addMoves(board, square, moves, piece);
+        auto moves = potentialMoves & emptySquares;
+        moveList.addMoves(board, square, moves, piece, false);
+        
+        auto captures = potentialMoves & blackSquares;
+        moveList.addMoves(board, square, captures, piece, true);
     }
 }

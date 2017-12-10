@@ -8,8 +8,8 @@
 
 #include "FMoveList.hpp"
 
-void MoveList::addMove(Board &board, int from, int to, Piece piece) {
-    Move move = createMove(from, to, board.color, piece);
+void MoveList::addMove(Board &board, int from, int to, Piece piece, bool capture) {
+    Move move = createMove(from, to, board.color, piece, capture);
     Board validBoard = board;
     validBoard.move(move);
     // Note: make sure the move that was just played doesn't make
@@ -20,12 +20,12 @@ void MoveList::addMove(Board &board, int from, int to, Piece piece) {
     }
 }
 
-void MoveList::addMoves(Board &board, int from, Bitboard moves, Piece piece) {
+void MoveList::addMoves(Board &board, int from, Bitboard moves, Piece piece, bool capture) {
     while (moves > 0) {
         int to = lsb(moves);
         bb_clear(moves, to);
         
-        addMove(board, from, to, piece);
+        addMove(board, from, to, piece, capture);
     }
 }
 

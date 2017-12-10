@@ -238,8 +238,9 @@ void Board::move(Move move) {
         }
     }
 
+    // Reset halfmove clock if a pawn is moved
     if (movePiece == PAWN) {
-        halfMoveClock = 0; // reset halfmove clock if a pawn is moved
+        halfMoveClock = 0;
     }
     
     if (movePiece == ROOK) {
@@ -251,12 +252,15 @@ void Board::move(Move move) {
     }
     
     auto otherColor = INVERSE(moveColor);
-    for (auto piece=0; piece<Piece::PCOUNT; piece++) {
-        auto &bitboard = pieces[otherColor][piece];
-        if (bb_test(bitboard, to)) {
-            halfMoveClock = 0; // reset halfmove clock if capture is done
-            bb_clear(bitboard, to);
-        }
+    bb_clear(pieces[otherColor][PAWN], to);
+    bb_clear(pieces[otherColor][KNIGHT], to);
+    bb_clear(pieces[otherColor][BISHOP], to);
+    bb_clear(pieces[otherColor][ROOK], to);
+    bb_clear(pieces[otherColor][QUEEN], to);
+    bb_clear(pieces[otherColor][KING], to);
+
+    if (MOVE_IS_CAPTURE(move)) {
+        halfMoveClock = 0; // reset halfmove clock if capture is done
     }
 
     color = INVERSE(color);
@@ -283,7 +287,8 @@ void Board::move(std::string from, std::string to) {
     auto toIndex = squareIndexForName(to);
     for (auto piece=0; piece<Piece::PCOUNT; piece++) {
         if (bb_test(pieces[color][piece], fromIndex)) {
-            Move m = createMove(fromIndex, toIndex, color, Piece(piece));
+            bool capture = bb_test(allPieces(INVERSE(color)), toIndex);
+            Move m = createMove(fromIndex, toIndex, color, Piece(piece), capture);
             move(m);
             break;
         }
