@@ -21,16 +21,29 @@
 // bit 13-15: 3 bits for PIECE (from 0 to 6)
 // bit 16: 0=move, 1=capture
 // bit 17: 1=en passant, 0 otherwise
+// bit 18-20: 3 bits for promotion PIECE (from 0 to 6). 0 means no promotion.
 typedef uint32_t Move;
 
-inline static Move createMove(Square from, Square to, Color color, Piece piece, bool capture, bool enPassant) {
-    Move m = (Move)(from | to << 6 | color << 12 | piece << 13);
-    if (capture) {
-        m |= 1UL << 16;
-    }
-    if (enPassant) {
-        m |= 1UL << 17;
-    }
+inline static Move createMove(Square from, Square to, Color color, Piece piece) {
+    Move m = (Move)(from | (Move)to << 6 | color << 12 | piece << 13);
+    return m;
+}
+
+inline static Move createPromotion(Square from, Square to, Color color, Piece piece, Piece promotionPiece) {
+    Move m = createMove(from, to, color, piece);
+    m |= promotionPiece << 18;
+    return m;
+}
+
+inline static Move createCapture(Square from, Square to, Color color, Piece piece) {
+    Move m = createMove(from, to, color, piece);
+    m |= 1UL << 16;
+    return m;
+}
+
+inline static Move createEnPassant(Square from, Square to, Color color, Piece piece) {
+    Move m = createCapture(from, to, color, piece);
+    m |= 1UL << 17;
     return m;
 }
 
@@ -58,6 +71,11 @@ inline static Piece MOVE_PIECE(Move move) {
     return Piece(test);
 }
 
+inline static Piece MOVE_PROMOTION_PIECE(Move move) {
+    uint8_t test = (move >> 18) & 7;
+    return Piece(test);
+}
+
 inline static Square MOVE_FROM(Move move) {
     Square from = move & 63;
     return from;
@@ -71,5 +89,11 @@ inline static Square MOVE_TO(Move move) {
 inline static std::string MOVE_DESCRIPTION(Move move) {
     auto fromSquare = SquareNames[MOVE_FROM(move)];
     auto toSquare = SquareNames[MOVE_TO(move)];
-    return fromSquare+toSquare;
+    auto promotionPiece = MOVE_PROMOTION_PIECE(move);
+    if (promotionPiece > PAWN){
+//        auto isWhite = MOVE_COLOR(move) == WHITE;
+        return fromSquare+toSquare+pieceToChar(promotionPiece, false); // Seems we always annotate the promotion with black-style piece letter (lowercase)
+    } else {
+        return fromSquare+toSquare;
+    }
 }

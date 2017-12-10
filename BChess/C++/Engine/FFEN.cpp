@@ -78,23 +78,7 @@ inline static char squareToChar(BoardSquare square) {
     }
     
     bool white = square.color == Color::WHITE;
-    
-    switch (square.piece) {
-        case Piece::PAWN:
-            return white ? 'P' : 'p';
-        case Piece::ROOK:
-            return white ? 'R' : 'r';
-        case Piece::KNIGHT:
-            return white ? 'N' : 'n';
-        case Piece::BISHOP:
-            return white ? 'B' : 'b';
-        case Piece::QUEEN:
-            return white ? 'Q' : 'q';
-        case Piece::KING:
-            return white ? 'K' : 'k';
-        case Piece::PCOUNT:
-            assert(false); // invalid
-    }
+    return pieceToChar(square.piece, white);
 }
 
 struct Coordinate {

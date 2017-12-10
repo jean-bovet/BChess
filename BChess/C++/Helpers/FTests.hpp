@@ -22,7 +22,11 @@ public:
     static void runAll() {
         MoveGenerator::initialize();
         
-        testMoves();
+        testInvalidMove();
+        testSimpleMove();
+        testMoveCapture();
+        testMoveEnPassant();
+        testMovePromotion();
         
         testEmptyBoard();
 
@@ -39,8 +43,35 @@ public:
         testPawnForkQueenAndKing();
     }
     
-    static void testMoves() {
-        Move m = createMove(12, 62, BLACK, BISHOP, true, true);
+    static void testInvalidMove() {
+        Move m = 0;
+        assert(!MOVE_ISVALID(m));
+    }
+
+    static void testSimpleMove() {
+        Move m = createMove(12, 62, BLACK, BISHOP);
+        assert(MOVE_FROM(m) == 12);
+        assert(MOVE_TO(m) == 62);
+        assert(MOVE_COLOR(m) == BLACK);
+        assert(MOVE_PIECE(m) == BISHOP);
+        assert(!MOVE_IS_CAPTURE(m));
+        assert(!MOVE_IS_ENPASSANT(m));
+        assert(MOVE_ISVALID(m));
+    }
+    
+    static void testMoveCapture() {
+        Move m = createCapture(12, 62, BLACK, BISHOP);
+        assert(MOVE_FROM(m) == 12);
+        assert(MOVE_TO(m) == 62);
+        assert(MOVE_COLOR(m) == BLACK);
+        assert(MOVE_PIECE(m) == BISHOP);
+        assert(MOVE_IS_CAPTURE(m));
+        assert(!MOVE_IS_ENPASSANT(m));
+        assert(MOVE_ISVALID(m));
+    }
+
+    static void testMoveEnPassant() {
+        Move m = createEnPassant(12, 62, BLACK, BISHOP);
         assert(MOVE_FROM(m) == 12);
         assert(MOVE_TO(m) == 62);
         assert(MOVE_COLOR(m) == BLACK);
@@ -49,7 +80,19 @@ public:
         assert(MOVE_IS_ENPASSANT(m));
         assert(MOVE_ISVALID(m));
     }
-    
+
+    static void testMovePromotion() {
+        Move m = createPromotion(12, 62, BLACK, PAWN, ROOK);
+        assert(MOVE_FROM(m) == 12);
+        assert(MOVE_TO(m) == 62);
+        assert(MOVE_COLOR(m) == BLACK);
+        assert(MOVE_PIECE(m) == PAWN);
+        assert(MOVE_PROMOTION_PIECE(m) == ROOK);
+        assert(!MOVE_IS_CAPTURE(m));
+        assert(!MOVE_IS_ENPASSANT(m));
+        assert(MOVE_ISVALID(m));
+    }
+
     static void testEmptyBoard() {
         Board board;
         assert(board.getOccupancy() > 0);

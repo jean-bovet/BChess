@@ -8,7 +8,27 @@
 
 #pragma once
 
-enum Piece: int {
+#include <cassert>
+
+enum Piece: unsigned {
     PAWN, KNIGHT, BISHOP, ROOK, QUEEN, KING, PCOUNT
 };
 
+inline static char pieceToChar(Piece piece, bool white) {
+    switch (piece) {
+        case PAWN:
+            return white ? 'P' : 'p';
+        case ROOK:
+            return white ? 'R' : 'r';
+        case KNIGHT:
+            return white ? 'N' : 'n';
+        case BISHOP:
+            return white ? 'B' : 'b';
+        case QUEEN:
+            return white ? 'Q' : 'q';
+        case KING:
+            return white ? 'K' : 'k';
+        case PCOUNT:
+            assert(false); // invalid
+    }
+}

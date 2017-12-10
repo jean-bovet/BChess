@@ -8,7 +8,7 @@
 
 #pragma once
 
-enum Color: int {
+enum Color: unsigned {
     WHITE, BLACK, COUNT
 };
 

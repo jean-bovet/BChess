@@ -243,6 +243,13 @@ void Board::move(Move move) {
         halfMoveClock = 0;
     }
     
+    // Handle promotion
+    Piece promotionPiece = MOVE_PROMOTION_PIECE(move);
+    if (promotionPiece > PAWN) {
+        bb_clear(pieces[color][movePiece], to);
+        bb_set(pieces[color][promotionPiece], to);
+    }
+    
     // First detect if the move is the "en-passant" move
     if (MOVE_IS_ENPASSANT(move)) {
         auto otherColor = INVERSE(moveColor);
@@ -318,11 +325,16 @@ void Board::move(Color color, Piece piece, Square from, Square to) {
 void Board::move(std::string from, std::string to) {
     Square fromSquare = squareForName(from);
     Square toSquare = squareForName(to);
-    for (auto piece=0; piece<Piece::PCOUNT; piece++) {
+    for (unsigned piece=PAWN; piece<Piece::PCOUNT; piece++) {
         if (bb_test(pieces[color][piece], fromSquare)) {
             bool capture = bb_test(allPieces(INVERSE(color)), toSquare);
-            Move m = createMove(fromSquare, toSquare, color, Piece(piece), capture, false); // TODO en passant
-            move(m);
+            if (capture) {
+                Move m = createCapture(fromSquare, toSquare, color, Piece(piece));
+                move(m);
+            } else {
+                Move m = createMove(fromSquare, toSquare, color, Piece(piece));
+                move(m);
+            }
             break;
         }
     }
@@ -353,8 +365,8 @@ void Board::print() {
         for (File file = 0; file < 8; file++) {
             char c = '.';
             
-            for (auto color=0; color<Color::COUNT; color++) {
-                for (auto piece=0; piece<Piece::PCOUNT; piece++) {
+            for (unsigned color=0; color<Color::COUNT; color++) {
+                for (unsigned piece=0; piece<Piece::PCOUNT; piece++) {
                     if (bb_test(pieces[color][piece], file, rank)) {
                         c = charForPiece((Color)color, (Piece)piece);
                     }
@@ -371,8 +383,8 @@ void Board::print() {
 BoardSquare Board::get(File file, Rank rank) {
     BoardSquare square;
     if (bb_test(getOccupancy(), file, rank)) {
-        for (auto color=0; color<Color::COUNT; color++) {
-            for (auto piece=0; piece<Piece::PCOUNT; piece++) {
+        for (unsigned color=0; color<Color::COUNT; color++) {
+            for (unsigned piece=0; piece<Piece::PCOUNT; piece++) {
                 if (bb_test(pieces[color][piece], file, rank)) {
                     square.empty = false;
                     square.color = Color(color);
@@ -389,8 +401,8 @@ BoardSquare Board::get(File file, Rank rank) {
 
 void Board::set(BoardSquare square, File file, Rank rank) {
     if (square.empty) {
-        for (auto color=0; color<Color::COUNT; color++) {
-            for (auto piece=0; piece<Piece::PCOUNT; piece++) {
+        for (unsigned color=0; color<Color::COUNT; color++) {
+            for (unsigned piece=0; piece<Piece::PCOUNT; piece++) {
                 bb_clear(pieces[color][piece], file, rank);
             }
         }

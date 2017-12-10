@@ -87,9 +87,9 @@ int Evaluate::evaluate(Board board) {
     // TODO: how to detect a draw?
     // Note: the value should always be computed from a white point of view
     int value = 0;
-    for (int color=0; color<COUNT; color++) {
+    for (unsigned color=0; color<COUNT; color++) {
         auto isWhite = color == WHITE;
-        for (int piece=0; piece<PCOUNT; piece++) {
+        for (unsigned piece=0; piece<PCOUNT; piece++) {
             Bitboard pieces = board.pieces[color][piece];
             int count = bb_count(pieces);
             int pvalue = PieceValue[piece];

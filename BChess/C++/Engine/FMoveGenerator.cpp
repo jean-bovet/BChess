@@ -115,14 +115,15 @@ void MoveGenerator::generatePawnsMoves(Board &board, MoveList &moveList, Square 
         // in the target square.
         auto attacks = PawnAttacks[board.color][square] & blackPieces;
         if (attacks > 0) {
-            moveList.addMoves(board, square, attacks, PAWN, true);
+            moveList.addCaptures(board, square, attacks, PAWN);
         }
         
         // Also check if it's possible to do the en-passant
         if (board.enPassant > 0) {
             auto enPassantMove = PawnAttacks[board.color][square] & board.enPassant;
             if (enPassantMove > 0) {
-                moveList.addMoves(board, square, enPassantMove, PAWN, true, true /* en passant */);
+                auto enPassantToSquare = lsb(enPassantMove);
+                moveList.addMove(board, createEnPassant(square, enPassantToSquare, board.color, PAWN));
             }
         }
         
@@ -131,12 +132,14 @@ void MoveGenerator::generatePawnsMoves(Board &board, MoveList &moveList, Square 
         // - Two squares if the pawn is in its initial rank
         Square oneSquareForward, twoSquaresForward;
         Rank initialRank;
+        Rank rankBeforePromotion;
         Rank currentRank = RankFrom(square);
         if (board.color == WHITE) {
             if (currentRank == 7) {
                 continue; // cannot move anymore, we are on the last rank
             }
             initialRank = 1;
+            rankBeforePromotion = 6;
             oneSquareForward = square + 8;
             twoSquaresForward = square + 16;
         } else {
@@ -144,16 +147,27 @@ void MoveGenerator::generatePawnsMoves(Board &board, MoveList &moveList, Square 
                 continue; // cannot move anymore, we are on the last rank
             }
             initialRank = 6;
+            rankBeforePromotion = 1;
             oneSquareForward = square - 8;
             twoSquaresForward = square - 16;
         }
         
         // Can we move the pawn forward one square?
         if (((1UL << oneSquareForward) & emptySquares) > 0) {
-            moveList.addMove(board, square, oneSquareForward, PAWN, false);
+            moveList.addMove(board, createMove(square, oneSquareForward, board.color, PAWN));
+            
+            // Handle promotion in case the pawn reaches the last rank
+            if (currentRank == rankBeforePromotion) {
+                // Generate one move for each piece that can the pawn can be promoted to.
+                moveList.addMove(board, createPromotion(square, oneSquareForward, board.color, PAWN, KNIGHT));
+                moveList.addMove(board, createPromotion(square, oneSquareForward, board.color, PAWN, BISHOP));
+                moveList.addMove(board, createPromotion(square, oneSquareForward, board.color, PAWN, ROOK));
+                moveList.addMove(board, createPromotion(square, oneSquareForward, board.color, PAWN, QUEEN));
+            }
+            
             // Is pawn on the initial rank? Try two squares forward
             if (currentRank == initialRank && ((1UL << twoSquaresForward) & emptySquares) > 0) {
-                moveList.addMove(board, square, twoSquaresForward, PAWN, false);
+                moveList.addMove(board, createMove(square, twoSquaresForward, board.color, PAWN));
             }
         }
     }
@@ -181,10 +195,10 @@ void MoveGenerator::generateKingsMoves(Board &board, MoveList &moveList, Square 
         // can do. The attacks bitboard is masked to ensure it can only
         // happy on an empty square or a square with a piece of the opposite color.
         auto moves = KingMoves[square] & emptySquares;
-        moveList.addMoves(board, square, moves, KING, false);
+        moveList.addMoves(board, square, moves, KING);
 
         auto captures = KingMoves[square] & blackSquares;
-        moveList.addMoves(board, square, captures, KING, true);
+        moveList.addCaptures(board, square, captures, KING);
         
     }
 }
@@ -211,10 +225,10 @@ void MoveGenerator::generateKnightsMoves(Board &board, MoveList &moveList, Squar
         // can do. The attacks bitboard is masked to ensure it can only
         // happy on an empty square or a square with a piece of the opposite color.
         auto moves = KnightMoves[square] & emptySquares;
-        moveList.addMoves(board, square, moves, KNIGHT, false);
+        moveList.addMoves(board, square, moves, KNIGHT);
         
         auto captures = KnightMoves[square] & blackSquares;
-        moveList.addMoves(board, square, captures, KNIGHT, true);
+        moveList.addCaptures(board, square, captures, KNIGHT);
     }
 }
 
@@ -261,9 +275,9 @@ void MoveGenerator::generateSlidingMoves(Board &board, Piece piece, MoveList &mo
         // we need to filter out the moves that land into a piece of the same
         // color because Rmagic will move to these squares anyway.
         auto moves = potentialMoves & emptySquares;
-        moveList.addMoves(board, square, moves, piece, false);
+        moveList.addMoves(board, square, moves, piece);
         
         auto captures = potentialMoves & blackSquares;
-        moveList.addMoves(board, square, captures, piece, true);
+        moveList.addCaptures(board, square, captures, piece);
     }
 }
