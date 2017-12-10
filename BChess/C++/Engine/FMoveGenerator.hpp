@@ -10,6 +10,7 @@
 
 #include "FMoveList.hpp"
 #include "FBoard.hpp"
+#include "FCoordinate.hpp"
 
 // Without this, the C file won't be linked
 extern "C" void initmagicmoves(void);
@@ -23,10 +24,10 @@ private:
 public:
     static void initialize();
         
-    MoveList generateMoves(Board board, int squareIndex = -1);
-    void generatePawnsMoves(Board &board, MoveList &moveList, int squareIndex = -1);
-    void generateKingsMoves(Board &board, MoveList &moveList, int squareIndex = -1);
-    void generateKnightsMoves(Board &board, MoveList &moveList, int squareIndex = -1);
-    void generateSlidingMoves(Board &board, Piece piece, MoveList &moveList, int squareIndex = -1);
+    MoveList generateMoves(Board board, Square specificSquare = SquareUndefined);
+    void generatePawnsMoves(Board &board, MoveList &moveList, Square specificSquare = SquareUndefined);
+    void generateKingsMoves(Board &board, MoveList &moveList, Square specificSquare = SquareUndefined);
+    void generateKnightsMoves(Board &board, MoveList &moveList, Square specificSquare = SquareUndefined);
+    void generateSlidingMoves(Board &board, Piece piece, MoveList &moveList, Square specificSquare = SquareUndefined);
 };
 

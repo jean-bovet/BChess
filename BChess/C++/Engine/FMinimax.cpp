@@ -114,8 +114,8 @@ Minimax::Evaluation Minimax::evaluate(Board board, Move move, int depth, int max
     
     Move lineMove = 0;
 
-    if (depth - 1 < line.size()) {
-        lineMove = line[depth - 1];
+    if (depth - 1 < (int)line.size()) {
+        lineMove = line[(size_t)(depth - 1)];
         if (evaluateAlphaBeta(board, lineMove, depth, maxDepth, maximizing, line, alpha, beta, bestEvaluation)) {
             return bestEvaluation;
         }

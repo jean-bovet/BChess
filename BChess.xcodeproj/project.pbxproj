@@ -71,6 +71,8 @@
 		A70A61CF1FD4AA9600AFDF0E /* FEngineInfo.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FEngineInfo.h; sourceTree = "<group>"; };
 		A70A61D01FD4AA9600AFDF0E /* FEngineInfo.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FEngineInfo.m; sourceTree = "<group>"; };
 		A75359831FDC51B2008D1DEE /* FENgineInfo+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FENgineInfo+Extension.swift"; sourceTree = "<group>"; };
+		A75359871FDCF8D6008D1DEE /* FBitboard.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = FBitboard.hpp; sourceTree = "<group>"; };
+		A753598A1FDCF95E008D1DEE /* FCoordinate.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = FCoordinate.hpp; sourceTree = "<group>"; };
 		A75683271FCD28A000CF1408 /* FEngine.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FEngine.h; sourceTree = "<group>"; };
 		A75683281FCD28A000CF1408 /* FEngine.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = FEngine.mm; sourceTree = "<group>"; };
 		A756832E1FD0D96300CF1408 /* FPerformance.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = FPerformance.cpp; sourceTree = "<group>"; };
@@ -138,6 +140,8 @@
 		A70A61D41FD4D37E00AFDF0E /* Engine */ = {
 			isa = PBXGroup;
 			children = (
+				A753598A1FDCF95E008D1DEE /* FCoordinate.hpp */,
+				A75359871FDCF8D6008D1DEE /* FBitboard.hpp */,
 				A70A61BE1FD38C7500AFDF0E /* FColor.hpp */,
 				A70A61BF1FD38D4100AFDF0E /* FPiece.hpp */,
 				A70A61C01FD4587B00AFDF0E /* FMove.hpp */,
@@ -357,9 +361,12 @@
 		A7712D1A1FB916E900E7E802 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_WARN_ASSIGN_ENUM = YES;
+				CLANG_WARN_SUSPICIOUS_IMPLICIT_CONVERSION = YES;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_TEAM = 28XRU7S6GA;
+				GCC_WARN_SIGN_COMPARE = YES;
 				INFOPLIST_FILE = BChessTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "ch.arizona-software.BChessTests";
@@ -372,9 +379,12 @@
 		A7712D1B1FB916E900E7E802 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_WARN_ASSIGN_ENUM = YES;
+				CLANG_WARN_SUSPICIOUS_IMPLICIT_CONVERSION = YES;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_TEAM = 28XRU7S6GA;
+				GCC_WARN_SIGN_COMPARE = YES;
 				INFOPLIST_FILE = BChessTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "ch.arizona-software.BChessTests";
@@ -494,8 +504,11 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_ENABLE_MODULES = YES;
+				CLANG_WARN_IMPLICIT_SIGN_CONVERSION = YES;
+				CLANG_WARN_SUSPICIOUS_IMPLICIT_CONVERSION = YES;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 28XRU7S6GA;
+				GCC_WARN_SIGN_COMPARE = YES;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "BChess/BChess-Bridging-Header.h";
@@ -508,8 +521,11 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_ENABLE_MODULES = YES;
+				CLANG_WARN_IMPLICIT_SIGN_CONVERSION = YES;
+				CLANG_WARN_SUSPICIOUS_IMPLICIT_CONVERSION = YES;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 28XRU7S6GA;
+				GCC_WARN_SIGN_COMPARE = YES;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "BChess/BChess-Bridging-Header.h";

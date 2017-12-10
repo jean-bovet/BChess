@@ -35,8 +35,8 @@ rank
 
 inline static Bitboard BB(Bitboard userDefined) {
     Bitboard reversed = 0;
-    for (int rank = 0; rank < 8; rank++) {
-        for (int file = 0; file < 8; file++) {
+    for (Rank rank = 0; rank < 8; rank++) {
+        for (File file = 0; file < 8; file++) {
             if (bb_test(userDefined, 7 - file, rank)) {
                 bb_set(reversed, file, rank);
             }
@@ -267,8 +267,8 @@ void Board::move(Move move) {
     // in case no en-passant is found.
     enPassant = 0;
     if (movePiece == PAWN) {
-        int fromRank = rank_index(from);
-        int toRank = rank_index(to);
+        auto fromRank = RankFrom(from);
+        auto toRank = RankFrom(to);
         if (moveColor == WHITE && toRank - fromRank == 2) {
             bb_set(enPassant, from+8);
         } else if (moveColor == BLACK && fromRank - toRank == 2) {
@@ -309,19 +309,19 @@ Bitboard Board::getOccupancy() {
     return occupancy;
 }
 
-void Board::move(Color color, Piece piece, int from, int to) {
+void Board::move(Color color, Piece piece, Square from, Square to) {
     bb_clear(pieces[color][piece], from);
     bb_set(pieces[color][piece], to);
     occupancyDirty = true;
 }
 
 void Board::move(std::string from, std::string to) {
-    auto fromIndex = squareIndexForName(from);
-    auto toIndex = squareIndexForName(to);
+    Square fromSquare = squareForName(from);
+    Square toSquare = squareForName(to);
     for (auto piece=0; piece<Piece::PCOUNT; piece++) {
-        if (bb_test(pieces[color][piece], fromIndex)) {
-            bool capture = bb_test(allPieces(INVERSE(color)), toIndex);
-            Move m = createMove(fromIndex, toIndex, color, Piece(piece), capture, false); // TODO en passant
+        if (bb_test(pieces[color][piece], fromSquare)) {
+            bool capture = bb_test(allPieces(INVERSE(color)), toSquare);
+            Move m = createMove(fromSquare, toSquare, color, Piece(piece), capture, false); // TODO en passant
             move(m);
             break;
         }
@@ -349,8 +349,8 @@ inline static char charForPiece(Color color, Piece piece) {
 }
 
 void Board::print() {
-    for (int rank = 7; rank >= 0; rank--) {
-        for (int file = 0; file < 8; file++) {
+    for (Rank rank = 7; rank >= 0; rank--) {
+        for (File file = 0; file < 8; file++) {
             char c = '.';
             
             for (auto color=0; color<Color::COUNT; color++) {
@@ -368,8 +368,8 @@ void Board::print() {
     std::cout << std::endl;
 }
 
-Square Board::get(int file, int rank) {
-    Square square;
+BoardSquare Board::get(File file, Rank rank) {
+    BoardSquare square;
     if (bb_test(getOccupancy(), file, rank)) {
         for (auto color=0; color<Color::COUNT; color++) {
             for (auto piece=0; piece<Piece::PCOUNT; piece++) {
@@ -387,7 +387,7 @@ Square Board::get(int file, int rank) {
     return square;
 }
 
-void Board::set(Square square, int file, int rank) {
+void Board::set(BoardSquare square, File file, Rank rank) {
     if (square.empty) {
         for (auto color=0; color<Color::COUNT; color++) {
             for (auto piece=0; piece<Piece::PCOUNT; piece++) {
@@ -419,7 +419,7 @@ bool Board::isCheck(Color color) {
     if (kingBoard == 0) {
         return false; // No king, can happen when testing
     }
-    int kingSquare = lsb(kingBoard);
+    Square kingSquare = lsb(kingBoard);
     
     auto otherColor = INVERSE(color);
     

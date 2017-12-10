@@ -10,10 +10,10 @@
 
 @interface FEngineInfo : NSObject
 
-@property (nonatomic, assign) NSUInteger depth;
-@property (nonatomic, assign) NSUInteger time;
-@property (nonatomic, assign) NSUInteger nodeEvaluated;
-@property (nonatomic, assign) NSUInteger movesPerSecond;
+@property (nonatomic, assign) NSInteger depth;
+@property (nonatomic, assign) NSInteger time;
+@property (nonatomic, assign) NSInteger nodeEvaluated;
+@property (nonatomic, assign) NSInteger movesPerSecond;
 
 @property (nonatomic, assign) NSInteger value;
 @property (nonatomic, retain) NSArray<NSString*> *bestLine;

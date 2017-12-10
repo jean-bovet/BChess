@@ -86,16 +86,15 @@
     std::string boardFEN = FFEN::getFEN(board);
     assert(boardFEN == fen);
     
-    int squareIndex;
+    Square square;
     if (squareName) {
-        auto square = std::string([squareName UTF8String]);
-        squareIndex = squareIndexForName(square);
+        square = squareForName(std::string([squareName UTF8String]));
     } else {
-        squareIndex = -1;
+        square = SquareUndefined;
     }
     
     MoveGenerator generator;
-    MoveList moves = generator.generateMoves(board, squareIndex);
+    MoveList moves = generator.generateMoves(board, square);
     NSMutableArray<NSString*>* moveFENs = [NSMutableArray array];
     for (int index=0; index<moves.moveCount; index++) {
         auto move = moves.moves[index];

@@ -102,7 +102,7 @@ int Evaluate::evaluate(Board board) {
             
             // Now let's add some bonus depending on the piece location
             while (pieces > 0) {
-                int square = lsb(pieces);
+                Square square = lsb(pieces);
                 bb_clear(pieces, square);
                 
                 int bonus = 0;

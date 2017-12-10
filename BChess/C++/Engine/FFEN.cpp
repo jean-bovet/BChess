@@ -12,8 +12,8 @@
 #include <vector>
 #include <cassert>
 
-inline static Square charToSquare(char p) {
-    Square square;
+inline static BoardSquare charToSquare(char p) {
+    BoardSquare square;
     square.empty = false;
     square.color = Color::WHITE;
     switch (p) {
@@ -72,7 +72,7 @@ inline static Square charToSquare(char p) {
     return square;
 }
 
-inline static char squareToChar(Square square) {
+inline static char squareToChar(BoardSquare square) {
     if (square.empty) {
         return ' ';
     }
@@ -98,17 +98,17 @@ inline static char squareToChar(Square square) {
 }
 
 struct Coordinate {
-    int rank = 0;
-    int file = 0;
+    Rank rank = 0;
+    File file = 0;
 };
 
 std::string FFEN::getFEN(Board board) {
     // "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
     std::string fen = "";
-    for (int rank=7; rank>=0; rank--) {
+    for (Rank rank=8; rank>0; rank--) {
         int emptyCount = 0;
-        for (int file=0; file<8; file++) {
-            auto square = board.get(file, rank);
+        for (File file=0; file<8; file++) {
+            auto square = board.get(file, rank - 1);
             if (square.empty) {
                 emptyCount += 1;
             } else {
@@ -122,10 +122,9 @@ std::string FFEN::getFEN(Board board) {
         
         if (emptyCount > 0) {
             fen += std::to_string(emptyCount);
-            emptyCount = 0;
         }
 
-        if (rank > 0) {
+        if (rank - 1 > 0) {
             fen += "/";
         }
     }
@@ -199,7 +198,7 @@ Board FFEN::createBoard(std::string fen) {
     if (enPassant == "-") {
         board.enPassant = 0;
     } else {
-        bb_set(board.enPassant, squareIndexForName(enPassant));
+        bb_set(board.enPassant, squareForName(enPassant));
     }
     
     // Half move

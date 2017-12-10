@@ -23,11 +23,11 @@ void MoveGenerator::initPawnMoves() {
     // is used by the some functions to determine if a piece is attacked
     // by a pawn which might need white pawn in the first rank or a black
     // pawn in the last rank to determine proper attack.
-    for (int square = 0; square < 64; square++) {
-        int fileIndex = file_index(square);
-        int rankIndex = rank_index(square);
+    for (Square square = 0; square < 64; square++) {
+        auto fileIndex = FileFrom(square);
+        auto rankIndex = RankFrom(square);
         
-        assert(square_index(fileIndex, rankIndex) == square);
+        assert(SquareFrom(fileIndex, rankIndex) == square);
         
         // White pawn attacks
         bb_set(PawnAttacks[WHITE][square], fileIndex-1, rankIndex+1);
@@ -40,9 +40,9 @@ void MoveGenerator::initPawnMoves() {
 }
 
 void MoveGenerator::initKingMoves() {
-    for (int square = 0; square < 64; square++) {
-        int fileIndex = file_index(square);
-        int rankIndex = rank_index(square);
+    for (Square square = 0; square < 64; square++) {
+        auto fileIndex = FileFrom(square);
+        auto rankIndex = RankFrom(square);
         
         bb_set(KingMoves[square], fileIndex, rankIndex+1);
         bb_set(KingMoves[square], fileIndex+1, rankIndex+1);
@@ -56,9 +56,9 @@ void MoveGenerator::initKingMoves() {
 }
 
 void MoveGenerator::initKnightMoves() {
-    for (int square = 0; square < 64; square++) {
-        int fileIndex = file_index(square);
-        int rankIndex = rank_index(square);
+    for (Square square = 0; square < 64; square++) {
+        auto fileIndex = FileFrom(square);
+        auto rankIndex = RankFrom(square);
         
         // Top
         bb_set(KnightMoves[square], fileIndex-1, rankIndex+2);
@@ -78,20 +78,20 @@ void MoveGenerator::initKnightMoves() {
     }
 }
 
-MoveList MoveGenerator::generateMoves(Board board, int squareIndex) {
+MoveList MoveGenerator::generateMoves(Board board, Square specificSquare) {
     MoveList moveList;
     
-    generatePawnsMoves(board, moveList, squareIndex);
-    generateKingsMoves(board, moveList, squareIndex);
-    generateKnightsMoves(board, moveList, squareIndex);
-    generateSlidingMoves(board, ROOK, moveList, squareIndex);
-    generateSlidingMoves(board, BISHOP, moveList, squareIndex);
-    generateSlidingMoves(board, QUEEN, moveList, squareIndex);
+    generatePawnsMoves(board, moveList, specificSquare);
+    generateKingsMoves(board, moveList, specificSquare);
+    generateKnightsMoves(board, moveList, specificSquare);
+    generateSlidingMoves(board, ROOK, moveList, specificSquare);
+    generateSlidingMoves(board, BISHOP, moveList, specificSquare);
+    generateSlidingMoves(board, QUEEN, moveList, specificSquare);
     
     return moveList;
 }
 
-void MoveGenerator::generatePawnsMoves(Board &board, MoveList &moveList, int squareIndex) {
+void MoveGenerator::generatePawnsMoves(Board &board, MoveList &moveList, Square specificSquare) {
     auto pawns = board.pieces[board.color][PAWN];
     auto emptySquares = board.emptySquares();
     auto blackPieces = board.allPieces(INVERSE(board.color));
@@ -99,10 +99,10 @@ void MoveGenerator::generatePawnsMoves(Board &board, MoveList &moveList, int squ
     // Generate moves for each white pawn
     while (pawns > 0) {
         // Find the first white pawn starting from the least significant bit (that is, square a1)
-        int square = lsb(pawns);
+        Square square = lsb(pawns);
         
         // If the square index is specified, only generate move for that square
-        if (squareIndex > -1 && square != squareIndex) {
+        if (specificSquare != SquareUndefined && square != specificSquare) {
             break;
         }
         
@@ -129,9 +129,9 @@ void MoveGenerator::generatePawnsMoves(Board &board, MoveList &moveList, int squ
         // Generate the move for the pawn:
         // - Either one square or
         // - Two squares if the pawn is in its initial rank
-        int oneSquareForward, twoSquaresForward;
-        int initialRank;
-        int currentRank = rank_index(square);
+        Square oneSquareForward, twoSquaresForward;
+        Rank initialRank;
+        Rank currentRank = RankFrom(square);
         if (board.color == WHITE) {
             if (currentRank == 7) {
                 continue; // cannot move anymore, we are on the last rank
@@ -159,7 +159,7 @@ void MoveGenerator::generatePawnsMoves(Board &board, MoveList &moveList, int squ
     }
 }
 
-void MoveGenerator::generateKingsMoves(Board &board, MoveList &moveList, int squareIndex) {
+void MoveGenerator::generateKingsMoves(Board &board, MoveList &moveList, Square specificSquare) {
     auto kings = board.pieces[board.color][KING];
     auto emptySquares = board.emptySquares();
     auto blackSquares = board.allPieces(INVERSE(board.color));
@@ -167,10 +167,10 @@ void MoveGenerator::generateKingsMoves(Board &board, MoveList &moveList, int squ
     // Generate moves for each white knight
     while (kings > 0) {
         // Find the first white knight starting from the least significant bit (that is, square a1)
-        int square = lsb(kings);
+        Square square = lsb(kings);
         
         // If the square index is specified, only generate move for that square
-        if (squareIndex > -1 && square != squareIndex) {
+        if (specificSquare != SquareUndefined && square != specificSquare) {
             break;
         }
         
@@ -189,7 +189,7 @@ void MoveGenerator::generateKingsMoves(Board &board, MoveList &moveList, int squ
     }
 }
 
-void MoveGenerator::generateKnightsMoves(Board &board, MoveList &moveList, int squareIndex) {
+void MoveGenerator::generateKnightsMoves(Board &board, MoveList &moveList, Square specificSquare) {
     auto whiteKnights = board.pieces[board.color][KNIGHT];
     auto emptySquares = board.emptySquares();
     auto blackSquares = board.allPieces(INVERSE(board.color));
@@ -197,10 +197,10 @@ void MoveGenerator::generateKnightsMoves(Board &board, MoveList &moveList, int s
     // Generate moves for each white knight
     while (whiteKnights > 0) {
         // Find the first white knight starting from the least significant bit (that is, square a1)
-        int square = lsb(whiteKnights);
+        Square square = lsb(whiteKnights);
         
         // If the square index is specified, only generate move for that square
-        if (squareIndex > -1 && square != squareIndex) {
+        if (specificSquare != SquareUndefined && square != specificSquare) {
             break;
         }
         
@@ -218,7 +218,7 @@ void MoveGenerator::generateKnightsMoves(Board &board, MoveList &moveList, int s
     }
 }
 
-void MoveGenerator::generateSlidingMoves(Board &board, Piece piece, MoveList &moveList, int squareIndex) {
+void MoveGenerator::generateSlidingMoves(Board &board, Piece piece, MoveList &moveList, Square specificSquare) {
     auto slidingPieces = board.pieces[board.color][piece];
     auto occupancy = board.getOccupancy();
     auto emptySquares = board.emptySquares();
@@ -227,10 +227,10 @@ void MoveGenerator::generateSlidingMoves(Board &board, Piece piece, MoveList &mo
     // Generate moves for each sliding piece
     while (slidingPieces > 0) {
         // Find the first sliding piece starting from the least significant bit (that is, square a1)
-        int square = lsb(slidingPieces);
+        Square square = lsb(slidingPieces);
         
         // If the square index is specified, only generate move for that square
-        if (squareIndex > -1 && square != squareIndex) {
+        if (specificSquare != SquareUndefined && square != specificSquare) {
             break;
         }
         
