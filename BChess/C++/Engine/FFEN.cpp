@@ -141,8 +141,12 @@ std::string FFEN::getFEN(Board board) {
     fen += " "+board.getCastling();
     
     // En passant
-    // TODO
-    fen += " -";
+    if (board.enPassant > 0) {
+        int square = lsb(board.enPassant);
+        fen += " "+SquareNames[square];
+    } else {
+        fen += " -";
+    }
     
     // Halfmove
     fen += " "+std::to_string(board.halfMoveClock);
@@ -191,7 +195,12 @@ Board FFEN::createBoard(std::string fen) {
     board.setCastling(fields[2]);
     
     // En passant
-    fields[3];
+    auto enPassant = fields[3];
+    if (enPassant == "-") {
+        board.enPassant = 0;
+    } else {
+        bb_set(board.enPassant, squareIndexForName(enPassant));
+    }
     
     // Half move
     board.halfMoveClock = stoi(fields[4]);

@@ -17,8 +17,8 @@ struct MoveList {
     Move moves[MAX_MOVES];
     int moveCount = 0;
     
-    void addMove(Board &board, int from, int to, Piece piece, bool capture);
-    void addMoves(Board &board, int from, Bitboard moves, Piece piece, bool capture);
+    void addMove(Board &board, int from, int to, Piece piece, bool capture, bool enPassant = false);
+    void addMoves(Board &board, int from, Bitboard moves, Piece piece, bool capture, bool enPassant = false);
 };
 
 

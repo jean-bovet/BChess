@@ -243,6 +243,39 @@ void Board::move(Move move) {
         halfMoveClock = 0;
     }
     
+    // First detect if the move is the "en-passant" move
+    if (MOVE_IS_ENPASSANT(move)) {
+        auto otherColor = INVERSE(moveColor);
+        auto enPassantSquare = lsb(enPassant);
+        // The pawn to remove by the "en-passant" move is actually below the pawn doing the "en-passant" move.
+        if (moveColor == WHITE) {
+            enPassantSquare -= 8;
+        } else {
+            enPassantSquare += 8;
+        }
+        
+        bb_clear(pieces[otherColor][PAWN], enPassantSquare);
+        bb_clear(pieces[otherColor][KNIGHT], enPassantSquare);
+        bb_clear(pieces[otherColor][BISHOP], enPassantSquare);
+        bb_clear(pieces[otherColor][ROOK], enPassantSquare);
+        bb_clear(pieces[otherColor][QUEEN], enPassantSquare);
+        bb_clear(pieces[otherColor][KING], enPassantSquare);
+    }
+    
+    // Detect if a pawn moves two squares in order to enable
+    // the "en-passant" move. Clear the enPassant bitboard
+    // in case no en-passant is found.
+    enPassant = 0;
+    if (movePiece == PAWN) {
+        int fromRank = rank_index(from);
+        int toRank = rank_index(to);
+        if (moveColor == WHITE && toRank - fromRank == 2) {
+            bb_set(enPassant, from+8);
+        } else if (moveColor == BLACK && fromRank - toRank == 2) {
+            bb_set(enPassant, from-8);
+        }
+    }
+
     if (movePiece == ROOK) {
         if (moveColor == WHITE) {
             whiteCanCastleKingSide = whiteCanCastleQueenSide = false;
@@ -288,7 +321,7 @@ void Board::move(std::string from, std::string to) {
     for (auto piece=0; piece<Piece::PCOUNT; piece++) {
         if (bb_test(pieces[color][piece], fromIndex)) {
             bool capture = bb_test(allPieces(INVERSE(color)), toIndex);
-            Move m = createMove(fromIndex, toIndex, color, Piece(piece), capture);
+            Move m = createMove(fromIndex, toIndex, color, Piece(piece), capture, false); // TODO en passant
             move(m);
             break;
         }

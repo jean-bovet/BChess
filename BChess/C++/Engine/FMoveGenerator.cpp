@@ -118,6 +118,13 @@ void MoveGenerator::generatePawnsMoves(Board &board, MoveList &moveList, int squ
             moveList.addMoves(board, square, attacks, PAWN, true);
         }
         
+        // Also check if it's possible to do the en-passant
+        if (board.enPassant > 0) {
+            auto enPassantMove = PawnAttacks[board.color][square] & board.enPassant;
+            if (enPassantMove > 0) {
+                moveList.addMoves(board, square, enPassantMove, PAWN, true, true /* en passant */);
+            }
+        }
         
         // Generate the move for the pawn:
         // - Either one square or

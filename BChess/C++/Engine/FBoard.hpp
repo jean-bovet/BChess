@@ -111,6 +111,12 @@ public:
     
     Bitboard pieces[COUNT][PCOUNT] = { };
     
+    // Bitboard representing the en-passant
+    // square (the one where the opposing pawn
+    // can move to) for the last move.
+    // Or 0 if no en-passant available.
+    Bitboard enPassant = 0;
+    
     // Halfmove clock: This is the number of halfmoves since the last capture or pawn advance. This is used to determine if a draw can be claimed under the fifty-move rule.
     int halfMoveClock = 0;
 
