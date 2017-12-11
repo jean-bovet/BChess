@@ -27,9 +27,14 @@ class ViewController: NSViewController {
         "K" : "king_w",
     ]
 
+    let ranks = [ "1", "2", "3", "4", "5", "6", "7", "8" ]
+    let files = [ "a", "b", "c", "d", "e", "f", "g", "h" ]
+    
+    var labels = [String: NSTextField]()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        
         // Do any additional setup after loading the view.
     }
 
@@ -38,11 +43,14 @@ class ViewController: NSViewController {
         var size = self.view.bounds.size
         size.width -= 50
         size.height -= 50
-        layoutBoardViews(boardSize: size)
+        computeSizes(boardSize: size)
+        layoutBoardViews()
     }
     
-    func layoutBoardViews(boardSize: CGSize) {
-        layoutBoard(boardSize: boardSize) { (frame, rank, file, blackBackground) in
+    func layoutBoardViews() {
+        layoutLabels()
+        
+        layoutBoard() { (frame, rank, file, blackBackground) in
             if let squareView = self.view.viewWithTag(100+rank*8+file) {
                 squareView.frame = frame
             } else {
@@ -59,9 +67,9 @@ class ViewController: NSViewController {
             }
         }
         
-        layoutBoard(boardSize: boardSize) { (frame, rank, file, blackBackground) in
+        layoutBoard() { (frame, rank, file, blackBackground) in
             let view = pieceSquareView(rank: rank, file: file)
-            view.frame = NSInsetRect(frame, 2, 2)
+            view.frame = frame
             if let piece = engine.engine.piece(at: UInt(rank), file: UInt(file)) {
                 if let imageName = pieceImageNames[piece], let image = NSImage(named: NSImage.Name(rawValue: imageName)) {
                     view.image = image
@@ -122,8 +130,37 @@ class ViewController: NSViewController {
         }
     }
     
+    func layoutLabels() {
+        for (index, rank) in ranks.enumerated() {
+            let label = textForLabel(label: rank)
+            label.frame = NSMakeRect(boardSquareDX - label.frame.size.width - 2, boardSquareDY + CGFloat(index) * boardSquareSize + (boardSquareSize - label.frame.size.height)/2, label.frame.size.width, label.frame.size.height)
+        }
+        
+        for (index, file) in files.enumerated() {
+            let label = textForLabel(label: file)
+            label.frame = NSMakeRect(boardSquareDX + CGFloat(index) * boardSquareSize + (boardSquareSize - label.frame.size.width)/2, boardSquareDY - label.frame.size.height - 2, label.frame.size.width, label.frame.size.height)
+        }
+    }
+    
+    func textForLabel(label: String) -> NSTextField {
+        if let tf = labels[label] {
+            return tf
+        } else {
+            let tf = NSTextField()
+            view.addSubview(tf)
+            tf.stringValue = label
+            tf.isBezeled = false
+            tf.drawsBackground = false
+            tf.isEditable = false
+            tf.isSelectable = false
+            tf.sizeToFit()
+            labels[label] = tf
+            return tf
+        }
+    }
+    
     func enginePlay() {
-        engine.evaluate(depth: 4) { (info, completed) in
+        engine.evaluate(depth: 5) { (info, completed) in
             if completed {
                 self.engine.engine.move(info.rawMoveValue)
                 DispatchQueue.main.async {
@@ -133,18 +170,24 @@ class ViewController: NSViewController {
         }
     }
     
-    func layoutBoard(boardSize: CGSize, callback: (_ frame: CGRect, _ rank: Int, _ file: Int, _ blackBackground: Bool) -> Void) {
-        let width = round(boardSize.width/8);
-        let height = round(boardSize.height/8);
-        let size = min(width, height);
-        
-        let dxOffset = round((self.view.frame.size.width - 8*size)/2)
-        let dyOffset = round((self.view.frame.size.height - 8*size)/2)
+    var boardSquareSize: CGFloat = 0
+    var boardSquareDX: CGFloat = 0
+    var boardSquareDY: CGFloat = 0
 
+    func computeSizes(boardSize: CGSize) {
+        let width = round(boardSize.width/8)
+        let height = round(boardSize.height/8)
+        boardSquareSize = min(width, height)
+        
+        boardSquareDX = round((self.view.frame.size.width - CGFloat(8*boardSquareSize))/2)
+        boardSquareDY = round((self.view.frame.size.height - CGFloat(8*boardSquareSize))/2)
+    }
+    
+    func layoutBoard(callback: (_ frame: CGRect, _ rank: Int, _ file: Int, _ blackBackground: Bool) -> Void) {
         var black = true
         for rank in 0...7 {
             for file in 0...7 {
-                let frame = NSMakeRect(CGFloat(file)*size+dxOffset, CGFloat(rank)*size+dyOffset, size, size)
+                let frame = NSMakeRect(CGFloat(file)*boardSquareSize+boardSquareDX, CGFloat(rank)*boardSquareSize+boardSquareDY, boardSquareSize, boardSquareSize)
                 callback(frame, rank, file, black)
                 black = !black
             }

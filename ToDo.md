@@ -1,7 +1,7 @@
 #  BChess
 
 Bug:
--
+- cannot select square to do castle!
 
 ToDo
 

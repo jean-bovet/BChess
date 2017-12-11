@@ -24,5 +24,13 @@ class PieceSquareView: NSImageView {
         }
     }
     
-    var selected = false
+    var selected = false {
+        didSet {
+            if selected {
+                self.layer?.backgroundColor = NSColor.yellow.withAlphaComponent(0.8).cgColor
+            } else {
+                self.layer?.backgroundColor = nil
+            }
+        }
+    }
 }
