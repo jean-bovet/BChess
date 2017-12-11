@@ -101,14 +101,14 @@ void MoveGenerator::generatePawnsMoves(Board &board, MoveList &moveList, Square 
         // Find the first white pawn starting from the least significant bit (that is, square a1)
         Square square = lsb(pawns);
         
-        // If the square index is specified, only generate move for that square
-        if (specificSquare != SquareUndefined && square != specificSquare) {
-            break;
-        }
-        
         // Clear that bit so next time we can find the next white pawn
         bb_clear(pawns, square);
         
+        // If the square index is specified, only generate move for that square
+        if (specificSquare != SquareUndefined && square != specificSquare) {
+            continue;
+        }
+
         // Generate a bitboard for all the attacks that this white pawn
         // can do. The attacks bitboard is masked with the occupancy bitboard
         // because a pawn attack can only happen when there is a black piece
@@ -183,13 +183,13 @@ void MoveGenerator::generateKingsMoves(Board &board, MoveList &moveList, Square 
         // Find the first white knight starting from the least significant bit (that is, square a1)
         Square square = lsb(kings);
         
-        // If the square index is specified, only generate move for that square
-        if (specificSquare != SquareUndefined && square != specificSquare) {
-            break;
-        }
-        
         // Clear that bit so next time we can find the next white knight
         bb_clear(kings, square);
+
+        // If the square index is specified, only generate move for that square
+        if (specificSquare != SquareUndefined && square != specificSquare) {
+            continue;
+        }
         
         // Generate a bitboard for all the moves that this white knight
         // can do. The attacks bitboard is masked to ensure it can only
@@ -213,13 +213,13 @@ void MoveGenerator::generateKnightsMoves(Board &board, MoveList &moveList, Squar
         // Find the first white knight starting from the least significant bit (that is, square a1)
         Square square = lsb(whiteKnights);
         
-        // If the square index is specified, only generate move for that square
-        if (specificSquare != SquareUndefined && square != specificSquare) {
-            break;
-        }
-        
         // Clear that bit so next time we can find the next white knight
         bb_clear(whiteKnights, square);
+
+        // If the square index is specified, only generate move for that square
+        if (specificSquare != SquareUndefined && square != specificSquare) {
+            continue;
+        }
         
         // Generate a bitboard for all the moves that this white knight
         // can do. The attacks bitboard is masked to ensure it can only
@@ -243,14 +243,14 @@ void MoveGenerator::generateSlidingMoves(Board &board, Piece piece, MoveList &mo
         // Find the first sliding piece starting from the least significant bit (that is, square a1)
         Square square = lsb(slidingPieces);
         
-        // If the square index is specified, only generate move for that square
-        if (specificSquare != SquareUndefined && square != specificSquare) {
-            break;
-        }
-        
         // Clear that bit so next time we can find the next sliding piece
         bb_clear(slidingPieces, square);
         
+        // If the square index is specified, only generate move for that square
+        if (specificSquare != SquareUndefined && square != specificSquare) {
+            continue;
+        }
+
         // Generate a bitboard for all the moves that this sliding piece can do.
         Bitboard potentialMoves;
         switch (piece) {
