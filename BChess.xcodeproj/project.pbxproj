@@ -23,6 +23,7 @@
 		A70A61DC1FD4D49500AFDF0E /* FMinimax.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A70A61CB1FD4713500AFDF0E /* FMinimax.cpp */; };
 		A70A61DD1FD4D49500AFDF0E /* FFEN.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A70A61B91FD132D200AFDF0E /* FFEN.cpp */; };
 		A70A61DE1FD4D49F00AFDF0E /* magicmoves.c in Sources */ = {isa = PBXBuildFile; fileRef = A7712D411FCB97A900E7E802 /* magicmoves.c */; };
+		A7460F011FDF2465002B0740 /* ChessView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7460F001FDF2465002B0740 /* ChessView.swift */; };
 		A75359841FDC51B2008D1DEE /* FENgineInfo+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = A75359831FDC51B2008D1DEE /* FENgineInfo+Extension.swift */; };
 		A75359851FDC994E008D1DEE /* FENgineInfo+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = A75359831FDC51B2008D1DEE /* FENgineInfo+Extension.swift */; };
 		A75359931FDE0947008D1DEE /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A75359921FDE0947008D1DEE /* AppDelegate.swift */; };
@@ -107,6 +108,7 @@
 		A70A61CC1FD4713500AFDF0E /* FMinimax.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = FMinimax.hpp; sourceTree = "<group>"; };
 		A70A61CF1FD4AA9600AFDF0E /* FEngineInfo.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FEngineInfo.h; sourceTree = "<group>"; };
 		A70A61D01FD4AA9600AFDF0E /* FEngineInfo.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FEngineInfo.m; sourceTree = "<group>"; };
+		A7460F001FDF2465002B0740 /* ChessView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChessView.swift; sourceTree = "<group>"; };
 		A75359831FDC51B2008D1DEE /* FENgineInfo+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FENgineInfo+Extension.swift"; sourceTree = "<group>"; };
 		A75359871FDCF8D6008D1DEE /* FBitboard.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = FBitboard.hpp; sourceTree = "<group>"; };
 		A753598A1FDCF95E008D1DEE /* FCoordinate.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = FCoordinate.hpp; sourceTree = "<group>"; };
@@ -238,6 +240,7 @@
 			isa = PBXGroup;
 			children = (
 				A75359921FDE0947008D1DEE /* AppDelegate.swift */,
+				A7460F001FDF2465002B0740 /* ChessView.swift */,
 				A75359941FDE0947008D1DEE /* ViewController.swift */,
 				A75359BE1FDE0E3B008D1DEE /* BackgroundSquareView.swift */,
 				A75359CE1FDE4385008D1DEE /* PieceSquareView.swift */,
@@ -524,6 +527,7 @@
 				A75359CA1FDE4038008D1DEE /* FEvaluate.cpp in Sources */,
 				A75359CF1FDE4385008D1DEE /* PieceSquareView.swift in Sources */,
 				A75359C31FDE4023008D1DEE /* FENgineInfo+Extension.swift in Sources */,
+				A7460F011FDF2465002B0740 /* ChessView.swift in Sources */,
 				A75359BF1FDE0E3B008D1DEE /* BackgroundSquareView.swift in Sources */,
 				A75359C61FDE4031008D1DEE /* magicmoves.c in Sources */,
 				A75359951FDE0947008D1DEE /* ViewController.swift in Sources */,

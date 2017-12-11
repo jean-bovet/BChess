@@ -10,7 +10,10 @@ import Cocoa
 
 class ViewController: NSViewController {
 
-    let engine = UCIEngine()
+    var engine : UCIEngine {
+        let chessView = self.view as! ChessView
+        return chessView.engine
+    }
     
     let pieceImageNames = [
         "p" : "pawn_b",
@@ -31,11 +34,6 @@ class ViewController: NSViewController {
     let files = [ "a", "b", "c", "d", "e", "f", "g", "h" ]
     
     var labels = [String: NSTextField]()
-    
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        
-    }
     
     override func viewDidLayout() {
         super.viewDidLayout()
@@ -110,7 +108,7 @@ class ViewController: NSViewController {
                 // Perform move
                 engine.engine.move(view.move!.rawMoveValue)
                 clearAllViewIndicators()
-                self.view.needsLayout = true
+                invalidateUI()
                 enginePlay()
             } else if view.selected {
                 clearAllViewIndicators()
@@ -183,7 +181,7 @@ class ViewController: NSViewController {
         }, completionHandler:{
             targetPieceView.alphaValue = 1.0
             self.engine.engine.move(info.rawMoveValue)
-            self.view.needsLayout = true
+            self.invalidateUI()
         })
     }
     
@@ -212,6 +210,11 @@ class ViewController: NSViewController {
         }
     }
     
+    func invalidateUI() {
+        view.needsLayout = true
+        view.invalidateRestorableState()
+    }
+    
     // MARK: Actions
     
     @IBAction func copy(_ sender: Any?) {
@@ -226,7 +229,7 @@ class ViewController: NSViewController {
         let pasteboard = NSPasteboard.general
         if let fen = pasteboard.string(forType: .string) {
             engine.set(fen: fen)
-            self.view.needsLayout = true
+            invalidateUI()
         }
     }
 }
