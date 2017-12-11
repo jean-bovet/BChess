@@ -35,9 +35,8 @@ class ViewController: NSViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        // Do any additional setup after loading the view.
     }
-
+    
     override func viewDidLayout() {
         super.viewDidLayout()
         var size = self.view.bounds.size
@@ -192,6 +191,24 @@ class ViewController: NSViewController {
                 black = !black
             }
             black = !black
+        }
+    }
+    
+    // MARK: Actions
+    
+    @IBAction func copy(_ sender: Any?) {
+        let fen = engine.get()
+        
+        let pasteboard = NSPasteboard.general
+        pasteboard.clearContents()
+        pasteboard.setString(fen, forType: .string)
+    }
+    
+    @IBAction func paste(_ sender: Any?) {
+        let pasteboard = NSPasteboard.general
+        if let fen = pasteboard.string(forType: .string) {
+            engine.set(fen: fen)
+            self.view.needsLayout = true
         }
     }
 }

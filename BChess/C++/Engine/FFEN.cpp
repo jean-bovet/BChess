@@ -140,17 +140,19 @@ std::string FFEN::getFEN(Board board) {
     return fen;
 }
 
-Board FFEN::createBoard(std::string fen) {
+bool FFEN::setFEN(std::string fen, Board &board) {
     std::vector<std::string> fields;
     split4(fen, fields);
-    assert(fields.size() == 6);
+    if (fields.size() != 6) {
+        std::cerr << "Invalid FEN string: " << fen << std::endl;
+        return false;
+    }
     
     // 4k3/2r5/8/8/8/8/2R5/4K3
     auto pieces = fields[0];
     std::vector<std::string> ranks;
     split4(pieces, ranks, "/");
 
-    Board board;
     board.clear();
     
     Coordinate coord = { 7, 0 };
@@ -191,5 +193,5 @@ Board FFEN::createBoard(std::string fen) {
     // Full move
     board.fullMoveCount = stoi(fields[5]);
     
-    return board;
+    return true;
 }

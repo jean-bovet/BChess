@@ -35,7 +35,7 @@
 }
 
 - (void)setFEN:(NSString*)boardFEN {
-    currentBoard = FFEN::createBoard(std::string([boardFEN UTF8String]));
+    FFEN::setFEN(std::string([boardFEN UTF8String]), currentBoard);
 }
 
 - (NSString*)boardFEN {
@@ -44,7 +44,7 @@
 }
 
 - (NSString* _Nullable)pieceAt:(NSUInteger)rank file:(NSUInteger)file {
-    BoardSquare square = currentBoard.get(file, rank);
+    BoardSquare square = currentBoard.get((File)file, (Rank)rank);
     if (square.empty) {
         return nil;
     } else {
@@ -55,7 +55,7 @@
 
 - (NSArray<FEngineMove*>* _Nonnull)movesAt:(NSUInteger)rank file:(NSUInteger)file {
     MoveGenerator generator = MoveGenerator();
-    MoveList moveList = generator.generateMoves(currentBoard, SquareFrom(file, rank));
+    MoveList moveList = generator.generateMoves(currentBoard, SquareFrom((File)file, (Rank)rank));
     
     NSMutableArray *moves = [NSMutableArray array];
     for (int index=0; index<moveList.moveCount; index++) {
@@ -111,7 +111,8 @@
 }
 
 - (FEngineInfo*)searchBestMove:(NSString*)boardFEN maxDepth:(NSInteger)maxDepth callback:(FEngineSearchCallback)callback {
-    Board board = FFEN::createBoard(std::string([boardFEN UTF8String]));
+    Board board;
+    FFEN::setFEN(std::string([boardFEN UTF8String]), board);
     Minimax::Info info = minimax.searchBestMove(board, (int)maxDepth, [self, callback](Minimax::Info info) {
         callback([self infoFor:info]);
     });
@@ -120,7 +121,8 @@
 
 - (NSArray<NSString*>* _Nonnull)moveFENsFrom:(NSString* _Nonnull)startingFEN squareName:(NSString* _Nullable)squareName {
     auto fen = std::string([startingFEN UTF8String]);
-    Board board = FFEN::createBoard(fen);
+    Board board;
+    FFEN::setFEN(fen, board);
     std::string boardFEN = FFEN::getFEN(board);
     assert(boardFEN == fen);
     
@@ -151,10 +153,10 @@
 }
 
 - (void)generatePositions {
-    FFEN::createBoard("3r3k/5Npp/8/8/2Q5/1B6/8/7K b - - 1 1");
+    Board board;
+    FFEN::setFEN("3r3k/5Npp/8/8/2Q5/1B6/8/7K b - - 1 1", board);
     
     MoveGenerator generator;
-    Board board;
     generator.generateMoves(board, Color::WHITE);
 }
 

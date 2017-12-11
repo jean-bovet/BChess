@@ -14,6 +14,6 @@
 class FFEN {
 public:
     static std::string getFEN(Board board);
-    static Board createBoard(std::string fen);
+    static bool setFEN(std::string fen, Board &board);
 };
 

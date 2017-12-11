@@ -106,43 +106,50 @@ public:
     }
     
     static void testWhiteKingCheckWithKnight() {
-        auto board = FFEN::createBoard("8/2k5/8/8/8/2K5/4n3/8 w - - 0 1");
+        Board board;
+        assert(FFEN::setFEN("8/2k5/8/8/8/2K5/4n3/8 w - - 0 1", board));
         assert(board.isCheck(Color::WHITE));
         assert(!board.isCheck(Color::BLACK));
     }
     
     static void testWhiteKingCheckWithBishop() {
-        auto board = FFEN::createBoard("8/2k5/5b2/8/8/2K5/8/8 w - - 0 1");
+        Board board;
+        assert(FFEN::setFEN("8/2k5/5b2/8/8/2K5/8/8 w - - 0 1", board));
         assert(board.isCheck(Color::WHITE));
         assert(!board.isCheck(Color::BLACK));
     }
     
     static void testWhiteKingCheckWithRook() {
-        auto board = FFEN::createBoard("8/2k5/8/8/8/2K3r1/8/8 w - - 0 1");
+        Board board;
+        assert(FFEN::setFEN("8/2k5/8/8/8/2K3r1/8/8 w - - 0 1", board));
         assert(board.isCheck(Color::WHITE));
         assert(!board.isCheck(Color::BLACK));
     }
     
     static void testWhiteKingCheckWithQueenLikeBishop() {
-        auto board = FFEN::createBoard("8/2k3q1/8/8/8/2K5/8/8 w - - 0 1");
+        Board board;
+        assert(FFEN::setFEN("8/2k3q1/8/8/8/2K5/8/8 w - - 0 1", board));
         assert(board.isCheck(Color::WHITE));
         assert(!board.isCheck(Color::BLACK));
     }
     
     static void testWhiteKingCheckWithQueenLikeRook() {
-        auto board = FFEN::createBoard("8/2k5/8/8/8/2K3q1/8/8 w - - 0 1");
+        Board board;
+        assert(FFEN::setFEN("8/2k5/8/8/8/2K3q1/8/8 w - - 0 1", board));
         assert(board.isCheck(Color::WHITE));
         assert(!board.isCheck(Color::BLACK));
     }
     
     static void testWhiteKingNotCheck() {
-        auto board = FFEN::createBoard("8/2k5/8/8/8/2K5/5n2/8 w - - 0 1");
+        Board board;
+        assert(FFEN::setFEN("8/2k5/8/8/8/2K5/5n2/8 w - - 0 1", board));
         assert(!board.isCheck(Color::WHITE));
         assert(!board.isCheck(Color::BLACK));
     }
     
     static void testBlackKingCheck() {
-        auto board = FFEN::createBoard("8/2k5/4N3/8/8/2K5/5n2/8 w - - 0 1");
+        Board board;
+        assert(FFEN::setFEN("8/2k5/4N3/8/8/2K5/5n2/8 w - - 0 1", board));
         assert(!board.isCheck(Color::WHITE));
         assert(board.isCheck(Color::BLACK));
     }
@@ -165,7 +172,8 @@ public:
     }
 
     static void assertBestMove(std::string fen, std::string finalFEN, std::string bestMove, std::vector<std::string> bestLine) {
-        Board board = FFEN::createBoard(fen);
+        Board board;
+        assert(FFEN::setFEN(fen, board));
         std::string boardFEN = FFEN::getFEN(board);
         assert(boardFEN == fen);
 
