@@ -161,12 +161,27 @@ class ViewController: NSViewController {
     func enginePlay() {
         engine.evaluate(depth: 5) { (info, completed) in
             if completed {
-                self.engine.engine.move(info.rawMoveValue)
                 DispatchQueue.main.async {
-                    self.view.needsLayout = true
+                    self.animateMove(info: info)
                 }
             }
         }
+    }
+    
+    func animateMove(info: FEngineInfo) {
+        let fromPieceView = pieceSquareView(rank: Int(info.fromRank), file: Int(info.fromFile))
+        let targetPieceView = pieceSquareView(rank: Int(info.toRank), file: Int(info.toFile))
+        NSAnimationContext.runAnimationGroup({ _ in
+            NSAnimationContext.current.duration = 0.5
+            NSAnimationContext.current.timingFunction = CAMediaTimingFunction(name: kCAAnimationLinear)
+            
+            targetPieceView.animator().alphaValue = 0.0
+            fromPieceView.animator().frame = targetPieceView.frame
+        }, completionHandler:{
+            targetPieceView.alphaValue = 1.0
+            self.engine.engine.move(info.rawMoveValue)
+            self.view.needsLayout = true
+        })
     }
     
     var boardSquareSize: CGFloat = 0

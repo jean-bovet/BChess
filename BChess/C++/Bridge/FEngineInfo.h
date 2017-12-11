@@ -10,6 +10,7 @@
 
 @interface FEngineInfo : NSObject
 
+@property (nonatomic, assign) NSUInteger fromRank, fromFile, toRank, toFile;
 @property (nonatomic, assign) NSUInteger rawMoveValue;
 
 @property (nonatomic, assign) NSInteger depth;

@@ -92,7 +92,11 @@
     ei.nodeEvaluated = info.nodeEvaluated;
     ei.movesPerSecond = info.movesPerSecond;
     ei.rawMoveValue = info.evaluation.move;
-    
+    ei.fromRank = RankFrom(MOVE_FROM(info.evaluation.move));
+    ei.fromFile = FileFrom(MOVE_FROM(info.evaluation.move));
+    ei.toRank = RankFrom(MOVE_TO(info.evaluation.move));
+    ei.toFile = FileFrom(MOVE_TO(info.evaluation.move));
+
     // For UCI, the value is always from the engine's point of view.
     // Because the evaluation function always evaluate from WHITE's point of view,
     // if the engine is playing black, make sure to inverse the value.
