@@ -112,6 +112,9 @@ class ViewController: NSViewController {
                 clearAllViewIndicators()
                 self.view.needsLayout = true
                 enginePlay()
+            } else if view.selected {
+                clearAllViewIndicators()
+                self.view.needsLayout = true
             } else {
                 clearAllViewIndicators()
 
