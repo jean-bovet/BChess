@@ -39,6 +39,16 @@
     return [NSString stringWithUTF8String:fen.c_str()];
 }
 
+- (NSString* _Nullable)pieceAt:(NSUInteger)rank file:(NSUInteger)file {
+    BoardSquare square = currentBoard.get(file, rank);
+    if (square.empty) {
+        return nil;
+    } else {
+        char p = pieceToChar(square.piece, square.color == WHITE);
+        return [NSString stringWithFormat:@"%c", p];
+    }
+}
+
 - (void)move:(NSString*)from to:(NSString*)to {
     currentBoard.move(std::string([from cStringUsingEncoding:NSUTF8StringEncoding]),
                       std::string([to cStringUsingEncoding:NSUTF8StringEncoding]));

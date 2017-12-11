@@ -18,7 +18,9 @@ typedef void(^FEngineSearchCallback)(FEngineInfo * _Nonnull info);
 - (id _Nonnull)init;
 
 - (void)setFEN:(NSString*_Nonnull)boardFEN;
-- ( NSString* _Nonnull )boardFEN;
+- (NSString* _Nonnull )boardFEN;
+
+- (NSString* _Nullable)pieceAt:(NSUInteger)rank file:(NSUInteger)file;
 
 - (void)move:(NSString*_Nonnull)from to:(NSString*_Nonnull)to;
 - (void)stop;

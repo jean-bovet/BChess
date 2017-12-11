@@ -25,6 +25,26 @@
 		A70A61DE1FD4D49F00AFDF0E /* magicmoves.c in Sources */ = {isa = PBXBuildFile; fileRef = A7712D411FCB97A900E7E802 /* magicmoves.c */; };
 		A75359841FDC51B2008D1DEE /* FENgineInfo+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = A75359831FDC51B2008D1DEE /* FENgineInfo+Extension.swift */; };
 		A75359851FDC994E008D1DEE /* FENgineInfo+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = A75359831FDC51B2008D1DEE /* FENgineInfo+Extension.swift */; };
+		A75359931FDE0947008D1DEE /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A75359921FDE0947008D1DEE /* AppDelegate.swift */; };
+		A75359951FDE0947008D1DEE /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A75359941FDE0947008D1DEE /* ViewController.swift */; };
+		A75359971FDE0947008D1DEE /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A75359961FDE0947008D1DEE /* Assets.xcassets */; };
+		A753599A1FDE0947008D1DEE /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A75359981FDE0947008D1DEE /* Main.storyboard */; };
+		A75359A61FDE0947008D1DEE /* BChessMacTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A75359A51FDE0947008D1DEE /* BChessMacTests.swift */; };
+		A75359B11FDE0947008D1DEE /* BChessMacUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A75359B01FDE0947008D1DEE /* BChessMacUITests.swift */; };
+		A75359BF1FDE0E3B008D1DEE /* BackgroundSquareView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A75359BE1FDE0E3B008D1DEE /* BackgroundSquareView.swift */; };
+		A75359C21FDE4023008D1DEE /* UCIEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7712D2C1FC7C22000E7E802 /* UCIEngine.swift */; };
+		A75359C31FDE4023008D1DEE /* FENgineInfo+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = A75359831FDC51B2008D1DEE /* FENgineInfo+Extension.swift */; };
+		A75359C41FDE4031008D1DEE /* FEngineInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = A70A61D01FD4AA9600AFDF0E /* FEngineInfo.m */; };
+		A75359C51FDE4031008D1DEE /* FEngine.mm in Sources */ = {isa = PBXBuildFile; fileRef = A75683281FCD28A000CF1408 /* FEngine.mm */; };
+		A75359C61FDE4031008D1DEE /* magicmoves.c in Sources */ = {isa = PBXBuildFile; fileRef = A7712D411FCB97A900E7E802 /* magicmoves.c */; };
+		A75359C71FDE4038008D1DEE /* FMoveList.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A70A61C51FD4592700AFDF0E /* FMoveList.cpp */; };
+		A75359C81FDE4038008D1DEE /* FMoveGenerator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A70A61C21FD458DE00AFDF0E /* FMoveGenerator.cpp */; };
+		A75359C91FDE4038008D1DEE /* FBoard.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A7712D451FCBC13100E7E802 /* FBoard.cpp */; };
+		A75359CA1FDE4038008D1DEE /* FEvaluate.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A70A61C81FD46E3C00AFDF0E /* FEvaluate.cpp */; };
+		A75359CB1FDE4038008D1DEE /* FMinimax.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A70A61CB1FD4713500AFDF0E /* FMinimax.cpp */; };
+		A75359CC1FDE4038008D1DEE /* FFEN.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A70A61B91FD132D200AFDF0E /* FFEN.cpp */; };
+		A75359CD1FDE40F4008D1DEE /* FPerformance.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A756832E1FD0D96300CF1408 /* FPerformance.cpp */; };
+		A75359CF1FDE4385008D1DEE /* PieceSquareView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A75359CE1FDE4385008D1DEE /* PieceSquareView.swift */; };
 		A75683291FCD28A000CF1408 /* FEngine.mm in Sources */ = {isa = PBXBuildFile; fileRef = A75683281FCD28A000CF1408 /* FEngine.mm */; };
 		A756832D1FD0B3FE00CF1408 /* magicmoves.c in Sources */ = {isa = PBXBuildFile; fileRef = A7712D411FCB97A900E7E802 /* magicmoves.c */; };
 		A75683301FD0D96300CF1408 /* FPerformance.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A756832E1FD0D96300CF1408 /* FPerformance.cpp */; };
@@ -39,6 +59,23 @@
 		A7B18F581FD9BAE500A605B8 /* MovesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7B18F571FD9BAE500A605B8 /* MovesTests.swift */; };
 		A7B18F5A1FD9BC8D00A605B8 /* CPPTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7B18F591FD9BC8D00A605B8 /* CPPTests.swift */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		A75359A21FDE0947008D1DEE /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A7AFCC9E1FB4E40D00AE3D85 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = A753598F1FDE0947008D1DEE;
+			remoteInfo = BChessMac;
+		};
+		A75359AD1FDE0947008D1DEE /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A7AFCC9E1FB4E40D00AE3D85 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = A753598F1FDE0947008D1DEE;
+			remoteInfo = BChessMac;
+		};
+/* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
 		A7AFCCA41FB4E40D00AE3D85 /* CopyFiles */ = {
@@ -73,6 +110,21 @@
 		A75359831FDC51B2008D1DEE /* FENgineInfo+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FENgineInfo+Extension.swift"; sourceTree = "<group>"; };
 		A75359871FDCF8D6008D1DEE /* FBitboard.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = FBitboard.hpp; sourceTree = "<group>"; };
 		A753598A1FDCF95E008D1DEE /* FCoordinate.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = FCoordinate.hpp; sourceTree = "<group>"; };
+		A75359901FDE0947008D1DEE /* BChessMac.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BChessMac.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		A75359921FDE0947008D1DEE /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		A75359941FDE0947008D1DEE /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		A75359961FDE0947008D1DEE /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		A75359991FDE0947008D1DEE /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		A753599B1FDE0947008D1DEE /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		A753599C1FDE0947008D1DEE /* BChessMac.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = BChessMac.entitlements; sourceTree = "<group>"; };
+		A75359A11FDE0947008D1DEE /* BChessMacTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BChessMacTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		A75359A51FDE0947008D1DEE /* BChessMacTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BChessMacTests.swift; sourceTree = "<group>"; };
+		A75359A71FDE0947008D1DEE /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		A75359AC1FDE0947008D1DEE /* BChessMacUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BChessMacUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		A75359B01FDE0947008D1DEE /* BChessMacUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BChessMacUITests.swift; sourceTree = "<group>"; };
+		A75359B21FDE0947008D1DEE /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		A75359BE1FDE0E3B008D1DEE /* BackgroundSquareView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundSquareView.swift; sourceTree = "<group>"; };
+		A75359CE1FDE4385008D1DEE /* PieceSquareView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PieceSquareView.swift; sourceTree = "<group>"; };
 		A75683271FCD28A000CF1408 /* FEngine.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FEngine.h; sourceTree = "<group>"; };
 		A75683281FCD28A000CF1408 /* FEngine.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = FEngine.mm; sourceTree = "<group>"; };
 		A756832E1FD0D96300CF1408 /* FPerformance.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = FPerformance.cpp; sourceTree = "<group>"; };
@@ -96,6 +148,27 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		A753598D1FDE0947008D1DEE /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A753599E1FDE0947008D1DEE /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A75359A91FDE0947008D1DEE /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		A7712D111FB916E900E7E802 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -161,6 +234,39 @@
 			path = Engine;
 			sourceTree = "<group>";
 		};
+		A75359911FDE0947008D1DEE /* BChessMac */ = {
+			isa = PBXGroup;
+			children = (
+				A75359921FDE0947008D1DEE /* AppDelegate.swift */,
+				A75359941FDE0947008D1DEE /* ViewController.swift */,
+				A75359BE1FDE0E3B008D1DEE /* BackgroundSquareView.swift */,
+				A75359CE1FDE4385008D1DEE /* PieceSquareView.swift */,
+				A75359961FDE0947008D1DEE /* Assets.xcassets */,
+				A75359981FDE0947008D1DEE /* Main.storyboard */,
+				A753599B1FDE0947008D1DEE /* Info.plist */,
+				A753599C1FDE0947008D1DEE /* BChessMac.entitlements */,
+			);
+			path = BChessMac;
+			sourceTree = "<group>";
+		};
+		A75359A41FDE0947008D1DEE /* BChessMacTests */ = {
+			isa = PBXGroup;
+			children = (
+				A75359A51FDE0947008D1DEE /* BChessMacTests.swift */,
+				A75359A71FDE0947008D1DEE /* Info.plist */,
+			);
+			path = BChessMacTests;
+			sourceTree = "<group>";
+		};
+		A75359AF1FDE0947008D1DEE /* BChessMacUITests */ = {
+			isa = PBXGroup;
+			children = (
+				A75359B01FDE0947008D1DEE /* BChessMacUITests.swift */,
+				A75359B21FDE0947008D1DEE /* Info.plist */,
+			);
+			path = BChessMacUITests;
+			sourceTree = "<group>";
+		};
 		A7712D151FB916E900E7E802 /* BChessTests */ = {
 			isa = PBXGroup;
 			children = (
@@ -185,8 +291,8 @@
 		A7712D481FCBC13500E7E802 /* C++ */ = {
 			isa = PBXGroup;
 			children = (
-				A70A61D41FD4D37E00AFDF0E /* Engine */,
 				A70A61CE1FD4AA8500AFDF0E /* Bridge */,
+				A70A61D41FD4D37E00AFDF0E /* Engine */,
 				A70A61D31FD4D37600AFDF0E /* Helpers */,
 			);
 			path = "C++";
@@ -198,6 +304,9 @@
 				A7712D311FC7C5CF00E7E802 /* ToDo.md */,
 				A7AFCCA81FB4E40D00AE3D85 /* BChess */,
 				A7712D151FB916E900E7E802 /* BChessTests */,
+				A75359911FDE0947008D1DEE /* BChessMac */,
+				A75359A41FDE0947008D1DEE /* BChessMacTests */,
+				A75359AF1FDE0947008D1DEE /* BChessMacUITests */,
 				A7AFCCA71FB4E40D00AE3D85 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -207,6 +316,9 @@
 			children = (
 				A7AFCCA61FB4E40D00AE3D85 /* BChess */,
 				A7712D141FB916E900E7E802 /* BChessTests.xctest */,
+				A75359901FDE0947008D1DEE /* BChessMac.app */,
+				A75359A11FDE0947008D1DEE /* BChessMacTests.xctest */,
+				A75359AC1FDE0947008D1DEE /* BChessMacUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -226,6 +338,59 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		A753598F1FDE0947008D1DEE /* BChessMac */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A75359B31FDE0947008D1DEE /* Build configuration list for PBXNativeTarget "BChessMac" */;
+			buildPhases = (
+				A753598C1FDE0947008D1DEE /* Sources */,
+				A753598D1FDE0947008D1DEE /* Frameworks */,
+				A753598E1FDE0947008D1DEE /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = BChessMac;
+			productName = BChessMac;
+			productReference = A75359901FDE0947008D1DEE /* BChessMac.app */;
+			productType = "com.apple.product-type.application";
+		};
+		A75359A01FDE0947008D1DEE /* BChessMacTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A75359B61FDE0947008D1DEE /* Build configuration list for PBXNativeTarget "BChessMacTests" */;
+			buildPhases = (
+				A753599D1FDE0947008D1DEE /* Sources */,
+				A753599E1FDE0947008D1DEE /* Frameworks */,
+				A753599F1FDE0947008D1DEE /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				A75359A31FDE0947008D1DEE /* PBXTargetDependency */,
+			);
+			name = BChessMacTests;
+			productName = BChessMacTests;
+			productReference = A75359A11FDE0947008D1DEE /* BChessMacTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		A75359AB1FDE0947008D1DEE /* BChessMacUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A75359B91FDE0947008D1DEE /* Build configuration list for PBXNativeTarget "BChessMacUITests" */;
+			buildPhases = (
+				A75359A81FDE0947008D1DEE /* Sources */,
+				A75359A91FDE0947008D1DEE /* Frameworks */,
+				A75359AA1FDE0947008D1DEE /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				A75359AE1FDE0947008D1DEE /* PBXTargetDependency */,
+			);
+			name = BChessMacUITests;
+			productName = BChessMacUITests;
+			productReference = A75359AC1FDE0947008D1DEE /* BChessMacUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
 		A7712D131FB916E900E7E802 /* BChessTests */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = A7712D191FB916E900E7E802 /* Build configuration list for PBXNativeTarget "BChessTests" */;
@@ -266,10 +431,24 @@
 		A7AFCC9E1FB4E40D00AE3D85 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastSwiftUpdateCheck = 0910;
+				LastSwiftUpdateCheck = 0920;
 				LastUpgradeCheck = 0910;
 				ORGANIZATIONNAME = "Jean Bovet";
 				TargetAttributes = {
+					A753598F1FDE0947008D1DEE = {
+						CreatedOnToolsVersion = 9.2;
+						ProvisioningStyle = Automatic;
+					};
+					A75359A01FDE0947008D1DEE = {
+						CreatedOnToolsVersion = 9.2;
+						ProvisioningStyle = Automatic;
+						TestTargetID = A753598F1FDE0947008D1DEE;
+					};
+					A75359AB1FDE0947008D1DEE = {
+						CreatedOnToolsVersion = 9.2;
+						ProvisioningStyle = Automatic;
+						TestTargetID = A753598F1FDE0947008D1DEE;
+					};
 					A7712D131FB916E900E7E802 = {
 						CreatedOnToolsVersion = 9.1;
 						ProvisioningStyle = Automatic;
@@ -287,6 +466,7 @@
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
+				Base,
 			);
 			mainGroup = A7AFCC9D1FB4E40D00AE3D85;
 			productRefGroup = A7AFCCA71FB4E40D00AE3D85 /* Products */;
@@ -295,11 +475,37 @@
 			targets = (
 				A7AFCCA51FB4E40D00AE3D85 /* BChess */,
 				A7712D131FB916E900E7E802 /* BChessTests */,
+				A753598F1FDE0947008D1DEE /* BChessMac */,
+				A75359A01FDE0947008D1DEE /* BChessMacTests */,
+				A75359AB1FDE0947008D1DEE /* BChessMacUITests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		A753598E1FDE0947008D1DEE /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A75359971FDE0947008D1DEE /* Assets.xcassets in Resources */,
+				A753599A1FDE0947008D1DEE /* Main.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A753599F1FDE0947008D1DEE /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A75359AA1FDE0947008D1DEE /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		A7712D121FB916E900E7E802 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -310,6 +516,45 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		A753598C1FDE0947008D1DEE /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A75359C21FDE4023008D1DEE /* UCIEngine.swift in Sources */,
+				A75359CA1FDE4038008D1DEE /* FEvaluate.cpp in Sources */,
+				A75359CF1FDE4385008D1DEE /* PieceSquareView.swift in Sources */,
+				A75359C31FDE4023008D1DEE /* FENgineInfo+Extension.swift in Sources */,
+				A75359BF1FDE0E3B008D1DEE /* BackgroundSquareView.swift in Sources */,
+				A75359C61FDE4031008D1DEE /* magicmoves.c in Sources */,
+				A75359951FDE0947008D1DEE /* ViewController.swift in Sources */,
+				A75359931FDE0947008D1DEE /* AppDelegate.swift in Sources */,
+				A75359C71FDE4038008D1DEE /* FMoveList.cpp in Sources */,
+				A75359CD1FDE40F4008D1DEE /* FPerformance.cpp in Sources */,
+				A75359CC1FDE4038008D1DEE /* FFEN.cpp in Sources */,
+				A75359C51FDE4031008D1DEE /* FEngine.mm in Sources */,
+				A75359C91FDE4038008D1DEE /* FBoard.cpp in Sources */,
+				A75359C41FDE4031008D1DEE /* FEngineInfo.m in Sources */,
+				A75359CB1FDE4038008D1DEE /* FMinimax.cpp in Sources */,
+				A75359C81FDE4038008D1DEE /* FMoveGenerator.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A753599D1FDE0947008D1DEE /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A75359A61FDE0947008D1DEE /* BChessMacTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A75359A81FDE0947008D1DEE /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A75359B11FDE0947008D1DEE /* BChessMacUITests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		A7712D101FB916E900E7E802 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -357,7 +602,131 @@
 		};
 /* End PBXSourcesBuildPhase section */
 
+/* Begin PBXTargetDependency section */
+		A75359A31FDE0947008D1DEE /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = A753598F1FDE0947008D1DEE /* BChessMac */;
+			targetProxy = A75359A21FDE0947008D1DEE /* PBXContainerItemProxy */;
+		};
+		A75359AE1FDE0947008D1DEE /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = A753598F1FDE0947008D1DEE /* BChessMac */;
+			targetProxy = A75359AD1FDE0947008D1DEE /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		A75359981FDE0947008D1DEE /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				A75359991FDE0947008D1DEE /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
 /* Begin XCBuildConfiguration section */
+		A75359B41FDE0947008D1DEE /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = BChessMac/BChessMac.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = 28XRU7S6GA;
+				INFOPLIST_FILE = BChessMac/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "ch.arizona-software.BChessMac";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "BChess/BChess-Bridging-Header.h";
+				SWIFT_VERSION = 4.0;
+			};
+			name = Debug;
+		};
+		A75359B51FDE0947008D1DEE /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = BChessMac/BChessMac.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = 28XRU7S6GA;
+				INFOPLIST_FILE = BChessMac/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "ch.arizona-software.BChessMac";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "BChess/BChess-Bridging-Header.h";
+				SWIFT_VERSION = 4.0;
+			};
+			name = Release;
+		};
+		A75359B71FDE0947008D1DEE /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = 28XRU7S6GA;
+				INFOPLIST_FILE = BChessMacTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "ch.arizona-software.BChessMacTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 4.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/BChessMac.app/Contents/MacOS/BChessMac";
+			};
+			name = Debug;
+		};
+		A75359B81FDE0947008D1DEE /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = 28XRU7S6GA;
+				INFOPLIST_FILE = BChessMacTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "ch.arizona-software.BChessMacTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 4.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/BChessMac.app/Contents/MacOS/BChessMac";
+			};
+			name = Release;
+		};
+		A75359BA1FDE0947008D1DEE /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = 28XRU7S6GA;
+				INFOPLIST_FILE = BChessMacUITests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "ch.arizona-software.BChessMacUITests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 4.0;
+				TEST_TARGET_NAME = BChessMac;
+			};
+			name = Debug;
+		};
+		A75359BB1FDE0947008D1DEE /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = 28XRU7S6GA;
+				INFOPLIST_FILE = BChessMacUITests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "ch.arizona-software.BChessMacUITests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 4.0;
+				TEST_TARGET_NAME = BChessMac;
+			};
+			name = Release;
+		};
 		A7712D1A1FB916E900E7E802 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -536,6 +905,33 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		A75359B31FDE0947008D1DEE /* Build configuration list for PBXNativeTarget "BChessMac" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A75359B41FDE0947008D1DEE /* Debug */,
+				A75359B51FDE0947008D1DEE /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A75359B61FDE0947008D1DEE /* Build configuration list for PBXNativeTarget "BChessMacTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A75359B71FDE0947008D1DEE /* Debug */,
+				A75359B81FDE0947008D1DEE /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A75359B91FDE0947008D1DEE /* Build configuration list for PBXNativeTarget "BChessMacUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A75359BA1FDE0947008D1DEE /* Debug */,
+				A75359BB1FDE0947008D1DEE /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		A7712D191FB916E900E7E802 /* Build configuration list for PBXNativeTarget "BChessTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
