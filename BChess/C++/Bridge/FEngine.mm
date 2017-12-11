@@ -14,6 +14,10 @@
 #import "FTests.hpp"
 #import "FMinimax.hpp"
 
+@implementation FEngineMove
+
+@end
+
 @interface FEngine () {
     Minimax minimax;
     Board currentBoard;
@@ -49,6 +53,29 @@
     }
 }
 
+- (NSArray<FEngineMove*>* _Nonnull)movesAt:(NSUInteger)rank file:(NSUInteger)file {
+    MoveGenerator generator = MoveGenerator();
+    MoveList moveList = generator.generateMoves(currentBoard, SquareFrom(file, rank));
+    
+    NSMutableArray *moves = [NSMutableArray array];
+    for (int index=0; index<moveList.moveCount; index++) {
+        Move fmove = moveList.moves[index];
+        
+        FEngineMove *move = [[FEngineMove alloc] init];
+        move.rawMoveValue = fmove;
+        move.fromFile = FileFrom(MOVE_FROM(fmove));
+        move.fromRank = RankFrom(MOVE_FROM(fmove));
+        move.toFile = FileFrom(MOVE_TO(fmove));
+        move.toRank = RankFrom(MOVE_TO(fmove));
+        [moves addObject:move];
+    }
+    return moves;
+}
+
+- (void)move:(NSUInteger)move {
+    currentBoard.move((Move)move);
+}
+
 - (void)move:(NSString*)from to:(NSString*)to {
     currentBoard.move(std::string([from cStringUsingEncoding:NSUTF8StringEncoding]),
                       std::string([to cStringUsingEncoding:NSUTF8StringEncoding]));
@@ -64,6 +91,7 @@
     ei.time = info.time;
     ei.nodeEvaluated = info.nodeEvaluated;
     ei.movesPerSecond = info.movesPerSecond;
+    ei.rawMoveValue = info.evaluation.move;
     
     // For UCI, the value is always from the engine's point of view.
     // Because the evaluation function always evaluate from WHITE's point of view,

@@ -11,6 +11,14 @@
 
 typedef void(^FEngineSearchCallback)(FEngineInfo * _Nonnull info);
 
+@interface FEngineMove: NSObject
+
+@property (nonatomic, assign) NSUInteger fromFile, toFile;
+@property (nonatomic, assign) NSUInteger fromRank, toRank;
+@property (nonatomic, assign) NSUInteger rawMoveValue;
+
+@end
+
 @interface FEngine : NSObject
 
 @property (nonatomic, assign) int moveCount;
@@ -21,6 +29,9 @@ typedef void(^FEngineSearchCallback)(FEngineInfo * _Nonnull info);
 - (NSString* _Nonnull )boardFEN;
 
 - (NSString* _Nullable)pieceAt:(NSUInteger)rank file:(NSUInteger)file;
+
+- (NSArray<FEngineMove*>* _Nonnull)movesAt:(NSUInteger)rank file:(NSUInteger)file;
+- (void)move:(NSUInteger)move;
 
 - (void)move:(NSString*_Nonnull)from to:(NSString*_Nonnull)to;
 - (void)stop;

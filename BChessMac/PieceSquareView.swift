@@ -10,4 +10,19 @@ import Cocoa
 
 class PieceSquareView: NSImageView {
 
+    var rank = 0
+    var file = 0
+    var move: FEngineMove? = nil
+    
+    var moveIndicator = false {
+        didSet {
+            if moveIndicator {
+                self.layer?.backgroundColor = NSColor.yellow.withAlphaComponent(0.4).cgColor
+            } else {
+                self.layer?.backgroundColor = nil
+            }
+        }
+    }
+    
+    var selected = false
 }

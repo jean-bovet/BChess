@@ -35,7 +35,10 @@ class ViewController: NSViewController {
 
     override func viewDidLayout() {
         super.viewDidLayout()
-        layoutBoardViews(boardSize: self.view.bounds.size)
+        var size = self.view.bounds.size
+        size.width -= 50
+        size.height -= 50
+        layoutBoardViews(boardSize: size)
     }
     
     func layoutBoardViews(boardSize: CGSize) {
@@ -77,21 +80,71 @@ class ViewController: NSViewController {
             return view
         } else {
             let view = PieceSquareView()
+            view.wantsLayer = true
+            view.addGestureRecognizer(NSClickGestureRecognizer(target: self, action: #selector(pieceSquareViewTapped)))
             view.tag = 200 + rank * 8 + file
+            view.rank = rank
+            view.file = file
             self.view.addSubview(view)
             return view
         }
     }
 
+    func clearAllViewIndicators() {
+        for pieceView in self.view.subviews.filter({ $0 is PieceSquareView }).map( {$0 as! PieceSquareView }) {
+            pieceView.moveIndicator = false
+            pieceView.selected = false
+        }
+    }
+    
+    @objc func pieceSquareViewTapped(sender: NSClickGestureRecognizer) {
+        if let view = sender.view as? PieceSquareView {
+            if view.moveIndicator {
+                // Perform move
+                engine.engine.move(view.move!.rawMoveValue)
+                clearAllViewIndicators()
+                self.view.needsLayout = true
+                enginePlay()
+            } else {
+                clearAllViewIndicators()
+
+                // Select the square
+                view.selected = true
+                
+                let moves = engine.engine.moves(at: UInt(view.rank), file: UInt(view.file))
+                for move in moves {
+                    let moveView = pieceSquareView(rank: Int(move.toRank), file: Int(move.toFile))
+                    moveView.moveIndicator = true
+                    moveView.move = move
+                }
+            }
+            self.view.needsDisplay = true
+        }
+    }
+    
+    func enginePlay() {
+        engine.evaluate(depth: 4) { (info, completed) in
+            if completed {
+                self.engine.engine.move(info.rawMoveValue)
+                DispatchQueue.main.async {
+                    self.view.needsLayout = true
+                }
+            }
+        }
+    }
+    
     func layoutBoard(boardSize: CGSize, callback: (_ frame: CGRect, _ rank: Int, _ file: Int, _ blackBackground: Bool) -> Void) {
         let width = round(boardSize.width/8);
         let height = round(boardSize.height/8);
         let size = min(width, height);
         
+        let dxOffset = round((self.view.frame.size.width - 8*size)/2)
+        let dyOffset = round((self.view.frame.size.height - 8*size)/2)
+
         var black = true
         for rank in 0...7 {
             for file in 0...7 {
-                let frame = NSMakeRect(CGFloat(file)*size, CGFloat(rank)*size, size, size)
+                let frame = NSMakeRect(CGFloat(file)*size+dxOffset, CGFloat(rank)*size+dyOffset, size, size)
                 callback(frame, rank, file, black)
                 black = !black
             }

@@ -10,6 +10,8 @@
 
 @interface FEngineInfo : NSObject
 
+@property (nonatomic, assign) NSUInteger rawMoveValue;
+
 @property (nonatomic, assign) NSInteger depth;
 @property (nonatomic, assign) NSInteger time;
 @property (nonatomic, assign) NSInteger nodeEvaluated;
