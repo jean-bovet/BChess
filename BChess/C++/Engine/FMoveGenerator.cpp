@@ -143,7 +143,7 @@ void MoveGenerator::generatePawnsMoves(Board &board, MoveList &moveList, Square 
             oneSquareForward = square + 8;
             twoSquaresForward = square + 16;
         } else {
-            if (currentRank == 1) {
+            if (currentRank == 0) {
                 continue; // cannot move anymore, we are on the last rank
             }
             initialRank = 6;
@@ -154,8 +154,6 @@ void MoveGenerator::generatePawnsMoves(Board &board, MoveList &moveList, Square 
         
         // Can we move the pawn forward one square?
         if (((1UL << oneSquareForward) & emptySquares) > 0) {
-            moveList.addMove(board, createMove(square, oneSquareForward, board.color, PAWN));
-            
             // Handle promotion in case the pawn reaches the last rank
             if (currentRank == rankBeforePromotion) {
                 // Generate one move for each piece that can the pawn can be promoted to.
@@ -163,6 +161,8 @@ void MoveGenerator::generatePawnsMoves(Board &board, MoveList &moveList, Square 
                 moveList.addMove(board, createPromotion(square, oneSquareForward, board.color, PAWN, BISHOP));
                 moveList.addMove(board, createPromotion(square, oneSquareForward, board.color, PAWN, ROOK));
                 moveList.addMove(board, createPromotion(square, oneSquareForward, board.color, PAWN, QUEEN));
+            } else {
+                moveList.addMove(board, createMove(square, oneSquareForward, board.color, PAWN));
             }
             
             // Is pawn on the initial rank? Try two squares forward

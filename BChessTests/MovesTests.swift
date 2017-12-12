@@ -178,6 +178,24 @@ class MovesTests: XCTestCase {
         )
     }
 
+    func testWhitePawnPromotion() {
+        assertMoves("4k3/6P1/8/8/8/8/8/4K3 w - - 0 2", [
+            "4k1Q1/8/8/8/8/8/8/4K3 b - - 0 2",
+            "4k1R1/8/8/8/8/8/8/4K3 b - - 0 2",
+            "4k1B1/8/8/8/8/8/8/4K3 b - - 0 2",
+            "4k1N1/8/8/8/8/8/8/4K3 b - - 0 2",
+            ], "g7")
+    }
+    
+    func testBlackPawnPromotion() {
+        assertMoves("4k3/8/8/8/8/8/6p1/4K3 b - - 0 1", [
+            "4k3/8/8/8/8/8/8/4K1q1 w - - 0 2",
+            "4k3/8/8/8/8/8/8/4K1r1 w - - 0 2",
+            "4k3/8/8/8/8/8/8/4K1b1 w - - 0 2",
+            "4k3/8/8/8/8/8/8/4K1n1 w - - 0 2"
+            ], "g2")
+    }
+    
     func assertMoves(_ startFEN: String, _ expectedMoveFENs: [String], _ squareName: String? = nil) {
         let engine = FEngine()
         let moveFENs = engine.moveFENs(from: startFEN, squareName: squareName)

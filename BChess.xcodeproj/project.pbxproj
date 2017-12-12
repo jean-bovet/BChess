@@ -275,8 +275,8 @@
 			children = (
 				A7712D321FC8957500E7E802 /* GamesTests.swift */,
 				A7B18F571FD9BAE500A605B8 /* MovesTests.swift */,
-				A7712D181FB916E900E7E802 /* Info.plist */,
 				A7B18F591FD9BC8D00A605B8 /* CPPTests.swift */,
+				A7712D181FB916E900E7E802 /* Info.plist */,
 			);
 			path = BChessTests;
 			sourceTree = "<group>";
