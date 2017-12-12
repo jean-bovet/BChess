@@ -204,14 +204,14 @@ void MoveGenerator::generateKingsMoves(Board &board, MoveList &moveList, Square 
         if (board.color == WHITE && square == e1) {
             if (board.whiteCanCastleKingSide) {
                 Bitboard kingMoves = 1 << (square+1) | 1 << (square+2);
-                if (kingMoves & emptySquares) {
+                if ((kingMoves & emptySquares) == kingMoves) {
                     moveList.addMove(board, createMove(square, square+2, board.color, KING));
                     moveList.addMove(board, createMove(square+3, square+1, board.color, ROOK));
                 }
             }
             if (board.whiteCanCastleQueenSide) {
                 Bitboard kingMoves = 1 << (square-1) | 1 << (square-2) | 1 << (square-3);
-                if (kingMoves & emptySquares) {
+                if ((kingMoves & emptySquares) == kingMoves) {
                     moveList.addMove(board, createMove(square, square-2, board.color, KING));
                     moveList.addMove(board, createMove(square-4, square-1, board.color, ROOK));
                 }
@@ -219,15 +219,15 @@ void MoveGenerator::generateKingsMoves(Board &board, MoveList &moveList, Square 
         }
         if (board.color == BLACK && square == e8) {
             if (board.blackCanCastleKingSide) {
-                Bitboard kingMoves = 1 << (square+1) | 1 << (square+2);
-                if (kingMoves & emptySquares) {
+                Bitboard kingMoves = 1UL << (square+1) | 1UL << (square+2);
+                if ((kingMoves & emptySquares) == kingMoves) {
                     moveList.addMove(board, createMove(square, square+2, board.color, KING));
                     moveList.addMove(board, createMove(square+3, square+1, board.color, ROOK));
                 }
             }
             if (board.blackCanCastleQueenSide) {
-                Bitboard kingMoves = 1 << (square-1) | 1 << (square-2) | 1 << (square-3);
-                if (kingMoves & emptySquares) {
+                Bitboard kingMoves = 1UL << (square-1) | 1UL << (square-2) | 1UL << (square-3);
+                if ((kingMoves & emptySquares) == kingMoves) {
                     moveList.addMove(board, createMove(square, square-2, board.color, KING));
                     moveList.addMove(board, createMove(square-4, square-1, board.color, ROOK));
                 }

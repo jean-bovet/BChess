@@ -8,7 +8,7 @@
 
 import Cocoa
 
-class PieceSquareView: NSImageView {
+class PieceView: NSImageView {
 
     var rank = 0
     var file = 0

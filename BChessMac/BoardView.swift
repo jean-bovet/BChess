@@ -12,7 +12,7 @@ protocol ChessViewInformationDelegate: class {
     func chessViewEngineInfoDidChange(info: String)
 }
 
-class ChessView: NSView {
+class BoardView: NSView {
 
     weak var delegate: ChessViewInformationDelegate? = nil
     
@@ -47,6 +47,7 @@ class ChessView: NSView {
     }
     
     var playAgainstComputer : PlayAgainst = .black
+    var searchDepth = 4
     
     override init(frame frameRect: NSRect) {
         super.init(frame: frameRect)
@@ -93,7 +94,7 @@ class ChessView: NSView {
             if let squareView = viewWithTag(100+rank*8+file) {
                 squareView.frame = frame
             } else {
-                let squareView = BackgroundSquareView(frame: frame)
+                let squareView = BoardSquareView(frame: frame)
                 squareView.rank = rank
                 squareView.file = file
                 squareView.wantsLayer = true
@@ -122,11 +123,11 @@ class ChessView: NSView {
         
     }
     
-    func pieceSquareView(rank: Int, file: Int) -> PieceSquareView {
-        if let view = viewWithTag(200 + rank * 8 + file) as? PieceSquareView {
+    func pieceSquareView(rank: Int, file: Int) -> PieceView {
+        if let view = viewWithTag(200 + rank * 8 + file) as? PieceView {
             return view
         } else {
-            let view = PieceSquareView()
+            let view = PieceView()
             view.wantsLayer = true
             view.addGestureRecognizer(NSClickGestureRecognizer(target: self, action: #selector(pieceSquareViewTapped)))
             view.tag = 200 + rank * 8 + file
@@ -138,14 +139,14 @@ class ChessView: NSView {
     }
     
     func clearAllViewIndicators() {
-        for pieceView in subviews.filter({ $0 is PieceSquareView }).map( {$0 as! PieceSquareView }) {
+        for pieceView in subviews.filter({ $0 is PieceView }).map( {$0 as! PieceView }) {
             pieceView.moveIndicator = false
             pieceView.selected = false
         }
     }
     
     @objc func pieceSquareViewTapped(sender: NSClickGestureRecognizer) {
-        if let view = sender.view as? PieceSquareView {
+        if let view = sender.view as? PieceView {
             if view.moveIndicator {
                 // Perform move
                 engine.engine.move(view.move!.rawMoveValue)
@@ -207,7 +208,7 @@ class ChessView: NSView {
     }
     
     func enginePlay() {
-        engine.evaluate(depth: 5) { (info, completed) in
+        engine.evaluate(depth: searchDepth) { (info, completed) in
             let lineInfo = info.bestLine.map { $0 }.joined(separator: " ")
             let infoNodes = self.numberFormatter.string(from: NSNumber(value: info.nodeEvaluated))!
             let infoSpeed = self.numberFormatter.string(from: NSNumber(value: info.movesPerSecond))!

@@ -10,7 +10,7 @@ import Cocoa
 
 class ChessViewController: NSViewController, ChessViewInformationDelegate {
 
-    @IBOutlet var chessView: ChessView!
+    @IBOutlet var chessView: BoardView!
     @IBOutlet var infoLabel: NSTextField!
 
     var engine : UCIEngine {
@@ -38,7 +38,15 @@ class ChessViewController: NSViewController, ChessViewInformationDelegate {
         if menuItem.action == #selector(playAgaintHuman) {
             menuItem.state = chessView.playAgainstComputer == .human ? .on : .off
         }
-
+        if menuItem.action == #selector(depth4) {
+            menuItem.state = chessView.searchDepth == 4 ? .on : .off
+        }
+        if menuItem.action == #selector(depth5) {
+            menuItem.state = chessView.searchDepth == 5 ? .on : .off
+        }
+        if menuItem.action == #selector(depth6) {
+            menuItem.state = chessView.searchDepth == 6 ? .on : .off
+        }
         return true
     }
     
@@ -78,5 +86,20 @@ class ChessViewController: NSViewController, ChessViewInformationDelegate {
         chessView.playAgainstComputer = .human
     }
 
+    // MARK: Menu Level
+    
+    @IBAction func depth4(_ sender: NSMenuItem) {
+        chessView.searchDepth = 4
+    }
+
+    @IBAction func depth5(_ sender: NSMenuItem) {
+        chessView.searchDepth = 5
+    }
+
+    @IBAction func depth6(_ sender: NSMenuItem) {
+        chessView.searchDepth = 6
+    }
+
+    
 }
 

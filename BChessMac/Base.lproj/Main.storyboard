@@ -389,12 +389,21 @@
                                     <items>
                                         <menuItem title="Depth 4" id="bWZ-c6-ZNR">
                                             <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="depth4:" target="Ady-hI-5gd" id="407-SM-Uti"/>
+                                            </connections>
                                         </menuItem>
                                         <menuItem title="Depth 5" id="KtQ-I4-Ove">
                                             <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="depth5:" target="Ady-hI-5gd" id="ZS8-ps-95I"/>
+                                            </connections>
                                         </menuItem>
                                         <menuItem title="Depth 6" id="4fw-O7-3Us">
                                             <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="depth6:" target="Ady-hI-5gd" id="Jxj-ao-hAW"/>
+                                            </connections>
                                         </menuItem>
                                     </items>
                                 </menu>
@@ -510,7 +519,7 @@
                         <rect key="frame" x="0.0" y="0.0" width="591" height="341"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
-                            <customView translatesAutoresizingMaskIntoConstraints="NO" id="Q8S-Oy-e6A" customClass="ChessView" customModule="BChessMac" customModuleProvider="target">
+                            <customView translatesAutoresizingMaskIntoConstraints="NO" id="Q8S-Oy-e6A" customClass="BoardView" customModule="BChessMac" customModuleProvider="target">
                                 <rect key="frame" x="0.0" y="25" width="591" height="316"/>
                             </customView>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="icQ-Uj-SKX">

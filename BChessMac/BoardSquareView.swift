@@ -8,7 +8,7 @@
 
 import Cocoa
 
-class BackgroundSquareView: NSView {
+class BoardSquareView: NSView {
 
     var rank = 0
     var file = 0
