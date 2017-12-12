@@ -220,13 +220,13 @@ void MoveGenerator::generateKingsMoves(Board &board, MoveList &moveList, Square 
         if (board.color == BLACK && square == e8) {
             if (board.blackCanCastleKingSide) {
                 Bitboard kingMoves = 1UL << (square+1) | 1UL << (square+2);
-                if ((kingMoves & emptySquares) == kingMoves) {
+                if ((kingMoves & emptySquares) == kingMoves && !board.isAttacked(square+1, otherColor) && !board.isAttacked(square+2, otherColor)) {
                     moveList.addMove(board, createMove(square, square+2, board.color, KING));
                 }
             }
             if (board.blackCanCastleQueenSide) {
                 Bitboard kingMoves = 1UL << (square-1) | 1UL << (square-2) | 1UL << (square-3);
-                if ((kingMoves & emptySquares) == kingMoves) {
+                if ((kingMoves & emptySquares) == kingMoves && !board.isAttacked(square-1, otherColor) && !board.isAttacked(square-2, otherColor) && !board.isAttacked(square-3, otherColor)) {
                     moveList.addMove(board, createMove(square, square-2, board.color, KING));
                 }
             }
