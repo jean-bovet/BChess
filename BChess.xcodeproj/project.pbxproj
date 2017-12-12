@@ -27,7 +27,7 @@
 		A75359841FDC51B2008D1DEE /* FENgineInfo+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = A75359831FDC51B2008D1DEE /* FENgineInfo+Extension.swift */; };
 		A75359851FDC994E008D1DEE /* FENgineInfo+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = A75359831FDC51B2008D1DEE /* FENgineInfo+Extension.swift */; };
 		A75359931FDE0947008D1DEE /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A75359921FDE0947008D1DEE /* AppDelegate.swift */; };
-		A75359951FDE0947008D1DEE /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A75359941FDE0947008D1DEE /* ViewController.swift */; };
+		A75359951FDE0947008D1DEE /* ChessViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A75359941FDE0947008D1DEE /* ChessViewController.swift */; };
 		A75359971FDE0947008D1DEE /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A75359961FDE0947008D1DEE /* Assets.xcassets */; };
 		A753599A1FDE0947008D1DEE /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A75359981FDE0947008D1DEE /* Main.storyboard */; };
 		A75359A61FDE0947008D1DEE /* BChessMacTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A75359A51FDE0947008D1DEE /* BChessMacTests.swift */; };
@@ -114,7 +114,7 @@
 		A753598A1FDCF95E008D1DEE /* FCoordinate.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = FCoordinate.hpp; sourceTree = "<group>"; };
 		A75359901FDE0947008D1DEE /* BChessMac.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BChessMac.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A75359921FDE0947008D1DEE /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		A75359941FDE0947008D1DEE /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		A75359941FDE0947008D1DEE /* ChessViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChessViewController.swift; sourceTree = "<group>"; };
 		A75359961FDE0947008D1DEE /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		A75359991FDE0947008D1DEE /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		A753599B1FDE0947008D1DEE /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -240,8 +240,8 @@
 			isa = PBXGroup;
 			children = (
 				A75359921FDE0947008D1DEE /* AppDelegate.swift */,
+				A75359941FDE0947008D1DEE /* ChessViewController.swift */,
 				A7460F001FDF2465002B0740 /* ChessView.swift */,
-				A75359941FDE0947008D1DEE /* ViewController.swift */,
 				A75359BE1FDE0E3B008D1DEE /* BackgroundSquareView.swift */,
 				A75359CE1FDE4385008D1DEE /* PieceSquareView.swift */,
 				A75359961FDE0947008D1DEE /* Assets.xcassets */,
@@ -530,7 +530,7 @@
 				A7460F011FDF2465002B0740 /* ChessView.swift in Sources */,
 				A75359BF1FDE0E3B008D1DEE /* BackgroundSquareView.swift in Sources */,
 				A75359C61FDE4031008D1DEE /* magicmoves.c in Sources */,
-				A75359951FDE0947008D1DEE /* ViewController.swift in Sources */,
+				A75359951FDE0947008D1DEE /* ChessViewController.swift in Sources */,
 				A75359931FDE0947008D1DEE /* AppDelegate.swift in Sources */,
 				A75359C71FDE4038008D1DEE /* FMoveList.cpp in Sources */,
 				A75359CD1FDE40F4008D1DEE /* FPerformance.cpp in Sources */,
