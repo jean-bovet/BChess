@@ -711,10 +711,10 @@
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="Q8S-Oy-e6A" customClass="ChessView" customModule="BChessMac" customModuleProvider="target">
-                                <rect key="frame" x="0.0" y="17" width="591" height="324"/>
+                                <rect key="frame" x="0.0" y="25" width="591" height="316"/>
                             </customView>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="icQ-Uj-SKX">
-                                <rect key="frame" x="-2" y="0.0" width="595" height="17"/>
+                                <rect key="frame" x="2" y="4" width="587" height="17"/>
                                 <textFieldCell key="cell" lineBreakMode="truncatingTail" allowsUndo="NO" sendsActionOnEndEditing="YES" title="Ready" id="OFN-5h-BpI">
                                     <font key="font" metaFont="system"/>
                                     <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -726,10 +726,10 @@
                             <constraint firstItem="Q8S-Oy-e6A" firstAttribute="top" secondItem="m2S-Jp-Qdl" secondAttribute="top" id="4KM-Ef-eFS"/>
                             <constraint firstAttribute="trailing" secondItem="Q8S-Oy-e6A" secondAttribute="trailing" id="D9G-dv-fjm"/>
                             <constraint firstItem="Q8S-Oy-e6A" firstAttribute="leading" secondItem="m2S-Jp-Qdl" secondAttribute="leading" id="Ibt-Sm-Ypk"/>
-                            <constraint firstItem="icQ-Uj-SKX" firstAttribute="leading" secondItem="m2S-Jp-Qdl" secondAttribute="leading" id="UqJ-NW-UfW"/>
-                            <constraint firstItem="icQ-Uj-SKX" firstAttribute="top" secondItem="Q8S-Oy-e6A" secondAttribute="bottom" id="g7H-Ff-wHA"/>
-                            <constraint firstAttribute="bottom" secondItem="icQ-Uj-SKX" secondAttribute="bottom" id="sbn-kp-jZm"/>
-                            <constraint firstAttribute="trailing" secondItem="icQ-Uj-SKX" secondAttribute="trailing" id="yJW-oZ-lhG"/>
+                            <constraint firstItem="icQ-Uj-SKX" firstAttribute="leading" secondItem="m2S-Jp-Qdl" secondAttribute="leading" constant="4" id="UqJ-NW-UfW"/>
+                            <constraint firstItem="icQ-Uj-SKX" firstAttribute="top" secondItem="Q8S-Oy-e6A" secondAttribute="bottom" constant="4" id="g7H-Ff-wHA"/>
+                            <constraint firstAttribute="bottom" secondItem="icQ-Uj-SKX" secondAttribute="bottom" constant="4" id="sbn-kp-jZm"/>
+                            <constraint firstAttribute="trailing" secondItem="icQ-Uj-SKX" secondAttribute="trailing" constant="4" id="yJW-oZ-lhG"/>
                         </constraints>
                     </view>
                     <connections>

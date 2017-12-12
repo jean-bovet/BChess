@@ -18,6 +18,8 @@ class ChessView: NSView {
     
     let engine = UCIEngine()
 
+    let numberFormatter = NumberFormatter()
+
     let pieceImageNames = [
         "p" : "pawn_b",
         "P" : "pawn_w",
@@ -37,6 +39,17 @@ class ChessView: NSView {
     let files = [ "a", "b", "c", "d", "e", "f", "g", "h" ]
     
     var labels = [String: NSTextField]()
+    
+    override init(frame frameRect: NSRect) {
+        super.init(frame: frameRect)
+    }
+    
+    required init?(coder decoder: NSCoder) {
+        super.init(coder: decoder)
+        numberFormatter.numberStyle = .decimal
+        numberFormatter.thousandSeparator = ","
+        numberFormatter.hasThousandSeparators = true
+    }
     
     override func encodeRestorableState(with coder: NSCoder) {
         super.encodeRestorableState(with: coder)
@@ -177,7 +190,11 @@ class ChessView: NSView {
     
     func enginePlay() {
         engine.evaluate(depth: 5) { (info, completed) in
-            self.delegate?.chessViewEngineInfoDidChange(info: info.uciInfoMessage)
+            let lineInfo = info.bestLine.map { $0 }.joined(separator: " ")
+            let infoNodes = self.numberFormatter.string(from: NSNumber(value: info.nodeEvaluated))!
+            let infoSpeed = self.numberFormatter.string(from: NSNumber(value: info.movesPerSecond))!
+            let infoString = "Line: \(lineInfo)   Value: \(info.value)   Depth: \(info.depth)   Nodes: \(infoNodes) at \(infoSpeed) n/s"
+            self.delegate?.chessViewEngineInfoDidChange(info: infoString)
             if completed {
                 DispatchQueue.main.async {
                     self.animateMove(info: info)
