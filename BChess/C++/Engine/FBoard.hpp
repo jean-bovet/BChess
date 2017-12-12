@@ -72,6 +72,8 @@ public:
     
     Bitboard getOccupancy();
     
+    bool isAttacked(Square square, Color byColor);
+    
     bool isCheck(Color color);
         
     void setCastling(std::string castling) {

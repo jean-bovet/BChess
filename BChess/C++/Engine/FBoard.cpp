@@ -425,6 +425,45 @@ Bitboard Board::emptySquares() {
     return ~getOccupancy();
 }
 
+bool Board::isAttacked(Square square, Color byColor) {
+    // Generate all the moves for a knight from the king position
+    // and keep only the ones that are actually hitting
+    // a black knight, meaning the king is attacked.
+    auto moves = KnightMoves[square] & pieces[byColor][Piece::KNIGHT];
+    if (moves > 0) {
+        return true;
+    }
+    
+    // Same for bishop (and queen)
+    auto rawBishopMoves = Bmagic(square, getOccupancy());
+    auto bishopMoves = rawBishopMoves & (pieces[byColor][Piece::BISHOP]|pieces[byColor][Piece::QUEEN]);
+    if (bishopMoves > 0) {
+        return true;
+    }
+    
+    // Same for rook (and queen)
+    auto rawRookMoves = Rmagic(square, getOccupancy());
+    auto rookMoves = rawRookMoves & (pieces[byColor][Piece::ROOK]|pieces[byColor][Piece::QUEEN]);
+    if (rookMoves > 0) {
+        return true;
+    }
+    
+    // Pawns: we put a pawn of the opposite color at our king's location. That way, we can
+    // determine the attacks that a pawn from the opposite color would do.
+    auto pawnAttacks = PawnAttacks[INVERSE(byColor)][square] & pieces[byColor][Piece::PAWN];
+    if (pawnAttacks > 0) {
+        return true;
+    }
+    
+    // King
+    auto kingMoves = KingMoves[square] & pieces[byColor][Piece::KING];
+    if (kingMoves > 0) {
+        return true;
+    }
+    
+    return false;
+}
+
 bool Board::isCheck(Color color) {
     // Locate the king
     auto kingBoard = pieces[color][Piece::KING];
@@ -435,42 +474,7 @@ bool Board::isCheck(Color color) {
     
     auto otherColor = INVERSE(color);
     
-    // Generate all the moves for a knight from the king position
-    // and keep only the ones that are actually hitting
-    // a black knight, meaning the king is attacked.
-    auto moves = KnightMoves[kingSquare] & pieces[otherColor][Piece::KNIGHT];
-    if (moves > 0) {
-        return true;
-    }
-    
-    // Same for bishop (and queen)
-    auto rawBishopMoves = Bmagic(kingSquare, getOccupancy());
-    auto bishopMoves = rawBishopMoves & (pieces[otherColor][Piece::BISHOP]|pieces[otherColor][Piece::QUEEN]);
-    if (bishopMoves > 0) {
-        return true;
-    }
-
-    // Same for rook (and queen)
-    auto rawRookMoves = Rmagic(kingSquare, getOccupancy());
-    auto rookMoves = rawRookMoves & (pieces[otherColor][Piece::ROOK]|pieces[otherColor][Piece::QUEEN]);
-    if (rookMoves > 0) {
-        return true;
-    }
-    
-    // Pawns: we put a pawn of the opposite color at our king's location. That way, we can
-    // determine the attacks that a pawn from the opposite color would do.
-    auto pawnAttacks = PawnAttacks[color][kingSquare] & pieces[otherColor][Piece::PAWN];
-    if (pawnAttacks > 0) {
-        return true;
-    }
-
-    // King
-    auto kingMoves = KingMoves[kingSquare] & pieces[otherColor][Piece::KING];
-    if (kingMoves > 0) {
-        return true;
-    }
-
-    return false;
+    return isAttacked(kingSquare, otherColor);
 }
 
 

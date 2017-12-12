@@ -174,9 +174,10 @@ void MoveGenerator::generatePawnsMoves(Board &board, MoveList &moveList, Square 
 }
 
 void MoveGenerator::generateKingsMoves(Board &board, MoveList &moveList, Square specificSquare) {
+    auto otherColor = INVERSE(board.color);
     auto kings = board.pieces[board.color][KING];
     auto emptySquares = board.emptySquares();
-    auto blackSquares = board.allPieces(INVERSE(board.color));
+    auto blackSquares = board.allPieces(otherColor);
     
     // Generate moves for each white knight
     while (kings > 0) {
@@ -200,20 +201,19 @@ void MoveGenerator::generateKingsMoves(Board &board, MoveList &moveList, Square 
         auto captures = KingMoves[square] & blackSquares;
         moveList.addCaptures(board, square, captures, KING);
         
-        // Try out castling
+        // Generate all legal casting moves. Note that we only generate the move for the king,
+        // the board is going to move the rook in move() when it detects a castling move.
         if (board.color == WHITE && square == e1) {
             if (board.whiteCanCastleKingSide) {
                 Bitboard kingMoves = 1 << (square+1) | 1 << (square+2);
-                if ((kingMoves & emptySquares) == kingMoves) {
+                if ((kingMoves & emptySquares) == kingMoves && !board.isAttacked(square+1, otherColor) && !board.isAttacked(square+2, otherColor)) {
                     moveList.addMove(board, createMove(square, square+2, board.color, KING));
-                    moveList.addMove(board, createMove(square+3, square+1, board.color, ROOK));
                 }
             }
             if (board.whiteCanCastleQueenSide) {
                 Bitboard kingMoves = 1 << (square-1) | 1 << (square-2) | 1 << (square-3);
-                if ((kingMoves & emptySquares) == kingMoves) {
+                if ((kingMoves & emptySquares) == kingMoves && !board.isAttacked(square-1, otherColor) && !board.isAttacked(square-2, otherColor) && !board.isAttacked(square-3, otherColor)) {
                     moveList.addMove(board, createMove(square, square-2, board.color, KING));
-                    moveList.addMove(board, createMove(square-4, square-1, board.color, ROOK));
                 }
             }
         }
@@ -222,14 +222,12 @@ void MoveGenerator::generateKingsMoves(Board &board, MoveList &moveList, Square 
                 Bitboard kingMoves = 1UL << (square+1) | 1UL << (square+2);
                 if ((kingMoves & emptySquares) == kingMoves) {
                     moveList.addMove(board, createMove(square, square+2, board.color, KING));
-                    moveList.addMove(board, createMove(square+3, square+1, board.color, ROOK));
                 }
             }
             if (board.blackCanCastleQueenSide) {
                 Bitboard kingMoves = 1UL << (square-1) | 1UL << (square-2) | 1UL << (square-3);
                 if ((kingMoves & emptySquares) == kingMoves) {
                     moveList.addMove(board, createMove(square, square-2, board.color, KING));
-                    moveList.addMove(board, createMove(square-4, square-1, board.color, ROOK));
                 }
             }
         }

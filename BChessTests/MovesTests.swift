@@ -112,6 +112,39 @@ class MovesTests: XCTestCase {
             ])
     }
     
+    func testWhiteKingCastling() {
+        // No castling at starting position
+        assertMoves(StartPosFEN, [], "e1")
+        
+        // Castling on both sides for white is possible
+        assertMoves("4k3/8/8/8/8/8/3PPP2/R3K2R w KQ - 0 1",
+                    [
+                        "4k3/8/8/8/8/8/3PPP2/R4RK1 b - - 1 1", // King side
+                        "4k3/8/8/8/8/8/3PPP2/2KR3R b - - 1 1", // Queen side
+                        "4k3/8/8/8/8/8/3PPP2/R2K3R b - - 1 1",
+                        "4k3/8/8/8/8/8/3PPP2/R4K1R b - - 1 1"
+            ], "e1"
+        )
+        
+        // Black rook attacking g1 (so no king side castling possible)
+        assertMoves("4k1r1/8/8/8/8/8/3PPP2/R3K2R w KQ - 0 1",
+                    [
+                        "4k1r1/8/8/8/8/8/3PPP2/2KR3R b - - 1 1", // Queen side
+                        "4k1r1/8/8/8/8/8/3PPP2/R2K3R b - - 1 1",
+                        "4k1r1/8/8/8/8/8/3PPP2/R4K1R b - - 1 1"
+            ], "e1"
+        )
+        
+        // Black rook attacking b1 (so no queen side castling possible)
+        assertMoves("1r2k3/8/8/8/8/8/3PPP2/R3K2R w KQ - 0 1",
+                    [
+                        "1r2k3/8/8/8/8/8/3PPP2/R4RK1 b - - 1 1", // King side
+                        "1r2k3/8/8/8/8/8/3PPP2/R2K3R b - - 1 1",
+                        "1r2k3/8/8/8/8/8/3PPP2/R4K1R b - - 1 1"
+            ], "e1"
+        )
+    }
+    
     func assertMoves(_ startFEN: String, _ expectedMoveFENs: [String], _ squareName: String? = nil) {
         let engine = FEngine()
         let moveFENs = engine.moveFENs(from: startFEN, squareName: squareName)
