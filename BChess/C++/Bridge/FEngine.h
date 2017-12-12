@@ -36,6 +36,8 @@ typedef void(^FEngineSearchCallback)(FEngineInfo * _Nonnull info);
 - (void)move:(NSString*_Nonnull)from to:(NSString*_Nonnull)to;
 - (void)stop;
 
+- (BOOL)isWhite;
+
 - (FEngineInfo*_Nonnull)searchBestMove:(NSString*_Nonnull)boardFEN
                               maxDepth:(NSInteger)maxDepth
                               callback:(FEngineSearchCallback _Nonnull )callback;

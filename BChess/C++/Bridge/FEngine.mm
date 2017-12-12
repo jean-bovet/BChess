@@ -85,6 +85,10 @@
     minimax.analyzing = false;
 }
 
+- (BOOL)isWhite {
+    return currentBoard.color == WHITE;
+}
+
 - (FEngineInfo*)infoFor:(Minimax::Info)info {
     FEngineInfo *ei = [[FEngineInfo alloc] init];
     ei.depth = info.depth;

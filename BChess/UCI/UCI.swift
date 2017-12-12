@@ -9,9 +9,6 @@
 import Foundation
 import os.log
 
-// https://en.wikipedia.org/wiki/Forsyth–Edwards_Notation
-let StartPosFEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
-
 class UCI {
     
     let log: OSLog

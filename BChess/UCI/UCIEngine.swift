@@ -8,6 +8,9 @@
 
 import Foundation
 
+// https://en.wikipedia.org/wiki/Forsyth–Edwards_Notation
+let StartPosFEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
+
 class UCIEngine {
     
     static let defaultDepth = 6
@@ -28,6 +31,10 @@ class UCIEngine {
         } else {
             synchronousEvaluate(depth: depth, callback: callback)
         }
+    }
+    
+    func newGame() {
+        set(fen: StartPosFEN)
     }
     
     func set(fen: String) {

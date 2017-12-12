@@ -28,8 +28,22 @@ class ChessViewController: NSViewController, ChessViewInformationDelegate {
         }
     }
     
-    // MARK: Actions
+    override func validateMenuItem(_ menuItem: NSMenuItem) -> Bool {
+        if menuItem.action == #selector(playAgaintComputerWhite) {
+            menuItem.state = chessView.playAgainstComputer == .white ? .on : .off
+        }
+        if menuItem.action == #selector(playAgaintComputerBlack) {
+            menuItem.state = chessView.playAgainstComputer == .black ? .on : .off
+        }
+        if menuItem.action == #selector(playAgaintHuman) {
+            menuItem.state = chessView.playAgainstComputer == .human ? .on : .off
+        }
+
+        return true
+    }
     
+    // MARK: Menu Edit
+
     @IBAction func copy(_ sender: Any?) {
         let fen = engine.get()
         
@@ -45,5 +59,24 @@ class ChessViewController: NSViewController, ChessViewInformationDelegate {
             chessView.invalidateUI()
         }
     }
+    
+    // MARK: Menu Game
+
+    @IBAction func newGame(_ sender: NSMenuItem) {
+        chessView.newGame()
+    }
+    
+    @IBAction func playAgaintComputerWhite(_ sender: NSMenuItem) {
+        chessView.playAgainstComputer = .white
+    }
+
+    @IBAction func playAgaintComputerBlack(_ sender: NSMenuItem) {
+        chessView.playAgainstComputer = .black
+    }
+
+    @IBAction func playAgaintHuman(_ sender: NSMenuItem) {
+        chessView.playAgainstComputer = .human
+    }
+
 }
 

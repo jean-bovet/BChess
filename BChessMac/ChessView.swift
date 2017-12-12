@@ -40,6 +40,14 @@ class ChessView: NSView {
     
     var labels = [String: NSTextField]()
     
+    enum PlayAgainst {
+        case white
+        case black
+        case human
+    }
+    
+    var playAgainstComputer : PlayAgainst = .black
+    
     override init(frame frameRect: NSRect) {
         super.init(frame: frameRect)
     }
@@ -71,6 +79,11 @@ class ChessView: NSView {
         size.height -= 50
         computeSizes(boardSize: size)
         layoutBoardViews()
+    }
+    
+    func newGame() {
+        engine.newGame()
+        invalidateUI()
     }
     
     func layoutBoardViews() {
@@ -138,7 +151,12 @@ class ChessView: NSView {
                 engine.engine.move(view.move!.rawMoveValue)
                 clearAllViewIndicators()
                 invalidateUI()
-                enginePlay()
+                if engine.engine.isWhite() && playAgainstComputer == .white {
+                    enginePlay()
+                }
+                if !engine.engine.isWhite() && playAgainstComputer == .black {
+                    enginePlay()
+                }
             } else if view.selected {
                 clearAllViewIndicators()
                 self.needsLayout = true
