@@ -21,6 +21,7 @@ public:
     struct Evaluation {
         Move move;
         int value = 0;
+        bool mat = false;
         LineMove line;
         Color color;
 

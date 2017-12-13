@@ -96,6 +96,7 @@
     ei.nodeEvaluated = info.nodeEvaluated;
     ei.movesPerSecond = info.movesPerSecond;
     ei.rawMoveValue = info.evaluation.move;
+    ei.mat = info.evaluation.mat;
     ei.fromRank = RankFrom(MOVE_FROM(info.evaluation.move));
     ei.fromFile = FileFrom(MOVE_FROM(info.evaluation.move));
     ei.toRank = RankFrom(MOVE_TO(info.evaluation.move));

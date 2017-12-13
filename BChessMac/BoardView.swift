@@ -18,6 +18,8 @@ class BoardView: NSView {
     
     let engine = UCIEngine()
 
+    let borderView = NSView()
+    
     let numberFormatter = NumberFormatter()
 
     let pieceImageNames = [
@@ -47,7 +49,7 @@ class BoardView: NSView {
     }
     
     var playAgainstComputer : PlayAgainst = .black
-    var searchDepth = 4
+    var searchDepth = 5
     
     override init(frame frameRect: NSRect) {
         super.init(frame: frameRect)
@@ -58,6 +60,12 @@ class BoardView: NSView {
         numberFormatter.numberStyle = .decimal
         numberFormatter.thousandSeparator = ","
         numberFormatter.hasThousandSeparators = true
+        
+        borderView.wantsLayer = true
+        borderView.layer?.borderColor = NSColor.black.cgColor
+        borderView.layer?.borderWidth = 1
+        
+        addSubview(borderView)
     }
     
     override func encodeRestorableState(with coder: NSCoder) {
@@ -80,6 +88,8 @@ class BoardView: NSView {
         size.height -= 50
         computeSizes(boardSize: size)
         layoutBoardViews()
+        
+        borderView.frame = NSInsetRect(NSMakeRect(boardSquareDX, boardSquareDY, 8*boardSquareSize, 8*boardSquareSize), -1, -1)
     }
     
     func newGame() {
@@ -212,7 +222,8 @@ class BoardView: NSView {
             let lineInfo = info.bestLine.map { $0 }.joined(separator: " ")
             let infoNodes = self.numberFormatter.string(from: NSNumber(value: info.nodeEvaluated))!
             let infoSpeed = self.numberFormatter.string(from: NSNumber(value: info.movesPerSecond))!
-            let infoString = "Line: \(lineInfo)   Value: \(info.value)   Depth: \(info.depth)   Nodes: \(infoNodes) at \(infoSpeed) n/s"
+            let infoValue = info.mat ? "Mat" : "\(info.value)"
+            let infoString = "Line: \(lineInfo)   Value: \(infoValue)   Depth: \(info.depth)   Nodes: \(infoNodes) at \(infoSpeed) n/s"
             self.delegate?.chessViewEngineInfoDidChange(info: infoString)
             if completed {
                 DispatchQueue.main.async {

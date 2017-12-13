@@ -102,6 +102,7 @@ Minimax::Evaluation Minimax::evaluate(Board board, Move move, int depth, int max
         // It's either a draw or mat
         if (board.isCheck(board.color)) {
             bestEvaluation.value = board.color == WHITE ? INT_MIN : INT_MAX;
+            bestEvaluation.mat = true;
         } else {
             // TODO: is that a draw??
             bestEvaluation.value = 0;
