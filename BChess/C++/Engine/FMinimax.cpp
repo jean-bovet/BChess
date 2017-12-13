@@ -162,6 +162,7 @@ bool Minimax::evaluateAlphaBeta(Board board, Move move, int depth, int maxDepth,
             bestEvaluation.move = move;
             bestEvaluation.value = evaluation.value;
             bestEvaluation.color = evaluation.color;
+            bestEvaluation.mat = evaluation.mat;
 
             bestEvaluation.line = evaluation.line;
             bestEvaluation.line.insert(bestEvaluation.line.begin(), move);

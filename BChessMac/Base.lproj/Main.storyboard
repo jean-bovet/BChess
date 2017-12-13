@@ -530,14 +530,21 @@
                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
+                            <box verticalHuggingPriority="750" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="bTG-oh-LkD">
+                                <rect key="frame" x="0.0" y="19" width="591" height="8"/>
+                            </box>
                         </subviews>
                         <constraints>
                             <constraint firstItem="Q8S-Oy-e6A" firstAttribute="top" secondItem="m2S-Jp-Qdl" secondAttribute="top" id="4KM-Ef-eFS"/>
                             <constraint firstAttribute="trailing" secondItem="Q8S-Oy-e6A" secondAttribute="trailing" id="D9G-dv-fjm"/>
                             <constraint firstItem="Q8S-Oy-e6A" firstAttribute="leading" secondItem="m2S-Jp-Qdl" secondAttribute="leading" id="Ibt-Sm-Ypk"/>
+                            <constraint firstItem="icQ-Uj-SKX" firstAttribute="top" secondItem="bTG-oh-LkD" secondAttribute="bottom" id="Iup-fg-Bcm"/>
                             <constraint firstItem="icQ-Uj-SKX" firstAttribute="leading" secondItem="m2S-Jp-Qdl" secondAttribute="leading" constant="4" id="UqJ-NW-UfW"/>
                             <constraint firstItem="icQ-Uj-SKX" firstAttribute="top" secondItem="Q8S-Oy-e6A" secondAttribute="bottom" constant="4" id="g7H-Ff-wHA"/>
+                            <constraint firstAttribute="trailing" secondItem="bTG-oh-LkD" secondAttribute="trailing" id="rL8-g8-3Ag"/>
+                            <constraint firstItem="bTG-oh-LkD" firstAttribute="leading" secondItem="m2S-Jp-Qdl" secondAttribute="leading" id="rlS-4a-teG"/>
                             <constraint firstAttribute="bottom" secondItem="icQ-Uj-SKX" secondAttribute="bottom" constant="4" id="sbn-kp-jZm"/>
+                            <constraint firstItem="bTG-oh-LkD" firstAttribute="top" secondItem="Q8S-Oy-e6A" secondAttribute="bottom" id="wfi-z4-b4A"/>
                             <constraint firstAttribute="trailing" secondItem="icQ-Uj-SKX" secondAttribute="trailing" constant="4" id="yJW-oZ-lhG"/>
                         </constraints>
                     </view>
@@ -548,7 +555,7 @@
                 </viewController>
                 <customObject id="rPt-NT-nkU" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="76" y="730"/>
+            <point key="canvasLocation" x="75.5" y="729.5"/>
         </scene>
     </scenes>
 </document>
