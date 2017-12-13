@@ -55,6 +55,8 @@ public:
     
     Board();
     
+    void reset();
+    
     void clear() {
         memset(pieces, 0, sizeof(pieces));
         occupancyDirty = true;

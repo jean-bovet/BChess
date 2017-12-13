@@ -180,6 +180,12 @@ static Bitboard IBlackPawns = BB(0b\
 #pragma mark -
 
 Board::Board() {
+    reset();
+}
+
+void Board::reset() {
+    clear();
+    
     pieces[WHITE][PAWN] = IWhitePawns;
     pieces[WHITE][KING] = IWhiteKing;
     pieces[WHITE][QUEEN] = IWhiteQueen;

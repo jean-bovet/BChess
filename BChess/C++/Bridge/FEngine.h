@@ -25,7 +25,7 @@ typedef void(^FEngineSearchCallback)(FEngineInfo * _Nonnull info);
 
 - (id _Nonnull)init;
 
-- (void)setFEN:(NSString*_Nonnull)boardFEN;
+- (void)setFEN:(NSString* _Nonnull)boardFEN;
 - (NSString* _Nonnull )boardFEN;
 
 - (NSString* _Nullable)pieceAt:(NSUInteger)rank file:(NSUInteger)file;
@@ -33,12 +33,18 @@ typedef void(^FEngineSearchCallback)(FEngineInfo * _Nonnull info);
 - (NSArray<FEngineMove*>* _Nonnull)movesAt:(NSUInteger)rank file:(NSUInteger)file;
 - (void)move:(NSUInteger)move;
 
-- (void)move:(NSString*_Nonnull)from to:(NSString*_Nonnull)to;
+- (BOOL)canUndoMove;
+- (BOOL)canRedoMove;
+
+- (void)undoMove;
+- (void)redoMove;
+
+- (void)move:(NSString* _Nonnull)from to:(NSString* _Nonnull)to;
 - (void)stop;
 
 - (BOOL)isWhite;
 
-- (FEngineInfo*_Nonnull)searchBestMove:(NSString*_Nonnull)boardFEN
+- (FEngineInfo* _Nonnull)searchBestMove:(NSString*_Nonnull)boardFEN
                               maxDepth:(NSInteger)maxDepth
                               callback:(FEngineSearchCallback _Nonnull )callback;
 

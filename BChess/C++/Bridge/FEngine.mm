@@ -23,6 +23,9 @@
     Board currentBoard;
 }
 
+@property (nonatomic, strong) NSMutableArray<FEngineMove*> *moves;
+@property (nonatomic, assign) NSUInteger moveCursor;
+
 @end
 
 @implementation FEngine
@@ -30,6 +33,8 @@
 - (id)init {
     if (self = [super init]) {
         MoveGenerator::initialize();
+        _moves = [NSMutableArray array];
+        _moveCursor = 0;
     }
     return self;
 }
@@ -53,6 +58,16 @@
     }
 }
 
+- (FEngineMove*)engineMoveFromMove:(Move)fmove {
+    FEngineMove *move = [[FEngineMove alloc] init];
+    move.rawMoveValue = fmove;
+    move.fromFile = FileFrom(MOVE_FROM(fmove));
+    move.fromRank = RankFrom(MOVE_FROM(fmove));
+    move.toFile = FileFrom(MOVE_TO(fmove));
+    move.toRank = RankFrom(MOVE_TO(fmove));
+    return move;
+}
+
 - (NSArray<FEngineMove*>* _Nonnull)movesAt:(NSUInteger)rank file:(NSUInteger)file {
     MoveGenerator generator = MoveGenerator();
     MoveList moveList = generator.generateMoves(currentBoard, SquareFrom((File)file, (Rank)rank));
@@ -60,25 +75,57 @@
     NSMutableArray *moves = [NSMutableArray array];
     for (int index=0; index<moveList.moveCount; index++) {
         Move fmove = moveList.moves[index];
-        
-        FEngineMove *move = [[FEngineMove alloc] init];
-        move.rawMoveValue = fmove;
-        move.fromFile = FileFrom(MOVE_FROM(fmove));
-        move.fromRank = RankFrom(MOVE_FROM(fmove));
-        move.toFile = FileFrom(MOVE_TO(fmove));
-        move.toRank = RankFrom(MOVE_TO(fmove));
-        [moves addObject:move];
+        [moves addObject:[self engineMoveFromMove:fmove]];
     }
     return moves;
 }
 
 - (void)move:(NSUInteger)move {
+    if (self.moveCursor < self.moves.count) {
+        // Clear the rest of the history
+        [self.moves removeObjectsInRange:NSMakeRange(self.moveCursor, self.moves.count - self.moveCursor)];
+    }
+    
+    [self.moves addObject:[self engineMoveFromMove:(Move)move]];
+    self.moveCursor = self.moves.count;
+    
     currentBoard.move((Move)move);
 }
 
 - (void)move:(NSString*)from to:(NSString*)to {
+    // TODO: when is that one used? We need to keep track of move for the history
     currentBoard.move(std::string([from cStringUsingEncoding:NSUTF8StringEncoding]),
                       std::string([to cStringUsingEncoding:NSUTF8StringEncoding]));
+}
+
+- (BOOL)canUndoMove {
+    return self.moves.count > 0;
+}
+
+- (BOOL)canRedoMove {
+    return self.moveCursor < self.moves.count;
+}
+
+- (void)undoMove {
+    if (self.moveCursor > 0) {
+        self.moveCursor--;
+        [self replayMoves];
+    }
+}
+
+- (void)redoMove {
+    if (self.moveCursor < self.moves.count) {
+        self.moveCursor++;
+        [self replayMoves];
+    }
+}
+
+- (void)replayMoves {
+    currentBoard.reset();
+    for (NSUInteger index=0; index<self.moveCursor; index++) {
+        FEngineMove *move = self.moves[index];
+        currentBoard.move((Move)move.rawMoveValue);
+    }
 }
 
 - (void)stop {

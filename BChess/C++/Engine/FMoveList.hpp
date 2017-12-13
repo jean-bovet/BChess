@@ -9,14 +9,17 @@
 #pragma once
 
 #include "FMove.hpp"
-#include "FBoard.hpp"
+#include "FBitboard.hpp"
 
 const int MAX_MOVES = 256;
+
+class Board;
 
 struct MoveList {
     Move moves[MAX_MOVES];
     int moveCount = 0;
     
+    void addMove(Move move);
     void addMove(Board &board, Move move);
     void addMoves(Board &board, Square from, Bitboard moves, Piece piece);
     void addCaptures(Board &board, Square from, Bitboard moves, Piece piece);

@@ -7,6 +7,12 @@
 //
 
 #include "FMoveList.hpp"
+#include "FBoard.hpp"
+
+void MoveList::addMove(Move move) {
+    moves[moveCount] = move;
+    moveCount++;
+}
 
 void MoveList::addMove(Board &board, Move move) {
     Board validBoard = board;
@@ -14,8 +20,7 @@ void MoveList::addMove(Board &board, Move move) {
     // Note: make sure the move that was just played doesn't make
     // it's king in check (use board.color which refers to the move's color).
     if (!validBoard.isCheck(board.color)) {
-        moves[moveCount] = move;
-        moveCount++;
+        addMove(move);
     }
 }
 

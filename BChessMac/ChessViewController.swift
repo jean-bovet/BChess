@@ -47,6 +47,12 @@ class ChessViewController: NSViewController, ChessViewInformationDelegate {
         if menuItem.action == #selector(depth6) {
             menuItem.state = chessView.searchDepth == 6 ? .on : .off
         }
+        if menuItem.action == #selector(undoMove) {
+            return chessView.engine.engine.canUndoMove()
+        }
+        if menuItem.action == #selector(redoMove) {
+            return chessView.engine.engine.canRedoMove()
+        }
         return true
     }
     
@@ -84,6 +90,16 @@ class ChessViewController: NSViewController, ChessViewInformationDelegate {
 
     @IBAction func playAgaintHuman(_ sender: NSMenuItem) {
         chessView.playAgainstComputer = .human
+    }
+
+    @IBAction func undoMove(_ sender: NSMenuItem) {
+        chessView.engine.engine.undoMove()
+        chessView.invalidateUI()
+    }
+
+    @IBAction func redoMove(_ sender: NSMenuItem) {
+        chessView.engine.engine.redoMove()
+        chessView.invalidateUI()
     }
 
     // MARK: Menu Level
