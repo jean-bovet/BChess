@@ -14,6 +14,9 @@ typedef uint8_t Square;
 typedef uint8_t File;
 typedef uint8_t Rank;
 
+#define FileUndefined UINT8_MAX
+#define RankUndefined UINT8_MAX
+
 #define SquareUndefined UINT8_MAX
 
 inline static Square SquareFrom(File file, Rank rank) {

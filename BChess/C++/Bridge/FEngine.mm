@@ -12,6 +12,7 @@
 #import "FFEN.hpp"
 #import "FMove.hpp"
 #import "FTests.hpp"
+#import "FTestsPGN.hpp"
 #import "FMinimax.hpp"
 
 @implementation FEngineMove
@@ -234,8 +235,12 @@
     return moveFENs;
 }
 
-- (void)runTests {
++ (void)runCPPTestMoves {
     FTests::runAll();
+}
+
++ (void)runCPPTestPGN {
+    FTestsPGN::runAll();
 }
 
 - (void)generatePositions {

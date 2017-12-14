@@ -10,9 +10,12 @@ import XCTest
 
 class CPPTests: XCTestCase {
 
-    func testCPP() {
-        let engine = FEngine()
-        engine.runTests()
+    func testMoves() {
+        FEngine.runCPPTestMoves()
+    }
+    
+    func testPGN() {
+        FEngine.runCPPTestPGN()
     }
 
 }

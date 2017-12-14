@@ -381,7 +381,8 @@ inline static char charForPiece(Color color, Piece piece) {
 }
 
 void Board::print() {
-    for (Rank rank = 7; rank >= 0; rank--) {
+    for (Rank reverseRank = 0; reverseRank < 8; reverseRank++) {
+        Rank rank = 7 - reverseRank;
         for (File file = 0; file < 8; file++) {
             char c = '.';
             
