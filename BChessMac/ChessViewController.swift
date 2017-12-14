@@ -20,12 +20,25 @@ class ChessViewController: NSViewController, ChessViewInformationDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
         chessView.delegate = self
+        engine.updateCallback = {
+            self.updateUI()
+        }
+        updateUI()
     }
     
-    func chessViewEngineInfoDidChange(info: String) {
+    func chessViewEngineInfoDidChange() {
         DispatchQueue.main.async {
-            self.infoLabel.stringValue = info
+            self.updateInfoLine()
         }
+    }
+    
+    func updateUI() {
+        chessView.invalidateUI()
+        updateInfoLine()
+    }
+    
+    func updateInfoLine() {
+        infoLabel.stringValue = chessView.infoLine
     }
     
     override func validateMenuItem(_ menuItem: NSMenuItem) -> Bool {
@@ -92,12 +105,10 @@ class ChessViewController: NSViewController, ChessViewInformationDelegate {
 
     @IBAction func undoMove(_ sender: NSMenuItem) {
         engine.undoMove()
-        chessView.invalidateUI()
     }
 
     @IBAction func redoMove(_ sender: NSMenuItem) {
         engine.redoMove()
-        chessView.invalidateUI()
     }
 
     // MARK: Menu Level

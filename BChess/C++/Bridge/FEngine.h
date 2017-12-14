@@ -10,6 +10,7 @@
 #import "FEngineInfo.h"
 
 typedef void(^FEngineSearchCallback)(FEngineInfo * _Nonnull info, BOOL completed);
+typedef void(^FEngineDidUpdateCallback)();
 
 @interface FEngineMove: NSObject
 
@@ -25,6 +26,8 @@ typedef void(^FEngineSearchCallback)(FEngineInfo * _Nonnull info, BOOL completed
 @property (nonatomic, assign) BOOL async;
 
 @property (nonatomic, strong) NSString * _Nonnull FEN;
+
+@property (nonatomic, strong) FEngineDidUpdateCallback _Nullable updateCallback;
 
 - (id _Nonnull)init;
 

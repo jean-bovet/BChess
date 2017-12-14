@@ -40,6 +40,10 @@
     return self;
 }
 
+- (void)fireUpdate {
+    self.updateCallback();
+}
+
 - (void)setFEN:(NSString *)FEN {
     FFEN::setFEN(std::string([FEN UTF8String]), currentBoard);
 }
@@ -91,6 +95,8 @@
     self.moveCursor = self.moves.count;
     
     currentBoard.move((Move)move);
+    
+    [self fireUpdate];
 }
 
 - (void)move:(NSString*)from to:(NSString*)to {
@@ -127,6 +133,7 @@
         FEngineMove *move = self.moves[index];
         currentBoard.move((Move)move.rawMoveValue);
     }
+    [self fireUpdate];
 }
 
 - (void)stop {
