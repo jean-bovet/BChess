@@ -99,17 +99,17 @@ class GamesTests: XCTestCase {
         assert(command: s, resultingFEN: fen, bestMove: "bestmove f7f8n")
     }
     
-    func assert(command: String, resultingFEN: String, bestMove: String, depth: Int = UCIEngine.defaultDepth) {
+    func assert(command: String, resultingFEN: String, bestMove: String, depth: Int = UCI.defaultDepth) {
         let uci = UCI()
         var tokens = command.split(separator: " ").map { String($0) }
         uci.process(&tokens)
                 
-        let fen = uci.engine.get()
+        let fen = uci.engine.fen
         XCTAssertEqual(fen, resultingFEN)
         
         let expectation = XCTestExpectation(description: "evaluation")
         var engineInfo: FEngineInfo? = nil
-        uci.engine.evaluate(depth: depth) { (info, completed) in
+        uci.engine.evaluate(depth) { (info, completed) in
             if completed {
                 engineInfo = info
                 expectation.fulfill()

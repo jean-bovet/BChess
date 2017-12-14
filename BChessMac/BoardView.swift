@@ -16,7 +16,7 @@ class BoardView: NSView {
 
     weak var delegate: ChessViewInformationDelegate? = nil
     
-    let engine = UCIEngine()
+    let engine = FEngine()
 
     let borderView = NSView()
     
@@ -70,13 +70,13 @@ class BoardView: NSView {
     
     override func encodeRestorableState(with coder: NSCoder) {
         super.encodeRestorableState(with: coder)
-        coder.encode(engine.get(), forKey: "fen")
+        coder.encode(engine.fen, forKey: "fen")
     }
     
     override func restoreState(with coder: NSCoder) {
         super.restoreState(with: coder)
         if let fen = coder.decodeObject(forKey: "fen") as? String {
-            engine.set(fen: fen)
+            engine.fen = fen
             self.needsLayout = true
         }
     }
@@ -93,7 +93,7 @@ class BoardView: NSView {
     }
     
     func newGame() {
-        engine.newGame()
+        engine.fen = StartPosFEN
         invalidateUI()
     }
     
@@ -120,7 +120,7 @@ class BoardView: NSView {
         layoutBoard() { (frame, rank, file, blackBackground) in
             let view = pieceSquareView(rank: rank, file: file)
             view.frame = frame
-            if let piece = engine.engine.piece(at: UInt(rank), file: UInt(file)) {
+            if let piece = engine.piece(at: UInt(rank), file: UInt(file)) {
                 if let imageName = pieceImageNames[piece], let image = NSImage(named: NSImage.Name(rawValue: imageName)) {
                     view.image = image
                 } else {
@@ -159,13 +159,13 @@ class BoardView: NSView {
         if let view = sender.view as? PieceView {
             if view.moveIndicator {
                 // Perform move
-                engine.engine.move(view.move!.rawMoveValue)
+                engine.move(view.move!.rawMoveValue)
                 clearAllViewIndicators()
                 invalidateUI()
-                if engine.engine.isWhite() && playAgainstComputer == .white {
+                if engine.isWhite() && playAgainstComputer == .white {
                     enginePlay()
                 }
-                if !engine.engine.isWhite() && playAgainstComputer == .black {
+                if !engine.isWhite() && playAgainstComputer == .black {
                     enginePlay()
                 }
             } else if view.selected {
@@ -177,7 +177,7 @@ class BoardView: NSView {
                 // Select the square
                 view.selected = true
                 
-                let moves = engine.engine.moves(at: UInt(view.rank), file: UInt(view.file))
+                let moves = engine.moves(at: UInt(view.rank), file: UInt(view.file))
                 for move in moves {
                     let moveView = pieceSquareView(rank: Int(move.toRank), file: Int(move.toFile))
                     moveView.moveIndicator = true
@@ -218,12 +218,13 @@ class BoardView: NSView {
     }
     
     func enginePlay() {
-        engine.evaluate(depth: searchDepth) { (info, completed) in
+        engine.evaluate(searchDepth) { (info, completed) in
             let lineInfo = info.bestLine.map { $0 }.joined(separator: " ")
             let infoNodes = self.numberFormatter.string(from: NSNumber(value: info.nodeEvaluated))!
             let infoSpeed = self.numberFormatter.string(from: NSNumber(value: info.movesPerSecond))!
             let infoValue = info.mat ? "Mat" : "\(info.value)"
-            let infoString = "Line: \(lineInfo)   Value: \(infoValue)   Depth: \(info.depth)   Nodes: \(infoNodes) at \(infoSpeed) n/s"
+            let infoColorToPlay = self.engine.isWhite() ? "Black to play" : "White to play"
+            let infoString = "\(infoColorToPlay) ––  Line: \(lineInfo)   Value: \(infoValue)   Depth: \(info.depth)   Nodes: \(infoNodes) at \(infoSpeed) n/s"
             self.delegate?.chessViewEngineInfoDidChange(info: infoString)
             if completed {
                 DispatchQueue.main.async {
@@ -244,7 +245,7 @@ class BoardView: NSView {
             fromPieceView.animator().frame = targetPieceView.frame
         }, completionHandler:{
             targetPieceView.alphaValue = 1.0
-            self.engine.engine.move(info.rawMoveValue)
+            self.engine.move(info.rawMoveValue)
             self.invalidateUI()
         })
     }

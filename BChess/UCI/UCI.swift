@@ -11,9 +11,11 @@ import os.log
 
 class UCI {
     
+    static let defaultDepth = 6
+
     let log: OSLog
-    let engine = UCIEngine()
-    
+    let engine = FEngine()
+
     var xcodeMode = false
     
     init() {        
@@ -23,7 +25,7 @@ class UCI {
         setbuf(__stdoutp, nil)
         
         // Initialize by default with the empty board
-        engine.set(fen: StartPosFEN)
+        engine.fen = StartPosFEN
     }
     
     func engineOutput(_ message: String) {
@@ -48,10 +50,10 @@ class UCI {
         let cmd = tokens.removeFirst()
         
         if cmd == "startpos" {
-            engine.set(fen: StartPosFEN)
+            engine.fen = StartPosFEN
         } else if cmd == "fen" {
             let fen = tokens[0...5].joined(separator: " ")
-            engine.set(fen: fen)
+            engine.fen = fen
             tokens.removeFirst(6)
         }
         
@@ -71,7 +73,7 @@ class UCI {
             
             let secondToken = moveToken.index(start, offsetBy: 2)
             let to = String(moveToken[secondToken...])
-            engine.move(from: from, to: to)
+            engine.move(from, to: to)
         }
         tokens.removeAll()
     }
@@ -81,9 +83,9 @@ class UCI {
         // go wtime 300000 btime 300000
         let cmd = tokens.removeFirst()
         
-        let depth = (cmd == "infinite") ? -1 : UCIEngine.defaultDepth
+        let depth = (cmd == "infinite") ? -1 : UCI.defaultDepth
         
-        engine.evaluate(depth: depth) { (info, completed) in
+        engine.evaluate(depth) { (info, completed) in
             if completed {
                 self.engineOutput(info.uciBestMove)
             } else {

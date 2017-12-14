@@ -13,7 +13,7 @@ class ChessViewController: NSViewController, ChessViewInformationDelegate {
     @IBOutlet var chessView: BoardView!
     @IBOutlet var infoLabel: NSTextField!
 
-    var engine : UCIEngine {
+    var engine : FEngine {
         return chessView.engine
     }
     
@@ -48,10 +48,10 @@ class ChessViewController: NSViewController, ChessViewInformationDelegate {
             menuItem.state = chessView.searchDepth == 6 ? .on : .off
         }
         if menuItem.action == #selector(undoMove) {
-            return chessView.engine.engine.canUndoMove()
+            return engine.canUndoMove()
         }
         if menuItem.action == #selector(redoMove) {
-            return chessView.engine.engine.canRedoMove()
+            return engine.canRedoMove()
         }
         return true
     }
@@ -59,17 +59,15 @@ class ChessViewController: NSViewController, ChessViewInformationDelegate {
     // MARK: Menu Edit
 
     @IBAction func copy(_ sender: Any?) {
-        let fen = engine.get()
-        
         let pasteboard = NSPasteboard.general
         pasteboard.clearContents()
-        pasteboard.setString(fen, forType: .string)
+        pasteboard.setString(engine.fen, forType: .string)
     }
     
     @IBAction func paste(_ sender: Any?) {
         let pasteboard = NSPasteboard.general
         if let fen = pasteboard.string(forType: .string) {
-            engine.set(fen: fen)
+            engine.fen = fen
             chessView.invalidateUI()
         }
     }
@@ -93,12 +91,12 @@ class ChessViewController: NSViewController, ChessViewInformationDelegate {
     }
 
     @IBAction func undoMove(_ sender: NSMenuItem) {
-        chessView.engine.engine.undoMove()
+        engine.undoMove()
         chessView.invalidateUI()
     }
 
     @IBAction func redoMove(_ sender: NSMenuItem) {
-        chessView.engine.engine.redoMove()
+        engine.redoMove()
         chessView.invalidateUI()
     }
 

@@ -59,17 +59,6 @@
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <menu key="submenu" title="Game" id="PBs-cT-jNJ">
                                     <items>
-                                        <menuItem title="Undo Move" keyEquivalent="z" id="uhi-8X-eXs">
-                                            <connections>
-                                                <action selector="undoMove:" target="Ady-hI-5gd" id="PE2-Q3-hm3"/>
-                                            </connections>
-                                        </menuItem>
-                                        <menuItem title="Redo Move" keyEquivalent="Z" id="i7O-t2-Y75">
-                                            <connections>
-                                                <action selector="redoMove:" target="Ady-hI-5gd" id="QXl-gj-Gus"/>
-                                            </connections>
-                                        </menuItem>
-                                        <menuItem isSeparatorItem="YES" id="eyf-5r-Nta"/>
                                         <menuItem title="New Game" id="t6v-J4-Mvn">
                                             <modifierMask key="keyEquivalentModifierMask"/>
                                             <connections>
@@ -82,6 +71,34 @@
                                         <menuItem isSeparatorItem="YES" id="McZ-7g-ahd"/>
                                         <menuItem title="Start Analysis" id="VHt-Yh-bdc">
                                             <modifierMask key="keyEquivalentModifierMask"/>
+                                        </menuItem>
+                                    </items>
+                                </menu>
+                            </menuItem>
+                            <menuItem title="Edit" id="D51-6k-Zg0">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <menu key="submenu" title="Edit" id="PFq-fQ-IKm">
+                                    <items>
+                                        <menuItem title="Undo Move" keyEquivalent="z" id="red-6C-pYp">
+                                            <connections>
+                                                <action selector="undoMove:" target="Ady-hI-5gd" id="gHQ-qo-mNc"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Redo Move" keyEquivalent="Z" id="eGi-yE-FnY">
+                                            <connections>
+                                                <action selector="redoMove:" target="Ady-hI-5gd" id="orO-wP-wHb"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem isSeparatorItem="YES" id="zce-s7-VHY"/>
+                                        <menuItem title="Copy" keyEquivalent="c" id="TzU-TD-3DC">
+                                            <connections>
+                                                <action selector="copy:" target="Ady-hI-5gd" id="4hc-8K-iuU"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Paste" keyEquivalent="v" id="jM5-BE-izz">
+                                            <connections>
+                                                <action selector="paste:" target="Ady-hI-5gd" id="Fhy-7v-Oq0"/>
+                                            </connections>
                                         </menuItem>
                                     </items>
                                 </menu>
@@ -216,7 +233,7 @@
                 <customObject id="YLy-65-1bz" customClass="NSFontManager"/>
                 <customObject id="Ady-hI-5gd" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="638" y="-248"/>
+            <point key="canvasLocation" x="558" y="-458"/>
         </scene>
         <!--Window Controller-->
         <scene sceneID="R2V-B0-nI4">

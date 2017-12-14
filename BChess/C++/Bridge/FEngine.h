@@ -9,7 +9,7 @@
 #import <Foundation/Foundation.h>
 #import "FEngineInfo.h"
 
-typedef void(^FEngineSearchCallback)(FEngineInfo * _Nonnull info);
+typedef void(^FEngineSearchCallback)(FEngineInfo * _Nonnull info, BOOL completed);
 
 @interface FEngineMove: NSObject
 
@@ -22,11 +22,11 @@ typedef void(^FEngineSearchCallback)(FEngineInfo * _Nonnull info);
 @interface FEngine : NSObject
 
 @property (nonatomic, assign) int moveCount;
+@property (nonatomic, assign) BOOL async;
+
+@property (nonatomic, strong) NSString * _Nonnull FEN;
 
 - (id _Nonnull)init;
-
-- (void)setFEN:(NSString* _Nonnull)boardFEN;
-- (NSString* _Nonnull )boardFEN;
 
 - (NSString* _Nullable)pieceAt:(NSUInteger)rank file:(NSUInteger)file;
 
@@ -44,9 +44,7 @@ typedef void(^FEngineSearchCallback)(FEngineInfo * _Nonnull info);
 
 - (BOOL)isWhite;
 
-- (FEngineInfo* _Nonnull)searchBestMove:(NSString*_Nonnull)boardFEN
-                              maxDepth:(NSInteger)maxDepth
-                              callback:(FEngineSearchCallback _Nonnull )callback;
+- (void)evaluate:(NSInteger)depth callback:(FEngineSearchCallback _Nonnull)callback;
 
 - (NSArray<NSString*>* _Nonnull)moveFENsFrom:(NSString* _Nonnull)startingFEN squareName:(NSString* _Nullable)squareName;
 

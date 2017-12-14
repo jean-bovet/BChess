@@ -33,7 +33,6 @@
 		A75359A61FDE0947008D1DEE /* BChessMacTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A75359A51FDE0947008D1DEE /* BChessMacTests.swift */; };
 		A75359B11FDE0947008D1DEE /* BChessMacUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A75359B01FDE0947008D1DEE /* BChessMacUITests.swift */; };
 		A75359BF1FDE0E3B008D1DEE /* BoardSquareView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A75359BE1FDE0E3B008D1DEE /* BoardSquareView.swift */; };
-		A75359C21FDE4023008D1DEE /* UCIEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7712D2C1FC7C22000E7E802 /* UCIEngine.swift */; };
 		A75359C31FDE4023008D1DEE /* FENgineInfo+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = A75359831FDC51B2008D1DEE /* FENgineInfo+Extension.swift */; };
 		A75359C41FDE4031008D1DEE /* FEngineInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = A70A61D01FD4AA9600AFDF0E /* FEngineInfo.m */; };
 		A75359C51FDE4031008D1DEE /* FEngine.mm in Sources */ = {isa = PBXBuildFile; fileRef = A75683281FCD28A000CF1408 /* FEngine.mm */; };
@@ -49,11 +48,9 @@
 		A75683291FCD28A000CF1408 /* FEngine.mm in Sources */ = {isa = PBXBuildFile; fileRef = A75683281FCD28A000CF1408 /* FEngine.mm */; };
 		A756832D1FD0B3FE00CF1408 /* magicmoves.c in Sources */ = {isa = PBXBuildFile; fileRef = A7712D411FCB97A900E7E802 /* magicmoves.c */; };
 		A75683301FD0D96300CF1408 /* FPerformance.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A756832E1FD0D96300CF1408 /* FPerformance.cpp */; };
-		A7712D2D1FC7C22000E7E802 /* UCIEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7712D2C1FC7C22000E7E802 /* UCIEngine.swift */; };
 		A7712D2F1FC7C4CD00E7E802 /* UCI.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7712D2E1FC7C4CD00E7E802 /* UCI.swift */; };
 		A7712D331FC8957500E7E802 /* GamesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7712D321FC8957500E7E802 /* GamesTests.swift */; };
 		A7712D341FC895D100E7E802 /* UCI.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7712D2E1FC7C4CD00E7E802 /* UCI.swift */; };
-		A7712D351FC895D300E7E802 /* UCIEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7712D2C1FC7C22000E7E802 /* UCIEngine.swift */; };
 		A7712D441FCBBD9C00E7E802 /* Performance.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7712D431FCBBD9C00E7E802 /* Performance.swift */; };
 		A7712D471FCBC13100E7E802 /* FBoard.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A7712D451FCBC13100E7E802 /* FBoard.cpp */; };
 		A7AFCCAA1FB4E40D00AE3D85 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7AFCCA91FB4E40D00AE3D85 /* main.swift */; };
@@ -133,7 +130,6 @@
 		A756832F1FD0D96300CF1408 /* FPerformance.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = FPerformance.hpp; sourceTree = "<group>"; };
 		A7712D141FB916E900E7E802 /* BChessTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BChessTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		A7712D181FB916E900E7E802 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		A7712D2C1FC7C22000E7E802 /* UCIEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UCIEngine.swift; sourceTree = "<group>"; };
 		A7712D2E1FC7C4CD00E7E802 /* UCI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UCI.swift; sourceTree = "<group>"; };
 		A7712D311FC7C5CF00E7E802 /* ToDo.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = ToDo.md; sourceTree = "<group>"; };
 		A7712D321FC8957500E7E802 /* GamesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GamesTests.swift; sourceTree = "<group>"; };
@@ -285,7 +281,6 @@
 			isa = PBXGroup;
 			children = (
 				A7712D2E1FC7C4CD00E7E802 /* UCI.swift */,
-				A7712D2C1FC7C22000E7E802 /* UCIEngine.swift */,
 				A75359831FDC51B2008D1DEE /* FENgineInfo+Extension.swift */,
 			);
 			path = UCI;
@@ -523,7 +518,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A75359C21FDE4023008D1DEE /* UCIEngine.swift in Sources */,
 				A75359CA1FDE4038008D1DEE /* FEvaluate.cpp in Sources */,
 				A75359CF1FDE4385008D1DEE /* PieceView.swift in Sources */,
 				A75359C31FDE4023008D1DEE /* FENgineInfo+Extension.swift in Sources */,
@@ -575,7 +569,6 @@
 				A7B18F5A1FD9BC8D00A605B8 /* CPPTests.swift in Sources */,
 				A7B18F581FD9BAE500A605B8 /* MovesTests.swift in Sources */,
 				A70A61D61FD4D46D00AFDF0E /* FEngine.mm in Sources */,
-				A7712D351FC895D300E7E802 /* UCIEngine.swift in Sources */,
 				A70A61D81FD4D49500AFDF0E /* FMoveList.cpp in Sources */,
 				A70A61D91FD4D49500AFDF0E /* FMoveGenerator.cpp in Sources */,
 				A70A61D71FD4D48700AFDF0E /* FPerformance.cpp in Sources */,
@@ -596,7 +589,6 @@
 				A756832D1FD0B3FE00CF1408 /* magicmoves.c in Sources */,
 				A7712D471FCBC13100E7E802 /* FBoard.cpp in Sources */,
 				A70A61CA1FD46E3C00AFDF0E /* FEvaluate.cpp in Sources */,
-				A7712D2D1FC7C22000E7E802 /* UCIEngine.swift in Sources */,
 				A70A61C41FD458DE00AFDF0E /* FMoveGenerator.cpp in Sources */,
 				A70A61D11FD4AA9600AFDF0E /* FEngineInfo.m in Sources */,
 				A75683301FD0D96300CF1408 /* FPerformance.cpp in Sources */,

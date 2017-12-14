@@ -35,15 +35,16 @@
         MoveGenerator::initialize();
         _moves = [NSMutableArray array];
         _moveCursor = 0;
+        _async = YES;
     }
     return self;
 }
 
-- (void)setFEN:(NSString*)boardFEN {
-    FFEN::setFEN(std::string([boardFEN UTF8String]), currentBoard);
+- (void)setFEN:(NSString *)FEN {
+    FFEN::setFEN(std::string([FEN UTF8String]), currentBoard);
 }
 
-- (NSString*)boardFEN {
+- (NSString*)FEN {
     auto fen = FFEN::getFEN(currentBoard);
     return [NSString stringWithUTF8String:fen.c_str()];
 }
@@ -166,13 +167,25 @@
     return ei;
 }
 
-- (FEngineInfo*)searchBestMove:(NSString*)boardFEN maxDepth:(NSInteger)maxDepth callback:(FEngineSearchCallback)callback {
+- (void)evaluate:(NSInteger)depth callback:(FEngineSearchCallback)callback {
+    [self stop];
+    
+    if (self.async) {
+        dispatch_async(dispatch_get_global_queue(QOS_CLASS_BACKGROUND, 0), ^{
+            [self searchBestMove:self.FEN maxDepth:depth callback:callback];
+        });
+    } else {
+        [self searchBestMove:self.FEN maxDepth:depth callback:callback];
+    }
+}
+
+- (void)searchBestMove:(NSString*)boardFEN maxDepth:(NSInteger)maxDepth callback:(FEngineSearchCallback)callback {
     Board board;
     FFEN::setFEN(std::string([boardFEN UTF8String]), board);
     Minimax::Info info = minimax.searchBestMove(board, (int)maxDepth, [self, callback](Minimax::Info info) {
-        callback([self infoFor:info]);
+        callback([self infoFor:info], NO);
     });
-    return [self infoFor:info];
+    callback([self infoFor:info], YES);
 }
 
 - (NSArray<NSString*>* _Nonnull)moveFENsFrom:(NSString* _Nonnull)startingFEN squareName:(NSString* _Nullable)squareName {
