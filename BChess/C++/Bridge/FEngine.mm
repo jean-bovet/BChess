@@ -41,7 +41,11 @@
 }
 
 - (void)fireUpdate {
-    self.updateCallback();
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if (self.updateCallback) {
+            self.updateCallback();
+        }
+    });
 }
 
 - (void)setFEN:(NSString *)FEN {
@@ -106,7 +110,7 @@
 }
 
 - (BOOL)canUndoMove {
-    return self.moves.count > 0;
+    return self.moveCursor > 0;
 }
 
 - (BOOL)canRedoMove {
@@ -179,10 +183,16 @@
     
     if (self.async) {
         dispatch_async(dispatch_get_global_queue(QOS_CLASS_BACKGROUND, 0), ^{
-            [self searchBestMove:self.FEN maxDepth:depth callback:callback];
+            [self searchBestMove:self.FEN maxDepth:depth callback:^(FEngineInfo * _Nonnull info, BOOL completed) {
+                callback(info, completed);
+                [self fireUpdate];
+            }];
         });
     } else {
-        [self searchBestMove:self.FEN maxDepth:depth callback:callback];
+        [self searchBestMove:self.FEN maxDepth:depth callback:^(FEngineInfo * _Nonnull info, BOOL completed) {
+            callback(info, completed);
+            [self fireUpdate];
+        }];
     }
 }
 

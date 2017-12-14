@@ -8,7 +8,7 @@
 
 import Cocoa
 
-class ChessViewController: NSViewController, ChessViewInformationDelegate {
+class ChessViewController: NSViewController {
 
     @IBOutlet var chessView: BoardView!
     @IBOutlet var infoLabel: NSTextField!
@@ -19,17 +19,10 @@ class ChessViewController: NSViewController, ChessViewInformationDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        chessView.delegate = self
         engine.updateCallback = {
             self.updateUI()
         }
         updateUI()
-    }
-    
-    func chessViewEngineInfoDidChange() {
-        DispatchQueue.main.async {
-            self.updateInfoLine()
-        }
     }
     
     func updateUI() {

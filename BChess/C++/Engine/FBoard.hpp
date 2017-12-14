@@ -57,10 +57,7 @@ public:
     
     void reset();
     
-    void clear() {
-        memset(pieces, 0, sizeof(pieces));
-        occupancyDirty = true;
-    }
+    void clear();
     
     BoardSquare get(File file, Rank rank);
     void set(BoardSquare square, File file, Rank rank);

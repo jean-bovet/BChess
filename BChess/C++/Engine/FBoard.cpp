@@ -183,6 +183,11 @@ Board::Board() {
     reset();
 }
 
+void Board::clear() {
+    memset(pieces, 0, sizeof(pieces));
+    occupancyDirty = true;
+}
+
 void Board::reset() {
     clear();
     
@@ -200,7 +205,16 @@ void Board::reset() {
     pieces[BLACK][BISHOP] = IBlackBishops;
     pieces[BLACK][KNIGHT] = IBlackKnights;
     
-    occupancyDirty = true;
+    color = WHITE;
+    
+    whiteCanCastleKingSide = true;
+    whiteCanCastleQueenSide = true;
+    blackCanCastleKingSide = true;
+    blackCanCastleQueenSide = true;
+    
+    enPassant = 0;
+    halfMoveClock = 0;
+    fullMoveCount = 1;
 }
 
 void Board::move(Move move) {

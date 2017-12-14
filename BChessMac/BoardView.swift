@@ -8,13 +8,7 @@
 
 import Cocoa
 
-protocol ChessViewInformationDelegate: class {
-    func chessViewEngineInfoDidChange()
-}
-
 class BoardView: NSView {
-
-    weak var delegate: ChessViewInformationDelegate? = nil
     
     let engine = FEngine()
 
@@ -167,7 +161,6 @@ class BoardView: NSView {
     func enginePlay() {
         engine.evaluate(searchDepth) { (info, completed) in
             self.info = info
-            self.delegate?.chessViewEngineInfoDidChange()
             if completed {
                 DispatchQueue.main.async {
                     self.animateMove(info: info)
@@ -177,7 +170,7 @@ class BoardView: NSView {
     }
     
     var infoLine: String {
-        let infoColorToPlay = self.engine.isWhite() ? "White to play" : "Black to play"
+        let infoColorToPlay = self.engine.isWhite() ? "White" : "Black"
 
         if let info = info {
             let lineInfo = info.bestLine.map { $0 }.joined(separator: " ")
