@@ -184,7 +184,10 @@ class BoardView: NSView {
         }
     }
     
+    var animation = false
+    
     func animateMove(info: FEngineInfo) {
+        animation = true
         let fromPieceView = pieceSquareView(rank: Int(info.fromRank), file: Int(info.fromFile))
         let targetPieceView = pieceSquareView(rank: Int(info.toRank), file: Int(info.toFile))
         NSAnimationContext.runAnimationGroup({ _ in
@@ -194,6 +197,7 @@ class BoardView: NSView {
             targetPieceView.animator().alphaValue = 0.0
             fromPieceView.animator().frame = targetPieceView.frame
         }, completionHandler:{
+            self.animation = false
             targetPieceView.alphaValue = 1.0
             self.engine.move(info.rawMoveValue)
         })
@@ -290,6 +294,9 @@ class BoardView: NSView {
     }
     
     func invalidateUI() {
+        guard !animation else {
+            return
+        }
         needsLayout = true
         invalidateRestorableState()
     }
