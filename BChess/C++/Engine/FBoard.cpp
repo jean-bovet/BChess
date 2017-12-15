@@ -336,13 +336,7 @@ Bitboard Board::getOccupancy() {
     return occupancy;
 }
 
-void Board::move(Color color, Piece piece, Square from, Square to) {
-    bb_clear(pieces[color][piece], from);
-    bb_set(pieces[color][piece], to);
-    occupancyDirty = true;
-}
-
-void Board::move(std::string from, std::string to) {
+Move Board::getMove(std::string from, std::string to) {
     Square fromSquare = squareForName(from);
     Square toSquare = squareForName(to);
     for (unsigned piece=PAWN; piece<Piece::PCOUNT; piece++) {
@@ -350,14 +344,21 @@ void Board::move(std::string from, std::string to) {
             bool capture = bb_test(allPieces(INVERSE(color)), toSquare);
             if (capture) {
                 Move m = createCapture(fromSquare, toSquare, color, Piece(piece));
-                move(m);
+                return m;
             } else {
                 Move m = createMove(fromSquare, toSquare, color, Piece(piece));
-                move(m);
+                return m;
             }
             break;
         }
     }
+    return 0; // Invalid move
+}
+
+void Board::move(Color color, Piece piece, Square from, Square to) {
+    bb_clear(pieces[color][piece], from);
+    bb_set(pieces[color][piece], to);
+    occupancyDirty = true;
 }
 
 inline static char charForPiece(Color color, Piece piece) {

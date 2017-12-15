@@ -7,6 +7,7 @@
 //
 
 #import "FEngine.h"
+#import "FGame.hpp"
 #import "FBoard.hpp"
 #import "FPerformance.hpp"
 #import "FFEN.hpp"
@@ -21,11 +22,8 @@
 
 @interface FEngine () {
     Minimax minimax;
-    Board currentBoard;
+    FGame currentGame;
 }
-
-@property (nonatomic, strong) NSMutableArray<FEngineMove*> *moves;
-@property (nonatomic, assign) NSUInteger moveCursor;
 
 @end
 
@@ -34,8 +32,6 @@
 - (id)init {
     if (self = [super init]) {
         MoveGenerator::initialize();
-        _moves = [NSMutableArray array];
-        _moveCursor = 0;
         _async = YES;
     }
     return self;
@@ -50,16 +46,16 @@
 }
 
 - (void)setFEN:(NSString *)FEN {
-    FFEN::setFEN(std::string([FEN UTF8String]), currentBoard);
+    currentGame.setFEN(std::string([FEN UTF8String]));
 }
 
 - (NSString*)FEN {
-    auto fen = FFEN::getFEN(currentBoard);
+    auto fen = currentGame.getFEN();
     return [NSString stringWithUTF8String:fen.c_str()];
 }
 
 - (NSString* _Nullable)pieceAt:(NSUInteger)rank file:(NSUInteger)file {
-    BoardSquare square = currentBoard.get((File)file, (Rank)rank);
+    BoardSquare square = currentGame.getPieceAt((File)file, (Rank)rank);
     if (square.empty) {
         return nil;
     } else {
@@ -79,65 +75,39 @@
 }
 
 - (NSArray<FEngineMove*>* _Nonnull)movesAt:(NSUInteger)rank file:(NSUInteger)file {
-    MoveGenerator generator = MoveGenerator();
-    MoveList moveList = generator.generateMoves(currentBoard, SquareFrom((File)file, (Rank)rank));
-    
     NSMutableArray *moves = [NSMutableArray array];
-    for (int index=0; index<moveList.moveCount; index++) {
-        Move fmove = moveList.moves[index];
-        [moves addObject:[self engineMoveFromMove:fmove]];
+    for (Move move : currentGame.movesAt((File)file, (Rank)rank)) {
+        [moves addObject:[self engineMoveFromMove:move]];
     }
     return moves;
 }
 
 - (void)move:(NSUInteger)move {
-    if (self.moveCursor < self.moves.count) {
-        // Clear the rest of the history
-        [self.moves removeObjectsInRange:NSMakeRange(self.moveCursor, self.moves.count - self.moveCursor)];
-    }
-    
-    [self.moves addObject:[self engineMoveFromMove:(Move)move]];
-    self.moveCursor = self.moves.count;
-    
-    currentBoard.move((Move)move);
-    
+    currentGame.move((Move)move);
     [self fireUpdate];
 }
 
 - (void)move:(NSString*)from to:(NSString*)to {
-    // TODO: when is that one used? We need to keep track of move for the history
-    currentBoard.move(std::string([from cStringUsingEncoding:NSUTF8StringEncoding]),
+    currentGame.move(std::string([from cStringUsingEncoding:NSUTF8StringEncoding]),
                       std::string([to cStringUsingEncoding:NSUTF8StringEncoding]));
+    [self fireUpdate];
 }
 
 - (BOOL)canUndoMove {
-    return self.moveCursor > 0;
+    return currentGame.canUndoMove();
 }
 
 - (BOOL)canRedoMove {
-    return self.moveCursor < self.moves.count;
+    return currentGame.canRedoMove();
 }
 
 - (void)undoMove {
-    if (self.moveCursor > 0) {
-        self.moveCursor--;
-        [self replayMoves];
-    }
+    currentGame.undoMove();
+    [self fireUpdate];
 }
 
 - (void)redoMove {
-    if (self.moveCursor < self.moves.count) {
-        self.moveCursor++;
-        [self replayMoves];
-    }
-}
-
-- (void)replayMoves {
-    currentBoard.reset();
-    for (NSUInteger index=0; index<self.moveCursor; index++) {
-        FEngineMove *move = self.moves[index];
-        currentBoard.move((Move)move.rawMoveValue);
-    }
+    currentGame.redoMove();
     [self fireUpdate];
 }
 
@@ -146,7 +116,7 @@
 }
 
 - (BOOL)isWhite {
-    return currentBoard.color == WHITE;
+    return currentGame.board.color == WHITE;
 }
 
 - (FEngineInfo*)infoFor:(Minimax::Info)info {

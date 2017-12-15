@@ -62,9 +62,10 @@ public:
     BoardSquare get(File file, Rank rank);
     void set(BoardSquare square, File file, Rank rank);
     
+    Move getMove(std::string from, std::string to);
+
     void move(Move move);
     void move(Color color, Piece piece, Square from, Square to);
-    void move(std::string from, std::string to);
     
     Bitboard allPieces(Color color);
     Bitboard emptySquares();

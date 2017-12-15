@@ -57,6 +57,8 @@
 		A77372011FE320010001A90F /* FPGN.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A77371FF1FE320010001A90F /* FPGN.cpp */; };
 		A77372021FE334BB0001A90F /* FGame.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A77371FC1FE31FEF0001A90F /* FGame.cpp */; };
 		A77372031FE334BB0001A90F /* FPGN.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A77371FF1FE320010001A90F /* FPGN.cpp */; };
+		A77372051FE443D70001A90F /* FPGN.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A77371FF1FE320010001A90F /* FPGN.cpp */; };
+		A77372061FE443DA0001A90F /* FGame.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A77371FC1FE31FEF0001A90F /* FGame.cpp */; };
 		A7AFCCAA1FB4E40D00AE3D85 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7AFCCA91FB4E40D00AE3D85 /* main.swift */; };
 		A7B18F581FD9BAE500A605B8 /* MovesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7B18F571FD9BAE500A605B8 /* MovesTests.swift */; };
 		A7B18F5A1FD9BC8D00A605B8 /* CPPTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7B18F591FD9BC8D00A605B8 /* CPPTests.swift */; };
@@ -537,8 +539,10 @@
 				A75359C31FDE4023008D1DEE /* FENgineInfo+Extension.swift in Sources */,
 				A7460F011FDF2465002B0740 /* BoardView.swift in Sources */,
 				A75359BF1FDE0E3B008D1DEE /* BoardSquareView.swift in Sources */,
+				A77372051FE443D70001A90F /* FPGN.cpp in Sources */,
 				A75359C61FDE4031008D1DEE /* magicmoves.c in Sources */,
 				A75359951FDE0947008D1DEE /* ChessViewController.swift in Sources */,
+				A77372061FE443DA0001A90F /* FGame.cpp in Sources */,
 				A75359931FDE0947008D1DEE /* AppDelegate.swift in Sources */,
 				A75359C71FDE4038008D1DEE /* FMoveList.cpp in Sources */,
 				A75359CD1FDE40F4008D1DEE /* FPerformance.cpp in Sources */,
