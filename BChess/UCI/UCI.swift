@@ -11,7 +11,7 @@ import os.log
 
 class UCI {
     
-    static let defaultDepth = 6
+    static let defaultDepth = 5
 
     let log: OSLog
     let engine = FEngine()

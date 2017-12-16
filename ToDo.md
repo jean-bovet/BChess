@@ -3,8 +3,6 @@
 Bug:
 - UI: indication of mate or draw
 - Better move list with a3xa5 when capture is made
-- PGN copy/paste handling
-- Undo/redo
 
 ToDo
 
