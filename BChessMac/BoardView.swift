@@ -66,19 +66,6 @@ class BoardView: NSView {
         addSubview(borderView)
     }
     
-    override func encodeRestorableState(with coder: NSCoder) {
-        super.encodeRestorableState(with: coder)
-        coder.encode(engine.pgn(), forKey: "pgn")
-    }
-    
-    override func restoreState(with coder: NSCoder) {
-        super.restoreState(with: coder)
-        if let pgn = coder.decodeObject(forKey: "pgn") as? String {
-            engine.setPGN(pgn)
-            self.needsLayout = true
-        }
-    }
-
     override func layout() {
         super.layout()
         var size = bounds.size
@@ -298,7 +285,6 @@ class BoardView: NSView {
             return
         }
         needsLayout = true
-        invalidateRestorableState()
     }
     
 }

@@ -19,9 +19,14 @@ class ChessViewController: NSViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        restoreFromDefaults()
+        
         engine.updateCallback = {
             self.updateUI()
+            self.saveToDefaults()
         }
+        
         updateUI()
     }
     
@@ -32,6 +37,16 @@ class ChessViewController: NSViewController {
     
     func updateInfoLine() {
         infoLabel.stringValue = chessView.infoLine
+    }
+    
+    func saveToDefaults() {
+        UserDefaults.standard.set(engine.pgn(), forKey: "pgn")
+    }
+    
+    func restoreFromDefaults() {
+        if let pgn = UserDefaults.standard.string(forKey: "pgn") {
+            engine.setPGN(pgn)
+        }
     }
     
     override func validateMenuItem(_ menuItem: NSMenuItem) -> Bool {
@@ -126,7 +141,6 @@ class ChessViewController: NSViewController {
     @IBAction func depth6(_ sender: NSMenuItem) {
         chessView.searchDepth = 6
     }
-
     
 }
 
