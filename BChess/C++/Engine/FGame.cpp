@@ -10,8 +10,12 @@
 #include "FFEN.hpp"
 #include "FMoveGenerator.hpp"
 
-void FGame::setFEN(std::string fen) {
-    FFEN::setFEN(fen, board);
+void FGame::reset() {
+    board.reset();
+}
+
+bool FGame::setFEN(std::string fen) {
+    return FFEN::setFEN(fen, board);
 }
 
 std::string FGame::getFEN() {
@@ -73,7 +77,7 @@ void FGame::redoMove() {
 
 void FGame::replayMoves() {
     board.reset();
-    for (int index=0; index<moveCursor; index++) {
+    for (size_t index=0; index<moveCursor; index++) {
         board.move(moves[index]);
     }
 }

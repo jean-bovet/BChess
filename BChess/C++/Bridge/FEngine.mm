@@ -45,13 +45,22 @@
     });
 }
 
-- (void)setFEN:(NSString *)FEN {
-    currentGame.setFEN(std::string([FEN UTF8String]));
+- (BOOL)setFEN:(NSString *)FEN {
+    return currentGame.setFEN(std::string([FEN UTF8String]));
 }
 
 - (NSString*)FEN {
     auto fen = currentGame.getFEN();
     return [NSString stringWithUTF8String:fen.c_str()];
+}
+
+- (BOOL)setPGN:(NSString *)PGN {
+    return FPGN::setGame(std::string([PGN UTF8String]), currentGame);
+}
+
+- (NSString*)PGN {
+    auto pgn = FPGN::getGame(currentGame);
+    return [NSString stringWithUTF8String:pgn.c_str()];
 }
 
 - (NSString* _Nullable)pieceAt:(NSUInteger)rank file:(NSUInteger)file {

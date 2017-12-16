@@ -25,7 +25,7 @@ class UCI {
         setbuf(__stdoutp, nil)
         
         // Initialize by default with the empty board
-        engine.fen = StartPosFEN
+        engine.setFEN(StartPosFEN)
     }
     
     func engineOutput(_ message: String) {
@@ -50,10 +50,10 @@ class UCI {
         let cmd = tokens.removeFirst()
         
         if cmd == "startpos" {
-            engine.fen = StartPosFEN
+            engine.setFEN(StartPosFEN)
         } else if cmd == "fen" {
             let fen = tokens[0...5].joined(separator: " ")
-            engine.fen = fen
+            engine.setFEN(fen)
             tokens.removeFirst(6)
         }
         

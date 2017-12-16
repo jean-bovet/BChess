@@ -14,6 +14,12 @@
 #include <iostream>
 #include <vector>
 
+static void eatWhiteSpace(std::string pgn, unsigned &cursor) {
+    while (pgn[cursor] == ' ') {
+        cursor++;
+    }
+}
+
 /**
  [Event "F/S Return Match"]
  [Site "Belgrade, Serbia JUG"]
@@ -45,11 +51,36 @@ static bool parseUntil(std::string pgn, unsigned &cursor, std::string &comment, 
 
 // For example: "12. "
 static bool parseMoveNumber(std::string pgn, unsigned &cursor) {
-    while (cursor < pgn.length() && pgn[cursor] != ' ') {
+    while (cursor < pgn.length() && pgn[cursor] != '.') {
         cursor++;
     }
     cursor++;
     return true;
+}
+
+static char pgnPiece(Piece piece) {
+    switch (piece) {
+        case PAWN:
+            return 0; // PGN allow pawn to be unspecified
+            
+        case KING:
+            return 'K';
+            
+        case QUEEN:
+            return 'Q';
+            
+        case ROOK:
+            return 'R';
+            
+        case BISHOP:
+            return 'B';
+            
+        case KNIGHT:
+            return 'N';
+            
+        default:
+            return '?';
+    }
 }
 
 static Piece parsePiece(std::string pgn, unsigned &cursor) {
@@ -120,7 +151,9 @@ static Rank getRank(char c) {
     return (Rank)(c - '1');
 }
 
-Move FPGN::parseMove(std::string pgn, unsigned &cursor, Board &board, bool &end) {
+Move FPGN::parseMove(std::string pgn, unsigned &cursor, FGame &game, bool &end) {
+    eatWhiteSpace(pgn, cursor);
+    
     Piece movingPiece = parsePiece(pgn, cursor);
     
     File fromFile = FileUndefined;
@@ -171,7 +204,7 @@ Move FPGN::parseMove(std::string pgn, unsigned &cursor, Board &board, bool &end)
     } else if (pgn[cursor] == 'O' && pgn[cursor+1] == '-' && pgn[cursor+2] == 'O' && pgn[cursor+3] == '-' && pgn[cursor+4] == 'O') {
         // O-O-O: Queen side
         movingPiece = KING;
-        if (board.color == WHITE) {
+        if (game.board.color == WHITE) {
             toFile = getFile('c');
             toRank = getRank('1');
         } else {
@@ -182,7 +215,7 @@ Move FPGN::parseMove(std::string pgn, unsigned &cursor, Board &board, bool &end)
     } else if (pgn[cursor] == 'O' && pgn[cursor+1] == '-' && pgn[cursor+2] == 'O') {
         // O-O: King side
         movingPiece = KING;
-        if (board.color == WHITE) {
+        if (game.board.color == WHITE) {
             toFile = getFile('g');
             toRank = getRank('1');
         } else {
@@ -193,18 +226,22 @@ Move FPGN::parseMove(std::string pgn, unsigned &cursor, Board &board, bool &end)
     } else if (pgn[cursor] == '1' && pgn[cursor+1] == '-' && pgn[cursor+2] == '0') {
         // Termination marker: white wins
         cursor+=3;
+        game.outcome = FGame::Outcome::white_wins;
         end = true;
     } else if (pgn[cursor] == '0' && pgn[cursor+1] == '-' && pgn[cursor+2] == '1') {
         // Termination marker: black wins
         cursor+=3;
+        game.outcome = FGame::Outcome::black_wins;
         end = true;
     } else if (pgn[cursor] == '1' && pgn[cursor+1] == '/' && pgn[cursor+2] == '2' && pgn[cursor+3] == '-' && pgn[cursor+4] == '1' && pgn[cursor+5] == '/' && pgn[cursor+6] == '2') {
         // Termination marker: draw
         cursor+=7;
+        game.outcome = FGame::Outcome::draw;
         end = true;
     } else if (pgn[cursor] == '*') {
         // Termination marker: game in progress or result unknown
         cursor++;
+        game.outcome = FGame::Outcome::in_progress;
         end = true;
     } else {
         // Invalid SAN representation
@@ -228,7 +265,7 @@ Move FPGN::parseMove(std::string pgn, unsigned &cursor, Board &board, bool &end)
     
     // Now the original square can be not fully defined...
     MoveGenerator generator;
-    auto moveList = generator.generateMoves(board);
+    auto moveList = generator.generateMoves(game.board);
     std::vector<Move> matchingMoves;
     for (int index=0; index<moveList.moveCount; index++) {
         Move m = moveList.moves[index];
@@ -260,12 +297,12 @@ Move FPGN::parseMove(std::string pgn, unsigned &cursor, Board &board, bool &end)
     }
 }
 
-bool FPGN::parseMoveText(std::string pgn, unsigned &cursor, Board &board, bool &end) {
+bool FPGN::parseMoveText(std::string pgn, unsigned &cursor, FGame &game, bool &end) {
     // Indication of a move, for example:
     // 1. e4 e5
     assert(parseMoveNumber(pgn, cursor));
     
-    Move whiteMove = parseMove(pgn, cursor, board, end);
+    Move whiteMove = parseMove(pgn, cursor, game, end);
     if (end) {
         return true;
     }
@@ -273,17 +310,17 @@ bool FPGN::parseMoveText(std::string pgn, unsigned &cursor, Board &board, bool &
         return false;
     }
     
-    board.move(whiteMove);
+    game.move(whiteMove);
     
 //    std::cout << MOVE_DESCRIPTION(whiteMove) << std::endl;
-//    board.print();
+//    game.board.print();
     
     if (!isSpaceOrNewLine(pgn[cursor++])) {
         // Missing white space or new line
         return false;
     }
     
-    Move blackMove = parseMove(pgn, cursor, board, end);
+    Move blackMove = parseMove(pgn, cursor, game, end);
     if (end) {
         return true;
     }
@@ -291,14 +328,16 @@ bool FPGN::parseMoveText(std::string pgn, unsigned &cursor, Board &board, bool &
         return false;
     }
     
-    board.move(blackMove);
+    game.move(blackMove);
 //    std::cout << MOVE_DESCRIPTION(blackMove) << std::endl;
-//    board.print();
+//    game.board.print();
     
     return true;
 }
 
 bool FPGN::setGame(std::string pgn, FGame &game) {
+    game.reset();
+    
     unsigned cursor = 0;
     bool end = false;
     while (cursor < pgn.length() && !end) {
@@ -314,7 +353,7 @@ bool FPGN::setGame(std::string pgn, FGame &game) {
             std::string comment = "";
             assert(parseUntil(pgn, cursor, comment, '}'));
         } else if (c >= '0' && c <= '9') {
-            if (!parseMoveText(pgn, cursor, game.board, end)) {
+            if (!parseMoveText(pgn, cursor, game, end)) {
                 return false;
             }
         } else {
@@ -326,4 +365,49 @@ bool FPGN::setGame(std::string pgn, FGame &game) {
     return true;
 }
 
+std::string FPGN::getGame(FGame game) {
+    std::string pgn;
+    unsigned fullMoveIndex = 0;
+    for (size_t index=0; index<game.moves.size(); index++) {
+        auto move = game.moves[index];
+        auto piece = MOVE_PIECE(move);
+        
+        if (pgn.size() > 0) {
+            pgn += " ";
+        }
+        
+        if (index % 2 == 0) {
+            fullMoveIndex++;
+            pgn += std::to_string(fullMoveIndex) + ". ";
+        }
+        
+        auto pgnP = pgnPiece(piece);
+        if (pgnP > 0) {
+            pgn += pgnP;
+        }
+                
+        pgn += MOVE_DESCRIPTION(move);
+    }
+    
+    pgn += " ";
+    
+    switch (game.outcome) {
+        case FGame::Outcome::black_wins:
+            pgn += "0-1";
+            break;
+            
+        case FGame::Outcome::white_wins:
+            pgn += "1-0";
+            break;
+            
+        case FGame::Outcome::draw:
+            pgn += "1/2-1/2";
+            break;
+            
+        case FGame::Outcome::in_progress:
+            pgn += "*";
+            break;
+    }
+    return pgn;
+}
 

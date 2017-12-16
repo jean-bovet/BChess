@@ -90,9 +90,15 @@
                                             </connections>
                                         </menuItem>
                                         <menuItem isSeparatorItem="YES" id="zce-s7-VHY"/>
-                                        <menuItem title="Copy" keyEquivalent="c" id="TzU-TD-3DC">
+                                        <menuItem title="Copy Position" keyEquivalent="c" id="TzU-TD-3DC">
                                             <connections>
-                                                <action selector="copy:" target="Ady-hI-5gd" id="4hc-8K-iuU"/>
+                                                <action selector="copyPosition:" target="Ady-hI-5gd" id="UGC-jS-SCB"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Copy Game" alternate="YES" keyEquivalent="c" id="yPa-5L-T3m">
+                                            <modifierMask key="keyEquivalentModifierMask" option="YES" command="YES"/>
+                                            <connections>
+                                                <action selector="copyGame:" target="Ady-hI-5gd" id="7o7-0e-2EL"/>
                                             </connections>
                                         </menuItem>
                                         <menuItem title="Paste" keyEquivalent="v" id="jM5-BE-izz">

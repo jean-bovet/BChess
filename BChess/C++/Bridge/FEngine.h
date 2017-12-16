@@ -25,11 +25,15 @@ typedef void(^FEngineDidUpdateCallback)();
 @property (nonatomic, assign) int moveCount;
 @property (nonatomic, assign) BOOL async;
 
-@property (nonatomic, strong) NSString * _Nonnull FEN;
-
 @property (nonatomic, strong) FEngineDidUpdateCallback _Nullable updateCallback;
 
 - (id _Nonnull)init;
+
+- (BOOL)setFEN:(NSString* _Nonnull)FEN;
+- (NSString* _Nonnull)FEN;
+
+- (BOOL)setPGN:(NSString* _Nonnull)PGN;
+- (NSString* _Nonnull)PGN;
 
 - (NSString* _Nullable)pieceAt:(NSUInteger)rank file:(NSUInteger)file;
 

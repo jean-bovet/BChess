@@ -68,13 +68,13 @@ class BoardView: NSView {
     
     override func encodeRestorableState(with coder: NSCoder) {
         super.encodeRestorableState(with: coder)
-        coder.encode(engine.fen, forKey: "fen")
+        coder.encode(engine.pgn(), forKey: "pgn")
     }
     
     override func restoreState(with coder: NSCoder) {
         super.restoreState(with: coder)
-        if let fen = coder.decodeObject(forKey: "fen") as? String {
-            engine.fen = fen
+        if let pgn = coder.decodeObject(forKey: "pgn") as? String {
+            engine.setPGN(pgn)
             self.needsLayout = true
         }
     }
@@ -93,7 +93,7 @@ class BoardView: NSView {
     // MARK: Functions
     
     func newGame() {
-        engine.fen = StartPosFEN
+        engine.setFEN(StartPosFEN)
         invalidateUI()
     }
     

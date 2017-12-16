@@ -12,8 +12,7 @@
 #include <vector>
 #include <cassert>
 
-inline static BoardSquare charToSquare(char p) {
-    BoardSquare square;
+inline static bool charToSquare(char p, BoardSquare &square) {
     square.empty = false;
     square.color = Color::WHITE;
     switch (p) {
@@ -66,10 +65,10 @@ inline static BoardSquare charToSquare(char p) {
             break;
             
         default:
-            assert(false); // Invalid FEN entry
+            return false; // Invalid FEN entry
             break;
     }
-    return square;
+    return true;
 }
 
 inline static char squareToChar(BoardSquare square) {
@@ -164,7 +163,10 @@ bool FFEN::setFEN(std::string fen, Board &board) {
                     coord.file += 1;
                 }
             } else {
-                auto square = charToSquare(p);
+                BoardSquare square;
+                if (!charToSquare(p, square)) {
+                    return false;
+                }
                 board.set(square, coord.file, coord.rank);
                 coord.file += 1;
             }

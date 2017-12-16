@@ -64,16 +64,25 @@ class ChessViewController: NSViewController {
     
     // MARK: Menu Edit
 
-    @IBAction func copy(_ sender: Any?) {
+    @IBAction func copyPosition(_ sender: Any?) {
         let pasteboard = NSPasteboard.general
         pasteboard.clearContents()
-        pasteboard.setString(engine.fen, forType: .string)
+        pasteboard.setString(engine.fen(), forType: .string)
     }
-    
+
+    @IBAction func copyGame(_ sender: Any?) {
+        let pasteboard = NSPasteboard.general
+        pasteboard.clearContents()
+        pasteboard.setString(engine.pgn(), forType: .string)
+    }
+
     @IBAction func paste(_ sender: Any?) {
         let pasteboard = NSPasteboard.general
-        if let fen = pasteboard.string(forType: .string) {
-            engine.fen = fen
+        if let text = pasteboard.string(forType: .string) {
+            if !engine.setFEN(text) {
+                // Could not past FEN, maybe PGN?
+                engine.setPGN(text);
+            }
             chessView.invalidateUI()
         }
     }

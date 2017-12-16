@@ -17,10 +17,18 @@ private:
     void replayMoves();
     
 public:
+    enum class Outcome {
+        white_wins, black_wins, draw, in_progress
+    };
+    
     Board board;
     std::vector<Move> moves;
     
-    void setFEN(std::string fen);
+    Outcome outcome = Outcome::in_progress;
+    
+    void reset();
+    
+    bool setFEN(std::string fen);
     std::string getFEN();
     
     BoardSquare getPieceAt(File file, Rank rank);

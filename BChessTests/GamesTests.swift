@@ -104,7 +104,7 @@ class GamesTests: XCTestCase {
         var tokens = command.split(separator: " ").map { String($0) }
         uci.process(&tokens)
                 
-        let fen = uci.engine.fen
+        let fen = uci.engine.fen()
         XCTAssertEqual(fen, resultingFEN)
         
         let expectation = XCTestExpectation(description: "evaluation")
