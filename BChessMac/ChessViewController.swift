@@ -10,9 +10,12 @@ import Cocoa
 
 class ChessViewController: NSViewController {
 
-    @IBOutlet var chessView: BoardView!
-    @IBOutlet var infoLabel: NSTextField!
-
+    @IBOutlet weak var chessView: BoardView!
+    @IBOutlet weak var infoLabel: NSTextField!
+    @IBOutlet weak var stackView: NSStackView!
+    @IBOutlet weak var gameInfoScrollView: NSScrollView!
+    @IBOutlet var gameInfoTextView: NSTextView!
+    
     var engine : FEngine {
         return chessView.engine
     }
@@ -33,10 +36,15 @@ class ChessViewController: NSViewController {
     func updateUI() {
         chessView.invalidateUI()
         updateInfoLine()
+        updateGameInfo()
     }
     
     func updateInfoLine() {
         infoLabel.stringValue = chessView.infoLine
+    }
+    
+    func updateGameInfo() {
+        gameInfoTextView.string = engine.pgn()
     }
     
     func saveToDefaults() {
@@ -73,6 +81,13 @@ class ChessViewController: NSViewController {
         }
         if menuItem.action == #selector(redoMove) {
             return engine.canRedoMove()
+        }
+        if menuItem.action == #selector(toggleGameInfo) {
+            if isGameInfoVisible() {
+                menuItem.title = "Hide Info"
+            } else {
+                menuItem.title = "Show Info"
+            }
         }
         return true
     }
@@ -142,5 +157,19 @@ class ChessViewController: NSViewController {
         chessView.searchDepth = 6
     }
     
+    // MARK: Menu View
+    
+    func isGameInfoVisible() -> Bool {
+        let visible = stackView.visibilityPriority(for: gameInfoScrollView) != NSStackView.VisibilityPriority.notVisible
+        return visible
+    }
+    
+    @IBAction func toggleGameInfo(_ sender: Any) {
+        if isGameInfoVisible() {
+            stackView.setVisibilityPriority(NSStackView.VisibilityPriority.notVisible, for: gameInfoScrollView)
+        } else {
+            stackView.setVisibilityPriority(NSStackView.VisibilityPriority.mustHold, for: gameInfoScrollView)
+        }
+    }
 }
 

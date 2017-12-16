@@ -3,6 +3,7 @@
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="13771"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+        <capability name="stacking Non-gravity area distributions on NSStackView" minToolsVersion="7.0" minSystemVersion="10.11"/>
     </dependencies>
     <scenes>
         <!--Application-->
@@ -164,6 +165,12 @@
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <menu key="submenu" title="View" id="HyV-fh-RgO">
                                     <items>
+                                        <menuItem title="Show Info" keyEquivalent="i" id="aQq-kO-dw7">
+                                            <connections>
+                                                <action selector="toggleGameInfo:" target="Ady-hI-5gd" id="gL4-3j-MJk"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem isSeparatorItem="YES" id="yzW-W7-7Kw"/>
                                         <menuItem title="Show Toolbar" keyEquivalent="t" id="snW-S8-Cw5">
                                             <modifierMask key="keyEquivalentModifierMask" option="YES" command="YES"/>
                                             <connections>
@@ -235,7 +242,7 @@
                         <outlet property="delegate" destination="Voe-Tx-rLC" id="PrD-fu-P6m"/>
                     </connections>
                 </application>
-                <customObject id="Voe-Tx-rLC" customClass="AppDelegate" customModule="BChessMac" customModuleProvider="target"/>
+                <customObject id="Voe-Tx-rLC" customClass="AppDelegate" customModule="BChess" customModuleProvider="target"/>
                 <customObject id="YLy-65-1bz" customClass="NSFontManager"/>
                 <customObject id="Ady-hI-5gd" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
@@ -266,14 +273,61 @@
         <!--Chess View Controller-->
         <scene sceneID="hIz-AP-VOD">
             <objects>
-                <viewController id="XfG-lQ-9wD" customClass="ChessViewController" customModule="BChessMac" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController id="XfG-lQ-9wD" customClass="ChessViewController" customModule="BChess" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" wantsLayer="YES" id="m2S-Jp-Qdl">
                         <rect key="frame" x="0.0" y="0.0" width="591" height="341"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
-                            <customView translatesAutoresizingMaskIntoConstraints="NO" id="Q8S-Oy-e6A" customClass="BoardView" customModule="BChessMac" customModuleProvider="target">
-                                <rect key="frame" x="0.0" y="25" width="591" height="316"/>
-                            </customView>
+                            <stackView distribution="fill" orientation="horizontal" alignment="centerY" spacing="0.0" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="a6M-pX-2Vm">
+                                <rect key="frame" x="0.0" y="22" width="591" height="319"/>
+                                <subviews>
+                                    <customView translatesAutoresizingMaskIntoConstraints="NO" id="Q8S-Oy-e6A" customClass="BoardView" customModule="BChess" customModuleProvider="target">
+                                        <rect key="frame" x="0.0" y="0.0" width="431" height="319"/>
+                                    </customView>
+                                    <scrollView borderType="none" autohidesScrollers="YES" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" hasVerticalScroller="NO" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="40J-P2-23o">
+                                        <rect key="frame" x="431" y="1" width="160" height="318"/>
+                                        <clipView key="contentView" id="Wbl-vo-wge">
+                                            <rect key="frame" x="0.0" y="0.0" width="160" height="318"/>
+                                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                            <subviews>
+                                                <textView editable="NO" drawsBackground="NO" importsGraphics="NO" richText="NO" verticallyResizable="YES" usesFontPanel="YES" findStyle="panel" continuousSpellChecking="YES" allowsUndo="YES" usesRuler="YES" allowsNonContiguousLayout="YES" quoteSubstitution="YES" dashSubstitution="YES" spellingCorrection="YES" smartInsertDelete="YES" id="lqJ-o6-VhY">
+                                                    <rect key="frame" x="0.0" y="0.0" width="160" height="318"/>
+                                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                    <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                                    <size key="minSize" width="160" height="318"/>
+                                                    <size key="maxSize" width="463" height="10000000"/>
+                                                    <color key="insertionPointColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
+                                                </textView>
+                                            </subviews>
+                                            <color key="backgroundColor" name="controlHighlightColor" catalog="System" colorSpace="catalog"/>
+                                        </clipView>
+                                        <constraints>
+                                            <constraint firstAttribute="width" constant="160" id="XOV-4t-S7U"/>
+                                        </constraints>
+                                        <scroller key="horizontalScroller" hidden="YES" verticalHuggingPriority="750" doubleValue="1" horizontal="YES" id="Yfl-gf-LMa">
+                                            <rect key="frame" x="-100" y="-100" width="87" height="18"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                        </scroller>
+                                        <scroller key="verticalScroller" hidden="YES" verticalHuggingPriority="750" doubleValue="1" horizontal="NO" id="QfP-Zb-FF7">
+                                            <rect key="frame" x="-100" y="-100" width="15" height="315"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                        </scroller>
+                                    </scrollView>
+                                </subviews>
+                                <constraints>
+                                    <constraint firstItem="Q8S-Oy-e6A" firstAttribute="centerY" secondItem="40J-P2-23o" secondAttribute="centerY" id="Kob-fa-INa"/>
+                                    <constraint firstItem="Q8S-Oy-e6A" firstAttribute="top" secondItem="a6M-pX-2Vm" secondAttribute="top" id="dwm-Qi-nkY"/>
+                                    <constraint firstItem="40J-P2-23o" firstAttribute="top" secondItem="a6M-pX-2Vm" secondAttribute="top" id="syb-Tc-2Y4"/>
+                                </constraints>
+                                <visibilityPriorities>
+                                    <integer value="1000"/>
+                                    <integer value="1000"/>
+                                </visibilityPriorities>
+                                <customSpacing>
+                                    <real value="3.4028234663852886e+38"/>
+                                    <real value="3.4028234663852886e+38"/>
+                                </customSpacing>
+                            </stackView>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="icQ-Uj-SKX">
                                 <rect key="frame" x="2" y="4" width="587" height="17"/>
                                 <textFieldCell key="cell" lineBreakMode="truncatingTail" allowsUndo="NO" sendsActionOnEndEditing="YES" title="Ready" id="OFN-5h-BpI">
@@ -283,26 +337,28 @@
                                 </textFieldCell>
                             </textField>
                             <box verticalHuggingPriority="750" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="bTG-oh-LkD">
-                                <rect key="frame" x="0.0" y="19" width="591" height="8"/>
+                                <rect key="frame" x="0.0" y="19" width="591" height="5"/>
                             </box>
                         </subviews>
                         <constraints>
-                            <constraint firstItem="Q8S-Oy-e6A" firstAttribute="top" secondItem="m2S-Jp-Qdl" secondAttribute="top" id="4KM-Ef-eFS"/>
-                            <constraint firstAttribute="trailing" secondItem="Q8S-Oy-e6A" secondAttribute="trailing" id="D9G-dv-fjm"/>
-                            <constraint firstItem="Q8S-Oy-e6A" firstAttribute="leading" secondItem="m2S-Jp-Qdl" secondAttribute="leading" id="Ibt-Sm-Ypk"/>
+                            <constraint firstAttribute="trailing" secondItem="a6M-pX-2Vm" secondAttribute="trailing" id="DNV-Ae-QJj"/>
                             <constraint firstItem="icQ-Uj-SKX" firstAttribute="top" secondItem="bTG-oh-LkD" secondAttribute="bottom" id="Iup-fg-Bcm"/>
                             <constraint firstItem="icQ-Uj-SKX" firstAttribute="leading" secondItem="m2S-Jp-Qdl" secondAttribute="leading" constant="4" id="UqJ-NW-UfW"/>
-                            <constraint firstItem="icQ-Uj-SKX" firstAttribute="top" secondItem="Q8S-Oy-e6A" secondAttribute="bottom" constant="4" id="g7H-Ff-wHA"/>
+                            <constraint firstItem="a6M-pX-2Vm" firstAttribute="top" secondItem="m2S-Jp-Qdl" secondAttribute="top" id="k54-Gj-NB5"/>
+                            <constraint firstItem="a6M-pX-2Vm" firstAttribute="leading" secondItem="bTG-oh-LkD" secondAttribute="leading" id="p5G-Rp-YVG"/>
+                            <constraint firstItem="bTG-oh-LkD" firstAttribute="top" secondItem="a6M-pX-2Vm" secondAttribute="bottom" id="q3r-Ur-kta"/>
                             <constraint firstAttribute="trailing" secondItem="bTG-oh-LkD" secondAttribute="trailing" id="rL8-g8-3Ag"/>
                             <constraint firstItem="bTG-oh-LkD" firstAttribute="leading" secondItem="m2S-Jp-Qdl" secondAttribute="leading" id="rlS-4a-teG"/>
                             <constraint firstAttribute="bottom" secondItem="icQ-Uj-SKX" secondAttribute="bottom" constant="4" id="sbn-kp-jZm"/>
-                            <constraint firstItem="bTG-oh-LkD" firstAttribute="top" secondItem="Q8S-Oy-e6A" secondAttribute="bottom" id="wfi-z4-b4A"/>
                             <constraint firstAttribute="trailing" secondItem="icQ-Uj-SKX" secondAttribute="trailing" constant="4" id="yJW-oZ-lhG"/>
                         </constraints>
                     </view>
                     <connections>
                         <outlet property="chessView" destination="Q8S-Oy-e6A" id="sQk-1T-5Sp"/>
+                        <outlet property="gameInfoScrollView" destination="40J-P2-23o" id="jJy-QF-BKU"/>
+                        <outlet property="gameInfoTextView" destination="lqJ-o6-VhY" id="dbz-3g-oet"/>
                         <outlet property="infoLabel" destination="icQ-Uj-SKX" id="Sf5-MA-gZ1"/>
+                        <outlet property="stackView" destination="a6M-pX-2Vm" id="VSw-e5-4tS"/>
                     </connections>
                 </viewController>
                 <customObject id="rPt-NT-nkU" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
