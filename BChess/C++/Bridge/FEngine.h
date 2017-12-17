@@ -62,4 +62,6 @@ typedef void(^FEngineDidUpdateCallback)();
 
 - (void)generatePositions:(int)depth;
 
+- (void)debugEvaluate;
+
 @end

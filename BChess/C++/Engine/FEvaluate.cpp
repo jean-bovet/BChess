@@ -83,12 +83,51 @@ static int KingPositionBonus[64] = {
 
 static int PieceValue[PCOUNT] = { 100, 320, 330, 500, 900, 20000 };
 
+static Square whiteIndex(Square original) {
+    auto rank = RankFrom(original);
+    auto file = FileFrom(original);
+    return 63 - (rank + 1) * 7 + file;
+}
+
+static Square blackIndex(Square original) {
+    auto rank = RankFrom(original);
+    auto file = FileFrom(original);
+    return 63 - (7 - rank + 1) * 7 + file;
+}
+
+int Evaluate::getBonus(Piece piece, Color color, Square square) {
+    auto index = color == WHITE ? whiteIndex(square) : blackIndex(square);
+    switch (piece) {
+        case PAWN:
+            return PawnPositionBonus[index];
+            
+        case BISHOP:
+            return BishopPositionBonus[index];
+            
+        case KNIGHT:
+            return KnightPositionBonus[index];
+            
+        case ROOK:
+            return RookPositionBonus[index];
+            
+        case KING:
+            return KingPositionBonus[index];
+            
+        case QUEEN:
+            return QueenPositionBonus[index];
+            
+        default:
+            return 0;
+    }
+}
+
 int Evaluate::evaluate(Board board) {
     // TODO: how to detect a draw?
     // Note: the value should always be computed from a white point of view
     int value = 0;
     for (unsigned color=0; color<COUNT; color++) {
         auto isWhite = color == WHITE;
+        int totalBonus = 0; // The bonus of the pieces' locations, for that particular color
         for (unsigned piece=0; piece<PCOUNT; piece++) {
             Bitboard pieces = board.pieces[color][piece];
             int count = bb_count(pieces);
@@ -105,42 +144,14 @@ int Evaluate::evaluate(Board board) {
                 Square square = lsb(pieces);
                 bb_clear(pieces, square);
                 
-                int bonus = 0;
-                int squareIndex = isWhite ? 63-square : square;
-                switch (piece) {
-                    case PAWN:
-                        bonus = PawnPositionBonus[squareIndex];
-                        break;
-                        
-                    case KNIGHT:
-                        bonus = KnightPositionBonus[squareIndex];
-                        break;
-
-                    case BISHOP:
-                        bonus = BishopPositionBonus[squareIndex];
-                        break;
-
-                    case ROOK:
-                        bonus = RookPositionBonus[squareIndex];
-                        break;
-
-                    case QUEEN:
-                        bonus = QueenPositionBonus[squareIndex];
-                        break;
-
-                    case KING:
-                        bonus = KingPositionBonus[squareIndex];
-                        break;
-
-                    default:
-                        break;
-                }
-                if (isWhite) { // Always evaluate from white point of view!!
-                    value += bonus;
-                } else {
-                    value -= bonus;
-                }
+                totalBonus += getBonus((Piece)piece, (Color)color, square);
             }
+        }
+        
+        if (isWhite) { // Always evaluate from white point of view!!
+            value += totalBonus;
+        } else {
+            value -= totalBonus;
         }
     }
 

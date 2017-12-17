@@ -9,6 +9,7 @@
 #include "FGame.hpp"
 #include "FFEN.hpp"
 #include "FMoveGenerator.hpp"
+#include "FEvaluate.hpp"
 
 void FGame::reset() {
     moveCursor = 0;
@@ -82,5 +83,9 @@ void FGame::replayMoves() {
     for (size_t index=0; index<moveCursor; index++) {
         board.move(moves[index]);
     }
+}
+
+void FGame::debugEvaluate() {
+    std::cout << Evaluate::evaluate(board) << std::endl;
 }
 

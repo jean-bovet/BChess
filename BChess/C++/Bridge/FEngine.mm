@@ -242,4 +242,8 @@
     self.moveCount = performance.moveCount;
 }
 
+- (void)debugEvaluate {
+    currentGame.debugEvaluate();
+}
+
 @end

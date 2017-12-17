@@ -14,4 +14,6 @@
 class Evaluate {
 public:
     static int evaluate(Board board);
+    
+    static int getBonus(Piece piece, Color color, Square square);
 };

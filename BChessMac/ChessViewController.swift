@@ -143,6 +143,10 @@ class ChessViewController: NSViewController {
         engine.redoMove()
     }
 
+    @IBAction func debugEvaluate(_ sender: NSMenuItem) {
+        engine.debugEvaluate()
+    }
+
     // MARK: Menu Level
     
     @IBAction func depth4(_ sender: NSMenuItem) {

@@ -73,6 +73,13 @@
                                         <menuItem title="Start Analysis" id="VHt-Yh-bdc">
                                             <modifierMask key="keyEquivalentModifierMask"/>
                                         </menuItem>
+                                        <menuItem isSeparatorItem="YES" id="Ndd-C1-l0n"/>
+                                        <menuItem title="Debug Evaluate" id="1Mn-CX-f1p">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="debugEvaluate:" target="Ady-hI-5gd" id="f1L-1e-2eo"/>
+                                            </connections>
+                                        </menuItem>
                                     </items>
                                 </menu>
                             </menuItem>

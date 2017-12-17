@@ -43,5 +43,7 @@ public:
     
     void undoMove();
     void redoMove();
+    
+    void debugEvaluate();
 };
 

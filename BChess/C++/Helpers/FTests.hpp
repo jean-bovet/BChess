@@ -13,6 +13,7 @@
 #include "FMinimax.hpp"
 #include "FMoveGenerator.hpp"
 #include "FPGN.hpp"
+#include "FEvaluate.hpp"
 
 #include <set>
 #include <vector>
@@ -23,12 +24,14 @@ public:
     static void runAll() {
         MoveGenerator::initialize();
         
+        testBonusPosition();
+        
         testInvalidMove();
         testSimpleMove();
         testMoveCapture();
         testMoveEnPassant();
         testMovePromotion();
-        
+
         testEmptyBoard();
 
         testWhiteKingCheckWithKnight();
@@ -40,8 +43,22 @@ public:
         testWhiteKingNotCheck();
 
         testBlackKingCheck();
-        
+
         testPawnForkQueenAndKing();
+        testKnightEscapeAttackByPawn();
+        testMovePawnToAttackBishop();
+    }
+    
+    static void testBonusPosition() {
+        {
+            int bonus = Evaluate::getBonus(PAWN, Color::WHITE, b2);
+            assert(bonus == 10);
+        }
+        
+        {
+            int bonus = Evaluate::getBonus(PAWN, Color::BLACK, b2);
+            assert(bonus == 50);
+        }
     }
     
     static void testInvalidMove() {
@@ -172,18 +189,35 @@ public:
         assertBestMove(start, end, "c3c4",  { "c3c4", "Qb5xc4", "Nb2xc4" } );
     }
 
-    static void assertBestMove(std::string fen, std::string finalFEN, std::string bestMove, std::vector<std::string> bestLine) {
+    static void testKnightEscapeAttackByPawn() {
+        std::string start = "r1bqkbnr/pppp1ppp/2n5/3P4/8/8/PPP2PPP/RNBQKBNR b KQkq - 0 4";
+        std::string end = "r1bqkb1r/ppppnppp/8/3P4/1n6/8/PPP1QPPP/RNB1KBNR w KQkq - 3 6";
+        // TODO: problem here. The engine wants to do Bf8b4 but actually this leads into material loss way down the tree.
+        // The best move here is moving the knight out of c6.
+//        assertBestMove(start, end, "Nc6b4",  { "Nc6b4", "Qd1e2", "Ng8e7" } );
+    }
+
+    // In this situation, we are trying to see if the engine is able to see
+    // that moving the pawn c2c3 can actually cause a double attacks against black.
+    static void testMovePawnToAttackBishop() {
+        std::string start = "r1bqk1nr/pppp1ppp/2n5/3P4/1b6/8/PPP2PPP/RNBQKBNR w KQkq - 1 5";
+        std::string end = "r1bqk1nr/p1pQ1ppp/2p5/b7/8/2P5/PP3PPP/RNB1KBNR b KQkq - 0 7";
+        // TODO: note that the last move, Qd1xd7 is not great at all
+        assertBestMove(start, end, "c2c3",  { "c2c3", "Bb4a5", "d5xc6", "b7xc6", "Qd1xd7" }, 6);
+    }
+
+    static void assertBestMove(std::string fen, std::string finalFEN, std::string bestMove, std::vector<std::string> bestLine, int maxDepth = 4) {
         Board board;
         assert(FFEN::setFEN(fen, board));
         std::string boardFEN = FFEN::getFEN(board);
         assert(boardFEN == fen);
 
         Minimax minimax;
-        Minimax::Info info = minimax.searchBestMove(board, 4, nil);
+        Minimax::Info info = minimax.searchBestMove(board, maxDepth, nil);
         
         // Assert the best move
-        auto expectedMove = FPGN::to_string(info.evaluation.move);
-        assert(expectedMove == bestMove);
+        auto actualMove = FPGN::to_string(info.evaluation.move);
+        assert(actualMove == bestMove);
 
         // Assert the best line
         std::vector<std::string> evaluatedLine;
