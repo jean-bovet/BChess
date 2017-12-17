@@ -11,10 +11,12 @@
 #include "FMoveGenerator.hpp"
 
 void FGame::reset() {
+    moveCursor = 0;
     board.reset();
 }
 
 bool FGame::setFEN(std::string fen) {
+    moveCursor = 0;
     return FFEN::setFEN(fen, board);
 }
 
