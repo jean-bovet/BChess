@@ -13,7 +13,6 @@
 
 class FGame {
 private:
-    size_t moveCursor = 0;
     void replayMoves();
     
 public:
@@ -23,7 +22,8 @@ public:
     
     Board board;
     std::vector<Move> moves;
-    
+    size_t moveCursor = 0;
+
     Outcome outcome = Outcome::in_progress;
     
     void reset();

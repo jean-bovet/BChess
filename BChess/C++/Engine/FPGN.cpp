@@ -468,7 +468,7 @@ std::string FPGN::getGame(FGame game, bool newLineAfterEachFullMove) {
     FGame outputGame; // Game used to compute the optimum PGN representation for each move
     std::string pgn;
     unsigned fullMoveIndex = 0;
-    for (size_t index=0; index<game.moves.size(); index++) {
+    for (size_t index=0; index<game.moveCursor; index++) {
         auto move = game.moves[index];
         auto piece = MOVE_PIECE(move);
 
