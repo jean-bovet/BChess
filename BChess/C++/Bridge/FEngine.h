@@ -35,7 +35,7 @@ typedef void(^FEngineDidUpdateCallback)();
 - (BOOL)setPGN:(NSString* _Nonnull)PGN;
 - (NSString* _Nonnull)PGN;
 
-- (NSString*)PGNFormattedForDisplay;
+- (NSString* _Nonnull)PGNFormattedForDisplay;
 
 - (NSString* _Nullable)pieceAt:(NSUInteger)rank file:(NSUInteger)file;
 

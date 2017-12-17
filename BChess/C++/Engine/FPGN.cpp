@@ -58,28 +58,28 @@ static bool parseMoveNumber(std::string pgn, unsigned &cursor) {
     return true;
 }
 
-static char pgnPiece(Piece piece) {
+static std::string pgnPiece(Piece piece) {
     switch (piece) {
         case PAWN:
-            return 0; // PGN allow pawn to be unspecified
+            return "";
             
         case KING:
-            return 'K';
+            return "K";
             
         case QUEEN:
-            return 'Q';
+            return "Q";
             
         case ROOK:
-            return 'R';
+            return "R";
             
         case BISHOP:
-            return 'B';
+            return "B";
             
         case KNIGHT:
-            return 'N';
+            return "N";
             
         default:
-            return '?';
+            return "?";
     }
 }
 
@@ -149,6 +149,128 @@ static File getFile(char c) {
 static Rank getRank(char c) {
     assert(isRank(c));
     return (Rank)(c - '1');
+}
+
+static std::vector<Move> getMatchingMoves(Board board, Square to, Piece movingPiece, File fromFile, Rank fromRank) {
+    MoveGenerator generator;
+    auto moveList = generator.generateMoves(board);
+    std::vector<Move> matchingMoves;
+    for (int index=0; index<moveList.moveCount; index++) {
+        Move m = moveList.moves[index];
+        
+        if (MOVE_TO(m) != to) {
+            continue;
+        }
+        
+        if (MOVE_PIECE(m) != movingPiece) {
+            continue;
+        }
+        
+        if (fromFile != FileUndefined && FileFrom(MOVE_FROM(m)) != fromFile) {
+            continue;
+        }
+        
+        if (fromRank != RankUndefined && RankFrom(MOVE_FROM(m)) != fromRank) {
+            continue;
+        }
+        
+        matchingMoves.push_back(m);
+    }
+    
+    return matchingMoves;
+}
+
+static bool IsCastlingKingSide(Move move) {
+    if (MOVE_COLOR(move) == WHITE) {
+        return MOVE_FROM(move) == e1 && MOVE_TO(move) == g1;
+    } else {
+        return MOVE_FROM(move) == e8 && MOVE_TO(move) == g8;
+    }
+}
+
+static bool IsCastlingQueenSide(Move move) {
+    if (MOVE_COLOR(move) == WHITE) {
+        return MOVE_FROM(move) == e1 && MOVE_TO(move) == c1;
+    } else {
+        return MOVE_FROM(move) == e8 && MOVE_TO(move) == c8;
+    }
+}
+
+std::string FPGN::to_string(Move move, SANType sanType) {
+    auto piece = MOVE_PIECE(move);
+    auto fromSquare = SquareNames[MOVE_FROM(move)];
+    auto toSquare = SquareNames[MOVE_TO(move)];
+    auto promotionPiece = MOVE_PROMOTION_PIECE(move);
+    
+    // UCI requires a very simple representation
+    if (sanType == SANType::uci) {
+        return fromSquare+toSquare;
+    }
+    
+    // Non-UCI mode is a bit more complex
+    std::string pgn = "";
+
+    if (IsCastlingKingSide(move)) {
+        pgn += "O-O";
+    } else if (IsCastlingQueenSide(move)) {
+        pgn += "O-O-O";
+    } else {
+        auto isCapture = MOVE_IS_CAPTURE(move);
+        
+        auto fromFile = FileFrom(MOVE_FROM(move));
+        auto fileName = FileNames[fromFile];
+
+        switch (sanType) {
+            case SANType::tight:
+                if (isCapture) {
+                    if (piece == PAWN) {
+                        // cxe4
+                        pgn += fileName;
+                        pgn += "x";
+                        pgn += toSquare;
+                    } else {
+                        // Nxe4
+                        pgn += pgnPiece(piece);
+                        pgn += "x";
+                        pgn += toSquare;
+                    }
+                } else {
+                    pgn += pgnPiece(piece);
+                    pgn += toSquare;
+                }
+                break;
+                
+            case SANType::full:
+                pgn += pgnPiece(piece);
+                pgn += fromSquare;
+                if (isCapture) {
+                    pgn += "x";
+                }
+                pgn += toSquare;
+                break;
+                
+            case SANType::medium: {
+                pgn += pgnPiece(piece);
+                pgn += fileName;
+                if (isCapture) {
+                    pgn += "x";
+                }
+                pgn += toSquare;
+                break;
+            }
+                
+            case SANType::uci:
+                // Handled above
+                break;
+        }
+    }
+    
+    if (promotionPiece > PAWN) {
+        pgn += "=";
+        pgn += pgnPiece(promotionPiece);
+    }
+    
+    return pgn;
 }
 
 Move FPGN::parseMove(std::string pgn, unsigned &cursor, FGame &game, bool &end) {
@@ -259,35 +381,12 @@ Move FPGN::parseMove(std::string pgn, unsigned &cursor, FGame &game, bool &end) 
     
     // The target square must be fully defined at this point
     assert(toFile != FileUndefined);
-    assert(toRank != FileUndefined);
+    assert(toRank != RankUndefined);
     
     Square to = SquareFrom(toFile, toRank);
     
     // Now the original square can be not fully defined...
-    MoveGenerator generator;
-    auto moveList = generator.generateMoves(game.board);
-    std::vector<Move> matchingMoves;
-    for (int index=0; index<moveList.moveCount; index++) {
-        Move m = moveList.moves[index];
-        
-        if (MOVE_TO(m) != to) {
-            continue;
-        }
-        
-        if (MOVE_PIECE(m) != movingPiece) {
-            continue;
-        }
-        
-        if (fromFile != FileUndefined && FileFrom(MOVE_FROM(m)) != fromFile) {
-            continue;
-        }
-
-        if (fromRank != RankUndefined && RankFrom(MOVE_FROM(m)) != fromRank) {
-            continue;
-        }
-
-        matchingMoves.push_back(m);
-    }
+    auto matchingMoves = getMatchingMoves(game.board, to, movingPiece, fromFile, fromRank);
     
     // After matching, one and only one move should be found
     if (matchingMoves.size() == 1) {
@@ -366,11 +465,33 @@ bool FPGN::setGame(std::string pgn, FGame &game) {
 }
 
 std::string FPGN::getGame(FGame game, bool newLineAfterEachFullMove) {
+    FGame outputGame; // Game used to compute the optimum PGN representation for each move
     std::string pgn;
     unsigned fullMoveIndex = 0;
     for (size_t index=0; index<game.moves.size(); index++) {
         auto move = game.moves[index];
         auto piece = MOVE_PIECE(move);
+
+        SANType sanType = SANType::full;
+        auto matchingMoves = getMatchingMoves(outputGame.board, MOVE_TO(move), piece, FileUndefined, RankUndefined);
+        if (matchingMoves.size() == 1) {
+            // Only one matching move, we can use the shortest form for PGN
+            // For example: Ne3
+            sanType = SANType::tight;
+        } else {
+            matchingMoves = getMatchingMoves(outputGame.board, MOVE_TO(move), piece, FileFrom(MOVE_FROM(move)), RankUndefined);
+            if (matchingMoves.size() == 1) {
+                // Use the File to specify the move. For example: Nge3
+                sanType = SANType::medium;
+            } else {
+                matchingMoves = getMatchingMoves(outputGame.board, MOVE_TO(move), piece, FileFrom(MOVE_FROM(move)), RankFrom(MOVE_FROM(move)));
+                if (matchingMoves.size() == 1) {
+                    sanType = SANType::full;
+                } else {
+                    assert(false); // Should not happen
+                }
+            }
+        }
         
         if (pgn.size() > 0) {
             pgn += " ";
@@ -383,13 +504,11 @@ std::string FPGN::getGame(FGame game, bool newLineAfterEachFullMove) {
             }
             pgn += std::to_string(fullMoveIndex) + ". ";
         }
-        
-        auto pgnP = pgnPiece(piece);
-        if (pgnP > 0) {
-            pgn += pgnP;
-        }
                 
-        pgn += MOVE_DESCRIPTION(move);
+        pgn += to_string(move, sanType);
+        
+        // Play the move on the board so it is ready for the next PGN token
+        outputGame.move(move);
     }
     
     pgn += " ";

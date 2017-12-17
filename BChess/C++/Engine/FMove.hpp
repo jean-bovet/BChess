@@ -86,14 +86,3 @@ inline static Square MOVE_TO(Move move) {
     return to;
 }
 
-inline static std::string MOVE_DESCRIPTION(Move move) {
-    auto fromSquare = SquareNames[MOVE_FROM(move)];
-    auto toSquare = SquareNames[MOVE_TO(move)];
-    auto promotionPiece = MOVE_PROMOTION_PIECE(move);
-    if (promotionPiece > PAWN){
-//        auto isWhite = MOVE_COLOR(move) == WHITE;
-        return fromSquare+toSquare+pieceToChar(promotionPiece, false); // Seems we always annotate the promotion with black-style piece letter (lowercase)
-    } else {
-        return fromSquare+toSquare;
-    }
-}

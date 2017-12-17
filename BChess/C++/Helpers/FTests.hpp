@@ -12,6 +12,7 @@
 #include "FFEN.hpp"
 #include "FMinimax.hpp"
 #include "FMoveGenerator.hpp"
+#include "FPGN.hpp"
 
 #include <set>
 #include <vector>
@@ -168,7 +169,7 @@ public:
     static void testPawnForkQueenAndKing() {
         std::string start = "8/8/8/1q1k4/8/2P5/1N6/4K3 w - - 0 1";
         std::string end = "8/8/8/3k4/2N5/8/8/4K3 b - - 0 2";
-        assertBestMove(start, end, "c3c4",  { "c3c4", "b5c4", "b2c4" } );
+        assertBestMove(start, end, "c3c4",  { "c3c4", "Qb5xc4", "Nb2xc4" } );
     }
 
     static void assertBestMove(std::string fen, std::string finalFEN, std::string bestMove, std::vector<std::string> bestLine) {
@@ -181,12 +182,13 @@ public:
         Minimax::Info info = minimax.searchBestMove(board, 4, nil);
         
         // Assert the best move
-        assert(MOVE_DESCRIPTION(info.evaluation.move) == bestMove);
+        auto expectedMove = FPGN::to_string(info.evaluation.move);
+        assert(expectedMove == bestMove);
 
         // Assert the best line
         std::vector<std::string> evaluatedLine;
         for (auto move : info.evaluation.line) {
-            evaluatedLine.push_back(MOVE_DESCRIPTION(move));
+            evaluatedLine.push_back(FPGN::to_string(move));
         }
         assert(evaluatedLine.size() == bestLine.size());
         assert(evaluatedLine == bestLine);

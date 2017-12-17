@@ -157,7 +157,7 @@
     
     auto bestLine = [NSMutableArray array];
     for (auto move : info.evaluation.line) {
-        [bestLine addObject:[NSString stringWithUTF8String:MOVE_DESCRIPTION(move).c_str()]];
+        [bestLine addObject:[NSString stringWithUTF8String:FPGN::to_string(move, FPGN::SANType::uci).c_str()]];
     }
     ei.bestLine = bestLine;
     return ei;
