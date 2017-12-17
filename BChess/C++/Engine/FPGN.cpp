@@ -507,8 +507,12 @@ std::string FPGN::getGame(FGame game, bool newLineAfterEachFullMove) {
                 
         pgn += to_string(move, sanType);
         
-        // Play the move on the board so it is ready for the next PGN token
         outputGame.move(move);
+        
+        // Now is that move doing a check?
+        if (outputGame.board.isCheck(outputGame.board.color)) {
+            pgn += "+";
+        }
     }
     
     pgn += " ";
