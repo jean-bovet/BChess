@@ -44,7 +44,7 @@ class ChessViewController: NSViewController {
     }
     
     func updateGameInfo() {
-        gameInfoTextView.string = engine.pgn()
+        gameInfoTextView.string = engine.pgnFormattedForDisplay()
     }
     
     func saveToDefaults() {

@@ -63,6 +63,11 @@
     return [NSString stringWithUTF8String:pgn.c_str()];
 }
 
+- (NSString*)PGNFormattedForDisplay {
+    auto pgn = FPGN::getGame(currentGame, true);
+    return [NSString stringWithUTF8String:pgn.c_str()];
+}
+
 - (NSString* _Nullable)pieceAt:(NSUInteger)rank file:(NSUInteger)file {
     BoardSquare square = currentGame.getPieceAt((File)file, (Rank)rank);
     if (square.empty) {

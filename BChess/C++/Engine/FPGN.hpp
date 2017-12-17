@@ -21,5 +21,5 @@ public:
     static Move parseMove(std::string pgn, unsigned &cursor, FGame &game, bool &end);
     static bool parseMoveText(std::string pgn, unsigned &cursor, FGame &game, bool &end);
     static bool setGame(std::string pgn, FGame &game);
-    static std::string getGame(FGame game);
+    static std::string getGame(FGame game, bool newLineAfterEachFullMove = false);
 };

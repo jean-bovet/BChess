@@ -365,7 +365,7 @@ bool FPGN::setGame(std::string pgn, FGame &game) {
     return true;
 }
 
-std::string FPGN::getGame(FGame game) {
+std::string FPGN::getGame(FGame game, bool newLineAfterEachFullMove) {
     std::string pgn;
     unsigned fullMoveIndex = 0;
     for (size_t index=0; index<game.moves.size(); index++) {
@@ -378,6 +378,9 @@ std::string FPGN::getGame(FGame game) {
         
         if (index % 2 == 0) {
             fullMoveIndex++;
+            if (newLineAfterEachFullMove) {
+                pgn += "\n";
+            }
             pgn += std::to_string(fullMoveIndex) + ". ";
         }
         
