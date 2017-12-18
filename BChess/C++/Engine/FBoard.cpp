@@ -321,6 +321,10 @@ void Board::move(Move move) {
 
     if (MOVE_IS_CAPTURE(move)) {
         halfMoveClock = 0; // reset halfmove clock if capture is done
+        
+        auto otherColor = INVERSE(moveColor);
+        auto capturedPiece = MOVE_CAPTURED_PIECE(move);
+        bb_clear(pieces[otherColor][capturedPiece], to);
     }
 
     color = INVERSE(color);
@@ -343,7 +347,14 @@ Move Board::getMove(std::string from, std::string to) {
         if (bb_test(pieces[color][piece], fromSquare)) {
             bool capture = bb_test(allPieces(INVERSE(color)), toSquare);
             if (capture) {
-                Move m = createCapture(fromSquare, toSquare, color, Piece(piece));
+                unsigned attackedPiece = PAWN;
+                for (; attackedPiece<PCOUNT; attackedPiece++) {
+                    if (bb_test(pieces[INVERSE(color)][attackedPiece], toSquare)) {
+                        break;
+                    }
+                }
+                assert(attackedPiece != PCOUNT);
+                Move m = createCapture(fromSquare, toSquare, color, Piece(piece), Piece(attackedPiece));
                 return m;
             } else {
                 Move m = createMove(fromSquare, toSquare, color, Piece(piece));

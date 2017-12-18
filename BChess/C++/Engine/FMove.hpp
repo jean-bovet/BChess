@@ -22,6 +22,7 @@
 // bit 16: 0=move, 1=capture
 // bit 17: 1=en passant, 0 otherwise
 // bit 18-20: 3 bits for promotion PIECE (from 0 to 6). 0 means no promotion.
+// bit 21-23: 3 bits for captured PIECE (from 0 to 6).
 typedef uint32_t Move;
 
 inline static Move createMove(Square from, Square to, Color color, Piece piece) {
@@ -35,14 +36,15 @@ inline static Move createPromotion(Square from, Square to, Color color, Piece pi
     return m;
 }
 
-inline static Move createCapture(Square from, Square to, Color color, Piece piece) {
-    Move m = createMove(from, to, color, piece);
+inline static Move createCapture(Square from, Square to, Color color, Piece attackingPiece, Piece capturedPiece) {
+    Move m = createMove(from, to, color, attackingPiece);
     m |= 1UL << 16;
+    m |= capturedPiece << 21;
     return m;
 }
 
 inline static Move createEnPassant(Square from, Square to, Color color, Piece piece) {
-    Move m = createCapture(from, to, color, piece);
+    Move m = createCapture(from, to, color, piece, PAWN);
     m |= 1UL << 17;
     return m;
 }
@@ -73,6 +75,11 @@ inline static Piece MOVE_PIECE(Move move) {
 
 inline static Piece MOVE_PROMOTION_PIECE(Move move) {
     uint8_t test = (move >> 18) & 7;
+    return Piece(test);
+}
+
+inline static Piece MOVE_CAPTURED_PIECE(Move move) {
+    uint8_t test = (move >> 21) & 7;
     return Piece(test);
 }
 

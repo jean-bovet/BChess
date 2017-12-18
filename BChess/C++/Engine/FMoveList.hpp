@@ -22,7 +22,7 @@ struct MoveList {
     void addMove(Move move);
     void addMove(Board &board, Move move);
     void addMoves(Board &board, Square from, Bitboard moves, Piece piece);
-    void addCaptures(Board &board, Square from, Bitboard moves, Piece piece);
+    void addCaptures(Board &board, Square from, Bitboard moves, Piece attackingPiece, Piece capturedPiece);
 };
 
 

@@ -25,6 +25,9 @@ public:
     static void initialize();
         
     MoveList generateMoves(Board board, Square specificSquare = SquareUndefined);
+    
+    void generateAttackMoves(Board &board, MoveList &moveList, Square fromSquare, Piece attackingPiece, Bitboard attackingSquares);
+    
     void generatePawnsMoves(Board &board, MoveList &moveList, Square specificSquare = SquareUndefined);
     void generateKingsMoves(Board &board, MoveList &moveList, Square specificSquare = SquareUndefined);
     void generateKnightsMoves(Board &board, MoveList &moveList, Square specificSquare = SquareUndefined);

@@ -33,12 +33,12 @@ void MoveList::addMoves(Board &board, Square from, Bitboard moves, Piece piece) 
     }
 }
 
-void MoveList::addCaptures(Board &board, Square from, Bitboard moves, Piece piece) {
+void MoveList::addCaptures(Board &board, Square from, Bitboard moves, Piece attackingPiece, Piece capturedPiece) {
     while (moves > 0) {
         Square to = lsb(moves);
         bb_clear(moves, to);
         
-        addMove(board, createCapture(from, to, board.color, piece));
+        addMove(board, createCapture(from, to, board.color, attackingPiece, capturedPiece));
     }
 }
 

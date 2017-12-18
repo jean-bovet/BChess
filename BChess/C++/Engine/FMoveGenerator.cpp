@@ -91,10 +91,19 @@ MoveList MoveGenerator::generateMoves(Board board, Square specificSquare) {
     return moveList;
 }
 
+void MoveGenerator::generateAttackMoves(Board &board, MoveList &moveList, Square fromSquare, Piece attackingPiece, Bitboard attackingSquares) {
+    auto attackedColor = INVERSE(board.color);
+    for (unsigned capturedPiece = PAWN; capturedPiece < PCOUNT; capturedPiece++) {
+        auto attacks = attackingSquares & board.pieces[attackedColor][capturedPiece];
+        if (attacks > 0) {
+            moveList.addCaptures(board, fromSquare, attacks, attackingPiece, Piece(capturedPiece));
+        }
+    }
+}
+
 void MoveGenerator::generatePawnsMoves(Board &board, MoveList &moveList, Square specificSquare) {
     auto pawns = board.pieces[board.color][PAWN];
     auto emptySquares = board.emptySquares();
-    auto blackPieces = board.allPieces(INVERSE(board.color));
     
     // Generate moves for each white pawn
     while (pawns > 0) {
@@ -113,10 +122,7 @@ void MoveGenerator::generatePawnsMoves(Board &board, MoveList &moveList, Square 
         // can do. The attacks bitboard is masked with the occupancy bitboard
         // because a pawn attack can only happen when there is a black piece
         // in the target square.
-        auto attacks = PawnAttacks[board.color][square] & blackPieces;
-        if (attacks > 0) {
-            moveList.addCaptures(board, square, attacks, PAWN);
-        }
+        generateAttackMoves(board, moveList, square, PAWN, PawnAttacks[board.color][square]);
         
         // Also check if it's possible to do the en-passant
         if (board.enPassant > 0) {
@@ -177,7 +183,6 @@ void MoveGenerator::generateKingsMoves(Board &board, MoveList &moveList, Square 
     auto otherColor = INVERSE(board.color);
     auto kings = board.pieces[board.color][KING];
     auto emptySquares = board.emptySquares();
-    auto blackSquares = board.allPieces(otherColor);
     
     // Generate moves for each white knight
     while (kings > 0) {
@@ -198,8 +203,7 @@ void MoveGenerator::generateKingsMoves(Board &board, MoveList &moveList, Square 
         auto moves = KingMoves[square] & emptySquares;
         moveList.addMoves(board, square, moves, KING);
 
-        auto captures = KingMoves[square] & blackSquares;
-        moveList.addCaptures(board, square, captures, KING);
+        generateAttackMoves(board, moveList, square, KING, KingMoves[square]);
         
         // Generate all legal casting moves. Note that we only generate the move for the king,
         // the board is going to move the rook in move() when it detects a castling move.
@@ -237,7 +241,6 @@ void MoveGenerator::generateKingsMoves(Board &board, MoveList &moveList, Square 
 void MoveGenerator::generateKnightsMoves(Board &board, MoveList &moveList, Square specificSquare) {
     auto whiteKnights = board.pieces[board.color][KNIGHT];
     auto emptySquares = board.emptySquares();
-    auto blackSquares = board.allPieces(INVERSE(board.color));
 
     // Generate moves for each white knight
     while (whiteKnights > 0) {
@@ -258,8 +261,7 @@ void MoveGenerator::generateKnightsMoves(Board &board, MoveList &moveList, Squar
         auto moves = KnightMoves[square] & emptySquares;
         moveList.addMoves(board, square, moves, KNIGHT);
         
-        auto captures = KnightMoves[square] & blackSquares;
-        moveList.addCaptures(board, square, captures, KNIGHT);
+        generateAttackMoves(board, moveList, square, KNIGHT, KnightMoves[square]);
     }
 }
 
@@ -267,7 +269,6 @@ void MoveGenerator::generateSlidingMoves(Board &board, Piece piece, MoveList &mo
     auto slidingPieces = board.pieces[board.color][piece];
     auto occupancy = board.getOccupancy();
     auto emptySquares = board.emptySquares();
-    auto blackSquares = board.allPieces(INVERSE(board.color));
 
     // Generate moves for each sliding piece
     while (slidingPieces > 0) {
@@ -308,7 +309,6 @@ void MoveGenerator::generateSlidingMoves(Board &board, Piece piece, MoveList &mo
         auto moves = potentialMoves & emptySquares;
         moveList.addMoves(board, square, moves, piece);
         
-        auto captures = potentialMoves & blackSquares;
-        moveList.addCaptures(board, square, captures, piece);
+        generateAttackMoves(board, moveList, square, piece, potentialMoves);
     }
 }
