@@ -10,14 +10,14 @@
 
 #include "FMove.hpp"
 #include "FBitboard.hpp"
+#include <vector>
 
 const int MAX_MOVES = 256;
 
 class Board;
 
 struct MoveList {
-    Move moves[MAX_MOVES];
-    int moveCount = 0;
+    std::vector<Move> moves;
     
     void addMove(Move move);
     void addMove(Board &board, Move move);

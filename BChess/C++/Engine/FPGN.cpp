@@ -155,9 +155,7 @@ static std::vector<Move> getMatchingMoves(Board board, Square to, Piece movingPi
     MoveGenerator generator;
     auto moveList = generator.generateMoves(board);
     std::vector<Move> matchingMoves;
-    for (int index=0; index<moveList.moveCount; index++) {
-        Move m = moveList.moves[index];
-        
+    for (Move m : moveList.moves) {        
         if (MOVE_TO(m) != to) {
             continue;
         }

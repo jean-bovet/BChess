@@ -10,8 +10,7 @@
 #include "FBoard.hpp"
 
 void MoveList::addMove(Move move) {
-    moves[moveCount] = move;
-    moveCount++;
+    moves.push_back(move);
 }
 
 void MoveList::addMove(Board &board, Move move) {

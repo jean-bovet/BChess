@@ -98,7 +98,7 @@ Minimax::Evaluation Minimax::evaluate(Board board, Move move, int depth, int max
     
     MoveGenerator generator;
     MoveList moves = generator.generateMoves(board);
-    if (moves.moveCount == 0) {
+    if (moves.moves.empty()) {
         // It's either a draw or mat
         if (board.isCheck(board.color)) {
             bestEvaluation.value = board.color == WHITE ? INT_MIN : INT_MAX;
@@ -122,8 +122,7 @@ Minimax::Evaluation Minimax::evaluate(Board board, Move move, int depth, int max
         }
     }
     
-    for (int index=0; index<moves.moveCount; index++) {
-        Move move = moves.moves[index];
+    for (Move move : moves.moves) {
         if (!analyzing) {
             break;
         }

@@ -33,8 +33,8 @@ std::vector<Move> FGame::movesAt(File file, Rank rank) {
     MoveGenerator generator = MoveGenerator();
     MoveList moveList = generator.generateMoves(board, SquareFrom(file, rank));
     std::vector<Move> moves;
-    for (int index=0; index<moveList.moveCount; index++) {
-        moves.push_back(moveList.moves[index]);
+    for (Move move : moveList.moves) {
+        moves.push_back(move);
     }
     return moves;
 }

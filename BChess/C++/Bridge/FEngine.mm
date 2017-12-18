@@ -207,9 +207,7 @@
     MoveGenerator generator;
     MoveList moves = generator.generateMoves(board, square);
     NSMutableArray<NSString*>* moveFENs = [NSMutableArray array];
-    for (int index=0; index<moves.moveCount; index++) {
-        auto move = moves.moves[index];
-
+    for (Move move : moves.moves) {
         Board newBoard = board;
         newBoard.move(move);
         std::string moveFEN = FFEN::getFEN(newBoard);
