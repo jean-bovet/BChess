@@ -12,10 +12,7 @@
 #import "FPerformance.hpp"
 #import "FFEN.hpp"
 #import "FMove.hpp"
-#import "FTests.hpp"
-#import "FTestsPGN.hpp"
-#import "FAlphaBetaSyntheticTests.hpp"
-#import "FAlphaBetaChessTests.hpp"
+#import "FPGN.hpp"
 #import "FMinimax.hpp"
 
 @implementation FEngineMove
@@ -33,7 +30,6 @@
 
 - (id)init {
     if (self = [super init]) {
-        MoveGenerator::initialize();
         _async = YES;
     }
     return self;
@@ -217,16 +213,6 @@
         [moveFENs addObject:[NSString stringWithUTF8String:moveFEN.c_str()]];
     }
     return moveFENs;
-}
-
-+ (void)runCPPTestMoves {
-    FAlphaBetaChessTests::runAll();
-    FAlphaBetaSyntheticTests::runAll();
-    FTests::runAll();
-}
-
-+ (void)runCPPTestPGN {
-    FTestsPGN::runAll();
 }
 
 - (void)generatePositions {

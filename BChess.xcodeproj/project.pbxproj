@@ -49,7 +49,6 @@
 		A756832D1FD0B3FE00CF1408 /* magicmoves.c in Sources */ = {isa = PBXBuildFile; fileRef = A7712D411FCB97A900E7E802 /* magicmoves.c */; };
 		A75683301FD0D96300CF1408 /* FPerformance.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A756832E1FD0D96300CF1408 /* FPerformance.cpp */; };
 		A7712D2F1FC7C4CD00E7E802 /* UCI.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7712D2E1FC7C4CD00E7E802 /* UCI.swift */; };
-		A7712D331FC8957500E7E802 /* GamesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7712D321FC8957500E7E802 /* GamesTests.swift */; };
 		A7712D341FC895D100E7E802 /* UCI.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7712D2E1FC7C4CD00E7E802 /* UCI.swift */; };
 		A7712D441FCBBD9C00E7E802 /* Performance.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7712D431FCBBD9C00E7E802 /* Performance.swift */; };
 		A7712D471FCBC13100E7E802 /* FBoard.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A7712D451FCBC13100E7E802 /* FBoard.cpp */; };
@@ -61,7 +60,13 @@
 		A77372061FE443DA0001A90F /* FGame.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A77371FC1FE31FEF0001A90F /* FGame.cpp */; };
 		A7AFCCAA1FB4E40D00AE3D85 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7AFCCA91FB4E40D00AE3D85 /* main.swift */; };
 		A7B18F581FD9BAE500A605B8 /* MovesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7B18F571FD9BAE500A605B8 /* MovesTests.swift */; };
-		A7B18F5A1FD9BC8D00A605B8 /* CPPTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7B18F591FD9BC8D00A605B8 /* CPPTests.swift */; };
+		A7E490EB1FEA207100970EAD /* gtest-all.cc in Sources */ = {isa = PBXBuildFile; fileRef = A7E490EA1FEA207100970EAD /* gtest-all.cc */; };
+		A7E490EC1FEA23DD00970EAD /* FTestsPGN.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A77372041FE340780001A90F /* FTestsPGN.cpp */; };
+		A7E490ED1FEA29B900970EAD /* GamesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7712D321FC8957500E7E802 /* GamesTests.swift */; };
+		A7E490EE1FEA2A7000970EAD /* FTests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A70A61BD1FD3196400AFDF0E /* FTests.cpp */; };
+		A7E490F21FEA2E7E00970EAD /* GoogleTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = A7E490F11FEA2E7E00970EAD /* GoogleTests.mm */; };
+		A7E490F31FEA2EE200970EAD /* FAlphaBetaChessTests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A7E490E41FEA1C0600970EAD /* FAlphaBetaChessTests.cpp */; };
+		A7E490F41FEA2F0F00970EAD /* FAlphaBetaSyntheticTests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A7E490E51FEA1C0600970EAD /* FAlphaBetaSyntheticTests.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -97,7 +102,7 @@
 		A70A61B91FD132D200AFDF0E /* FFEN.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = FFEN.cpp; sourceTree = "<group>"; };
 		A70A61BA1FD132D200AFDF0E /* FFEN.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = FFEN.hpp; sourceTree = "<group>"; };
 		A70A61BC1FD1333300AFDF0E /* FUtility.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = FUtility.hpp; sourceTree = "<group>"; };
-		A70A61BD1FD3196400AFDF0E /* FTests.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = FTests.hpp; sourceTree = "<group>"; };
+		A70A61BD1FD3196400AFDF0E /* FTests.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = FTests.cpp; sourceTree = "<group>"; };
 		A70A61BE1FD38C7500AFDF0E /* FColor.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = FColor.hpp; sourceTree = "<group>"; };
 		A70A61BF1FD38D4100AFDF0E /* FPiece.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = FPiece.hpp; sourceTree = "<group>"; };
 		A70A61C01FD4587B00AFDF0E /* FMove.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = FMove.hpp; sourceTree = "<group>"; };
@@ -150,13 +155,14 @@
 		A77371FD1FE31FEF0001A90F /* FGame.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = FGame.hpp; sourceTree = "<group>"; };
 		A77371FF1FE320010001A90F /* FPGN.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = FPGN.cpp; sourceTree = "<group>"; };
 		A77372001FE320010001A90F /* FPGN.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = FPGN.hpp; sourceTree = "<group>"; };
-		A77372041FE340780001A90F /* FTestsPGN.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = FTestsPGN.hpp; sourceTree = "<group>"; };
+		A77372041FE340780001A90F /* FTestsPGN.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FTestsPGN.cpp; sourceTree = "<group>"; };
 		A7AFCCA61FB4E40D00AE3D85 /* BChess */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = BChess; sourceTree = BUILT_PRODUCTS_DIR; };
 		A7AFCCA91FB4E40D00AE3D85 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		A7B18F571FD9BAE500A605B8 /* MovesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MovesTests.swift; sourceTree = "<group>"; };
-		A7B18F591FD9BC8D00A605B8 /* CPPTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CPPTests.swift; sourceTree = "<group>"; };
-		A7E490E41FEA1C0600970EAD /* FAlphaBetaChessTests.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = FAlphaBetaChessTests.hpp; sourceTree = "<group>"; };
-		A7E490E51FEA1C0600970EAD /* FAlphaBetaSyntheticTests.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = FAlphaBetaSyntheticTests.hpp; sourceTree = "<group>"; };
+		A7E490E41FEA1C0600970EAD /* FAlphaBetaChessTests.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FAlphaBetaChessTests.cpp; sourceTree = "<group>"; };
+		A7E490E51FEA1C0600970EAD /* FAlphaBetaSyntheticTests.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FAlphaBetaSyntheticTests.cpp; sourceTree = "<group>"; };
+		A7E490EA1FEA207100970EAD /* gtest-all.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "gtest-all.cc"; path = "BChessTests/Helper/gtest-all.cc"; sourceTree = SOURCE_ROOT; };
+		A7E490F11FEA2E7E00970EAD /* GoogleTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = GoogleTests.mm; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -217,10 +223,6 @@
 				A756832F1FD0D96300CF1408 /* FPerformance.hpp */,
 				A756832E1FD0D96300CF1408 /* FPerformance.cpp */,
 				A70A61BC1FD1333300AFDF0E /* FUtility.hpp */,
-				A70A61BD1FD3196400AFDF0E /* FTests.hpp */,
-				A77372041FE340780001A90F /* FTestsPGN.hpp */,
-				A7E490E41FEA1C0600970EAD /* FAlphaBetaChessTests.hpp */,
-				A7E490E51FEA1C0600970EAD /* FAlphaBetaSyntheticTests.hpp */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -293,7 +295,8 @@
 			children = (
 				A7712D321FC8957500E7E802 /* GamesTests.swift */,
 				A7B18F571FD9BAE500A605B8 /* MovesTests.swift */,
-				A7B18F591FD9BC8D00A605B8 /* CPPTests.swift */,
+				A7E490EF1FEA2E6100970EAD /* C++ */,
+				A7E490F01FEA2E6F00970EAD /* Helper */,
 				A7712D181FB916E900E7E802 /* Info.plist */,
 			);
 			path = BChessTests;
@@ -353,6 +356,26 @@
 				A7712D481FCBC13500E7E802 /* C++ */,
 			);
 			path = BChess;
+			sourceTree = "<group>";
+		};
+		A7E490EF1FEA2E6100970EAD /* C++ */ = {
+			isa = PBXGroup;
+			children = (
+				A70A61BD1FD3196400AFDF0E /* FTests.cpp */,
+				A77372041FE340780001A90F /* FTestsPGN.cpp */,
+				A7E490E41FEA1C0600970EAD /* FAlphaBetaChessTests.cpp */,
+				A7E490E51FEA1C0600970EAD /* FAlphaBetaSyntheticTests.cpp */,
+			);
+			path = "C++";
+			sourceTree = "<group>";
+		};
+		A7E490F01FEA2E6F00970EAD /* Helper */ = {
+			isa = PBXGroup;
+			children = (
+				A7E490F11FEA2E7E00970EAD /* GoogleTests.mm */,
+				A7E490EA1FEA207100970EAD /* gtest-all.cc */,
+			);
+			path = Helper;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -583,15 +606,20 @@
 			files = (
 				A70A61DD1FD4D49500AFDF0E /* FFEN.cpp in Sources */,
 				A70A61DC1FD4D49500AFDF0E /* FMinimax.cpp in Sources */,
-				A7712D331FC8957500E7E802 /* GamesTests.swift in Sources */,
 				A7712D341FC895D100E7E802 /* UCI.swift in Sources */,
 				A70A61DA1FD4D49500AFDF0E /* FBoard.cpp in Sources */,
+				A7E490EE1FEA2A7000970EAD /* FTests.cpp in Sources */,
+				A7E490F31FEA2EE200970EAD /* FAlphaBetaChessTests.cpp in Sources */,
+				A7E490EC1FEA23DD00970EAD /* FTestsPGN.cpp in Sources */,
+				A7E490ED1FEA29B900970EAD /* GamesTests.swift in Sources */,
 				A77372031FE334BB0001A90F /* FPGN.cpp in Sources */,
 				A70A61DE1FD4D49F00AFDF0E /* magicmoves.c in Sources */,
 				A75359851FDC994E008D1DEE /* FENgineInfo+Extension.swift in Sources */,
 				A70A61D51FD4D42100AFDF0E /* FEngineInfo.m in Sources */,
+				A7E490F21FEA2E7E00970EAD /* GoogleTests.mm in Sources */,
 				A70A61DB1FD4D49500AFDF0E /* FEvaluate.cpp in Sources */,
-				A7B18F5A1FD9BC8D00A605B8 /* CPPTests.swift in Sources */,
+				A7E490EB1FEA207100970EAD /* gtest-all.cc in Sources */,
+				A7E490F41FEA2F0F00970EAD /* FAlphaBetaSyntheticTests.cpp in Sources */,
 				A77372021FE334BB0001A90F /* FGame.cpp in Sources */,
 				A7B18F581FD9BAE500A605B8 /* MovesTests.swift in Sources */,
 				A70A61D61FD4D46D00AFDF0E /* FEngine.mm in Sources */,
@@ -758,6 +786,14 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_TEAM = 28XRU7S6GA;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/BChessTests",
+				);
+				HEADER_SEARCH_PATHS = (
+					Dependencies/gtest/include,
+					Dependencies/gtest,
+				);
 				INFOPLIST_FILE = BChessTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "ch.arizona-software.BChessTests";
@@ -774,6 +810,14 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_TEAM = 28XRU7S6GA;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/BChessTests",
+				);
+				HEADER_SEARCH_PATHS = (
+					Dependencies/gtest/include,
+					Dependencies/gtest,
+				);
 				INFOPLIST_FILE = BChessTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "ch.arizona-software.BChessTests";

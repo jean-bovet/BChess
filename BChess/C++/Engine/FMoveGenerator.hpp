@@ -17,13 +17,13 @@ extern "C" void initmagicmoves(void);
 
 class MoveGenerator {
 private:
+    static void initialize();
+    
     static void initPawnMoves();
     static void initKingMoves();
     static void initKnightMoves();
 
-public:
-    static void initialize();
-        
+public:        
     MoveList generateMoves(Board board, Square specificSquare = SquareUndefined);
     
     void generateAttackMoves(Board &board, MoveList &moveList, Square fromSquare, Piece attackingPiece, Bitboard attackingSquares);

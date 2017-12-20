@@ -11,6 +11,8 @@
 
 #include <cassert>
 
+static bool initialized = false;
+
 void MoveGenerator::initialize() {
     initmagicmoves();
     initPawnMoves();
@@ -79,6 +81,11 @@ void MoveGenerator::initKnightMoves() {
 }
 
 MoveList MoveGenerator::generateMoves(Board board, Square specificSquare) {
+    if (!initialized) {
+        initialized = true;
+        initialize();
+    }
+    
     MoveList moveList;
     
     generatePawnsMoves(board, moveList, specificSquare);
