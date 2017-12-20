@@ -20,6 +20,7 @@ class AlphaBeta {
 public:
     int visitedNodes = 0;
     bool alphaBetaCutoff = true;
+    bool debugOutput = false;
     
     AlphaBeta(Evaluater evaluater, int maxDepth) : evaluater(evaluater), maxDepth(maxDepth) { }
 
@@ -28,11 +29,15 @@ public:
     }
     
     void outputDebug(Node node, int depth, int alpha, int beta, bool maximizingPlayer) {
-        std::cout << "    Quiet node: " << node.description() << ", d=" << depth << ", a=" << alpha << ", b=" << beta << ", m=" << maximizingPlayer << std::endl;
+        if (debugOutput) {
+            std::cout << "    Quiet node: " << node.description() << ", d=" << depth << ", a=" << alpha << ", b=" << beta << ", m=" << maximizingPlayer << std::endl;
+        }
     }
     
     void outputCutoff(Node node, int depth, int alpha, int beta, bool maximizingPlayer) {
-        std::cout << "Cut-off (b<=a): " << node.description() << ", d=" << depth << ", a=" << alpha << ", b=" << beta << ", m=" << maximizingPlayer << std::endl;
+        if (debugOutput) {
+            std::cout << "Cut-off (b<=a): " << node.description() << ", d=" << depth << ", a=" << alpha << ", b=" << beta << ", m=" << maximizingPlayer << std::endl;
+        }
     }
 
     int alphabeta(Node node, int depth, int alpha, int beta, bool maximizingPlayer) {
@@ -48,9 +53,12 @@ public:
             }
         }
         
+        auto children = node.children();
+        std::stable_sort(children.begin(), children.end());
+
         if (maximizingPlayer) {
             int v = INT_MIN;
-            for (Node child : node.children()) {
+            for (Node child : children) {
                 v = std::max(v, alphabeta(child, depth + 1, alpha, beta, false));
                 alpha = std::max(alpha, v);
                 if (alphaBetaCutoff && beta <= alpha) {
@@ -61,7 +69,7 @@ public:
             return v;
         } else {
             int v = INT_MAX;
-            for (Node child : node.children()) {
+            for (Node child : children) {
                 v = std::min(v, alphabeta(child, depth + 1, alpha, beta, true));
                 beta = std::min(beta, v);
                 if (alphaBetaCutoff && beta <= alpha) {

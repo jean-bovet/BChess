@@ -40,7 +40,13 @@ public:
     std::string description() {
         return "";
     }
+    
+    int value = 0;
 };
+
+bool operator<(const ChessNode &lhs, const ChessNode &rhs) {
+    return lhs.value < lhs.value;
+}
 
 class ChessEvaluater {
 public:

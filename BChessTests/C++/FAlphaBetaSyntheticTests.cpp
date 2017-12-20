@@ -17,14 +17,27 @@
 
 class TestNode {
 public:
-    void push(std::vector<int> indexes, int newValue, bool quiet = true) {
-        push({ }, indexes, newValue, quiet);
-    }
+    typedef std::function<void(TestNode &node)> TestNodeSetupCallback;
     
-    void push(std::vector<int> parentIndexes, std::vector<int> indexes, int newValue, bool quiet = true) {
+    void setValue(std::vector<int> indexes, int newValue) {
+        push({ }, indexes, [&](TestNode &node) { node.value = newValue; });
+    }
+
+    void setQuiet(std::vector<int> indexes, bool quiet) {
+        push({ }, indexes, [&](TestNode &node) { node.quiet = quiet; });
+    }
+
+    void setOrdering(std::vector<int> indexes, int ordering) {
+        push({ }, indexes, [&](TestNode &node) { node.ordering = ordering; });
+    }
+
+    void push(std::vector<int> indexes, TestNodeSetupCallback callback) {
+        push({ }, indexes, callback);
+    }
+
+    void push(std::vector<int> parentIndexes, std::vector<int> indexes, TestNodeSetupCallback callback) {
         if (indexes.empty()) {
-            TestNode::value = newValue;
-            TestNode::quiet = quiet;
+            callback(*this);
         } else {
             int childIndex = indexes.front();
             while (_children.size() < childIndex) {
@@ -38,7 +51,7 @@ public:
             
             auto newParentIndexes = parentIndexes;
             newParentIndexes.push_back(childIndex);
-            child.push(newParentIndexes, indexes, newValue, quiet);
+            child.push(newParentIndexes, indexes, callback);
         }
     }
     
@@ -66,9 +79,14 @@ public:
     std::vector<int> parentIndexes = { };
     int index = 0;
     int value = 0;
+    int ordering = 0;
     bool quiet = true;
     std::vector<TestNode> _children = { };
 };
+
+bool operator<(const TestNode &lhs, const TestNode &rhs) {
+    return lhs.ordering < rhs.ordering;
+}
 
 class TestEvaluater {
 public:
@@ -89,59 +107,33 @@ static void assertAlphaBeta(AlphaBeta<Node, Evaluater> alphaBeta, Node rootNode,
 }
 
 static void configureTree(TestNode &rootNode) {
-    rootNode.push({ 1, 1, 1, 1 }, 5);
-    rootNode.push({ 1, 1, 1, 2 }, 6);
+    rootNode.setValue({ 1, 1, 1, 1 }, 5);
+    rootNode.setValue({ 1, 1, 1, 2 }, 6);
     
-    rootNode.push({ 1, 1, 2, 1 }, 7);
-    rootNode.push({ 1, 1, 2, 2 }, 4);
-    rootNode.push({ 1, 1, 2, 3 }, 5);
+    rootNode.setValue({ 1, 1, 2, 1 }, 7);
+    rootNode.setValue({ 1, 1, 2, 2 }, 4);
+    rootNode.setValue({ 1, 1, 2, 3 }, 5);
     
-    rootNode.push({ 1, 2, 1, 1 }, 3);
+    rootNode.setValue({ 1, 2, 1, 1 }, 3);
     
-    rootNode.push({ 2, 1, 1, 1 }, 6);
+    rootNode.setValue({ 2, 1, 1, 1 }, 6);
     
-    rootNode.push({ 2, 1, 2, 1 }, 6);
-    rootNode.push({ 2, 1, 2, 2 }, 9);
+    rootNode.setValue({ 2, 1, 2, 1 }, 6);
+    rootNode.setValue({ 2, 1, 2, 2 }, 9);
     
-    rootNode.push({ 2, 2, 1, 1 }, 7);
+    rootNode.setValue({ 2, 2, 1, 1 }, 7);
     
-    rootNode.push({ 3, 1, 1, 1 }, 5);
+    rootNode.setValue({ 3, 1, 1, 1 }, 5);
     
-    rootNode.push({ 3, 2, 1, 1 }, 9);
-    rootNode.push({ 3, 2, 1, 2 }, 8);
+    rootNode.setValue({ 3, 2, 1, 1 }, 9);
+    rootNode.setValue({ 3, 2, 1, 2 }, 8);
     
-    rootNode.push({ 3, 2, 2, 1 }, 6);
+    rootNode.setValue({ 3, 2, 2, 1 }, 6);
 }
 
-static void configureTreeWithBestBranchFirst(TestNode &rootNode) {
-    // 1st node
-    rootNode.push({ 2, 1, 1, 1 }, 5);
-    rootNode.push({ 2, 1, 1, 2 }, 6);
-    
-    rootNode.push({ 2, 1, 2, 1 }, 7);
-    rootNode.push({ 2, 1, 2, 2 }, 4);
-    rootNode.push({ 2, 1, 2, 3 }, 5);
-    
-    rootNode.push({ 2, 2, 1, 1 }, 3);
-    
-    // 2nd node
-    rootNode.push({ 1, 1, 1, 1 }, 6);
-    
-    rootNode.push({ 1, 1, 2, 1 }, 6);
-    rootNode.push({ 1, 1, 2, 2 }, 9);
-    
-    rootNode.push({ 1, 2, 1, 1 }, 7);
-    
-    // 3rd node
-    rootNode.push({ 3, 1, 1, 1 }, 5);
-    
-    rootNode.push({ 3, 2, 1, 1 }, 9);
-    rootNode.push({ 3, 2, 1, 2 }, 8);
-    
-    rootNode.push({ 3, 2, 2, 1 }, 6);
-}
+#pragma mark -
 
-TEST(Synthetic, FakeTree) {
+TEST(Synthetic, AlphaBetaCutoff) {
     TestEvaluater evaluater;
     AlphaBeta<TestNode, TestEvaluater> alphaBeta(evaluater, 4);
     
@@ -149,27 +141,57 @@ TEST(Synthetic, FakeTree) {
     
     configureTree(rootNode);
     
+    // Test with alpha-beta enabled (some nodes are skipped)
     assertAlphaBeta(alphaBeta, rootNode, 25, 6);
-    assertAlphaBeta(alphaBeta, rootNode, 33, 6, false);
     
+    // Test with alpha-beta disabled (all the nodes are analyzed)
+    assertAlphaBeta(alphaBeta, rootNode, 33, 6, false);
+}
+
+TEST(Synthetic, SortedNodes) {
+    TestEvaluater evaluater;
+    AlphaBeta<TestNode, TestEvaluater> alphaBeta(evaluater, 4);
+    
+    TestNode rootNode;
+    
+    // The nodes are now sorted by best node first
+    // which should lead to less nodes being analyzed by
+    // the alpha-beta prunning algorithm.
+    configureTree(rootNode);
+    
+    rootNode.setOrdering({ 2 }, 1);
+    rootNode.setOrdering({ 1 }, 2);
+    rootNode.setOrdering({ 3 }, 3);
+
+    assertAlphaBeta(alphaBeta, rootNode, 21, 6);
+}
+
+TEST(Synthetic, QuiescenceSearch) {
+    TestEvaluater evaluater;
+    AlphaBeta<TestNode, TestEvaluater> alphaBeta(evaluater, 4);
+    
+    TestNode rootNode;
+    
+    configureTree(rootNode);
+
     // Let's add two nodes after the best ones (6) that are not good
     // to see if the quiescence search is able to detect those and avoid those.
-    rootNode.push({ 2, 1, 1, 1 }, 6, false); // change this node to a non-quiet node
-    rootNode.push({ 2, 1, 2, 1 }, 6, false); // change this node to a non-quiet node
+    rootNode.setQuiet({ 2, 1, 1, 1 }, false); // change this node to a non-quiet node
+    rootNode.setQuiet({ 2, 1, 2, 1 }, false); // change this node to a non-quiet node
     
-    rootNode.push({ 2, 1, 1, 1, 1 }, 2, false);
-    rootNode.push({ 2, 1, 2, 1, 1 }, 2, false);
+    rootNode.setValue({ 2, 1, 1, 1, 1 }, 2);
+    rootNode.setValue({ 2, 1, 2, 1, 1 }, 2);
     
-    assertAlphaBeta(alphaBeta, rootNode, 30, 5); // why 30 nodes visited? print out which ones were cut off
-    
-    rootNode.push({ 2, 1, 1, 1, 1 }, 2, true);
-    rootNode.push({ 2, 1, 2, 1, 1 }, 2, true);
-    
+    // The best value is now 5 instead of 6
     assertAlphaBeta(alphaBeta, rootNode, 30, 5);
     
-    // TODO: display the nodes visited and the one skipped?
-    TestNode rootNode2;
-    configureTreeWithBestBranchFirst(rootNode2);
-    assertAlphaBeta(alphaBeta, rootNode2, 21, 6);
+    // Try again, this time by setting the last two nodes
+    // to be non-quiet node. This should not change anything
+    // because they are the leaf nodes but let's make
+    // sure the search algorithm does the right thing.
+    rootNode.setQuiet({ 2, 1, 1, 1, 1 }, false); // change this node to a non-quiet node
+    rootNode.setQuiet({ 2, 1, 1, 1, 1 }, false); // change this node to a non-quiet node
+
+    assertAlphaBeta(alphaBeta, rootNode, 30, 5);
 }
 
