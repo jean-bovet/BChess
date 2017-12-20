@@ -139,9 +139,88 @@ Minimax::Evaluation Minimax::evaluate(Board board, Move move, int depth, int max
     return bestEvaluation;
 }
 
+// Returns true if move i goes before move j.
+bool captureMoveComparison (Move i, Move j) {
+    if (i == j) {
+        return false;
+    }
+    
+    if (MOVE_CAPTURED_PIECE(i) > MOVE_CAPTURED_PIECE(j)) {
+        return true;
+    } else if (MOVE_CAPTURED_PIECE(i) == MOVE_CAPTURED_PIECE(j)) {
+        return MOVE_PIECE(i) > MOVE_PIECE(j);
+    } else {
+        return false;
+    }
+}
+
+int Minimax::quiescentSearch(Board board, int depth, bool maximizing, int alpha, int beta) {
+    evaluateCount += 1;
+
+    int stand_pat = Evaluate::evaluate(board);
+    
+    if (maximizing) {
+        alpha = std::max(alpha, stand_pat); // aka white's best score
+    } else {
+        beta = std::min(beta, stand_pat); // aka black's best score
+    }
+
+    if (beta <= alpha) {
+        return maximizing ? alpha : beta;
+    }
+    
+//    if (stand_pat >= beta) {
+//        return beta;
+//    }
+//    if (alpha < stand_pat) {
+//        alpha = stand_pat;
+//    }
+    
+    bool evaluated = false;
+    MoveGenerator generator;
+    MoveList moveList = generator.generateMoves(board);
+    
+    // Sort the moves according to:
+    // MVV/LVA (Most Valuable Victim/Least Valuable Attacker).
+    
+    auto moves = moveList.moves;
+    std::sort(moves.begin(), moves.end(), captureMoveComparison);
+    
+    for (Move move : moves) {
+        if (!MOVE_IS_CAPTURE(move)) {
+            continue;
+        }
+        
+        evaluated = true;
+        
+        Board newBoard = board;
+        newBoard.move(move);
+        int score = quiescentSearch(newBoard, depth+1, !maximizing, alpha, beta);
+        if (maximizing) {
+            alpha = std::max(alpha, score);
+        } else {
+            beta = std::min(beta, score);
+        }
+        
+        if (beta <= alpha) {
+            return maximizing ? alpha : beta;
+        }
+
+//        if (score >= beta) {
+//            return beta;
+//        }
+//        if (score > alpha) {
+//            alpha = score;
+//        }
+    }
+    
+    return maximizing ? alpha : beta;
+}
+
 bool Minimax::evaluateAlphaBeta(Board board, Move move, int depth, int maxDepth, bool maximizing, LineMove line, int &alpha, int &beta, Minimax::Evaluation &bestEvaluation) {
     if (depth == maxDepth) {
-        int boardValue = Evaluate::evaluate(board);
+        int boardValue = quiescentSearch(board, depth, maximizing, alpha, beta);
+//        int boardValue = Evaluate::evaluate(board);
         bestEvaluation.move = move;
         bestEvaluation.value = boardValue;
         bestEvaluation.color = board.color;

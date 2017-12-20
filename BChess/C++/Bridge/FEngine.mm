@@ -14,6 +14,8 @@
 #import "FMove.hpp"
 #import "FTests.hpp"
 #import "FTestsPGN.hpp"
+#import "FAlphaBetaSyntheticTests.hpp"
+#import "FAlphaBetaChessTests.hpp"
 #import "FMinimax.hpp"
 
 @implementation FEngineMove
@@ -218,6 +220,8 @@
 }
 
 + (void)runCPPTestMoves {
+    FAlphaBetaChessTests::runAll();
+    FAlphaBetaSyntheticTests::runAll();
     FTests::runAll();
 }
 

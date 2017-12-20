@@ -186,16 +186,17 @@ public:
      */
     static void testPawnForkQueenAndKing() {
         std::string start = "8/8/8/1q1k4/8/2P5/1N6/4K3 w - - 0 1";
-        std::string end = "8/8/8/3k4/2N5/8/8/4K3 b - - 0 2";
-        assertBestMove(start, end, "c3c4",  { "c3c4", "Qb5xc4", "Nb2xc4" } );
+        std::string end = "8/8/8/8/2k5/8/8/4K3 w - - 0 3";
+        assertBestMove(start, end, "c3c4",  { "c3c4", "Qb5xc4", "Nb2xc4", "Kd5xc4" }, 5 );
     }
 
     static void testKnightEscapeAttackByPawn() {
         std::string start = "r1bqkbnr/pppp1ppp/2n5/3P4/8/8/PPP2PPP/RNBQKBNR b KQkq - 0 4";
-        std::string end = "r1bqkb1r/ppppnppp/8/3P4/1n6/8/PPP1QPPP/RNB1KBNR w KQkq - 3 6";
-        // TODO: problem here. The engine wants to do Bf8b4 but actually this leads into material loss way down the tree.
+        std::string end = "rnb1kbnr/ppppqppp/B7/3P4/8/4B3/PPP2PPP/RN1QK1NR b KQkq - 4 6";
+        // Note: without quiescence search, the engine wants to do Bf8b4 but actually this leads into material loss way down the tree.
         // The best move here is moving the knight out of c6.
-//        assertBestMove(start, end, "Nc6b4",  { "Nc6b4", "Qd1e2", "Ng8e7" } );
+        // last move Bf1a6 is pretty bad in the evaluation - why?
+        assertBestMove(start, end, "Qd8e7",  { "Qd8e7", "Bc1e3", "Nc6b8", "Bf1a6" }, 5 );
     }
 
     // In this situation, we are trying to see if the engine is able to see

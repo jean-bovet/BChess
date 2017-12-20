@@ -45,6 +45,8 @@ public:
 
     Evaluation evaluate(Board board, Move move, int depth, int maxDepth, bool maximizing, LineMove line, int alpha, int beta);
 
+    int quiescentSearch(Board board, int depth, bool maximizing, int alpha, int beta);
+    
     bool evaluateAlphaBeta(Board board, Move move, int depth, int maxDepth, bool maximizing, LineMove line, int &alpha, int &beta, Evaluation &bestEvaluation);
 
 };
