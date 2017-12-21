@@ -19,7 +19,10 @@ class Board;
 struct MoveList {
     std::vector<Move> moves;
     
+    std::string description();
+    
     void addMove(Move move);
+    void addMoves(MoveList moves);
     void addMove(Board &board, Move move);
     void addMoves(Board &board, Square from, Bitboard moves, Piece piece);
     void addCaptures(Board &board, Square from, Bitboard moves, Piece attackingPiece, Piece capturedPiece);

@@ -12,115 +12,153 @@
 #include <climits>
 #include <algorithm>
 
-template <class Node, class Evaluater>
+struct Configuration {
+    int maxDepth = 0;
+    bool debugLog = false;
+    bool alphaBetaPrunning = true;
+    bool quiescenceSearch = true;
+};
+
+template <class Node, class Evaluater, class Evaluation>
 class AlphaBeta {
     Evaluater evaluater;
-    int maxDepth = 0;
     
 public:
+    Configuration config;
+
     int visitedNodes = 0;
-    bool alphaBetaCutoff = true;
-    bool debugOutput = false;
     
-    AlphaBeta(Evaluater evaluater, int maxDepth) : evaluater(evaluater), maxDepth(maxDepth) { }
+    AlphaBeta(Evaluater evaluater) : evaluater(evaluater) { }
+    AlphaBeta(Evaluater evaluater, Configuration config) : evaluater(evaluater), config(config) { }
 
     void reset() {
         visitedNodes = 0;
     }
     
     void outputDebug(Node node, int depth, int alpha, int beta, bool maximizingPlayer) {
-        if (debugOutput) {
-            std::cout << "    Quiet node: " << node.description() << ", d=" << depth << ", a=" << alpha << ", b=" << beta << ", m=" << maximizingPlayer << std::endl;
+        if (config.debugLog) {
+            std::cout << "Quiet node: " << node.description() << ", d=" << depth << ", a=" << alpha << ", b=" << beta << ", m=" << maximizingPlayer << std::endl;
+        }
+    }
+
+    void outputEnter(Node node, int depth, int alpha, int beta, bool maximizingPlayer) {
+        if (config.debugLog) {
+            std::cout << "Enter node: " << node.description() << ", d=" << depth << ", a=" << alpha << ", b=" << beta << ", m=" << maximizingPlayer << std::endl;
+        }
+    }
+
+    void outputReturn(Node node, int depth, int alpha, int beta, bool maximizingPlayer, Evaluation bestEval) {
+        if (config.debugLog) {
+            std::cout << "Return from: " << node.description() << ", d=" << depth << ", a=" << alpha << ", b=" << beta << ", m=" << maximizingPlayer << ", bv=" << bestEval.value << std::endl;
+        }
+    }
+    
+    void outputBest(Node node, int depth, int alpha, int beta, bool maximizingPlayer, Evaluation bestEval) {
+        if (config.debugLog) {
+            std::cout << "Best match: " << node.description() << ", d=" << depth << ", a=" << alpha << ", b=" << beta << ", m=" << maximizingPlayer << ", bv=" << bestEval.value << std::endl;
         }
     }
     
     void outputCutoff(Node node, int depth, int alpha, int beta, bool maximizingPlayer) {
-        if (debugOutput) {
+        if (config.debugLog) {
             std::cout << "Cut-off (b<=a): " << node.description() << ", d=" << depth << ", a=" << alpha << ", b=" << beta << ", m=" << maximizingPlayer << std::endl;
         }
     }
 
-    int alphabeta(Node node, int depth, int alpha, int beta, bool maximizingPlayer) {
+    Evaluation alphabeta(Node node, int depth, int alpha, int beta, bool maximizingPlayer) {
+        return alphabeta(node, depth, alpha, beta, maximizingPlayer, false);
+    }
+    
+    Evaluation alphabeta(Node node, int depth, int alpha, int beta, bool maximizingPlayer, bool quiescence) {
         visitedNodes++;
         
-        if (depth == maxDepth) {
+        outputEnter(node, depth, alpha, beta, maximizingPlayer);
+
+        std::vector<Node> children;
+        if (quiescence) {
+            children = node.children(true);
             if (node.isQuiet()) {
-                int value = evaluater.evaluate(node);
+                Evaluation eval = evaluater.evaluate(node);
                 outputDebug(node, depth, alpha, beta, maximizingPlayer);
-                return value;
+                return eval;
             } else {
-                return quiescence(node, depth, alpha, beta, maximizingPlayer);
+                Evaluation stand_pat = evaluater.evaluate(node);
+                if (maximizingPlayer) { 
+                    if (stand_pat.value > alpha) {
+                        alpha = stand_pat.value;
+                        if (config.alphaBetaPrunning && beta <= alpha) {
+                            outputCutoff(node, depth, alpha, beta, maximizingPlayer);
+                            return stand_pat;
+                        }
+                    }
+                } else {
+                    if (stand_pat.value < beta) {
+                        beta = stand_pat.value;
+                        if (config.alphaBetaPrunning && beta <= alpha) {
+                            outputCutoff(node, depth, alpha, beta, maximizingPlayer);
+                            return stand_pat;
+                        }
+                    }
+                }
+            }
+        } else {
+            children = node.children(false);
+
+            if (depth == config.maxDepth) {
+                if (!config.quiescenceSearch || node.isQuiet()) {
+                    auto value = evaluater.evaluate(node);
+                    outputDebug(node, depth, alpha, beta, maximizingPlayer);
+                    return value;
+                } else {
+                    return alphabeta(node, depth, alpha, beta, maximizingPlayer, true);
+                }
             }
         }
-        
-        auto children = node.children();
+
+        if (children.empty()) {
+            // Terminal node
+            Evaluation eval = evaluater.evaluate(node);
+            outputDebug(node, depth, alpha, beta, maximizingPlayer);
+            return eval;
+        }
+
         std::stable_sort(children.begin(), children.end());
 
         if (maximizingPlayer) {
-            int v = INT_MIN;
+            Evaluation bestEval;
+            bestEval.value = INT_MIN;
             for (Node child : children) {
-                v = std::max(v, alphabeta(child, depth + 1, alpha, beta, false));
-                alpha = std::max(alpha, v);
-                if (alphaBetaCutoff && beta <= alpha) {
+                auto candidate = alphabeta(child, depth + 1, alpha, beta, false, quiescence);
+                if (candidate.value > bestEval.value) {
+                    bestEval = candidate;
+                    alpha = std::max(alpha, candidate.value);
+                    outputBest(node, depth, alpha, beta, maximizingPlayer, bestEval);
+                }
+                if (config.alphaBetaPrunning && beta <= alpha) {
                     outputCutoff(child, depth, alpha, beta, maximizingPlayer);
                     break; // Beta cut-off
                 }
             }
-            return v;
+            outputReturn(node, depth, alpha, beta, maximizingPlayer, bestEval);
+            return bestEval;
         } else {
-            int v = INT_MAX;
+            Evaluation bestEval;
+            bestEval.value = INT_MAX;
             for (Node child : children) {
-                v = std::min(v, alphabeta(child, depth + 1, alpha, beta, true));
-                beta = std::min(beta, v);
-                if (alphaBetaCutoff && beta <= alpha) {
+                auto candidate = alphabeta(child, depth + 1, alpha, beta, true, quiescence);
+                if (candidate.value < bestEval.value) {
+                    bestEval = candidate;
+                    beta = std::min(beta, candidate.value);
+                    outputBest(node, depth, alpha, beta, maximizingPlayer, bestEval);
+                }
+                if (config.alphaBetaPrunning && beta <= alpha) {
                     outputCutoff(child, depth, alpha, beta, maximizingPlayer);
                     break; // Alpha cut-off
                 }
             }
-            return v;
+            outputReturn(node, depth, alpha, beta, maximizingPlayer, bestEval);
+            return bestEval;
         }
     }
     
-    int quiescence(Node node, int depth, int alpha, int beta, bool maximizingPlayer) {
-        visitedNodes++;
-        
-        if (node.isQuiet()) {
-            int value = evaluater.evaluate(node);
-            outputDebug(node, depth, alpha, beta, maximizingPlayer);
-            return value;
-        }
-        
-        auto children = node.children();
-        if (children.empty()) {
-            // Terminal node
-            int value = evaluater.evaluate(node);
-            outputDebug(node, depth, alpha, beta, maximizingPlayer);
-            return value;
-        }
-        
-        if (maximizingPlayer) {
-            int v = INT_MIN;
-            for (Node child : children) {
-                v = std::max(v, quiescence(child, depth + 1, alpha, beta, false));
-                alpha = std::max(alpha, v);
-                if (alphaBetaCutoff && beta <= alpha) {
-                    outputCutoff(child, depth, alpha, beta, maximizingPlayer);
-                    break; // Beta cut-off
-                }
-            }
-            return v;
-        } else {
-            int v = INT_MAX;
-            for (Node child : children) {
-                v = std::min(v, quiescence(child, depth + 1, alpha, beta, true));
-                beta = std::min(beta, v);
-                if (alphaBetaCutoff && beta <= alpha) {
-                    outputCutoff(child, depth, alpha, beta, maximizingPlayer);
-                    break; // Alpha cut-off
-                }
-            }
-            return v;
-        }
-    }
-
 };

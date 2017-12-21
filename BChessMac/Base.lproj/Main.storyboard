@@ -109,9 +109,9 @@
                                                 <action selector="copyGame:" target="Ady-hI-5gd" id="7o7-0e-2EL"/>
                                             </connections>
                                         </menuItem>
-                                        <menuItem title="Paste" keyEquivalent="v" id="jM5-BE-izz">
+                                        <menuItem title="Paste" keyEquivalent="v" id="8Ko-8d-y0f">
                                             <connections>
-                                                <action selector="paste:" target="Ady-hI-5gd" id="Fhy-7v-Oq0"/>
+                                                <action selector="paste:" target="Ady-hI-5gd" id="dM0-Tx-9ao"/>
                                             </connections>
                                         </menuItem>
                                     </items>
@@ -297,7 +297,7 @@
                                             <rect key="frame" x="0.0" y="0.0" width="160" height="318"/>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                             <subviews>
-                                                <textView editable="NO" drawsBackground="NO" importsGraphics="NO" richText="NO" verticallyResizable="YES" usesFontPanel="YES" findStyle="panel" continuousSpellChecking="YES" allowsUndo="YES" usesRuler="YES" allowsNonContiguousLayout="YES" quoteSubstitution="YES" dashSubstitution="YES" spellingCorrection="YES" smartInsertDelete="YES" id="lqJ-o6-VhY">
+                                                <textView editable="NO" selectable="NO" drawsBackground="NO" importsGraphics="NO" richText="NO" verticallyResizable="YES" usesFontPanel="YES" findStyle="panel" continuousSpellChecking="YES" usesRuler="YES" allowsNonContiguousLayout="YES" quoteSubstitution="YES" dashSubstitution="YES" spellingCorrection="YES" smartInsertDelete="YES" id="lqJ-o6-VhY">
                                                     <rect key="frame" x="0.0" y="0.0" width="160" height="318"/>
                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                     <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>

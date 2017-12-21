@@ -55,7 +55,7 @@ public:
         }
     }
     
-    std::vector<TestNode> children() {
+    std::vector<TestNode> children(bool quietChildrenOnly) {
         return _children;
     }
     
@@ -90,20 +90,21 @@ bool operator<(const TestNode &lhs, const TestNode &rhs) {
 
 class TestEvaluater {
 public:
-    int evaluate(TestNode node) {
-        return node.value;
+    TestNode evaluate(TestNode node) {
+        return node;
     }
 };
 
 template<class Node, class Evaluater>
-static void assertAlphaBeta(AlphaBeta<Node, Evaluater> alphaBeta, Node rootNode, int expectedVisitedNodes, int expectedValue, bool alphaBetaCutoff = true) {
+static void assertAlphaBeta(AlphaBeta<Node, Evaluater, TestNode> alphaBeta, Node rootNode, int expectedVisitedNodes, int expectedValue) {
     alphaBeta.reset();
-    alphaBeta.alphaBetaCutoff = alphaBetaCutoff;
     
-    int value = alphaBeta.alphabeta(rootNode, 0, INT_MIN, INT_MAX, true);
-    std::cout << alphaBeta.visitedNodes << " => " << value << std::endl;
+    alphaBeta.config.maxDepth = 4;
+    
+    auto eval = alphaBeta.alphabeta(rootNode, 0, INT_MIN, INT_MAX, true);
+    std::cout << alphaBeta.visitedNodes << " => " << eval.value << std::endl;
     ASSERT_EQ(alphaBeta.visitedNodes, expectedVisitedNodes);
-    ASSERT_EQ(value, expectedValue);
+    ASSERT_EQ(eval.value, expectedValue);
 }
 
 static void configureTree(TestNode &rootNode) {
@@ -135,7 +136,7 @@ static void configureTree(TestNode &rootNode) {
 
 TEST(Synthetic, AlphaBetaCutoff) {
     TestEvaluater evaluater;
-    AlphaBeta<TestNode, TestEvaluater> alphaBeta(evaluater, 4);
+    AlphaBeta<TestNode, TestEvaluater, TestNode> alphaBeta(evaluater);
     
     TestNode rootNode;
     
@@ -145,12 +146,13 @@ TEST(Synthetic, AlphaBetaCutoff) {
     assertAlphaBeta(alphaBeta, rootNode, 25, 6);
     
     // Test with alpha-beta disabled (all the nodes are analyzed)
-    assertAlphaBeta(alphaBeta, rootNode, 33, 6, false);
+    alphaBeta.config.alphaBetaPrunning = false;
+    assertAlphaBeta(alphaBeta, rootNode, 33, 6);
 }
 
 TEST(Synthetic, SortedNodes) {
     TestEvaluater evaluater;
-    AlphaBeta<TestNode, TestEvaluater> alphaBeta(evaluater, 4);
+    AlphaBeta<TestNode, TestEvaluater, TestNode> alphaBeta(evaluater);
     
     TestNode rootNode;
     
@@ -163,12 +165,14 @@ TEST(Synthetic, SortedNodes) {
     rootNode.setOrdering({ 1 }, 2);
     rootNode.setOrdering({ 3 }, 3);
 
+    alphaBeta.config.maxDepth = 4;
+
     assertAlphaBeta(alphaBeta, rootNode, 21, 6);
 }
 
 TEST(Synthetic, QuiescenceSearch) {
     TestEvaluater evaluater;
-    AlphaBeta<TestNode, TestEvaluater> alphaBeta(evaluater, 4);
+    AlphaBeta<TestNode, TestEvaluater, TestNode> alphaBeta(evaluater);
     
     TestNode rootNode;
     
@@ -180,10 +184,15 @@ TEST(Synthetic, QuiescenceSearch) {
     rootNode.setQuiet({ 2, 1, 2, 1 }, false); // change this node to a non-quiet node
     
     rootNode.setValue({ 2, 1, 1, 1, 1 }, 2);
-    rootNode.setValue({ 2, 1, 2, 1, 1 }, 2);
     
+    rootNode.setValue({ 2, 1, 2, 1, 1 }, 9);
+    rootNode.setQuiet({ 2, 1, 2, 1, 1 }, false); // change this node to a non-quiet node so the algorithm will continue it's quiescence search for the two following nodes
+
+    rootNode.setValue({ 2, 1, 2, 1, 1, 1 }, 3);
+    rootNode.setValue({ 2, 1, 2, 1, 1, 2 }, 4);
+
     // The best value is now 5 instead of 6
-    assertAlphaBeta(alphaBeta, rootNode, 30, 5);
+    assertAlphaBeta(alphaBeta, rootNode, 31, 5);
     
     // Try again, this time by setting the last two nodes
     // to be non-quiet node. This should not change anything
@@ -192,6 +201,6 @@ TEST(Synthetic, QuiescenceSearch) {
     rootNode.setQuiet({ 2, 1, 1, 1, 1 }, false); // change this node to a non-quiet node
     rootNode.setQuiet({ 2, 1, 1, 1, 1 }, false); // change this node to a non-quiet node
 
-    assertAlphaBeta(alphaBeta, rootNode, 30, 5);
+    assertAlphaBeta(alphaBeta, rootNode, 31, 5);
 }
 

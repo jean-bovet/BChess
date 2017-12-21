@@ -184,11 +184,11 @@ TEST(BestMove, PawnForkQueenAndKing) {
 
 TEST(BestMove, KnightEscapeAttackByPawn) {
     std::string start = "r1bqkbnr/pppp1ppp/2n5/3P4/8/8/PPP2PPP/RNBQKBNR b KQkq - 0 4";
-    std::string end = "rnb1kbnr/ppppqppp/B7/3P4/8/4B3/PPP2PPP/RN1QK1NR b KQkq - 4 6";
+    std::string end = "r1bqkb1r/ppppnppp/8/n2P4/8/2N5/PPP1NPPP/R1BQKB1R b KQkq - 4 6";
     // Note: without quiescence search, the engine wants to do Bf8b4 but actually this leads into material loss way down the tree.
     // The best move here is moving the knight out of c6.
     // last move Bf1a6 is pretty bad in the evaluation - why?
-    assertBestMove(start, end, "Qd8e7",  { "Qd8e7", "Bc1e3", "Nc6b8", "Bf1a6" }, 5 );
+    assertBestMove(start, end, "Nc6a5",  { "Nc6a5", "Nb1c3", "Ng8e7", "Ng1e2" }, 5 );
 }
 
 // In this situation, we are trying to see if the engine is able to see

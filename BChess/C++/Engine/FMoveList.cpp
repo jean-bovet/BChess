@@ -8,9 +8,25 @@
 
 #include "FMoveList.hpp"
 #include "FBoard.hpp"
+#include "FPGN.hpp"
+
+std::string MoveList::description() {
+    std::string text = "";
+    for (auto move : moves) {
+        if (text.length() > 0) {
+            text += " ";
+        }
+        text += FPGN::to_string(move);
+    }
+    return text;
+}
 
 void MoveList::addMove(Move move) {
     moves.push_back(move);
+}
+
+void MoveList::addMoves(MoveList moves) {
+    MoveList::moves.insert(MoveList::moves.end(), moves.moves.begin(), moves.moves.end());
 }
 
 void MoveList::addMove(Board &board, Move move) {
