@@ -74,60 +74,50 @@ public:
         
         outputEnter(node, depth, alpha, beta, maximizingPlayer);
 
-        std::vector<Node> children;
+        std::vector<Node> children = node.children();
         if (quiescence) {
-            children = node.children(true);
-            if (node.isQuiet()) {
-                Evaluation eval = evaluater.evaluate(node);
-                outputDebug(node, depth, alpha, beta, maximizingPlayer);
-                return eval;
-            } else {
-                Evaluation stand_pat = evaluater.evaluate(node);
-                if (maximizingPlayer) { 
-                    if (stand_pat.value > alpha) {
-                        alpha = stand_pat.value;
-                        if (config.alphaBetaPrunning && beta <= alpha) {
-                            outputCutoff(node, depth, alpha, beta, maximizingPlayer);
-                            return stand_pat;
-                        }
+            Evaluation stand_pat = evaluater.evaluate(node);
+            if (maximizingPlayer) {
+                if (stand_pat.value > alpha) {
+                    alpha = stand_pat.value;
+                    if (config.alphaBetaPrunning && beta <= alpha) {
+                        outputCutoff(node, depth, alpha, beta, maximizingPlayer);
+                        return stand_pat;
                     }
-                } else {
-                    if (stand_pat.value < beta) {
-                        beta = stand_pat.value;
-                        if (config.alphaBetaPrunning && beta <= alpha) {
-                            outputCutoff(node, depth, alpha, beta, maximizingPlayer);
-                            return stand_pat;
-                        }
+                }
+            } else {
+                if (stand_pat.value < beta) {
+                    beta = stand_pat.value;
+                    if (config.alphaBetaPrunning && beta <= alpha) {
+                        outputCutoff(node, depth, alpha, beta, maximizingPlayer);
+                        return stand_pat;
                     }
                 }
             }
         } else {
-            children = node.children(false);
-
             if (depth == config.maxDepth) {
-                if (!config.quiescenceSearch || node.isQuiet()) {
-                    auto value = evaluater.evaluate(node);
-                    outputDebug(node, depth, alpha, beta, maximizingPlayer);
-                    return value;
+                if (config.quiescenceSearch) {
+                    quiescence = true;
                 } else {
-                    return alphabeta(node, depth, alpha, beta, maximizingPlayer, true);
+                    Evaluation eval = evaluater.evaluate(node);
+                    outputDebug(node, depth, alpha, beta, maximizingPlayer);
+                    return eval;
                 }
             }
         }
 
-        if (children.empty()) {
-            // Terminal node
-            Evaluation eval = evaluater.evaluate(node);
-            outputDebug(node, depth, alpha, beta, maximizingPlayer);
-            return eval;
-        }
-
         std::stable_sort(children.begin(), children.end());
 
+        bool evaluatedAtLeastOneChild = false;
+        
         if (maximizingPlayer) {
             Evaluation bestEval;
             bestEval.value = INT_MIN;
             for (Node child : children) {
+                if (quiescence && child.isQuiet()) {
+                    continue;
+                }
+                evaluatedAtLeastOneChild = true;
                 auto candidate = alphabeta(child, depth + 1, alpha, beta, false, quiescence);
                 if (candidate.value > bestEval.value) {
                     bestEval = candidate;
@@ -139,12 +129,21 @@ public:
                     break; // Beta cut-off
                 }
             }
+            if (!evaluatedAtLeastOneChild) {
+                Evaluation eval = evaluater.evaluate(node);
+                outputDebug(node, depth, alpha, beta, maximizingPlayer);
+                return eval;
+            }
             outputReturn(node, depth, alpha, beta, maximizingPlayer, bestEval);
             return bestEval;
         } else {
             Evaluation bestEval;
             bestEval.value = INT_MAX;
             for (Node child : children) {
+                if (quiescence && child.isQuiet()) {
+                    continue;
+                }
+                evaluatedAtLeastOneChild = true;
                 auto candidate = alphabeta(child, depth + 1, alpha, beta, true, quiescence);
                 if (candidate.value < bestEval.value) {
                     bestEval = candidate;
@@ -155,6 +154,11 @@ public:
                     outputCutoff(child, depth, alpha, beta, maximizingPlayer);
                     break; // Alpha cut-off
                 }
+            }
+            if (!evaluatedAtLeastOneChild) {
+                Evaluation eval = evaluater.evaluate(node);
+                outputDebug(node, depth, alpha, beta, maximizingPlayer);
+                return eval;
             }
             outputReturn(node, depth, alpha, beta, maximizingPlayer, bestEval);
             return bestEval;

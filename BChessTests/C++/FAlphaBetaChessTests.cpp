@@ -20,44 +20,31 @@
 class ChessNode {
 public:
     Board board;
+    Move originatedMove; // move that lead to that board
     MoveList moves; // moves that lead to that board
-    
-    bool generatedChildren = false;
-    bool quiet = true;
-    std::vector<ChessNode> _children;
     
     ChessNode(Board board) : board(board) { }
     
-    std::vector<ChessNode> children(bool activeChildrenOnly) {
-        if (!generatedChildren) {
-            generatedChildren = true;
+    std::vector<ChessNode> children() {
+        std::vector<ChessNode> _children;
+        MoveGenerator generator;
+        auto moveList = generator.generateMoves(board);
+        for (auto move : moveList.moves) {
+            auto newBoard = board;
+            newBoard.move(move);
             
-            MoveGenerator generator;
-            auto moveList = generator.generateMoves(board);
-            for (auto move : moveList.moves) {
-                if (activeChildrenOnly && !MOVE_IS_CAPTURE(move)) {
-                    continue;
-                }
-                
-                auto newBoard = board;
-                newBoard.move(move);
-                
-                auto child = ChessNode(newBoard);
-                child.moves.addMoves(moves);
-                child.moves.addMove(move);
-                
-                if (MOVE_IS_CAPTURE(move)) {
-                    quiet = false;
-                }
-                
-                _children.push_back(child);
-            }
+            auto child = ChessNode(newBoard);
+            child.originatedMove = move;
+            child.moves.addMoves(moves);
+            child.moves.addMove(move);
+            
+            _children.push_back(child);
         }
         return _children;
     }
     
     bool isQuiet() {
-        return quiet;
+        return !MOVE_IS_CAPTURE(originatedMove);
     }
     
     std::string description() {

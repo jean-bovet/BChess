@@ -55,7 +55,7 @@ public:
         }
     }
     
-    std::vector<TestNode> children(bool quietChildrenOnly) {
+    std::vector<TestNode> children() {
         return _children;
     }
     
@@ -184,23 +184,18 @@ TEST(Synthetic, QuiescenceSearch) {
     rootNode.setQuiet({ 2, 1, 2, 1 }, false); // change this node to a non-quiet node
     
     rootNode.setValue({ 2, 1, 1, 1, 1 }, 2);
-    
+    rootNode.setQuiet({ 2, 1, 1, 1, 1 }, false); // non-quiet node (it has been reached by a non-quiet move)
+
     rootNode.setValue({ 2, 1, 2, 1, 1 }, 9);
     rootNode.setQuiet({ 2, 1, 2, 1, 1 }, false); // change this node to a non-quiet node so the algorithm will continue it's quiescence search for the two following nodes
 
     rootNode.setValue({ 2, 1, 2, 1, 1, 1 }, 3);
+    rootNode.setQuiet({ 2, 1, 2, 1, 1, 1 }, false); // non-quiet node (it has been reached by a non-quiet move)
+
     rootNode.setValue({ 2, 1, 2, 1, 1, 2 }, 4);
+    rootNode.setQuiet({ 2, 1, 2, 1, 1, 2 }, false); // non-quiet node (it has been reached by a non-quiet move)
 
     // The best value is now 5 instead of 6
-    assertAlphaBeta(alphaBeta, rootNode, 31, 5);
-    
-    // Try again, this time by setting the last two nodes
-    // to be non-quiet node. This should not change anything
-    // because they are the leaf nodes but let's make
-    // sure the search algorithm does the right thing.
-    rootNode.setQuiet({ 2, 1, 1, 1, 1 }, false); // change this node to a non-quiet node
-    rootNode.setQuiet({ 2, 1, 1, 1, 1 }, false); // change this node to a non-quiet node
-
-    assertAlphaBeta(alphaBeta, rootNode, 31, 5);
+    assertAlphaBeta(alphaBeta, rootNode, 29, 5);
 }
 
