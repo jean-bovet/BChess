@@ -47,8 +47,11 @@
 		A75683291FCD28A000CF1408 /* FEngine.mm in Sources */ = {isa = PBXBuildFile; fileRef = A75683281FCD28A000CF1408 /* FEngine.mm */; };
 		A756832D1FD0B3FE00CF1408 /* magicmoves.c in Sources */ = {isa = PBXBuildFile; fileRef = A7712D411FCB97A900E7E802 /* magicmoves.c */; };
 		A75683301FD0D96300CF1408 /* FPerformance.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A756832E1FD0D96300CF1408 /* FPerformance.cpp */; };
-		A75A283B1FEC743E003AC5EF /* FAlphaBetaChessTests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A7E490E41FEA1C0600970EAD /* FAlphaBetaChessTests.cpp */; };
+		A75A283B1FEC743E003AC5EF /* SearchChessTests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A7E490E41FEA1C0600970EAD /* SearchChessTests.cpp */; };
 		A75A283F1FECD7DD003AC5EF /* FEngine.mm in Sources */ = {isa = PBXBuildFile; fileRef = A75683281FCD28A000CF1408 /* FEngine.mm */; };
+		A75CB25B1FED8F2C005487BD /* MoveTests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A75CB25A1FED8F2B005487BD /* MoveTests.cpp */; };
+		A75CB25D1FED8F82005487BD /* EvaluationTests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A75CB25C1FED8F82005487BD /* EvaluationTests.cpp */; };
+		A75CB25F1FED8F9E005487BD /* CheckTests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A75CB25E1FED8F9E005487BD /* CheckTests.cpp */; };
 		A7712D2F1FC7C4CD00E7E802 /* UCI.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7712D2E1FC7C4CD00E7E802 /* UCI.swift */; };
 		A7712D341FC895D100E7E802 /* UCI.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7712D2E1FC7C4CD00E7E802 /* UCI.swift */; };
 		A7712D441FCBBD9C00E7E802 /* Performance.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7712D431FCBBD9C00E7E802 /* Performance.swift */; };
@@ -62,11 +65,11 @@
 		A7AFCCAA1FB4E40D00AE3D85 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7AFCCA91FB4E40D00AE3D85 /* main.swift */; };
 		A7B18F581FD9BAE500A605B8 /* MovesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7B18F571FD9BAE500A605B8 /* MovesTests.swift */; };
 		A7E490EB1FEA207100970EAD /* gtest-all.cc in Sources */ = {isa = PBXBuildFile; fileRef = A7E490EA1FEA207100970EAD /* gtest-all.cc */; };
-		A7E490EC1FEA23DD00970EAD /* FTestsPGN.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A77372041FE340780001A90F /* FTestsPGN.cpp */; };
+		A7E490EC1FEA23DD00970EAD /* PGNTests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A77372041FE340780001A90F /* PGNTests.cpp */; };
 		A7E490ED1FEA29B900970EAD /* GamesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7712D321FC8957500E7E802 /* GamesTests.swift */; };
-		A7E490EE1FEA2A7000970EAD /* FTests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A70A61BD1FD3196400AFDF0E /* FTests.cpp */; };
+		A7E490EE1FEA2A7000970EAD /* BestMoveTests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A70A61BD1FD3196400AFDF0E /* BestMoveTests.cpp */; };
 		A7E490F21FEA2E7E00970EAD /* GoogleTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = A7E490F11FEA2E7E00970EAD /* GoogleTests.mm */; };
-		A7E490F41FEA2F0F00970EAD /* FAlphaBetaSyntheticTests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A7E490E51FEA1C0600970EAD /* FAlphaBetaSyntheticTests.cpp */; };
+		A7E490F41FEA2F0F00970EAD /* SearchSyntheticTests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A7E490E51FEA1C0600970EAD /* SearchSyntheticTests.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -102,7 +105,7 @@
 		A70A61B91FD132D200AFDF0E /* FFEN.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = FFEN.cpp; sourceTree = "<group>"; };
 		A70A61BA1FD132D200AFDF0E /* FFEN.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = FFEN.hpp; sourceTree = "<group>"; };
 		A70A61BC1FD1333300AFDF0E /* FUtility.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = FUtility.hpp; sourceTree = "<group>"; };
-		A70A61BD1FD3196400AFDF0E /* FTests.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = FTests.cpp; sourceTree = "<group>"; };
+		A70A61BD1FD3196400AFDF0E /* BestMoveTests.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = BestMoveTests.cpp; sourceTree = "<group>"; };
 		A70A61BE1FD38C7500AFDF0E /* FColor.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = FColor.hpp; sourceTree = "<group>"; };
 		A70A61BF1FD38D4100AFDF0E /* FPiece.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = FPiece.hpp; sourceTree = "<group>"; };
 		A70A61C01FD4587B00AFDF0E /* FMove.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = FMove.hpp; sourceTree = "<group>"; };
@@ -141,6 +144,9 @@
 		A756832F1FD0D96300CF1408 /* FPerformance.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = FPerformance.hpp; sourceTree = "<group>"; };
 		A75A283D1FEC8506003AC5EF /* ChessSearch.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = ChessSearch.hpp; sourceTree = "<group>"; };
 		A75BFAC61FE8C05E001EE942 /* MinMaxSearch.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = MinMaxSearch.hpp; sourceTree = "<group>"; };
+		A75CB25A1FED8F2B005487BD /* MoveTests.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MoveTests.cpp; sourceTree = "<group>"; };
+		A75CB25C1FED8F82005487BD /* EvaluationTests.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = EvaluationTests.cpp; sourceTree = "<group>"; };
+		A75CB25E1FED8F9E005487BD /* CheckTests.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CheckTests.cpp; sourceTree = "<group>"; };
 		A7712D141FB916E900E7E802 /* BChessTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BChessTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		A7712D181FB916E900E7E802 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		A7712D2E1FC7C4CD00E7E802 /* UCI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UCI.swift; sourceTree = "<group>"; };
@@ -156,12 +162,12 @@
 		A77371FD1FE31FEF0001A90F /* FGame.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = FGame.hpp; sourceTree = "<group>"; };
 		A77371FF1FE320010001A90F /* FPGN.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = FPGN.cpp; sourceTree = "<group>"; };
 		A77372001FE320010001A90F /* FPGN.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = FPGN.hpp; sourceTree = "<group>"; };
-		A77372041FE340780001A90F /* FTestsPGN.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FTestsPGN.cpp; sourceTree = "<group>"; };
+		A77372041FE340780001A90F /* PGNTests.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PGNTests.cpp; sourceTree = "<group>"; };
 		A7AFCCA61FB4E40D00AE3D85 /* BChess */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = BChess; sourceTree = BUILT_PRODUCTS_DIR; };
 		A7AFCCA91FB4E40D00AE3D85 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		A7B18F571FD9BAE500A605B8 /* MovesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MovesTests.swift; sourceTree = "<group>"; };
-		A7E490E41FEA1C0600970EAD /* FAlphaBetaChessTests.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FAlphaBetaChessTests.cpp; sourceTree = "<group>"; };
-		A7E490E51FEA1C0600970EAD /* FAlphaBetaSyntheticTests.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FAlphaBetaSyntheticTests.cpp; sourceTree = "<group>"; };
+		A7E490E41FEA1C0600970EAD /* SearchChessTests.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SearchChessTests.cpp; sourceTree = "<group>"; };
+		A7E490E51FEA1C0600970EAD /* SearchSyntheticTests.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SearchSyntheticTests.cpp; sourceTree = "<group>"; };
 		A7E490EA1FEA207100970EAD /* gtest-all.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "gtest-all.cc"; path = "BChessTests/Helper/gtest-all.cc"; sourceTree = SOURCE_ROOT; };
 		A7E490F11FEA2E7E00970EAD /* GoogleTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = GoogleTests.mm; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -363,10 +369,13 @@
 		A7E490EF1FEA2E6100970EAD /* C++ */ = {
 			isa = PBXGroup;
 			children = (
-				A70A61BD1FD3196400AFDF0E /* FTests.cpp */,
-				A77372041FE340780001A90F /* FTestsPGN.cpp */,
-				A7E490E41FEA1C0600970EAD /* FAlphaBetaChessTests.cpp */,
-				A7E490E51FEA1C0600970EAD /* FAlphaBetaSyntheticTests.cpp */,
+				A75CB25A1FED8F2B005487BD /* MoveTests.cpp */,
+				A75CB25C1FED8F82005487BD /* EvaluationTests.cpp */,
+				A75CB25E1FED8F9E005487BD /* CheckTests.cpp */,
+				A70A61BD1FD3196400AFDF0E /* BestMoveTests.cpp */,
+				A77372041FE340780001A90F /* PGNTests.cpp */,
+				A7E490E41FEA1C0600970EAD /* SearchChessTests.cpp */,
+				A7E490E51FEA1C0600970EAD /* SearchSyntheticTests.cpp */,
 			);
 			path = "C++";
 			sourceTree = "<group>";
@@ -606,13 +615,15 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A75A283B1FEC743E003AC5EF /* FAlphaBetaChessTests.cpp in Sources */,
+				A75CB25B1FED8F2C005487BD /* MoveTests.cpp in Sources */,
+				A75A283B1FEC743E003AC5EF /* SearchChessTests.cpp in Sources */,
 				A70A61DD1FD4D49500AFDF0E /* FFEN.cpp in Sources */,
 				A70A61DC1FD4D49500AFDF0E /* FMinimax.cpp in Sources */,
 				A7712D341FC895D100E7E802 /* UCI.swift in Sources */,
 				A70A61DA1FD4D49500AFDF0E /* FBoard.cpp in Sources */,
-				A7E490EE1FEA2A7000970EAD /* FTests.cpp in Sources */,
-				A7E490EC1FEA23DD00970EAD /* FTestsPGN.cpp in Sources */,
+				A7E490EE1FEA2A7000970EAD /* BestMoveTests.cpp in Sources */,
+				A75CB25D1FED8F82005487BD /* EvaluationTests.cpp in Sources */,
+				A7E490EC1FEA23DD00970EAD /* PGNTests.cpp in Sources */,
 				A7E490ED1FEA29B900970EAD /* GamesTests.swift in Sources */,
 				A77372031FE334BB0001A90F /* FPGN.cpp in Sources */,
 				A70A61DE1FD4D49F00AFDF0E /* magicmoves.c in Sources */,
@@ -620,8 +631,9 @@
 				A70A61D51FD4D42100AFDF0E /* FEngineInfo.m in Sources */,
 				A7E490F21FEA2E7E00970EAD /* GoogleTests.mm in Sources */,
 				A70A61DB1FD4D49500AFDF0E /* FEvaluate.cpp in Sources */,
+				A75CB25F1FED8F9E005487BD /* CheckTests.cpp in Sources */,
 				A7E490EB1FEA207100970EAD /* gtest-all.cc in Sources */,
-				A7E490F41FEA2F0F00970EAD /* FAlphaBetaSyntheticTests.cpp in Sources */,
+				A7E490F41FEA2F0F00970EAD /* SearchSyntheticTests.cpp in Sources */,
 				A77372021FE334BB0001A90F /* FGame.cpp in Sources */,
 				A7B18F581FD9BAE500A605B8 /* MovesTests.swift in Sources */,
 				A70A61D81FD4D49500AFDF0E /* FMoveList.cpp in Sources */,
