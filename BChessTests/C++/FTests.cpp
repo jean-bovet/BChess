@@ -195,8 +195,7 @@ TEST(BestMove, KnightEscapeAttackByPawn) {
 // that moving the pawn c2c3 can actually cause a double attacks against black.
 TEST(BestMove, MovePawnToAttackBishop) {
     std::string start = "r1bqk1nr/pppp1ppp/2n5/3P4/1b6/8/PPP2PPP/RNBQKBNR w KQkq - 1 5";
-    std::string end = "r1bqk1nr/p1pQ1ppp/2p5/b7/8/2P5/PP3PPP/RNB1KBNR b KQkq - 0 7";
-    // TODO: note that the last move, Qd1xd7 is not great at all
-    assertBestMove(start, end, "c2c3",  { "c2c3", "Bb4a5", "d5xc6", "b7xc6", "Qd1xd7" }, 6);
+    std::string end = "r1b1k1nr/ppppqppp/2P5/b7/8/2P5/PP2NPPP/RNBQKB1R b KQkq - 2 7";
+    assertBestMove(start, end, "c2c3",  { "c2c3", "Bb4a5", "d5xc6", "Qd8e7", "Ng1e2" }, 6);
 }
 

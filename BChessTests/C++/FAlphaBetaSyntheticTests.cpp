@@ -135,8 +135,16 @@ struct TestEvaluation {
         
     }
     
+    void insertMove(int index, TestMove move) {
+        
+    }
+    
     int value = 0;
 };
+
+bool testMoveComparison(TestMove i, TestMove j) {
+    return i.ordering < j.ordering;
+}
 
 class TestMoveGenerator {
 public:
@@ -150,6 +158,7 @@ public:
             move.ordering = child.ordering;
             moveList.add(move);
         }
+        std::sort(moveList._moves.begin(), moveList._moves.end(), testMoveComparison);
         return moveList;
     }
 };
