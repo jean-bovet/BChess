@@ -109,6 +109,8 @@ MoveList ChessMoveGenerator::generateMoves(Board board, Square specificSquare) {
     generateSlidingMoves(board, BISHOP, moveList, specificSquare);
     generateSlidingMoves(board, QUEEN, moveList, specificSquare);
     
+    // Sort the moves according to:
+    // MVV/LVA (Most Valuable Victim/Least Valuable Attacker).
     std::stable_sort(std::begin(moveList._moves), std::begin(moveList._moves) + moveList.count, moveComparison);
 
     return moveList;
