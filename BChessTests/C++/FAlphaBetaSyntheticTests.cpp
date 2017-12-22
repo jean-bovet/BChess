@@ -115,10 +115,6 @@ struct TestBoard {
     
 };
 
-bool operator<(const TestMove &lhs, const TestMove &rhs) {
-    return lhs.ordering < rhs.ordering;
-}
-
 class TestEvaluater {
 public:
     int evaluate(TestBoard board) {
