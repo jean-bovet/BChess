@@ -95,7 +95,11 @@ static Square blackIndex(Square original) {
     return 63 - (7 - rank + 1) * 7 + file;
 }
 
-int Evaluate::getBonus(Piece piece, Color color, Square square) {
+bool ChessEvaluate::isQuiet(Move move) {
+    return !MOVE_IS_CAPTURE(move);
+}
+
+int ChessEvaluate::getBonus(Piece piece, Color color, Square square) {
     auto index = color == WHITE ? whiteIndex(square) : blackIndex(square);
     switch (piece) {
         case PAWN:
@@ -121,7 +125,7 @@ int Evaluate::getBonus(Piece piece, Color color, Square square) {
     }
 }
 
-int Evaluate::evaluate(Board board) {
+int ChessEvaluate::evaluate(Board board) {
     // TODO: how to detect a draw?
     // Note: the value should always be computed from a white point of view
     int value = 0;

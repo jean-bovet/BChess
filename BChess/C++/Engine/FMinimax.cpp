@@ -96,9 +96,9 @@ Minimax::Evaluation Minimax::evaluate(Board board, Move move, int depth, int max
     int alpha = _alpha;
     int beta = _beta;
     
-    MoveGenerator generator;
+    ChessMoveGenerator generator;
     MoveList moves = generator.generateMoves(board);
-    if (moves.moves.empty()) {
+    if (moves.count == 0) {
         // It's either a draw or mat
         if (board.isCheck(board.color)) {
             bestEvaluation.value = board.color == WHITE ? INT_MIN : INT_MAX;
@@ -122,7 +122,8 @@ Minimax::Evaluation Minimax::evaluate(Board board, Move move, int depth, int max
         }
     }
     
-    for (Move move : moves.moves) {
+    for (int index=0; index<moves.count; index++) {
+        auto move = moves._moves[index];
         if (!analyzing) {
             break;
         }
@@ -157,7 +158,7 @@ bool captureMoveComparison (Move i, Move j) {
 int Minimax::quiescentSearch(Board board, int depth, bool maximizing, int alpha, int beta) {
     evaluateCount += 1;
 
-    int stand_pat = Evaluate::evaluate(board);
+    int stand_pat = ChessEvaluate::evaluate(board);
     
     if (maximizing) {
         alpha = std::max(alpha, stand_pat); // aka white's best score
@@ -177,16 +178,17 @@ int Minimax::quiescentSearch(Board board, int depth, bool maximizing, int alpha,
 //    }
     
     bool evaluated = false;
-    MoveGenerator generator;
+    ChessMoveGenerator generator;
     MoveList moveList = generator.generateMoves(board);
     
     // Sort the moves according to:
     // MVV/LVA (Most Valuable Victim/Least Valuable Attacker).
     
-    auto moves = moveList.moves;
-    std::sort(moves.begin(), moves.end(), captureMoveComparison);
+    std::sort(std::begin(moveList._moves), std::end(moveList._moves), captureMoveComparison);
     
-    for (Move move : moves) {
+    for (int index=0; index<moveList.count; index++) {
+        auto move = moveList._moves[index];
+        
         if (!MOVE_IS_CAPTURE(move)) {
             continue;
         }

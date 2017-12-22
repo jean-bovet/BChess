@@ -152,10 +152,11 @@ static Rank getRank(char c) {
 }
 
 static std::vector<Move> getMatchingMoves(Board board, Square to, Piece movingPiece, File fromFile, Rank fromRank) {
-    MoveGenerator generator;
+    ChessMoveGenerator generator;
     auto moveList = generator.generateMoves(board);
     std::vector<Move> matchingMoves;
-    for (Move m : moveList.moves) {        
+    for (int index=0; index<moveList.count; index++) {
+        auto m = moveList._moves[index];
         if (MOVE_TO(m) != to) {
             continue;
         }

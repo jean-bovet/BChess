@@ -30,10 +30,11 @@ BoardSquare FGame::getPieceAt(File file, Rank rank) {
 }
 
 std::vector<Move> FGame::movesAt(File file, Rank rank) {
-    MoveGenerator generator = MoveGenerator();
+    ChessMoveGenerator generator = ChessMoveGenerator();
     MoveList moveList = generator.generateMoves(board, SquareFrom(file, rank));
     std::vector<Move> moves;
-    for (Move move : moveList.moves) {
+    for (int index=0; index<moveList.count; index++) {
+        auto move = moveList._moves[index];
         moves.push_back(move);
     }
     return moves;
@@ -86,6 +87,6 @@ void FGame::replayMoves() {
 }
 
 void FGame::debugEvaluate() {
-    std::cout << Evaluate::evaluate(board) << std::endl;
+    std::cout << ChessEvaluate::evaluate(board) << std::endl;
 }
 

@@ -13,14 +13,14 @@
 
 static bool initialized = false;
 
-void MoveGenerator::initialize() {
+void ChessMoveGenerator::initialize() {
     initmagicmoves();
     initPawnMoves();
     initKingMoves();
     initKnightMoves();
 }
 
-void MoveGenerator::initPawnMoves() {
+void ChessMoveGenerator::initPawnMoves() {
     // Note: generate moves even for the first and last rank, because it
     // is used by the some functions to determine if a piece is attacked
     // by a pawn which might need white pawn in the first rank or a black
@@ -41,7 +41,7 @@ void MoveGenerator::initPawnMoves() {
     }
 }
 
-void MoveGenerator::initKingMoves() {
+void ChessMoveGenerator::initKingMoves() {
     for (Square square = 0; square < 64; square++) {
         auto fileIndex = FileFrom(square);
         auto rankIndex = RankFrom(square);
@@ -57,7 +57,7 @@ void MoveGenerator::initKingMoves() {
     }
 }
 
-void MoveGenerator::initKnightMoves() {
+void ChessMoveGenerator::initKnightMoves() {
     for (Square square = 0; square < 64; square++) {
         auto fileIndex = FileFrom(square);
         auto rankIndex = RankFrom(square);
@@ -80,7 +80,7 @@ void MoveGenerator::initKnightMoves() {
     }
 }
 
-MoveList MoveGenerator::generateMoves(Board board, Square specificSquare) {
+MoveList ChessMoveGenerator::generateMoves(Board board, Square specificSquare) {
     if (!initialized) {
         initialized = true;
         initialize();
@@ -94,11 +94,11 @@ MoveList MoveGenerator::generateMoves(Board board, Square specificSquare) {
     generateSlidingMoves(board, ROOK, moveList, specificSquare);
     generateSlidingMoves(board, BISHOP, moveList, specificSquare);
     generateSlidingMoves(board, QUEEN, moveList, specificSquare);
-    
+        
     return moveList;
 }
 
-void MoveGenerator::generateAttackMoves(Board &board, MoveList &moveList, Square fromSquare, Piece attackingPiece, Bitboard attackingSquares) {
+void ChessMoveGenerator::generateAttackMoves(Board &board, MoveList &moveList, Square fromSquare, Piece attackingPiece, Bitboard attackingSquares) {
     auto attackedColor = INVERSE(board.color);
     for (unsigned capturedPiece = PAWN; capturedPiece < PCOUNT; capturedPiece++) {
         auto attacks = attackingSquares & board.pieces[attackedColor][capturedPiece];
@@ -108,7 +108,7 @@ void MoveGenerator::generateAttackMoves(Board &board, MoveList &moveList, Square
     }
 }
 
-void MoveGenerator::generatePawnsMoves(Board &board, MoveList &moveList, Square specificSquare) {
+void ChessMoveGenerator::generatePawnsMoves(Board &board, MoveList &moveList, Square specificSquare) {
     auto pawns = board.pieces[board.color][PAWN];
     auto emptySquares = board.emptySquares();
     
@@ -186,7 +186,7 @@ void MoveGenerator::generatePawnsMoves(Board &board, MoveList &moveList, Square 
     }
 }
 
-void MoveGenerator::generateKingsMoves(Board &board, MoveList &moveList, Square specificSquare) {
+void ChessMoveGenerator::generateKingsMoves(Board &board, MoveList &moveList, Square specificSquare) {
     auto otherColor = INVERSE(board.color);
     auto kings = board.pieces[board.color][KING];
     auto emptySquares = board.emptySquares();
@@ -245,7 +245,7 @@ void MoveGenerator::generateKingsMoves(Board &board, MoveList &moveList, Square 
     }
 }
 
-void MoveGenerator::generateKnightsMoves(Board &board, MoveList &moveList, Square specificSquare) {
+void ChessMoveGenerator::generateKnightsMoves(Board &board, MoveList &moveList, Square specificSquare) {
     auto whiteKnights = board.pieces[board.color][KNIGHT];
     auto emptySquares = board.emptySquares();
 
@@ -272,7 +272,7 @@ void MoveGenerator::generateKnightsMoves(Board &board, MoveList &moveList, Squar
     }
 }
 
-void MoveGenerator::generateSlidingMoves(Board &board, Piece piece, MoveList &moveList, Square specificSquare) {
+void ChessMoveGenerator::generateSlidingMoves(Board &board, Piece piece, MoveList &moveList, Square specificSquare) {
     auto slidingPieces = board.pieces[board.color][piece];
     auto occupancy = board.getOccupancy();
     auto emptySquares = board.emptySquares();

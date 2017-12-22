@@ -15,7 +15,7 @@
 // Without this, the C file won't be linked
 extern "C" void initmagicmoves(void);
 
-class MoveGenerator {
+class ChessMoveGenerator {
 private:
     static void initialize();
     

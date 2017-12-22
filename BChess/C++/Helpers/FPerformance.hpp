@@ -13,7 +13,7 @@
 #include <stdio.h>
 
 class FPerformance {
-    MoveGenerator generator;
+    ChessMoveGenerator generator;
     
 public:
     int moveCount = 0;

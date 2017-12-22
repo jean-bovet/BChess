@@ -15,8 +15,9 @@ void FPerformance::generateMoves(Board board, int depth) {
     }
     
     MoveList moves = generator.generateMoves(board);
-    moveCount += moves.moves.size();
-    for (Move m : moves.moves) {
+    moveCount += moves.count;
+    for (int index=0; index<moves.count; index++) {
+        auto m = moves._moves[index];
         Board newBoard = board;
         newBoard.move(m);
         generateMoves(newBoard, depth - 1);

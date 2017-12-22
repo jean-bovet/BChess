@@ -11,8 +11,10 @@
 #include "FBoard.hpp"
 #include "FMoveList.hpp"
 
-class Evaluate {
+class ChessEvaluate {
 public:
+    static bool isQuiet(Move move);
+    
     static int evaluate(Board board);
     
     static int getBonus(Piece piece, Color color, Square square);

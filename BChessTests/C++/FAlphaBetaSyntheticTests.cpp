@@ -8,106 +8,168 @@
 
 #include <gtest/gtest.h>
 
-#include "FAlphaBeta.hpp"
+#include "MinMaxSearch.hpp"
 #include "FEvaluate.hpp"
 #include "FMoveGenerator.hpp"
 
 #include <vector>
 #include <map>
 
-class TestNode {
-public:
-    typedef std::function<void(TestNode &node)> TestNodeSetupCallback;
+struct TestTreeNode {
+    typedef std::function<void(TestTreeNode &node)> TestNodeSetupCallback;
     
+    std::vector<TestTreeNode> _children = { };
+    
+    std::vector<int> indexes = { };
+
+    int value = 0;
+    int ordering = 0;
+    bool quiet = true;
+
     void setValue(std::vector<int> indexes, int newValue) {
-        push({ }, indexes, [&](TestNode &node) { node.value = newValue; });
+        push({ }, indexes, [&](TestTreeNode &node) { node.value = newValue; });
     }
-
+    
     void setQuiet(std::vector<int> indexes, bool quiet) {
-        push({ }, indexes, [&](TestNode &node) { node.quiet = quiet; });
+        push({ }, indexes, [&](TestTreeNode &node) { node.quiet = quiet; });
     }
-
+    
     void setOrdering(std::vector<int> indexes, int ordering) {
-        push({ }, indexes, [&](TestNode &node) { node.ordering = ordering; });
+        push({ }, indexes, [&](TestTreeNode &node) { node.ordering = ordering; });
     }
-
+    
     void push(std::vector<int> indexes, TestNodeSetupCallback callback) {
         push({ }, indexes, callback);
     }
-
+    
     void push(std::vector<int> parentIndexes, std::vector<int> indexes, TestNodeSetupCallback callback) {
         if (indexes.empty()) {
             callback(*this);
         } else {
             int childIndex = indexes.front();
             while (_children.size() < childIndex) {
-                _children.push_back(TestNode());
+                _children.push_back(TestTreeNode());
             }
             indexes.erase(indexes.begin());
             
             auto & child = _children[childIndex-1];
-            child.parentIndexes = parentIndexes;
-            child.index = childIndex;
             
             auto newParentIndexes = parentIndexes;
             newParentIndexes.push_back(childIndex);
+            
+            child.indexes = newParentIndexes;
+            
             child.push(newParentIndexes, indexes, callback);
         }
     }
     
-    std::vector<TestNode> children() {
-        return _children;
+    TestTreeNode getNode(std::vector<int> atIndexes) {
+        if (atIndexes.empty()) {
+            return *this;
+        }
+        int index = atIndexes.front();
+        atIndexes.erase(atIndexes.begin());
+        return _children[index-1].getNode(atIndexes);
     }
     
-    bool isQuiet() {
-        return quiet;
+};
+
+struct TestMove {
+    std::vector<int> fromIndexes;
+    std::vector<int> toIndexes;
+    int ordering = 0;
+    bool quiet = false;
+};
+
+struct TestMoveList {
+    std::vector<TestMove> _moves;
+    int count = 0;
+    
+    void add(TestMove move) {
+        _moves.push_back(move);
+        count = (int)_moves.size();
+    }
+};
+
+struct TestBoard {
+    TestTreeNode rootNode;
+    TestTreeNode node;
+    
+    void move(TestMove move) {
+        node = rootNode.getNode(move.toIndexes);
     }
     
     std::string description() {
         std::string text;
-        for (auto pi : parentIndexes) {
+        for (auto pi : node.indexes) {
+            if (!text.empty()) {
+                text += ".";
+            }
             text += std::to_string(pi);
-            text += ".";
         }
-        text += std::to_string(index);
         text += "[";
-        text += std::to_string(value);
+        text += std::to_string(node.value);
         text += "]";
         return text;
     }
     
-    std::vector<int> parentIndexes = { };
-    int index = 0;
-    int value = 0;
-    int ordering = 0;
-    bool quiet = true;
-    std::vector<TestNode> _children = { };
 };
 
-bool operator<(const TestNode &lhs, const TestNode &rhs) {
+bool operator<(const TestMove &lhs, const TestMove &rhs) {
     return lhs.ordering < rhs.ordering;
 }
 
 class TestEvaluater {
 public:
-    TestNode evaluate(TestNode node) {
-        return node;
+    int evaluate(TestBoard board) {
+        return board.node.value;
+    }
+    
+    bool isQuiet(TestMove move) {
+        return move.quiet;
     }
 };
 
-template<class Node, class Evaluater>
-static void assertAlphaBeta(AlphaBeta<Node, Evaluater, TestNode> alphaBeta, Node rootNode, int expectedVisitedNodes, int expectedValue) {
+struct TestEvaluation {
+    void addMove(TestMove move) {
+        
+    }
+    
+    int value = 0;
+};
+
+class TestMoveGenerator {
+public:
+    TestMoveList generateMoves(TestBoard board) {
+        TestMoveList moveList;
+        for (TestTreeNode child : board.node._children) {
+            TestMove move;
+            move.fromIndexes = board.node.indexes;
+            move.toIndexes = child.indexes;
+            move.quiet = child.quiet;
+            move.ordering = child.ordering;
+            moveList.add(move);
+        }
+        return moveList;
+    }
+};
+
+static void assertAlphaBeta(MinMaxSearch<TestBoard, TestMoveGenerator, TestEvaluater, TestEvaluation> alphaBeta, TestTreeNode rootNode, int expectedVisitedNodes, int expectedValue) {
     alphaBeta.reset();
     
     alphaBeta.config.maxDepth = 4;
     
-    auto eval = alphaBeta.alphabeta(rootNode, 0, INT_MIN, INT_MAX, true);
+    TestBoard board;
+    board.rootNode = rootNode;
+    board.node = rootNode;
+    
+    auto eval = alphaBeta.alphabeta(board, 0, INT_MIN, INT_MAX, true);
     std::cout << alphaBeta.visitedNodes << " => " << eval.value << std::endl;
     ASSERT_EQ(alphaBeta.visitedNodes, expectedVisitedNodes);
     ASSERT_EQ(eval.value, expectedValue);
 }
 
-static void configureTree(TestNode &rootNode) {
+static void configureTree(TestTreeNode &rootNode) {
     rootNode.setValue({ 1, 1, 1, 1 }, 5);
     rootNode.setValue({ 1, 1, 1, 2 }, 6);
     
@@ -132,30 +194,35 @@ static void configureTree(TestNode &rootNode) {
     rootNode.setValue({ 3, 2, 2, 1 }, 6);
 }
 
+static MinMaxSearch<TestBoard, TestMoveGenerator, TestEvaluater, TestEvaluation> defaultMinMaxSearch() {
+    TestEvaluater evaluater;
+    TestMoveGenerator moveGenerator;
+    MinMaxSearch<TestBoard, TestMoveGenerator, TestEvaluater, TestEvaluation> alphaBeta(evaluater, moveGenerator);
+    return alphaBeta;
+}
+
 #pragma mark -
 
 TEST(Synthetic, AlphaBetaCutoff) {
-    TestEvaluater evaluater;
-    AlphaBeta<TestNode, TestEvaluater, TestNode> alphaBeta(evaluater);
-    
-    TestNode rootNode;
-    
+    auto search = defaultMinMaxSearch();
+
+    TestTreeNode rootNode;
+
     configureTree(rootNode);
     
     // Test with alpha-beta enabled (some nodes are skipped)
-    assertAlphaBeta(alphaBeta, rootNode, 25, 6);
+    assertAlphaBeta(search, rootNode, 25, 6);
     
     // Test with alpha-beta disabled (all the nodes are analyzed)
-    alphaBeta.config.alphaBetaPrunning = false;
-    assertAlphaBeta(alphaBeta, rootNode, 33, 6);
+    search.config.alphaBetaPrunning = false;
+    assertAlphaBeta(search, rootNode, 33, 6);
 }
 
 TEST(Synthetic, SortedNodes) {
-    TestEvaluater evaluater;
-    AlphaBeta<TestNode, TestEvaluater, TestNode> alphaBeta(evaluater);
+    auto search = defaultMinMaxSearch();
     
-    TestNode rootNode;
-    
+    TestTreeNode rootNode;
+
     // The nodes are now sorted by best node first
     // which should lead to less nodes being analyzed by
     // the alpha-beta prunning algorithm.
@@ -165,17 +232,16 @@ TEST(Synthetic, SortedNodes) {
     rootNode.setOrdering({ 1 }, 2);
     rootNode.setOrdering({ 3 }, 3);
 
-    alphaBeta.config.maxDepth = 4;
+    search.config.maxDepth = 4;
 
-    assertAlphaBeta(alphaBeta, rootNode, 21, 6);
+    assertAlphaBeta(search, rootNode, 21, 6);
 }
 
 TEST(Synthetic, QuiescenceSearch) {
-    TestEvaluater evaluater;
-    AlphaBeta<TestNode, TestEvaluater, TestNode> alphaBeta(evaluater);
-    
-    TestNode rootNode;
-    
+    auto search = defaultMinMaxSearch();
+
+    TestTreeNode rootNode;
+
     configureTree(rootNode);
 
     // Let's add two nodes after the best ones (6) that are not good
@@ -196,6 +262,6 @@ TEST(Synthetic, QuiescenceSearch) {
     rootNode.setQuiet({ 2, 1, 2, 1, 1, 2 }, false); // non-quiet node (it has been reached by a non-quiet move)
 
     // The best value is now 5 instead of 6
-    assertAlphaBeta(alphaBeta, rootNode, 29, 5);
+    assertAlphaBeta(search, rootNode, 29, 5);
 }
 

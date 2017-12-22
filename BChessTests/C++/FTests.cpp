@@ -19,8 +19,8 @@
 #include <vector>
 
 TEST(Evaluation, BonusPosition) {
-    ASSERT_EQ(Evaluate::getBonus(PAWN, Color::WHITE, b2), 10);
-    ASSERT_EQ(Evaluate::getBonus(PAWN, Color::BLACK, b2), 50);
+    ASSERT_EQ(ChessEvaluate::getBonus(PAWN, Color::WHITE, b2), 10);
+    ASSERT_EQ(ChessEvaluate::getBonus(PAWN, Color::BLACK, b2), 50);
 }
 
 TEST(Move, InvalidMove) {

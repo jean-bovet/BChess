@@ -61,4 +61,6 @@ typedef void(^FEngineDidUpdateCallback)();
 
 - (void)debugEvaluate;
 
+- (void)debugPerformance;
+
 @end

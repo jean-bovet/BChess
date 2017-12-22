@@ -12,7 +12,8 @@
 
 std::string MoveList::description() {
     std::string text = "";
-    for (auto move : moves) {
+    for (int index=0; index<count; index++) {
+        auto move = _moves[index];
         if (text.length() > 0) {
             text += " ";
         }
@@ -22,11 +23,14 @@ std::string MoveList::description() {
 }
 
 void MoveList::addMove(Move move) {
-    moves.push_back(move);
+    _moves[count] = move;
+    count++;
 }
 
 void MoveList::addMoves(MoveList moves) {
-    MoveList::moves.insert(MoveList::moves.end(), moves.moves.begin(), moves.moves.end());
+    for (int index=0; index<moves.count; index++) {
+        addMove(moves._moves[index]);
+    }
 }
 
 void MoveList::addMove(Board &board, Move move) {

@@ -14,6 +14,8 @@
 #import "FMove.hpp"
 #import "FPGN.hpp"
 #import "FMinimax.hpp"
+#import "FEvaluate.hpp"
+#import "ChessSearch.hpp"
 
 @implementation FEngineMove
 
@@ -202,10 +204,11 @@
         square = SquareUndefined;
     }
     
-    MoveGenerator generator;
+    ChessMoveGenerator generator;
     MoveList moves = generator.generateMoves(board, square);
     NSMutableArray<NSString*>* moveFENs = [NSMutableArray array];
-    for (Move move : moves.moves) {
+    for (int index=0; index<moves.count; index++) {
+        auto move = moves._moves[index];
         Board newBoard = board;
         newBoard.move(move);
         std::string moveFEN = FFEN::getFEN(newBoard);
@@ -219,7 +222,7 @@
     Board board;
     FFEN::setFEN("3r3k/5Npp/8/8/2Q5/1B6/8/7K b - - 1 1", board);
     
-    MoveGenerator generator;
+    ChessMoveGenerator generator;
     generator.generateMoves(board, Color::WHITE);
 }
 
@@ -232,6 +235,22 @@
 
 - (void)debugEvaluate {
     currentGame.debugEvaluate();
+}
+
+- (void)debugPerformance {
+    auto fen = "r1bqkbnr/pppp1ppp/2n5/3P4/8/8/PPP2PPP/RNBQKBNR b KQkq - 0 5";
+    Board board;
+    FFEN::setFEN(fen, board);
+    
+    Configuration config;
+    config.maxDepth = 4;
+    config.debugLog = false;
+    ChessEvaluate evaluater;
+    ChessMoveGenerator moveGenerator;
+    MinMaxSearch<Board, ChessMoveGenerator, ChessEvaluate, ChessEvaluation> alphaBeta(evaluater, moveGenerator, config);
+    
+    auto eval = alphaBeta.alphabeta(board, 0, INT_MIN, INT_MAX, board.color == WHITE, false);
+    std::cout << alphaBeta.visitedNodes << " => " << eval.value << " for " << eval.line.description() << std::endl;
 }
 
 @end
