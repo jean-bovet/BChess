@@ -22,4 +22,7 @@ struct ChessEvaluation {
     void addMove(Move move) {
         line.addMove(move);
     }
+    void insertMove(int index, Move move) {
+        line.insertMove(index, move);
+    }
 };

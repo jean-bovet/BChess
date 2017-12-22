@@ -27,6 +27,11 @@ void MoveList::addMove(Move move) {
     count++;
 }
 
+void MoveList::insertMove(int index, Move move) {
+    _moves[index] = move;
+    count = std::max(index + 1, count);
+}
+
 void MoveList::addMoves(MoveList moves) {
     for (int index=0; index<moves.count; index++) {
         addMove(moves._moves[index]);

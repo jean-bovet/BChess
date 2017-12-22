@@ -23,6 +23,8 @@ struct MoveList {
     std::string description();
     
     void addMove(Move move);
+    void insertMove(int index, Move move);
+    
     void addMoves(MoveList moves);
     void addMove(Board &board, Move move);
     void addMoves(Board &board, Square from, Bitboard moves, Piece piece);

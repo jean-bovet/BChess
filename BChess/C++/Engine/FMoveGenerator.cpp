@@ -80,6 +80,20 @@ void ChessMoveGenerator::initKnightMoves() {
     }
 }
 
+bool moveComparison(Move i, Move j) {
+    if (i == j) {
+        return false;
+    }
+    
+    if (MOVE_CAPTURED_PIECE(i) > MOVE_CAPTURED_PIECE(j)) {
+        return true;
+    } else if (MOVE_CAPTURED_PIECE(i) == MOVE_CAPTURED_PIECE(j)) {
+        return MOVE_PIECE(i) > MOVE_PIECE(j);
+    } else {
+        return false;
+    }
+}
+
 MoveList ChessMoveGenerator::generateMoves(Board board, Square specificSquare) {
     if (!initialized) {
         initialized = true;
@@ -94,7 +108,9 @@ MoveList ChessMoveGenerator::generateMoves(Board board, Square specificSquare) {
     generateSlidingMoves(board, ROOK, moveList, specificSquare);
     generateSlidingMoves(board, BISHOP, moveList, specificSquare);
     generateSlidingMoves(board, QUEEN, moveList, specificSquare);
-        
+    
+    std::stable_sort(std::begin(moveList._moves), std::begin(moveList._moves) + moveList.count, moveComparison);
+
     return moveList;
 }
 

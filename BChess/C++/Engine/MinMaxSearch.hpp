@@ -112,8 +112,6 @@ public:
         }
         
         auto moves = moveGenerator.generateMoves(node);
-
-        std::stable_sort(std::begin(moves._moves), std::end(moves._moves));
         
         bool evaluatedAtLeastOneChild = false;
         
@@ -132,14 +130,14 @@ public:
             if (maximizingPlayer) {
                 if (candidate.value > bestEval.value) {
                     bestEval = candidate;
-                    bestEval.addMove(move);
+                    bestEval.insertMove(depth, move);
                     alpha = std::max(alpha, candidate.value);
                     outputBest(node, depth, alpha, beta, maximizingPlayer, bestEval);
                 }
             } else {
                 if (candidate.value < bestEval.value) {
                     bestEval = candidate;
-                    bestEval.addMove(move);
+                    bestEval.insertMove(depth, move);
                     beta = std::min(beta, candidate.value);
                     outputBest(node, depth, alpha, beta, maximizingPlayer, bestEval);
                 }
