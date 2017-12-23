@@ -24,13 +24,13 @@ private:
     static void initKnightMoves();
 
 public:        
-    MoveList generateMoves(Board board, Square specificSquare = SquareUndefined);
+    static MoveList generateMoves(Board board, Square specificSquare = SquareUndefined);
     
-    void generateAttackMoves(Board &board, MoveList &moveList, Square fromSquare, Piece attackingPiece, Bitboard attackingSquares);
+    static void generateAttackMoves(Board &board, MoveList &moveList, Square fromSquare, Piece attackingPiece, Bitboard attackingSquares);
     
-    void generatePawnsMoves(Board &board, MoveList &moveList, Square specificSquare = SquareUndefined);
-    void generateKingsMoves(Board &board, MoveList &moveList, Square specificSquare = SquareUndefined);
-    void generateKnightsMoves(Board &board, MoveList &moveList, Square specificSquare = SquareUndefined);
-    void generateSlidingMoves(Board &board, Piece piece, MoveList &moveList, Square specificSquare = SquareUndefined);
+    static void generatePawnsMoves(Board &board, MoveList &moveList, Square specificSquare = SquareUndefined);
+    static void generateKingsMoves(Board &board, MoveList &moveList, Square specificSquare = SquareUndefined);
+    static void generateKnightsMoves(Board &board, MoveList &moveList, Square specificSquare = SquareUndefined);
+    static void generateSlidingMoves(Board &board, Piece piece, MoveList &moveList, Square specificSquare = SquareUndefined);
 };
 

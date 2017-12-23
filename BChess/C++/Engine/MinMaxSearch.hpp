@@ -22,21 +22,21 @@ struct Configuration {
 
 template <class Node, class MoveGenerator, class Evaluater, class Evaluation>
 class MinMaxSearch {
-    Evaluater evaluater;
-    MoveGenerator moveGenerator;
+    bool analyzing = false;
     
 public:
     Configuration config;
-
+    
     int visitedNodes = 0;
     
-    MinMaxSearch(Evaluater evaluater, MoveGenerator moveGenerator) : evaluater(evaluater), moveGenerator(moveGenerator) { }
-    MinMaxSearch(Evaluater evaluater, MoveGenerator moveGenerator, Configuration config) : evaluater(evaluater), moveGenerator(moveGenerator), config(config) { }
-
     void reset() {
         visitedNodes = 0;
     }
-    
+
+    void cancel() {
+        analyzing = false;
+    }
+
     void outputDebug(Node node, int depth, int alpha, int beta, bool maximizingPlayer) {
         if (config.debugLog) {
 //            std::cout << "Quiet node: " << node.description() << ", d=" << depth << ", a=" << alpha << ", b=" << beta << ", m=" << maximizingPlayer << std::endl;
@@ -68,6 +68,7 @@ public:
     }
 
     Evaluation alphabeta(Node node, int depth, int alpha, int beta, bool maximizingPlayer) {
+        analyzing = true;
         return alphabeta(node, depth, alpha, beta, maximizingPlayer, false);
     }
     
@@ -75,11 +76,13 @@ public:
         visitedNodes++;
         
         Evaluation bestEval;
+        bestEval.depth = depth;
+        bestEval.nodes = visitedNodes;
         
         outputEnter(node, depth, alpha, beta, maximizingPlayer);
 
         if (quiescence) {
-            auto stand_pat = evaluater.evaluate(node);
+            auto stand_pat = Evaluater::evaluate(node);
             if (maximizingPlayer) {
                 if (stand_pat > alpha) {
                     alpha = stand_pat;
@@ -104,22 +107,26 @@ public:
                 if (config.quiescenceSearch) {
                     quiescence = true;
                 } else {
-                    bestEval.value = evaluater.evaluate(node);
+                    bestEval.value = Evaluater::evaluate(node);
                     outputDebug(node, depth, alpha, beta, maximizingPlayer);
                     return bestEval;
                 }
             }
         }
         
-        auto moves = moveGenerator.generateMoves(node);
-        
+        auto moves = MoveGenerator::generateMoves(node);
+
         bool evaluatedAtLeastOneChild = false;
         
         bestEval.value = maximizingPlayer ? INT_MIN : INT_MAX;
         for (int index=0; index<moves.count; index++) {
             auto move = moves._moves[index];
-            if (quiescence && evaluater.isQuiet(move)) {
+            if (quiescence && Evaluater::isQuiet(move)) {
                 continue;
+            }
+            
+            if (!analyzing) {
+                break;
             }
             
             evaluatedAtLeastOneChild = true;
@@ -148,7 +155,18 @@ public:
             }
         }
         if (!evaluatedAtLeastOneChild) {
-            bestEval.value = evaluater.evaluate(node);
+            if (moves.count == 0) {
+                if (Evaluater::isCheck(node)) {
+                    // No moves but a check, that's a mat
+                    bestEval.mat = true;
+                } else {
+                    // No moves and not check, that's a draw
+                    bestEval.value = 0;
+                }
+            } else {
+                // Otherwise let's evaluate the node itself
+                bestEval.value = Evaluater::evaluate(node);
+            }
         }
         outputReturn(node, depth, alpha, beta, maximizingPlayer, bestEval);
         return bestEval;

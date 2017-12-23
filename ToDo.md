@@ -6,5 +6,6 @@ Bug:
 
 ToDo
 
+- Quiet move should not include promotion nor check
 - Time management
 - Check how the best line is used (or maybe think about re-ordering the moves)

@@ -15,6 +15,8 @@ class ChessEvaluate {
 public:
     static bool isQuiet(Move move);
     
+    static bool isCheck(Board board);
+    
     static int evaluate(Board board);
     
     static int getBonus(Piece piece, Color color, Square square);

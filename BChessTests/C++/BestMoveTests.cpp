@@ -26,7 +26,7 @@ static void assertBestMove(std::string fen, std::string finalFEN, std::string be
     ChessMoveGenerator moveGenerator;
     Configuration config;
     config.maxDepth = maxDepth;
-    MinMaxSearch<Board, ChessMoveGenerator, ChessEvaluate, ChessEvaluation> search(evaluater, moveGenerator, config);
+    ChessMinMaxSearch search(evaluater, moveGenerator, config);
     
     ChessEvaluation evaluation = search.alphabeta(board, 0, INT_MIN, INT_MAX, board.color == WHITE);
     

@@ -24,7 +24,7 @@ static void assertChessSearch(int expectedVisitedNodes, int expectedValue, Confi
     
     ChessEvaluate evaluater;
     ChessMoveGenerator moveGenerator;
-    MinMaxSearch<Board, ChessMoveGenerator, ChessEvaluate, ChessEvaluation> alphaBeta(evaluater, moveGenerator, config);
+    ChessMinMaxSearch alphaBeta(evaluater, moveGenerator, config);
     
     Board rootBoard;
 
@@ -55,7 +55,7 @@ TEST(Chess, OrderedMove) {
     config.debugLog = false;
     ChessEvaluate evaluater;
     ChessMoveGenerator moveGenerator;
-    MinMaxSearch<Board, ChessMoveGenerator, ChessEvaluate, ChessEvaluation> alphaBeta(evaluater, moveGenerator, config);
+    ChessMinMaxSearch alphaBeta(evaluater, moveGenerator, config);
 
     auto eval = alphaBeta.alphabeta(board, 0, INT_MIN, INT_MAX, board.color == WHITE, false);
     std::cout << alphaBeta.visitedNodes << " => " << eval.value << " for " << eval.line.description() << std::endl;

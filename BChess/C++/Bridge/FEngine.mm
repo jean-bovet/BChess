@@ -13,16 +13,15 @@
 #import "FFEN.hpp"
 #import "FMove.hpp"
 #import "FPGN.hpp"
-#import "FMinimax.hpp"
 #import "FEvaluate.hpp"
-#import "ChessSearch.hpp"
+#import "IterativeDeepening.hpp"
 
 @implementation FEngineMove
 
 @end
 
 @interface FEngine () {
-    Minimax minimax;
+    IterativeDeepening<Board, ChessMoveGenerator, ChessEvaluate, ChessEvaluation> iterativeSearch;
     FGame currentGame;
 }
 
@@ -126,37 +125,41 @@
 }
 
 - (void)stop {
-    minimax.analyzing = false;
+    iterativeSearch.cancel();
 }
 
 - (BOOL)isWhite {
     return currentGame.board.color == WHITE;
 }
 
-- (FEngineInfo*)infoFor:(Minimax::Info)info {
+- (FEngineInfo*)infoFor:(ChessEvaluation)info {
     FEngineInfo *ei = [[FEngineInfo alloc] init];
     ei.depth = info.depth;
     ei.time = info.time;
-    ei.nodeEvaluated = info.nodeEvaluated;
+    ei.nodeEvaluated = info.nodes;
     ei.movesPerSecond = info.movesPerSecond;
-    ei.rawMoveValue = info.evaluation.move;
-    ei.mat = info.evaluation.mat;
-    ei.fromRank = RankFrom(MOVE_FROM(info.evaluation.move));
-    ei.fromFile = FileFrom(MOVE_FROM(info.evaluation.move));
-    ei.toRank = RankFrom(MOVE_TO(info.evaluation.move));
-    ei.toFile = FileFrom(MOVE_TO(info.evaluation.move));
+    ei.mat = info.mat;
+
+    Move bestMove = info.bestMove();
+    ei.rawMoveValue = bestMove;
+
+    ei.fromRank = RankFrom(MOVE_FROM(bestMove));
+    ei.fromFile = FileFrom(MOVE_FROM(bestMove));
+    ei.toRank = RankFrom(MOVE_TO(bestMove));
+    ei.toFile = FileFrom(MOVE_TO(bestMove));
 
     // For UCI, the value is always from the engine's point of view.
     // Because the evaluation function always evaluate from WHITE's point of view,
     // if the engine is playing black, make sure to inverse the value.
     if (info.engineColor == BLACK) {
-        ei.value = -info.evaluation.value;
+        ei.value = -info.value;
     } else {
-        ei.value = info.evaluation.value;
+        ei.value = info.value;
     }
     
     auto bestLine = [NSMutableArray array];
-    for (auto move : info.evaluation.line) {
+    for (int index=0; index<info.line.count; index++) {
+        Move move = info.line._moves[index];
         [bestLine addObject:[NSString stringWithUTF8String:FPGN::to_string(move, FPGN::SANType::uci).c_str()]];
     }
     ei.bestLine = bestLine;
@@ -184,7 +187,7 @@
 - (void)searchBestMove:(NSString*)boardFEN maxDepth:(NSInteger)maxDepth callback:(FEngineSearchCallback)callback {
     Board board;
     FFEN::setFEN(std::string([boardFEN UTF8String]), board);
-    Minimax::Info info = minimax.searchBestMove(board, (int)maxDepth, [self, callback](Minimax::Info info) {
+    ChessEvaluation info = iterativeSearch.search(board, (int)maxDepth, [self, callback](ChessEvaluation info) {
         callback([self infoFor:info], NO);
     });
     callback([self infoFor:info], YES);
@@ -242,14 +245,11 @@
     Board board;
     FFEN::setFEN(fen, board);
     
-    Configuration config;
-    config.maxDepth = 4;
-    config.debugLog = false;
-    ChessEvaluate evaluater;
-    ChessMoveGenerator moveGenerator;
-    MinMaxSearch<Board, ChessMoveGenerator, ChessEvaluate, ChessEvaluation> alphaBeta(evaluater, moveGenerator, config);
-    
-    auto eval = alphaBeta.alphabeta(board, 0, INT_MIN, INT_MAX, board.color == WHITE, false);
+    ChessMinMaxSearch alphaBeta;
+    alphaBeta.config.maxDepth = 4;
+    alphaBeta.config.debugLog = false;
+
+    auto eval = alphaBeta.alphabeta(board, 0, INT_MIN, INT_MAX, board.color == WHITE);
     std::cout << alphaBeta.visitedNodes << " => " << eval.value << " for " << eval.line.description() << std::endl;
 }
 

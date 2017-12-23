@@ -99,6 +99,10 @@ bool ChessEvaluate::isQuiet(Move move) {
     return !MOVE_IS_CAPTURE(move);
 }
 
+bool ChessEvaluate::isCheck(Board board) {
+    return board.isCheck(board.color);
+}
+
 int ChessEvaluate::getBonus(Piece piece, Color color, Square square) {
     auto index = color == WHITE ? whiteIndex(square) : blackIndex(square);
     switch (piece) {
