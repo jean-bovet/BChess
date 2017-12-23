@@ -51,7 +51,6 @@
 		A75CB25F1FED8F9E005487BD /* CheckTests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A75CB25E1FED8F9E005487BD /* CheckTests.cpp */; };
 		A7712D2F1FC7C4CD00E7E802 /* UCI.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7712D2E1FC7C4CD00E7E802 /* UCI.swift */; };
 		A7712D341FC895D100E7E802 /* UCI.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7712D2E1FC7C4CD00E7E802 /* UCI.swift */; };
-		A7712D441FCBBD9C00E7E802 /* Performance.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7712D431FCBBD9C00E7E802 /* Performance.swift */; };
 		A7712D471FCBC13100E7E802 /* FBoard.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A7712D451FCBC13100E7E802 /* FBoard.cpp */; };
 		A77371FE1FE31FEF0001A90F /* FGame.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A77371FC1FE31FEF0001A90F /* FGame.cpp */; };
 		A77372011FE320010001A90F /* FPGN.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A77371FF1FE320010001A90F /* FPGN.cpp */; };
@@ -151,7 +150,6 @@
 		A7712D3F1FCB97A800E7E802 /* BChess-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "BChess-Bridging-Header.h"; sourceTree = "<group>"; };
 		A7712D401FCB97A900E7E802 /* magicmoves.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = magicmoves.h; sourceTree = "<group>"; };
 		A7712D411FCB97A900E7E802 /* magicmoves.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = magicmoves.c; sourceTree = "<group>"; };
-		A7712D431FCBBD9C00E7E802 /* Performance.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Performance.swift; sourceTree = "<group>"; };
 		A7712D451FCBC13100E7E802 /* FBoard.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = FBoard.cpp; sourceTree = "<group>"; };
 		A7712D461FCBC13100E7E802 /* FBoard.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = FBoard.hpp; sourceTree = "<group>"; };
 		A77371FC1FE31FEF0001A90F /* FGame.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = FGame.cpp; sourceTree = "<group>"; };
@@ -361,7 +359,6 @@
 			isa = PBXGroup;
 			children = (
 				A7AFCCA91FB4E40D00AE3D85 /* main.swift */,
-				A7712D431FCBBD9C00E7E802 /* Performance.swift */,
 				A7712D3F1FCB97A800E7E802 /* BChess-Bridging-Header.h */,
 				A7712D301FC7C4D300E7E802 /* UCI */,
 				A7712D481FCBC13500E7E802 /* C++ */,
@@ -654,7 +651,6 @@
 				A77372011FE320010001A90F /* FPGN.cpp in Sources */,
 				A70A61BB1FD132D200AFDF0E /* FFEN.cpp in Sources */,
 				A75359841FDC51B2008D1DEE /* FENgineInfo+Extension.swift in Sources */,
-				A7712D441FCBBD9C00E7E802 /* Performance.swift in Sources */,
 				A756832D1FD0B3FE00CF1408 /* magicmoves.c in Sources */,
 				A7712D471FCBC13100E7E802 /* FBoard.cpp in Sources */,
 				A77371FE1FE31FEF0001A90F /* FGame.cpp in Sources */,

@@ -32,7 +32,7 @@ public:
         
         analyzing = true;
         
-        for (int curMaxDepth=1; curMaxDepth<maxDepth; curMaxDepth++) {
+        for (int curMaxDepth=1; curMaxDepth<=maxDepth; curMaxDepth++) {
             if (!analyzing) {
                 break;
             }

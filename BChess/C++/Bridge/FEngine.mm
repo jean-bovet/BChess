@@ -235,17 +235,4 @@
     currentGame.debugEvaluate();
 }
 
-- (void)debugPerformance {
-    auto fen = "r1bqkbnr/pppp1ppp/2n5/3P4/8/8/PPP2PPP/RNBQKBNR b KQkq - 0 5";
-    Board board;
-    FFEN::setFEN(fen, board);
-    
-    ChessMinMaxSearch alphaBeta;
-    alphaBeta.config.maxDepth = 6;
-    alphaBeta.config.debugLog = false;
-
-    auto eval = alphaBeta.alphabeta(board, 0, board.color == WHITE);
-    std::cout << alphaBeta.visitedNodes << " => " << eval.value << " for " << eval.line.description() << std::endl;
-}
-
 @end

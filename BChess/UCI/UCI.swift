@@ -126,6 +126,12 @@ class UCI {
         }
     }
     
+    func performance() {
+        engine.searchBestMove(StartPosFEN, maxDepth: 6) { (info, completed) in
+            print(info.uciInfoMessage)
+        }
+    }
+    
     func run() {
         // Performance testing
 //        if true {
