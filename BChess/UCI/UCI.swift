@@ -127,7 +127,8 @@ class UCI {
     }
     
     func performance() {
-        engine.searchBestMove(StartPosFEN, maxDepth: 6) { (info, completed) in
+        engine.async = false
+        engine.evaluate(6) { (info, completed) in
             print(info.uciInfoMessage)
         }
     }

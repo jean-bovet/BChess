@@ -17,7 +17,7 @@ const int MAX_MOVES = 256;
 class Board;
 
 struct MoveList {
-    Move _moves[MAX_MOVES] = { };
+    Move _moves[MAX_MOVES];
     int count = 0;
     
     std::string description();

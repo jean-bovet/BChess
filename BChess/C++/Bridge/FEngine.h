@@ -54,7 +54,6 @@ typedef void(^FEngineDidUpdateCallback)();
 - (BOOL)isWhite;
 
 - (void)evaluate:(NSInteger)depth callback:(FEngineSearchCallback _Nonnull)callback;
-- (void)searchBestMove:(NSString* _Nonnull)boardFEN maxDepth:(NSInteger)maxDepth callback:(FEngineSearchCallback _Nonnull)callback;
 
 - (NSArray<NSString*>* _Nonnull)moveFENsFrom:(NSString* _Nonnull)startingFEN squareName:(NSString* _Nullable)squareName;
 
