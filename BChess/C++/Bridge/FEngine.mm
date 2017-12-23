@@ -138,7 +138,7 @@
     ei.time = info.time;
     ei.nodeEvaluated = info.nodes;
     ei.movesPerSecond = info.movesPerSecond;
-    ei.mat = info.mat;
+    ei.mat = info.value == INT_MAX || info.value == INT_MIN;
 
     Move bestMove = info.bestMove();
     ei.rawMoveValue = bestMove;
@@ -249,7 +249,7 @@
     alphaBeta.config.maxDepth = 4;
     alphaBeta.config.debugLog = false;
 
-    auto eval = alphaBeta.alphabeta(board, 0, INT_MIN, INT_MAX, board.color == WHITE);
+    auto eval = alphaBeta.alphabeta(board, 0, board.color == WHITE);
     std::cout << alphaBeta.visitedNodes << " => " << eval.value << " for " << eval.line.description() << std::endl;
 }
 

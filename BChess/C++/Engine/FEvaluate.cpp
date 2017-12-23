@@ -99,10 +99,6 @@ bool ChessEvaluate::isQuiet(Move move) {
     return !MOVE_IS_CAPTURE(move);
 }
 
-bool ChessEvaluate::isCheck(Board board) {
-    return board.isCheck(board.color);
-}
-
 int ChessEvaluate::getBonus(Piece piece, Color color, Square square) {
     auto index = color == WHITE ? whiteIndex(square) : blackIndex(square);
     switch (piece) {
@@ -126,6 +122,21 @@ int ChessEvaluate::getBonus(Piece piece, Color color, Square square) {
             
         default:
             return 0;
+    }
+}
+
+int ChessEvaluate::evaluate(Board board, MoveList moves) {
+    if (moves.count == 0) {
+        if (board.isCheck(board.color)) {
+            // No moves but a check, that's a mat
+            return board.color == WHITE ? INT_MIN : INT_MAX;
+        } else {
+            // No moves and not check, that's a draw
+            return 0;
+        }
+    } else {
+        // Otherwise let's evaluate the node itself
+        return evaluate(board);
     }
 }
 

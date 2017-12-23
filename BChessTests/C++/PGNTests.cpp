@@ -10,7 +10,6 @@
 
 #include "FBoard.hpp"
 #include "FFEN.hpp"
-#include "FMinimax.hpp"
 #include "FMoveGenerator.hpp"
 #include "FPGN.hpp"
 

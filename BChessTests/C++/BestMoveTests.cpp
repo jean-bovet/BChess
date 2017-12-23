@@ -22,13 +22,10 @@ static void assertBestMove(std::string fen, std::string finalFEN, std::string be
     std::string boardFEN = FFEN::getFEN(board);
     ASSERT_STREQ(boardFEN.c_str(), fen.c_str());
 
-    ChessEvaluate evaluater;
-    ChessMoveGenerator moveGenerator;
-    Configuration config;
-    config.maxDepth = maxDepth;
-    ChessMinMaxSearch search(evaluater, moveGenerator, config);
-    
-    ChessEvaluation evaluation = search.alphabeta(board, 0, INT_MIN, INT_MAX, board.color == WHITE);
+    ChessMinMaxSearch search;
+    search.config.maxDepth = maxDepth;
+
+    ChessEvaluation evaluation = search.alphabeta(board, 0, board.color == WHITE);
     
     // Assert the best move
     auto actualMove = FPGN::to_string(evaluation.line._moves[0]);

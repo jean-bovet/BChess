@@ -38,7 +38,6 @@
 		A75359C81FDE4038008D1DEE /* FMoveGenerator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A70A61C21FD458DE00AFDF0E /* FMoveGenerator.cpp */; };
 		A75359C91FDE4038008D1DEE /* FBoard.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A7712D451FCBC13100E7E802 /* FBoard.cpp */; };
 		A75359CA1FDE4038008D1DEE /* FEvaluate.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A70A61C81FD46E3C00AFDF0E /* FEvaluate.cpp */; };
-		A75359CB1FDE4038008D1DEE /* FMinimax.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A70A61CB1FD4713500AFDF0E /* FMinimax.cpp */; };
 		A75359CC1FDE4038008D1DEE /* FFEN.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A70A61B91FD132D200AFDF0E /* FFEN.cpp */; };
 		A75359CD1FDE40F4008D1DEE /* FPerformance.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A756832E1FD0D96300CF1408 /* FPerformance.cpp */; };
 		A75359CF1FDE4385008D1DEE /* PieceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A75359CE1FDE4385008D1DEE /* PieceView.swift */; };
@@ -113,8 +112,6 @@
 		A70A61C51FD4592700AFDF0E /* FMoveList.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = FMoveList.cpp; sourceTree = "<group>"; };
 		A70A61C81FD46E3C00AFDF0E /* FEvaluate.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = FEvaluate.cpp; sourceTree = "<group>"; };
 		A70A61C91FD46E3C00AFDF0E /* FEvaluate.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = FEvaluate.hpp; sourceTree = "<group>"; };
-		A70A61CB1FD4713500AFDF0E /* FMinimax.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = FMinimax.cpp; sourceTree = "<group>"; };
-		A70A61CC1FD4713500AFDF0E /* FMinimax.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = FMinimax.hpp; sourceTree = "<group>"; };
 		A70A61CF1FD4AA9600AFDF0E /* FEngineInfo.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FEngineInfo.h; sourceTree = "<group>"; };
 		A70A61D01FD4AA9600AFDF0E /* FEngineInfo.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FEngineInfo.m; sourceTree = "<group>"; };
 		A7460F001FDF2465002B0740 /* BoardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoardView.swift; sourceTree = "<group>"; };
@@ -251,15 +248,10 @@
 				A7712D451FCBC13100E7E802 /* FBoard.cpp */,
 				A70A61C91FD46E3C00AFDF0E /* FEvaluate.hpp */,
 				A70A61C81FD46E3C00AFDF0E /* FEvaluate.cpp */,
-				A70A61CC1FD4713500AFDF0E /* FMinimax.hpp */,
-				A70A61CB1FD4713500AFDF0E /* FMinimax.cpp */,
-				A70A61BA1FD132D200AFDF0E /* FFEN.hpp */,
-				A70A61B91FD132D200AFDF0E /* FFEN.cpp */,
-				A77372001FE320010001A90F /* FPGN.hpp */,
-				A77371FF1FE320010001A90F /* FPGN.cpp */,
 				A75BFAC61FE8C05E001EE942 /* MinMaxSearch.hpp */,
 				A75A283D1FEC8506003AC5EF /* ChessSearch.hpp */,
 				A75CB2611FED9693005487BD /* IterativeDeepening.hpp */,
+				A75CB2631FEDF011005487BD /* Serialization */,
 			);
 			path = Engine;
 			sourceTree = "<group>";
@@ -296,6 +288,17 @@
 				A75359B21FDE0947008D1DEE /* Info.plist */,
 			);
 			path = BChessMacUITests;
+			sourceTree = "<group>";
+		};
+		A75CB2631FEDF011005487BD /* Serialization */ = {
+			isa = PBXGroup;
+			children = (
+				A70A61BA1FD132D200AFDF0E /* FFEN.hpp */,
+				A70A61B91FD132D200AFDF0E /* FFEN.cpp */,
+				A77372001FE320010001A90F /* FPGN.hpp */,
+				A77371FF1FE320010001A90F /* FPGN.cpp */,
+			);
+			path = Serialization;
 			sourceTree = "<group>";
 		};
 		A7712D151FB916E900E7E802 /* BChessTests */ = {
@@ -590,7 +593,6 @@
 				A75359C51FDE4031008D1DEE /* FEngine.mm in Sources */,
 				A75359C91FDE4038008D1DEE /* FBoard.cpp in Sources */,
 				A75359C41FDE4031008D1DEE /* FEngineInfo.m in Sources */,
-				A75359CB1FDE4038008D1DEE /* FMinimax.cpp in Sources */,
 				A75359C81FDE4038008D1DEE /* FMoveGenerator.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

@@ -115,15 +115,19 @@ struct TestBoard {
     
 };
 
-class TestEvaluater {
-public:
-    int evaluate(TestBoard board) {
+struct TestEvaluater {
+    static int evaluate(TestBoard board) {
         return board.node.value;
     }
-    
-    bool isQuiet(TestMove move) {
+
+    static int evaluate(TestBoard board, TestMoveList moves) {
+        return board.node.value;
+    }
+
+    static bool isQuiet(TestMove move) {
         return move.quiet;
     }
+    
 };
 
 struct TestEvaluation {
@@ -136,15 +140,17 @@ struct TestEvaluation {
     }
     
     int value = 0;
+    int depth = 0;
+    int nodes = 0;
+    bool mat = false;
 };
 
 bool testMoveComparison(TestMove i, TestMove j) {
     return i.ordering < j.ordering;
 }
 
-class TestMoveGenerator {
-public:
-    TestMoveList generateMoves(TestBoard board) {
+struct TestMoveGenerator {
+    static TestMoveList generateMoves(TestBoard board) {
         TestMoveList moveList;
         for (TestTreeNode child : board.node._children) {
             TestMove move;
@@ -168,7 +174,7 @@ static void assertAlphaBeta(MinMaxSearch<TestBoard, TestMoveGenerator, TestEvalu
     board.rootNode = rootNode;
     board.node = rootNode;
     
-    auto eval = alphaBeta.alphabeta(board, 0, INT_MIN, INT_MAX, true);
+    auto eval = alphaBeta.alphabeta(board, 0, true);
     std::cout << alphaBeta.visitedNodes << " => " << eval.value << std::endl;
     ASSERT_EQ(alphaBeta.visitedNodes, expectedVisitedNodes);
     ASSERT_EQ(eval.value, expectedValue);
@@ -200,9 +206,7 @@ static void configureTree(TestTreeNode &rootNode) {
 }
 
 static MinMaxSearch<TestBoard, TestMoveGenerator, TestEvaluater, TestEvaluation> defaultMinMaxSearch() {
-    TestEvaluater evaluater;
-    TestMoveGenerator moveGenerator;
-    MinMaxSearch<TestBoard, TestMoveGenerator, TestEvaluater, TestEvaluation> alphaBeta(evaluater, moveGenerator);
+    MinMaxSearch<TestBoard, TestMoveGenerator, TestEvaluater, TestEvaluation> alphaBeta;
     return alphaBeta;
 }
 
@@ -236,8 +240,6 @@ TEST(Synthetic, SortedNodes) {
     rootNode.setOrdering({ 2 }, 1);
     rootNode.setOrdering({ 1 }, 2);
     rootNode.setOrdering({ 3 }, 3);
-
-    search.config.maxDepth = 4;
 
     assertAlphaBeta(search, rootNode, 21, 6);
 }

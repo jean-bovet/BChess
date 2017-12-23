@@ -14,7 +14,7 @@
 #include <iostream>
 
 struct Configuration {
-    int maxDepth = 0;
+    int maxDepth = 4;
     bool debugLog = false;
     bool alphaBetaPrunning = true;
     bool quiescenceSearch = true;
@@ -67,11 +67,13 @@ public:
         }
     }
 
-    Evaluation alphabeta(Node node, int depth, int alpha, int beta, bool maximizingPlayer) {
+    Evaluation alphabeta(Node node, int depth, bool maximizingPlayer) {
         analyzing = true;
-        return alphabeta(node, depth, alpha, beta, maximizingPlayer, false);
+        return alphabeta(node, depth, INT_MIN, INT_MAX, maximizingPlayer, false);
     }
-    
+
+private:
+        
     Evaluation alphabeta(Node node, int depth, int alpha, int beta, bool maximizingPlayer, bool quiescence) {
         visitedNodes++;
         
@@ -155,18 +157,7 @@ public:
             }
         }
         if (!evaluatedAtLeastOneChild) {
-            if (moves.count == 0) {
-                if (Evaluater::isCheck(node)) {
-                    // No moves but a check, that's a mat
-                    bestEval.mat = true;
-                } else {
-                    // No moves and not check, that's a draw
-                    bestEval.value = 0;
-                }
-            } else {
-                // Otherwise let's evaluate the node itself
-                bestEval.value = Evaluater::evaluate(node);
-            }
+            bestEval.value = Evaluater::evaluate(node, moves);
         }
         outputReturn(node, depth, alpha, beta, maximizingPlayer, bestEval);
         return bestEval;

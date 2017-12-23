@@ -39,9 +39,9 @@ public:
             
             high_resolution_clock::time_point before = high_resolution_clock::now();
             
-            minMaxSearch.config.maxDepth = maxDepth;
+            minMaxSearch.config.maxDepth = curMaxDepth;
             minMaxSearch.reset();
-            evaluation = minMaxSearch.alphabeta(board, curMaxDepth, INT_MIN, INT_MAX, board.color == WHITE);
+            evaluation = minMaxSearch.alphabeta(board, 0, board.color == WHITE);
             
             high_resolution_clock::time_point after = high_resolution_clock::now();
             

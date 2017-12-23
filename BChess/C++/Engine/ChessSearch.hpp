@@ -25,8 +25,6 @@ struct ChessEvaluation {
     int nodes = 0;
     int movesPerSecond = 0;
     
-    bool mat = false;
-
     Color engineColor;
     
     void addMove(Move move) {

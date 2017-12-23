@@ -22,13 +22,12 @@
 static void assertChessSearch(int expectedVisitedNodes, int expectedValue, Configuration config) {
     config.maxDepth = 4;
     
-    ChessEvaluate evaluater;
-    ChessMoveGenerator moveGenerator;
-    ChessMinMaxSearch alphaBeta(evaluater, moveGenerator, config);
-    
+    ChessMinMaxSearch alphaBeta;
+    alphaBeta.config = config;
+
     Board rootBoard;
 
-    auto eval = alphaBeta.alphabeta(rootBoard, 0, INT_MIN, INT_MAX, true, false);
+    auto eval = alphaBeta.alphabeta(rootBoard, 0, rootBoard.color == WHITE);
     std::cout << alphaBeta.visitedNodes << " => " << eval.value << std::endl;
     ASSERT_EQ(alphaBeta.visitedNodes, expectedVisitedNodes); // n initial moves + 1 for the root node
     ASSERT_EQ(eval.value, expectedValue);
@@ -50,13 +49,10 @@ TEST(Chess, OrderedMove) {
     Board board;
     ASSERT_TRUE(FFEN::setFEN(fen, board));
         
-    Configuration config;
-    config.maxDepth = 4;
-    config.debugLog = false;
-    ChessEvaluate evaluater;
-    ChessMoveGenerator moveGenerator;
-    ChessMinMaxSearch alphaBeta(evaluater, moveGenerator, config);
+    ChessMinMaxSearch alphaBeta;
+    alphaBeta.config.maxDepth = 4;
+    alphaBeta.config.debugLog = false;
 
-    auto eval = alphaBeta.alphabeta(board, 0, INT_MIN, INT_MAX, board.color == WHITE, false);
+    auto eval = alphaBeta.alphabeta(board, 0, board.color == WHITE);
     std::cout << alphaBeta.visitedNodes << " => " << eval.value << " for " << eval.line.description() << std::endl;
 }
