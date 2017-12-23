@@ -8,16 +8,13 @@
 
 #include <gtest/gtest.h>
 
-#include "FBoard.hpp"
 #include "FFEN.hpp"
-#include "FMoveGenerator.hpp"
 #include "FPGN.hpp"
-#include "FEvaluate.hpp"
-#include "MinMaxSearch.hpp"
-#include "ChessSearch.hpp"
+
+#include "ChessEngine.hpp"
 
 static void assertBestMove(std::string fen, std::string finalFEN, std::string bestMove, std::vector<std::string> bestLine, Configuration config) {
-    Board board;
+    ChessBoard board;
     ASSERT_TRUE(FFEN::setFEN(fen, board));
     std::string boardFEN = FFEN::getFEN(board);
     ASSERT_STREQ(boardFEN.c_str(), fen.c_str());
@@ -40,7 +37,7 @@ static void assertBestMove(std::string fen, std::string finalFEN, std::string be
     }
     
     // Now play the moves to reach the final position
-    Board finalBoard = board;
+    ChessBoard finalBoard = board;
     for (int index=0; index<evaluation.line.count; index++) {
         auto move = evaluation.line._moves[index];
         finalBoard.move(move);

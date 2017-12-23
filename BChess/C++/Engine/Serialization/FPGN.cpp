@@ -7,8 +7,8 @@
 //
 
 #include "FPGN.hpp"
-#include "FBoard.hpp"
-#include "FMoveGenerator.hpp"
+#include "ChessBoard.hpp"
+#include "ChessMoveGenerator.hpp"
 
 #include <cassert>
 #include <iostream>
@@ -151,7 +151,7 @@ static Rank getRank(char c) {
     return (Rank)(c - '1');
 }
 
-static std::vector<Move> getMatchingMoves(Board board, Square to, Piece movingPiece, File fromFile, Rank fromRank) {
+static std::vector<Move> getMatchingMoves(ChessBoard board, Square to, Piece movingPiece, File fromFile, Rank fromRank) {
     ChessMoveGenerator generator;
     auto moveList = generator.generateMoves(board);
     std::vector<Move> matchingMoves;

@@ -8,10 +8,10 @@
 
 #pragma once
 
-#include "FBoard.hpp"
+#include "ChessBoard.hpp"
 #include "FMoveList.hpp"
 
-class ChessEvaluate {
+class ChessEvaluater {
 public:
     // Mat value which must be lower than INT_MIN or INT_MAX
     // otherwise it causes issue with the min-max algorithm
@@ -21,9 +21,9 @@ public:
     
     static bool isQuiet(Move move);
     
-    static int evaluate(Board board, MoveList moves);
+    static int evaluate(ChessBoard board, MoveList moves);
 
-    static int evaluate(Board board);
+    static int evaluate(ChessBoard board);
 
     static int getBonus(Piece piece, Color color, Square square);
 };

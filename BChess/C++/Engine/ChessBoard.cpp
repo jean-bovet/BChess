@@ -6,7 +6,7 @@
 //  Copyright © 2017 Jean Bovet. All rights reserved.
 //
 
-#include "FBoard.hpp"
+#include "ChessBoard.hpp"
 #include <bitstring.h>
 #include <iostream>
 #include <cassert>
@@ -179,16 +179,16 @@ static Bitboard IBlackPawns = BB(0b\
 
 #pragma mark -
 
-Board::Board() {
+ChessBoard::ChessBoard() {
     reset();
 }
 
-void Board::clear() {
+void ChessBoard::clear() {
     memset(pieces, 0, sizeof(pieces));
     occupancyDirty = true;
 }
 
-void Board::reset() {
+void ChessBoard::reset() {
     clear();
     
     pieces[WHITE][PAWN] = IWhitePawns;
@@ -217,7 +217,7 @@ void Board::reset() {
     fullMoveCount = 1;
 }
 
-void Board::move(Move move) {
+void ChessBoard::move(Move move) {
     if (color == BLACK) {
         fullMoveCount++;
     }
@@ -230,7 +230,7 @@ void Board::move(Move move) {
     auto from = MOVE_FROM(move);
     auto to = MOVE_TO(move);
     
-    Board::move(moveColor, movePiece, from, to);
+    ChessBoard::move(moveColor, movePiece, from, to);
     
     if (movePiece == KING) {
         if (moveColor == WHITE) {
@@ -238,22 +238,22 @@ void Board::move(Move move) {
             
             if (from == e1 && to == g1) {
                 // White castle king side, need to move the rook
-                Board::move(moveColor, ROOK, h1, f1);
+                ChessBoard::move(moveColor, ROOK, h1, f1);
             }
             if (from == e1 && to == c1) {
                 // White castle queen side, need to move the rook
-                Board::move(moveColor, ROOK, a1, d1);
+                ChessBoard::move(moveColor, ROOK, a1, d1);
             }
         } else {
             blackCanCastleKingSide = blackCanCastleQueenSide = false;
             
             if (from == e8 && to == g8) {
                 // Black castle king side, need to move the rook
-                Board::move(moveColor, ROOK, h8, f8);
+                ChessBoard::move(moveColor, ROOK, h8, f8);
             }
             if (from == e8 && to == c8) {
                 // Black castle queen side, need to move the rook
-                Board::move(moveColor, ROOK, a8, d8);
+                ChessBoard::move(moveColor, ROOK, a8, d8);
             }
         }
     }
@@ -330,7 +330,7 @@ void Board::move(Move move) {
     color = INVERSE(color);
 }
 
-Bitboard Board::getOccupancy() {
+Bitboard ChessBoard::getOccupancy() {
     if (occupancyDirty) {
         auto whitePieces = allPieces(Color::WHITE);
         auto blackPieces = allPieces(Color::BLACK);
@@ -340,7 +340,7 @@ Bitboard Board::getOccupancy() {
     return occupancy;
 }
 
-Move Board::getMove(std::string from, std::string to) {
+Move ChessBoard::getMove(std::string from, std::string to) {
     Square fromSquare = squareForName(from);
     Square toSquare = squareForName(to);
     for (unsigned piece=PAWN; piece<Piece::PCOUNT; piece++) {
@@ -366,7 +366,7 @@ Move Board::getMove(std::string from, std::string to) {
     return 0; // Invalid move
 }
 
-void Board::move(Color color, Piece piece, Square from, Square to) {
+void ChessBoard::move(Color color, Piece piece, Square from, Square to) {
     bb_clear(pieces[color][piece], from);
     bb_set(pieces[color][piece], to);
     occupancyDirty = true;
@@ -392,7 +392,7 @@ inline static char charForPiece(Color color, Piece piece) {
     }
 }
 
-void Board::print() {
+void ChessBoard::print() {
     for (Rank reverseRank = 0; reverseRank < 8; reverseRank++) {
         Rank rank = 7 - reverseRank;
         for (File file = 0; file < 8; file++) {
@@ -413,7 +413,7 @@ void Board::print() {
     std::cout << std::endl;
 }
 
-BoardSquare Board::get(File file, Rank rank) {
+BoardSquare ChessBoard::get(File file, Rank rank) {
     BoardSquare square;
     if (bb_test(getOccupancy(), file, rank)) {
         for (unsigned color=0; color<Color::COUNT; color++) {
@@ -432,7 +432,7 @@ BoardSquare Board::get(File file, Rank rank) {
     return square;
 }
 
-void Board::set(BoardSquare square, File file, Rank rank) {
+void ChessBoard::set(BoardSquare square, File file, Rank rank) {
     if (square.empty) {
         for (unsigned color=0; color<Color::COUNT; color++) {
             for (unsigned piece=0; piece<Piece::PCOUNT; piece++) {
@@ -445,7 +445,7 @@ void Board::set(BoardSquare square, File file, Rank rank) {
     occupancyDirty = true;
 }
 
-Bitboard Board::allPieces(Color color) {
+Bitboard ChessBoard::allPieces(Color color) {
     return pieces[color][PAWN]|
     pieces[color][ROOK]|
     pieces[color][KNIGHT]|
@@ -454,11 +454,11 @@ Bitboard Board::allPieces(Color color) {
     pieces[color][KING];    
 }
 
-Bitboard Board::emptySquares() {
+Bitboard ChessBoard::emptySquares() {
     return ~getOccupancy();
 }
 
-bool Board::isAttacked(Square square, Color byColor) {
+bool ChessBoard::isAttacked(Square square, Color byColor) {
     // Generate all the moves for a knight from the king position
     // and keep only the ones that are actually hitting
     // a black knight, meaning the king is attacked.
@@ -497,7 +497,7 @@ bool Board::isAttacked(Square square, Color byColor) {
     return false;
 }
 
-bool Board::isCheck(Color color) {
+bool ChessBoard::isCheck(Color color) {
     // Locate the king
     auto kingBoard = pieces[color][Piece::KING];
     if (kingBoard == 0) {

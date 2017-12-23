@@ -8,8 +8,8 @@
 
 #include "FGame.hpp"
 #include "FFEN.hpp"
-#include "FMoveGenerator.hpp"
-#include "FEvaluate.hpp"
+#include "ChessMoveGenerator.hpp"
+#include "ChessEvaluater.hpp"
 
 void FGame::reset() {
     moveCursor = 0;
@@ -87,6 +87,6 @@ void FGame::replayMoves() {
 }
 
 void FGame::debugEvaluate() {
-    std::cout << ChessEvaluate::evaluate(board) << std::endl;
+    std::cout << ChessEvaluater::evaluate(board) << std::endl;
 }
 

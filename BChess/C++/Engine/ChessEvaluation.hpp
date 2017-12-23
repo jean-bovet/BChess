@@ -8,13 +8,7 @@
 
 #pragma once
 
-#include "MinMaxSearch.hpp"
-#include "FBoard.hpp"
 #include "FMoveList.hpp"
-#include "FEvaluate.hpp"
-#include "FMoveGenerator.hpp"
-
-#include <vector>
 
 struct ChessEvaluation {
     MoveList line;
@@ -43,4 +37,3 @@ struct ChessEvaluation {
     }
 };
 
-typedef MinMaxSearch<Board, ChessMoveGenerator, ChessEvaluate, ChessEvaluation> ChessMinMaxSearch;

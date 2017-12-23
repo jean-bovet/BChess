@@ -7,7 +7,7 @@
 //
 
 #include "FMoveList.hpp"
-#include "FBoard.hpp"
+#include "ChessBoard.hpp"
 #include "FPGN.hpp"
 
 std::string MoveList::description() {
@@ -38,8 +38,8 @@ void MoveList::addMoves(MoveList moves) {
     }
 }
 
-void MoveList::addMove(Board &board, Move move) {
-    Board validBoard = board;
+void MoveList::addMove(ChessBoard &board, Move move) {
+    ChessBoard validBoard = board;
     validBoard.move(move);
     // Note: make sure the move that was just played doesn't make
     // it's king in check (use board.color which refers to the move's color).
@@ -48,7 +48,7 @@ void MoveList::addMove(Board &board, Move move) {
     }
 }
 
-void MoveList::addMoves(Board &board, Square from, Bitboard moves, Piece piece) {
+void MoveList::addMoves(ChessBoard &board, Square from, Bitboard moves, Piece piece) {
     while (moves > 0) {
         Square to = lsb(moves);
         bb_clear(moves, to);
@@ -57,7 +57,7 @@ void MoveList::addMoves(Board &board, Square from, Bitboard moves, Piece piece) 
     }
 }
 
-void MoveList::addCaptures(Board &board, Square from, Bitboard moves, Piece attackingPiece, Piece capturedPiece) {
+void MoveList::addCaptures(ChessBoard &board, Square from, Bitboard moves, Piece attackingPiece, Piece capturedPiece) {
     while (moves > 0) {
         Square to = lsb(moves);
         bb_clear(moves, to);

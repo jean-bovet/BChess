@@ -8,9 +8,7 @@
 
 #include <gtest/gtest.h>
 
-#include "MinMaxSearch.hpp"
-#include "FEvaluate.hpp"
-#include "FMoveGenerator.hpp"
+#include "ChessEngine.hpp"
 
 #include <vector>
 #include <map>
@@ -141,8 +139,10 @@ struct TestEvaluation {
     
     int value = 0;
     int depth = 0;
+    int quiescenceDepth = 0;
     int nodes = 0;
     bool mat = false;
+    bool cancelled = false;
 };
 
 bool testMoveComparison(TestMove i, TestMove j) {

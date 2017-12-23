@@ -14,7 +14,7 @@
 #include <string>
 
 #include "FGame.hpp"
-#include "FBoard.hpp"
+#include "ChessBoard.hpp"
 
 class FPGN {
 public:

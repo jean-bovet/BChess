@@ -14,7 +14,7 @@
 
 const int MAX_MOVES = 256;
 
-class Board;
+class ChessBoard;
 
 struct MoveList {
     Move _moves[MAX_MOVES];
@@ -26,9 +26,9 @@ struct MoveList {
     void insertMove(int index, Move move);
     
     void addMoves(MoveList moves);
-    void addMove(Board &board, Move move);
-    void addMoves(Board &board, Square from, Bitboard moves, Piece piece);
-    void addCaptures(Board &board, Square from, Bitboard moves, Piece attackingPiece, Piece capturedPiece);
+    void addMove(ChessBoard &board, Move move);
+    void addMoves(ChessBoard &board, Square from, Bitboard moves, Piece piece);
+    void addCaptures(ChessBoard &board, Square from, Bitboard moves, Piece attackingPiece, Piece capturedPiece);
 };
 
 

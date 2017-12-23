@@ -8,10 +8,10 @@
 
 #include <gtest/gtest.h>
 
-#include "FBoard.hpp"
 #include "FFEN.hpp"
-#include "FMoveGenerator.hpp"
 #include "FPGN.hpp"
+
+#include "ChessEngine.hpp"
 
 #include <set>
 #include <vector>

@@ -8,12 +8,11 @@
 
 #import "FEngine.h"
 #import "FGame.hpp"
-#import "FBoard.hpp"
-#import "FPerformance.hpp"
+#import "ChessBoard.hpp"
 #import "FFEN.hpp"
 #import "FMove.hpp"
 #import "FPGN.hpp"
-#import "FEvaluate.hpp"
+#import "ChessEngine.hpp"
 #import "IterativeDeepening.hpp"
 
 @implementation FEngineMove
@@ -21,7 +20,7 @@
 @end
 
 @interface FEngine () {
-    IterativeDeepening<Board, ChessMoveGenerator, ChessEvaluate, ChessEvaluation> iterativeSearch;
+    IterativeDeepening<ChessBoard, ChessMoveGenerator, ChessEvaluater, ChessEvaluation> iterativeSearch;
     FGame currentGame;
 }
 
@@ -140,7 +139,7 @@
     ei.time = info.time;
     ei.nodeEvaluated = info.nodes;
     ei.movesPerSecond = info.movesPerSecond;
-    ei.mat = info.value == ChessEvaluate::MAT_VALUE || info.value == -ChessEvaluate::MAT_VALUE;
+    ei.mat = info.value == ChessEvaluater::MAT_VALUE || info.value == -ChessEvaluater::MAT_VALUE;
 
     Move bestMove = info.bestMove();
     ei.rawMoveValue = bestMove;
@@ -208,7 +207,7 @@
 }
 
 - (void)searchBestMove:(NSString*)boardFEN maxDepth:(NSInteger)maxDepth callback:(FEngineSearchCallback)callback {
-    Board board;
+    ChessBoard board;
     FFEN::setFEN(std::string([boardFEN UTF8String]), board);
     ChessEvaluation info = iterativeSearch.search(board, (int)maxDepth, [self, callback](ChessEvaluation info) {
         callback([self infoFor:info], NO);
@@ -218,7 +217,7 @@
 
 - (NSArray<NSString*>* _Nonnull)moveFENsFrom:(NSString* _Nonnull)startingFEN squareName:(NSString* _Nullable)squareName {
     auto fen = std::string([startingFEN UTF8String]);
-    Board board;
+    ChessBoard board;
     FFEN::setFEN(fen, board);
     std::string boardFEN = FFEN::getFEN(board);
     assert(boardFEN == fen);
@@ -235,7 +234,7 @@
     NSMutableArray<NSString*>* moveFENs = [NSMutableArray array];
     for (int index=0; index<moves.count; index++) {
         auto move = moves._moves[index];
-        Board newBoard = board;
+        ChessBoard newBoard = board;
         newBoard.move(move);
         std::string moveFEN = FFEN::getFEN(newBoard);
 
@@ -245,18 +244,11 @@
 }
 
 - (void)generatePositions {
-    Board board;
+    ChessBoard board;
     FFEN::setFEN("3r3k/5Npp/8/8/2Q5/1B6/8/7K b - - 1 1", board);
     
     ChessMoveGenerator generator;
     generator.generateMoves(board, Color::WHITE);
-}
-
-- (void)generatePositions:(int)depth {
-    FPerformance performance;
-    Board board;
-    performance.generateMoves(board, depth);
-    self.moveCount = performance.moveCount;
 }
 
 - (void)debugEvaluate {

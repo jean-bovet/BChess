@@ -9,11 +9,11 @@
 #pragma once
 
 #include <stdio.h>
-#include "FBoard.hpp"
+#include "ChessBoard.hpp"
 
 class FFEN {
 public:
-    static std::string getFEN(Board board);
-    static bool setFEN(std::string fen, Board &board);
+    static std::string getFEN(ChessBoard board);
+    static bool setFEN(std::string fen, ChessBoard &board);
 };
 

@@ -8,11 +8,8 @@
 
 #include <gtest/gtest.h>
 
-#include "MinMaxSearch.hpp"
-#include "ChessSearch.hpp"
+#include "ChessEngine.hpp"
 
-#include "FEvaluate.hpp"
-#include "FMoveGenerator.hpp"
 #include "FFEN.hpp"
 #include "FPGN.hpp"
 
@@ -25,7 +22,7 @@ static void assertChessSearch(int expectedVisitedNodes, int expectedValue, Confi
     ChessMinMaxSearch alphaBeta;
     alphaBeta.config = config;
 
-    Board rootBoard;
+    ChessBoard rootBoard;
 
     auto eval = alphaBeta.alphabeta(rootBoard, 0, rootBoard.color == WHITE);
     std::cout << alphaBeta.visitedNodes << " => " << eval.value << std::endl;
@@ -46,7 +43,7 @@ TEST(Chess, ChessTree) {
 
 TEST(Chess, OrderedMove) {
     auto fen = "r1bqkbnr/pppp1ppp/2n5/3P4/8/8/PPP2PPP/RNBQKBNR b KQkq - 0 5";
-    Board board;
+    ChessBoard board;
     ASSERT_TRUE(FFEN::setFEN(fen, board));
         
     ChessMinMaxSearch alphaBeta;

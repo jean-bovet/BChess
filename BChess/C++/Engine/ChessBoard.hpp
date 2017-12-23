@@ -24,7 +24,7 @@ struct BoardSquare {
     Piece piece;
 };
 
-struct Board {
+struct ChessBoard {
 private:
     Bitboard occupancy = 0;
 
@@ -53,7 +53,7 @@ public:
     bool blackCanCastleKingSide = true;
     bool blackCanCastleQueenSide = true;
     
-    Board();
+    ChessBoard();
     
     void reset();
     

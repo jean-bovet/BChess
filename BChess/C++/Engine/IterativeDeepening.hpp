@@ -8,8 +8,8 @@
 
 #pragma once
 
-#include "ChessSearch.hpp"
-#include "FEvaluate.hpp"
+#include "ChessEvaluation.hpp"
+#include "ChessEvaluater.hpp"
 
 #include <chrono>
 using namespace std::chrono;
@@ -44,7 +44,7 @@ class IterativeDeepening {
 public:
     typedef std::function<void(ChessEvaluation)> SearchCallback;
     
-    ChessEvaluation search(Board board, int maxDepth, SearchCallback callback) {
+    ChessEvaluation search(ChessBoard board, int maxDepth, SearchCallback callback) {
         if (maxDepth == -1) {
             maxDepth = INT_MAX; // infinite depth
         }

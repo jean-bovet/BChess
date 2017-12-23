@@ -6,9 +6,9 @@
 //  Copyright © 2017 Jean Bovet. All rights reserved.
 //
 
-#include "FEvaluate.hpp"
-#include "FMoveGenerator.hpp"
-#include "FBoard.hpp"
+#include "ChessEvaluater.hpp"
+#include "ChessMoveGenerator.hpp"
+#include "ChessBoard.hpp"
 #include "magicmoves.h"
 
 #include <iostream>
@@ -95,11 +95,11 @@ static Square blackIndex(Square original) {
     return 63 - (7 - rank + 1) * 7 + file;
 }
 
-bool ChessEvaluate::isQuiet(Move move) {
+bool ChessEvaluater::isQuiet(Move move) {
     return !MOVE_IS_CAPTURE(move);
 }
 
-int ChessEvaluate::getBonus(Piece piece, Color color, Square square) {
+int ChessEvaluater::getBonus(Piece piece, Color color, Square square) {
     auto index = color == WHITE ? whiteIndex(square) : blackIndex(square);
     switch (piece) {
         case PAWN:
@@ -125,7 +125,7 @@ int ChessEvaluate::getBonus(Piece piece, Color color, Square square) {
     }
 }
 
-int ChessEvaluate::evaluate(Board board, MoveList moves) {
+int ChessEvaluater::evaluate(ChessBoard board, MoveList moves) {
     if (moves.count == 0) {
         if (board.isCheck(board.color)) {
             // No moves but a check, that's a mat
@@ -140,7 +140,7 @@ int ChessEvaluate::evaluate(Board board, MoveList moves) {
     }
 }
 
-int ChessEvaluate::evaluate(Board board) {
+int ChessEvaluater::evaluate(ChessBoard board) {
     // TODO: how to detect a draw?
     // Note: the value should always be computed from a white point of view
     int value = 0;

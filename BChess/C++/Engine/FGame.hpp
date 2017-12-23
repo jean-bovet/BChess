@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include "FBoard.hpp"
+#include "ChessBoard.hpp"
 #include <vector>
 
 class FGame {
@@ -20,7 +20,7 @@ public:
         white_wins, black_wins, draw, in_progress
     };
     
-    Board board;
+    ChessBoard board;
     std::vector<Move> moves;
     size_t moveCursor = 0;
 

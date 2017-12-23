@@ -85,7 +85,7 @@ struct Coordinate {
     File file = 0;
 };
 
-std::string FFEN::getFEN(Board board) {
+std::string FFEN::getFEN(ChessBoard board) {
     // "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
     std::string fen = "";
     for (Rank rank=8; rank>0; rank--) {
@@ -139,7 +139,7 @@ std::string FFEN::getFEN(Board board) {
     return fen;
 }
 
-bool FFEN::setFEN(std::string fen, Board &board) {
+bool FFEN::setFEN(std::string fen, ChessBoard &board) {
     std::vector<std::string> fields;
     split4(fen, fields);
     if (fields.size() != 6) {

@@ -66,8 +66,6 @@ typedef enum : NSUInteger {
 
 - (NSArray<NSString*>* _Nonnull)moveFENsFrom:(NSString* _Nonnull)startingFEN squareName:(NSString* _Nullable)squareName;
 
-- (void)generatePositions:(int)depth;
-
 - (void)debugEvaluate;
 
 @end
