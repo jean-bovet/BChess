@@ -61,14 +61,14 @@ class ChessViewController: NSViewController {
         if menuItem.action == #selector(playAgaintHuman) {
             menuItem.state = chessView.playAgainstComputer == .human ? .on : .off
         }
-        if menuItem.action == #selector(depth4) {
-            menuItem.state = chessView.searchDepth == 4 ? .on : .off
+        if menuItem.action == #selector(levelEasy) {
+            menuItem.state = engine.level == Easy ? .on : .off
         }
-        if menuItem.action == #selector(depth5) {
-            menuItem.state = chessView.searchDepth == 5 ? .on : .off
+        if menuItem.action == #selector(levelMedium) {
+            menuItem.state = engine.level == Medium ? .on : .off
         }
-        if menuItem.action == #selector(depth6) {
-            menuItem.state = chessView.searchDepth == 6 ? .on : .off
+        if menuItem.action == #selector(levelHard) {
+            menuItem.state = engine.level == Hard ? .on : .off
         }
         if menuItem.action == #selector(undoMove) {
             return engine.canUndoMove()
@@ -143,16 +143,16 @@ class ChessViewController: NSViewController {
 
     // MARK: Menu Level
     
-    @IBAction func depth4(_ sender: NSMenuItem) {
-        chessView.searchDepth = 4
+    @IBAction func levelEasy(_ sender: NSMenuItem) {
+        engine.level = Easy
     }
 
-    @IBAction func depth5(_ sender: NSMenuItem) {
-        chessView.searchDepth = 5
+    @IBAction func levelMedium(_ sender: NSMenuItem) {
+        engine.level = Medium
     }
 
-    @IBAction func depth6(_ sender: NSMenuItem) {
-        chessView.searchDepth = 6
+    @IBAction func levelHard(_ sender: NSMenuItem) {
+        engine.level = Hard
     }
     
     // MARK: Menu View

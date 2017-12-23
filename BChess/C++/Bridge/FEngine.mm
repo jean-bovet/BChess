@@ -32,6 +32,7 @@
 - (id)init {
     if (self = [super init]) {
         _async = YES;
+        _level = Medium;
     }
     return self;
 }
@@ -161,11 +162,38 @@
     return ei;
 }
 
+- (NSTimeInterval)timeForLevel:(Level)level {
+    switch (level) {
+        case Easy:
+            return 2;
+
+        case Medium:
+            return 5;
+            
+        case Hard:
+            return 20;
+    }
+}
+
+- (void)evaluate:(FEngineSearchCallback _Nonnull)callback {
+    [self evaluate:INT_MAX time:[self timeForLevel:self.level] callback:callback];
+}
+
 - (void)evaluate:(NSInteger)depth callback:(FEngineSearchCallback)callback {
+    [self evaluate:depth time:0 callback:callback];
+}
+
+- (void)evaluate:(NSInteger)depth time:(NSTimeInterval)time callback:(FEngineSearchCallback)callback {
     [self stop];
     
+    if (time > 0) {
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(time * NSEC_PER_SEC)), dispatch_get_global_queue(QOS_CLASS_UTILITY, 0), ^{
+            [self stop];
+        });
+    }
+
     if (self.async) {
-        dispatch_async(dispatch_get_global_queue(QOS_CLASS_BACKGROUND, 0), ^{
+        dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0), ^{
             [self searchBestMove:self.FEN maxDepth:depth callback:^(FEngineInfo * _Nonnull info, BOOL completed) {
                 callback(info, completed);
                 [self fireUpdate];

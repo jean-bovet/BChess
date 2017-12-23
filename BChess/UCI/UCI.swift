@@ -83,9 +83,18 @@ class UCI {
         // go wtime 300000 btime 300000
         let cmd = tokens.removeFirst()
         
-        let depth = (cmd == "infinite") ? -1 : UCI.defaultDepth
-        
-        engine.evaluate(depth) { (info, completed) in
+        // UCI only plays with time control
+        let depth: Int
+        let time: TimeInterval
+        if cmd == "infinite" {
+            depth = -1
+            time = -1
+        } else {
+            // TODO time control
+            depth = -1
+            time = 10 // 10 seconds for now
+        }
+        engine.evaluate(depth, time: time) { (info, completed) in
             if completed {
                 self.engineOutput(info.uciBestMove)
             } else {

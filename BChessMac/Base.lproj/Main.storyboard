@@ -147,22 +147,22 @@
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <menu key="submenu" title="Level" id="Jhl-lf-vXn">
                                     <items>
-                                        <menuItem title="Depth 4" id="bWZ-c6-ZNR">
+                                        <menuItem title="Easy" id="bWZ-c6-ZNR">
                                             <modifierMask key="keyEquivalentModifierMask"/>
                                             <connections>
-                                                <action selector="depth4:" target="Ady-hI-5gd" id="407-SM-Uti"/>
+                                                <action selector="levelEasy:" target="Ady-hI-5gd" id="TjC-xf-qME"/>
                                             </connections>
                                         </menuItem>
-                                        <menuItem title="Depth 5" id="KtQ-I4-Ove">
+                                        <menuItem title="Medium" id="KtQ-I4-Ove">
                                             <modifierMask key="keyEquivalentModifierMask"/>
                                             <connections>
-                                                <action selector="depth5:" target="Ady-hI-5gd" id="ZS8-ps-95I"/>
+                                                <action selector="levelMedium:" target="Ady-hI-5gd" id="caI-fM-E1B"/>
                                             </connections>
                                         </menuItem>
-                                        <menuItem title="Depth 6" id="4fw-O7-3Us">
+                                        <menuItem title="Hard" id="4fw-O7-3Us">
                                             <modifierMask key="keyEquivalentModifierMask"/>
                                             <connections>
-                                                <action selector="depth6:" target="Ady-hI-5gd" id="Jxj-ao-hAW"/>
+                                                <action selector="levelHard:" target="Ady-hI-5gd" id="KAb-eb-9qU"/>
                                             </connections>
                                         </menuItem>
                                     </items>

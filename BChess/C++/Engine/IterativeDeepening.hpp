@@ -63,16 +63,19 @@ public:
             
             minMaxSearch.config.maxDepth = curMaxDepth;
             minMaxSearch.reset();
-            evaluation = minMaxSearch.alphabeta(board, 0, board.color == WHITE);
+            ChessEvaluation bestEval = minMaxSearch.alphabeta(board, 0, board.color == WHITE);
             
             moveClock.stop();
             
             double movesPerSingleMs = evaluation.nodes / moveClock.elapsedMilli();
             int movesPerSecond = int(movesPerSingleMs * 1e3);
             
-            evaluation.time = int(moveClock.elapsedMilli()/1e3);
-            evaluation.engineColor = board.color;
-            evaluation.movesPerSecond = movesPerSecond;
+            if (!bestEval.cancelled) {
+                evaluation = bestEval;
+                evaluation.time = int(moveClock.elapsedMilli()/1e3);
+                evaluation.engineColor = board.color;
+                evaluation.movesPerSecond = movesPerSecond;
+            }
             
             if (callback) {
                 callback(evaluation);

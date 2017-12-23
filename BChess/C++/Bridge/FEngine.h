@@ -12,6 +12,12 @@
 typedef void(^FEngineSearchCallback)(FEngineInfo * _Nonnull info, BOOL completed);
 typedef void(^FEngineDidUpdateCallback)();
 
+typedef enum : NSUInteger {
+    Easy,
+    Medium,
+    Hard,
+} Level;
+
 @interface FEngineMove: NSObject
 
 @property (nonatomic, assign) NSUInteger fromFile, toFile;
@@ -24,6 +30,7 @@ typedef void(^FEngineDidUpdateCallback)();
 
 @property (nonatomic, assign) int moveCount;
 @property (nonatomic, assign) BOOL async;
+@property (nonatomic, assign) Level level;
 
 @property (nonatomic, strong) FEngineDidUpdateCallback _Nullable updateCallback;
 
@@ -53,7 +60,9 @@ typedef void(^FEngineDidUpdateCallback)();
 
 - (BOOL)isWhite;
 
+- (void)evaluate:(FEngineSearchCallback _Nonnull)callback;
 - (void)evaluate:(NSInteger)depth callback:(FEngineSearchCallback _Nonnull)callback;
+- (void)evaluate:(NSInteger)depth time:(NSTimeInterval)time callback:(FEngineSearchCallback _Nonnull)callback;
 
 - (NSArray<NSString*>* _Nonnull)moveFENsFrom:(NSString* _Nonnull)startingFEN squareName:(NSString* _Nullable)squareName;
 

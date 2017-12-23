@@ -21,11 +21,13 @@ struct ChessEvaluation {
     int value = 0;
     int quiescenceDepth = 0;
     int depth = 0;
-    int time = 0; // TODO
-    
+    int time = 0;
+
     int nodes = 0;
     int movesPerSecond = 0;
     
+    bool cancelled = false;
+
     Color engineColor;
     
     void addMove(Move move) {

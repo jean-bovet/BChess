@@ -43,7 +43,6 @@ class BoardView: NSView {
     }
     
     var playAgainstComputer : PlayAgainst = .black
-    var searchDepth = 5
     
     var boardSquareSize: CGFloat = 0
     var boardSquareDX: CGFloat = 0
@@ -146,7 +145,7 @@ class BoardView: NSView {
     var info: FEngineInfo? = nil
     
     func enginePlay() {
-        engine.evaluate(searchDepth) { (info, completed) in
+        engine.evaluate() { (info, completed) in
             self.info = info
             if completed {
                 DispatchQueue.main.async {

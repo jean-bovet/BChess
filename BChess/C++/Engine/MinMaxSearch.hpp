@@ -146,6 +146,7 @@ private:
             }
             
             if (!analyzing) {
+                bestEval.cancelled = true;
                 break;
             }
             
