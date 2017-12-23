@@ -12,11 +12,13 @@
 
 struct ChessEvaluation {
     MoveList line;
+    
     int value = 0;
+    
     int quiescenceDepth = 0;
     int depth = 0;
+    
     int time = 0;
-
     int nodes = 0;
     int movesPerSecond = 0;
     
@@ -24,16 +26,5 @@ struct ChessEvaluation {
 
     Color engineColor;
     
-    void addMove(Move move) {
-        line.addMove(move);
-    }
-    
-    void insertMove(int index, Move move) {
-        line.insertMove(index, move);
-    }
-    
-    Move bestMove() {
-        return line._moves[0];
-    }
 };
 

@@ -25,6 +25,8 @@
 // bit 21-23: 3 bits for captured PIECE (from 0 to 6).
 typedef uint32_t Move;
 
+static const Move INVALID_MOVE = 0;
+
 inline static Move createMove(Square from, Square to, Color color, Piece piece) {
     Move m = (Move)(from | (Move)to << 6 | color << 12 | piece << 13);
     return m;

@@ -25,21 +25,21 @@ static void assertBestMove(std::string fen, std::string finalFEN, std::string be
     ChessEvaluation evaluation = search.alphabeta(board, 0, board.color == WHITE);
     
     // Assert the best move
-    auto actualMove = FPGN::to_string(evaluation.line._moves[0]);
+    auto actualMove = FPGN::to_string(evaluation.line.moves[0]);
     ASSERT_STREQ(actualMove.c_str(), bestMove.c_str());
     
     // Assert the best line
     ASSERT_EQ(evaluation.line.count, bestLine.size());
 
     for (int index=0; index<bestLine.size(); index++) {
-        auto lineMove = FPGN::to_string(evaluation.line._moves[index]);
+        auto lineMove = FPGN::to_string(evaluation.line.moves[index]);
         ASSERT_STREQ(lineMove.c_str(), bestLine[index].c_str());
     }
     
     // Now play the moves to reach the final position
     ChessBoard finalBoard = board;
     for (int index=0; index<evaluation.line.count; index++) {
-        auto move = evaluation.line._moves[index];
+        auto move = evaluation.line.moves[index];
         finalBoard.move(move);
     }
     auto finalBoardFEN = FFEN::getFEN(finalBoard);

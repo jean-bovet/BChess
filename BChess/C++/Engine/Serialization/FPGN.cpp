@@ -156,7 +156,7 @@ static std::vector<Move> getMatchingMoves(ChessBoard board, Square to, Piece mov
     auto moveList = generator.generateMoves(board);
     std::vector<Move> matchingMoves;
     for (int index=0; index<moveList.count; index++) {
-        auto m = moveList._moves[index];
+        auto m = moveList.moves[index];
         if (MOVE_TO(m) != to) {
             continue;
         }

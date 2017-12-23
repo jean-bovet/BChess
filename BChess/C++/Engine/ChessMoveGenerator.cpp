@@ -105,7 +105,7 @@ bool moveComparison(Move i, Move j) {
 void ChessMoveGenerator::sortMoves(MoveList & moves) {
     // Sort the moves according to:
     // MVV/LVA (Most Valuable Victim/Least Valuable Attacker).
-    std::stable_sort(std::begin(moves._moves), std::begin(moves._moves) + moves.count, moveComparison);
+    std::stable_sort(std::begin(moves.moves), std::begin(moves.moves) + moves.count, moveComparison);
 }
 
 MoveList ChessMoveGenerator::generateMoves(ChessBoard board, Square specificSquare) {

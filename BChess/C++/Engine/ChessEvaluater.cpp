@@ -96,7 +96,11 @@ static Square blackIndex(Square original) {
 }
 
 bool ChessEvaluater::isQuiet(Move move) {
-    return !MOVE_IS_CAPTURE(move);
+    // A quiet move is a move that is not:
+    // - a capture
+    // - a promotion
+    // - a check
+    return !MOVE_IS_CAPTURE(move) && MOVE_PROMOTION_PIECE(move) == 0;
 }
 
 int ChessEvaluater::getBonus(Piece piece, Color color, Square square) {
@@ -141,8 +145,6 @@ int ChessEvaluater::evaluate(ChessBoard board, MoveList moves) {
 }
 
 int ChessEvaluater::evaluate(ChessBoard board) {
-    // TODO: how to detect a draw?
-    // Note: the value should always be computed from a white point of view
     int value = 0;
     for (unsigned color=0; color<COUNT; color++) {
         auto isWhite = color == WHITE;

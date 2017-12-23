@@ -141,7 +141,7 @@
     ei.movesPerSecond = info.movesPerSecond;
     ei.mat = info.value == ChessEvaluater::MAT_VALUE || info.value == -ChessEvaluater::MAT_VALUE;
 
-    Move bestMove = info.bestMove();
+    Move bestMove = info.line.firstMove();
     ei.rawMoveValue = bestMove;
 
     ei.fromRank = RankFrom(MOVE_FROM(bestMove));
@@ -154,7 +154,7 @@
     
     auto bestLine = [NSMutableArray array];
     for (int index=0; index<info.line.count; index++) {
-        Move move = info.line._moves[index];
+        Move move = info.line.moves[index];
         [bestLine addObject:[NSString stringWithUTF8String:FPGN::to_string(move, FPGN::SANType::uci).c_str()]];
     }
     ei.bestLine = bestLine;
@@ -233,7 +233,7 @@
     MoveList moves = generator.generateMoves(board, square);
     NSMutableArray<NSString*>* moveFENs = [NSMutableArray array];
     for (int index=0; index<moves.count; index++) {
-        auto move = moves._moves[index];
+        auto move = moves.moves[index];
         ChessBoard newBoard = board;
         newBoard.move(move);
         std::string moveFEN = FFEN::getFEN(newBoard);

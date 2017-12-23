@@ -80,12 +80,16 @@ struct TestMove {
 };
 
 struct TestMoveList {
-    std::vector<TestMove> _moves;
+    std::vector<TestMove> moves;
     int count = 0;
     
     void add(TestMove move) {
-        _moves.push_back(move);
-        count = (int)_moves.size();
+        moves.push_back(move);
+        count = (int)moves.size();
+    }
+    
+    void insertMove(int index, TestMove move) {
+        
     }
 };
 
@@ -129,14 +133,7 @@ struct TestEvaluater {
 };
 
 struct TestEvaluation {
-    void addMove(TestMove move) {
-        
-    }
-    
-    void insertMove(int index, TestMove move) {
-        
-    }
-    
+    TestMoveList line;
     int value = 0;
     int depth = 0;
     int quiescenceDepth = 0;
@@ -152,7 +149,7 @@ bool testMoveComparison(TestMove i, TestMove j) {
 struct TestMoveGenerator {
     
     static void sortMoves(TestMoveList & moveList) {
-        std::sort(moveList._moves.begin(), moveList._moves.end(), testMoveComparison);
+        std::sort(moveList.moves.begin(), moveList.moves.end(), testMoveComparison);
     }
     
     static TestMoveList generateMoves(TestBoard board) {

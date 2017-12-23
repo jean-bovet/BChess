@@ -10,17 +10,18 @@
 
 #include "FMove.hpp"
 #include "FBitboard.hpp"
-#include <vector>
 
 const int MAX_MOVES = 256;
 
 class ChessBoard;
 
 struct MoveList {
-    Move _moves[MAX_MOVES];
+    Move moves[MAX_MOVES];
     int count = 0;
     
     std::string description();
+    
+    Move firstMove();
     
     void addMove(Move move);
     void insertMove(int index, Move move);

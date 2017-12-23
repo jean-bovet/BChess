@@ -13,7 +13,7 @@
 std::string MoveList::description() {
     std::string text = "";
     for (int index=0; index<count; index++) {
-        auto move = _moves[index];
+        auto move = moves[index];
         if (text.length() > 0) {
             text += " ";
         }
@@ -22,19 +22,27 @@ std::string MoveList::description() {
     return text;
 }
 
+Move MoveList::firstMove() {
+    if (count > 0) {
+        return moves[0];
+    } else {
+        return INVALID_MOVE;
+    }
+}
+
 void MoveList::addMove(Move move) {
-    _moves[count] = move;
+    moves[count] = move;
     count++;
 }
 
 void MoveList::insertMove(int index, Move move) {
-    _moves[index] = move;
+    moves[index] = move;
     count = std::max(index + 1, count);
 }
 
 void MoveList::addMoves(MoveList moves) {
     for (int index=0; index<moves.count; index++) {
-        addMove(moves._moves[index]);
+        addMove(moves.moves[index]);
     }
 }
 

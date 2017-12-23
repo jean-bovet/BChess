@@ -140,7 +140,7 @@ private:
         
         bestEval.value = maximizingPlayer ? INT_MIN : INT_MAX;
         for (int index=0; index<moves.count; index++) {
-            auto move = moves._moves[index];
+            auto move = moves.moves[index];
             if (quiescence && Evaluater::isQuiet(move)) {
                 continue;
             }
@@ -158,7 +158,7 @@ private:
             if (maximizingPlayer) {
                 if (candidate.value > bestEval.value) {
                     bestEval = candidate;
-                    bestEval.insertMove(depth, move);
+                    bestEval.line.insertMove(depth, move);
                     alpha = std::max(alpha, candidate.value);
 #if DEBUG_OUTPUT
                     outputBest(node, depth, alpha, beta, maximizingPlayer, bestEval);
@@ -167,7 +167,7 @@ private:
             } else {
                 if (candidate.value < bestEval.value) {
                     bestEval = candidate;
-                    bestEval.insertMove(depth, move);
+                    bestEval.line.insertMove(depth, move);
                     beta = std::min(beta, candidate.value);
 #if DEBUG_OUTPUT
                     outputBest(node, depth, alpha, beta, maximizingPlayer, bestEval);
