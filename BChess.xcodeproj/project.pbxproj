@@ -248,9 +248,9 @@
 				A7712D451FCBC13100E7E802 /* FBoard.cpp */,
 				A70A61C91FD46E3C00AFDF0E /* FEvaluate.hpp */,
 				A70A61C81FD46E3C00AFDF0E /* FEvaluate.cpp */,
+				A75CB2611FED9693005487BD /* IterativeDeepening.hpp */,
 				A75BFAC61FE8C05E001EE942 /* MinMaxSearch.hpp */,
 				A75A283D1FEC8506003AC5EF /* ChessSearch.hpp */,
-				A75CB2611FED9693005487BD /* IterativeDeepening.hpp */,
 				A75CB2631FEDF011005487BD /* Serialization */,
 			);
 			path = Engine;

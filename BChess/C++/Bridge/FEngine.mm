@@ -135,6 +135,7 @@
 - (FEngineInfo*)infoFor:(ChessEvaluation)info {
     FEngineInfo *ei = [[FEngineInfo alloc] init];
     ei.depth = info.depth;
+    ei.quiescenceDepth = info.quiescenceDepth;
     ei.time = info.time;
     ei.nodeEvaluated = info.nodes;
     ei.movesPerSecond = info.movesPerSecond;
@@ -148,14 +149,8 @@
     ei.toRank = RankFrom(MOVE_TO(bestMove));
     ei.toFile = FileFrom(MOVE_TO(bestMove));
 
-    // For UCI, the value is always from the engine's point of view.
-    // Because the evaluation function always evaluate from WHITE's point of view,
-    // if the engine is playing black, make sure to inverse the value.
-    if (info.engineColor == BLACK) {
-        ei.value = -info.value;
-    } else {
-        ei.value = info.value;
-    }
+    ei.isWhite = info.engineColor == WHITE;
+    ei.value = info.value;
     
     auto bestLine = [NSMutableArray array];
     for (int index=0; index<info.line.count; index++) {
@@ -246,7 +241,7 @@
     FFEN::setFEN(fen, board);
     
     ChessMinMaxSearch alphaBeta;
-    alphaBeta.config.maxDepth = 4;
+    alphaBeta.config.maxDepth = 6;
     alphaBeta.config.debugLog = false;
 
     auto eval = alphaBeta.alphabeta(board, 0, board.color == WHITE);

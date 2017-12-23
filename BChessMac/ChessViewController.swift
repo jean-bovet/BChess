@@ -11,7 +11,6 @@ import Cocoa
 class ChessViewController: NSViewController {
 
     @IBOutlet weak var chessView: BoardView!
-    @IBOutlet weak var infoLabel: NSTextField!
     @IBOutlet weak var stackView: NSStackView!
     @IBOutlet weak var gameInfoScrollView: NSScrollView!
     @IBOutlet var gameInfoTextView: NSTextView!
@@ -35,16 +34,11 @@ class ChessViewController: NSViewController {
     
     func updateUI() {
         chessView.invalidateUI()
-        updateInfoLine()
         updateGameInfo()
     }
     
-    func updateInfoLine() {
-        infoLabel.stringValue = chessView.infoLine
-    }
-    
     func updateGameInfo() {
-        gameInfoTextView.string = engine.pgnFormattedForDisplay()
+        gameInfoTextView.string = chessView.infoLine + "\n" + engine.pgnFormattedForDisplay()
     }
     
     func saveToDefaults() {

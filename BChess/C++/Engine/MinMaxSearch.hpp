@@ -13,6 +13,8 @@
 #include <algorithm>
 #include <iostream>
 
+#define DEBUG_OUTPUT 0
+
 struct Configuration {
     int maxDepth = 4;
     bool debugLog = false;
@@ -37,6 +39,8 @@ public:
     void cancel() {
         analyzing = false;
     }
+
+#if DEBUG_OUTPUT
 
     void outputDebug(Node node, int depth, int alpha, int beta, bool maximizingPlayer) {
         if (config.debugLog) {
@@ -67,7 +71,8 @@ public:
 //            std::cout << "Cut-off (b<=a): " << node.description() << ", d=" << depth << ", a=" << alpha << ", b=" << beta << ", m=" << maximizingPlayer << std::endl;
         }
     }
-
+#endif
+    
     Evaluation alphabeta(Node node, int depth, bool maximizingPlayer) {
         analyzing = true;
         return alphabeta(node, depth, INT_MIN, INT_MAX, maximizingPlayer, false);
@@ -79,18 +84,23 @@ private:
         visitedNodes++;
         
         Evaluation bestEval;
-        bestEval.depth = depth;
+        bestEval.quiescenceDepth = depth;
+        bestEval.depth = config.maxDepth;
         bestEval.nodes = visitedNodes;
         
+#if DEBUG_OUTPUT
         outputEnter(node, depth, alpha, beta, maximizingPlayer);
-
+#endif
+        
         if (quiescence) {
             auto stand_pat = Evaluater::evaluate(node);
             if (maximizingPlayer) {
                 if (stand_pat > alpha) {
                     alpha = stand_pat;
                     if (config.alphaBetaPrunning && beta <= alpha) {
+#if DEBUG_OUTPUT
                         outputCutoff(node, depth, alpha, beta, maximizingPlayer);
+#endif
                         bestEval.value = stand_pat;
                         return bestEval;
                     }
@@ -99,7 +109,9 @@ private:
                 if (stand_pat < beta) {
                     beta = stand_pat;
                     if (config.alphaBetaPrunning && beta <= alpha) {
+#if DEBUG_OUTPUT
                         outputCutoff(node, depth, alpha, beta, maximizingPlayer);
+#endif
                         bestEval.value = stand_pat;
                         return bestEval;
                     }
@@ -111,7 +123,9 @@ private:
                     quiescence = true;
                 } else {
                     bestEval.value = Evaluater::evaluate(node);
+#if DEBUG_OUTPUT
                     outputDebug(node, depth, alpha, beta, maximizingPlayer);
+#endif
                     return bestEval;
                 }
             }
@@ -145,25 +159,33 @@ private:
                     bestEval = candidate;
                     bestEval.insertMove(depth, move);
                     alpha = std::max(alpha, candidate.value);
+#if DEBUG_OUTPUT
                     outputBest(node, depth, alpha, beta, maximizingPlayer, bestEval);
+#endif
                 }
             } else {
                 if (candidate.value < bestEval.value) {
                     bestEval = candidate;
                     bestEval.insertMove(depth, move);
                     beta = std::min(beta, candidate.value);
+#if DEBUG_OUTPUT
                     outputBest(node, depth, alpha, beta, maximizingPlayer, bestEval);
+#endif
                 }
             }
             if (config.alphaBetaPrunning && beta <= alpha) {
+#if DEBUG_OUTPUT
                 outputCutoff(newNode, depth, alpha, beta, maximizingPlayer);
+#endif
                 break; // Beta cut-off
             }
         }
         if (!evaluatedAtLeastOneChild) {
             bestEval.value = Evaluater::evaluate(node, moves);
         }
+#if DEBUG_OUTPUT
         outputReturn(node, depth, alpha, beta, maximizingPlayer, bestEval);
+#endif
         return bestEval;
     }
     

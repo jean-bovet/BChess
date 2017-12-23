@@ -19,6 +19,7 @@
 struct ChessEvaluation {
     MoveList line;
     int value = 0;
+    int quiescenceDepth = 0;
     int depth = 0;
     int time = 0; // TODO
     

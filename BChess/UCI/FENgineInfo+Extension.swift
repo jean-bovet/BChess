@@ -14,7 +14,18 @@ extension FEngineInfo {
     
     var uciInfoMessage: String {
         let lineInfo = bestLine.map { $0 }.joined(separator: " ")
-        return "info depth \(depth) time \(time) nodes \(nodeEvaluated) nps \(movesPerSecond) score cp \(value) pv \(lineInfo)"
+        
+        // For UCI, the value is always from the engine's point of view.
+        // Because the evaluation function always evaluate from WHITE's point of view,
+        // if the engine is playing black, make sure to inverse the value.
+        let uciValue: String
+        if isWhite {
+            uciValue = String(value)
+        } else {
+            uciValue = String(-value)
+        }
+        
+        return "info depth \(depth) time \(time) nodes \(nodeEvaluated) nps \(movesPerSecond) score cp \(uciValue) pv \(lineInfo)"
     }
     
     var uciBestMove: String {

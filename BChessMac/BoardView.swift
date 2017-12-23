@@ -157,14 +157,19 @@ class BoardView: NSView {
     }
     
     var infoLine: String {
-        let infoColorToPlay = self.engine.isWhite() ? "White" : "Black"
+        let infoColorToPlay = engine.isWhite() ? "White" : "Black"
 
         if let info = info {
             let lineInfo = info.bestLine.map { $0 }.joined(separator: " ")
             let infoNodes = self.numberFormatter.string(from: NSNumber(value: info.nodeEvaluated))!
             let infoSpeed = self.numberFormatter.string(from: NSNumber(value: info.movesPerSecond))!
-            let infoValue = info.mat ? "Mat" : "\(info.value)"
-            let infoString = "\(infoColorToPlay) ––  Line: \(lineInfo)   Value: \(infoValue)   Depth: \(info.depth)   Nodes: \(infoNodes) at \(infoSpeed) n/s"
+            let infoValue: String
+            if info.mat {
+                infoValue = "#"
+            } else {
+                infoValue = String(info.value)
+            }
+            let infoString = "\(infoColorToPlay)\nValue: \(infoValue)\nLine: \(lineInfo)\nDepth: \(info.depth)/\(info.quiescenceDepth)\nNodes: \(infoNodes)\nSpeed: \(infoSpeed) n/s"
             return infoString
         } else {
             return "\(infoColorToPlay)"

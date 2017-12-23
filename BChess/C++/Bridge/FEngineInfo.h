@@ -13,8 +13,10 @@
 @property (nonatomic, assign) NSUInteger fromRank, fromFile, toRank, toFile;
 @property (nonatomic, assign) NSUInteger rawMoveValue;
 @property (nonatomic, assign) BOOL mat;
+@property (nonatomic, assign) BOOL isWhite;
 
 @property (nonatomic, assign) NSInteger depth;
+@property (nonatomic, assign) NSInteger quiescenceDepth;
 @property (nonatomic, assign) NSInteger time;
 @property (nonatomic, assign) NSInteger nodeEvaluated;
 @property (nonatomic, assign) NSInteger movesPerSecond;
