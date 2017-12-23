@@ -38,7 +38,7 @@ TEST(Chess, ChessTree) {
     config.quiescenceSearch = false;
 
     config.alphaBetaPrunning = true;
-    assertChessSearch(3251, 0, config); // with alpha-beta prunning
+    assertChessSearch(24177, 0, config); // with alpha-beta prunning
     
     config.alphaBetaPrunning = false;
     assertChessSearch(206604, 0, config); // without alpha-beta

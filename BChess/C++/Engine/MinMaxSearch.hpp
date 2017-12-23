@@ -18,6 +18,7 @@ struct Configuration {
     bool debugLog = false;
     bool alphaBetaPrunning = true;
     bool quiescenceSearch = true;
+    bool sortMoves = true;
 };
 
 template <class Node, class MoveGenerator, class Evaluater, class Evaluation>
@@ -117,7 +118,10 @@ private:
         }
         
         auto moves = MoveGenerator::generateMoves(node);
-
+        if (config.sortMoves) {
+            MoveGenerator::sortMoves(moves);
+        }
+        
         bool evaluatedAtLeastOneChild = false;
         
         bestEval.value = maximizingPlayer ? INT_MIN : INT_MAX;

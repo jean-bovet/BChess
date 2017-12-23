@@ -138,7 +138,7 @@
     ei.time = info.time;
     ei.nodeEvaluated = info.nodes;
     ei.movesPerSecond = info.movesPerSecond;
-    ei.mat = info.value == INT_MAX || info.value == INT_MIN;
+    ei.mat = info.value == ChessEvaluate::MAT_VALUE || info.value == -ChessEvaluate::MAT_VALUE;
 
     Move bestMove = info.bestMove();
     ei.rawMoveValue = bestMove;

@@ -150,6 +150,11 @@ bool testMoveComparison(TestMove i, TestMove j) {
 }
 
 struct TestMoveGenerator {
+    
+    static void sortMoves(TestMoveList & moveList) {
+        std::sort(moveList._moves.begin(), moveList._moves.end(), testMoveComparison);
+    }
+    
     static TestMoveList generateMoves(TestBoard board) {
         TestMoveList moveList;
         for (TestTreeNode child : board.node._children) {
@@ -160,7 +165,6 @@ struct TestMoveGenerator {
             move.ordering = child.ordering;
             moveList.add(move);
         }
-        std::sort(moveList._moves.begin(), moveList._moves.end(), testMoveComparison);
         return moveList;
     }
 };

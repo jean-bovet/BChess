@@ -23,7 +23,9 @@ private:
     static void initKingMoves();
     static void initKnightMoves();
 
-public:        
+public:
+    static void sortMoves(MoveList & moves);
+
     static MoveList generateMoves(Board board, Square specificSquare = SquareUndefined);
     
     static void generateAttackMoves(Board &board, MoveList &moveList, Square fromSquare, Piece attackingPiece, Bitboard attackingSquares);

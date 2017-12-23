@@ -85,13 +85,27 @@ bool moveComparison(Move i, Move j) {
         return false;
     }
     
-    if (MOVE_CAPTURED_PIECE(i) > MOVE_CAPTURED_PIECE(j)) {
+    if (MOVE_IS_CAPTURE(i) && !MOVE_IS_CAPTURE(j)) {
         return true;
-    } else if (MOVE_CAPTURED_PIECE(i) == MOVE_CAPTURED_PIECE(j)) {
-        return MOVE_PIECE(i) > MOVE_PIECE(j);
+    } else if (!MOVE_IS_CAPTURE(i) && MOVE_IS_CAPTURE(j)) {
+        return false;
+    } if (MOVE_IS_CAPTURE(i) && MOVE_IS_CAPTURE(j)) {
+        if (MOVE_CAPTURED_PIECE(i) > MOVE_CAPTURED_PIECE(j)) {
+            return true;
+        } else if (MOVE_CAPTURED_PIECE(i) == MOVE_CAPTURED_PIECE(j)) {
+            return MOVE_PIECE(i) > MOVE_PIECE(j);
+        } else {
+            return false;
+        }
     } else {
         return false;
     }
+}
+
+void ChessMoveGenerator::sortMoves(MoveList & moves) {
+    // Sort the moves according to:
+    // MVV/LVA (Most Valuable Victim/Least Valuable Attacker).
+    std::stable_sort(std::begin(moves._moves), std::begin(moves._moves) + moves.count, moveComparison);
 }
 
 MoveList ChessMoveGenerator::generateMoves(Board board, Square specificSquare) {
@@ -109,10 +123,6 @@ MoveList ChessMoveGenerator::generateMoves(Board board, Square specificSquare) {
     generateSlidingMoves(board, BISHOP, moveList, specificSquare);
     generateSlidingMoves(board, QUEEN, moveList, specificSquare);
     
-    // Sort the moves according to:
-    // MVV/LVA (Most Valuable Victim/Least Valuable Attacker).
-    std::stable_sort(std::begin(moveList._moves), std::begin(moveList._moves) + moveList.count, moveComparison);
-
     return moveList;
 }
 

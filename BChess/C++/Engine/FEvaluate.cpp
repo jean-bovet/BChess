@@ -129,7 +129,7 @@ int ChessEvaluate::evaluate(Board board, MoveList moves) {
     if (moves.count == 0) {
         if (board.isCheck(board.color)) {
             // No moves but a check, that's a mat
-            return board.color == WHITE ? INT_MIN : INT_MAX;
+            return board.color == WHITE ? -MAT_VALUE : MAT_VALUE;
         } else {
             // No moves and not check, that's a draw
             return 0;
