@@ -73,6 +73,8 @@ class UCI {
             
             let secondToken = moveToken.index(start, offsetBy: 2)
             let to = String(moveToken[secondToken...])
+            // http://wbec-ridderkerk.nl/html/UCIProtocol.html
+            // Examples:  e2e4, e7e5, e1g1 (white short castling), e7e8q (for promotion)
             engine.move(from, to: to)
         }
         tokens.removeAll()

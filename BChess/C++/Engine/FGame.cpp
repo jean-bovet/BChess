@@ -14,6 +14,7 @@
 void FGame::reset() {
     moveCursor = 0;
     board.reset();
+    startBoard.reset();
 }
 
 bool FGame::setFEN(std::string fen) {

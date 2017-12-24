@@ -151,7 +151,7 @@ static Rank getRank(char c) {
     return (Rank)(c - '1');
 }
 
-static std::vector<Move> getMatchingMoves(ChessBoard board, Square to, Piece movingPiece, File fromFile, Rank fromRank) {
+static std::vector<Move> getMatchingMoves(ChessBoard board, Square to, Piece movingPiece, Piece promotedPiece, File fromFile, Rank fromRank) {
     ChessMoveGenerator generator;
     auto moveList = generator.generateMoves(board);
     std::vector<Move> matchingMoves;
@@ -164,7 +164,11 @@ static std::vector<Move> getMatchingMoves(ChessBoard board, Square to, Piece mov
         if (MOVE_PIECE(m) != movingPiece) {
             continue;
         }
-        
+
+        if (MOVE_PROMOTION_PIECE(m) != promotedPiece) {
+            continue;
+        }
+
         if (fromFile != FileUndefined && FileFrom(MOVE_FROM(m)) != fromFile) {
             continue;
         }
@@ -285,7 +289,12 @@ Move FPGN::parseMove(std::string pgn, unsigned &cursor, FGame &game, bool &end) 
 
     bool capture = false;
     
-    if (isFile(pgn[cursor]) && isFile(pgn[cursor+1]) && isRank(pgn[cursor+2])) {
+    if (isRank(pgn[cursor]) && isFile(pgn[cursor+1]) && isRank(pgn[cursor+2])) {
+        // R6e4
+        fromRank = getRank(pgn[cursor++]);
+        toFile = getFile(pgn[cursor++]);
+        toRank = getRank(pgn[cursor++]);
+    } else if (isFile(pgn[cursor]) && isFile(pgn[cursor+1]) && isRank(pgn[cursor+2])) {
         // Nbd7
         // Rae8
         
@@ -385,7 +394,7 @@ Move FPGN::parseMove(std::string pgn, unsigned &cursor, FGame &game, bool &end) 
     Square to = SquareFrom(toFile, toRank);
     
     // Now the original square can be not fully defined...
-    auto matchingMoves = getMatchingMoves(game.board, to, movingPiece, fromFile, fromRank);
+    auto matchingMoves = getMatchingMoves(game.board, to, movingPiece, (Piece)0, fromFile, fromRank);
     
     // After matching, one and only one move should be found
     if (matchingMoves.size() == 1) {
@@ -412,6 +421,12 @@ bool FPGN::parseMoveText(std::string pgn, unsigned &cursor, FGame &game, bool &e
     
 //    std::cout << MOVE_DESCRIPTION(whiteMove) << std::endl;
 //    game.board.print();
+    
+    // Did we reach the end now?
+    if (cursor >= pgn.length()) {
+        end = true;
+        return true;
+    }
     
     if (!isSpaceOrNewLine(pgn[cursor++])) {
         // Missing white space or new line
@@ -472,18 +487,18 @@ std::string FPGN::getGame(FGame game, bool newLineAfterEachFullMove) {
         auto piece = MOVE_PIECE(move);
 
         SANType sanType = SANType::full;
-        auto matchingMoves = getMatchingMoves(outputBoard, MOVE_TO(move), piece, FileUndefined, RankUndefined);
+        auto matchingMoves = getMatchingMoves(outputBoard, MOVE_TO(move), piece, MOVE_PROMOTION_PIECE(move), FileUndefined, RankUndefined);
         if (matchingMoves.size() == 1) {
             // Only one matching move, we can use the shortest form for PGN
             // For example: Ne3
             sanType = SANType::tight;
         } else {
-            matchingMoves = getMatchingMoves(outputBoard, MOVE_TO(move), piece, FileFrom(MOVE_FROM(move)), RankUndefined);
+            matchingMoves = getMatchingMoves(outputBoard, MOVE_TO(move), piece, MOVE_PROMOTION_PIECE(move), FileFrom(MOVE_FROM(move)), RankUndefined);
             if (matchingMoves.size() == 1) {
                 // Use the File to specify the move. For example: Nge3
                 sanType = SANType::medium;
             } else {
-                matchingMoves = getMatchingMoves(outputBoard, MOVE_TO(move), piece, FileFrom(MOVE_FROM(move)), RankFrom(MOVE_FROM(move)));
+                matchingMoves = getMatchingMoves(outputBoard, MOVE_TO(move), piece, MOVE_PROMOTION_PIECE(move), FileFrom(MOVE_FROM(move)), RankFrom(MOVE_FROM(move)));
                 if (matchingMoves.size() == 1) {
                     sanType = SANType::full;
                 } else {
