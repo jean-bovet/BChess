@@ -464,7 +464,7 @@ bool FPGN::setGame(std::string pgn, FGame &game) {
 }
 
 std::string FPGN::getGame(FGame game, bool newLineAfterEachFullMove) {
-    FGame outputGame; // Game used to compute the optimum PGN representation for each move
+    ChessBoard outputBoard = game.startBoard; // Game used to compute the optimum PGN representation for each move
     std::string pgn;
     unsigned fullMoveIndex = 0;
     for (size_t index=0; index<game.moveCursor; index++) {
@@ -472,18 +472,18 @@ std::string FPGN::getGame(FGame game, bool newLineAfterEachFullMove) {
         auto piece = MOVE_PIECE(move);
 
         SANType sanType = SANType::full;
-        auto matchingMoves = getMatchingMoves(outputGame.board, MOVE_TO(move), piece, FileUndefined, RankUndefined);
+        auto matchingMoves = getMatchingMoves(outputBoard, MOVE_TO(move), piece, FileUndefined, RankUndefined);
         if (matchingMoves.size() == 1) {
             // Only one matching move, we can use the shortest form for PGN
             // For example: Ne3
             sanType = SANType::tight;
         } else {
-            matchingMoves = getMatchingMoves(outputGame.board, MOVE_TO(move), piece, FileFrom(MOVE_FROM(move)), RankUndefined);
+            matchingMoves = getMatchingMoves(outputBoard, MOVE_TO(move), piece, FileFrom(MOVE_FROM(move)), RankUndefined);
             if (matchingMoves.size() == 1) {
                 // Use the File to specify the move. For example: Nge3
                 sanType = SANType::medium;
             } else {
-                matchingMoves = getMatchingMoves(outputGame.board, MOVE_TO(move), piece, FileFrom(MOVE_FROM(move)), RankFrom(MOVE_FROM(move)));
+                matchingMoves = getMatchingMoves(outputBoard, MOVE_TO(move), piece, FileFrom(MOVE_FROM(move)), RankFrom(MOVE_FROM(move)));
                 if (matchingMoves.size() == 1) {
                     sanType = SANType::full;
                 } else {
@@ -506,10 +506,10 @@ std::string FPGN::getGame(FGame game, bool newLineAfterEachFullMove) {
                 
         pgn += to_string(move, sanType);
         
-        outputGame.move(move);
+        outputBoard.move(move);
         
         // Now is that move doing a check?
-        if (outputGame.board.isCheck(outputGame.board.color)) {
+        if (outputBoard.isCheck(outputBoard.color)) {
             pgn += "+";
         }
     }

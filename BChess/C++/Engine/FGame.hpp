@@ -21,6 +21,8 @@ public:
     };
     
     ChessBoard board;
+    ChessBoard startBoard;
+    
     std::vector<Move> moves;
     size_t moveCursor = 0;
 

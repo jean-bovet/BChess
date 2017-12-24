@@ -18,7 +18,12 @@ void FGame::reset() {
 
 bool FGame::setFEN(std::string fen) {
     moveCursor = 0;
-    return FFEN::setFEN(fen, board);
+    if (FFEN::setFEN(fen, board)) {
+        startBoard = board;
+        return true;
+    } else {
+        return false;
+    }
 }
 
 std::string FGame::getFEN() {

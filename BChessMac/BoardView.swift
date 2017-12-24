@@ -42,7 +42,11 @@ class BoardView: NSView {
         case human
     }
     
-    var playAgainstComputer : PlayAgainst = .black
+    var playAgainstComputer : PlayAgainst = .black {
+        didSet {
+            playEngineIfPossible()
+        }
+    }
     
     var boardSquareSize: CGFloat = 0
     var boardSquareDX: CGFloat = 0
@@ -105,6 +109,15 @@ class BoardView: NSView {
         }
     }
     
+    func playEngineIfPossible() {
+        if engine.isWhite() && playAgainstComputer == .white {
+            enginePlay()
+        }
+        if !engine.isWhite() && playAgainstComputer == .black {
+            enginePlay()
+        }
+    }
+    
     // MARK: Actions
     
     @objc func pieceSquareViewTapped(sender: NSClickGestureRecognizer) {
@@ -114,12 +127,7 @@ class BoardView: NSView {
                 engine.move(view.move!.rawMoveValue)
                 clearAllViewIndicators()
                 invalidateUI()
-                if engine.isWhite() && playAgainstComputer == .white {
-                    enginePlay()
-                }
-                if !engine.isWhite() && playAgainstComputer == .black {
-                    enginePlay()
-                }
+                playEngineIfPossible()
             } else if view.selected {
                 clearAllViewIndicators()
                 self.needsLayout = true
