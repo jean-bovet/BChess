@@ -9,7 +9,7 @@
 import Foundation
 
 let uci = UCI()
-//uci.performance()
-uci.run()
+uci.performance()
+//uci.run()
 
 
