@@ -41,7 +41,6 @@
 		A75359CF1FDE4385008D1DEE /* PieceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A75359CE1FDE4385008D1DEE /* PieceView.swift */; };
 		A75683291FCD28A000CF1408 /* FEngine.mm in Sources */ = {isa = PBXBuildFile; fileRef = A75683281FCD28A000CF1408 /* FEngine.mm */; };
 		A756832D1FD0B3FE00CF1408 /* magicmoves.c in Sources */ = {isa = PBXBuildFile; fileRef = A7712D411FCB97A900E7E802 /* magicmoves.c */; };
-		A75A283B1FEC743E003AC5EF /* SearchChessTests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A7E490E41FEA1C0600970EAD /* SearchChessTests.cpp */; };
 		A75A283F1FECD7DD003AC5EF /* FEngine.mm in Sources */ = {isa = PBXBuildFile; fileRef = A75683281FCD28A000CF1408 /* FEngine.mm */; };
 		A75CB25B1FED8F2C005487BD /* MoveTests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A75CB25A1FED8F2B005487BD /* MoveTests.cpp */; };
 		A75CB25D1FED8F82005487BD /* EvaluationTests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A75CB25C1FED8F82005487BD /* EvaluationTests.cpp */; };
@@ -60,7 +59,6 @@
 		A7E490EB1FEA207100970EAD /* gtest-all.cc in Sources */ = {isa = PBXBuildFile; fileRef = A7E490EA1FEA207100970EAD /* gtest-all.cc */; };
 		A7E490EC1FEA23DD00970EAD /* PGNTests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A77372041FE340780001A90F /* PGNTests.cpp */; };
 		A7E490ED1FEA29B900970EAD /* GamesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7712D321FC8957500E7E802 /* GamesTests.swift */; };
-		A7E490EE1FEA2A7000970EAD /* BestMoveTests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A70A61BD1FD3196400AFDF0E /* BestMoveTests.cpp */; };
 		A7E490F21FEA2E7E00970EAD /* GoogleTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = A7E490F11FEA2E7E00970EAD /* GoogleTests.mm */; };
 		A7E490F41FEA2F0F00970EAD /* SearchSyntheticTests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A7E490E51FEA1C0600970EAD /* SearchSyntheticTests.cpp */; };
 /* End PBXBuildFile section */
@@ -609,11 +607,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				A75CB25B1FED8F2C005487BD /* MoveTests.cpp in Sources */,
-				A75A283B1FEC743E003AC5EF /* SearchChessTests.cpp in Sources */,
 				A70A61DD1FD4D49500AFDF0E /* FFEN.cpp in Sources */,
 				A7712D341FC895D100E7E802 /* UCI.swift in Sources */,
 				A70A61DA1FD4D49500AFDF0E /* ChessBoard.cpp in Sources */,
-				A7E490EE1FEA2A7000970EAD /* BestMoveTests.cpp in Sources */,
 				A75CB25D1FED8F82005487BD /* EvaluationTests.cpp in Sources */,
 				A7E490EC1FEA23DD00970EAD /* PGNTests.cpp in Sources */,
 				A7E490ED1FEA29B900970EAD /* GamesTests.swift in Sources */,

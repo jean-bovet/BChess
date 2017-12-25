@@ -20,7 +20,7 @@
 @end
 
 @interface FEngine () {
-    IterativeDeepening<ChessBoard, ChessMoveGenerator, ChessEvaluater, ChessEvaluation> iterativeSearch;
+    IterativeDeepening<ChessBoard, ChessMoveGenerator, Move, ChessEvaluater, ChessEvaluation> iterativeSearch;
     FGame currentGame;
 }
 

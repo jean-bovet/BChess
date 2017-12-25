@@ -61,56 +61,46 @@ struct TestTreeNode {
         }
     }
     
-    TestTreeNode getNode(std::vector<int> atIndexes) {
-        if (atIndexes.empty()) {
-            return *this;
-        }
-        int index = atIndexes.front();
-        atIndexes.erase(atIndexes.begin());
-        return _children[index-1].getNode(atIndexes);
-    }
-    
 };
 
 struct TestMove {
-    std::vector<int> fromIndexes;
-    std::vector<int> toIndexes;
+    int index = 0;
     int ordering = 0;
     bool quiet = false;
 };
 
 struct TestMoveList {
-    std::vector<TestMove> moves;
+    TestMove moves[256];
     int count = 0;
     
     void add(TestMove move) {
-        moves.push_back(move);
-        count = (int)moves.size();
+        moves[count] = move;
+        count++;
     }
     
     void insertMove(int index, TestMove move) {
-        
+        moves[index] = move;
+        count = index + 1;
     }
 };
 
 struct TestBoard {
-    TestTreeNode rootNode;
-    TestTreeNode node;
+    TestTreeNode *node = nullptr;
     
     void move(TestMove move) {
-        node = rootNode.getNode(move.toIndexes);
+        node = &node->_children[move.index - 1];
     }
     
     std::string description() {
         std::string text;
-        for (auto pi : node.indexes) {
+        for (auto pi : node->indexes) {
             if (!text.empty()) {
                 text += ".";
             }
             text += std::to_string(pi);
         }
         text += "[";
-        text += std::to_string(node.value);
+        text += std::to_string(node->value);
         text += "]";
         return text;
     }
@@ -119,11 +109,11 @@ struct TestBoard {
 
 struct TestEvaluater {
     static int evaluate(TestBoard board) {
-        return board.node.value;
+        return board.node->value;
     }
 
     static int evaluate(TestBoard board, TestMoveList moves) {
-        return board.node.value;
+        return evaluate(board);
     }
 
     static bool isQuiet(TestMove move) {
@@ -140,6 +130,10 @@ struct TestEvaluation {
     int nodes = 0;
     bool mat = false;
     bool cancelled = false;
+    
+    void add(int depth, TestMove move) {
+        line.insertMove(depth, move);
+    }
 };
 
 bool testMoveComparison(TestMove i, TestMove j) {
@@ -149,15 +143,16 @@ bool testMoveComparison(TestMove i, TestMove j) {
 struct TestMoveGenerator {
     
     static void sortMoves(TestMoveList & moveList) {
-        std::sort(moveList.moves.begin(), moveList.moves.end(), testMoveComparison);
+        std::sort(std::begin(moveList.moves), std::begin(moveList.moves)+moveList.count, testMoveComparison);
     }
     
     static TestMoveList generateMoves(TestBoard board) {
         TestMoveList moveList;
-        for (TestTreeNode child : board.node._children) {
+        for (int index=0; index<board.node->_children.size(); index++) {
+            TestTreeNode child = board.node->_children[index];
+            
             TestMove move;
-            move.fromIndexes = board.node.indexes;
-            move.toIndexes = child.indexes;
+            move.index = index+1;
             move.quiet = child.quiet;
             move.ordering = child.ordering;
             moveList.add(move);
@@ -166,19 +161,21 @@ struct TestMoveGenerator {
     }
 };
 
-static void assertAlphaBeta(MinMaxSearch<TestBoard, TestMoveGenerator, TestEvaluater, TestEvaluation> alphaBeta, TestTreeNode rootNode, int expectedVisitedNodes, int expectedValue) {
+static void assertAlphaBeta(MinMaxSearch<TestBoard, TestMoveGenerator, TestMove, TestEvaluater, TestEvaluation> alphaBeta, TestTreeNode rootNode, int expectedVisitedNodes, int expectedValue, std::vector<int> expectedPV) {
     alphaBeta.reset();
-    
-    alphaBeta.config.maxDepth = 4;
-    
+        
     TestBoard board;
-    board.rootNode = rootNode;
-    board.node = rootNode;
+    board.node = &rootNode;
     
-    auto eval = alphaBeta.alphabeta(board, 0, true);
-    std::cout << alphaBeta.visitedNodes << " => " << eval.value << std::endl;
-    ASSERT_EQ(alphaBeta.visitedNodes, expectedVisitedNodes);
-    ASSERT_EQ(eval.value, expectedValue);
+    TestEvaluation pv;
+    int eval = alphaBeta.alphabeta(board, 0, true, pv);
+//    std::cout << alphaBeta.visitedNodes << " => " << eval << std::endl;
+    ASSERT_EQ(expectedValue, eval);
+    ASSERT_EQ(expectedVisitedNodes, alphaBeta.visitedNodes);
+    ASSERT_EQ(expectedPV.size(), pv.line.count);
+    for (int index=0; index<expectedPV.size(); index++) {
+        ASSERT_EQ(expectedPV[index], pv.line.moves[index].index);
+    }
 }
 
 static void configureTree(TestTreeNode &rootNode) {
@@ -206,8 +203,9 @@ static void configureTree(TestTreeNode &rootNode) {
     rootNode.setValue({ 3, 2, 2, 1 }, 6);
 }
 
-static MinMaxSearch<TestBoard, TestMoveGenerator, TestEvaluater, TestEvaluation> defaultMinMaxSearch() {
-    MinMaxSearch<TestBoard, TestMoveGenerator, TestEvaluater, TestEvaluation> alphaBeta;
+static MinMaxSearch<TestBoard, TestMoveGenerator, TestMove, TestEvaluater, TestEvaluation> defaultMinMaxSearch() {
+    MinMaxSearch<TestBoard, TestMoveGenerator, TestMove, TestEvaluater, TestEvaluation> alphaBeta;
+    alphaBeta.config.maxDepth = 4; // That's the height of the tree
     return alphaBeta;
 }
 
@@ -215,17 +213,18 @@ static MinMaxSearch<TestBoard, TestMoveGenerator, TestEvaluater, TestEvaluation>
 
 TEST(Synthetic, AlphaBetaCutoff) {
     auto search = defaultMinMaxSearch();
-
+    search.config.quiescenceSearch = false;
+    
     TestTreeNode rootNode;
 
     configureTree(rootNode);
     
     // Test with alpha-beta enabled (some nodes are skipped)
-    assertAlphaBeta(search, rootNode, 25, 6);
+    assertAlphaBeta(search, rootNode, 24, 6, { 2, 1, 1, 1 });
     
     // Test with alpha-beta disabled (all the nodes are analyzed)
     search.config.alphaBetaPrunning = false;
-    assertAlphaBeta(search, rootNode, 33, 6);
+    assertAlphaBeta(search, rootNode, 32, 6, { 2, 1, 1, 1 });
 }
 
 TEST(Synthetic, SortedNodes) {
@@ -242,7 +241,7 @@ TEST(Synthetic, SortedNodes) {
     rootNode.setOrdering({ 1 }, 2);
     rootNode.setOrdering({ 3 }, 3);
 
-    assertAlphaBeta(search, rootNode, 21, 6);
+    assertAlphaBeta(search, rootNode, 20, 6, { 2, 1, 1, 1 });
 }
 
 TEST(Synthetic, QuiescenceSearch) {
@@ -257,19 +256,19 @@ TEST(Synthetic, QuiescenceSearch) {
     rootNode.setQuiet({ 2, 1, 1, 1 }, false); // change this node to a non-quiet node
     rootNode.setQuiet({ 2, 1, 2, 1 }, false); // change this node to a non-quiet node
     
-    rootNode.setValue({ 2, 1, 1, 1, 1 }, 2);
+    rootNode.setValue({ 2, 1, 1, 1, 1 }, 12); // must be better than 6
     rootNode.setQuiet({ 2, 1, 1, 1, 1 }, false); // non-quiet node (it has been reached by a non-quiet move)
 
-    rootNode.setValue({ 2, 1, 2, 1, 1 }, 9);
+    rootNode.setValue({ 2, 1, 2, 1, 1 }, 8); // must be better than 6
     rootNode.setQuiet({ 2, 1, 2, 1, 1 }, false); // change this node to a non-quiet node so the algorithm will continue it's quiescence search for the two following nodes
 
-    rootNode.setValue({ 2, 1, 2, 1, 1, 1 }, 3);
+    rootNode.setValue({ 2, 1, 2, 1, 1, 1 }, 3); // must be lower than 7
     rootNode.setQuiet({ 2, 1, 2, 1, 1, 1 }, false); // non-quiet node (it has been reached by a non-quiet move)
 
-    rootNode.setValue({ 2, 1, 2, 1, 1, 2 }, 4);
+    rootNode.setValue({ 2, 1, 2, 1, 1, 2 }, 4); // must be lower than 7
     rootNode.setQuiet({ 2, 1, 2, 1, 1, 2 }, false); // non-quiet node (it has been reached by a non-quiet move)
 
-    // The best value is now 5 instead of 6
-    assertAlphaBeta(search, rootNode, 29, 5);
+    // The best value is now 7 instead of 6
+    assertAlphaBeta(search, rootNode, 26, 7, { 2, 2, 1, 1 });
 }
 
