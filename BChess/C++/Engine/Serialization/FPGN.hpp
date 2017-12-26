@@ -31,5 +31,8 @@ public:
     static bool parseMoveText(std::string pgn, unsigned &cursor, FGame &game, bool &end);
     
     static bool setGame(std::string pgn, FGame &game);
-    static std::string getGame(FGame game, bool newLineAfterEachFullMove = false);
+    
+    // compact: true to return a compact form of PGN for display in the UI. For example: "Na3 Bxc4 e5+"
+    // fromIndex: the index from which to start building the PGN. Used to display a line from a game.
+    static std::string getGame(FGame game, bool newLineAfterEachFullMove = false, bool compact = false, int fromIndex = 0);
 };

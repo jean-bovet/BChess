@@ -79,6 +79,7 @@ public:
                     evaluation.line.push(pv.moves[index]);
                 }
                 evaluation.depth = pv.depth;
+                evaluation.quiescenceDepth = pv.qsDepth;
                 evaluation.value = pv.value;
                 evaluation.nodes = minMaxSearch.visitedNodes;
                 evaluation.time = int(moveClock.elapsedMilli()/1e3);

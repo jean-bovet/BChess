@@ -10,18 +10,22 @@
 
 @interface FEngineInfo : NSObject
 
-@property (nonatomic, assign) NSUInteger fromRank, fromFile, toRank, toFile;
-@property (nonatomic, assign) NSUInteger rawMoveValue;
-@property (nonatomic, assign) BOOL mat;
-@property (nonatomic, assign) BOOL isWhite;
+@property (nonatomic, assign, readonly) NSUInteger fromRank, fromFile, toRank, toFile;
 
-@property (nonatomic, assign) NSInteger depth;
-@property (nonatomic, assign) NSInteger quiescenceDepth;
-@property (nonatomic, assign) NSInteger time;
-@property (nonatomic, assign) NSInteger nodeEvaluated;
-@property (nonatomic, assign) NSInteger movesPerSecond;
+@property (nonatomic, assign, readonly) NSUInteger bestMove;
 
-@property (nonatomic, assign) NSInteger value;
-@property (nonatomic, retain) NSArray<NSString*> *bestLine;
+@property (nonatomic, assign, readonly) BOOL mat;
+@property (nonatomic, assign, readonly) BOOL isWhite;
+
+@property (nonatomic, assign, readonly) NSInteger depth;
+@property (nonatomic, assign, readonly) NSInteger quiescenceDepth;
+@property (nonatomic, assign, readonly) NSInteger time;
+@property (nonatomic, assign, readonly) NSInteger nodeEvaluated;
+@property (nonatomic, assign, readonly) NSInteger movesPerSecond;
+
+@property (nonatomic, assign, readonly) NSInteger value;
+
+- (NSString* _Nullable)bestMove:(BOOL)uci;
+- (NSString* _Nonnull)bestLine:(BOOL)uci;
 
 @end

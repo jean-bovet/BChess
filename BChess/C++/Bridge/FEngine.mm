@@ -7,6 +7,7 @@
 //
 
 #import "FEngine.h"
+#import "FEngineInfo+Private.h"
 #import "FGame.hpp"
 #import "ChessBoard.hpp"
 #import "FFEN.hpp"
@@ -134,30 +135,8 @@
 
 - (FEngineInfo*)infoFor:(ChessEvaluation)info {
     FEngineInfo *ei = [[FEngineInfo alloc] init];
-    ei.depth = info.depth;
-    ei.quiescenceDepth = info.quiescenceDepth;
-    ei.time = info.time;
-    ei.nodeEvaluated = info.nodes;
-    ei.movesPerSecond = info.movesPerSecond;
-    ei.mat = info.value == ChessEvaluater::MAT_VALUE || info.value == -ChessEvaluater::MAT_VALUE;
-
-    Move bestMove = info.line.bestMove();
-    ei.rawMoveValue = bestMove;
-
-    ei.fromRank = RankFrom(MOVE_FROM(bestMove));
-    ei.fromFile = FileFrom(MOVE_FROM(bestMove));
-    ei.toRank = RankFrom(MOVE_TO(bestMove));
-    ei.toFile = FileFrom(MOVE_TO(bestMove));
-
-    ei.isWhite = info.engineColor == WHITE;
-    ei.value = info.value;
-    
-    auto bestLine = [NSMutableArray array];
-    for (int index=0; index<info.line.count; index++) {
-        Move move = info.line.moves[index];
-        [bestLine addObject:[NSString stringWithUTF8String:FPGN::to_string(move, FPGN::SANType::uci).c_str()]];
-    }
-    ei.bestLine = bestLine;
+    ei.info = info;
+    ei.game = currentGame;
     return ei;
 }
 

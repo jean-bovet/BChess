@@ -167,7 +167,7 @@ class BoardView: NSView {
         let infoColorToPlay = engine.isWhite() ? "White" : "Black"
 
         if let info = info {
-            let lineInfo = info.bestLine.map { $0 }.joined(separator: " ")
+            let lineInfo = info.bestLine(false)
             let infoNodes = self.numberFormatter.string(from: NSNumber(value: info.nodeEvaluated))!
             let infoSpeed = self.numberFormatter.string(from: NSNumber(value: info.movesPerSecond))!
             let infoValue: String
@@ -198,7 +198,7 @@ class BoardView: NSView {
         }, completionHandler:{
             self.animation = false
             targetPieceView.alphaValue = 1.0
-            self.engine.move(info.rawMoveValue)
+            self.engine.move(info.bestMove)
         })
     }
     

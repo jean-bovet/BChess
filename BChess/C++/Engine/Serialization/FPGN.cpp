@@ -478,7 +478,7 @@ bool FPGN::setGame(std::string pgn, FGame &game) {
     return true;
 }
 
-std::string FPGN::getGame(FGame game, bool newLineAfterEachFullMove) {
+std::string FPGN::getGame(FGame game, bool newLineAfterEachFullMove, bool compact, int fromIndex) {
     ChessBoard outputBoard = game.startBoard; // Game used to compute the optimum PGN representation for each move
     std::string pgn;
     unsigned fullMoveIndex = 0;
@@ -486,6 +486,10 @@ std::string FPGN::getGame(FGame game, bool newLineAfterEachFullMove) {
         auto move = game.moves[index];
         auto piece = MOVE_PIECE(move);
 
+        if (index == fromIndex) {
+            pgn = "";
+        }
+        
         SANType sanType = SANType::full;
         auto matchingMoves = getMatchingMoves(outputBoard, MOVE_TO(move), piece, MOVE_PROMOTION_PIECE(move), FileUndefined, RankUndefined);
         if (matchingMoves.size() == 1) {
@@ -516,7 +520,9 @@ std::string FPGN::getGame(FGame game, bool newLineAfterEachFullMove) {
             if (newLineAfterEachFullMove) {
                 pgn += "\n";
             }
-            pgn += std::to_string(fullMoveIndex) + ". ";
+            if (!compact) {
+                pgn += std::to_string(fullMoveIndex) + ". ";
+            }
         }
                 
         pgn += to_string(move, sanType);
@@ -527,6 +533,10 @@ std::string FPGN::getGame(FGame game, bool newLineAfterEachFullMove) {
         if (outputBoard.isCheck(outputBoard.color)) {
             pgn += "+";
         }
+    }
+    
+    if (compact) {
+        return pgn;
     }
     
     pgn += " ";

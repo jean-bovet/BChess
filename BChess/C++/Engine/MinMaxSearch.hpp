@@ -28,12 +28,15 @@ struct MinMaxVariation {
     TMoveList moves;
     
     int depth = 0;
+    int qsDepth = 0;
+    
     int value = 0;
 
     void push(int score, TMove move, MinMaxVariation<TMoveList, TMove> line) {
         value = score;
         
-        depth = line.depth;
+        depth = std::max(depth, line.depth);
+        qsDepth = line.qsDepth;
         
         moves.count = 0;
         moves.push(move);
@@ -125,7 +128,7 @@ private:
     }
     
     int quiescence(TNode node, int depth, int alpha, int beta, int color, Variation &pv, Variation &cv) {
-        pv.depth = depth;
+        pv.qsDepth = depth;
         
         auto stand_pat = TNodeEvaluater::evaluate(node) * color;
         if (stand_pat >= beta) {

@@ -11,8 +11,8 @@
 		A70A61C41FD458DE00AFDF0E /* ChessMoveGenerator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A70A61C21FD458DE00AFDF0E /* ChessMoveGenerator.cpp */; };
 		A70A61C61FD4592700AFDF0E /* FMoveList.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A70A61C51FD4592700AFDF0E /* FMoveList.cpp */; };
 		A70A61CA1FD46E3C00AFDF0E /* ChessEvaluater.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A70A61C81FD46E3C00AFDF0E /* ChessEvaluater.cpp */; };
-		A70A61D11FD4AA9600AFDF0E /* FEngineInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = A70A61D01FD4AA9600AFDF0E /* FEngineInfo.m */; };
-		A70A61D51FD4D42100AFDF0E /* FEngineInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = A70A61D01FD4AA9600AFDF0E /* FEngineInfo.m */; };
+		A70A61D11FD4AA9600AFDF0E /* FEngineInfo.mm in Sources */ = {isa = PBXBuildFile; fileRef = A70A61D01FD4AA9600AFDF0E /* FEngineInfo.mm */; };
+		A70A61D51FD4D42100AFDF0E /* FEngineInfo.mm in Sources */ = {isa = PBXBuildFile; fileRef = A70A61D01FD4AA9600AFDF0E /* FEngineInfo.mm */; };
 		A70A61D81FD4D49500AFDF0E /* FMoveList.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A70A61C51FD4592700AFDF0E /* FMoveList.cpp */; };
 		A70A61D91FD4D49500AFDF0E /* ChessMoveGenerator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A70A61C21FD458DE00AFDF0E /* ChessMoveGenerator.cpp */; };
 		A70A61DA1FD4D49500AFDF0E /* ChessBoard.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A7712D451FCBC13100E7E802 /* ChessBoard.cpp */; };
@@ -30,7 +30,7 @@
 		A75359B11FDE0947008D1DEE /* BChessMacUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A75359B01FDE0947008D1DEE /* BChessMacUITests.swift */; };
 		A75359BF1FDE0E3B008D1DEE /* BoardSquareView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A75359BE1FDE0E3B008D1DEE /* BoardSquareView.swift */; };
 		A75359C31FDE4023008D1DEE /* FENgineInfo+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = A75359831FDC51B2008D1DEE /* FENgineInfo+Extension.swift */; };
-		A75359C41FDE4031008D1DEE /* FEngineInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = A70A61D01FD4AA9600AFDF0E /* FEngineInfo.m */; };
+		A75359C41FDE4031008D1DEE /* FEngineInfo.mm in Sources */ = {isa = PBXBuildFile; fileRef = A70A61D01FD4AA9600AFDF0E /* FEngineInfo.mm */; };
 		A75359C51FDE4031008D1DEE /* FEngine.mm in Sources */ = {isa = PBXBuildFile; fileRef = A75683281FCD28A000CF1408 /* FEngine.mm */; };
 		A75359C61FDE4031008D1DEE /* magicmoves.c in Sources */ = {isa = PBXBuildFile; fileRef = A7712D411FCB97A900E7E802 /* magicmoves.c */; };
 		A75359C71FDE4038008D1DEE /* FMoveList.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A70A61C51FD4592700AFDF0E /* FMoveList.cpp */; };
@@ -109,7 +109,7 @@
 		A70A61C81FD46E3C00AFDF0E /* ChessEvaluater.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ChessEvaluater.cpp; sourceTree = "<group>"; };
 		A70A61C91FD46E3C00AFDF0E /* ChessEvaluater.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = ChessEvaluater.hpp; sourceTree = "<group>"; };
 		A70A61CF1FD4AA9600AFDF0E /* FEngineInfo.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FEngineInfo.h; sourceTree = "<group>"; };
-		A70A61D01FD4AA9600AFDF0E /* FEngineInfo.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FEngineInfo.m; sourceTree = "<group>"; };
+		A70A61D01FD4AA9600AFDF0E /* FEngineInfo.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = FEngineInfo.mm; sourceTree = "<group>"; };
 		A7460F001FDF2465002B0740 /* BoardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoardView.swift; sourceTree = "<group>"; };
 		A75359831FDC51B2008D1DEE /* FENgineInfo+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FENgineInfo+Extension.swift"; sourceTree = "<group>"; };
 		A75359871FDCF8D6008D1DEE /* FBitboard.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = FBitboard.hpp; sourceTree = "<group>"; };
@@ -155,6 +155,7 @@
 		A7AFCCA61FB4E40D00AE3D85 /* BChess */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = BChess; sourceTree = BUILT_PRODUCTS_DIR; };
 		A7AFCCA91FB4E40D00AE3D85 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		A7B18F571FD9BAE500A605B8 /* MovesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MovesTests.swift; sourceTree = "<group>"; };
+		A7B1B0F41FF2D97300EAF157 /* FEngineInfo+Private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "FEngineInfo+Private.h"; sourceTree = "<group>"; };
 		A7E490E41FEA1C0600970EAD /* SearchChessTests.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SearchChessTests.cpp; sourceTree = "<group>"; };
 		A7E490E51FEA1C0600970EAD /* SearchSyntheticTests.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SearchSyntheticTests.cpp; sourceTree = "<group>"; };
 		A7E490EA1FEA207100970EAD /* gtest-all.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "gtest-all.cc"; path = "BChessTests/Helper/gtest-all.cc"; sourceTree = SOURCE_ROOT; };
@@ -206,7 +207,8 @@
 			isa = PBXGroup;
 			children = (
 				A70A61CF1FD4AA9600AFDF0E /* FEngineInfo.h */,
-				A70A61D01FD4AA9600AFDF0E /* FEngineInfo.m */,
+				A7B1B0F41FF2D97300EAF157 /* FEngineInfo+Private.h */,
+				A70A61D01FD4AA9600AFDF0E /* FEngineInfo.mm */,
 				A75683271FCD28A000CF1408 /* FEngine.h */,
 				A75683281FCD28A000CF1408 /* FEngine.mm */,
 			);
@@ -585,7 +587,7 @@
 				A75359CC1FDE4038008D1DEE /* FFEN.cpp in Sources */,
 				A75359C51FDE4031008D1DEE /* FEngine.mm in Sources */,
 				A75359C91FDE4038008D1DEE /* ChessBoard.cpp in Sources */,
-				A75359C41FDE4031008D1DEE /* FEngineInfo.m in Sources */,
+				A75359C41FDE4031008D1DEE /* FEngineInfo.mm in Sources */,
 				A75359C81FDE4038008D1DEE /* ChessMoveGenerator.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -620,7 +622,7 @@
 				A77372031FE334BB0001A90F /* FPGN.cpp in Sources */,
 				A70A61DE1FD4D49F00AFDF0E /* magicmoves.c in Sources */,
 				A75359851FDC994E008D1DEE /* FENgineInfo+Extension.swift in Sources */,
-				A70A61D51FD4D42100AFDF0E /* FEngineInfo.m in Sources */,
+				A70A61D51FD4D42100AFDF0E /* FEngineInfo.mm in Sources */,
 				A7E490F21FEA2E7E00970EAD /* GoogleTests.mm in Sources */,
 				A7EF55C91FF1CF77004CF2DA /* BestMoveTests.cpp in Sources */,
 				A7EF55CA1FF1D8C2004CF2DA /* SearchSyntheticTests.cpp in Sources */,
@@ -651,7 +653,7 @@
 				A77371FE1FE31FEF0001A90F /* FGame.cpp in Sources */,
 				A70A61CA1FD46E3C00AFDF0E /* ChessEvaluater.cpp in Sources */,
 				A70A61C41FD458DE00AFDF0E /* ChessMoveGenerator.cpp in Sources */,
-				A70A61D11FD4AA9600AFDF0E /* FEngineInfo.m in Sources */,
+				A70A61D11FD4AA9600AFDF0E /* FEngineInfo.mm in Sources */,
 				A70A61C61FD4592700AFDF0E /* FMoveList.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

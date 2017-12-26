@@ -13,7 +13,7 @@ let StartPosFEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
 extension FEngineInfo {
     
     var uciInfoMessage: String {
-        let lineInfo = bestLine.map { $0 }.joined(separator: " ")
+        let lineInfo = bestLine(true)
         
         // For UCI, the value is always from the engine's point of view.
         // Because the evaluation function always evaluate from WHITE's point of view,
@@ -25,14 +25,16 @@ extension FEngineInfo {
             uciValue = String(-value)
         }
         
-        return "info depth \(depth) time \(time) nodes \(nodeEvaluated) nps \(movesPerSecond) score cp \(uciValue) pv \(lineInfo)"
+        let totalDepth = max(depth, quiescenceDepth)
+        
+        return "info depth \(totalDepth) time \(time) nodes \(nodeEvaluated) nps \(movesPerSecond) score cp \(uciValue) pv \(lineInfo)"
     }
     
     var uciBestMove: String {
-        if bestLine.isEmpty {
-            return "bestmove ??"
+        if let move = bestMove(true) {
+            return "bestmove \(move)"
         } else {
-            return "bestmove \(bestLine[0])"
+            return "bestmove ??"
         }
     }
 }
