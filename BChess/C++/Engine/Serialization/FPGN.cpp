@@ -529,9 +529,15 @@ std::string FPGN::getGame(FGame game, bool newLineAfterEachFullMove, bool compac
         
         outputBoard.move(move);
         
-        // Now is that move doing a check?
+        // Determine if the position is check or mate
         if (outputBoard.isCheck(outputBoard.color)) {
-            pgn += "+";
+            ChessMoveGenerator generator;
+            auto moveList = generator.generateMoves(outputBoard);
+            if (moveList.count == 0) {
+                pgn += "#";
+            } else {
+                pgn += "+";
+            }
         }
     }
     

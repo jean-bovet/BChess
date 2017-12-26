@@ -167,6 +167,14 @@ class MovesTests: XCTestCase {
             ], "e8"
         )
     }
+    
+    func testBlackKingCannotCastleBecauseInCheck() {
+        assertMoves("r3kb1r/pp2pQpp/n7/qNn1N3/8/P7/1PP2PPP/R1B1R1K1 b kq - 0 15",
+                    [
+                        "r2k1b1r/pp2pQpp/n7/qNn1N3/8/P7/1PP2PPP/R1B1R1K1 w - - 1 16", // King to d8 it's only possible move
+            ], "e8"
+        )
+    }
 
     func testWhitePawnPromotion() {
         assertMoves("4k3/6P1/8/8/8/8/8/4K3 w - - 0 2", [

@@ -248,7 +248,7 @@ void ChessMoveGenerator::generateKingsMoves(ChessBoard &board, MoveList &moveLis
         
         // Generate all legal casting moves. Note that we only generate the move for the king,
         // the board is going to move the rook in move() when it detects a castling move.
-        if (board.color == WHITE && square == e1) {
+        if (board.color == WHITE && square == e1 && !board.isCheck(board.color)) {
             if (board.whiteCanCastleKingSide) {
                 Bitboard kingMoves = 1 << (square+1) | 1 << (square+2);
                 if ((kingMoves & emptySquares) == kingMoves && !board.isAttacked(square+1, otherColor) && !board.isAttacked(square+2, otherColor)) {
@@ -262,7 +262,7 @@ void ChessMoveGenerator::generateKingsMoves(ChessBoard &board, MoveList &moveLis
                 }
             }
         }
-        if (board.color == BLACK && square == e8) {
+        if (board.color == BLACK && square == e8 && !board.isCheck(board.color)) {
             if (board.blackCanCastleKingSide) {
                 Bitboard kingMoves = 1UL << (square+1) | 1UL << (square+2);
                 if ((kingMoves & emptySquares) == kingMoves && !board.isAttacked(square+1, otherColor) && !board.isAttacked(square+2, otherColor)) {

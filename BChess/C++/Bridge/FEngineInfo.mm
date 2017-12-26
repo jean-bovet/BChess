@@ -43,7 +43,7 @@
     return self.info.engineColor == WHITE;
 }
 
-- (BOOL)isMat {
+- (BOOL)mat {
     return self.value == ChessEvaluater::MAT_VALUE || self.value == -ChessEvaluater::MAT_VALUE;
 }
 
