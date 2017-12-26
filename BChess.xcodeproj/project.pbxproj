@@ -160,6 +160,7 @@
 		A7E490EA1FEA207100970EAD /* gtest-all.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "gtest-all.cc"; path = "BChessTests/Helper/gtest-all.cc"; sourceTree = SOURCE_ROOT; };
 		A7E490F11FEA2E7E00970EAD /* GoogleTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = GoogleTests.mm; sourceTree = "<group>"; };
 		A7EF55C71FEF17A1004CF2DA /* ChessEngine.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = ChessEngine.hpp; sourceTree = "<group>"; };
+		A7EF55CB1FF22FE7004CF2DA /* MinMaxMoveList.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = MinMaxMoveList.hpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -243,6 +244,7 @@
 				A7712D451FCBC13100E7E802 /* ChessBoard.cpp */,
 				A7EF55C71FEF17A1004CF2DA /* ChessEngine.hpp */,
 				A75CB2611FED9693005487BD /* IterativeDeepening.hpp */,
+				A7EF55CB1FF22FE7004CF2DA /* MinMaxMoveList.hpp */,
 				A75BFAC61FE8C05E001EE942 /* MinMaxSearch.hpp */,
 				A75CB2631FEDF011005487BD /* Serialization */,
 			);

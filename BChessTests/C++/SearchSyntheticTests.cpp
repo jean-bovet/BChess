@@ -69,19 +69,7 @@ struct TestMove {
     bool quiet = false;
 };
 
-struct TestMoveList {
-    TestMove moves[256];
-    int count = 0;
-    
-    void add(TestMove move) {
-        moves[count] = move;
-        count++;
-    }
-    
-    void insertMove(int index, TestMove move) {
-        moves[index] = move;
-        count = index + 1;
-    }
+struct TestMoveList: MinMaxMoveList<TestMove> {
 };
 
 struct TestBoard {
@@ -131,9 +119,10 @@ struct TestEvaluation {
     bool mat = false;
     bool cancelled = false;
     
-    void add(int depth, TestMove move) {
-        line.insertMove(depth, move);
-    }
+//    void add(int depth, TestMove move) {
+//        line.moves.
+//        line.insertMove(depth, move);
+//    }
 };
 
 bool testMoveComparison(TestMove i, TestMove j) {
@@ -155,26 +144,26 @@ struct TestMoveGenerator {
             move.index = index+1;
             move.quiet = child.quiet;
             move.ordering = child.ordering;
-            moveList.add(move);
+            moveList.push(move);
         }
         return moveList;
     }
 };
 
-static void assertAlphaBeta(MinMaxSearch<TestBoard, TestMoveGenerator, TestMove, TestEvaluater, TestEvaluation> alphaBeta, TestTreeNode rootNode, int expectedVisitedNodes, int expectedValue, std::vector<int> expectedPV) {
+static void assertAlphaBeta(MinMaxSearch<TestBoard, TestMoveGenerator, TestMove, TestMoveList, TestEvaluater, TestEvaluation> alphaBeta, TestTreeNode rootNode, int expectedVisitedNodes, int expectedValue, std::vector<int> expectedPV) {
     alphaBeta.reset();
         
     TestBoard board;
     board.node = &rootNode;
     
-    TestEvaluation pv;
+    MinMaxVariation<TestMoveList> pv;
     int eval = alphaBeta.alphabeta(board, 0, true, pv);
 //    std::cout << alphaBeta.visitedNodes << " => " << eval << std::endl;
     ASSERT_EQ(expectedValue, eval);
     ASSERT_EQ(expectedVisitedNodes, alphaBeta.visitedNodes);
-    ASSERT_EQ(expectedPV.size(), pv.line.count);
+    ASSERT_EQ(expectedPV.size(), pv.moves.count);
     for (int index=0; index<expectedPV.size(); index++) {
-        ASSERT_EQ(expectedPV[index], pv.line.moves[index].index);
+        ASSERT_EQ(expectedPV[index], pv.moves[index].index);
     }
 }
 
@@ -203,8 +192,8 @@ static void configureTree(TestTreeNode &rootNode) {
     rootNode.setValue({ 3, 2, 2, 1 }, 6);
 }
 
-static MinMaxSearch<TestBoard, TestMoveGenerator, TestMove, TestEvaluater, TestEvaluation> defaultMinMaxSearch() {
-    MinMaxSearch<TestBoard, TestMoveGenerator, TestMove, TestEvaluater, TestEvaluation> alphaBeta;
+static MinMaxSearch<TestBoard, TestMoveGenerator, TestMove, TestMoveList, TestEvaluater, TestEvaluation> defaultMinMaxSearch() {
+    MinMaxSearch<TestBoard, TestMoveGenerator, TestMove, TestMoveList, TestEvaluater, TestEvaluation> alphaBeta;
     alphaBeta.config.maxDepth = 4; // That's the height of the tree
     return alphaBeta;
 }

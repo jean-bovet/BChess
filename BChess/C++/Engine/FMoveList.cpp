@@ -40,6 +40,10 @@ void MoveList::insertMove(int index, Move move) {
     count = std::max(index + 1, count);
 }
 
+void MoveList::pop() {
+    count--;
+}
+
 void MoveList::addMoves(MoveList moves) {
     for (int index=0; index<moves.count; index++) {
         addMove(moves.moves[index]);

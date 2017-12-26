@@ -22,26 +22,26 @@ static void assertBestMove(std::string fen, std::string finalFEN, std::string ex
     ChessMinMaxSearch search;
     search.config = config;
 
-    ChessEvaluation pv;
+    MinMaxVariation<MoveList> pv;
     
     search.alphabeta(board, 0, board.color == WHITE, pv);
     
     // Assert the best move
-    auto actualMove = FPGN::to_string(pv.line.moves[0]);
+    auto actualMove = FPGN::to_string(pv.moves.bestMove());
     ASSERT_STREQ(expectedMove.c_str(), actualMove.c_str());
     
     // Assert the best line
-    ASSERT_EQ(expectedLine.size(), pv.line.count);
+    ASSERT_EQ(expectedLine.size(), pv.moves.count);
 
     for (int index=0; index<expectedLine.size(); index++) {
-        auto lineMove = FPGN::to_string(pv.line.moves[index]);
+        auto lineMove = FPGN::to_string(pv.moves[index]);
         ASSERT_STREQ(expectedLine[index].c_str(), lineMove.c_str());
     }
     
     // Now play the moves to reach the final position
     ChessBoard finalBoard = board;
-    for (int index=0; index<pv.line.count; index++) {
-        auto move = pv.line.moves[index];
+    for (int index=0; index<pv.moves.count; index++) {
+        auto move = pv.moves[index];
         finalBoard.move(move);
     }
     auto finalBoardFEN = FFEN::getFEN(finalBoard);
@@ -71,18 +71,18 @@ TEST(BestMove, PawnForkQueenAndKing) {
 
 TEST(BestMove, KnightEscapeAttackByPawn) {
     std::string start = "r1bqkbnr/pppp1ppp/2n5/3P4/8/8/PPP2PPP/RNBQKBNR b KQkq - 0 4";
-    std::string end = "r1bqkb1r/ppppnppp/8/n2P4/8/2N5/PPP1NPPP/R1BQKB1R b KQkq - 4 6";
+    std::string end = "r1bqkb1r/pppp1ppp/8/n2Q4/8/2N5/PPP1NPPP/R1B1KB1R b KQkq - 0 7";
     // Note: without quiescence search, the engine wants to do Bf8b4 but actually this leads into material loss way down the tree.
     // The best move here is moving the knight out of c6.
-    assertBestMove(start, end, "Nc6a5",  { "Nc6a5", "Nb1c3", "Ng8e7", "Ng1e2" });
+    assertBestMove(start, end, "Nc6a5",  { "Nc6a5", "Nb1c3", "Ng8e7", "Ng1e2", "Ne7xd5", "Qd1xd5" });
 }
 
 // In this situation, we are trying to see if the engine is able to see
 // that moving the pawn c2c3 can actually cause a double attacks against black.
 TEST(BestMove, MovePawnToAttackBishop) {
     std::string start = "r1bqk1nr/pppp1ppp/2n5/3P4/1b6/8/PPP2PPP/RNBQKBNR w KQkq - 1 5";
-    std::string end = "r1bqk1nr/ppp2ppp/2p5/b7/8/2P5/PP3PPP/RNBQKBNR w KQkq - 0 7";
-    assertBestMove(start, end, "c2c3",  { "c2c3", "Bb4a5", "d5xc6", "d7xc6" });
+    std::string end = "r1bk2nr/ppp2ppp/2p5/b7/8/2P5/PP3PPP/RNB1KBNR w KQ - 0 8";
+    assertBestMove(start, end, "c2c3",  { "c2c3", "Bb4a5", "d5xc6", "d7xc6", "Qd1xd8", "Ke8xd8" });
 }
 
 TEST(BestMove, BlackMoveToMateNonSorted) {
