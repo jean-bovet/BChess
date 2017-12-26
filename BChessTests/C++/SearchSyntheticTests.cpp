@@ -118,11 +118,6 @@ struct TestEvaluation {
     int nodes = 0;
     bool mat = false;
     bool cancelled = false;
-    
-//    void add(int depth, TestMove move) {
-//        line.moves.
-//        line.insertMove(depth, move);
-//    }
 };
 
 bool testMoveComparison(TestMove i, TestMove j) {
@@ -150,7 +145,9 @@ struct TestMoveGenerator {
     }
 };
 
-static void assertAlphaBeta(MinMaxSearch<TestBoard, TestMoveGenerator, TestMoveList, TestEvaluater> alphaBeta, TestTreeNode rootNode, int expectedVisitedNodes, int expectedValue, std::vector<int> expectedPV) {
+typedef MinMaxSearch<TestBoard, TestEvaluater, TestMoveGenerator, TestMoveList> TestMinMaxSearch;
+
+static void assertAlphaBeta(TestMinMaxSearch alphaBeta, TestTreeNode rootNode, int expectedVisitedNodes, int expectedValue, std::vector<int> expectedPV) {
     alphaBeta.reset();
         
     TestBoard board;
@@ -192,8 +189,8 @@ static void configureTree(TestTreeNode &rootNode) {
     rootNode.setValue({ 3, 2, 2, 1 }, 6);
 }
 
-static MinMaxSearch<TestBoard, TestMoveGenerator, TestMoveList, TestEvaluater> defaultMinMaxSearch() {
-    MinMaxSearch<TestBoard, TestMoveGenerator, TestMoveList, TestEvaluater> alphaBeta;
+static TestMinMaxSearch defaultMinMaxSearch() {
+    TestMinMaxSearch alphaBeta;
     alphaBeta.config.maxDepth = 4; // That's the height of the tree
     return alphaBeta;
 }

@@ -16,18 +16,14 @@
 #include <vector>
 #include <map>
 
-static void assertChessSearch(int expectedVisitedNodes, int expectedValue, Configuration config) {
-    config.maxDepth = 4;
-    
+static void assertChessSearch(int expectedVisitedNodes, int expectedValue, Configuration config, ChessBoard rootBoard = ChessBoard()) {
     ChessMinMaxSearch alphaBeta;
     alphaBeta.config = config;
-
-    ChessBoard rootBoard;
     
     MinMaxVariation<MoveList> pv;
     
     int score = alphaBeta.alphabeta(rootBoard, 0, rootBoard.color == WHITE, pv);
-    std::cout << alphaBeta.visitedNodes << " => " << score << std::endl;
+//    std::cout << alphaBeta.visitedNodes << " => " << score << " " << pv.moves.description() << std::endl;
     ASSERT_EQ(expectedVisitedNodes, alphaBeta.visitedNodes); // n initial moves + 1 for the root node
     ASSERT_EQ(expectedValue, score);
 }
@@ -47,13 +43,12 @@ TEST(Chess, OrderedMove) {
     auto fen = "r1bqkbnr/pppp1ppp/2n5/3P4/8/8/PPP2PPP/RNBQKBNR b KQkq - 0 5";
     ChessBoard board;
     ASSERT_TRUE(FFEN::setFEN(fen, board));
-        
-    ChessMinMaxSearch alphaBeta;
-    alphaBeta.config.maxDepth = 4;
-    alphaBeta.config.debugLog = false;
 
-    MinMaxVariation<MoveList> pv;
+    Configuration config;
 
-    int score = alphaBeta.alphabeta(board, 0, board.color == WHITE, pv);
-    std::cout << alphaBeta.visitedNodes << " => " << score << " for " << pv.moves.description() << std::endl;
+    config.sortMoves = true;
+    assertChessSearch(28924, -20, config, board);
+    
+    config.sortMoves = false;
+    assertChessSearch(456733, -20, config, board);
 }

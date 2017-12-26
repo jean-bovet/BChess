@@ -52,7 +52,7 @@ inline static Move createEnPassant(Square from, Square to, Color color, Piece pi
 }
 
 inline static bool MOVE_ISVALID(Move move) {
-    return move != 0;
+    return move != INVALID_MOVE;
 }
 
 inline static bool MOVE_IS_CAPTURE(Move move) {

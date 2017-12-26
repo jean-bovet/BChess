@@ -15,3 +15,7 @@ TEST(Evaluation, BonusPosition) {
     ASSERT_EQ(ChessEvaluater::getBonus(PAWN, Color::BLACK, b2), 50);
 }
 
+TEST(Evaluation, InvalidMove) {
+    MinMaxMoveList<Move> moveList;
+    ASSERT_EQ(INVALID_MOVE, moveList.bestMove());
+}

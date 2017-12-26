@@ -37,7 +37,7 @@ public:
 
 template<class Node, class MoveGenerator, class TMoveList, class Evaluater>
 class IterativeDeepening {
-    MinMaxSearch<Node, MoveGenerator, TMoveList, Evaluater> minMaxSearch;
+    ChessMinMaxSearch minMaxSearch;
     
     bool analyzing = false;
     

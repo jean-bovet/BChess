@@ -15,8 +15,6 @@
 
 #include "MinMaxMoveList.hpp"
 
-#define DEBUG_OUTPUT 0
-
 struct Configuration {
     int maxDepth = 4;
     bool debugLog = false;
@@ -33,7 +31,7 @@ struct MinMaxVariation {
     int value = 0;
 };
 
-template <class Node, class MoveGenerator, class TMoveList, class Evaluater>
+template <class TNode, class TNodeEvaluater, class TMoveGenerator, class TMoveList>
 class MinMaxSearch {
     bool analyzing = false;
     
@@ -50,31 +48,32 @@ public:
         analyzing = false;
     }
     
-    int alphabeta(Node node, int depth, bool maximizingPlayer, MinMaxVariation<TMoveList> &pv) {
+    int alphabeta(TNode node, int depth, bool maximizingPlayer, MinMaxVariation<TMoveList> &pv) {
         analyzing = true;
         MinMaxVariation<TMoveList> currentLine;
-        return alphabeta(node, depth, -INT_MAX, INT_MAX, maximizingPlayer ? 1 : -1, pv, currentLine);
+        int color = maximizingPlayer ? 1 : -1;
+        return alphabeta(node, depth, -INT_MAX, INT_MAX, color, pv, currentLine);
     }
     
 private:
     
     // pv: Principal Variation - the best line found so far.
     // cv: Current Variation - the current line being examined.
-    int alphabeta(Node node, int depth, int alpha, int beta, int color, MinMaxVariation<TMoveList> &pv, MinMaxVariation<TMoveList> &cv) {
+    int alphabeta(TNode node, int depth, int alpha, int beta, int color, MinMaxVariation<TMoveList> &pv, MinMaxVariation<TMoveList> &cv) {
         pv.depth = depth;
 
         if (depth == config.maxDepth) {
             if (config.quiescenceSearch) {
                 return quiescence(node, depth, alpha, beta, color, pv, cv);
             } else {
-                int v = Evaluater::evaluate(node) * color;
+                int v = TNodeEvaluater::evaluate(node) * color;
                 return v;
             }
         }
 
-        auto moves = MoveGenerator::generateMoves(node);
+        auto moves = TMoveGenerator::generateMoves(node);
         if (config.sortMoves) {
-            MoveGenerator::sortMoves(moves);
+            TMoveGenerator::sortMoves(moves);
         }
         
         bool evaluatedAtLeastOneChild = false; // TODO simplify with moves.empty()?
@@ -116,15 +115,15 @@ private:
             }
         }
         if (!evaluatedAtLeastOneChild) {
-            bestValue = Evaluater::evaluate(node, moves) * color;
+            bestValue = TNodeEvaluater::evaluate(node, moves) * color;
         }
         return bestValue;
     }
     
-    int quiescence(Node node, int depth, int alpha, int beta, int color, MinMaxVariation<TMoveList> &pv, MinMaxVariation<TMoveList> &cv) {
+    int quiescence(TNode node, int depth, int alpha, int beta, int color, MinMaxVariation<TMoveList> &pv, MinMaxVariation<TMoveList> &cv) {
         pv.depth = depth;
         
-        auto stand_pat = Evaluater::evaluate(node) * color;
+        auto stand_pat = TNodeEvaluater::evaluate(node) * color;
         if (stand_pat >= beta) {
             return beta;
         }
@@ -133,16 +132,16 @@ private:
             alpha = stand_pat;
         }
         
-        auto moves = MoveGenerator::generateMoves(node);
+        auto moves = TMoveGenerator::generateMoves(node);
         if (config.sortMoves) {
-            MoveGenerator::sortMoves(moves);
+            TMoveGenerator::sortMoves(moves);
         }
         
         bool atLeastOne = false;  // TODO simplify with moves.empty()?
         
         for (int index=0; index<moves.count; index++) {
             auto move = moves.moves[index];
-            if (Evaluater::isQuiet(move)) {
+            if (TNodeEvaluater::isQuiet(move)) {
                 continue;
             }
             
