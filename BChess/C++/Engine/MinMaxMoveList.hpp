@@ -8,9 +8,11 @@
 
 #pragma once
 
+const int MAX_MOVES = 256;
+
 template <class TMove>
 struct MinMaxMoveList {
-    TMove moves[256];
+    TMove moves[MAX_MOVES];
     int count = 0;
     
     TMove &operator[] (int index) {
@@ -18,16 +20,19 @@ struct MinMaxMoveList {
     }
 
     void push(TMove move) {
+        assert(count < MAX_MOVES);
         moves[count] = move;
         count++;
     }
     
     void push(MinMaxMoveList<TMove> line) {
+        assert(count+line.count < MAX_MOVES);
         memcpy(moves+count, line.moves, line.count * sizeof(TMove));
         count += line.count;
     }
     
     void pop() {
+        assert(count > 0);
         count--;
     }
     

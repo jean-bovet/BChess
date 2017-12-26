@@ -22,41 +22,13 @@ std::string MoveList::description() {
     return text;
 }
 
-Move MoveList::firstMove() {
-    if (count > 0) {
-        return moves[0];
-    } else {
-        return INVALID_MOVE;
-    }
-}
-
-void MoveList::addMove(Move move) {
-    moves[count] = move;
-    count++;
-}
-
-void MoveList::insertMove(int index, Move move) {
-    moves[index] = move;
-    count = std::max(index + 1, count);
-}
-
-void MoveList::pop() {
-    count--;
-}
-
-void MoveList::addMoves(MoveList moves) {
-    for (int index=0; index<moves.count; index++) {
-        addMove(moves.moves[index]);
-    }
-}
-
 void MoveList::addMove(ChessBoard &board, Move move) {
     ChessBoard validBoard = board;
     validBoard.move(move);
     // Note: make sure the move that was just played doesn't make
     // it's king in check (use board.color which refers to the move's color).
     if (!validBoard.isCheck(board.color)) {
-        addMove(move);
+        push(move);
     }
 }
 

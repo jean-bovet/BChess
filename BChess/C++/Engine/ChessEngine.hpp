@@ -14,6 +14,6 @@
 #include "ChessEvaluater.hpp"
 #include "ChessEvaluation.hpp"
 
-typedef MinMaxSearch<ChessBoard, ChessMoveGenerator, Move, MoveList, ChessEvaluater, ChessEvaluation> ChessMinMaxSearch;
+typedef MinMaxSearch<ChessBoard, ChessMoveGenerator, MoveList, ChessEvaluater> ChessMinMaxSearch;
 
 

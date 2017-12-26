@@ -33,7 +33,7 @@ struct MinMaxVariation {
     int value = 0;
 };
 
-template <class Node, class MoveGenerator, class TMove, class TMoveList, class Evaluater, class Evaluation>
+template <class Node, class MoveGenerator, class TMoveList, class Evaluater>
 class MinMaxSearch {
     bool analyzing = false;
     
@@ -77,7 +77,7 @@ private:
             MoveGenerator::sortMoves(moves);
         }
         
-        bool evaluatedAtLeastOneChild = false;
+        bool evaluatedAtLeastOneChild = false; // TODO simplify with moves.empty()?
         int bestValue = -INT_MAX;
         for (int index=0; index<moves.count; index++) {
             auto move = moves.moves[index];
@@ -138,7 +138,7 @@ private:
             MoveGenerator::sortMoves(moves);
         }
         
-        bool atLeastOne = false;
+        bool atLeastOne = false;  // TODO simplify with moves.empty()?
         
         for (int index=0; index<moves.count; index++) {
             auto move = moves.moves[index];
@@ -166,7 +166,7 @@ private:
 
             pv.depth = line.depth;
             pv.value = score;
-            
+            pv.moves.count = 0;
             pv.moves.push(move);
             pv.moves.push(line.moves);
 

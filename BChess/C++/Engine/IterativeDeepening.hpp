@@ -35,9 +35,9 @@ public:
     }
 };
 
-template<class Node, class MoveGenerator, class TMove, class TMoveList, class Evaluater, class Evaluation>
+template<class Node, class MoveGenerator, class TMoveList, class Evaluater>
 class IterativeDeepening {
-    MinMaxSearch<Node, MoveGenerator, TMove, TMoveList, Evaluater, Evaluation> minMaxSearch;
+    MinMaxSearch<Node, MoveGenerator, TMoveList, Evaluater> minMaxSearch;
     
     bool analyzing = false;
     
@@ -53,7 +53,7 @@ public:
         
         analyzing = true;
         
-        for (int curMaxDepth=3; curMaxDepth<=3; curMaxDepth++) {
+        for (int curMaxDepth=1; curMaxDepth<=maxDepth; curMaxDepth++) {
             if (!analyzing) {
                 break;
             }
@@ -76,7 +76,7 @@ public:
                 // TODO
                 evaluation.clear();
                 for (int index=0; index<pv.moves.count; index++) {
-                    evaluation.line.addMove(pv.moves[index]);
+                    evaluation.line.push(pv.moves[index]);
                 }
                 evaluation.depth = pv.depth;
                 evaluation.value = pv.value;

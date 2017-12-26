@@ -20,7 +20,7 @@
 @end
 
 @interface FEngine () {
-    IterativeDeepening<ChessBoard, ChessMoveGenerator, Move, MoveList, ChessEvaluater, ChessEvaluation> iterativeSearch;
+    IterativeDeepening<ChessBoard, ChessMoveGenerator, MoveList, ChessEvaluater> iterativeSearch;
     FGame currentGame;
 }
 
@@ -141,7 +141,7 @@
     ei.movesPerSecond = info.movesPerSecond;
     ei.mat = info.value == ChessEvaluater::MAT_VALUE || info.value == -ChessEvaluater::MAT_VALUE;
 
-    Move bestMove = info.line.firstMove();
+    Move bestMove = info.line.bestMove();
     ei.rawMoveValue = bestMove;
 
     ei.fromRank = RankFrom(MOVE_FROM(bestMove));
