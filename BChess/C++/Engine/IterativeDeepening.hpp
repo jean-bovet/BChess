@@ -64,7 +64,7 @@ public:
             minMaxSearch.config.maxDepth = curMaxDepth;
             minMaxSearch.reset();
             
-            MinMaxVariation<TMoveList> pv;
+            ChessMinMaxSearch::Variation pv;
             minMaxSearch.alphabeta(board, 0, board.color == WHITE, pv);
             
             moveClock.stop();

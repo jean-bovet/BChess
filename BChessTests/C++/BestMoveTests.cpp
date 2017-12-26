@@ -22,7 +22,7 @@ static void assertBestMove(std::string fen, std::string finalFEN, std::string ex
     ChessMinMaxSearch search;
     search.config = config;
 
-    MinMaxVariation<MoveList> pv;
+    ChessMinMaxSearch::Variation pv;
     
     search.alphabeta(board, 0, board.color == WHITE, pv);
     

@@ -145,7 +145,7 @@ struct TestMoveGenerator {
     }
 };
 
-typedef MinMaxSearch<TestBoard, TestEvaluater, TestMoveGenerator, TestMoveList> TestMinMaxSearch;
+typedef MinMaxSearch<TestBoard, TestEvaluater, TestMoveGenerator, TestMoveList, TestMove> TestMinMaxSearch;
 
 static void assertAlphaBeta(TestMinMaxSearch alphaBeta, TestTreeNode rootNode, int expectedVisitedNodes, int expectedValue, std::vector<int> expectedPV) {
     alphaBeta.reset();
@@ -153,7 +153,7 @@ static void assertAlphaBeta(TestMinMaxSearch alphaBeta, TestTreeNode rootNode, i
     TestBoard board;
     board.node = &rootNode;
     
-    MinMaxVariation<TestMoveList> pv;
+    TestMinMaxSearch::Variation pv;
     int eval = alphaBeta.alphabeta(board, 0, true, pv);
 //    std::cout << alphaBeta.visitedNodes << " => " << eval << std::endl;
     ASSERT_EQ(expectedValue, eval);

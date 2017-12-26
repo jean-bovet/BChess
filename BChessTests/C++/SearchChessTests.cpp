@@ -20,7 +20,7 @@ static void assertChessSearch(int expectedVisitedNodes, int expectedValue, Confi
     ChessMinMaxSearch alphaBeta;
     alphaBeta.config = config;
     
-    MinMaxVariation<MoveList> pv;
+    ChessMinMaxSearch::Variation pv;
     
     int score = alphaBeta.alphabeta(rootBoard, 0, rootBoard.color == WHITE, pv);
 //    std::cout << alphaBeta.visitedNodes << " => " << score << " " << pv.moves.description() << std::endl;
