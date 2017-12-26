@@ -136,16 +136,13 @@ private:
             alpha = stand_pat;
         }
         
-        auto moves = TMoveGenerator::generateMoves(node);
+        auto moves = TMoveGenerator::generateMoves(node, true);
         if (config.sortMoves) {
             TMoveGenerator::sortMoves(moves);
         }
         
         for (int index=0; index<moves.count && analyzing; index++) {
             auto move = moves.moves[index];
-            if (TNodeEvaluater::isQuiet(move)) {
-                continue;
-            }
             
             visitedNodes++;
 

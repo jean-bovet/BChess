@@ -230,7 +230,7 @@
     }
     
     ChessMoveGenerator generator;
-    MoveList moves = generator.generateMoves(board, square);
+    MoveList moves = generator.generateMoves(board, false, square);
     NSMutableArray<NSString*>* moveFENs = [NSMutableArray array];
     for (int index=0; index<moves.count; index++) {
         auto move = moves.moves[index];
@@ -248,7 +248,7 @@
     FFEN::setFEN("3r3k/5Npp/8/8/2Q5/1B6/8/7K b - - 1 1", board);
     
     ChessMoveGenerator generator;
-    generator.generateMoves(board, Color::WHITE);
+    generator.generateMoves(board);
 }
 
 - (void)debugEvaluate {

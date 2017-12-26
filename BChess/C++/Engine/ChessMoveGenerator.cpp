@@ -108,7 +108,7 @@ void ChessMoveGenerator::sortMoves(MoveList & moves) {
     std::stable_sort(std::begin(moves.moves), std::begin(moves.moves) + moves.count, moveComparison);
 }
 
-MoveList ChessMoveGenerator::generateMoves(ChessBoard board, Square specificSquare) {
+MoveList ChessMoveGenerator::generateMoves(ChessBoard board, bool qs, Square specificSquare) {
     if (!initialized) {
         initialized = true;
         initialize();
@@ -116,12 +116,12 @@ MoveList ChessMoveGenerator::generateMoves(ChessBoard board, Square specificSqua
     
     MoveList moveList;
     
-    generatePawnsMoves(board, moveList, specificSquare);
-    generateKingsMoves(board, moveList, specificSquare);
-    generateKnightsMoves(board, moveList, specificSquare);
-    generateSlidingMoves(board, ROOK, moveList, specificSquare);
-    generateSlidingMoves(board, BISHOP, moveList, specificSquare);
-    generateSlidingMoves(board, QUEEN, moveList, specificSquare);
+    generatePawnsMoves(board, moveList, qs, specificSquare);
+    generateKingsMoves(board, moveList, qs, specificSquare);
+    generateKnightsMoves(board, moveList, qs, specificSquare);
+    generateSlidingMoves(board, ROOK, moveList, qs, specificSquare);
+    generateSlidingMoves(board, BISHOP, moveList, qs, specificSquare);
+    generateSlidingMoves(board, QUEEN, moveList, qs, specificSquare);
     
     return moveList;
 }
@@ -136,7 +136,7 @@ void ChessMoveGenerator::generateAttackMoves(ChessBoard &board, MoveList &moveLi
     }
 }
 
-void ChessMoveGenerator::generatePawnsMoves(ChessBoard &board, MoveList &moveList, Square specificSquare) {
+void ChessMoveGenerator::generatePawnsMoves(ChessBoard &board, MoveList &moveList, bool qs, Square specificSquare) {
     auto pawns = board.pieces[board.color][PAWN];
     auto emptySquares = board.emptySquares();
     
@@ -168,6 +168,9 @@ void ChessMoveGenerator::generatePawnsMoves(ChessBoard &board, MoveList &moveLis
             }
         }
         
+        // If doing quiescence search, skip the generation of moves that are quiet
+        if (qs) continue;
+
         // Generate the move for the pawn:
         // - Either one square or
         // - Two squares if the pawn is in its initial rank
@@ -214,7 +217,7 @@ void ChessMoveGenerator::generatePawnsMoves(ChessBoard &board, MoveList &moveLis
     }
 }
 
-void ChessMoveGenerator::generateKingsMoves(ChessBoard &board, MoveList &moveList, Square specificSquare) {
+void ChessMoveGenerator::generateKingsMoves(ChessBoard &board, MoveList &moveList, bool qs, Square specificSquare) {
     auto otherColor = INVERSE(board.color);
     auto kings = board.pieces[board.color][KING];
     auto emptySquares = board.emptySquares();
@@ -235,10 +238,13 @@ void ChessMoveGenerator::generateKingsMoves(ChessBoard &board, MoveList &moveLis
         // Generate a bitboard for all the moves that this white knight
         // can do. The attacks bitboard is masked to ensure it can only
         // happy on an empty square or a square with a piece of the opposite color.
+        
+        generateAttackMoves(board, moveList, square, KING, KingMoves[square]);
+
+        if (qs) continue;
+
         auto moves = KingMoves[square] & emptySquares;
         moveList.addMoves(board, square, moves, KING);
-
-        generateAttackMoves(board, moveList, square, KING, KingMoves[square]);
         
         // Generate all legal casting moves. Note that we only generate the move for the king,
         // the board is going to move the rook in move() when it detects a castling move.
@@ -273,7 +279,7 @@ void ChessMoveGenerator::generateKingsMoves(ChessBoard &board, MoveList &moveLis
     }
 }
 
-void ChessMoveGenerator::generateKnightsMoves(ChessBoard &board, MoveList &moveList, Square specificSquare) {
+void ChessMoveGenerator::generateKnightsMoves(ChessBoard &board, MoveList &moveList, bool qs, Square specificSquare) {
     auto whiteKnights = board.pieces[board.color][KNIGHT];
     auto emptySquares = board.emptySquares();
 
@@ -293,14 +299,16 @@ void ChessMoveGenerator::generateKnightsMoves(ChessBoard &board, MoveList &moveL
         // Generate a bitboard for all the moves that this white knight
         // can do. The attacks bitboard is masked to ensure it can only
         // happy on an empty square or a square with a piece of the opposite color.
+        generateAttackMoves(board, moveList, square, KNIGHT, KnightMoves[square]);
+
+        if (qs) continue;
+
         auto moves = KnightMoves[square] & emptySquares;
         moveList.addMoves(board, square, moves, KNIGHT);
-        
-        generateAttackMoves(board, moveList, square, KNIGHT, KnightMoves[square]);
     }
 }
 
-void ChessMoveGenerator::generateSlidingMoves(ChessBoard &board, Piece piece, MoveList &moveList, Square specificSquare) {
+void ChessMoveGenerator::generateSlidingMoves(ChessBoard &board, Piece piece, MoveList &moveList, bool qs, Square specificSquare) {
     auto slidingPieces = board.pieces[board.color][piece];
     auto occupancy = board.getOccupancy();
     auto emptySquares = board.emptySquares();
@@ -341,9 +349,11 @@ void ChessMoveGenerator::generateSlidingMoves(ChessBoard &board, Piece piece, Mo
         // Note: the occupancy bitboard has all the white and black pieces,
         // we need to filter out the moves that land into a piece of the same
         // color because Rmagic will move to these squares anyway.
+        generateAttackMoves(board, moveList, square, piece, potentialMoves);
+
+        if (qs) continue;
+        
         auto moves = potentialMoves & emptySquares;
         moveList.addMoves(board, square, moves, piece);
-        
-        generateAttackMoves(board, moveList, square, piece, potentialMoves);
     }
 }
