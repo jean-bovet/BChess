@@ -2,6 +2,7 @@
 
 ToDo
 
+- Helper for p FPGN::to_string(move, (FPGN::SANType)1)
 - Handle UCI move with promotion (for example h1b1q)
 - Best line caching for iterative deepening
 - Quiet move should not include check

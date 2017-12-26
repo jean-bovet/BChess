@@ -47,6 +47,59 @@ public:
 
 private:
     
+    int alphabeta(Node node, int depth, int alpha, int beta, int color, Evaluation &pv) {
+        if (depth == config.maxDepth) {
+            if (config.quiescenceSearch) {
+                return quiescence(node, depth, alpha, beta, color, pv);
+            } else {
+                int v = Evaluater::evaluate(node) * color;
+                return v;
+            }
+        }
+
+        auto moves = MoveGenerator::generateMoves(node);
+        if (config.sortMoves) {
+            MoveGenerator::sortMoves(moves);
+        }
+        
+        bool evaluatedAtLeastOneChild = false;
+        int bestValue = -INT_MAX;
+        for (int index=0; index<moves.count; index++) {
+            auto move = moves.moves[index];
+            if (!analyzing) {
+                pv.cancelled = true;
+                break;
+            }
+            
+            evaluatedAtLeastOneChild = true;
+            
+            visitedNodes++;
+
+            auto newNode = node;
+            newNode.move(move);
+
+            Evaluation line;
+            int score = -alphabeta(newNode, depth + 1, -beta, -alpha, -color, line);
+            if (score > bestValue) {
+                bestValue = score;
+                
+                pv.value = score;
+                pv.line.moves[0] = move;
+                memcpy(pv.line.moves+1, line.line.moves, line.line.count * sizeof(TMove));
+                pv.line.count = line.line.count + 1;                
+            }
+            
+            alpha = std::max(alpha, score);
+            if (config.alphaBetaPrunning && beta <= alpha) {
+                break; // Beta cut-off
+            }
+        }
+        if (!evaluatedAtLeastOneChild) {
+            bestValue = Evaluater::evaluate(node, moves);
+        }
+        return bestValue;
+    }
+    
     int quiescence(Node node, int depth, int alpha, int beta, int color, Evaluation &pv) {
         auto stand_pat = Evaluater::evaluate(node) * color;
         if (stand_pat >= beta) {
@@ -56,7 +109,7 @@ private:
         if (alpha < stand_pat) {
             alpha = stand_pat;
         }
-
+        
         auto moves = MoveGenerator::generateMoves(node);
         if (config.sortMoves) {
             MoveGenerator::sortMoves(moves);
@@ -74,10 +127,10 @@ private:
             }
             
             visitedNodes++;
-
+            
             auto newNode = node;
             newNode.move(move);
-            auto score = -quiescence(newNode, depth+1, -beta, -alpha, -color, pv);
+            int score = -quiescence(newNode, depth+1, -beta, -alpha, -color, pv);
             if (score >= beta) {
                 return beta;
             }
@@ -87,57 +140,6 @@ private:
             }
         }
         return alpha;
-    }
-    
-    int alphabeta(Node node, int depth, int alpha, int beta, int color, Evaluation &pv) {
-        if (depth == config.maxDepth) {
-            if (config.quiescenceSearch) {
-                return quiescence(node, depth, alpha, beta, color, pv);
-            } else {
-                int v = Evaluater::evaluate(node) * color;
-                return v;
-            }
-        }
-
-        auto moves = MoveGenerator::generateMoves(node);
-        if (config.sortMoves) {
-            MoveGenerator::sortMoves(moves);
-        }
-        
-        bool evaluatedAtLeastOneChild = false;
-        Evaluation line;
-        int bestValue = -INT_MAX;
-        for (int index=0; index<moves.count; index++) {
-            auto move = moves.moves[index];
-            if (!analyzing) {
-                pv.cancelled = true;
-                break;
-            }
-            
-            evaluatedAtLeastOneChild = true;
-            
-            visitedNodes++;
-
-            auto newNode = node;
-            newNode.move(move);
-            auto score = -alphabeta(newNode, depth + 1, -beta, -alpha, -color, line);
-            if (score > bestValue) {
-                bestValue = score;
-                
-                pv.line.moves[0] = move;
-                memcpy(pv.line.moves+1, line.line.moves, line.line.count * sizeof(TMove));
-                pv.line.count = line.line.count + 1;
-            }
-            
-            alpha = std::max(alpha, score);
-            if (config.alphaBetaPrunning && beta <= alpha) {
-                break; // Beta cut-off
-            }
-        }
-        if (!evaluatedAtLeastOneChild) {
-            bestValue = Evaluater::evaluate(node, moves);
-        }
-        return bestValue;
     }
     
 };

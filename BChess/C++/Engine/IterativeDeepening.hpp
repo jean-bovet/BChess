@@ -35,9 +35,9 @@ public:
     }
 };
 
-template<class Node, class MoveGenerator, class Evaluater, class Evaluation>
+template<class Node, class MoveGenerator, class TMove, class Evaluater, class Evaluation>
 class IterativeDeepening {
-    MinMaxSearch<Node, MoveGenerator, Evaluater, Evaluation> minMaxSearch;
+    MinMaxSearch<Node, MoveGenerator, TMove, Evaluater, Evaluation> minMaxSearch;
     
     bool analyzing = false;
     
@@ -57,21 +57,23 @@ public:
             if (!analyzing) {
                 break;
             }
-                        
+            
             TimeManagement moveClock;
             moveClock.start();
             
             minMaxSearch.config.maxDepth = curMaxDepth;
             minMaxSearch.reset();
-            ChessEvaluation bestEval = minMaxSearch.alphabeta(board, 0, board.color == WHITE);
+            
+            ChessEvaluation pv;
+            minMaxSearch.alphabeta(board, 0, board.color == WHITE, pv);
             
             moveClock.stop();
             
             double movesPerSingleMs = evaluation.nodes / moveClock.elapsedMilli();
             int movesPerSecond = int(movesPerSingleMs * 1e3);
             
-            if (!bestEval.cancelled) {
-                evaluation = bestEval;
+            if (!pv.cancelled) {
+                evaluation = pv;
                 evaluation.time = int(moveClock.elapsedMilli()/1e3);
                 evaluation.engineColor = board.color;
                 evaluation.movesPerSecond = movesPerSecond;

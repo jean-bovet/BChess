@@ -23,11 +23,13 @@ static void assertChessSearch(int expectedVisitedNodes, int expectedValue, Confi
     alphaBeta.config = config;
 
     ChessBoard rootBoard;
+    
+    ChessEvaluation pv;
 
-    auto eval = alphaBeta.alphabeta(rootBoard, 0, rootBoard.color == WHITE);
-    std::cout << alphaBeta.visitedNodes << " => " << eval.value << std::endl;
-    ASSERT_EQ(alphaBeta.visitedNodes, expectedVisitedNodes); // n initial moves + 1 for the root node
-    ASSERT_EQ(eval.value, expectedValue);
+    int score = alphaBeta.alphabeta(rootBoard, 0, rootBoard.color == WHITE, pv);
+    std::cout << alphaBeta.visitedNodes << " => " << score << std::endl;
+    ASSERT_EQ(expectedVisitedNodes, alphaBeta.visitedNodes); // n initial moves + 1 for the root node
+    ASSERT_EQ(expectedValue, score);
 }
 
 TEST(Chess, ChessTree) {
@@ -35,10 +37,10 @@ TEST(Chess, ChessTree) {
     config.quiescenceSearch = false;
 
     config.alphaBetaPrunning = true;
-    assertChessSearch(24177, 0, config); // with alpha-beta prunning
+    assertChessSearch(24176, 0, config); // with alpha-beta prunning
     
     config.alphaBetaPrunning = false;
-    assertChessSearch(206604, 0, config); // without alpha-beta
+    assertChessSearch(206603, 0, config); // without alpha-beta
 }
 
 TEST(Chess, OrderedMove) {
@@ -50,6 +52,8 @@ TEST(Chess, OrderedMove) {
     alphaBeta.config.maxDepth = 4;
     alphaBeta.config.debugLog = false;
 
-    auto eval = alphaBeta.alphabeta(board, 0, board.color == WHITE);
-    std::cout << alphaBeta.visitedNodes << " => " << eval.value << " for " << eval.line.description() << std::endl;
+    ChessEvaluation pv;
+
+    int score = alphaBeta.alphabeta(board, 0, board.color == WHITE, pv);
+    std::cout << alphaBeta.visitedNodes << " => " << score << " for " << pv.line.description() << std::endl;
 }

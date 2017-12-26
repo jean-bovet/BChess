@@ -12,7 +12,14 @@
 
 #include "FFEN.hpp"
 
-TEST(Check, EmptyBoard) {
+class CheckTests: public ::testing::Test {        
+public:
+    void SetUp() {
+        ChessMoveGenerator::initialize();
+    }
+};
+
+TEST_F(CheckTests, EmptyBoard) {
     ChessBoard board;
     ASSERT_TRUE(board.getOccupancy() > 0);
     ASSERT_FALSE(board.isCheck(Color::WHITE));
@@ -24,49 +31,49 @@ TEST(Check, EmptyBoard) {
     ASSERT_FALSE(board.isCheck(Color::BLACK));
 }
 
-TEST(Check, WhiteKingCheckWithKnight) {
+TEST_F(CheckTests, WhiteKingCheckWithKnight) {
     ChessBoard board;
     ASSERT_TRUE(FFEN::setFEN("8/2k5/8/8/8/2K5/4n3/8 w - - 0 1", board));
     ASSERT_TRUE(board.isCheck(Color::WHITE));
     ASSERT_FALSE(board.isCheck(Color::BLACK));
 }
 
-TEST(Check, WhiteKingCheckWithBishop) {
+TEST_F(CheckTests, WhiteKingCheckWithBishop) {
     ChessBoard board;
     ASSERT_TRUE(FFEN::setFEN("8/2k5/5b2/8/8/2K5/8/8 w - - 0 1", board));
     ASSERT_TRUE(board.isCheck(Color::WHITE));
     ASSERT_FALSE(board.isCheck(Color::BLACK));
 }
 
-TEST(Check, WhiteKingCheckWithRook) {
+TEST_F(CheckTests, WhiteKingCheckWithRook) {
     ChessBoard board;
     ASSERT_TRUE(FFEN::setFEN("8/2k5/8/8/8/2K3r1/8/8 w - - 0 1", board));
     ASSERT_TRUE(board.isCheck(Color::WHITE));
     ASSERT_FALSE(board.isCheck(Color::BLACK));
 }
 
-TEST(Check, WhiteKingCheckWithQueenLikeBishop) {
+TEST_F(CheckTests, WhiteKingCheckWithQueenLikeBishop) {
     ChessBoard board;
     ASSERT_TRUE(FFEN::setFEN("8/2k3q1/8/8/8/2K5/8/8 w - - 0 1", board));
     ASSERT_TRUE(board.isCheck(Color::WHITE));
     ASSERT_FALSE(board.isCheck(Color::BLACK));
 }
 
-TEST(Check, WhiteKingCheckWithQueenLikeRook) {
+TEST_F(CheckTests, WhiteKingCheckWithQueenLikeRook) {
     ChessBoard board;
     ASSERT_TRUE(FFEN::setFEN("8/2k5/8/8/8/2K3q1/8/8 w - - 0 1", board));
     ASSERT_TRUE(board.isCheck(Color::WHITE));
     ASSERT_FALSE(board.isCheck(Color::BLACK));
 }
 
-TEST(Check, WhiteKingNotCheck) {
+TEST_F(CheckTests, WhiteKingNotCheck) {
     ChessBoard board;
     ASSERT_TRUE(FFEN::setFEN("8/2k5/8/8/8/2K5/5n2/8 w - - 0 1", board));
     ASSERT_FALSE(board.isCheck(Color::WHITE));
     ASSERT_FALSE(board.isCheck(Color::BLACK));
 }
 
-TEST(Check, BlackKingCheck) {
+TEST_F(CheckTests, BlackKingCheck) {
     ChessBoard board;
     ASSERT_TRUE(FFEN::setFEN("8/2k5/4N3/8/8/2K5/5n2/8 w - - 0 1", board));
     ASSERT_FALSE(board.isCheck(Color::WHITE));

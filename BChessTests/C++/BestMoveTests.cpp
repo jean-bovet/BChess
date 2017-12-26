@@ -13,7 +13,7 @@
 
 #include "ChessEngine.hpp"
 
-static void assertBestMove(std::string fen, std::string finalFEN, std::string bestMove, std::vector<std::string> bestLine, Configuration config) {
+static void assertBestMove(std::string fen, std::string finalFEN, std::string expectedMove, std::vector<std::string> expectedLine, Configuration config) {
     ChessBoard board;
     ASSERT_TRUE(FFEN::setFEN(fen, board));
     std::string boardFEN = FFEN::getFEN(board);
@@ -22,28 +22,30 @@ static void assertBestMove(std::string fen, std::string finalFEN, std::string be
     ChessMinMaxSearch search;
     search.config = config;
 
-    ChessEvaluation evaluation = search.alphabeta(board, 0, board.color == WHITE);
+    ChessEvaluation pv;
+    
+    search.alphabeta(board, 0, board.color == WHITE, pv);
     
     // Assert the best move
-    auto actualMove = FPGN::to_string(evaluation.line.moves[0]);
-    ASSERT_STREQ(actualMove.c_str(), bestMove.c_str());
+    auto actualMove = FPGN::to_string(pv.line.moves[0]);
+    ASSERT_STREQ(expectedMove.c_str(), actualMove.c_str());
     
     // Assert the best line
-    ASSERT_EQ(evaluation.line.count, bestLine.size());
+    ASSERT_EQ(expectedLine.size(), pv.line.count);
 
-    for (int index=0; index<bestLine.size(); index++) {
-        auto lineMove = FPGN::to_string(evaluation.line.moves[index]);
-        ASSERT_STREQ(lineMove.c_str(), bestLine[index].c_str());
+    for (int index=0; index<expectedLine.size(); index++) {
+        auto lineMove = FPGN::to_string(pv.line.moves[index]);
+        ASSERT_STREQ(expectedLine[index].c_str(), lineMove.c_str());
     }
     
     // Now play the moves to reach the final position
     ChessBoard finalBoard = board;
-    for (int index=0; index<evaluation.line.count; index++) {
-        auto move = evaluation.line.moves[index];
+    for (int index=0; index<pv.line.count; index++) {
+        auto move = pv.line.moves[index];
         finalBoard.move(move);
     }
     auto finalBoardFEN = FFEN::getFEN(finalBoard);
-    ASSERT_STREQ(finalBoardFEN.c_str(), finalFEN.c_str());
+    ASSERT_STREQ(finalFEN.c_str(), finalBoardFEN.c_str());
 }
 
 static void assertBestMove(std::string fen, std::string finalFEN, std::string bestMove, std::vector<std::string> bestLine) {
@@ -69,18 +71,18 @@ TEST(BestMove, PawnForkQueenAndKing) {
 
 TEST(BestMove, KnightEscapeAttackByPawn) {
     std::string start = "r1bqkbnr/pppp1ppp/2n5/3P4/8/8/PPP2PPP/RNBQKBNR b KQkq - 0 4";
-    std::string end = "r1bqk1nr/pp1p1ppp/8/3Q4/8/b7/1P3PPP/RNB1KBNR w KQkq - 0 9";
+    std::string end = "r1bqkb1r/ppppnppp/8/n2P4/8/2N5/PPP1NPPP/R1BQKB1R b KQkq - 4 6";
     // Note: without quiescence search, the engine wants to do Bf8b4 but actually this leads into material loss way down the tree.
     // The best move here is moving the knight out of c6.
-    assertBestMove(start, end, "Nc6e7",  { "Nc6e7", "a2a3", "c7c6", "c2c4", "c6xd5", "c4xd5", "Ne7xd5", "Qd1xd5", "Bf8xa3" });
+    assertBestMove(start, end, "Nc6a5",  { "Nc6a5", "Nb1c3", "Ng8e7", "Ng1e2" });
 }
 
 // In this situation, we are trying to see if the engine is able to see
 // that moving the pawn c2c3 can actually cause a double attacks against black.
 TEST(BestMove, MovePawnToAttackBishop) {
     std::string start = "r1bqk1nr/pppp1ppp/2n5/3P4/1b6/8/PPP2PPP/RNBQKBNR w KQkq - 1 5";
-    std::string end = "r1bqk1nr/pppp1ppp/8/n1bP4/8/N1P5/PP3PPP/R1BQKBNR w KQkq - 3 7";
-    assertBestMove(start, end, "c2c3",  { "c2c3", "Bb4c5", "Nb1a3", "Nc6a5" });
+    std::string end = "r1bqk1nr/ppp2ppp/2p5/b7/8/2P5/PP3PPP/RNBQKBNR w KQkq - 0 7";
+    assertBestMove(start, end, "c2c3",  { "c2c3", "Bb4a5", "d5xc6", "d7xc6" });
 }
 
 TEST(BestMove, BlackMoveToMateNonSorted) {
