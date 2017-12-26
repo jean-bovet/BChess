@@ -65,7 +65,7 @@ public:
             minMaxSearch.reset();
             
             ChessMinMaxSearch::Variation pv;
-            minMaxSearch.alphabeta(board, 0, board.color == WHITE, pv);
+            int score = minMaxSearch.alphabeta(board, 0, board.color == WHITE, pv);
             
             moveClock.stop();
             
@@ -73,14 +73,15 @@ public:
             int movesPerSecond = int(movesPerSingleMs * 1e3);
             
             if (analyzing) {
-                // TODO
                 evaluation.clear();
-                for (int index=0; index<pv.moves.count; index++) {
-                    evaluation.line.push(pv.moves[index]);
-                }
+                
+                evaluation.value = score;
+
                 evaluation.depth = pv.depth;
                 evaluation.quiescenceDepth = pv.qsDepth;
-                evaluation.value = pv.value;
+
+                evaluation.line.push(pv.moves);
+                
                 evaluation.nodes = minMaxSearch.visitedNodes;
                 evaluation.time = int(moveClock.elapsedMilli()/1e3);
                 evaluation.engineColor = board.color;

@@ -68,7 +68,8 @@ public:
         analyzing = true;
         Variation currentLine;
         int color = maximizingPlayer ? 1 : -1;
-        return alphabeta(node, depth, -INT_MAX, INT_MAX, color, pv, currentLine);
+        int score = alphabeta(node, depth, -INT_MAX, INT_MAX, color, pv, currentLine);
+        return score * color;
     }
     
 private:
@@ -140,6 +141,10 @@ private:
         }
         
         auto moves = TMoveGenerator::generateMoves(node, true);
+        if (moves.count == 0) {
+            return alpha;
+        }
+        
         if (config.sortMoves) {
             TMoveGenerator::sortMoves(moves);
         }
