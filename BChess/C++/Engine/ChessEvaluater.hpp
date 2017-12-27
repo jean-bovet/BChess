@@ -21,9 +21,9 @@ public:
     
     static bool isQuiet(Move move);
     
-    static int evaluate(ChessBoard board, MoveList moves);
-
     static int evaluate(ChessBoard board);
+
+    static int evaluate(ChessBoard board, MoveList moves);
 
     static int getBonus(Piece piece, Color color, Square square);
 };

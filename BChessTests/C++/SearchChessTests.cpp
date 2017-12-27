@@ -47,8 +47,8 @@ TEST(Chess, OrderedMove) {
     Configuration config;
 
     config.sortMoves = true;
-    assertChessSearch(28834, 20, config, board);
+    assertChessSearch(28832, 20, config, board);
     
     config.sortMoves = false;
-    assertChessSearch(421861, 20, config, board);
+    assertChessSearch(453639, 20, config, board);
 }

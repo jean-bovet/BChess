@@ -129,6 +129,11 @@ int ChessEvaluater::getBonus(Piece piece, Color color, Square square) {
     }
 }
 
+int ChessEvaluater::evaluate(ChessBoard board) {
+    auto moves = ChessMoveGenerator::generateMoves(board);
+    return evaluate(board, moves);
+}
+
 int ChessEvaluater::evaluate(ChessBoard board, MoveList moves) {
     if (moves.count == 0) {
         if (board.isCheck(board.color)) {
@@ -138,13 +143,8 @@ int ChessEvaluater::evaluate(ChessBoard board, MoveList moves) {
             // No moves and not check, that's a draw
             return 0;
         }
-    } else {
-        // Otherwise let's evaluate the node itself
-        return evaluate(board);
     }
-}
-
-int ChessEvaluater::evaluate(ChessBoard board) {
+    
     int value = 0;
     for (unsigned color=0; color<COUNT; color++) {
         auto isWhite = color == WHITE;

@@ -87,10 +87,10 @@ TEST(BestMove, MovePawnToAttackBishop) {
 
 TEST(BestMove, BlackMoveToMateNonSorted) {
     std::string start = "8/6k1/p7/2rbp3/8/7P/5qPK/8 b - - 3 39";
-    std::string end = "8/6k1/8/p1rbp3/7P/8/6qK/8 w - - 0 41";
+    std::string end = "8/6k1/p7/2rb3P/8/4p3/6qK/8 w - - 0 42";
     Configuration config;
     config.sortMoves = false;
-    assertBestMove(start, end, "a6a5",  { "a6a5", "h3h4", "Qf2xg2" }, config );
+    assertBestMove(start, end, "e5e4",  { "e5e4", "h3h4", "e4e3", "h4h5", "Qf2xg2" }, config );
 }
 
 TEST(BestMove, BlackMoveToMate) {

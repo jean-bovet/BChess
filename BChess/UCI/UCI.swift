@@ -139,8 +139,8 @@ class UCI {
     
     func performance() {
         engine.async = false
-        engine.setFEN("rnbqkb1r/pppppppp/5n2/8/4P3/2N5/PPPP1PPP/R1BQKBNR b KQkq - 2 2")
-        engine.evaluate(6) { (info, completed) in
+        engine.setFEN("r3kb1r/pp2pQpp/n7/qNn1N3/8/P7/1PP2PPP/R1B1R1K1 b kq - 0 15")
+        engine.evaluate(8) { (info, completed) in
             print(info.uciInfoMessage)
         }
     }

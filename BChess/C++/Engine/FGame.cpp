@@ -47,13 +47,13 @@ std::vector<Move> FGame::movesAt(File file, Rank rank) {
 }
 
 void FGame::move(Move move) {
-    if (moveCursor < moves.size()) {
+    if (moveCursor < moves.count) {
         // Clear the rest of the history
-        moves.erase(moves.begin() + (long)moveCursor, moves.end());
+        moves.count = moveCursor;
     }
-    
-    moves.push_back(move);
-    moveCursor = moves.size();
+
+    moves.push(move);
+    moveCursor = moves.count;
 
     board.move(move);
 }
@@ -70,7 +70,7 @@ bool FGame::canUndoMove() {
 }
 
 bool FGame::canRedoMove() {
-    return moveCursor < moves.size();
+    return moveCursor < moves.count;
 }
 
 void FGame::undoMove() {
@@ -87,7 +87,7 @@ void FGame::redoMove() {
 
 void FGame::replayMoves() {
     board.reset();
-    for (size_t index=0; index<moveCursor; index++) {
+    for (int index=0; index<moveCursor; index++) {
         board.move(moves[index]);
     }
 }
