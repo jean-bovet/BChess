@@ -11,6 +11,7 @@
 #include "ChessBoard.hpp"
 #include "FMoveList.hpp"
 
+// https://chessprogramming.wikispaces.com/Evaluation
 class ChessEvaluater {
 public:
     // Mat value which must be lower than INT_MIN or INT_MAX

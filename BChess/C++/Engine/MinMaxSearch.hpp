@@ -76,6 +76,8 @@ private:
     
     // pv: Principal Variation - the best line found so far.
     // cv: Current Variation - the current line being examined.
+    // https://en.wikipedia.org/wiki/Negamax
+    // https://chessprogramming.wikispaces.com/Principal+variation
     int alphabeta(TNode node, int depth, int alpha, int beta, int color, Variation &pv, Variation &cv) {
         pv.depth = depth;
 
@@ -128,6 +130,7 @@ private:
         return bestValue;
     }
     
+    // https://chessprogramming.wikispaces.com/Quiescence+Search
     int quiescence(TNode node, int depth, int alpha, int beta, int color, Variation &pv, Variation &cv) {
         pv.qsDepth = depth;
         
