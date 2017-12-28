@@ -282,26 +282,26 @@
             <objects>
                 <viewController id="XfG-lQ-9wD" customClass="ChessViewController" customModule="BChess" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" wantsLayer="YES" id="m2S-Jp-Qdl">
-                        <rect key="frame" x="0.0" y="0.0" width="852" height="563"/>
+                        <rect key="frame" x="0.0" y="0.0" width="952" height="563"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
                             <stackView distribution="fill" orientation="horizontal" alignment="centerY" spacing="0.0" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="a6M-pX-2Vm">
-                                <rect key="frame" x="0.0" y="0.0" width="852" height="563"/>
+                                <rect key="frame" x="0.0" y="0.0" width="952" height="563"/>
                                 <subviews>
                                     <customView translatesAutoresizingMaskIntoConstraints="NO" id="Q8S-Oy-e6A" customClass="BoardView" customModule="BChess" customModuleProvider="target">
                                         <rect key="frame" x="0.0" y="0.0" width="692" height="563"/>
                                     </customView>
                                     <scrollView borderType="none" autohidesScrollers="YES" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" hasVerticalScroller="NO" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="40J-P2-23o">
-                                        <rect key="frame" x="692" y="1" width="160" height="562"/>
+                                        <rect key="frame" x="692" y="1" width="260" height="562"/>
                                         <clipView key="contentView" id="Wbl-vo-wge">
-                                            <rect key="frame" x="0.0" y="0.0" width="160" height="562"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="260" height="562"/>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                             <subviews>
-                                                <textView editable="NO" selectable="NO" drawsBackground="NO" importsGraphics="NO" richText="NO" verticallyResizable="YES" usesFontPanel="YES" findStyle="panel" continuousSpellChecking="YES" usesRuler="YES" allowsNonContiguousLayout="YES" quoteSubstitution="YES" dashSubstitution="YES" spellingCorrection="YES" smartInsertDelete="YES" id="lqJ-o6-VhY">
-                                                    <rect key="frame" x="0.0" y="0.0" width="160" height="562"/>
+                                                <textView editable="NO" selectable="NO" drawsBackground="NO" importsGraphics="NO" verticallyResizable="YES" usesFontPanel="YES" findStyle="panel" continuousSpellChecking="YES" usesRuler="YES" allowsNonContiguousLayout="YES" quoteSubstitution="YES" dashSubstitution="YES" spellingCorrection="YES" smartInsertDelete="YES" id="lqJ-o6-VhY">
+                                                    <rect key="frame" x="0.0" y="0.0" width="260" height="562"/>
                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                     <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                                                    <size key="minSize" width="160" height="562"/>
+                                                    <size key="minSize" width="260" height="562"/>
                                                     <size key="maxSize" width="463" height="10000000"/>
                                                     <attributedString key="textStorage">
                                                         <fragment content="PGN Representation here">
@@ -317,7 +317,7 @@
                                             <color key="backgroundColor" name="controlHighlightColor" catalog="System" colorSpace="catalog"/>
                                         </clipView>
                                         <constraints>
-                                            <constraint firstAttribute="width" constant="160" id="XOV-4t-S7U"/>
+                                            <constraint firstAttribute="width" constant="260" id="XOV-4t-S7U"/>
                                         </constraints>
                                         <scroller key="horizontalScroller" hidden="YES" verticalHuggingPriority="750" doubleValue="1" horizontal="YES" id="Yfl-gf-LMa">
                                             <rect key="frame" x="-100" y="-100" width="87" height="18"/>

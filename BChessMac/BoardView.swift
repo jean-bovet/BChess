@@ -163,7 +163,15 @@ class BoardView: NSView {
         }
     }
     
-    var infoLine: String {
+    func boldText(text: String) -> NSAttributedString {
+        return NSAttributedString(string: text, attributes: [ NSAttributedStringKey.font : NSFont.boldSystemFont(ofSize: 12)])
+    }
+    
+    func regularText(text: String) -> NSAttributedString {
+        return NSAttributedString(string: text, attributes: [ NSAttributedStringKey.font : NSFont.systemFont(ofSize: 12)])
+    }
+
+    var infoLine: NSAttributedString {
         let infoColorToPlay = engine.isWhite() ? "White" : "Black"
 
         if let info = info {
@@ -176,10 +184,35 @@ class BoardView: NSView {
             } else {
                 infoValue = String(info.value)
             }
-            let infoString = "\(infoColorToPlay)\nValue: \(infoValue)\nLine: \(lineInfo)\nDepth: \(info.depth)/\(info.quiescenceDepth)\nNodes: \(infoNodes)\nSpeed: \(infoSpeed) n/s"
+            let infoString = NSMutableAttributedString()
+            infoString.append(boldText(text: "Side to play: "))
+            infoString.append(regularText(text: infoColorToPlay))
+            infoString.append(regularText(text: "\n"))
+
+            infoString.append(boldText(text: "Value: "))
+            infoString.append(regularText(text: infoValue))
+            infoString.append(regularText(text: "\n"))
+
+            infoString.append(boldText(text: "Line: "))
+            infoString.append(regularText(text: lineInfo))
+            infoString.append(regularText(text: "\n"))
+
+            infoString.append(boldText(text: "Depth: "))
+            infoString.append(regularText(text: "\(info.depth)/\(info.quiescenceDepth)"))
+            infoString.append(regularText(text: "\n"))
+
+            infoString.append(boldText(text: "Nodes: "))
+            infoString.append(regularText(text: infoNodes))
+            infoString.append(regularText(text: "\n"))
+
+            infoString.append(boldText(text: "Speed: "))
+            infoString.append(regularText(text: "\(infoSpeed) n/s"))
             return infoString
         } else {
-            return "\(infoColorToPlay)"
+            let infoString = NSMutableAttributedString()
+            infoString.append(boldText(text: "Side to play: "))
+            infoString.append(regularText(text: infoColorToPlay))
+            return infoString
         }
     }
     

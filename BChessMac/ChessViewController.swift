@@ -38,7 +38,11 @@ class ChessViewController: NSViewController {
     }
     
     func updateGameInfo() {
-        gameInfoTextView.string = chessView.infoLine + "\n" + engine.pgnFormattedForDisplay()
+        let text = NSMutableAttributedString()
+        text.append(chessView.infoLine)
+        text.append(NSAttributedString(string: "\n"))
+        text.append(NSAttributedString(string: engine.pgnFormattedForDisplay()))
+        gameInfoTextView.textStorage?.setAttributedString(text)
     }
     
     func saveToDefaults() {
