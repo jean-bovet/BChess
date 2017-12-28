@@ -220,6 +220,10 @@
 			children = (
 				A7712D401FCB97A900E7E802 /* magicmoves.h */,
 				A7712D411FCB97A900E7E802 /* magicmoves.c */,
+				A70A61BA1FD132D200AFDF0E /* FFEN.hpp */,
+				A70A61B91FD132D200AFDF0E /* FFEN.cpp */,
+				A77372001FE320010001A90F /* FPGN.hpp */,
+				A77371FF1FE320010001A90F /* FPGN.cpp */,
 				A70A61BC1FD1333300AFDF0E /* FUtility.hpp */,
 			);
 			path = Helpers;
@@ -248,7 +252,7 @@
 				A75CB2611FED9693005487BD /* IterativeDeepening.hpp */,
 				A7EF55CB1FF22FE7004CF2DA /* MinMaxMoveList.hpp */,
 				A75BFAC61FE8C05E001EE942 /* MinMaxSearch.hpp */,
-				A75CB2631FEDF011005487BD /* Serialization */,
+				A70A61D31FD4D37600AFDF0E /* Helpers */,
 			);
 			path = Engine;
 			sourceTree = "<group>";
@@ -287,23 +291,18 @@
 			path = BChessMacUITests;
 			sourceTree = "<group>";
 		};
-		A75CB2631FEDF011005487BD /* Serialization */ = {
-			isa = PBXGroup;
-			children = (
-				A70A61BA1FD132D200AFDF0E /* FFEN.hpp */,
-				A70A61B91FD132D200AFDF0E /* FFEN.cpp */,
-				A77372001FE320010001A90F /* FPGN.hpp */,
-				A77371FF1FE320010001A90F /* FPGN.cpp */,
-			);
-			path = Serialization;
-			sourceTree = "<group>";
-		};
 		A7712D151FB916E900E7E802 /* BChessTests */ = {
 			isa = PBXGroup;
 			children = (
 				A7712D321FC8957500E7E802 /* GamesTests.swift */,
 				A7B18F571FD9BAE500A605B8 /* MovesTests.swift */,
-				A7E490EF1FEA2E6100970EAD /* C++ */,
+				A75CB25A1FED8F2B005487BD /* MoveTests.cpp */,
+				A75CB25C1FED8F82005487BD /* EvaluationTests.cpp */,
+				A75CB25E1FED8F9E005487BD /* CheckTests.cpp */,
+				A70A61BD1FD3196400AFDF0E /* BestMoveTests.cpp */,
+				A77372041FE340780001A90F /* PGNTests.cpp */,
+				A7E490E41FEA1C0600970EAD /* SearchChessTests.cpp */,
+				A7E490E51FEA1C0600970EAD /* SearchSyntheticTests.cpp */,
 				A7E490F01FEA2E6F00970EAD /* Helper */,
 				A7712D181FB916E900E7E802 /* Info.plist */,
 			);
@@ -317,16 +316,6 @@
 				A75359831FDC51B2008D1DEE /* FENgineInfo+Extension.swift */,
 			);
 			path = UCI;
-			sourceTree = "<group>";
-		};
-		A7712D481FCBC13500E7E802 /* C++ */ = {
-			isa = PBXGroup;
-			children = (
-				A70A61CE1FD4AA8500AFDF0E /* Bridge */,
-				A70A61D41FD4D37E00AFDF0E /* Engine */,
-				A70A61D31FD4D37600AFDF0E /* Helpers */,
-			);
-			path = "C++";
 			sourceTree = "<group>";
 		};
 		A7AFCC9D1FB4E40D00AE3D85 = {
@@ -360,23 +349,10 @@
 				A7AFCCA91FB4E40D00AE3D85 /* main.swift */,
 				A7712D3F1FCB97A800E7E802 /* BChess-Bridging-Header.h */,
 				A7712D301FC7C4D300E7E802 /* UCI */,
-				A7712D481FCBC13500E7E802 /* C++ */,
+				A70A61CE1FD4AA8500AFDF0E /* Bridge */,
+				A70A61D41FD4D37E00AFDF0E /* Engine */,
 			);
 			path = BChess;
-			sourceTree = "<group>";
-		};
-		A7E490EF1FEA2E6100970EAD /* C++ */ = {
-			isa = PBXGroup;
-			children = (
-				A75CB25A1FED8F2B005487BD /* MoveTests.cpp */,
-				A75CB25C1FED8F82005487BD /* EvaluationTests.cpp */,
-				A75CB25E1FED8F9E005487BD /* CheckTests.cpp */,
-				A70A61BD1FD3196400AFDF0E /* BestMoveTests.cpp */,
-				A77372041FE340780001A90F /* PGNTests.cpp */,
-				A7E490E41FEA1C0600970EAD /* SearchChessTests.cpp */,
-				A7E490E51FEA1C0600970EAD /* SearchSyntheticTests.cpp */,
-			);
-			path = "C++";
 			sourceTree = "<group>";
 		};
 		A7E490F01FEA2E6F00970EAD /* Helper */ = {
