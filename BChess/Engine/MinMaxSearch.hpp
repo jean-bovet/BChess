@@ -143,7 +143,7 @@ private:
             alpha = stand_pat;
         }
         
-        auto moves = TMoveGenerator::generateMoves(node, true);
+        auto moves = TMoveGenerator::generateQuiescenceMoves(node);
         if (moves.count == 0) {
             return alpha;
         }

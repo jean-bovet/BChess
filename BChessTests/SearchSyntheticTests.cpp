@@ -130,6 +130,10 @@ struct TestMoveGenerator {
         std::sort(std::begin(moveList.moves), std::begin(moveList.moves)+moveList.count, testMoveComparison);
     }
     
+    static TestMoveList generateQuiescenceMoves(TestBoard board) {
+        return generateMoves(board, true);
+    }
+    
     static TestMoveList generateMoves(TestBoard board, bool qs = false) {
         TestMoveList moveList;
         for (int index=0; index<board.node->_children.size(); index++) {

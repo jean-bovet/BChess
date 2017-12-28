@@ -130,7 +130,7 @@ int ChessEvaluater::getBonus(Piece piece, Color color, Square square) {
 }
 
 int ChessEvaluater::evaluate(ChessBoard board) {
-    auto moves = ChessMoveGenerator::generateMoves(board);
+    auto moves = ChessMoveGenerator::generateMoves(board, ChessMoveGenerator::Mode::firstMoveOnly);
     return evaluate(board, moves);
 }
 

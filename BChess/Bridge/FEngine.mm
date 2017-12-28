@@ -209,7 +209,7 @@
     }
     
     ChessMoveGenerator generator;
-    MoveList moves = generator.generateMoves(board, false, square);
+    MoveList moves = generator.generateMoves(board, ChessMoveGenerator::Mode::allMoves, square);
     NSMutableArray<NSString*>* moveFENs = [NSMutableArray array];
     for (int index=0; index<moves.count; index++) {
         auto move = moves.moves[index];

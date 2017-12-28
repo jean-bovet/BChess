@@ -26,13 +26,21 @@ public:
 
     static void sortMoves(MoveList & moves);
 
-    static MoveList generateMoves(ChessBoard board, bool qs = false, Square specificSquare = SquareUndefined);
+    enum class Mode {
+        allMoves,
+        quiescenceMoveOnly,
+        firstMoveOnly
+    };
     
-    static void generateAttackMoves(ChessBoard &board, MoveList &moveList, Square fromSquare, Piece attackingPiece, Bitboard attackingSquares);
+    static MoveList generateQuiescenceMoves(ChessBoard board);
+
+    static MoveList generateMoves(ChessBoard board, Mode mode = Mode::allMoves, Square specificSquare = SquareUndefined);
     
-    static void generatePawnsMoves(ChessBoard &board, MoveList &moveList, bool qs, Square specificSquare = SquareUndefined);
-    static void generateKingsMoves(ChessBoard &board, MoveList &moveList, bool qs, Square specificSquare = SquareUndefined);
-    static void generateKnightsMoves(ChessBoard &board, MoveList &moveList, bool qs, Square specificSquare = SquareUndefined);
-    static void generateSlidingMoves(ChessBoard &board, Piece piece, MoveList &moveList, bool qs, Square specificSquare = SquareUndefined);
+    static void generateAttackMoves(ChessBoard &board, MoveList &moveList, Square fromSquare, Piece attackingPiece, Bitboard attackingSquares, Mode mode);
+    
+    static void generatePawnsMoves(ChessBoard &board, MoveList &moveList, Mode mode, Square specificSquare = SquareUndefined);
+    static void generateKingsMoves(ChessBoard &board, MoveList &moveList, Mode mode, Square specificSquare = SquareUndefined);
+    static void generateKnightsMoves(ChessBoard &board, MoveList &moveList, Mode mode, Square specificSquare = SquareUndefined);
+    static void generateSlidingMoves(ChessBoard &board, Piece piece, MoveList &moveList, Mode mode, Square specificSquare = SquareUndefined);
 };
 

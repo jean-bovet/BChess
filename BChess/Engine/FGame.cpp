@@ -41,7 +41,7 @@ BoardSquare FGame::getPieceAt(File file, Rank rank) {
 
 std::vector<Move> FGame::movesAt(File file, Rank rank) {
     ChessMoveGenerator generator = ChessMoveGenerator();
-    MoveList moveList = generator.generateMoves(board, false, SquareFrom(file, rank));
+    MoveList moveList = generator.generateMoves(board, ChessMoveGenerator::Mode::allMoves, SquareFrom(file, rank));
     std::vector<Move> moves;
     for (int index=0; index<moveList.count; index++) {
         auto move = moveList.moves[index];
