@@ -91,6 +91,12 @@ public:
             if (callback) {
                 callback(evaluation);
             }
+            
+            // If the principal variation has no valid move, it means
+            // the current position is stale or mate so no need to continue.
+            if (pv.moves.count == 0) {
+                break;
+            }
         }
         return evaluation;
     }

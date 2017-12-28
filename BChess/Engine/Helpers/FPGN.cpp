@@ -523,7 +523,7 @@ std::string FPGN::getGame(FGame game, Formatting formatting, int fromIndex) {
     
     std::string pgn;
     unsigned fullMoveIndex = 0;
-    for (int index=0; index<game.moveCursor; index++) {
+    for (int index=0; index<game.moveCursor && fromIndex < game.moveCursor; index++) {
         auto move = game.moves[index];
         auto piece = MOVE_PIECE(move);
 
@@ -554,9 +554,6 @@ std::string FPGN::getGame(FGame game, Formatting formatting, int fromIndex) {
         
         if (index % 2 == 0) {
             fullMoveIndex++;
-            if (formatting == Formatting::history) {
-                pgn += "\n";
-            }
             if (formatting != Formatting::line) {
                 pgn += std::to_string(fullMoveIndex) + ". ";
             }

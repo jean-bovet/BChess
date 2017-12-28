@@ -60,6 +60,20 @@ void FGame::move(Move move) {
     moveCursor = moves.count;
 
     board.move(move);
+    
+    // Update the outcome after each move
+    ChessMoveGenerator generator = ChessMoveGenerator();
+    if (generator.generateMoves(board).count == 0) {
+        if (board.isCheck(board.color)) {
+            if (board.color == WHITE) {
+                outcome = Outcome::black_wins;
+            } else {
+                outcome = Outcome::white_wins;
+            }
+        } else {
+            outcome = Outcome::draw;
+        }
+    }
 }
 
 void FGame::move(std::string from, std::string to) {

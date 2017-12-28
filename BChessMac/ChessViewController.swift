@@ -40,7 +40,7 @@ class ChessViewController: NSViewController {
     func updateGameInfo() {
         let text = NSMutableAttributedString()
         text.append(chessView.infoLine)
-        text.append(NSAttributedString(string: "\n"))
+        text.append(NSAttributedString(string: "\n\n"))
         text.append(NSAttributedString(string: engine.pgnFormattedForDisplay()))
         gameInfoTextView.textStorage?.setAttributedString(text)
     }
