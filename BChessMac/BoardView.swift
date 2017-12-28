@@ -219,6 +219,13 @@ class BoardView: NSView {
     var animation = false
     
     func animateMove(info: FEngineInfo) {
+        // Do not try to animate an invalid move, which can happen
+        // when there is a stale or mate and no move is found by
+        // the chess engine.
+        guard info.bestMove != 0 else {
+            return
+        }
+        
         animation = true
         let fromPieceView = pieceSquareView(rank: Int(info.fromRank), file: Int(info.fromFile))
         let targetPieceView = pieceSquareView(rank: Int(info.toRank), file: Int(info.toFile))
