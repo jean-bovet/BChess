@@ -64,7 +64,7 @@
 }
 
 - (NSString*)PGNFormattedForDisplay {
-    auto pgn = FPGN::getGame(currentGame, true);
+    auto pgn = FPGN::getGame(currentGame, FPGN::Formatting::history);
     return [NSString stringWithUTF8String:pgn.c_str()];
 }
 

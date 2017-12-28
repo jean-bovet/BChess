@@ -518,7 +518,7 @@ bool FPGN::setGame(std::string pgn, FGame &game) {
     return true;
 }
 
-std::string FPGN::getGame(FGame game, bool newLineAfterEachFullMove, bool compact, int fromIndex) {
+std::string FPGN::getGame(FGame game, Formatting formatting, int fromIndex) {
     // Game used to compute the optimum PGN representation for each move
     ChessBoard outputBoard;
     FFEN::setFEN(game.initialFEN, outputBoard);
@@ -556,10 +556,10 @@ std::string FPGN::getGame(FGame game, bool newLineAfterEachFullMove, bool compac
         
         if (index % 2 == 0) {
             fullMoveIndex++;
-            if (newLineAfterEachFullMove) {
+            if (formatting == Formatting::history) {
                 pgn += "\n";
             }
-            if (!compact) {
+            if (formatting != Formatting::line) {
                 pgn += std::to_string(fullMoveIndex) + ". ";
             }
         }
@@ -582,7 +582,7 @@ std::string FPGN::getGame(FGame game, bool newLineAfterEachFullMove, bool compac
         pgn += " ";
     }
     
-    if (compact) {
+    if (formatting == Formatting::line) {
         return pgn;
     }
         
@@ -604,15 +604,17 @@ std::string FPGN::getGame(FGame game, bool newLineAfterEachFullMove, bool compac
             break;
     }
     
-    // Now let's add the tag pairs
-    // https://en.wikipedia.org/wiki/Portable_Game_Notation
-    if (game.initialFEN != StartFEN) {
-        // [FEN "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq - 0 1"]
-        // [SetUp "1"]
-        std::string tags = "[FEN \"" + game.initialFEN + "\"]\n";
-        tags += "Setup \"1\"\n";
-        
-        pgn = tags + pgn;
+    if (formatting == Formatting::storage) {
+        // Now let's add the tag pairs
+        // https://en.wikipedia.org/wiki/Portable_Game_Notation
+        if (game.initialFEN != StartFEN) {
+            // [FEN "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq - 0 1"]
+            // [SetUp "1"]
+            std::string tags = "[FEN \"" + game.initialFEN + "\"]\n";
+            tags += "Setup \"1\"\n";
+            
+            pgn = tags + pgn;
+        }
     }
     
     return pgn;

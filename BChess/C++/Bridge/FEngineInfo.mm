@@ -96,7 +96,7 @@
         }
 
         // Get the PGN representation of the best line only
-        auto cppString = FPGN::getGame(lineGame, false, true, cursor);
+        auto cppString = FPGN::getGame(lineGame, FPGN::Formatting::line, cursor);
         return [NSString stringWithUTF8String:cppString.c_str()];
     }
 }

@@ -32,7 +32,13 @@ public:
     
     static bool setGame(std::string pgn, FGame &game);
     
+    enum class Formatting {
+        storage, // default mode, to be exported or stored outside this program
+        line, // for displaying the line of game, without numbering the moves. For example: "Na3 Bxc4 e5+"
+        history, // for displaying the history of the game, with new lines every two ply.
+    };
+    
     // compact: true to return a compact form of PGN for display in the UI. For example: "Na3 Bxc4 e5+"
     // fromIndex: the index from which to start building the PGN. Used to display a line from a game.
-    static std::string getGame(FGame game, bool newLineAfterEachFullMove = false, bool compact = false, int fromIndex = 0);
+    static std::string getGame(FGame game, Formatting formatting = FPGN::Formatting::storage, int fromIndex = 0);
 };
