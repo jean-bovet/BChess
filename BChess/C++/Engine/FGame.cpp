@@ -11,16 +11,20 @@
 #include "ChessMoveGenerator.hpp"
 #include "ChessEvaluater.hpp"
 
+FGame::FGame() {
+    reset();
+}
+
 void FGame::reset() {
     moveCursor = 0;
     board.reset();
-    startBoard.reset();
+    initialFEN = StartFEN;
 }
 
 bool FGame::setFEN(std::string fen) {
     moveCursor = 0;
     if (FFEN::setFEN(fen, board)) {
-        startBoard = board;
+        initialFEN = fen;
         return true;
     } else {
         return false;
@@ -87,6 +91,7 @@ void FGame::redoMove() {
 
 void FGame::replayMoves() {
     board.reset();
+    assert(FFEN::setFEN(initialFEN, board));
     for (int index=0; index<moveCursor; index++) {
         board.move(moves[index]);
     }

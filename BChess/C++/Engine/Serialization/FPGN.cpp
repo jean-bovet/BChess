@@ -7,6 +7,9 @@
 //
 
 #include "FPGN.hpp"
+#include "FFEN.hpp"
+#include "FUtility.hpp"
+
 #include "ChessBoard.hpp"
 #include "ChessMoveGenerator.hpp"
 
@@ -55,6 +58,35 @@ static bool parseMoveNumber(std::string pgn, unsigned &cursor) {
         cursor++;
     }
     cursor++;
+    return true;
+}
+
+static bool parseString(std::string pgn, unsigned &cursor, std::string string) {
+    for (int index=0; index<string.length(); index++) {
+        if (cursor < pgn.length()) {
+            if (string[index] == pgn[cursor]) {
+                cursor++;
+            } else {
+                return false;
+            }
+        } else {
+            return false;
+        }
+    }
+    return true;
+}
+
+static bool parseQuotedString(std::string pgn, unsigned &cursor, std::string &string) {
+    if (pgn[cursor] != '"') {
+        return false;
+    }
+    cursor++;
+    
+    while (cursor < pgn.length() && pgn[cursor] != '"') {
+        string += pgn[cursor];
+        cursor++;
+    }
+    cursor++; // go after the endCharacter
     return true;
 }
 
@@ -456,10 +488,18 @@ bool FPGN::setGame(std::string pgn, FGame &game) {
     while (cursor < pgn.length() && !end) {
         auto c = pgn[cursor];
         if (c == '[') {
-            // Indication for a comment
+            // Indication for a tag
             cursor++; // go after the [
-            std::string comment = "";
-            assert(parseUntil(pgn, cursor, comment, ']'));
+
+            if (parseString(pgn, cursor, "FEN")) {
+                eatWhiteSpace(pgn, cursor);
+                std::string fen;
+                assert(parseQuotedString(pgn, cursor, fen));
+                assert(game.setFEN(fen));
+            } else {
+                std::string comment = "";
+                assert(parseUntil(pgn, cursor, comment, ']'));
+            }
         } else if (c == '{') {
             // Indication for a comment
             cursor++; // go after the [
@@ -479,7 +519,10 @@ bool FPGN::setGame(std::string pgn, FGame &game) {
 }
 
 std::string FPGN::getGame(FGame game, bool newLineAfterEachFullMove, bool compact, int fromIndex) {
-    ChessBoard outputBoard = game.startBoard; // Game used to compute the optimum PGN representation for each move
+    // Game used to compute the optimum PGN representation for each move
+    ChessBoard outputBoard;
+    FFEN::setFEN(game.initialFEN, outputBoard);
+    
     std::string pgn;
     unsigned fullMoveIndex = 0;
     for (int index=0; index<game.moveCursor; index++) {
@@ -511,10 +554,6 @@ std::string FPGN::getGame(FGame game, bool newLineAfterEachFullMove, bool compac
             }
         }
         
-        if (pgn.size() > 0) {
-            pgn += " ";
-        }
-        
         if (index % 2 == 0) {
             fullMoveIndex++;
             if (newLineAfterEachFullMove) {
@@ -526,7 +565,7 @@ std::string FPGN::getGame(FGame game, bool newLineAfterEachFullMove, bool compac
         }
                 
         pgn += to_string(move, sanType);
-        
+
         outputBoard.move(move);
         
         // Determine if the position is check or mate
@@ -539,14 +578,14 @@ std::string FPGN::getGame(FGame game, bool newLineAfterEachFullMove, bool compac
                 pgn += "+";
             }
         }
+        
+        pgn += " ";
     }
     
     if (compact) {
         return pgn;
     }
-    
-    pgn += " ";
-    
+        
     switch (game.outcome) {
         case FGame::Outcome::black_wins:
             pgn += "0-1";
@@ -564,6 +603,18 @@ std::string FPGN::getGame(FGame game, bool newLineAfterEachFullMove, bool compac
             pgn += "*";
             break;
     }
+    
+    // Now let's add the tag pairs
+    // https://en.wikipedia.org/wiki/Portable_Game_Notation
+    if (game.initialFEN != StartFEN) {
+        // [FEN "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq - 0 1"]
+        // [SetUp "1"]
+        std::string tags = "[FEN \"" + game.initialFEN + "\"]\n";
+        tags += "Setup \"1\"\n";
+        
+        pgn = tags + pgn;
+    }
+    
     return pgn;
 }
 

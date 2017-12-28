@@ -46,7 +46,7 @@ static void assertOutputPGN(const char *pgnGame, std::string expectedFEN, std::s
 static void assertMovetextSingle(std::string pgn, std::string expectedMove) {
     unsigned cursor = 0;
     FGame game;
-    bool end;
+    bool end = false;
     Move move = FPGN::parseMove(pgn, cursor, game, end);
     if (expectedMove.size() == 0) {
         EXPECT_FALSE(MOVE_ISVALID(move));
@@ -131,7 +131,7 @@ TEST(PGN, GameWithBlackFromFEN) {
     game.move("c1", "d1");
     
     auto pgn = FPGN::getGame(game);
-    ASSERT_STREQ(pgn.c_str(), "1. Rd1+ *");
+    ASSERT_STREQ(pgn.c_str(), "[FEN \"1K1k4/1P6/8/8/8/8/r7/2R5 w - - 0 1\"]\nSetup \"1\"\n1. Rd1+ *");
 }
 
 TEST(PGN, GameWithBlackPromotion) {
@@ -143,6 +143,49 @@ TEST(PGN, GameWithBlackPromotion) {
     
     auto pgn = FPGN::getGame(game);
     ASSERT_STREQ(pgn.c_str(), "1. e4 Nf6 2. Nc3 Nxe4 3. Nxe4 d5 4. Nc3 Qd6 5. Nf3 h5 6. d4 Qd8 7. Bb5+ c6 8. Ba4 b5 9. Bb3 a5 10. a4 b4 11. Na2 Bg4 12. Qd3 Bxf3 13. Qxf3 h4 14. h3 Qd6 15. Bf4 Qe6+ 16. Be3 Qd6 17. O-O g6 18. c4 bxc3 19. bxc3 Nd7 20. c4 dxc4 21. Bxc4 Qf6 22. Qg4 e5 23. Rfe1 Qg7 24. dxe5 Nc5 25. Bxc5 Bxc5 26. e6 Bd4 27. exf7+ Kf8 28. Qe6 Qf6 29. Rad1 Qxe6 30. Bxe6 c5 31. Bd5 Rb8 32. Nc1 Rh5 33. Bc4 Rf5 34. Re2 Rf4 35. Rde1 Bxf2+ 36. Rxf2 Rxc4 37. Nd3 Kg7 38. Re7 Kf8 39. Re6 Rxa4 40. Nxc5 Ra1+ 41. Kh2 Rd1 42. Ne4 Kg7 43. Ng5 Rf8 44. Rfe2 Rxf7 45. Nxf7 Kxf7 46. Re6e4 Ra1 47. Rxh4 Kg8 48. Rf2 Kg7 49. Rhf4 a4 50. Rf7+ Kh6 51. Rf2f4 a3 52. Rg4 a2 53. Rf6 Rh1+ 54. Kxh1 a1=Q+ *");
+}
+
+TEST(PGN, OutputFromInitialPosition) {
+    FGame game;
+    ASSERT_STREQ(StartFEN, game.initialFEN.c_str());
+
+    ASSERT_STREQ("*", FPGN::getGame(game).c_str());
+
+    game.move("e2", "e4");
+    
+    ASSERT_STREQ("1. e4 *", FPGN::getGame(game).c_str());
+}
+
+TEST(PGN, InputFromInitialPosition) {
+    FGame game;
+    FPGN::setGame("*", game);
+    ASSERT_STREQ(StartFEN, game.initialFEN.c_str());
+    
+    FPGN::setGame("1. e4 *", game);
+
+    ASSERT_STREQ("1. e4 *", FPGN::getGame(game).c_str());
+}
+
+TEST(PGN, OutputFromPosition) {
+    std::string fen = "r1bqkbnr/ppp1pppp/2n5/3p4/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 2 3";
+    
+    FGame game;
+    game.setFEN(fen);
+    ASSERT_STREQ(fen.c_str(), game.initialFEN.c_str());
+    
+    auto pgn = FPGN::getGame(game);
+    ASSERT_STREQ("[FEN \"r1bqkbnr/ppp1pppp/2n5/3p4/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 2 3\"]\nSetup \"1\"\n*", pgn.c_str());
+}
+
+TEST(PGN, InputFromPosition) {
+    std::string fen = "r1bqkbnr/ppp1pppp/2n5/3p4/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 2 3";
+    
+    FGame game;
+    FPGN::setGame("[FEN \"r1bqkbnr/ppp1pppp/2n5/3p4/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 2 3\"]\nSetup \"1\"\n*", game);
+    
+    ASSERT_STREQ("r1bqkbnr/ppp1pppp/2n5/3p4/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 2 3", game.initialFEN.c_str());
+    
+    ASSERT_EQ(0, game.moveCursor);
 }
 
 

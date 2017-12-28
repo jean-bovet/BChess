@@ -11,6 +11,8 @@
 #include <stdio.h>
 #include "ChessBoard.hpp"
 
+static const char * StartFEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+
 class FFEN {
 public:
     static std::string getFEN(ChessBoard board);

@@ -21,9 +21,13 @@ public:
     enum class Outcome {
         white_wins, black_wins, draw, in_progress
     };
+
+    FGame();
+    
+    // The initial representation of the game in FEN.
+    std::string initialFEN;
     
     ChessBoard board;
-    ChessBoard startBoard;
     
     MoveList moves;
     int moveCursor = 0;

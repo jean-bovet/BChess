@@ -2,7 +2,6 @@
 
 ToDo
 
-- saving game: save the FEN inside the PGN so we can save properly pasted FEN from game
 - bug: when doing checkmate, the UI becomes unresponsive
 - Best line caching for iterative deepening
 - Quiet move should not include check (use this position to see if the mat can be seen when doing shallow depth search: r3kb1r/pp2pQpp/n7/qNn1N3/8/P7/1PP2PPP/R1B1R1K1 b kq - 0 15)
