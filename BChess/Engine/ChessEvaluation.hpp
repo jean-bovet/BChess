@@ -22,7 +22,7 @@ struct ChessEvaluation {
     int nodes = 0;
     int movesPerSecond = 0;
     
-    Color engineColor;
+    Color engineColor = WHITE;
     
     void clear() {
         line.count = 0;

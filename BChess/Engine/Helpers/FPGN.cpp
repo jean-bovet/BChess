@@ -318,8 +318,6 @@ Move FPGN::parseMove(std::string pgn, unsigned &cursor, FGame &game, bool &end) 
 
     File toFile = FileUndefined;
     Rank toRank = RankUndefined;
-
-    bool capture = false;
     
     if (isRank(pgn[cursor]) && isFile(pgn[cursor+1]) && isRank(pgn[cursor+2])) {
         // R6e4
@@ -337,7 +335,7 @@ Move FPGN::parseMove(std::string pgn, unsigned &cursor, FGame &game, bool &end) 
         // Qa6xb7#
         fromFile = getFile(pgn[cursor++]);
         fromRank = getRank(pgn[cursor++]);
-        capture = true; cursor++;
+        cursor++;
         toFile = getFile(pgn[cursor++]);
         toRank = getRank(pgn[cursor++]);
     } else if (isFile(pgn[cursor]) && isRank(pgn[cursor+1]) && isFile(pgn[cursor+2]) && isRank(pgn[cursor+3])) {
@@ -355,12 +353,12 @@ Move FPGN::parseMove(std::string pgn, unsigned &cursor, FGame &game, bool &end) 
         // cxb5
         // fxg1=Q+
         fromFile = getFile(pgn[cursor++]);
-        capture = true; cursor++;
+        cursor++;
         toFile = getFile(pgn[cursor++]);
         toRank = getRank(pgn[cursor++]);
     } else if (pgn[cursor] == 'x' && isFile(pgn[cursor+1]) && isRank(pgn[cursor+2])) {
         // Bxf7+
-        capture = true; cursor++;
+        cursor++;
         toFile = getFile(pgn[cursor++]);
         toRank = getRank(pgn[cursor++]);
     } else if (pgn[cursor] == 'O' && pgn[cursor+1] == '-' && pgn[cursor+2] == 'O' && pgn[cursor+3] == '-' && pgn[cursor+4] == 'O') {
