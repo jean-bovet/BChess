@@ -90,6 +90,9 @@ class BoardView: NSView {
     // MARK: Functions
     
     func newGame() {
+        clearEngineMoveIndicators()
+        clearAllViewIndicators()
+        
         engine.setFEN(StartPosFEN)
         invalidateUI()
     }
@@ -109,13 +112,32 @@ class BoardView: NSView {
         }
     }
     
-    func clearAllViewIndicators() {
-        for pieceView in subviews.filter({ $0 is PieceView }).map( {$0 as! PieceView }) {
-            pieceView.moveIndicator = false
-            pieceView.selected = false
+    func boardSquareView(rank: Int, file: Int, blackSquare: Bool = false) -> BoardSquareView {
+        if let squareView = viewWithTag(100+rank*8+file) as? BoardSquareView {
+            return squareView
+        } else {
+            let squareView = BoardSquareView(frame: frame)
+            squareView.rank = rank
+            squareView.file = file
+            squareView.wantsLayer = true
+            squareView.blackSquare = blackSquare
+            addSubview(squareView)
+            return squareView
         }
     }
     
+    func clearAllViewIndicators() {
+        for pieceView in subviews.filter({ $0 is PieceView }).map( {$0 as! PieceView }) {
+            pieceView.clear()
+        }
+    }
+    
+    func clearEngineMoveIndicators() {
+        for pieceView in subviews.filter({ $0 is BoardSquareView }).map( {$0 as! BoardSquareView }) {
+            pieceView.clear()
+        }
+    }
+
     func playEngineIfPossible() {
         if engine.isWhite() && playAgainstComputer == .white {
             enginePlay()
@@ -133,6 +155,7 @@ class BoardView: NSView {
                 // Perform move
                 engine.move(view.move!.rawMoveValue)
                 clearAllViewIndicators()
+                clearEngineMoveIndicators()
                 invalidateUI()
                 playEngineIfPossible()
             } else if view.selected {
@@ -234,15 +257,22 @@ class BoardView: NSView {
         }
         
         animation = true
+        
         let fromPieceView = pieceSquareView(rank: Int(info.fromRank), file: Int(info.fromFile))
         let targetPieceView = pieceSquareView(rank: Int(info.toRank), file: Int(info.toFile))
+        
+        let fromSquareView = boardSquareView(rank: Int(info.fromRank), file: Int(info.fromFile))
+        let targetSquareView = boardSquareView(rank: Int(info.toRank), file: Int(info.toFile))
+        fromSquareView.fromIndicator = true
+        targetSquareView.toIndicator = true
+
         NSAnimationContext.runAnimationGroup({ _ in
             NSAnimationContext.current.duration = 0.5
             NSAnimationContext.current.timingFunction = CAMediaTimingFunction(name: kCAAnimationLinear)
-            
+        
             targetPieceView.animator().alphaValue = 0.0
             fromPieceView.animator().frame = targetPieceView.frame
-        }, completionHandler:{
+        }, completionHandler: {
             self.animation = false
             targetPieceView.alphaValue = 1.0
             self.engine.move(info.bestMove)
@@ -276,20 +306,8 @@ class BoardView: NSView {
         layoutLabels()
         
         layoutBoard() { (frame, rank, file, blackBackground) in
-            if let squareView = viewWithTag(100+rank*8+file) {
-                squareView.frame = frame
-            } else {
-                let squareView = BoardSquareView(frame: frame)
-                squareView.rank = rank
-                squareView.file = file
-                squareView.wantsLayer = true
-                if blackBackground {
-                    squareView.layer?.backgroundColor = NSColor.gray.cgColor
-                } else {
-                    squareView.layer?.backgroundColor = NSColor(red: 0.9, green: 0.9, blue: 0.9, alpha: 1).cgColor
-                }
-                addSubview(squareView)
-            }
+            let squareView = boardSquareView(rank: rank, file: file, blackSquare: blackBackground)
+            squareView.frame = frame
         }
         
         layoutBoard() { (frame, rank, file, blackBackground) in

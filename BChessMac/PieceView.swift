@@ -33,4 +33,10 @@ class PieceView: NSImageView {
             }
         }
     }
+    
+    func clear() {
+        moveIndicator = false
+        selected = false
+    }
+
 }
