@@ -18,6 +18,7 @@ FGame::FGame() {
 void FGame::reset() {
     moveCursor = 0;
     board.reset();
+    outcome = Outcome::in_progress;
     initialFEN = StartFEN;
 }
 
@@ -73,6 +74,8 @@ void FGame::move(Move move) {
         } else {
             outcome = Outcome::draw;
         }
+    } else {
+        outcome = Outcome::in_progress;
     }
 }
 

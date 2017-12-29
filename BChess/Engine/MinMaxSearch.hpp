@@ -110,6 +110,8 @@ private:
         for (int index=-1; index<moves.count && analyzing; index++) {
             TMove move = TMove();
             if (index == -1) {
+                // At index -1 we try to evaluate the previously detected
+                // best move, if available.
                 if (TMoveGenerator::isValid(bestMove)) {
                     // Analyze the best move first
                     move = bestMove;
@@ -118,9 +120,11 @@ private:
                     continue;
                 }
             } else {
+                // Above index -1, we analyze the generated moves
                 move = moves.moves[index];
+                
+                // Skip this move if it is the best move (which has been analyzed first)
                 if (move == bestMove) {
-                    // Skip this move if it is the best move (which has been analyzed first)
                     continue;
                 }
             }
@@ -133,8 +137,8 @@ private:
             newNode.move(move);
             
             Variation line;
-            auto bestVariation = (move == bestMove) ? bv : Variation();
-            int score = -alphabeta(newNode, depth + 1, -beta, -alpha, -color, line, cv, bestVariation);
+            Variation bestLine = (move == bestMove) ? bv : Variation();
+            int score = -alphabeta(newNode, depth + 1, -beta, -alpha, -color, line, cv, bestLine);
             
             cv.moves.pop();
             
