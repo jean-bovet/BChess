@@ -26,6 +26,9 @@ class UCI {
         
         // Initialize by default with the empty board
         engine.setFEN(StartPosFEN)
+        
+        // Make sure to use the opening book
+        engine.useOpeningBook = true
     }
     
     func engineOutput(_ message: String) {

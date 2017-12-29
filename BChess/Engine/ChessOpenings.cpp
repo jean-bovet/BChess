@@ -9,42 +9,54 @@
 #include "ChessOpenings.hpp"
 
 ChessOpenings::ChessOpenings() {
-    root.push({ e4 }, [](auto node) {
+    root.push({ createMove(e2, e4, WHITE, PAWN) }, [](auto & node) {
         node.score = 55;
     });
 
-    root.push({ e4, c5 }, [](auto node) {
+    root.push({ createMove(e2, e4, WHITE, PAWN), createMove(c7, c5, BLACK, PAWN) }, [](auto & node) {
         node.score = 54;
         node.name = "Sicilian defense";
         node.site = "B20";
     });
     
-    root.push({ e4, e5 }, [](auto & node) {
+    root.push({ createMove(e2, e4, WHITE, PAWN), createMove(e7, e5, BLACK, PAWN) }, [](auto & node) {
         node.score = 56;
         node.name = "King's pawn game";
         node.site = "C20";
     });
 
-    root.push({ d4 }, [](auto node) {
+    root.push({ createMove(d2, d4, WHITE, PAWN) }, [](auto & node) {
         node.score = 56;
     });
     
 }
 
-OpeningTreeNode * ChessOpenings::lookup(ChessMoveList moves) {
-    return root.lookup(moves);
+bool ChessOpenings::lookup(ChessMoveList moves, OpeningTreeNode::NodeCallback callback) {
+    return root.lookup(moves, 0, callback);
 }
 
-OpeningTreeNode * ChessOpenings::best(ChessMoveList moves) {
-    auto node = lookup(moves);
-    if (node == nullptr) {
-        return nullptr;
-    }
+bool nodeComparison(OpeningTreeNode i, OpeningTreeNode j) {
+    return i.score > j.score;
+}
+
+bool ChessOpenings::best(ChessMoveList moves, OpeningTreeNode::NodeCallback callback) {
+    bool bestFound = false;
+    bool result = lookup(moves, [&](auto & node) {
+        // Check if the opening book has some more moves for that particular node
+        if (node.children.empty()) {
+            bestFound = false;
+        } else {
+            // Pick the child with the best score
+            std::vector<OpeningTreeNode> sortedChildren;
+            for (auto entry : node.children) {
+                sortedChildren.push_back(entry.second);
+            }
+            std::sort(sortedChildren.begin(), sortedChildren.end(), nodeComparison);
+            auto & best = sortedChildren.front();
+            callback(best);
+            bestFound = true;
+        }
+    });
     
-    // Check if the opening book has some more moves for that particular node
-    if (node->children.empty()) {
-        return nullptr;
-    }
-    
-    // Pick the first child which is the best one (sorted by score)
+    return result && bestFound;
 }

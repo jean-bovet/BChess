@@ -60,6 +60,7 @@
 		A77372061FE443DA0001A90F /* ChessGame.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A77371FC1FE31FEF0001A90F /* ChessGame.cpp */; };
 		A7AFCCAA1FB4E40D00AE3D85 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7AFCCA91FB4E40D00AE3D85 /* main.swift */; };
 		A7B18F581FD9BAE500A605B8 /* MovesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7B18F571FD9BAE500A605B8 /* MovesTests.swift */; };
+		A7C92AA81FF6D74400160D2E /* ChessOpenings.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A765D85F1FF6C1950045BB36 /* ChessOpenings.cpp */; };
 		A7E3B6891FF6C85500DBB66B /* OpeningsTests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A7E3B6881FF6C85500DBB66B /* OpeningsTests.cpp */; };
 		A7E490EB1FEA207100970EAD /* gtest-all.cc in Sources */ = {isa = PBXBuildFile; fileRef = A7E490EA1FEA207100970EAD /* gtest-all.cc */; };
 		A7E490EC1FEA23DD00970EAD /* PGNTests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A77372041FE340780001A90F /* PGNTests.cpp */; };
@@ -582,6 +583,7 @@
 				A765D85E1FF61AA70045BB36 /* PromotionPicker.swift in Sources */,
 				A7460F011FDF2465002B0740 /* BoardView.swift in Sources */,
 				A75359BF1FDE0E3B008D1DEE /* BoardSquareView.swift in Sources */,
+				A7C92AA81FF6D74400160D2E /* ChessOpenings.cpp in Sources */,
 				A77372051FE443D70001A90F /* FPGN.cpp in Sources */,
 				A75359C61FDE4031008D1DEE /* magicmoves.c in Sources */,
 				A75359951FDE0947008D1DEE /* ChessViewController.swift in Sources */,

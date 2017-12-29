@@ -18,39 +18,41 @@ public:
 };
 
 TEST_F(OpeningsTests, KingsPawnOpening) {
+    Move m;
     ChessMoveList moves;
-    moves.push(createMove(e2, e4, WHITE, PAWN));
-
-    OpeningTreeNode *node = nullptr;
+    moves.push(m = createMove(e2, e4, WHITE, PAWN));
     
-    node = openings.lookup(moves);
-    ASSERT_TRUE(node != nullptr);
+    bool result = openings.lookup(moves, [&](auto & node) {
+        ASSERT_EQ(m, node.move);
+    });
+    ASSERT_TRUE(result);
     
-    moves.push(createMove(e7, e5, BLACK, PAWN));
-    node = openings.lookup(moves);
-    ASSERT_TRUE(node != nullptr);
-    ASSERT_STREQ("King's pawn game", node->name.c_str());
+    moves.push(m = createMove(e7, e5, BLACK, PAWN));
+    result = openings.lookup(moves, [&](auto & node) {
+        ASSERT_EQ(m, node.move);
+        ASSERT_STREQ("King's pawn game", node.name.c_str());
+    });
+    ASSERT_TRUE(result);
 
     moves.push(createMove(e2, e4, WHITE, PAWN));
-    node = openings.lookup(moves);
-    ASSERT_TRUE(node == nullptr);
+    result = openings.lookup(moves, [&](auto & node) {
+        FAIL();
+    });
+    ASSERT_FALSE(result);
 }
 
-TEST_F(OpeningsTests, BestMoveAtStartPosition) {
+TEST_F(OpeningsTests, BestMove) {
     ChessMoveList moves;
-    moves.push(createMove(e2, e4, WHITE, PAWN));
     
-    OpeningTreeNode *node = nullptr;
-    
-    node = openings.bestMove(moves);
-    ASSERT_TRUE(node != nullptr);
-    
-    moves.push(createMove(e7, e5, BLACK, PAWN));
-    node = openings.bestMove(moves);
-    ASSERT_TRUE(node != nullptr);
-    ASSERT_STREQ("King's pawn game", node->name.c_str());
+    bool result = openings.best(moves, [&](auto & node) {
+        ASSERT_EQ(createMove(d2, d4, WHITE, PAWN), node.move);
+    });
+    ASSERT_TRUE(result);
     
     moves.push(createMove(e2, e4, WHITE, PAWN));
-    node = openings.bestMove(moves);
-    ASSERT_TRUE(node == nullptr);
+    
+    result = openings.best(moves, [&](auto & node) {
+        ASSERT_EQ(createMove(e7, e5, BLACK, PAWN), node.move);
+    });
+    ASSERT_TRUE(result);
 }

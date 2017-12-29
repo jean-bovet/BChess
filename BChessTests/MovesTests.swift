@@ -9,7 +9,7 @@
 import XCTest
 
 class MovesTests: XCTestCase {
-        
+    
     func testWhitePawnFromStartRank() {
         assertMoves("8/8/8/8/8/8/2P5/8 w - - 0 1",
                     [

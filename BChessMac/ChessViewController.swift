@@ -24,6 +24,8 @@ class ChessViewController: NSViewController {
         
         restoreFromDefaults()
         
+        engine.useOpeningBook = true
+        
         engine.updateCallback = {
             self.updateUI()
             self.saveToDefaults()

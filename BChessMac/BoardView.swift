@@ -43,6 +43,7 @@ class BoardView: NSView {
     
     required init?(coder decoder: NSCoder) {
         super.init(coder: decoder)
+        
         numberFormatter.numberStyle = .decimal
         numberFormatter.thousandSeparator = ","
         numberFormatter.hasThousandSeparators = true

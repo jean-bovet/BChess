@@ -14,6 +14,7 @@
 #import "FMove.hpp"
 #import "FPGN.hpp"
 #import "ChessEngine.hpp"
+#import "ChessOpenings.hpp"
 #import "IterativeDeepening.hpp"
 
 @implementation FEngineMove
@@ -46,6 +47,7 @@
 @interface FEngine () {
     IterativeDeepening<ChessBoard, ChessMoveGenerator, ChessMoveList, ChessEvaluater> iterativeSearch;
     ChessGame currentGame;
+    ChessOpenings openings;
 }
 
 @end
@@ -195,6 +197,15 @@
 - (void)evaluate:(NSInteger)depth time:(NSTimeInterval)time callback:(FEngineSearchCallback)callback {
     [self stop];
     
+    if (self.useOpeningBook) {
+        FEngineInfo *info = [self lookupOpeningMove];
+        if (info) {
+            callback(info, YES);
+            [self fireUpdate];
+            return;
+        }
+    }
+    
     if (time > 0) {
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(time * NSEC_PER_SEC)), dispatch_get_global_queue(QOS_CLASS_UTILITY, 0), ^{
             [self stop];
@@ -213,6 +224,20 @@
             callback(info, completed);
             [self fireUpdate];
         }];
+    }
+}
+
+- (FEngineInfo*)lookupOpeningMove {
+    FEngineInfo *info = nil;
+    bool result = openings.best(currentGame.moves, [&info, self](OpeningTreeNode & node) {
+        ChessEvaluation evaluation;
+        evaluation.line.push(node.move);
+        info = [self infoFor:evaluation];
+    });
+    if (!result) {
+        return nil;
+    } else {
+        return info;
     }
 }
 

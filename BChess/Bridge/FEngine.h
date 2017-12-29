@@ -33,6 +33,7 @@ typedef enum : NSUInteger {
 
 @property (nonatomic, assign) int moveCount;
 @property (nonatomic, assign) BOOL async;
+@property (nonatomic, assign) BOOL useOpeningBook;
 @property (nonatomic, assign) Level level;
 
 @property (nonatomic, strong) FEngineDidUpdateCallback _Nullable updateCallback;

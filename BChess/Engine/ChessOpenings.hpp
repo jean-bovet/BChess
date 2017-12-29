@@ -15,37 +15,39 @@
 #include "ChessMoveList.hpp"
 
 struct OpeningTreeNode {
-    Square move;
+    Move move;
     int score = 0;
     std::string name;
     std::string site;
-    std::map<Square, OpeningTreeNode> children;
+        
+    std::map<Move, OpeningTreeNode> children;
     
-    typedef std::function<void(OpeningTreeNode &node)> PushCallback;
+    typedef std::function<void(OpeningTreeNode &node)> NodeCallback;
 
-    void push(std::vector<Square> line, PushCallback callback) {
+    void push(std::vector<Move> line, NodeCallback callback) {
         if (line.empty()) {
             callback(*this);
         } else {
             auto key = line.front();
             auto & child = children[key];
             line.erase(line.begin());
+            child.move = key;
             child.push(line, callback);
         }
     }
     
-    OpeningTreeNode * lookup(ChessMoveList moves, int moveIndex = 0) {
+    bool lookup(ChessMoveList moves, int moveIndex, NodeCallback callback) {
         if (moveIndex < moves.count) {
             Move move = moves[moveIndex];
-            Square key = MOVE_TO(move);
-            if (children.count(key) == 0) {
-                return nullptr;
+            if (children.count(move) == 0) {
+                return false;
             } else {
-                auto & child = children[key];
-                return child.lookup(moves, moveIndex+1);
+                auto & child = children[move];
+                return child.lookup(moves, moveIndex+1, callback);
             }
         } else {
-            return this;
+            callback(*this);
+            return true;
         }
     }
     
@@ -57,8 +59,8 @@ class ChessOpenings {
 public:
     ChessOpenings();
     
-    OpeningTreeNode* lookup(ChessMoveList moves);
+    bool lookup(ChessMoveList moves, OpeningTreeNode::NodeCallback callback);
 
-    OpeningTreeNode* best(ChessMoveList moves);
+    bool best(ChessMoveList moves, OpeningTreeNode::NodeCallback callback);
     
 };
