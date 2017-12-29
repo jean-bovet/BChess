@@ -17,13 +17,13 @@ ChessOpenings::ChessOpenings() {
     root.push({ createMove(e2, e4, WHITE, PAWN), createMove(c7, c5, BLACK, PAWN) }, [](auto & node) {
         node.score = 54;
         node.name = "Sicilian defense";
-        node.site = "B20";
+        node.eco = "B20";
     });
     
     root.push({ createMove(e2, e4, WHITE, PAWN), createMove(e7, e5, BLACK, PAWN) }, [](auto & node) {
         node.score = 56;
         node.name = "King's pawn game";
-        node.site = "C20";
+        node.eco = "C20";
     });
 
     root.push({ createMove(d2, d4, WHITE, PAWN) }, [](auto & node) {
@@ -43,6 +43,7 @@ bool ChessOpenings::load(std::string pgn) {
                     node.score = stoi(score);
                 }
                 node.name = game.tags["Name"];
+                node.eco = game.tags["ECO"];
             });
         }
         return true;

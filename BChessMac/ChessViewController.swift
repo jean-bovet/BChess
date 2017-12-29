@@ -24,7 +24,7 @@ class ChessViewController: NSViewController {
         
         restoreFromDefaults()
         
-        engine.useOpeningBook = true
+        loadOpenings()
         
         engine.updateCallback = {
             self.updateUI()
@@ -32,6 +32,17 @@ class ChessViewController: NSViewController {
         }
         
         updateUI()
+    }
+    
+    func loadOpenings() {
+        engine.useOpeningBook = true
+
+        let path = Bundle.main.path(forResource: "Openings", ofType: "pgn")
+        assert(path != nil)
+        
+        let pgn = try! String(contentsOfFile: path!)
+
+        assert(engine.loadOpening(pgn))
     }
     
     func updateUI() {

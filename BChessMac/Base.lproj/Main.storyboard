@@ -60,8 +60,7 @@
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <menu key="submenu" title="Game" id="PBs-cT-jNJ">
                                     <items>
-                                        <menuItem title="New" id="t6v-J4-Mvn">
-                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                        <menuItem title="New" keyEquivalent="n" id="t6v-J4-Mvn">
                                             <connections>
                                                 <action selector="newGame:" target="Ady-hI-5gd" id="tbm-Fu-PRk"/>
                                             </connections>
@@ -133,8 +132,7 @@
                                             </connections>
                                         </menuItem>
                                         <menuItem isSeparatorItem="YES" id="X9U-y1-wsZ"/>
-                                        <menuItem title="Start Analysis" id="6oR-Jh-jYi">
-                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                        <menuItem title="Start Analysis" keyEquivalent="a" id="6oR-Jh-jYi">
                                             <connections>
                                                 <action selector="startAnalysis:" target="Ady-hI-5gd" id="3Wc-XA-nSV"/>
                                             </connections>

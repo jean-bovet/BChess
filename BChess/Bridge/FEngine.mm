@@ -74,6 +74,26 @@
     return openings.load(std::string([pgn UTF8String]));
 }
 
+- (NSDictionary*)openingFor:(NSString *)pgn {
+    ChessGame temp;
+    if (!FPGN::setGame(std::string([pgn UTF8String]), temp)) {
+        return nil;
+    }
+    
+    NSMutableDictionary *info = [NSMutableDictionary dictionary];
+    bool result = openings.lookup(temp.moves, [&](auto & node) {
+        info[@"Score"] = @(node.score);
+        info[@"Name"] = [NSString stringWithUTF8String:node.name.c_str()];
+        info[@"ECO"] = [NSString stringWithUTF8String:node.eco.c_str()];
+    });
+    
+    if (result) {
+        return info;
+    } else {
+        return nil;
+    }
+}
+
 - (BOOL)setFEN:(NSString *)FEN {
     return currentGame.setFEN(std::string([FEN UTF8String]));
 }
@@ -236,6 +256,7 @@
     bool result = openings.best(currentGame.moves, [&info, self](OpeningTreeNode & node) {
         ChessEvaluation evaluation;
         evaluation.line.push(node.move);
+        evaluation.opening = node.name;
         info = [self infoFor:evaluation];
     });
     if (!result) {

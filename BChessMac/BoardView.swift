@@ -180,38 +180,45 @@ class BoardView: NSView {
         let infoColorToPlay = engine.isWhite() ? "White" : "Black"
 
         if let info = info {
-            let lineInfo = info.bestLine(false)
-            let infoNodes = self.numberFormatter.string(from: NSNumber(value: info.nodeEvaluated))!
-            let infoSpeed = self.numberFormatter.string(from: NSNumber(value: info.movesPerSecond))!
-            let infoValue: String
-            if info.mat {
-                infoValue = "#"
-            } else {
-                infoValue = String(info.value)
-            }
             let infoString = NSMutableAttributedString()
             infoString.append(boldText(text: "Side to play: "))
             infoString.append(regularText(text: infoColorToPlay))
             infoString.append(regularText(text: "\n"))
 
-            infoString.append(boldText(text: "Value: "))
-            infoString.append(regularText(text: infoValue))
-            infoString.append(regularText(text: "\n"))
-
-            infoString.append(boldText(text: "Line: "))
-            infoString.append(regularText(text: lineInfo))
-            infoString.append(regularText(text: "\n"))
-
-            infoString.append(boldText(text: "Depth: "))
-            infoString.append(regularText(text: "\(info.depth)/\(info.quiescenceDepth)"))
-            infoString.append(regularText(text: "\n"))
-
-            infoString.append(boldText(text: "Nodes: "))
-            infoString.append(regularText(text: infoNodes))
-            infoString.append(regularText(text: "\n"))
-
-            infoString.append(boldText(text: "Speed: "))
-            infoString.append(regularText(text: "\(infoSpeed) n/s"))
+            if let opening = info.opening {
+                infoString.append(boldText(text: "Opening: "))
+                infoString.append(regularText(text: opening))
+                infoString.append(regularText(text: "\n"))
+                return infoString
+            } else {
+                infoString.append(boldText(text: "Value: "))
+                let infoValue: String
+                if info.mat {
+                    infoValue = "#"
+                } else {
+                    infoValue = String(info.value)
+                }
+                infoString.append(regularText(text: infoValue))
+                infoString.append(regularText(text: "\n"))
+                
+                infoString.append(boldText(text: "Line: "))
+                let lineInfo = info.bestLine(false)
+                infoString.append(regularText(text: lineInfo))
+                infoString.append(regularText(text: "\n"))
+                
+                infoString.append(boldText(text: "Depth: "))
+                infoString.append(regularText(text: "\(info.depth)/\(info.quiescenceDepth)"))
+                infoString.append(regularText(text: "\n"))
+                
+                infoString.append(boldText(text: "Nodes: "))
+                let infoNodes = self.numberFormatter.string(from: NSNumber(value: info.nodeEvaluated))!
+                infoString.append(regularText(text: infoNodes))
+                infoString.append(regularText(text: "\n"))
+                
+                infoString.append(boldText(text: "Speed: "))
+                let infoSpeed = self.numberFormatter.string(from: NSNumber(value: info.movesPerSecond))!
+                infoString.append(regularText(text: "\(infoSpeed) n/s"))
+            }
             return infoString
         } else {
             let infoString = NSMutableAttributedString()

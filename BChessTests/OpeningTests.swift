@@ -19,5 +19,11 @@ class OpeningTests: XCTestCase {
 
         let engine = FEngine()
         XCTAssertTrue(engine.loadOpening(pgn))
+        
+        let info = engine.opening(for: "1. e4 c5")
+
+        XCTAssertEqual(54, info!["Score"] as! Int)
+        XCTAssertEqual("Sicilian defense", info!["Name"] as! String)
+        XCTAssertEqual("B20", info!["ECO"] as! String)
     }
 }

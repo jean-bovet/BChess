@@ -18,7 +18,7 @@ struct OpeningTreeNode {
     Move move;
     int score = 0;
     std::string name;
-    std::string site;
+    std::string eco;
         
     std::map<Move, OpeningTreeNode> children;
     

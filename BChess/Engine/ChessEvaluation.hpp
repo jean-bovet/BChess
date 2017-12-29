@@ -13,6 +13,8 @@
 struct ChessEvaluation {
     ChessMoveList line;
     
+    std::string opening;
+    
     int value = 0;
     
     int quiescenceDepth = 0;

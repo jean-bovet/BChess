@@ -67,6 +67,15 @@
     return self.info.line.bestMove();
 }
 
+- (NSString*)opening {
+    auto name = self.info.opening;
+    if (name.size() > 0) {
+        return [NSString stringWithUTF8String:name.c_str()];
+    } else {
+        return nil;
+    }
+}
+
 - (NSString*)bestMove:(BOOL)uci {
     FPGN::SANType type = uci ? FPGN::SANType::uci : FPGN::SANType::full;
     return [NSString stringWithUTF8String:FPGN::to_string((Move)self.bestMove, type).c_str()];

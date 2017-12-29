@@ -41,6 +41,7 @@ typedef enum : NSUInteger {
 - (id _Nonnull)init;
 
 - (BOOL)loadOpening:(NSString* _Nonnull)pgn;
+- (NSDictionary<NSString*, id>* _Nullable)openingFor:(NSString * _Nonnull)moves;
 
 - (BOOL)setFEN:(NSString* _Nonnull)FEN;
 - (NSString* _Nonnull)FEN;

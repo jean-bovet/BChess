@@ -25,6 +25,8 @@
 
 @property (nonatomic, assign, readonly) NSInteger value;
 
+@property (nonatomic, strong, readonly) NSString * _Nullable opening;
+
 - (NSString* _Nullable)bestMove:(BOOL)uci;
 - (NSString* _Nonnull)bestLine:(BOOL)uci;
 
