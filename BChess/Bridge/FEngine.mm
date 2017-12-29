@@ -57,7 +57,7 @@
 - (id)init {
     if (self = [super init]) {
         _async = YES;
-        _level = Medium;
+        _thinkingTime = 5;
     }
     return self;
 }
@@ -193,25 +193,12 @@
     return ei;
 }
 
-- (NSTimeInterval)timeForLevel:(Level)level {
-    switch (level) {
-        case Easy:
-            return 2;
-
-        case Medium:
-            return 5;
-            
-        case Hard:
-            return 20;
-    }
-}
-
 - (void)analyze:(FEngineSearchCallback _Nonnull)callback {
     [self evaluate:INT_MAX time:0 callback:callback];
 }
 
 - (void)evaluate:(FEngineSearchCallback _Nonnull)callback {
-    [self evaluate:INT_MAX time:[self timeForLevel:self.level] callback:callback];
+    [self evaluate:INT_MAX time:self.thinkingTime callback:callback];
 }
 
 - (void)evaluate:(NSInteger)depth callback:(FEngineSearchCallback)callback {

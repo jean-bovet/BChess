@@ -78,14 +78,8 @@ class ChessViewController: NSViewController {
         if menuItem.action == #selector(playAgaintHuman) {
             menuItem.state = chessView.playAgainstComputer == .human ? .on : .off
         }
-        if menuItem.action == #selector(levelEasy) {
-            menuItem.state = engine.level == Easy ? .on : .off
-        }
-        if menuItem.action == #selector(levelMedium) {
-            menuItem.state = engine.level == Medium ? .on : .off
-        }
-        if menuItem.action == #selector(levelHard) {
-            menuItem.state = engine.level == Hard ? .on : .off
+        if menuItem.action == #selector(level) {
+            menuItem.state = engine.thinkingTime == TimeInterval(menuItem.tag) ? .on : .off
         }
         if menuItem.action == #selector(undoMove) {
             return engine.canUndoMove()
@@ -178,16 +172,8 @@ class ChessViewController: NSViewController {
 
     // MARK: Menu Level
     
-    @IBAction func levelEasy(_ sender: NSMenuItem) {
-        engine.level = Easy
-    }
-
-    @IBAction func levelMedium(_ sender: NSMenuItem) {
-        engine.level = Medium
-    }
-
-    @IBAction func levelHard(_ sender: NSMenuItem) {
-        engine.level = Hard
+    @IBAction func level(_ sender: NSMenuItem) {
+        engine.thinkingTime = TimeInterval(sender.tag)
     }
     
     // MARK: Menu View

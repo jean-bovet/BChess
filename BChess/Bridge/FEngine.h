@@ -12,12 +12,6 @@
 typedef void(^FEngineSearchCallback)(FEngineInfo * _Nonnull info, BOOL completed);
 typedef void(^FEngineDidUpdateCallback)();
 
-typedef enum : NSUInteger {
-    Easy,
-    Medium,
-    Hard,
-} Level;
-
 @interface FEngineMove: NSObject
 
 @property (nonatomic, assign) NSUInteger fromFile, toFile;
@@ -34,7 +28,7 @@ typedef enum : NSUInteger {
 @property (nonatomic, assign) int moveCount;
 @property (nonatomic, assign) BOOL async;
 @property (nonatomic, assign) BOOL useOpeningBook;
-@property (nonatomic, assign) Level level;
+@property (nonatomic, assign) NSTimeInterval thinkingTime;
 
 @property (nonatomic, strong) FEngineDidUpdateCallback _Nullable updateCallback;
 

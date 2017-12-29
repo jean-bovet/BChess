@@ -144,22 +144,24 @@
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <menu key="submenu" title="Level" id="Jhl-lf-vXn">
                                     <items>
-                                        <menuItem title="Easy" id="bWZ-c6-ZNR">
-                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                        <menuItem title="2 seconds" tag="2" keyEquivalent="1" id="bWZ-c6-ZNR">
                                             <connections>
-                                                <action selector="levelEasy:" target="Ady-hI-5gd" id="TjC-xf-qME"/>
+                                                <action selector="level:" target="Ady-hI-5gd" id="Umw-yz-04Y"/>
                                             </connections>
                                         </menuItem>
-                                        <menuItem title="Medium" id="KtQ-I4-Ove">
-                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                        <menuItem title="5 seconds" tag="5" keyEquivalent="2" id="KtQ-I4-Ove">
                                             <connections>
-                                                <action selector="levelMedium:" target="Ady-hI-5gd" id="caI-fM-E1B"/>
+                                                <action selector="level:" target="Ady-hI-5gd" id="shH-Oa-R1I"/>
                                             </connections>
                                         </menuItem>
-                                        <menuItem title="Hard" id="4fw-O7-3Us">
-                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                        <menuItem title="10 seconds" tag="10" keyEquivalent="3" id="4fw-O7-3Us">
                                             <connections>
-                                                <action selector="levelHard:" target="Ady-hI-5gd" id="KAb-eb-9qU"/>
+                                                <action selector="level:" target="Ady-hI-5gd" id="eLT-mG-7cQ"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="20 seconds" tag="20" keyEquivalent="4" id="xzx-wE-eFV">
+                                            <connections>
+                                                <action selector="level:" target="Ady-hI-5gd" id="rDt-GM-aOI"/>
                                             </connections>
                                         </menuItem>
                                     </items>
