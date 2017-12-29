@@ -80,6 +80,13 @@ class ChessViewController: NSViewController {
         if menuItem.action == #selector(redoMove) {
             return engine.canRedoMove()
         }
+        if menuItem.action == #selector(startAnalysis) {
+            if engine.isAnalyzing() {
+                menuItem.title = "Stop Analyze"
+            } else {
+                menuItem.title = "Start Analyze"
+            }
+        }
         if menuItem.action == #selector(toggleGameInfo) {
             if isGameInfoVisible() {
                 menuItem.title = "Hide Info"
@@ -111,6 +118,8 @@ class ChessViewController: NSViewController {
                 // Could not past FEN, maybe PGN?
                 engine.setPGN(text);
             }
+            chessView.clearEngineMoveIndicators()
+            chessView.clearAllViewIndicators()
             chessView.invalidateUI()
         }
     }
@@ -143,6 +152,14 @@ class ChessViewController: NSViewController {
 
     @IBAction func debugEvaluate(_ sender: NSMenuItem) {
         engine.debugEvaluate()
+    }
+
+    @IBAction func startAnalysis(_ sender: NSMenuItem) {
+        if (engine.isAnalyzing()) {
+            engine.stop()
+        } else {
+            chessView.engineAnalyze()
+        }
     }
 
     // MARK: Menu Level

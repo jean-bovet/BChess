@@ -182,6 +182,12 @@ class BoardView: NSView {
     
     var info: FEngineInfo? = nil
     
+    func engineAnalyze() {
+        engine.analyze { (info, completed) in
+            self.info = info
+        }
+    }
+    
     func enginePlay() {
         engine.evaluate() { (info, completed) in
             self.info = info

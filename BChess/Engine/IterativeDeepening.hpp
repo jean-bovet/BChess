@@ -101,7 +101,14 @@ public:
                 break;
             }
         }
+        
+        analyzing = false;
+        
         return evaluation;
+    }
+    
+    bool running() {
+        return analyzing;
     }
     
     void cancel() {

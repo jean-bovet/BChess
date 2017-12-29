@@ -17,7 +17,7 @@ class BoardSquareView: NSView {
         didSet {
             if fromIndicator {
                 self.layer?.borderColor = NSColor.orange.cgColor
-                self.layer?.borderWidth = 2.0
+                self.layer?.borderWidth = 1.5
             } else {
                 self.layer?.borderColor = nil
                 self.layer?.borderWidth = 0.0

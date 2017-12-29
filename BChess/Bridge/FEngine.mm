@@ -129,6 +129,10 @@
     iterativeSearch.cancel();
 }
 
+- (BOOL)isAnalyzing {
+    return iterativeSearch.running();
+}
+
 - (BOOL)isWhite {
     return currentGame.board.color == WHITE;
 }
@@ -151,6 +155,10 @@
         case Hard:
             return 20;
     }
+}
+
+- (void)analyze:(FEngineSearchCallback _Nonnull)callback {
+    [self evaluate:INT_MAX time:0 callback:callback];
 }
 
 - (void)evaluate:(FEngineSearchCallback _Nonnull)callback {

@@ -66,14 +66,7 @@
                                                 <action selector="newGame:" target="Ady-hI-5gd" id="tbm-Fu-PRk"/>
                                             </connections>
                                         </menuItem>
-                                        <menuItem title="Flip Side" id="OjP-5x-nFL">
-                                            <modifierMask key="keyEquivalentModifierMask"/>
-                                        </menuItem>
                                         <menuItem isSeparatorItem="YES" id="McZ-7g-ahd"/>
-                                        <menuItem title="Start Analysis" id="VHt-Yh-bdc">
-                                            <modifierMask key="keyEquivalentModifierMask"/>
-                                        </menuItem>
-                                        <menuItem isSeparatorItem="YES" id="Ndd-C1-l0n"/>
                                         <menuItem title="Debug Evaluate" id="1Mn-CX-f1p">
                                             <modifierMask key="keyEquivalentModifierMask"/>
                                             <connections>
@@ -117,9 +110,9 @@
                                     </items>
                                 </menu>
                             </menuItem>
-                            <menuItem title="Play Against" id="jxT-CU-nIS">
+                            <menuItem title="Play" id="jxT-CU-nIS">
                                 <modifierMask key="keyEquivalentModifierMask"/>
-                                <menu key="submenu" title="Play Against" id="rga-6D-vAg">
+                                <menu key="submenu" title="Play" id="rga-6D-vAg">
                                     <items>
                                         <menuItem title="Computer (White)" id="cRB-C6-vzy">
                                             <modifierMask key="keyEquivalentModifierMask"/>
@@ -133,11 +126,17 @@
                                                 <action selector="playAgaintComputerBlack:" target="Ady-hI-5gd" id="UIj-Bs-AFY"/>
                                             </connections>
                                         </menuItem>
-                                        <menuItem isSeparatorItem="YES" id="X9U-y1-wsZ"/>
-                                        <menuItem title="Human" id="JP2-Fi-KOK">
+                                        <menuItem title="Human vs Human" id="JP2-Fi-KOK">
                                             <modifierMask key="keyEquivalentModifierMask"/>
                                             <connections>
                                                 <action selector="playAgaintHuman:" target="Ady-hI-5gd" id="wXX-jS-JkO"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem isSeparatorItem="YES" id="X9U-y1-wsZ"/>
+                                        <menuItem title="Start Analysis" id="6oR-Jh-jYi">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="startAnalysis:" target="Ady-hI-5gd" id="3Wc-XA-nSV"/>
                                             </connections>
                                         </menuItem>
                                     </items>

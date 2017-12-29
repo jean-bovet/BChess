@@ -57,8 +57,11 @@ typedef enum : NSUInteger {
 
 - (void)move:(NSString* _Nonnull)from to:(NSString* _Nonnull)to;
 - (void)stop;
+- (BOOL)isAnalyzing;
 
 - (BOOL)isWhite;
+
+- (void)analyze:(FEngineSearchCallback _Nonnull)callback;
 
 - (void)evaluate:(FEngineSearchCallback _Nonnull)callback;
 - (void)evaluate:(NSInteger)depth callback:(FEngineSearchCallback _Nonnull)callback;
