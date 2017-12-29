@@ -9,7 +9,7 @@
 #pragma once
 
 #include "ChessBoard.hpp"
-#include "FMoveList.hpp"
+#include "ChessMoveList.hpp"
 
 // https://chessprogramming.wikispaces.com/Evaluation
 class ChessEvaluater {
@@ -24,7 +24,7 @@ public:
     
     static int evaluate(ChessBoard board);
 
-    static int evaluate(ChessBoard board, MoveList moves);
+    static int evaluate(ChessBoard board, ChessMoveList moves);
 
     static int getBonus(Piece piece, Color color, Square square);
 };

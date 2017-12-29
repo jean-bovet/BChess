@@ -8,11 +8,11 @@
 
 #import "FEngineInfo.h"
 #import "ChessEvaluation.hpp"
-#import "FGame.hpp"
+#import "ChessGame.hpp"
 
 @interface FEngineInfo ()
 
 @property (nonatomic, assign) ChessEvaluation info;
-@property (nonatomic, assign) FGame game;
+@property (nonatomic, assign) ChessGame game;
 
 @end

@@ -8,10 +8,10 @@
 
 #pragma once
 
-#include "FMoveList.hpp"
+#include "ChessMoveList.hpp"
 
 struct ChessEvaluation {
-    MoveList line;
+    ChessMoveList line;
     
     int value = 0;
     

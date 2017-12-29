@@ -6,11 +6,11 @@
 //  Copyright © 2017 Jean Bovet. All rights reserved.
 //
 
-#include "FMoveList.hpp"
+#include "ChessMoveList.hpp"
 #include "ChessBoard.hpp"
 #include "FPGN.hpp"
 
-std::string MoveList::description() {
+std::string ChessMoveList::description() {
     std::string text = "";
     for (int index=0; index<count; index++) {
         auto move = moves[index];
@@ -22,7 +22,7 @@ std::string MoveList::description() {
     return text;
 }
 
-void MoveList::addMove(ChessBoard &board, Move move) {
+void ChessMoveList::addMove(ChessBoard &board, Move move) {
     ChessBoard validBoard = board;
     validBoard.move(move);
     // Note: make sure the move that was just played doesn't make
@@ -32,7 +32,7 @@ void MoveList::addMove(ChessBoard &board, Move move) {
     }
 }
 
-void MoveList::addMoves(ChessBoard &board, Square from, Bitboard moves, Piece piece) {
+void ChessMoveList::addMoves(ChessBoard &board, Square from, Bitboard moves, Piece piece) {
     while (moves > 0) {
         Square to = lsb(moves);
         bb_clear(moves, to);
@@ -41,7 +41,7 @@ void MoveList::addMoves(ChessBoard &board, Square from, Bitboard moves, Piece pi
     }
 }
 
-void MoveList::addCaptures(ChessBoard &board, Square from, Bitboard moves, Piece attackingPiece, Piece capturedPiece) {
+void ChessMoveList::addCaptures(ChessBoard &board, Square from, Bitboard moves, Piece attackingPiece, Piece capturedPiece) {
     while (moves > 0) {
         Square to = lsb(moves);
         bb_clear(moves, to);

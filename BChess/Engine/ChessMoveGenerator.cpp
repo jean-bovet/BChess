@@ -102,23 +102,23 @@ bool moveComparison(Move i, Move j) {
     }
 }
 
-void ChessMoveGenerator::sortMoves(MoveList & moves) {
+void ChessMoveGenerator::sortMoves(ChessMoveList & moves) {
     // Sort the moves according to:
     // MVV/LVA (Most Valuable Victim/Least Valuable Attacker).
     std::stable_sort(std::begin(moves.moves), std::begin(moves.moves) + moves.count, moveComparison);
 }
 
-MoveList ChessMoveGenerator::generateQuiescenceMoves(ChessBoard board) {
+ChessMoveList ChessMoveGenerator::generateQuiescenceMoves(ChessBoard board) {
     return generateMoves(board, Mode::quiescenceMoveOnly);
 }
 
-MoveList ChessMoveGenerator::generateMoves(ChessBoard board, Mode mode, Square specificSquare) {
+ChessMoveList ChessMoveGenerator::generateMoves(ChessBoard board, Mode mode, Square specificSquare) {
     if (!initialized) {
         initialized = true;
         initialize();
     }
     
-    MoveList moveList;
+    ChessMoveList moveList;
     
     generatePawnsMoves(board, moveList, mode, specificSquare);
     if (mode == Mode::firstMoveOnly && moveList.count > 0) return moveList;
@@ -140,7 +140,7 @@ MoveList ChessMoveGenerator::generateMoves(ChessBoard board, Mode mode, Square s
     return moveList;
 }
 
-void ChessMoveGenerator::generateAttackMoves(ChessBoard &board, MoveList &moveList, Square fromSquare, Piece attackingPiece, Bitboard attackingSquares, Mode mode) {
+void ChessMoveGenerator::generateAttackMoves(ChessBoard &board, ChessMoveList &moveList, Square fromSquare, Piece attackingPiece, Bitboard attackingSquares, Mode mode) {
     auto attackedColor = INVERSE(board.color);
     for (unsigned capturedPiece = PAWN; capturedPiece < PCOUNT; capturedPiece++) {
         auto attacks = attackingSquares & board.pieces[attackedColor][capturedPiece];
@@ -151,7 +151,7 @@ void ChessMoveGenerator::generateAttackMoves(ChessBoard &board, MoveList &moveLi
     }
 }
 
-void ChessMoveGenerator::generatePawnsMoves(ChessBoard &board, MoveList &moveList, Mode mode, Square specificSquare) {
+void ChessMoveGenerator::generatePawnsMoves(ChessBoard &board, ChessMoveList &moveList, Mode mode, Square specificSquare) {
     auto pawns = board.pieces[board.color][PAWN];
     auto emptySquares = board.emptySquares();
     
@@ -236,7 +236,7 @@ void ChessMoveGenerator::generatePawnsMoves(ChessBoard &board, MoveList &moveLis
     }
 }
 
-void ChessMoveGenerator::generateKingsMoves(ChessBoard &board, MoveList &moveList, Mode mode, Square specificSquare) {
+void ChessMoveGenerator::generateKingsMoves(ChessBoard &board, ChessMoveList &moveList, Mode mode, Square specificSquare) {
     auto otherColor = INVERSE(board.color);
     auto kings = board.pieces[board.color][KING];
     auto emptySquares = board.emptySquares();
@@ -303,7 +303,7 @@ void ChessMoveGenerator::generateKingsMoves(ChessBoard &board, MoveList &moveLis
     }
 }
 
-void ChessMoveGenerator::generateKnightsMoves(ChessBoard &board, MoveList &moveList, Mode mode, Square specificSquare) {
+void ChessMoveGenerator::generateKnightsMoves(ChessBoard &board, ChessMoveList &moveList, Mode mode, Square specificSquare) {
     auto whiteKnights = board.pieces[board.color][KNIGHT];
     auto emptySquares = board.emptySquares();
 
@@ -334,7 +334,7 @@ void ChessMoveGenerator::generateKnightsMoves(ChessBoard &board, MoveList &moveL
     }
 }
 
-void ChessMoveGenerator::generateSlidingMoves(ChessBoard &board, Piece piece, MoveList &moveList, Mode mode, Square specificSquare) {
+void ChessMoveGenerator::generateSlidingMoves(ChessBoard &board, Piece piece, ChessMoveList &moveList, Mode mode, Square specificSquare) {
     auto slidingPieces = board.pieces[board.color][piece];
     auto occupancy = board.getOccupancy();
     auto emptySquares = board.emptySquares();

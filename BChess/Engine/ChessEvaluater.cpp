@@ -134,7 +134,7 @@ int ChessEvaluater::evaluate(ChessBoard board) {
     return evaluate(board, moves);
 }
 
-int ChessEvaluater::evaluate(ChessBoard board, MoveList moves) {
+int ChessEvaluater::evaluate(ChessBoard board, ChessMoveList moves) {
     if (moves.count == 0) {
         if (board.isCheck(board.color)) {
             // No moves but a check, that's a mat

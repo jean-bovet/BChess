@@ -89,7 +89,7 @@
         int cursor = (int)self.game.moveCursor;
         
         // Copy the current game and play the best line.
-        FGame lineGame = self.game;
+        ChessGame lineGame = self.game;
         for (int index=0; index<self.info.line.count; index++) {
             Move move = self.info.line[index];
             lineGame.move(move);

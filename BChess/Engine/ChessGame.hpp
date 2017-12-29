@@ -9,11 +9,11 @@
 #pragma once
 
 #include "ChessBoard.hpp"
-#include "FMoveList.hpp"
+#include "ChessMoveList.hpp"
 
 #include <vector>
 
-class FGame {
+class ChessGame {
 private:
     void replayMoves();
     
@@ -22,14 +22,14 @@ public:
         white_wins, black_wins, draw, in_progress
     };
 
-    FGame();
+    ChessGame();
     
     // The initial representation of the game in FEN.
     std::string initialFEN;
     
     ChessBoard board;
     
-    MoveList moves;
+    ChessMoveList moves;
     int moveCursor = 0;
     
     Outcome outcome = Outcome::in_progress;

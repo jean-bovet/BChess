@@ -6,23 +6,23 @@
 //  Copyright © 2017 Jean Bovet. All rights reserved.
 //
 
-#include "FGame.hpp"
+#include "ChessGame.hpp"
 #include "FFEN.hpp"
 #include "ChessMoveGenerator.hpp"
 #include "ChessEvaluater.hpp"
 
-FGame::FGame() {
+ChessGame::ChessGame() {
     reset();
 }
 
-void FGame::reset() {
+void ChessGame::reset() {
     moveCursor = 0;
     board.reset();
     outcome = Outcome::in_progress;
     initialFEN = StartFEN;
 }
 
-bool FGame::setFEN(std::string fen) {
+bool ChessGame::setFEN(std::string fen) {
     moveCursor = 0;
     if (FFEN::setFEN(fen, board)) {
         initialFEN = fen;
@@ -32,17 +32,17 @@ bool FGame::setFEN(std::string fen) {
     }
 }
 
-std::string FGame::getFEN() {
+std::string ChessGame::getFEN() {
     return FFEN::getFEN(board);
 }
 
-BoardSquare FGame::getPieceAt(File file, Rank rank) {
+BoardSquare ChessGame::getPieceAt(File file, Rank rank) {
     return board.get(file, rank);
 }
 
-std::vector<Move> FGame::movesAt(File file, Rank rank) {
+std::vector<Move> ChessGame::movesAt(File file, Rank rank) {
     ChessMoveGenerator generator = ChessMoveGenerator();
-    MoveList moveList = generator.generateMoves(board, ChessMoveGenerator::Mode::allMoves, SquareFrom(file, rank));
+    ChessMoveList moveList = generator.generateMoves(board, ChessMoveGenerator::Mode::allMoves, SquareFrom(file, rank));
     std::vector<Move> moves;
     for (int index=0; index<moveList.count; index++) {
         auto move = moveList.moves[index];
@@ -51,7 +51,7 @@ std::vector<Move> FGame::movesAt(File file, Rank rank) {
     return moves;
 }
 
-void FGame::move(Move move) {
+void ChessGame::move(Move move) {
     if (moveCursor < moves.count) {
         // Clear the rest of the history
         moves.count = moveCursor;
@@ -79,34 +79,34 @@ void FGame::move(Move move) {
     }
 }
 
-void FGame::move(std::string from, std::string to) {
+void ChessGame::move(std::string from, std::string to) {
     auto move = board.getMove(from, to);
     if (MOVE_ISVALID(move)) {
-        FGame::move(move);
+        ChessGame::move(move);
     }
 }
 
-bool FGame::canUndoMove() {
+bool ChessGame::canUndoMove() {
     return moveCursor > 0;
 }
 
-bool FGame::canRedoMove() {
+bool ChessGame::canRedoMove() {
     return moveCursor < moves.count;
 }
 
-void FGame::undoMove() {
+void ChessGame::undoMove() {
     assert(canUndoMove());
     moveCursor--;
     replayMoves();
 }
 
-void FGame::redoMove() {
+void ChessGame::redoMove() {
     assert(canRedoMove());
     moveCursor++;
     replayMoves();
 }
 
-void FGame::replayMoves() {
+void ChessGame::replayMoves() {
     board.reset();
     assert(FFEN::setFEN(initialFEN, board));
     for (int index=0; index<moveCursor; index++) {
@@ -114,7 +114,7 @@ void FGame::replayMoves() {
     }
 }
 
-void FGame::debugEvaluate() {
+void ChessGame::debugEvaluate() {
     std::cout << ChessEvaluater::evaluate(board) << std::endl;
 }
 

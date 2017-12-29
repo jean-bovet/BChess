@@ -8,7 +8,7 @@
 
 #import "FEngine.h"
 #import "FEngineInfo+Private.h"
-#import "FGame.hpp"
+#import "ChessGame.hpp"
 #import "ChessBoard.hpp"
 #import "FFEN.hpp"
 #import "FMove.hpp"
@@ -21,8 +21,8 @@
 @end
 
 @interface FEngine () {
-    IterativeDeepening<ChessBoard, ChessMoveGenerator, MoveList, ChessEvaluater> iterativeSearch;
-    FGame currentGame;
+    IterativeDeepening<ChessBoard, ChessMoveGenerator, ChessMoveList, ChessEvaluater> iterativeSearch;
+    ChessGame currentGame;
 }
 
 @end
@@ -209,7 +209,7 @@
     }
     
     ChessMoveGenerator generator;
-    MoveList moves = generator.generateMoves(board, ChessMoveGenerator::Mode::allMoves, square);
+    ChessMoveList moves = generator.generateMoves(board, ChessMoveGenerator::Mode::allMoves, square);
     NSMutableArray<NSString*>* moveFENs = [NSMutableArray array];
     for (int index=0; index<moves.count; index++) {
         auto move = moves.moves[index];

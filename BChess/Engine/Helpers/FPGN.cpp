@@ -308,7 +308,7 @@ std::string FPGN::to_string(Move move, SANType sanType) {
     return pgn;
 }
 
-Move FPGN::parseMove(std::string pgn, unsigned &cursor, FGame &game, bool &end) {
+Move FPGN::parseMove(std::string pgn, unsigned &cursor, ChessGame &game, bool &end) {
     eatWhiteSpace(pgn, cursor);
     
     Piece movingPiece = parsePiece(pgn, cursor);
@@ -386,22 +386,22 @@ Move FPGN::parseMove(std::string pgn, unsigned &cursor, FGame &game, bool &end) 
     } else if (pgn[cursor] == '1' && pgn[cursor+1] == '-' && pgn[cursor+2] == '0') {
         // Termination marker: white wins
         cursor+=3;
-        game.outcome = FGame::Outcome::white_wins;
+        game.outcome = ChessGame::Outcome::white_wins;
         end = true;
     } else if (pgn[cursor] == '0' && pgn[cursor+1] == '-' && pgn[cursor+2] == '1') {
         // Termination marker: black wins
         cursor+=3;
-        game.outcome = FGame::Outcome::black_wins;
+        game.outcome = ChessGame::Outcome::black_wins;
         end = true;
     } else if (pgn[cursor] == '1' && pgn[cursor+1] == '/' && pgn[cursor+2] == '2' && pgn[cursor+3] == '-' && pgn[cursor+4] == '1' && pgn[cursor+5] == '/' && pgn[cursor+6] == '2') {
         // Termination marker: draw
         cursor+=7;
-        game.outcome = FGame::Outcome::draw;
+        game.outcome = ChessGame::Outcome::draw;
         end = true;
     } else if (pgn[cursor] == '*') {
         // Termination marker: game in progress or result unknown
         cursor++;
-        game.outcome = FGame::Outcome::in_progress;
+        game.outcome = ChessGame::Outcome::in_progress;
         end = true;
     } else {
         // Invalid SAN representation
@@ -434,7 +434,7 @@ Move FPGN::parseMove(std::string pgn, unsigned &cursor, FGame &game, bool &end) 
     }
 }
 
-bool FPGN::parseMoveText(std::string pgn, unsigned &cursor, FGame &game, bool &end) {
+bool FPGN::parseMoveText(std::string pgn, unsigned &cursor, ChessGame &game, bool &end) {
     // Indication of a move, for example:
     // 1. e4 e5
     assert(parseMoveNumber(pgn, cursor));
@@ -478,7 +478,7 @@ bool FPGN::parseMoveText(std::string pgn, unsigned &cursor, FGame &game, bool &e
     return true;
 }
 
-bool FPGN::setGame(std::string pgn, FGame &game) {
+bool FPGN::setGame(std::string pgn, ChessGame &game) {
     game.reset();
     
     unsigned cursor = 0;
@@ -516,7 +516,7 @@ bool FPGN::setGame(std::string pgn, FGame &game) {
     return true;
 }
 
-std::string FPGN::getGame(FGame game, Formatting formatting, int fromIndex) {
+std::string FPGN::getGame(ChessGame game, Formatting formatting, int fromIndex) {
     // Game used to compute the optimum PGN representation for each move
     ChessBoard outputBoard;
     FFEN::setFEN(game.initialFEN, outputBoard);
@@ -582,19 +582,19 @@ std::string FPGN::getGame(FGame game, Formatting formatting, int fromIndex) {
     }
         
     switch (game.outcome) {
-        case FGame::Outcome::black_wins:
+        case ChessGame::Outcome::black_wins:
             pgn += "0-1";
             break;
             
-        case FGame::Outcome::white_wins:
+        case ChessGame::Outcome::white_wins:
             pgn += "1-0";
             break;
             
-        case FGame::Outcome::draw:
+        case ChessGame::Outcome::draw:
             pgn += "1/2-1/2";
             break;
             
-        case FGame::Outcome::in_progress:
+        case ChessGame::Outcome::in_progress:
             pgn += "*";
             break;
     }
