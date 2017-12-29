@@ -121,6 +121,7 @@ class ChessViewController: NSViewController {
             chessView.clearEngineMoveIndicators()
             chessView.clearAllViewIndicators()
             chessView.invalidateUI()
+            saveToDefaults()
         }
     }
     

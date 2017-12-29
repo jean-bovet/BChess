@@ -252,7 +252,7 @@
                 <customObject id="YLy-65-1bz" customClass="NSFontManager"/>
                 <customObject id="Ady-hI-5gd" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="558" y="-458"/>
+            <point key="canvasLocation" x="-26" y="-529"/>
         </scene>
         <!--Window Controller-->
         <scene sceneID="R2V-B0-nI4">
@@ -275,6 +275,46 @@
                 <customObject id="Oky-zY-oP4" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="75" y="116"/>
+        </scene>
+        <!--Window Controller-->
+        <scene sceneID="Mnf-h0-2qk">
+            <objects>
+                <windowController storyboardIdentifier="PromotionSheet" id="WlH-8f-SP6" sceneMemberID="viewController">
+                    <window key="window" identifier="PromotionSheet" title="Window" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" oneShot="NO" releasedWhenClosed="NO" showsToolbarButton="NO" visibleAtLaunch="NO" frameAutosaveName="" animationBehavior="default" id="Gm2-Io-3ZJ">
+                        <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
+                        <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
+                        <rect key="contentRect" x="425" y="461" width="412" height="157"/>
+                        <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1417"/>
+                        <connections>
+                            <outlet property="delegate" destination="WlH-8f-SP6" id="vMY-sJ-3DS"/>
+                        </connections>
+                    </window>
+                    <connections>
+                        <segue destination="xoP-Nu-Rhw" kind="relationship" relationship="window.shadowedContentViewController" id="qAw-gb-71O"/>
+                    </connections>
+                </windowController>
+                <customObject id="ttI-eB-3sP" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="837" y="-104.5"/>
+        </scene>
+        <!--View Controller-->
+        <scene sceneID="8M3-uY-Eoq">
+            <objects>
+                <viewController id="xoP-Nu-Rhw" sceneMemberID="viewController">
+                    <view key="view" id="BdU-Yt-L2h">
+                        <rect key="frame" x="0.0" y="0.0" width="352" height="136"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                        <subviews>
+                            <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="V72-p8-6EH" customClass="PromotionPickerView" customModule="BChess" customModuleProvider="target">
+                                <rect key="frame" x="20" y="20" width="312" height="96"/>
+                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                            </customView>
+                        </subviews>
+                    </view>
+                </viewController>
+                <customObject id="T2M-re-unm" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1503" y="-115"/>
         </scene>
         <!--Chess View Controller-->
         <scene sceneID="hIz-AP-VOD">

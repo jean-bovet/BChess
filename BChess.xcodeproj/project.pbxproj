@@ -45,6 +45,9 @@
 		A75CB25B1FED8F2C005487BD /* MoveTests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A75CB25A1FED8F2B005487BD /* MoveTests.cpp */; };
 		A75CB25D1FED8F82005487BD /* EvaluationTests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A75CB25C1FED8F82005487BD /* EvaluationTests.cpp */; };
 		A75CB25F1FED8F9E005487BD /* CheckTests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A75CB25E1FED8F9E005487BD /* CheckTests.cpp */; };
+		A765D85A1FF60CEE0045BB36 /* PromotionPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A765D8591FF60CEE0045BB36 /* PromotionPickerView.swift */; };
+		A765D85C1FF60DED0045BB36 /* NSView+Chess.swift in Sources */ = {isa = PBXBuildFile; fileRef = A765D85B1FF60DED0045BB36 /* NSView+Chess.swift */; };
+		A765D85E1FF61AA70045BB36 /* PromotionPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = A765D85D1FF61AA70045BB36 /* PromotionPicker.swift */; };
 		A7712D2F1FC7C4CD00E7E802 /* UCI.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7712D2E1FC7C4CD00E7E802 /* UCI.swift */; };
 		A7712D341FC895D100E7E802 /* UCI.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7712D2E1FC7C4CD00E7E802 /* UCI.swift */; };
 		A7712D471FCBC13100E7E802 /* ChessBoard.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A7712D451FCBC13100E7E802 /* ChessBoard.cpp */; };
@@ -137,6 +140,9 @@
 		A75CB25C1FED8F82005487BD /* EvaluationTests.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = EvaluationTests.cpp; sourceTree = "<group>"; };
 		A75CB25E1FED8F9E005487BD /* CheckTests.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CheckTests.cpp; sourceTree = "<group>"; };
 		A75CB2611FED9693005487BD /* IterativeDeepening.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = IterativeDeepening.hpp; sourceTree = "<group>"; };
+		A765D8591FF60CEE0045BB36 /* PromotionPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromotionPickerView.swift; sourceTree = "<group>"; };
+		A765D85B1FF60DED0045BB36 /* NSView+Chess.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSView+Chess.swift"; sourceTree = "<group>"; };
+		A765D85D1FF61AA70045BB36 /* PromotionPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromotionPicker.swift; sourceTree = "<group>"; };
 		A7712D141FB916E900E7E802 /* BChessTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BChessTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		A7712D181FB916E900E7E802 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		A7712D2E1FC7C4CD00E7E802 /* UCI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UCI.swift; sourceTree = "<group>"; };
@@ -265,6 +271,9 @@
 				A7460F001FDF2465002B0740 /* BoardView.swift */,
 				A75359BE1FDE0E3B008D1DEE /* BoardSquareView.swift */,
 				A75359CE1FDE4385008D1DEE /* PieceView.swift */,
+				A765D85D1FF61AA70045BB36 /* PromotionPicker.swift */,
+				A765D8591FF60CEE0045BB36 /* PromotionPickerView.swift */,
+				A765D85B1FF60DED0045BB36 /* NSView+Chess.swift */,
 				A75359961FDE0947008D1DEE /* Assets.xcassets */,
 				A75359981FDE0947008D1DEE /* Main.storyboard */,
 				A753599B1FDE0947008D1DEE /* Info.plist */,
@@ -549,9 +558,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A765D85C1FF60DED0045BB36 /* NSView+Chess.swift in Sources */,
 				A75359CA1FDE4038008D1DEE /* ChessEvaluater.cpp in Sources */,
 				A75359CF1FDE4385008D1DEE /* PieceView.swift in Sources */,
 				A75359C31FDE4023008D1DEE /* FENgineInfo+Extension.swift in Sources */,
+				A765D85E1FF61AA70045BB36 /* PromotionPicker.swift in Sources */,
 				A7460F011FDF2465002B0740 /* BoardView.swift in Sources */,
 				A75359BF1FDE0E3B008D1DEE /* BoardSquareView.swift in Sources */,
 				A77372051FE443D70001A90F /* FPGN.cpp in Sources */,
@@ -565,6 +576,7 @@
 				A75359C91FDE4038008D1DEE /* ChessBoard.cpp in Sources */,
 				A75359C41FDE4031008D1DEE /* FEngineInfo.mm in Sources */,
 				A75359C81FDE4038008D1DEE /* ChessMoveGenerator.cpp in Sources */,
+				A765D85A1FF60CEE0045BB36 /* PromotionPickerView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

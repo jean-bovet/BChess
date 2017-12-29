@@ -16,21 +16,6 @@ class BoardView: NSView {
     
     let numberFormatter = NumberFormatter()
 
-    let pieceImageNames = [
-        "p" : "pawn_b",
-        "P" : "pawn_w",
-        "n" : "knight_b",
-        "N" : "knight_w",
-        "b" : "bishop_b",
-        "B" : "bishop_w",
-        "r" : "rook_b",
-        "R" : "rook_w",
-        "q" : "queen_b",
-        "Q" : "queen_w",
-        "k" : "king_b",
-        "K" : "king_w",
-        ]
-    
     let ranks = [ "1", "2", "3", "4", "5", "6", "7", "8" ]
     let files = [ "a", "b", "c", "d", "e", "f", "g", "h" ]
     
@@ -97,35 +82,6 @@ class BoardView: NSView {
         invalidateUI()
     }
     
-    func pieceSquareView(rank: Int, file: Int) -> PieceView {
-        if let view = viewWithTag(200 + rank * 8 + file) as? PieceView {
-            return view
-        } else {
-            let view = PieceView()
-            view.wantsLayer = true
-            view.addGestureRecognizer(NSClickGestureRecognizer(target: self, action: #selector(pieceSquareViewTapped)))
-            view.tag = 200 + rank * 8 + file
-            view.rank = rank
-            view.file = file
-            addSubview(view)
-            return view
-        }
-    }
-    
-    func boardSquareView(rank: Int, file: Int, blackSquare: Bool = false) -> BoardSquareView {
-        if let squareView = viewWithTag(100+rank*8+file) as? BoardSquareView {
-            return squareView
-        } else {
-            let squareView = BoardSquareView(frame: frame)
-            squareView.rank = rank
-            squareView.file = file
-            squareView.wantsLayer = true
-            squareView.blackSquare = blackSquare
-            addSubview(squareView)
-            return squareView
-        }
-    }
-    
     func clearAllViewIndicators() {
         for pieceView in subviews.filter({ $0 is PieceView }).map( {$0 as! PieceView }) {
             pieceView.clear()
@@ -152,12 +108,16 @@ class BoardView: NSView {
     @objc func pieceSquareViewTapped(sender: NSClickGestureRecognizer) {
         if let view = sender.view as? PieceView {
             if view.moveIndicator {
+                if view.move!.isPromotion {
+                    let picker = PromotionPicker(isWhite: true)
+                    picker.choosePromotionPiece { (piece) in
+                        view.move!.setPromotionPiece(piece!)
+                        self.playUserMove(move: view.move!)
+                    }
+                } else {
+                    playUserMove(move: view.move!)
+                }
                 // Perform move
-                engine.move(view.move!.rawMoveValue)
-                clearAllViewIndicators()
-                clearEngineMoveIndicators()
-                invalidateUI()
-                playEngineIfPossible()
             } else if view.selected {
                 clearAllViewIndicators()
                 needsLayout = true
@@ -176,6 +136,14 @@ class BoardView: NSView {
             }
             self.needsDisplay = true
         }
+    }
+    
+    func playUserMove(move : FEngineMove) {
+        engine.move(move.rawMoveValue)
+        clearAllViewIndicators()
+        clearEngineMoveIndicators()
+        invalidateUI()
+        playEngineIfPossible()
     }
     
     // MARK: Actions
@@ -317,17 +285,10 @@ class BoardView: NSView {
         }
         
         layoutBoard() { (frame, rank, file, blackBackground) in
-            let view = pieceSquareView(rank: rank, file: file)
+            let view = pieceSquareView(rank: rank, file: file,
+                                       action: #selector(pieceSquareViewTapped))
+            view.image = image(forPiece: engine.piece(at: UInt(rank), file: UInt(file)))
             view.frame = frame
-            if let piece = engine.piece(at: UInt(rank), file: UInt(file)) {
-                if let imageName = pieceImageNames[piece], let image = NSImage(named: NSImage.Name(rawValue: imageName)) {
-                    view.image = image
-                } else {
-                    view.image = nil
-                }
-            } else {
-                view.image = nil
-            }
         }
         
     }

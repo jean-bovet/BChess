@@ -28,35 +28,12 @@ typedef uint32_t Move;
 
 static const Move INVALID_MOVE = 0;
 
-inline static Move createMove(Square from, Square to, Color color, Piece piece) {
-    Move m = (Move)(from | (Move)to << 6 | color << 12 | piece << 13);
-    return m;
-}
-
-inline static Move createPromotion(Square from, Square to, Color color, Piece piece, Piece promotionPiece) {
-    Move m = createMove(from, to, color, piece);
-    m |= promotionPiece << 18;
-    return m;
-}
-
-inline static Move createCapture(Square from, Square to, Color color, Piece attackingPiece, Piece capturedPiece) {
-    Move m = createMove(from, to, color, attackingPiece);
-    m |= 1UL << 16;
-    m |= capturedPiece << 21;
-    return m;
-}
-
-inline static Move createEnPassant(Square from, Square to, Color color, Piece piece) {
-    Move m = createCapture(from, to, color, piece, PAWN);
-    m |= 1UL << 17;
-    return m;
-}
-
 inline static bool MOVE_ISVALID(Move move) {
     return move != INVALID_MOVE;
 }
 
-inline static void SET_MOVE_IS_CHECK(Move move) {
+inline static void SET_MOVE_IS_CHECK(Move & move) {
+    move &= ~(1UL << 24);
     move |= 1UL << 24;
 }
 
@@ -85,6 +62,11 @@ inline static Piece MOVE_PIECE(Move move) {
     return Piece(test);
 }
 
+inline static void SET_MOVE_PROMOTION_PIECE(Move & move, Piece promotionPiece) {
+    move &= ~(7UL << 18);
+    move |= promotionPiece << 18;
+}
+
 inline static Piece MOVE_PROMOTION_PIECE(Move move) {
     uint8_t test = (move >> 18) & 7;
     return Piece(test);
@@ -103,5 +85,29 @@ inline static Square MOVE_FROM(Move move) {
 inline static Square MOVE_TO(Move move) {
     Square to = (move >> 6) & 63;
     return to;
+}
+
+inline static Move createMove(Square from, Square to, Color color, Piece piece) {
+    Move m = (Move)(from | (Move)to << 6 | color << 12 | piece << 13);
+    return m;
+}
+
+inline static Move createPromotion(Square from, Square to, Color color, Piece piece, Piece promotionPiece) {
+    Move m = createMove(from, to, color, piece);
+    SET_MOVE_PROMOTION_PIECE(m, promotionPiece);
+    return m;
+}
+
+inline static Move createCapture(Square from, Square to, Color color, Piece attackingPiece, Piece capturedPiece) {
+    Move m = createMove(from, to, color, attackingPiece);
+    m |= 1UL << 16;
+    m |= capturedPiece << 21;
+    return m;
+}
+
+inline static Move createEnPassant(Square from, Square to, Color color, Piece piece) {
+    Move m = createCapture(from, to, color, piece, PAWN);
+    m |= 1UL << 17;
+    return m;
 }
 

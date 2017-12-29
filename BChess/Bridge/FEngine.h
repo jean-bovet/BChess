@@ -23,6 +23,9 @@ typedef enum : NSUInteger {
 @property (nonatomic, assign) NSUInteger fromFile, toFile;
 @property (nonatomic, assign) NSUInteger fromRank, toRank;
 @property (nonatomic, assign) NSUInteger rawMoveValue;
+@property (nonatomic, assign, readonly) BOOL isPromotion;
+
+- (void)setPromotionPiece:(NSString* _Nonnull)piece;
 
 @end
 

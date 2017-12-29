@@ -26,6 +26,14 @@ TEST(Move, SimpleMove) {
     ASSERT_TRUE(MOVE_ISVALID(m));
 }
 
+TEST(Move, MoveIsCheck) {
+    Move m = createMove(12, 62, BLACK, BISHOP);
+    ASSERT_FALSE(MOVE_IS_CHECK(m));
+    
+    SET_MOVE_IS_CHECK(m);
+    ASSERT_TRUE(MOVE_IS_CHECK(m));
+}
+
 TEST(Move, MoveCapture) {
     Move m = createCapture(12, 62, BLACK, BISHOP, ROOK);
     ASSERT_EQ(MOVE_FROM(m), 12);
@@ -61,3 +69,13 @@ TEST(Move, MovePromotion) {
     ASSERT_TRUE(MOVE_ISVALID(m));
 }
 
+TEST(Move, MoveSetPromotion) {
+    Move m = createMove(12, 62, BLACK, BISHOP);
+    ASSERT_EQ(MOVE_PROMOTION_PIECE(m), 0);
+    
+    SET_MOVE_PROMOTION_PIECE(m, QUEEN);
+    ASSERT_EQ(MOVE_PROMOTION_PIECE(m), QUEEN);
+    
+    SET_MOVE_PROMOTION_PIECE(m, KNIGHT);
+    ASSERT_EQ(MOVE_PROMOTION_PIECE(m), KNIGHT);
+}
