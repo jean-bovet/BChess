@@ -23,8 +23,9 @@ static void assertBestMove(std::string fen, std::string finalFEN, std::string ex
     search.config = config;
 
     ChessMinMaxSearch::Variation pv;
+    ChessMinMaxSearch::Variation bv;
     
-    search.alphabeta(board, 0, board.color == WHITE, pv);
+    search.alphabeta(board, 0, board.color == WHITE, pv, bv);
     
     // Assert the best move
     auto actualMove = FPGN::to_string(pv.moves.bestMove());

@@ -64,11 +64,13 @@ public:
     
     typedef MinMaxVariation<TMoveList, TMove> Variation;
     
-    int alphabeta(TNode node, int depth, bool maximizingPlayer, Variation &pv) {
+    // pv: Principal Variation that will be available when this method returns.
+    // bv: Best Variation that is provided from an earlier search (typically by the iterative deepening algorithm).
+    int alphabeta(TNode node, int depth, bool maximizingPlayer, Variation &pv, Variation &bv) {
         analyzing = true;
         Variation currentLine;
         int color = maximizingPlayer ? 1 : -1;
-        int score = alphabeta(node, depth, -INT_MAX, INT_MAX, color, pv, currentLine);
+        int score = alphabeta(node, depth, -INT_MAX, INT_MAX, color, pv, currentLine, bv);
         return score * color;
     }
     
@@ -76,9 +78,10 @@ private:
     
     // pv: Principal Variation - the best line found so far.
     // cv: Current Variation - the current line being examined.
+    // bv: Best Variation - if available
     // https://en.wikipedia.org/wiki/Negamax
     // https://chessprogramming.wikispaces.com/Principal+variation
-    int alphabeta(TNode node, int depth, int alpha, int beta, int color, Variation &pv, Variation &cv) {
+    int alphabeta(TNode node, int depth, int alpha, int beta, int color, Variation &pv, Variation &cv, Variation &bv) {
         pv.depth = depth;
 
         if (depth == config.maxDepth) {
@@ -100,19 +103,38 @@ private:
             TMoveGenerator::sortMoves(moves);
         }
         
+        // Lookup the best move if available in the best variation
+        auto bestMove = bv.moves.lookup(depth);
+
         int bestValue = -INT_MAX;
-        for (int index=0; index<moves.count && analyzing; index++) {
+        for (int index=-1; index<moves.count && analyzing; index++) {
+            TMove move = TMove();
+            if (index == -1) {
+                if (TMoveGenerator::isValid(bestMove)) {
+                    // Analyze the best move first
+                    move = bestMove;
+                } else {
+                    // Let's skip this best move and start with the generated moves
+                    continue;
+                }
+            } else {
+                move = moves.moves[index];
+                if (move == bestMove) {
+                    // Skip this move if it is the best move (which has been analyzed first)
+                    continue;
+                }
+            }
+            
             visitedNodes++;
-            
-            auto move = moves.moves[index];
-            
+
             cv.moves.push(move);
 
             auto newNode = node;
             newNode.move(move);
             
             Variation line;
-            int score = -alphabeta(newNode, depth + 1, -beta, -alpha, -color, line, cv);
+            auto bestVariation = (move == bestMove) ? bv : Variation();
+            int score = -alphabeta(newNode, depth + 1, -beta, -alpha, -color, line, cv, bestVariation);
             
             cv.moves.pop();
             

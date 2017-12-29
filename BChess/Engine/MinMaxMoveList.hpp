@@ -16,6 +16,8 @@ struct MinMaxMoveList {
     int count = 0;
     
     TMove &operator[] (int index) {
+        assert(index < MAX_MOVES);
+        assert(index < count);
         return moves[index];
     }
 
@@ -34,6 +36,14 @@ struct MinMaxMoveList {
     void pop() {
         assert(count > 0);
         count--;
+    }
+    
+    TMove lookup(int index) {
+        if (index < count) {
+            return moves[index];
+        } else {
+            return TMove();
+        }
     }
     
     TMove bestMove() {

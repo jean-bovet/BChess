@@ -67,6 +67,13 @@ struct TestMove {
     int index = 0;
     int ordering = 0;
     bool quiet = false;
+    bool invalid = true;
+    
+    inline bool operator==(const TestMove& other){
+        return index == other.index && ordering == other.ordering &&
+        quiet == other.quiet && invalid == other.invalid;
+    }
+
 };
 
 struct TestMoveList: MinMaxMoveList<TestMove> {
@@ -130,6 +137,10 @@ struct TestMoveGenerator {
         std::sort(std::begin(moveList.moves), std::begin(moveList.moves)+moveList.count, testMoveComparison);
     }
     
+    static bool isValid(TestMove move) {
+        return !move.invalid;
+    }
+    
     static TestMoveList generateQuiescenceMoves(TestBoard board) {
         return generateMoves(board, true);
     }
@@ -143,6 +154,7 @@ struct TestMoveGenerator {
             move.index = index+1;
             move.quiet = child.quiet;
             move.ordering = child.ordering;
+            move.invalid = false;
             moveList.push(move);
         }
         return moveList;
@@ -151,14 +163,13 @@ struct TestMoveGenerator {
 
 typedef MinMaxSearch<TestBoard, TestEvaluater, TestMoveGenerator, TestMoveList, TestMove> TestMinMaxSearch;
 
-static void assertAlphaBeta(TestMinMaxSearch alphaBeta, TestTreeNode rootNode, int expectedVisitedNodes, int expectedValue, std::vector<int> expectedPV) {
+static void assertAlphaBeta(TestMinMaxSearch alphaBeta, TestTreeNode rootNode, int expectedVisitedNodes, int expectedValue, std::vector<int> expectedPV, TestMinMaxSearch::Variation &pv, TestMinMaxSearch::Variation &bv) {
     alphaBeta.reset();
         
     TestBoard board;
     board.node = &rootNode;
     
-    TestMinMaxSearch::Variation pv;
-    int eval = alphaBeta.alphabeta(board, 0, true, pv);
+    int eval = alphaBeta.alphabeta(board, 0, true, pv, bv);
 //    std::cout << alphaBeta.visitedNodes << " => " << eval << std::endl;
     ASSERT_EQ(expectedValue, eval);
     ASSERT_EQ(expectedVisitedNodes, alphaBeta.visitedNodes);
@@ -166,6 +177,12 @@ static void assertAlphaBeta(TestMinMaxSearch alphaBeta, TestTreeNode rootNode, i
     for (int index=0; index<expectedPV.size(); index++) {
         ASSERT_EQ(expectedPV[index], pv.moves[index].index);
     }
+}
+
+static void assertAlphaBeta(TestMinMaxSearch alphaBeta, TestTreeNode rootNode, int expectedVisitedNodes, int expectedValue, std::vector<int> expectedPV) {
+    TestMinMaxSearch::Variation pv;
+    TestMinMaxSearch::Variation bv;
+    assertAlphaBeta(alphaBeta, rootNode, expectedVisitedNodes, expectedValue, expectedPV, pv, bv);
 }
 
 static void configureTree(TestTreeNode &rootNode) {
@@ -212,6 +229,9 @@ TEST(Synthetic, AlphaBetaCutoff) {
     // Test with alpha-beta enabled (some nodes are skipped)
     assertAlphaBeta(search, rootNode, 24, 6, { 2, 1, 1, 1 });
     
+    // Repeat to make sure the same result is obtained
+    assertAlphaBeta(search, rootNode, 24, 6, { 2, 1, 1, 1 });
+
     // Test with alpha-beta disabled (all the nodes are analyzed)
     search.config.alphaBetaPrunning = false;
     assertAlphaBeta(search, rootNode, 32, 6, { 2, 1, 1, 1 });
@@ -232,6 +252,30 @@ TEST(Synthetic, SortedNodes) {
     rootNode.setOrdering({ 3 }, 3);
 
     assertAlphaBeta(search, rootNode, 20, 6, { 2, 1, 1, 1 });
+}
+
+TEST(Synthetic, CachedBestLine) {
+    auto search = defaultMinMaxSearch();
+    
+    TestTreeNode rootNode;
+    
+    configureTree(rootNode);
+    
+    TestMinMaxSearch::Variation pv;
+    TestMinMaxSearch::Variation bv;
+
+    assertAlphaBeta(search, rootNode, 24, 6, { 2, 1, 1, 1 }, pv, bv);
+    
+    ASSERT_EQ(4, pv.moves.count);
+    ASSERT_EQ(0, bv.moves.count);
+    
+    bv = pv;
+    
+    // Now using the cached best line, we should see less nodes being analyzed.
+    assertAlphaBeta(search, rootNode, 20, 6, { 2, 1, 1, 1 }, pv, bv);
+    
+    ASSERT_EQ(4, pv.moves.count);
+    ASSERT_EQ(4, bv.moves.count);
 }
 
 TEST(Synthetic, QuiescenceSearch) {

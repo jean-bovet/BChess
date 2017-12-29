@@ -26,6 +26,10 @@ public:
 
     static void sortMoves(MoveList & moves);
 
+    static bool isValid(Move move) {
+        return MOVE_ISVALID(move);
+    }
+    
     enum class Mode {
         allMoves,
         quiescenceMoveOnly,

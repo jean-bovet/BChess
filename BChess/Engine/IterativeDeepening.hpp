@@ -50,7 +50,8 @@ public:
         }
         
         ChessEvaluation evaluation;
-        
+        ChessMinMaxSearch::Variation bestVariation;
+
         analyzing = true;
         
         for (int curMaxDepth=1; curMaxDepth<=maxDepth; curMaxDepth++) {
@@ -65,7 +66,7 @@ public:
             minMaxSearch.reset();
             
             ChessMinMaxSearch::Variation pv;
-            int score = minMaxSearch.alphabeta(board, 0, board.color == WHITE, pv);
+            int score = minMaxSearch.alphabeta(board, 0, board.color == WHITE, pv, bestVariation);
             
             moveClock.stop();
             
@@ -73,6 +74,8 @@ public:
             int movesPerSecond = int(movesPerSingleMs * 1e3);
             
             if (analyzing) {
+                bestVariation = pv;
+                
                 evaluation.clear();
                 
                 evaluation.value = score;
