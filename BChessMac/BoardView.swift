@@ -71,6 +71,13 @@ class BoardView: NSView {
     
     override func layout() {
         super.layout()
+        
+        // Don't layout the UI if there is an animation in progress
+        // to avoid cancelling the animation.
+        guard !animation else {
+            return
+        }
+        
         var size = bounds.size
         size.width -= 50
         size.height -= 50
@@ -130,7 +137,7 @@ class BoardView: NSView {
                 playEngineIfPossible()
             } else if view.selected {
                 clearAllViewIndicators()
-                self.needsLayout = true
+                needsLayout = true
             } else {
                 clearAllViewIndicators()
                 
@@ -333,9 +340,6 @@ class BoardView: NSView {
     }
     
     func invalidateUI() {
-        guard !animation else {
-            return
-        }
         needsLayout = true
     }
     
