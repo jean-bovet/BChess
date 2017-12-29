@@ -23,6 +23,7 @@
 // bit 17: 1=en passant, 0 otherwise
 // bit 18-20: 3 bits for promotion PIECE (from 0 to 6). 0 means no promotion.
 // bit 21-23: 3 bits for captured PIECE (from 0 to 6).
+// bit 24: 0=nothing, 1=check move
 typedef uint32_t Move;
 
 static const Move INVALID_MOVE = 0;
@@ -53,6 +54,15 @@ inline static Move createEnPassant(Square from, Square to, Color color, Piece pi
 
 inline static bool MOVE_ISVALID(Move move) {
     return move != INVALID_MOVE;
+}
+
+inline static void SET_MOVE_IS_CHECK(Move move) {
+    move |= 1UL << 24;
+}
+
+inline static bool MOVE_IS_CHECK(Move move) {
+    uint32_t test = move & (1UL << 24);
+    return test > 0;
 }
 
 inline static bool MOVE_IS_CAPTURE(Move move) {

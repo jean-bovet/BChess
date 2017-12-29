@@ -459,6 +459,19 @@ Bitboard ChessBoard::emptySquares() {
 }
 
 bool ChessBoard::isAttacked(Square square, Color byColor) {
+    // Pawns: we put a pawn of the opposite color at our king's location. That way, we can
+    // determine the attacks that a pawn from the opposite color would do.
+    auto pawnAttacks = PawnAttacks[INVERSE(byColor)][square] & pieces[byColor][Piece::PAWN];
+    if (pawnAttacks > 0) {
+        return true;
+    }
+    
+    // King
+    auto kingMoves = KingMoves[square] & pieces[byColor][Piece::KING];
+    if (kingMoves > 0) {
+        return true;
+    }
+    
     // Generate all the moves for a knight from the king position
     // and keep only the ones that are actually hitting
     // a black knight, meaning the king is attacked.
@@ -478,19 +491,6 @@ bool ChessBoard::isAttacked(Square square, Color byColor) {
     auto rawRookMoves = Rmagic(square, getOccupancy());
     auto rookMoves = rawRookMoves & (pieces[byColor][Piece::ROOK]|pieces[byColor][Piece::QUEEN]);
     if (rookMoves > 0) {
-        return true;
-    }
-    
-    // Pawns: we put a pawn of the opposite color at our king's location. That way, we can
-    // determine the attacks that a pawn from the opposite color would do.
-    auto pawnAttacks = PawnAttacks[INVERSE(byColor)][square] & pieces[byColor][Piece::PAWN];
-    if (pawnAttacks > 0) {
-        return true;
-    }
-    
-    // King
-    auto kingMoves = KingMoves[square] & pieces[byColor][Piece::KING];
-    if (kingMoves > 0) {
         return true;
     }
     

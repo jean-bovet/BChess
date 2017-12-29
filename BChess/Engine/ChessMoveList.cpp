@@ -28,6 +28,14 @@ void ChessMoveList::addMove(ChessBoard &board, Move move) {
     // Note: make sure the move that was just played doesn't make
     // it's king in check (use board.color which refers to the move's color).
     if (!validBoard.isCheck(board.color)) {
+        // Determinte if the move makes the king of the opposite side in check.
+        // This is used to know which moves to use during quiescence search,
+        // as a check move is not considered a quiet move.
+        if (validBoard.isCheck(validBoard.color)) {
+            SET_MOVE_IS_CHECK(move);
+        }
+        
+        // Add the valid move to the list
         push(move);
     }
 }

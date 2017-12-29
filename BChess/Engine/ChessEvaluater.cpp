@@ -100,7 +100,7 @@ bool ChessEvaluater::isQuiet(Move move) {
     // - a capture
     // - a promotion
     // - a check
-    return !MOVE_IS_CAPTURE(move) && MOVE_PROMOTION_PIECE(move) == 0;
+    return !MOVE_IS_CAPTURE(move) && MOVE_PROMOTION_PIECE(move) == 0 && !MOVE_IS_CHECK(move);
 }
 
 int ChessEvaluater::getBonus(Piece piece, Color color, Square square) {
