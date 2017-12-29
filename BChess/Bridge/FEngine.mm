@@ -70,6 +70,10 @@
     });
 }
 
+- (BOOL)loadOpening:(NSString* _Nonnull)pgn {
+    return openings.load(std::string([pgn UTF8String]));
+}
+
 - (BOOL)setFEN:(NSString *)FEN {
     return currentGame.setFEN(std::string([FEN UTF8String]));
 }

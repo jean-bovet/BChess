@@ -61,6 +61,9 @@
 		A7AFCCAA1FB4E40D00AE3D85 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7AFCCA91FB4E40D00AE3D85 /* main.swift */; };
 		A7B18F581FD9BAE500A605B8 /* MovesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7B18F571FD9BAE500A605B8 /* MovesTests.swift */; };
 		A7C92AA81FF6D74400160D2E /* ChessOpenings.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A765D85F1FF6C1950045BB36 /* ChessOpenings.cpp */; };
+		A7C92AAA1FF6EE5500160D2E /* Openings.pgn in Resources */ = {isa = PBXBuildFile; fileRef = A7C92AA91FF6EE5500160D2E /* Openings.pgn */; };
+		A7C92AAB1FF6F19100160D2E /* Openings.pgn in Resources */ = {isa = PBXBuildFile; fileRef = A7C92AA91FF6EE5500160D2E /* Openings.pgn */; };
+		A7C92AAD1FF6F19D00160D2E /* OpeningTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7C92AAC1FF6F19D00160D2E /* OpeningTests.swift */; };
 		A7E3B6891FF6C85500DBB66B /* OpeningsTests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A7E3B6881FF6C85500DBB66B /* OpeningsTests.cpp */; };
 		A7E490EB1FEA207100970EAD /* gtest-all.cc in Sources */ = {isa = PBXBuildFile; fileRef = A7E490EA1FEA207100970EAD /* gtest-all.cc */; };
 		A7E490EC1FEA23DD00970EAD /* PGNTests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A77372041FE340780001A90F /* PGNTests.cpp */; };
@@ -168,6 +171,8 @@
 		A7AFCCA91FB4E40D00AE3D85 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		A7B18F571FD9BAE500A605B8 /* MovesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MovesTests.swift; sourceTree = "<group>"; };
 		A7B1B0F41FF2D97300EAF157 /* FEngineInfo+Private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "FEngineInfo+Private.h"; sourceTree = "<group>"; };
+		A7C92AA91FF6EE5500160D2E /* Openings.pgn */ = {isa = PBXFileReference; lastKnownFileType = text; path = Openings.pgn; sourceTree = "<group>"; };
+		A7C92AAC1FF6F19D00160D2E /* OpeningTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpeningTests.swift; sourceTree = "<group>"; };
 		A7E3B6881FF6C85500DBB66B /* OpeningsTests.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = OpeningsTests.cpp; sourceTree = "<group>"; };
 		A7E490E41FEA1C0600970EAD /* SearchChessTests.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SearchChessTests.cpp; sourceTree = "<group>"; };
 		A7E490E51FEA1C0600970EAD /* SearchSyntheticTests.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SearchSyntheticTests.cpp; sourceTree = "<group>"; };
@@ -285,6 +290,7 @@
 				A75359981FDE0947008D1DEE /* Main.storyboard */,
 				A753599B1FDE0947008D1DEE /* Info.plist */,
 				A753599C1FDE0947008D1DEE /* BChessMac.entitlements */,
+				A7C92AA91FF6EE5500160D2E /* Openings.pgn */,
 			);
 			path = BChessMac;
 			sourceTree = "<group>";
@@ -322,6 +328,7 @@
 			children = (
 				A7712D321FC8957500E7E802 /* GamesTests.swift */,
 				A7B18F571FD9BAE500A605B8 /* MovesTests.swift */,
+				A7C92AAC1FF6F19D00160D2E /* OpeningTests.swift */,
 				A75CB25A1FED8F2B005487BD /* MoveTests.cpp */,
 				A75CB25C1FED8F82005487BD /* EvaluationTests.cpp */,
 				A75CB25E1FED8F9E005487BD /* CheckTests.cpp */,
@@ -543,6 +550,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A7C92AAA1FF6EE5500160D2E /* Openings.pgn in Resources */,
 				A75359971FDE0947008D1DEE /* Assets.xcassets in Resources */,
 				A753599A1FDE0947008D1DEE /* Main.storyboard in Resources */,
 			);
@@ -566,6 +574,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A7C92AAB1FF6F19100160D2E /* Openings.pgn in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -635,6 +644,7 @@
 				A7E490F21FEA2E7E00970EAD /* GoogleTests.mm in Sources */,
 				A7EF55C91FF1CF77004CF2DA /* BestMoveTests.cpp in Sources */,
 				A7EF55CA1FF1D8C2004CF2DA /* SearchSyntheticTests.cpp in Sources */,
+				A7C92AAD1FF6F19D00160D2E /* OpeningTests.swift in Sources */,
 				A70A61DB1FD4D49500AFDF0E /* ChessEvaluater.cpp in Sources */,
 				A75CB25F1FED8F9E005487BD /* CheckTests.cpp in Sources */,
 				A7E490EB1FEA207100970EAD /* gtest-all.cc in Sources */,

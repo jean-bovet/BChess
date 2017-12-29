@@ -12,6 +12,7 @@
 #include "ChessMoveList.hpp"
 
 #include <vector>
+#include <map>
 
 class ChessGame {
 private:
@@ -33,6 +34,8 @@ public:
     int moveCursor = 0;
     
     Outcome outcome = Outcome::in_progress;
+    
+    std::map<std::string, std::string> tags;
     
     void reset();
     

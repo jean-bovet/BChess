@@ -17,12 +17,6 @@
 #include <iostream>
 #include <vector>
 
-static void eatWhiteSpace(std::string pgn, unsigned &cursor) {
-    while (pgn[cursor] == ' ') {
-        cursor++;
-    }
-}
-
 /**
  [Event "F/S Return Match"]
  [Site "Belgrade, Serbia JUG"]
@@ -41,6 +35,22 @@ static void eatWhiteSpace(std::string pgn, unsigned &cursor) {
  35. Ra7 g6 36. Ra6+ Kc5 37. Ke1 Nf4 38. g3 Nxh3 39. Kd2 Kb5 40. Rd6 Kc5 41. Ra6
  Nf2 42. g4 Bd3 43. Re6 1/2-1/2
  */
+
+static bool isFile(char c) {
+    return c >= 'a' && c <= 'h';
+}
+
+static bool isRank(char c) {
+    return c >= '1' && c <= '8';
+}
+
+static bool isSpaceOrNewLine(char c) {
+    return c == ' ' || c == '\n' || c == '\r';
+}
+
+static bool isCheckOrMate(char c) {
+    return c == '+' || c == '#';
+}
 
 static bool parseUntil(std::string pgn, unsigned &cursor, std::string &comment, char endCharacter) {
     while (cursor < pgn.length() && pgn[cursor] != endCharacter) {
@@ -61,17 +71,14 @@ static bool parseMoveNumber(std::string pgn, unsigned &cursor) {
     return true;
 }
 
-static bool parseString(std::string pgn, unsigned &cursor, std::string string) {
-    for (int index=0; index<string.length(); index++) {
-        if (cursor < pgn.length()) {
-            if (string[index] == pgn[cursor]) {
-                cursor++;
-            } else {
-                return false;
-            }
-        } else {
-            return false;
-        }
+static bool parseString(std::string pgn, unsigned &cursor, std::string & string) {
+    if (isSpaceOrNewLine(pgn[cursor])) {
+        return false;
+    }
+    
+    while (cursor < pgn.length() && !isSpaceOrNewLine(pgn[cursor])) {
+        string += pgn[cursor];
+        cursor++;
     }
     return true;
 }
@@ -157,22 +164,6 @@ static Piece parsePiece(std::string pgn, unsigned &cursor) {
     return piece;
 }
 
-static bool isFile(char c) {
-    return c >= 'a' && c <= 'h';
-}
-
-static bool isRank(char c) {
-    return c >= '1' && c <= '8';
-}
-
-static bool isSpaceOrNewLine(char c) {
-    return c == ' ' || c == '\n' || c == '\r';
-}
-
-static bool isCheckOrMate(char c) {
-    return c == '+' || c == '#';
-}
-
 static File getFile(char c) {
     assert(isFile(c));
     return (File)(c - 'a');
@@ -181,6 +172,12 @@ static File getFile(char c) {
 static Rank getRank(char c) {
     assert(isRank(c));
     return (Rank)(c - '1');
+}
+
+static void eatWhiteSpace(std::string pgn, unsigned &cursor) {
+    while (isSpaceOrNewLine(pgn[cursor])) {
+        cursor++;
+    }
 }
 
 static std::vector<Move> getMatchingMoves(ChessBoard board, Square to, Piece movingPiece, Piece promotedPiece, File fromFile, Rank fromRank) {
@@ -463,6 +460,20 @@ bool FPGN::parseMoveText(std::string pgn, unsigned &cursor, ChessGame &game, boo
         return false;
     }
     
+    eatWhiteSpace(pgn, cursor);
+
+    // Did we reach the end now?
+    if (cursor >= pgn.length()) {
+        end = true;
+        return true;
+    }
+
+    if (pgn[cursor] == '[') {
+        // Start of a new game
+        end = true;
+        return true;
+    }
+    
     Move blackMove = parseMove(pgn, cursor, game, end);
     if (end) {
         return true;
@@ -479,24 +490,36 @@ bool FPGN::parseMoveText(std::string pgn, unsigned &cursor, ChessGame &game, boo
 }
 
 bool FPGN::setGame(std::string pgn, ChessGame &game) {
+    unsigned cursor = 0;
+    return setGame(pgn, game, cursor);
+}
+
+bool FPGN::setGame(std::string pgn, ChessGame &game, unsigned & cursor) {
     game.reset();
     
-    unsigned cursor = 0;
     bool end = false;
+    bool parsedMoveText = false;
     while (cursor < pgn.length() && !end) {
         auto c = pgn[cursor];
         if (c == '[') {
-            // Indication for a tag
+            // If we already parsed the moveText section, it means
+            // we are hitting another game.
+            if (parsedMoveText) {
+                return true;
+            }
+            
             cursor++; // go after the [
 
-            if (parseString(pgn, cursor, "FEN")) {
-                eatWhiteSpace(pgn, cursor);
-                std::string fen;
-                assert(parseQuotedString(pgn, cursor, fen));
-                assert(game.setFEN(fen));
-            } else {
-                std::string comment = "";
-                assert(parseUntil(pgn, cursor, comment, ']'));
+            std::string tagName;
+            std::string tagValue;
+            assert(parseString(pgn, cursor, tagName));
+            eatWhiteSpace(pgn, cursor);
+            assert(parseQuotedString(pgn, cursor, tagValue));
+
+            game.tags[tagName] = tagValue;
+            
+            if (tagName == "FEN") {
+                assert(game.setFEN(tagValue));
             }
         } else if (c == '{') {
             // Indication for a comment
@@ -507,12 +530,25 @@ bool FPGN::setGame(std::string pgn, ChessGame &game) {
             if (!parseMoveText(pgn, cursor, game, end)) {
                 return false;
             }
+            parsedMoveText = true; // we are done parsing the move text section
         } else {
             // Any other character, such as white space or new line are ignored
             cursor++;
         }
     }
     
+    return true;
+}
+
+bool FPGN::setGames(std::string pgn, std::vector<ChessGame> & games) {
+    unsigned cursor = 0;
+    while (cursor < pgn.length()) {
+        ChessGame game;
+        if (!setGame(pgn, game, cursor)) {
+            return false;
+        }
+        games.push_back(game);
+    }
     return true;
 }
 

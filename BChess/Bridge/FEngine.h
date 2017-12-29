@@ -40,6 +40,8 @@ typedef enum : NSUInteger {
 
 - (id _Nonnull)init;
 
+- (BOOL)loadOpening:(NSString* _Nonnull)pgn;
+
 - (BOOL)setFEN:(NSString* _Nonnull)FEN;
 - (NSString* _Nonnull)FEN;
 

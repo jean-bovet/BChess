@@ -188,4 +188,10 @@ TEST(PGN, InputFromPosition) {
     ASSERT_EQ(0, game.moveCursor);
 }
 
+TEST(PGN, InputMultipleGames) {
+    std::string pgn = "[Title \"a\"] 1. e4 e5 [Title \"b\"] 1. d4 d5";
+    std::vector<ChessGame> games;
+    FPGN::setGames(pgn, games);
+    ASSERT_EQ(2, games.size());
+}
 

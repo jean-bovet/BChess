@@ -7,6 +7,7 @@
 //
 
 #include "ChessOpenings.hpp"
+#include "FPGN.hpp"
 
 ChessOpenings::ChessOpenings() {
     root.push({ createMove(e2, e4, WHITE, PAWN) }, [](auto & node) {
@@ -29,6 +30,25 @@ ChessOpenings::ChessOpenings() {
         node.score = 56;
     });
     
+}
+
+bool ChessOpenings::load(std::string pgn) {
+    std::vector<ChessGame> games;
+    if (FPGN::setGames(pgn, games)) {
+        root.clear();
+        for (auto game : games) {
+            root.push(game.moves, 0, [&](auto & node) {
+                auto score = game.tags["Score"];
+                if (score.length() > 0) {
+                    node.score = stoi(score);
+                }
+                node.name = game.tags["Name"];
+            });
+        }
+        return true;
+    } else {
+        return false;
+    }
 }
 
 bool ChessOpenings::lookup(ChessMoveList moves, OpeningTreeNode::NodeCallback callback) {

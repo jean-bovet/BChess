@@ -24,15 +24,26 @@ struct OpeningTreeNode {
     
     typedef std::function<void(OpeningTreeNode &node)> NodeCallback;
 
-    void push(std::vector<Move> line, NodeCallback callback) {
-        if (line.empty()) {
+    void clear() {
+        children.clear();
+    }
+
+    void push(std::vector<Move> moves, NodeCallback callback) {
+        ChessMoveList moveList;
+        for (auto move : moves) {
+            moveList.push(move);
+        }
+        push(moveList, 0, callback);
+    }
+    
+    void push(ChessMoveList moves, int moveIndex, NodeCallback callback) {
+        if (moveIndex == moves.count) {
             callback(*this);
         } else {
-            auto key = line.front();
+            auto key = moves[moveIndex];
             auto & child = children[key];
-            line.erase(line.begin());
             child.move = key;
-            child.push(line, callback);
+            child.push(moves, moveIndex+1, callback);
         }
     }
     
@@ -58,6 +69,8 @@ class ChessOpenings {
     
 public:
     ChessOpenings();
+    
+    bool load(std::string pgn);
     
     bool lookup(ChessMoveList moves, OpeningTreeNode::NodeCallback callback);
 

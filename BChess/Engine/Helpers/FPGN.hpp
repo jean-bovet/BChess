@@ -29,8 +29,12 @@ public:
     
     static Move parseMove(std::string pgn, unsigned &cursor, ChessGame &game, bool &end);
     static bool parseMoveText(std::string pgn, unsigned &cursor, ChessGame &game, bool &end);
-    
+
     static bool setGame(std::string pgn, ChessGame &game);
+
+    static bool setGame(std::string pgn, ChessGame &game, unsigned & cursor);
+    
+    static bool setGames(std::string pgn, std::vector<ChessGame> & games);
     
     enum class Formatting {
         storage, // default mode, to be exported or stored outside this program
