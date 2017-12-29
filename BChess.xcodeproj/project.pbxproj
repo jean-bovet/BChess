@@ -48,6 +48,7 @@
 		A765D85A1FF60CEE0045BB36 /* PromotionPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A765D8591FF60CEE0045BB36 /* PromotionPickerView.swift */; };
 		A765D85C1FF60DED0045BB36 /* NSView+Chess.swift in Sources */ = {isa = PBXBuildFile; fileRef = A765D85B1FF60DED0045BB36 /* NSView+Chess.swift */; };
 		A765D85E1FF61AA70045BB36 /* PromotionPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = A765D85D1FF61AA70045BB36 /* PromotionPicker.swift */; };
+		A765D8611FF6C1950045BB36 /* ChessOpenings.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A765D85F1FF6C1950045BB36 /* ChessOpenings.cpp */; };
 		A7712D2F1FC7C4CD00E7E802 /* UCI.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7712D2E1FC7C4CD00E7E802 /* UCI.swift */; };
 		A7712D341FC895D100E7E802 /* UCI.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7712D2E1FC7C4CD00E7E802 /* UCI.swift */; };
 		A7712D471FCBC13100E7E802 /* ChessBoard.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A7712D451FCBC13100E7E802 /* ChessBoard.cpp */; };
@@ -59,10 +60,12 @@
 		A77372061FE443DA0001A90F /* ChessGame.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A77371FC1FE31FEF0001A90F /* ChessGame.cpp */; };
 		A7AFCCAA1FB4E40D00AE3D85 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7AFCCA91FB4E40D00AE3D85 /* main.swift */; };
 		A7B18F581FD9BAE500A605B8 /* MovesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7B18F571FD9BAE500A605B8 /* MovesTests.swift */; };
+		A7E3B6891FF6C85500DBB66B /* OpeningsTests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A7E3B6881FF6C85500DBB66B /* OpeningsTests.cpp */; };
 		A7E490EB1FEA207100970EAD /* gtest-all.cc in Sources */ = {isa = PBXBuildFile; fileRef = A7E490EA1FEA207100970EAD /* gtest-all.cc */; };
 		A7E490EC1FEA23DD00970EAD /* PGNTests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A77372041FE340780001A90F /* PGNTests.cpp */; };
 		A7E490ED1FEA29B900970EAD /* GamesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7712D321FC8957500E7E802 /* GamesTests.swift */; };
 		A7E490F21FEA2E7E00970EAD /* GoogleTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = A7E490F11FEA2E7E00970EAD /* GoogleTests.mm */; };
+		A7EBE7CF1FF6C93600ACDF85 /* ChessOpenings.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A765D85F1FF6C1950045BB36 /* ChessOpenings.cpp */; };
 		A7EF55C81FF191B1004CF2DA /* SearchChessTests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A7E490E41FEA1C0600970EAD /* SearchChessTests.cpp */; };
 		A7EF55C91FF1CF77004CF2DA /* BestMoveTests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A70A61BD1FD3196400AFDF0E /* BestMoveTests.cpp */; };
 		A7EF55CA1FF1D8C2004CF2DA /* SearchSyntheticTests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A7E490E51FEA1C0600970EAD /* SearchSyntheticTests.cpp */; };
@@ -143,6 +146,8 @@
 		A765D8591FF60CEE0045BB36 /* PromotionPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromotionPickerView.swift; sourceTree = "<group>"; };
 		A765D85B1FF60DED0045BB36 /* NSView+Chess.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSView+Chess.swift"; sourceTree = "<group>"; };
 		A765D85D1FF61AA70045BB36 /* PromotionPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromotionPicker.swift; sourceTree = "<group>"; };
+		A765D85F1FF6C1950045BB36 /* ChessOpenings.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ChessOpenings.cpp; sourceTree = "<group>"; };
+		A765D8601FF6C1950045BB36 /* ChessOpenings.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = ChessOpenings.hpp; sourceTree = "<group>"; };
 		A7712D141FB916E900E7E802 /* BChessTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BChessTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		A7712D181FB916E900E7E802 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		A7712D2E1FC7C4CD00E7E802 /* UCI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UCI.swift; sourceTree = "<group>"; };
@@ -162,6 +167,7 @@
 		A7AFCCA91FB4E40D00AE3D85 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		A7B18F571FD9BAE500A605B8 /* MovesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MovesTests.swift; sourceTree = "<group>"; };
 		A7B1B0F41FF2D97300EAF157 /* FEngineInfo+Private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "FEngineInfo+Private.h"; sourceTree = "<group>"; };
+		A7E3B6881FF6C85500DBB66B /* OpeningsTests.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = OpeningsTests.cpp; sourceTree = "<group>"; };
 		A7E490E41FEA1C0600970EAD /* SearchChessTests.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SearchChessTests.cpp; sourceTree = "<group>"; };
 		A7E490E51FEA1C0600970EAD /* SearchSyntheticTests.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SearchSyntheticTests.cpp; sourceTree = "<group>"; };
 		A7E490EA1FEA207100970EAD /* gtest-all.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "gtest-all.cc"; path = "BChessTests/Helper/gtest-all.cc"; sourceTree = SOURCE_ROOT; };
@@ -255,9 +261,9 @@
 				A7712D461FCBC13100E7E802 /* ChessBoard.hpp */,
 				A7712D451FCBC13100E7E802 /* ChessBoard.cpp */,
 				A7EF55C71FEF17A1004CF2DA /* ChessEngine.hpp */,
-				A75CB2611FED9693005487BD /* IterativeDeepening.hpp */,
-				A7EF55CB1FF22FE7004CF2DA /* MinMaxMoveList.hpp */,
-				A75BFAC61FE8C05E001EE942 /* MinMaxSearch.hpp */,
+				A765D8601FF6C1950045BB36 /* ChessOpenings.hpp */,
+				A765D85F1FF6C1950045BB36 /* ChessOpenings.cpp */,
+				A765D8621FF6C1B30045BB36 /* Algorithm */,
 				A70A61D31FD4D37600AFDF0E /* Helpers */,
 			);
 			path = Engine;
@@ -300,6 +306,16 @@
 			path = BChessMacUITests;
 			sourceTree = "<group>";
 		};
+		A765D8621FF6C1B30045BB36 /* Algorithm */ = {
+			isa = PBXGroup;
+			children = (
+				A75CB2611FED9693005487BD /* IterativeDeepening.hpp */,
+				A7EF55CB1FF22FE7004CF2DA /* MinMaxMoveList.hpp */,
+				A75BFAC61FE8C05E001EE942 /* MinMaxSearch.hpp */,
+			);
+			path = Algorithm;
+			sourceTree = "<group>";
+		};
 		A7712D151FB916E900E7E802 /* BChessTests */ = {
 			isa = PBXGroup;
 			children = (
@@ -309,6 +325,7 @@
 				A75CB25C1FED8F82005487BD /* EvaluationTests.cpp */,
 				A75CB25E1FED8F9E005487BD /* CheckTests.cpp */,
 				A70A61BD1FD3196400AFDF0E /* BestMoveTests.cpp */,
+				A7E3B6881FF6C85500DBB66B /* OpeningsTests.cpp */,
 				A77372041FE340780001A90F /* PGNTests.cpp */,
 				A7E490E41FEA1C0600970EAD /* SearchChessTests.cpp */,
 				A7E490E51FEA1C0600970EAD /* SearchSyntheticTests.cpp */,
@@ -602,12 +619,14 @@
 			files = (
 				A75CB25B1FED8F2C005487BD /* MoveTests.cpp in Sources */,
 				A70A61DD1FD4D49500AFDF0E /* FFEN.cpp in Sources */,
+				A7EBE7CF1FF6C93600ACDF85 /* ChessOpenings.cpp in Sources */,
 				A7712D341FC895D100E7E802 /* UCI.swift in Sources */,
 				A70A61DA1FD4D49500AFDF0E /* ChessBoard.cpp in Sources */,
 				A75CB25D1FED8F82005487BD /* EvaluationTests.cpp in Sources */,
 				A7E490EC1FEA23DD00970EAD /* PGNTests.cpp in Sources */,
 				A7E490ED1FEA29B900970EAD /* GamesTests.swift in Sources */,
 				A77372031FE334BB0001A90F /* FPGN.cpp in Sources */,
+				A7E3B6891FF6C85500DBB66B /* OpeningsTests.cpp in Sources */,
 				A70A61DE1FD4D49F00AFDF0E /* magicmoves.c in Sources */,
 				A75359851FDC994E008D1DEE /* FENgineInfo+Extension.swift in Sources */,
 				A70A61D51FD4D42100AFDF0E /* FEngineInfo.mm in Sources */,
@@ -643,6 +662,7 @@
 				A70A61C41FD458DE00AFDF0E /* ChessMoveGenerator.cpp in Sources */,
 				A70A61D11FD4AA9600AFDF0E /* FEngineInfo.mm in Sources */,
 				A70A61C61FD4592700AFDF0E /* ChessMoveList.cpp in Sources */,
+				A765D8611FF6C1950045BB36 /* ChessOpenings.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
