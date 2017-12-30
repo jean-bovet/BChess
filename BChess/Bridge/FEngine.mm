@@ -157,30 +157,31 @@
 }
 
 - (BOOL)canUndoMove {
-    if (self.isAnalyzing) {
-        return NO;
-    }
     return currentGame.canUndoMove();
 }
 
 - (BOOL)canRedoMove {
-    if (self.isAnalyzing) {
-        return NO;
-    }
     return currentGame.canRedoMove();
 }
 
 - (void)undoMove {
+    // TODO: handle the cancel with a callback when the cancel actually really happened
+    [self cancel];
     currentGame.undoMove();
     [self fireUpdate];
 }
 
 - (void)redoMove {
+    [self cancel];
     currentGame.redoMove();
     [self fireUpdate];
 }
 
 - (void)stop {
+    iterativeSearch.stop();
+}
+
+- (void)cancel {
     iterativeSearch.cancel();
 }
 
@@ -212,7 +213,7 @@
 }
 
 - (void)evaluate:(NSInteger)depth time:(NSTimeInterval)time callback:(FEngineSearchCallback)callback {
-    [self stop];
+    [self cancel];
     
     if (self.useOpeningBook) {
         FEngineInfo *info = [self lookupOpeningMove];
@@ -263,9 +264,13 @@
     ChessBoard board;
     FFEN::setFEN(std::string([boardFEN UTF8String]), board);
     ChessEvaluation info = iterativeSearch.search(board, (int)maxDepth, [self, callback](ChessEvaluation info) {
-        callback([self infoFor:info], NO);
+        if (!iterativeSearch.cancelled()) {
+            callback([self infoFor:info], NO);
+        }
     });
-    callback([self infoFor:info], YES);
+    if (!iterativeSearch.cancelled()) {
+        callback([self infoFor:info], YES);
+    }
 }
 
 - (NSArray<NSString*>* _Nonnull)moveFENsFrom:(NSString* _Nonnull)startingFEN squareName:(NSString* _Nullable)squareName {

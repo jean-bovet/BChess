@@ -39,10 +39,16 @@ template<class Node, class MoveGenerator, class TMoveList, class Evaluater>
 class IterativeDeepening {
     ChessMinMaxSearch minMaxSearch;
     
-    bool analyzing = false;
-    
 public:
     typedef std::function<void(ChessEvaluation)> SearchCallback;
+    
+    enum class Status {
+        running,
+        stopped,
+        cancelled
+    };
+    
+    Status status = Status::stopped;
     
     ChessEvaluation search(ChessBoard board, int maxDepth, SearchCallback callback) {
         if (maxDepth == -1) {
@@ -52,13 +58,9 @@ public:
         ChessEvaluation evaluation;
         ChessMinMaxSearch::Variation bestVariation;
 
-        analyzing = true;
+        status = Status::running;
         
-        for (int curMaxDepth=1; curMaxDepth<=maxDepth; curMaxDepth++) {
-            if (!analyzing) {
-                break;
-            }
-            
+        for (int curMaxDepth=1; curMaxDepth<=maxDepth && running(); curMaxDepth++) {
             TimeManagement moveClock;
             moveClock.start();
             
@@ -73,7 +75,11 @@ public:
             double movesPerSingleMs = minMaxSearch.visitedNodes / moveClock.elapsedMilli();
             int movesPerSecond = int(movesPerSingleMs * 1e3);
             
-            if (analyzing) {
+            if (status == Status::cancelled) {
+                break;
+                
+            }
+            if (status == Status::running) {
                 bestVariation = pv;
                 
                 evaluation.clear();
@@ -102,17 +108,28 @@ public:
             }
         }
         
-        analyzing = false;
+        if (status == Status::running) {
+            status = Status::stopped;
+        }
         
         return evaluation;
     }
     
     bool running() {
-        return analyzing;
+        return status == Status::running;
+    }
+
+    bool cancelled() {
+        return status == Status::cancelled;
+    }
+
+    void stop() {
+        status = Status::stopped;
+        minMaxSearch.cancel();
     }
     
     void cancel() {
-        analyzing = false;
+        status = Status::cancelled;
         minMaxSearch.cancel();
     }
 

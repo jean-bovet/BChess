@@ -57,7 +57,15 @@ typedef void(^FEngineDidUpdateCallback)();
 - (void)redoMove;
 
 - (void)move:(NSString* _Nonnull)from to:(NSString* _Nonnull)to;
+
+// This stops the current search and return the best result so far. This is used
+// when the time alloted to think has expired.
 - (void)stop;
+
+// This stops the current search but does not return anything. This is used
+// to cancel what's happening without affecting the current game.
+- (void)cancel;
+
 - (BOOL)isAnalyzing;
 
 - (BOOL)isWhite;
