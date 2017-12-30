@@ -157,10 +157,16 @@
 }
 
 - (BOOL)canUndoMove {
+    if (self.isAnalyzing) {
+        return NO;
+    }
     return currentGame.canUndoMove();
 }
 
 - (BOOL)canRedoMove {
+    if (self.isAnalyzing) {
+        return NO;
+    }
     return currentGame.canRedoMove();
 }
 
