@@ -86,13 +86,13 @@ static int PieceValue[PCOUNT] = { 100, 320, 330, 500, 900, 20000 };
 static Square whiteIndex(Square original) {
     auto rank = RankFrom(original);
     auto file = FileFrom(original);
-    return 63 - (rank + 1) * 7 + file;
+    return (7-rank)*8+file;
 }
 
 static Square blackIndex(Square original) {
     auto rank = RankFrom(original);
     auto file = FileFrom(original);
-    return 63 - (7 - rank + 1) * 7 + file;
+    return rank*8+file;
 }
 
 bool ChessEvaluater::isQuiet(Move move) {
@@ -147,17 +147,22 @@ int ChessEvaluater::evaluate(ChessBoard board, ChessMoveList moves) {
     
     int value = 0;
     for (unsigned color=0; color<COUNT; color++) {
-        auto isWhite = color == WHITE;
-        int totalBonus = 0; // The bonus of the pieces' locations, for that particular color
+        // Always evaluate from white point of view
+        int colorSign = (color == WHITE) ? 1 : -1;
+        
+        // The bonus of the pieces' locations, for that particular color
+        int totalBonus = 0;
         for (unsigned piece=0; piece<PCOUNT; piece++) {
             Bitboard pieces = board.pieces[color][piece];
             int count = bb_count(pieces);
             int pvalue = PieceValue[piece];
+
+            value += colorSign * (pvalue * count);
             
-            if (isWhite) { // Always evaluate from white point of view!!
-                value += pvalue * count;
-            } else {
-                value -= pvalue * count;
+            // Advantage when a pair of bishop is detected, which is worth 1/2 pawn
+            // https://www.chess.com/article/view/the-evaluation-of-material-imbalances-by-im-larry-kaufman
+            if (piece == BISHOP && count >= 2) {
+                value += color * (PieceValue[PAWN]/2);
             }
             
             // Now let's add some bonus depending on the piece location
@@ -169,11 +174,7 @@ int ChessEvaluater::evaluate(ChessBoard board, ChessMoveList moves) {
             }
         }
         
-        if (isWhite) { // Always evaluate from white point of view!!
-            value += totalBonus;
-        } else {
-            value -= totalBonus;
-        }
+        value += colorSign * totalBonus;
     }
     
     return value;

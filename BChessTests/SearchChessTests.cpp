@@ -34,10 +34,10 @@ TEST(Chess, ChessTree) {
     config.quiescenceSearch = false;
 
     config.alphaBetaPrunning = true;
-    assertChessSearch(24176, 0, config); // with alpha-beta prunning
+    assertChessSearch(26850, 50, config); // with alpha-beta prunning
     
     config.alphaBetaPrunning = false;
-    assertChessSearch(206603, 0, config); // without alpha-beta
+    assertChessSearch(206603, 50, config); // without alpha-beta
 }
 
 TEST(Chess, OrderedMove) {
@@ -48,8 +48,8 @@ TEST(Chess, OrderedMove) {
     Configuration config;
 
     config.sortMoves = true;
-    assertChessSearch(28832, 20, config, board);
+    assertChessSearch(43222, 50, config, board);
     
     config.sortMoves = false;
-    assertChessSearch(453639, 20, config, board);
+    assertChessSearch(528427, 50, config, board);
 }
