@@ -7,6 +7,7 @@
 //
 
 #import "FEngineInfo+Private.h"
+#import "FEngineUtility.h"
 #import "FMove.hpp"
 #import "FPGN.hpp"
 #import "ChessEvaluater.hpp"
@@ -70,7 +71,7 @@
 - (NSString*)opening {
     auto name = self.info.opening;
     if (name.size() > 0) {
-        return [NSString stringWithUTF8String:name.c_str()];
+        return NSStringFromString(name);
     } else {
         return nil;
     }
@@ -78,7 +79,7 @@
 
 - (NSString*)bestMove:(BOOL)uci {
     FPGN::SANType type = uci ? FPGN::SANType::uci : FPGN::SANType::full;
-    return [NSString stringWithUTF8String:FPGN::to_string((Move)self.bestMove, type).c_str()];
+    return NSStringFromString(FPGN::to_string((Move)self.bestMove, type));
 }
 
 - (NSString*)bestLine:(BOOL)uci {
@@ -89,7 +90,7 @@
             if (line.length > 0) {
                 [line appendString:@" "];
             }
-            [line appendString:[NSString stringWithUTF8String:FPGN::to_string(move, FPGN::SANType::uci).c_str()]];
+            [line appendString:NSStringFromString(FPGN::to_string(move, FPGN::SANType::uci))];
         }
         return line;
     } else {
@@ -106,7 +107,7 @@
 
         // Get the PGN representation of the best line only
         auto cppString = FPGN::getGame(lineGame, FPGN::Formatting::line, cursor);
-        return [NSString stringWithUTF8String:cppString.c_str()];
+        return NSStringFromString(cppString);
     }
 }
 

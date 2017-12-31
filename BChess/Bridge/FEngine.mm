@@ -10,6 +10,7 @@
 #import "FEngineInfo+Private.h"
 #import "FEngineMove.h"
 #import "FEngineInfo.h"
+#import "FEngineUtility.h"
 #import "ChessGame.hpp"
 #import "ChessBoard.hpp"
 #import "FFEN.hpp"
@@ -54,20 +55,20 @@
 }
 
 - (BOOL)loadOpening:(NSString* _Nonnull)pgn {
-    return openings.load(std::string([pgn UTF8String]));
+    return openings.load(StringFromNSString(pgn));
 }
 
 - (NSDictionary*)openingFor:(NSString *)pgn {
     ChessGame temp;
-    if (!FPGN::setGame(std::string([pgn UTF8String]), temp)) {
+    if (!FPGN::setGame(StringFromNSString(pgn), temp)) {
         return nil;
     }
     
     NSMutableDictionary *info = [NSMutableDictionary dictionary];
     bool result = openings.lookup(temp.moves, [&](auto & node) {
         info[@"Score"] = @(node.score);
-        info[@"Name"] = [NSString stringWithUTF8String:node.name.c_str()];
-        info[@"ECO"] = [NSString stringWithUTF8String:node.eco.c_str()];
+        info[@"Name"] = NSStringFromString(node.name);
+        info[@"ECO"] = NSStringFromString(node.eco);
     });
     
     if (result) {
@@ -78,26 +79,26 @@
 }
 
 - (BOOL)setFEN:(NSString *)FEN {
-    return currentGame.setFEN(std::string([FEN UTF8String]));
+    return currentGame.setFEN(StringFromNSString(FEN));
 }
 
 - (NSString*)FEN {
     auto fen = currentGame.getFEN();
-    return [NSString stringWithUTF8String:fen.c_str()];
+    return NSStringFromString(fen);
 }
 
 - (BOOL)setPGN:(NSString *)PGN {
-    return FPGN::setGame(std::string([PGN UTF8String]), currentGame);
+    return FPGN::setGame(StringFromNSString(PGN), currentGame);
 }
 
 - (NSString*)PGN {
     auto pgn = FPGN::getGame(currentGame);
-    return [NSString stringWithUTF8String:pgn.c_str()];
+    return NSStringFromString(pgn);
 }
 
 - (NSString*)PGNFormattedForDisplay {
     auto pgn = FPGN::getGame(currentGame, FPGN::Formatting::history);
-    return [NSString stringWithUTF8String:pgn.c_str()];
+    return NSStringFromString(pgn);
 }
 
 - (NSString* _Nullable)pieceAt:(NSUInteger)rank file:(NSUInteger)file {
@@ -248,7 +249,7 @@
 
 - (void)searchBestMove:(NSString*)boardFEN maxDepth:(NSInteger)maxDepth callback:(FEngineSearchCallback)callback {
     ChessBoard board;
-    FFEN::setFEN(std::string([boardFEN UTF8String]), board);
+    FFEN::setFEN(StringFromNSString(boardFEN), board);
     ChessEvaluation info = iterativeSearch.search(board, (int)maxDepth, [self, callback](ChessEvaluation info) {
         if (!iterativeSearch.cancelled()) {
             callback([self infoFor:info], NO);
@@ -260,7 +261,7 @@
 }
 
 - (NSArray<NSString*>* _Nonnull)moveFENsFrom:(NSString* _Nonnull)startingFEN squareName:(NSString* _Nullable)squareName {
-    auto fen = std::string([startingFEN UTF8String]);
+    auto fen = StringFromNSString(startingFEN);
     ChessBoard board;
     FFEN::setFEN(fen, board);
     std::string boardFEN = FFEN::getFEN(board);
@@ -268,7 +269,7 @@
     
     Square square;
     if (squareName) {
-        square = squareForName(std::string([squareName UTF8String]));
+        square = squareForName(StringFromNSString(squareName));
     } else {
         square = SquareUndefined;
     }
@@ -282,7 +283,7 @@
         newBoard.move(move);
         std::string moveFEN = FFEN::getFEN(newBoard);
 
-        [moveFENs addObject:[NSString stringWithUTF8String:moveFEN.c_str()]];
+        [moveFENs addObject:NSStringFromString(moveFEN)];
     }
     return moveFENs;
 }
