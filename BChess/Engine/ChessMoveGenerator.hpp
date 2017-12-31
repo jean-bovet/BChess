@@ -36,15 +36,17 @@ public:
         firstMoveOnly
     };
     
-    static ChessMoveList generateQuiescenceMoves(ChessBoard board);
+    static ChessMoveList generateQuiescenceMoves(ChessBoard &board);
+    static ChessMoveList generateQuiescenceMoves(ChessBoard &board, Color color);
 
-    static ChessMoveList generateMoves(ChessBoard board, Mode mode = Mode::allMoves, Square specificSquare = SquareUndefined);
+    static ChessMoveList generateMoves(ChessBoard &board);
+    static ChessMoveList generateMoves(ChessBoard &board, Color color, Mode mode = Mode::allMoves, Square specificSquare = SquareUndefined);
     
-    static void generateAttackMoves(ChessBoard &board, ChessMoveList &moveList, Square fromSquare, Piece attackingPiece, Bitboard attackingSquares, Mode mode);
+    static void generateAttackMoves(ChessBoard &board, Color color, ChessMoveList &moveList, Square fromSquare, Piece attackingPiece, Bitboard attackingSquares, Mode mode);
     
-    static void generatePawnsMoves(ChessBoard &board, ChessMoveList &moveList, Mode mode, Square specificSquare = SquareUndefined);
-    static void generateKingsMoves(ChessBoard &board, ChessMoveList &moveList, Mode mode, Square specificSquare = SquareUndefined);
-    static void generateKnightsMoves(ChessBoard &board, ChessMoveList &moveList, Mode mode, Square specificSquare = SquareUndefined);
-    static void generateSlidingMoves(ChessBoard &board, Piece piece, ChessMoveList &moveList, Mode mode, Square specificSquare = SquareUndefined);
+    static void generatePawnsMoves(ChessBoard &board, Color color, ChessMoveList &moveList, Mode mode, Square specificSquare = SquareUndefined);
+    static void generateKingsMoves(ChessBoard &board, Color color, ChessMoveList &moveList, Mode mode, Square specificSquare = SquareUndefined);
+    static void generateKnightsMoves(ChessBoard &board, Color color, ChessMoveList &moveList, Mode mode, Square specificSquare = SquareUndefined);
+    static void generateSlidingMoves(ChessBoard &board, Color color, Piece piece, ChessMoveList &moveList, Mode mode, Square specificSquare = SquareUndefined);
 };
 

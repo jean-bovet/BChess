@@ -40,6 +40,7 @@
         _async = YES;
         _thinkingTime = 5;
         _stateIndex = 0;
+        ChessMoveGenerator::initialize();
     }
     return self;
 }
@@ -275,7 +276,7 @@
     }
     
     ChessMoveGenerator generator;
-    ChessMoveList moves = generator.generateMoves(board, ChessMoveGenerator::Mode::allMoves, square);
+    ChessMoveList moves = generator.generateMoves(board, board.color, ChessMoveGenerator::Mode::allMoves, square);
     NSMutableArray<NSString*>* moveFENs = [NSMutableArray array];
     for (int index=0; index<moves.count; index++) {
         auto move = moves.moves[index];
