@@ -7,21 +7,12 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "FEngineInfo.h"
+
+@class FEngineMove;
+@class FEngineInfo;
 
 typedef void(^FEngineSearchCallback)(FEngineInfo * _Nonnull info, BOOL completed);
 typedef void(^FEngineDidUpdateCallback)();
-
-@interface FEngineMove: NSObject
-
-@property (nonatomic, assign) NSUInteger fromFile, toFile;
-@property (nonatomic, assign) NSUInteger fromRank, toRank;
-@property (nonatomic, assign) NSUInteger rawMoveValue;
-@property (nonatomic, assign, readonly) BOOL isPromotion;
-
-- (void)setPromotionPiece:(NSString* _Nonnull)piece;
-
-@end
 
 @interface FEngine : NSObject
 

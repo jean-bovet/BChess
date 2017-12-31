@@ -79,7 +79,7 @@ public:
                 break;
                 
             }
-            if (status == Status::running) {
+            if (running()) {
                 bestVariation = pv;
                 
                 evaluation.clear();
@@ -108,7 +108,7 @@ public:
             }
         }
         
-        if (status == Status::running) {
+        if (running()) {
             status = Status::stopped;
         }
         

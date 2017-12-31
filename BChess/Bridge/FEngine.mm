@@ -8,6 +8,8 @@
 
 #import "FEngine.h"
 #import "FEngineInfo+Private.h"
+#import "FEngineMove.h"
+#import "FEngineInfo.h"
 #import "ChessGame.hpp"
 #import "ChessBoard.hpp"
 #import "FFEN.hpp"
@@ -17,38 +19,16 @@
 #import "ChessOpenings.hpp"
 #import "IterativeDeepening.hpp"
 
-@implementation FEngineMove
-
-- (BOOL)isPromotion {
-    return MOVE_PROMOTION_PIECE((Move)self.rawMoveValue) > 0;
-}
-
-- (void)setPromotionPiece:(NSString*)piece {
-    Piece promotionPiece = QUEEN;
-    if ([[piece lowercaseString] isEqualToString:@"q"]) {
-        promotionPiece = QUEEN;
-    }
-    if ([[piece lowercaseString] isEqualToString:@"r"]) {
-        promotionPiece = ROOK;
-    }
-    if ([[piece lowercaseString] isEqualToString:@"b"]) {
-        promotionPiece = BISHOP;
-    }
-    if ([[piece lowercaseString] isEqualToString:@"n"]) {
-        promotionPiece = KNIGHT;
-    }
-    Move m = (Move)_rawMoveValue;
-    SET_MOVE_PROMOTION_PIECE(m, promotionPiece);
-    _rawMoveValue = m;
-}
-
-@end
-
 @interface FEngine () {
     IterativeDeepening<ChessBoard, ChessMoveGenerator, ChessMoveList, ChessEvaluater> iterativeSearch;
     ChessGame currentGame;
     ChessOpenings openings;
 }
+
+// This index is used to keep track of which engine session is currently analyzing.
+// It is incremented each time the user cancels the current session and is used to
+// avoid firing an update if the engine has been cancelled.
+@property (nonatomic, assign) NSUInteger stateIndex;
 
 @end
 
@@ -58,13 +38,16 @@
     if (self = [super init]) {
         _async = YES;
         _thinkingTime = 5;
+        _stateIndex = 0;
     }
     return self;
 }
 
-- (void)fireUpdate {
+- (void)fireUpdate:(NSUInteger)localStateIndex {
     dispatch_async(dispatch_get_main_queue(), ^{
-        if (self.updateCallback) {
+        // Do not fire an update if the localStateIndex (which is the one used when
+        // the engine started analyzing) is different from the current state index.
+        if (self.updateCallback && self.stateIndex == localStateIndex) {
             self.updateCallback();
         }
     });
@@ -147,13 +130,13 @@
 
 - (void)move:(NSUInteger)move {
     currentGame.move((Move)move);
-    [self fireUpdate];
+    [self fireUpdate:self.stateIndex];
 }
 
 - (void)move:(NSString*)from to:(NSString*)to {
     currentGame.move(std::string([from cStringUsingEncoding:NSUTF8StringEncoding]),
                       std::string([to cStringUsingEncoding:NSUTF8StringEncoding]));
-    [self fireUpdate];
+    [self fireUpdate:self.stateIndex];
 }
 
 - (BOOL)canUndoMove {
@@ -168,13 +151,13 @@
     // TODO: handle the cancel with a callback when the cancel actually really happened
     [self cancel];
     currentGame.undoMove();
-    [self fireUpdate];
+    [self fireUpdate:self.stateIndex];
 }
 
 - (void)redoMove {
     [self cancel];
     currentGame.redoMove();
-    [self fireUpdate];
+    [self fireUpdate:self.stateIndex];
 }
 
 - (void)stop {
@@ -182,6 +165,7 @@
 }
 
 - (void)cancel {
+    self.stateIndex += 1;
     iterativeSearch.cancel();
 }
 
@@ -215,11 +199,13 @@
 - (void)evaluate:(NSInteger)depth time:(NSTimeInterval)time callback:(FEngineSearchCallback)callback {
     [self cancel];
     
+    NSUInteger localStateIndex = self.stateIndex;
+    
     if (self.useOpeningBook) {
         FEngineInfo *info = [self lookupOpeningMove];
         if (info) {
             callback(info, YES);
-            [self fireUpdate];
+            [self fireUpdate:localStateIndex];
             return;
         }
     }
@@ -234,13 +220,13 @@
         dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0), ^{
             [self searchBestMove:self.FEN maxDepth:depth callback:^(FEngineInfo * _Nonnull info, BOOL completed) {
                 callback(info, completed);
-                [self fireUpdate];
+                [self fireUpdate:localStateIndex];
             }];
         });
     } else {
         [self searchBestMove:self.FEN maxDepth:depth callback:^(FEngineInfo * _Nonnull info, BOOL completed) {
             callback(info, completed);
-            [self fireUpdate];
+            [self fireUpdate:localStateIndex];
         }];
     }
 }
