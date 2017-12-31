@@ -8,6 +8,7 @@
 
 #include "ChessOpenings.hpp"
 #include "FPGN.hpp"
+#include "FUtility.hpp"
 
 ChessOpenings::ChessOpenings() {
     root.push({ createMove(e2, e4, WHITE, PAWN) }, [](auto & node) {
@@ -40,7 +41,7 @@ bool ChessOpenings::load(std::string pgn) {
             root.push(game.moves, 0, [&](auto & node) {
                 auto score = game.tags["Score"];
                 if (score.length() > 0) {
-                    node.score = stoi(score);
+                    node.score = integer(score);
                 }
                 node.name = game.tags["Name"];
                 node.eco = game.tags["ECO"];

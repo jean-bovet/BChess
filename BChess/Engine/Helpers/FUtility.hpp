@@ -25,3 +25,13 @@ void split4(const std::string& str, Container& cont,
     }
     cont.push_back(str.substr(previous, current - previous));
 }
+
+inline static int integer(std::string string) {
+    try {
+        return stoi(string);
+    } catch (const std::exception& e) {
+        std::cerr << e.what() << " for " << string << std::endl;
+        return 0;
+    }
+}
+

@@ -140,9 +140,16 @@ std::string FFEN::getFEN(ChessBoard board) {
 }
 
 bool FFEN::setFEN(std::string fen, ChessBoard &board) {
+    // Non-fully formed FEN should also be supported (for example using
+    // the EPD format - https://chessprogramming.wikispaces.com/Kaufman+Test).
+    // 1rbq1rk1/p1b1nppp/1p2p3/8/1B1pN3/P2B4/1P3PPP/2RQ1R1K w - - bm Nf6+; id "position 01";
+    
     std::vector<std::string> fields;
     split4(fen, fields);
-    if (fields.size() != 6) {
+    
+    // We need at least two fields, the board position and the color
+    // who is playing.
+    if (fields.size() < 2) {
         std::cerr << "Invalid FEN string: " << fen << std::endl;
         return false;
     }
@@ -179,21 +186,29 @@ bool FFEN::setFEN(std::string fen, ChessBoard &board) {
     board.color = (sideToMove == "w") ? WHITE : BLACK;
     
     // KQkq
-    board.setCastling(fields[2]);
+    if (fields.size() > 2) {
+        board.setCastling(fields[2]);
+    }
     
     // En passant
-    auto enPassant = fields[3];
-    if (enPassant == "-") {
-        board.enPassant = 0;
-    } else {
-        bb_set(board.enPassant, squareForName(enPassant));
+    if (fields.size() > 3) {
+        auto enPassant = fields[3];
+        if (enPassant == "-") {
+            board.enPassant = 0;
+        } else {
+            bb_set(board.enPassant, squareForName(enPassant));
+        }
     }
     
     // Half move
-    board.halfMoveClock = stoi(fields[4]);
+    if (fields.size() > 4) {
+        board.halfMoveClock = integer(fields[4]);
+    }
 
     // Full move
-    board.fullMoveCount = stoi(fields[5]);
+    if (fields.size() > 5) {
+        board.fullMoveCount = integer(fields[5]);
+    }
     
     return true;
 }
