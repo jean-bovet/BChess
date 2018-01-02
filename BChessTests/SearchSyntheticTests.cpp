@@ -145,6 +145,10 @@ struct TestMoveGenerator {
         return generateMoves(board, true);
     }
     
+    static TestMoveList generatePseudoLegalMoves(TestBoard board, bool qs = false) {
+        return generateMoves(board, qs);
+    }
+    
     static TestMoveList generateMoves(TestBoard board, bool qs = false) {
         TestMoveList moveList;
         for (int index=0; index<board.node->_children.size(); index++) {

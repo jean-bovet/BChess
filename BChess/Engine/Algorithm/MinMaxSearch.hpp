@@ -52,6 +52,8 @@ class MinMaxSearch {
 public:
     Configuration config;
     
+    static const int ILLEGAL_MOVE_VALUE = 999999;
+
     int visitedNodes = 0;
     
     void reset() {
@@ -93,7 +95,11 @@ private:
             }
         }
 
-        auto moves = TMoveGenerator::generateMoves(node);
+        auto moves = TMoveGenerator::generatePseudoLegalMoves(node);
+        if (moves.illegal) {
+            return ILLEGAL_MOVE_VALUE;
+        }
+        
         if (moves.count == 0) {
             int score = TNodeEvaluater::evaluate(node, moves) * color;
             return score;
@@ -142,6 +148,11 @@ private:
             
             cv.moves.pop();
             
+            if (std::abs(score) == ILLEGAL_MOVE_VALUE) {
+                // Move was illegal so ignore it
+                continue;
+            }
+
             if (score > bestValue) {
                 bestValue = score;
             
@@ -160,6 +171,13 @@ private:
     int quiescence(TNode node, int depth, int alpha, int beta, int color, Variation &pv, Variation &cv) {
         pv.qsDepth = depth;
         
+        // TODO
+//        auto moves = TMoveGenerator::generatePseudoLegalMoves(node);
+//        if (moves.illegal) {
+//            // An illegal move was detected which means that this position is illegal.
+//            return ILLEGAL_MOVE_VALUE;
+//        }
+        
         auto stand_pat = TNodeEvaluater::evaluate(node) * color;
         if (stand_pat >= beta) {
             return beta;
@@ -169,7 +187,7 @@ private:
             alpha = stand_pat;
         }
         
-        auto moves = TMoveGenerator::generateQuiescenceMoves(node);
+        auto moves = TMoveGenerator::generatePseudoLegalMoves(node);
         if (moves.count == 0) {
             return alpha;
         }
@@ -180,6 +198,9 @@ private:
         
         for (int index=0; index<moves.count && analyzing; index++) {
             auto move = moves.moves[index];
+            if (TNodeEvaluater::isQuiet(move)) {
+                continue;
+            }
             
             visitedNodes++;
 
@@ -193,7 +214,10 @@ private:
             
             cv.moves.pop();
 
-            pv.push(score, move, line);
+            if (std::abs(score) == ILLEGAL_MOVE_VALUE) {
+                // Move was illegal so ignore it
+                continue;
+            }
 
             if (score >= beta) {
                 return beta;
@@ -201,6 +225,7 @@ private:
             
             if (score > alpha) {
                 alpha = score;
+                pv.push(score, move, line);
             }
         }
                 

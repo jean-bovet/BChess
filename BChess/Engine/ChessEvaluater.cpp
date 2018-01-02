@@ -83,6 +83,8 @@ static int KingPositionBonus[64] = {
 
 static int PieceValue[PCOUNT] = { 100, 320, 330, 500, 900, 20000 };
 
+static int PieceActionValue[PCOUNT] = { 6, 3, 3, 2, 1, 1 };
+
 static Square whiteIndex(Square original) {
     auto rank = RankFrom(original);
     auto file = FileFrom(original);
@@ -130,8 +132,33 @@ int ChessEvaluater::getBonus(Piece piece, Color color, Square square) {
 }
 
 int ChessEvaluater::evaluate(ChessBoard board) {
-    auto moves = ChessMoveGenerator::generateMoves(board, board.color, ChessMoveGenerator::Mode::firstMoveOnly);
+    auto moves = ChessMoveGenerator::generateMoves(board, board.color, ChessMoveGenerator::Mode::All);
     return evaluate(board, moves);
+}
+
+static void evaluatePieceMobility(ChessMoveList &moves, int colorSign, int (&mobility)[64]) {
+    for (unsigned index=0; index<moves.count; index++) {
+        auto move = moves[index];
+        mobility[MOVE_FROM(move)] += colorSign * 1;
+    }
+}
+
+static void evaluatePieceCapture(ChessMoveList &moves, int colorSign, int (&attacked)[64]) {
+    for (unsigned index=0; index<moves.count; index++) {
+        auto move = moves[index];
+        if (MOVE_IS_CAPTURE(move)) {
+            attacked[MOVE_TO(move)] += colorSign * PieceActionValue[MOVE_PIECE(move)];
+        }
+    }
+}
+
+static void evaluatePieceProtection(ChessMoveList &moves, int colorSign, int (&defended)[64]) {
+    for (unsigned index=0; index<moves.count; index++) {
+        auto move = moves[index];
+        if (MOVE_IS_CAPTURE(move)) {
+            defended[MOVE_TO(move)] += colorSign * PieceActionValue[MOVE_PIECE(move)];
+        }
+    }
 }
 
 int ChessEvaluater::evaluate(ChessBoard board, ChessMoveList moves) {
@@ -177,5 +204,32 @@ int ChessEvaluater::evaluate(ChessBoard board, ChessMoveList moves) {
         value += colorSign * totalBonus;
     }
     
+//    auto protectionMoves = ChessMoveGenerator::generateMoves(board, board.color, ChessMoveGenerator::Mode::Protection);
+//
+//    auto opponentMoves = ChessMoveGenerator::generateMoves(board, INVERSE(board.color), ChessMoveGenerator::Mode::All);
+//    auto opponentProtectionMoves = ChessMoveGenerator::generateMoves(board, INVERSE(board.color), ChessMoveGenerator::Mode::Protection);
+//
+//    int mobility[64] = { };
+//    int attackedValues[64] = { };
+//    int defendedValues[64] = { };
+//
+//    evaluatePieceMobility(moves, 1, mobility);
+//    evaluatePieceCapture(moves, 1, attackedValues);
+//    evaluatePieceProtection(protectionMoves, 1, defendedValues);
+//
+//    evaluatePieceMobility(opponentMoves, -1, mobility);
+//    evaluatePieceCapture(opponentMoves, -1, attackedValues);
+//    evaluatePieceProtection(opponentProtectionMoves, -1, defendedValues);
+//
+//    for (unsigned index=0; index<64; index++) {
+//        value += mobility[index];
+//        value += defendedValues[index];
+//        value -= attackedValues[index];
+//
+//        // Double Penalty for Hanging Pieces
+//        if (defendedValues[index] < attackedValues[index]) {
+//            value -= (attackedValues[index] - defendedValues[index]) * 10;
+//        }
+//    }
     return value;
 }

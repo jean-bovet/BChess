@@ -15,6 +15,9 @@ struct MinMaxMoveList {
     TMove moves[MAX_MOVES];
     int count = 0;
     
+    bool legalOnly = true;
+    bool illegal = false;
+
     TMove &operator[] (int index) {
         assert(index < MAX_MOVES);
         assert(index < count);

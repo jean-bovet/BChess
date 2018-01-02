@@ -31,16 +31,21 @@ public:
     }
     
     enum class Mode {
-        allMoves,
-        quiescenceMoveOnly,
-        firstMoveOnly
+        All,
+        
+        AllPseudoLegal,
+        
+        Captures,
+        
+        // Only "protection" moves, where a piece is capturing another piece
+        // of the same color, hence protecting it.
+        Protection
     };
     
-    static ChessMoveList generateQuiescenceMoves(ChessBoard &board);
-    static ChessMoveList generateQuiescenceMoves(ChessBoard &board, Color color);
+    static ChessMoveList generatePseudoLegalMoves(ChessBoard &board);
 
     static ChessMoveList generateMoves(ChessBoard &board);
-    static ChessMoveList generateMoves(ChessBoard &board, Color color, Mode mode = Mode::allMoves, Square specificSquare = SquareUndefined);
+    static ChessMoveList generateMoves(ChessBoard &board, Color color, Mode mode = Mode::All, Square specificSquare = SquareUndefined);
     
     static void generateAttackMoves(ChessBoard &board, Color color, ChessMoveList &moveList, Square fromSquare, Piece attackingPiece, Bitboard attackingSquares, Mode mode);
     
