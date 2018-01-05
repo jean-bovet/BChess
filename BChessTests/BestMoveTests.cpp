@@ -75,14 +75,32 @@ TEST_F(BestMoveTests, PawnForkQueenAndKing) {
     assertBestMove(start, end, "c3c4 Qb5xc4 Nb2xc4 Kd5xc4");
 }
 
+TEST_F(BestMoveTests, QueenEatPawn) {
+    std::string start = "7k/6p1/5p2/5Q2/8/8/8/7K w - - 0 1";
+    std::string end = "7k/6p1/5Q2/8/8/8/8/7K b - - 0 1";
+    Configuration config;
+    config.maxDepth = 1;
+    config.quiescenceSearch = false;
+    assertBestMove(start, end, "Qf5xf6", config);
+}
+
+TEST_F(BestMoveTests, QueenShouldNotEatPawn) {
+    std::string start = "7k/6p1/5p2/5Q2/8/8/8/7K w - - 0 1";
+    std::string end = "7k/6p1/5p2/5Q2/8/8/8/6K1 b - - 1 1";
+    Configuration config;
+    config.maxDepth = 1;
+    config.quiescenceSearch = true;
+    assertBestMove(start, end, "Kh1g1", config);
+}
+
 TEST_F(BestMoveTests, KnightEscapeAttackByPawn) {
     std::string start = "r1bqkbnr/pppp1ppp/2n5/3P4/8/8/PPP2PPP/RNBQKBNR b KQkq - 0 4";
-    std::string end = "r1bqk1nr/pppp1ppp/8/3P4/8/5Q2/PPPB1PPP/R3KB1R b KQkq - 0 8";
+    std::string end = "r1bqkbnr/pppp1ppp/8/3P4/8/5Q2/PPP2PPP/RNB1KB1R b KQkq - 0 6";
     // Note: without quiescence search, the engine wants to do Bf8b4 but actually this leads into material loss way down the tree.
     // The best move here is moving the knight out of c6.
     Configuration config;
-    config.maxDepth = 6;
-    assertBestMove(start, end, "Nc6e5 Ng1f3 Bf8b4 Nb1d2 Bb4xd2 Bc1xd2 Ne5xf3 Qd1xf3", config);
+//    config.maxDepth = 6;
+    assertBestMove(start, end, "Nc6e5 Ng1f3 Ne5xf3 Qd1xf3", config);
 }
 
 // In this situation, we are trying to see if the engine is able to see

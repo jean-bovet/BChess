@@ -2,6 +2,7 @@
 
 ## ToDo
 
+- OrderedMove: test fails when running in isolation but not when running with all the other tests!!!
 - Handle UCI move with promotion (for example h1b1q)
 - Add 3 fold repetition rule
 - Add 50 moves rule

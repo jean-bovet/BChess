@@ -30,9 +30,12 @@ void ChessMoveList::addMove(ChessBoard &board, Move move) {
         // Determine if the move makes the king of the opposite side in check.
         // This is used to know which moves to use during quiescence search,
         // as a check move is not considered a quiet move.
-        if (validBoard.isCheck(validBoard.color)) {
-            SET_MOVE_IS_CHECK(move);
-        }
+        // TODO: careful, we cannot just use check move in quiescence search just like that.
+        // Seems that we need to read more about when we can use the stand_pat score.
+        // See http://www.talkchess.com/forum/viewtopic.php?topic_view=threads&p=681015&t=60962
+//        if (validBoard.isCheck(validBoard.color)) {
+//            SET_MOVE_IS_CHECK(move);
+//        }
         
         // Add the valid move to the list
         push(move);

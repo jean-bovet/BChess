@@ -13,6 +13,8 @@
 #include <algorithm>
 #include <iostream>
 
+//#include "FPGN.hpp"
+
 #include "MinMaxMoveList.hpp"
 
 struct Configuration {
@@ -86,7 +88,18 @@ private:
 
         if (depth == config.maxDepth) {
             if (config.quiescenceSearch) {
-                return quiescence(node, depth, alpha, beta, color, pv, cv);
+                bool debug = false;
+//                bool debug = cv.moves.description() == "Bf8b4 c2c3 Qd8e7 Ng1e2";
+//                bool debug = cv.moves.description() == "Bf8b4 c2c3 a7a6 c3xb4";
+//                bool debug = cv.moves.description() == "Qf5xf6";
+//                if (debug) {
+//                    std::cout << "Before quiescence at depth " << depth << " cv=" << cv.moves.description() << " alpha=" << alpha << ", beta=" << beta << std::endl;
+//                }
+                int score = quiescence(node, depth, alpha, beta, color, pv, cv, debug);
+//                if (debug) {
+//                    std::cout << "After quiescence at depth " << depth << " cv=" << cv.moves.description() << " pv=" << pv.moves.description() << " score=" << score << std::endl;
+//                }
+                return score;
             } else {
                 int score = TNodeEvaluater::evaluate(node) * color;
                 return score;
@@ -142,10 +155,17 @@ private:
             
             cv.moves.pop();
             
+//            if (depth == 0) {
+//                std::cout << "* " << FPGN::to_string(move, FPGN::SANType::full) << " " << line.moves.description() << ", score = " << score << ", alpha = " << alpha << ", beta = " << beta << std::endl;
+//            }
+            
             if (score > bestValue) {
                 bestValue = score;
             
                 pv.push(score, move, line);
+//                if (depth == 0) {
+//                    std::cout << "Bestline: " << pv.moves.description() << std::endl;
+//                }
             }
             
             alpha = std::max(alpha, score);
@@ -157,27 +177,48 @@ private:
     }
     
     // https://chessprogramming.wikispaces.com/Quiescence+Search
-    int quiescence(TNode node, int depth, int alpha, int beta, int color, Variation &pv, Variation &cv) {
+    // Note: the search described in the link above returns alpha which doesn't work
+    // with the positions I've been analyzing (returning alpha will never return the
+    // position evaluation but rather the previous alpha and this won't work). However
+    // this link shows quiescence search that returns the score, like regular negamax
+    // and this is way better IMO:
+    // https://www.ics.uci.edu/~eppstein/180a/990204.html
+    int quiescence(TNode node, int depth, int alpha, int beta, int color, Variation &pv, Variation &cv, bool debug) {
         pv.qsDepth = depth;
         
         auto stand_pat = TNodeEvaluater::evaluate(node) * color;
+//        if (debug) {
+//            std::cout << "[q] " << depth << ": " << cv.moves.description() << ", alpha=" << alpha << ", beta=" << beta << " color = " << color << std::endl;
+//            std::cout << "[q] " << depth << ": " << "stand_pat = " << stand_pat << std::endl;
+//        }
+        
         if (stand_pat >= beta) {
-            return beta;
+//            if (debug) {
+//                std::cout << "[q] " << depth << ": " << "stand_pat >= beta (" << stand_pat << " >= " << beta << ") => return stand_pat" << std::endl;
+//            }
+            return stand_pat;
         }
         
         if (alpha < stand_pat) {
+//            if (debug) {
+//                std::cout << "[q] " << depth << ": " << "stand_pat > alpha (" << stand_pat << " > " << alpha << ") => alpha = " << stand_pat << std::endl;
+//            }
             alpha = stand_pat;
         }
-        
+
         auto moves = TMoveGenerator::generateQuiescenceMoves(node);
         if (moves.count == 0) {
-            return alpha;
+//            if (debug) {
+//                std::cout << "[q] " << depth << ": " << "moves.count == 0, return stand_pat " << stand_pat << std::endl;
+//            }
+            return stand_pat;
         }
         
         if (config.sortMoves) {
             TMoveGenerator::sortMoves(moves);
         }
         
+        int score = stand_pat;
         for (int index=0; index<moves.count && analyzing; index++) {
             auto move = moves.moves[index];
             
@@ -189,22 +230,27 @@ private:
             newNode.move(move);
             
             Variation line;
-            int score = -quiescence(newNode, depth+1, -beta, -alpha, -color, line, cv);
+            score = -quiescence(newNode, depth+1, -beta, -alpha, -color, line, cv, debug);
             
             cv.moves.pop();
 
-            pv.push(score, move, line);
-
-            if (score >= beta) {
-                return beta;
-            }
-            
-            if (score > alpha) {
+            if (score >= alpha) {
+//                if (debug) {
+//                    std::cout << "[q] " << depth << ": " << "score >= alpha (" << score << " > " << alpha << ") => alpha = " << score << std::endl;
+//                }
+                
                 alpha = score;
+                pv.push(score, move, line);
+                
+                if (score >= beta) break;
             }
         }
-                
-        return alpha;
+        
+//        if (debug) {
+//            std::cout << "[q] " << depth << ": " << "return score = " << score << std::endl;
+//        }
+        
+        return score;
     }
     
 };

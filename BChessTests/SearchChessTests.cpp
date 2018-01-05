@@ -23,6 +23,8 @@ static void assertChessSearch(int expectedVisitedNodes, int expectedValue, Confi
     ChessMinMaxSearch::Variation pv;
     ChessMinMaxSearch::Variation bv;
 
+    ASSERT_EQ(0, alphaBeta.visitedNodes);
+    
     int score = alphaBeta.alphabeta(rootBoard, 0, rootBoard.color == WHITE, pv, bv);
 //    std::cout << alphaBeta.visitedNodes << " => " << score << " " << pv.moves.description() << std::endl;
     ASSERT_EQ(expectedVisitedNodes, alphaBeta.visitedNodes); // n initial moves + 1 for the root node
@@ -48,8 +50,8 @@ TEST(Chess, OrderedMove) {
     Configuration config;
 
     config.sortMoves = true;
-    assertChessSearch(43222, 50, config, board);
+    assertChessSearch(26983, 105, config, board);
     
     config.sortMoves = false;
-    assertChessSearch(528427, 50, config, board);
+    assertChessSearch(231447, 105, config, board);
 }
