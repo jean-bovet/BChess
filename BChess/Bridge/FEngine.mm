@@ -235,6 +235,9 @@
 
 - (FEngineInfo*)lookupOpeningMove {
     FEngineInfo *info = nil;
+    if (currentGame.moves.count == 0 && currentGame.board.fullMoveCount != 0) {
+        return info;
+    }
     bool result = openings.best(currentGame.moves, [&info, self](OpeningTreeNode & node) {
         ChessEvaluation evaluation;
         evaluation.line.push(node.move);

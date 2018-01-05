@@ -3,6 +3,7 @@
 ## ToDo
 
 - OrderedMove: test fails when running in isolation but not when running with all the other tests!!!
+- Better handling of openings when a FEN is passed (and the board is not in the expected state for the opening)
 - Handle UCI move with promotion (for example h1b1q)
 - Add 3 fold repetition rule
 - Add 50 moves rule
