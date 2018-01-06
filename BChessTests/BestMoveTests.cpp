@@ -98,9 +98,7 @@ TEST_F(BestMoveTests, KnightEscapeAttackByPawn) {
     std::string end = "r1bqkbnr/pppp1ppp/8/3P4/8/5Q2/PPP2PPP/RNB1KB1R b KQkq - 0 6";
     // Note: without quiescence search, the engine wants to do Bf8b4 but actually this leads into material loss way down the tree.
     // The best move here is moving the knight out of c6.
-    Configuration config;
-//    config.maxDepth = 6;
-    assertBestMove(start, end, "Nc6e5 Ng1f3 Ne5xf3 Qd1xf3", config);
+    assertBestMove(start, end, "Nc6e5 Ng1f3 Ne5xf3 Qd1xf3");
 }
 
 // In this situation, we are trying to see if the engine is able to see
