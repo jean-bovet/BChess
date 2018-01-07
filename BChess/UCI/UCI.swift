@@ -142,11 +142,12 @@ class UCI {
     
     func performance() {
         engine.async = false
-        engine.setFEN("r3kb1r/pp2pQpp/n7/qNn1N3/8/P7/1PP2PPP/R1B1R1K1 b kq - 0 15")
+        engine.setFEN("1rbq1rk1/p1b1nppp/1p2p3/8/1B1pN3/P2B4/1P3PPP/2RQ1R1K w - - 0 1")
         engine.evaluate(8) { (info, completed) in
             print(info.uciInfoMessage)
         }
     }
+
     
     func run() {
         // Performance testing

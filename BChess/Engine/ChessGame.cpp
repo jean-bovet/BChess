@@ -10,13 +10,16 @@
 #include "FFEN.hpp"
 #include "ChessMoveGenerator.hpp"
 #include "ChessEvaluater.hpp"
+#include "ChessBoardHash.hpp"
 
 ChessGame::ChessGame() {
+    history = NEW_HISTORY;
     reset();
 }
 
 void ChessGame::reset() {
     moveCursor = 0;
+    history->clear();
     board.reset();
     outcome = Outcome::in_progress;
     initialFEN = StartFEN;
@@ -52,9 +55,12 @@ std::vector<Move> ChessGame::movesAt(File file, Rank rank) {
 }
 
 void ChessGame::move(Move move) {
+    assert(MOVE_ISVALID(move));
+    
     if (moveCursor < moves.count) {
         // Clear the rest of the history
         moves.count = moveCursor;
+        history->clear();
     }
 
     moves.push(move);
@@ -62,6 +68,8 @@ void ChessGame::move(Move move) {
 
     board.move(move);
     
+    history->push_back(board.hash());
+
     // Update the outcome after each move
     ChessMoveGenerator generator = ChessMoveGenerator();
     if (generator.generateMoves(board).count == 0) {
@@ -115,6 +123,6 @@ void ChessGame::replayMoves() {
 }
 
 void ChessGame::debugEvaluate() {
-    std::cout << ChessEvaluater::evaluate(board) << std::endl;
+    std::cout << ChessEvaluater::evaluate(board, history) << std::endl;
 }
 

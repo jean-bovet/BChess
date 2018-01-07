@@ -35,12 +35,17 @@
 
 @implementation FEngine
 
++ (void)initialize {
+    if (self == [FEngine class]) {
+        ChessEngine::initialize();
+    }
+}
+
 - (id)init {
     if (self = [super init]) {
         _async = YES;
         _thinkingTime = 5;
         _stateIndex = 0;
-        ChessMoveGenerator::initialize();
     }
     return self;
 }
@@ -179,6 +184,10 @@
     return currentGame.board.color == WHITE;
 }
 
+- (BOOL)canPlay {
+    return currentGame.outcome == ChessGame::Outcome::in_progress;
+}
+
 - (FEngineInfo*)infoFor:(ChessEvaluation)info {
     FEngineInfo *ei = [[FEngineInfo alloc] init];
     ei.info = info;
@@ -220,13 +229,13 @@
 
     if (self.async) {
         dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0), ^{
-            [self searchBestMove:self.FEN maxDepth:depth callback:^(FEngineInfo * _Nonnull info, BOOL completed) {
+            [self searchBestMove:depth callback:^(FEngineInfo * _Nonnull info, BOOL completed) {
                 callback(info, completed);
                 [self fireUpdate:localStateIndex];
             }];
         });
     } else {
-        [self searchBestMove:self.FEN maxDepth:depth callback:^(FEngineInfo * _Nonnull info, BOOL completed) {
+        [self searchBestMove:depth callback:^(FEngineInfo * _Nonnull info, BOOL completed) {
             callback(info, completed);
             [self fireUpdate:localStateIndex];
         }];
@@ -251,10 +260,8 @@
     }
 }
 
-- (void)searchBestMove:(NSString*)boardFEN maxDepth:(NSInteger)maxDepth callback:(FEngineSearchCallback)callback {
-    ChessBoard board;
-    FFEN::setFEN(StringFromNSString(boardFEN), board);
-    ChessEvaluation info = iterativeSearch.search(board, (int)maxDepth, [self, callback](ChessEvaluation info) {
+- (void)searchBestMove:(NSInteger)maxDepth callback:(FEngineSearchCallback)callback {
+    ChessEvaluation info = iterativeSearch.search(currentGame.board, currentGame.history, (int)maxDepth, [self, callback](ChessEvaluation info) {
         if (!iterativeSearch.cancelled()) {
             callback([self infoFor:info], NO);
         }

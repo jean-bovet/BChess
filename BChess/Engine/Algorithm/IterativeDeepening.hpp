@@ -50,7 +50,7 @@ public:
     
     Status status = Status::stopped;
     
-    ChessEvaluation search(ChessBoard board, int maxDepth, SearchCallback callback) {
+    ChessEvaluation search(ChessBoard board, HistoryPtr history, int maxDepth, SearchCallback callback) {
         if (maxDepth == -1) {
             maxDepth = INT_MAX; // infinite depth
         }
@@ -68,7 +68,8 @@ public:
             minMaxSearch.reset();
             
             ChessMinMaxSearch::Variation pv;
-            int score = minMaxSearch.alphabeta(board, 0, board.color == WHITE, pv, bestVariation);
+                        
+            int score = minMaxSearch.alphabeta(board, history, 0, board.color == WHITE, pv, bestVariation);
             
             moveClock.stop();
             

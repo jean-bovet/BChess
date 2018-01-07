@@ -61,6 +61,8 @@ typedef void(^FEngineDidUpdateCallback)();
 
 - (BOOL)isWhite;
 
+- (BOOL)canPlay;
+
 - (void)analyze:(FEngineSearchCallback _Nonnull)callback;
 
 - (void)evaluate:(FEngineSearchCallback _Nonnull)callback;

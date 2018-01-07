@@ -7,6 +7,8 @@
 //
 
 #include "ChessBoard.hpp"
+#include "ChessBoardHash.hpp"
+
 #include <bitstring.h>
 #include <iostream>
 #include <cassert>
@@ -510,4 +512,7 @@ bool ChessBoard::isCheck(Color color) {
     return isAttacked(kingSquare, otherColor);
 }
 
+BoardHash ChessBoard::hash() {
+    return ChessBoardHash::hash(*this);
+}
 

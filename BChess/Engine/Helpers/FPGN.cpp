@@ -52,6 +52,10 @@ static bool isCheckOrMate(char c) {
     return c == '+' || c == '#';
 }
 
+static bool isPromotion(char c) {
+    return c == '=';
+}
+
 static bool parseUntil(std::string pgn, unsigned &cursor, std::string &comment, char endCharacter) {
     while (cursor < pgn.length() && pgn[cursor] != endCharacter) {
         comment += pgn[cursor];
@@ -324,12 +328,11 @@ Move FPGN::parseMove(std::string pgn, unsigned &cursor, ChessGame &game, bool &e
     } else if (isFile(pgn[cursor]) && isFile(pgn[cursor+1]) && isRank(pgn[cursor+2])) {
         // Nbd7
         // Rae8
-        
         fromFile = getFile(pgn[cursor++]);
         toFile = getFile(pgn[cursor++]);
         toRank = getRank(pgn[cursor++]);
     } else if (isFile(pgn[cursor]) && isRank(pgn[cursor+1]) && pgn[cursor+2] == 'x' && isFile(pgn[cursor+3]) && isRank(pgn[cursor+4])) {
-        // Qa6xb7#
+        // Qa6xb7
         fromFile = getFile(pgn[cursor++]);
         fromRank = getRank(pgn[cursor++]);
         cursor++;
@@ -341,20 +344,19 @@ Move FPGN::parseMove(std::string pgn, unsigned &cursor, ChessGame &game, bool &e
         fromRank = getRank(pgn[cursor++]);
         toFile = getFile(pgn[cursor++]);
         toRank = getRank(pgn[cursor++]);
-    } else if (isFile(pgn[cursor]) && isRank(pgn[cursor+1]) && (isSpaceOrNewLine(pgn[cursor+2]) || isCheckOrMate(pgn[cursor+2]) || cursor+2 == pgn.size())) {
+    } else if (isFile(pgn[cursor]) && isRank(pgn[cursor+1]) && (isSpaceOrNewLine(pgn[cursor+2]) || isCheckOrMate(pgn[cursor+2]) || isPromotion(pgn[cursor+2]) || cursor+2 == pgn.size())) {
         // e4
         // Ba4
         toFile = getFile(pgn[cursor++]);
         toRank = getRank(pgn[cursor++]);
     } else if (isFile(pgn[cursor]) && pgn[cursor+1] == 'x' && isFile(pgn[cursor+2]) && isRank(pgn[cursor+3])) {
         // cxb5
-        // fxg1=Q+
         fromFile = getFile(pgn[cursor++]);
         cursor++;
         toFile = getFile(pgn[cursor++]);
         toRank = getRank(pgn[cursor++]);
     } else if (pgn[cursor] == 'x' && isFile(pgn[cursor+1]) && isRank(pgn[cursor+2])) {
-        // Bxf7+
+        // Bxf7
         cursor++;
         toFile = getFile(pgn[cursor++]);
         toRank = getRank(pgn[cursor++]);
@@ -414,6 +416,13 @@ Move FPGN::parseMove(std::string pgn, unsigned &cursor, ChessGame &game, bool &e
         cursor++;
     }
     
+    // Handle promotion
+    Piece promotedPiece = (Piece)0;
+    if (isPromotion(pgn[cursor])) {
+        cursor++;
+        promotedPiece = parsePiece(pgn, cursor);
+    }
+    
     // The target square must be fully defined at this point
     assert(toFile != FileUndefined);
     assert(toRank != RankUndefined);
@@ -421,7 +430,7 @@ Move FPGN::parseMove(std::string pgn, unsigned &cursor, ChessGame &game, bool &e
     Square to = SquareFrom(toFile, toRank);
     
     // Now the original square can be not fully defined...
-    auto matchingMoves = getMatchingMoves(game.board, to, movingPiece, (Piece)0, fromFile, fromRank);
+    auto matchingMoves = getMatchingMoves(game.board, to, movingPiece, promotedPiece, fromFile, fromRank);
     
     // After matching, one and only one move should be found
     if (matchingMoves.size() == 1) {

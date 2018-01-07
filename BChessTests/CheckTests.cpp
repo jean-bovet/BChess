@@ -15,7 +15,7 @@
 class CheckTests: public ::testing::Test {        
 public:
     void SetUp() {
-        ChessMoveGenerator::initialize();
+        ChessEngine::initialize();
     }
 };
 

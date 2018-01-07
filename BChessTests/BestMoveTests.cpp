@@ -16,7 +16,7 @@
 class BestMoveTests: public ::testing::Test {
 public:
     void SetUp() {
-        ChessMoveGenerator::initialize();
+        ChessEngine::initialize();
     }
 };
 
@@ -32,7 +32,8 @@ static void assertBestMove(std::string fen, std::string expectedFinalFEN, std::s
     ChessMinMaxSearch::Variation pv;
     ChessMinMaxSearch::Variation bv;
     
-    search.alphabeta(board, 0, board.color == WHITE, pv, bv);
+    HistoryPtr history = NEW_HISTORY;
+    search.alphabeta(board, history, 0, board.color == WHITE, pv, bv);
     
 //    std::cout << pv.depth << "/" << pv.qsDepth << std::endl;
 //    std::cout << pv.moves.description() << std::endl;

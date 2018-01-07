@@ -9,6 +9,8 @@
 #include "ChessEvaluater.hpp"
 #include "ChessMoveGenerator.hpp"
 #include "ChessBoard.hpp"
+#include "GameHistory.hpp"
+
 #include "magicmoves.h"
 
 #include <iostream>
@@ -129,12 +131,16 @@ int ChessEvaluater::getBonus(Piece piece, Color color, Square square) {
     }
 }
 
-int ChessEvaluater::evaluate(ChessBoard board) {
-    auto moves = ChessMoveGenerator::generateMoves(board, board.color, ChessMoveGenerator::Mode::firstMoveOnly);
-    return evaluate(board, moves);
+bool ChessEvaluater::isDraw(ChessBoard board, HistoryPtr history) {
+    return ChessHistory::isThreefoldRepetition(board.hash(), history);
 }
 
-int ChessEvaluater::evaluate(ChessBoard board, ChessMoveList moves) {
+int ChessEvaluater::evaluate(ChessBoard board, HistoryPtr history) {
+    auto moves = ChessMoveGenerator::generateMoves(board, board.color, ChessMoveGenerator::Mode::firstMoveOnly);
+    return evaluate(board, history, moves);
+}
+
+int ChessEvaluater::evaluate(ChessBoard board, HistoryPtr history, ChessMoveList moves) {
     if (moves.count == 0) {
         if (board.isCheck(board.color)) {
             // No moves but a check, that's a mat
@@ -143,6 +149,12 @@ int ChessEvaluater::evaluate(ChessBoard board, ChessMoveList moves) {
             // No moves and not check, that's a draw
             return 0;
         }
+    }
+    
+    // Check for threefold repetition
+    if (isDraw(board, history)) {
+        // It's a draw if the repetition is detected
+        return 0;
     }
     
     int value = 0;

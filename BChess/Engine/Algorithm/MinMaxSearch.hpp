@@ -66,11 +66,11 @@ public:
     
     // pv: Principal Variation that will be available when this method returns.
     // bv: Best Variation that is provided from an earlier search (typically by the iterative deepening algorithm).
-    int alphabeta(TNode node, int depth, bool maximizingPlayer, Variation &pv, Variation &bv) {
+    int alphabeta(TNode node, HistoryPtr history, int depth, bool maximizingPlayer, Variation &pv, Variation &bv) {
         analyzing = true;
         Variation currentLine;
         int color = maximizingPlayer ? 1 : -1;
-        int score = alphabeta(node, depth, -INT_MAX, INT_MAX, color, pv, currentLine, bv);
+        int score = alphabeta(node, history, depth, -INT_MAX, INT_MAX, color, pv, currentLine, bv);
         return score * color;
     }
     
@@ -81,22 +81,26 @@ private:
     // bv: Best Variation - if available
     // https://en.wikipedia.org/wiki/Negamax
     // https://chessprogramming.wikispaces.com/Principal+variation
-    int alphabeta(TNode node, int depth, int alpha, int beta, int color, Variation &pv, Variation &cv, Variation &bv) {
+    int alphabeta(TNode node, HistoryPtr history, int depth, int alpha, int beta, int color, Variation &pv, Variation &cv, Variation &bv) {
         pv.depth = depth;
+
+        if (TNodeEvaluater::isDraw(node, history)) {
+            return 0;
+        }
 
         if (depth == config.maxDepth) {
             if (config.quiescenceSearch) {
-                int score = quiescence(node, depth, alpha, beta, color, pv, cv);
+                int score = quiescence(node, history, depth, alpha, beta, color, pv, cv);
                 return score;
             } else {
-                int score = TNodeEvaluater::evaluate(node) * color;
+                int score = TNodeEvaluater::evaluate(node, history) * color;
                 return score;
             }
         }
-
+        
         auto moves = TMoveGenerator::generateMoves(node);
         if (moves.count == 0) {
-            int score = TNodeEvaluater::evaluate(node, moves) * color;
+            int score = TNodeEvaluater::evaluate(node, history, moves) * color;
             return score;
         }
         
@@ -132,16 +136,18 @@ private:
             
             visitedNodes++;
 
-            cv.moves.push(move);
-
             auto newNode = node;
             newNode.move(move);
             
+            cv.moves.push(move);
+            history->push_back(newNode.hash());
+            
             Variation line;
             Variation bestLine = (move == bestMove) ? bv : Variation();
-            int score = -alphabeta(newNode, depth + 1, -beta, -alpha, -color, line, cv, bestLine);
+            int score = -alphabeta(newNode, history, depth + 1, -beta, -alpha, -color, line, cv, bestLine);
             
             cv.moves.pop();
+            history->pop_back();
             
             if (score > bestValue) {
                 bestValue = score;
@@ -164,10 +170,14 @@ private:
     // this link shows quiescence search that returns the score, like regular negamax
     // and this is way better IMO:
     // https://www.ics.uci.edu/~eppstein/180a/990204.html
-    int quiescence(TNode node, int depth, int alpha, int beta, int color, Variation &pv, Variation &cv) {
+    int quiescence(TNode node, HistoryPtr history, int depth, int alpha, int beta, int color, Variation &pv, Variation &cv) {
         pv.qsDepth = depth;
         
-        auto stand_pat = TNodeEvaluater::evaluate(node) * color;
+        if (TNodeEvaluater::isDraw(node, history)) {
+            return 0;
+        }
+
+        auto stand_pat = TNodeEvaluater::evaluate(node, history) * color;
         if (stand_pat >= beta) {
             return stand_pat;
         }
@@ -190,16 +200,18 @@ private:
             auto move = moves.moves[index];
             
             visitedNodes++;
-
-            cv.moves.push(move);
             
             auto newNode = node;
             newNode.move(move);
-            
+
+            cv.moves.push(move);
+            history->push_back(newNode.hash());
+
             Variation line;
-            score = -quiescence(newNode, depth+1, -beta, -alpha, -color, line, cv);
+            score = -quiescence(newNode, history, depth+1, -beta, -alpha, -color, line, cv);
             
             cv.moves.pop();
+            history->pop_back();
 
             if (score >= alpha) {
                 alpha = score;

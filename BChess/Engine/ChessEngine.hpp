@@ -8,12 +8,20 @@
 
 #pragma once
 
+#include "Types.hpp"
 #include "MinMaxSearch.hpp"
 #include "ChessBoard.hpp"
+#include "ChessBoardHash.hpp"
 #include "ChessMoveGenerator.hpp"
 #include "ChessEvaluater.hpp"
 #include "ChessEvaluation.hpp"
 
 typedef MinMaxSearch<ChessBoard, ChessEvaluater, ChessMoveGenerator, ChessMoveList, Move> ChessMinMaxSearch;
 
-
+class ChessEngine {
+public:
+    static void initialize() {
+        ChessMoveGenerator::initialize();
+        ChessBoardHash::initialize();
+    }
+};

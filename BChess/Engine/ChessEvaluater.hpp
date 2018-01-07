@@ -22,9 +22,11 @@ public:
     
     static bool isQuiet(Move move);
     
-    static int evaluate(ChessBoard board);
+    static bool isDraw(ChessBoard board, HistoryPtr history);
 
-    static int evaluate(ChessBoard board, ChessMoveList moves);
+    static int evaluate(ChessBoard board, HistoryPtr history);
+
+    static int evaluate(ChessBoard board, HistoryPtr history, ChessMoveList moves);
 
     static int getBonus(Piece piece, Color color, Square square);
 };

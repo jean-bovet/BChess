@@ -19,7 +19,15 @@
 		A70A61DB1FD4D49500AFDF0E /* ChessEvaluater.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A70A61C81FD46E3C00AFDF0E /* ChessEvaluater.cpp */; };
 		A70A61DD1FD4D49500AFDF0E /* FFEN.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A70A61B91FD132D200AFDF0E /* FFEN.cpp */; };
 		A70A61DE1FD4D49F00AFDF0E /* magicmoves.c in Sources */ = {isa = PBXBuildFile; fileRef = A7712D411FCB97A900E7E802 /* magicmoves.c */; };
+		A731BD3720009856004C13EF /* Tournament.swift in Sources */ = {isa = PBXBuildFile; fileRef = A731BD3620009856004C13EF /* Tournament.swift */; };
+		A731BD392000A513004C13EF /* TournamentEngines.swift in Sources */ = {isa = PBXBuildFile; fileRef = A731BD382000A513004C13EF /* TournamentEngines.swift */; };
 		A7460F011FDF2465002B0740 /* BoardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7460F001FDF2465002B0740 /* BoardView.swift */; };
+		A746C244200148E9001F4437 /* ChessBoardHash.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A746C242200148E9001F4437 /* ChessBoardHash.cpp */; };
+		A746C245200148ED001F4437 /* ChessBoardHash.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A746C242200148E9001F4437 /* ChessBoardHash.cpp */; };
+		A746C246200148ED001F4437 /* ChessBoardHash.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A746C242200148E9001F4437 /* ChessBoardHash.cpp */; };
+		A746C2492001707F001F4437 /* GameHistory.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A746C2472001707F001F4437 /* GameHistory.cpp */; };
+		A746C24D2001A2FD001F4437 /* GameHistory.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A746C2472001707F001F4437 /* GameHistory.cpp */; };
+		A746C24E2001A306001F4437 /* GameHistory.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A746C2472001707F001F4437 /* GameHistory.cpp */; };
 		A75359841FDC51B2008D1DEE /* FENgineInfo+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = A75359831FDC51B2008D1DEE /* FENgineInfo+Extension.swift */; };
 		A75359851FDC994E008D1DEE /* FENgineInfo+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = A75359831FDC51B2008D1DEE /* FENgineInfo+Extension.swift */; };
 		A75359931FDE0947008D1DEE /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A75359921FDE0947008D1DEE /* AppDelegate.swift */; };
@@ -126,7 +134,14 @@
 		A70A61C91FD46E3C00AFDF0E /* ChessEvaluater.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = ChessEvaluater.hpp; sourceTree = "<group>"; };
 		A70A61CF1FD4AA9600AFDF0E /* FEngineInfo.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FEngineInfo.h; sourceTree = "<group>"; };
 		A70A61D01FD4AA9600AFDF0E /* FEngineInfo.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = FEngineInfo.mm; sourceTree = "<group>"; };
+		A731BD3620009856004C13EF /* Tournament.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tournament.swift; sourceTree = "<group>"; };
+		A731BD382000A513004C13EF /* TournamentEngines.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TournamentEngines.swift; sourceTree = "<group>"; };
 		A7460F001FDF2465002B0740 /* BoardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoardView.swift; sourceTree = "<group>"; };
+		A746C242200148E9001F4437 /* ChessBoardHash.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ChessBoardHash.cpp; sourceTree = "<group>"; };
+		A746C243200148E9001F4437 /* ChessBoardHash.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = ChessBoardHash.hpp; sourceTree = "<group>"; };
+		A746C2472001707F001F4437 /* GameHistory.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = GameHistory.cpp; sourceTree = "<group>"; };
+		A746C2482001707F001F4437 /* GameHistory.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = GameHistory.hpp; sourceTree = "<group>"; };
+		A746C24B20017351001F4437 /* Types.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Types.hpp; sourceTree = "<group>"; };
 		A75359831FDC51B2008D1DEE /* FENgineInfo+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FENgineInfo+Extension.swift"; sourceTree = "<group>"; };
 		A75359871FDCF8D6008D1DEE /* FBitboard.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = FBitboard.hpp; sourceTree = "<group>"; };
 		A753598A1FDCF95E008D1DEE /* FCoordinate.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = FCoordinate.hpp; sourceTree = "<group>"; };
@@ -252,6 +267,8 @@
 			children = (
 				A7712D401FCB97A900E7E802 /* magicmoves.h */,
 				A7712D411FCB97A900E7E802 /* magicmoves.c */,
+				A746C243200148E9001F4437 /* ChessBoardHash.hpp */,
+				A746C242200148E9001F4437 /* ChessBoardHash.cpp */,
 				A70A61BA1FD132D200AFDF0E /* FFEN.hpp */,
 				A70A61B91FD132D200AFDF0E /* FFEN.cpp */,
 				A77372001FE320010001A90F /* FPGN.hpp */,
@@ -264,6 +281,7 @@
 		A70A61D41FD4D37E00AFDF0E /* Engine */ = {
 			isa = PBXGroup;
 			children = (
+				A746C24B20017351001F4437 /* Types.hpp */,
 				A753598A1FDCF95E008D1DEE /* FCoordinate.hpp */,
 				A75359871FDCF8D6008D1DEE /* FBitboard.hpp */,
 				A70A61BE1FD38C7500AFDF0E /* FColor.hpp */,
@@ -283,6 +301,8 @@
 				A7EF55C71FEF17A1004CF2DA /* ChessEngine.hpp */,
 				A765D8601FF6C1950045BB36 /* ChessOpenings.hpp */,
 				A765D85F1FF6C1950045BB36 /* ChessOpenings.cpp */,
+				A746C2482001707F001F4437 /* GameHistory.hpp */,
+				A746C2472001707F001F4437 /* GameHistory.cpp */,
 				A765D8621FF6C1B30045BB36 /* Algorithm */,
 				A70A61D31FD4D37600AFDF0E /* Helpers */,
 			);
@@ -362,6 +382,8 @@
 			children = (
 				A7712D2E1FC7C4CD00E7E802 /* UCI.swift */,
 				A75359831FDC51B2008D1DEE /* FENgineInfo+Extension.swift */,
+				A731BD3620009856004C13EF /* Tournament.swift */,
+				A731BD382000A513004C13EF /* TournamentEngines.swift */,
 			);
 			path = UCI;
 			sourceTree = "<group>";
@@ -603,6 +625,7 @@
 				A7C92ABA1FF86F6800160D2E /* FEngineUtility.mm in Sources */,
 				A75359CA1FDE4038008D1DEE /* ChessEvaluater.cpp in Sources */,
 				A75359CF1FDE4385008D1DEE /* PieceView.swift in Sources */,
+				A746C24E2001A306001F4437 /* GameHistory.cpp in Sources */,
 				A75359C31FDE4023008D1DEE /* FENgineInfo+Extension.swift in Sources */,
 				A765D85E1FF61AA70045BB36 /* PromotionPicker.swift in Sources */,
 				A7460F011FDF2465002B0740 /* BoardView.swift in Sources */,
@@ -616,6 +639,7 @@
 				A75359C71FDE4038008D1DEE /* ChessMoveList.cpp in Sources */,
 				A75359CC1FDE4038008D1DEE /* FFEN.cpp in Sources */,
 				A75359C51FDE4031008D1DEE /* FEngine.mm in Sources */,
+				A746C246200148ED001F4437 /* ChessBoardHash.cpp in Sources */,
 				A75359C91FDE4038008D1DEE /* ChessBoard.cpp in Sources */,
 				A75359C41FDE4031008D1DEE /* FEngineInfo.mm in Sources */,
 				A7C92AB61FF86C4300160D2E /* FEngineMove.mm in Sources */,
@@ -644,9 +668,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A746C245200148ED001F4437 /* ChessBoardHash.cpp in Sources */,
 				A75CB25B1FED8F2C005487BD /* MoveTests.cpp in Sources */,
 				A70A61DD1FD4D49500AFDF0E /* FFEN.cpp in Sources */,
 				A7EBE7CF1FF6C93600ACDF85 /* ChessOpenings.cpp in Sources */,
+				A746C24D2001A2FD001F4437 /* GameHistory.cpp in Sources */,
 				A7712D341FC895D100E7E802 /* UCI.swift in Sources */,
 				A70A61DA1FD4D49500AFDF0E /* ChessBoard.cpp in Sources */,
 				A75CB25D1FED8F82005487BD /* EvaluationTests.cpp in Sources */,
@@ -683,6 +709,7 @@
 				A75683291FCD28A000CF1408 /* FEngine.mm in Sources */,
 				A7712D2F1FC7C4CD00E7E802 /* UCI.swift in Sources */,
 				A77372011FE320010001A90F /* FPGN.cpp in Sources */,
+				A746C2492001707F001F4437 /* GameHistory.cpp in Sources */,
 				A70A61BB1FD132D200AFDF0E /* FFEN.cpp in Sources */,
 				A75359841FDC51B2008D1DEE /* FENgineInfo+Extension.swift in Sources */,
 				A756832D1FD0B3FE00CF1408 /* magicmoves.c in Sources */,
@@ -695,6 +722,9 @@
 				A70A61C61FD4592700AFDF0E /* ChessMoveList.cpp in Sources */,
 				A765D8611FF6C1950045BB36 /* ChessOpenings.cpp in Sources */,
 				A7C92AB91FF86F6800160D2E /* FEngineUtility.mm in Sources */,
+				A731BD392000A513004C13EF /* TournamentEngines.swift in Sources */,
+				A731BD3720009856004C13EF /* Tournament.swift in Sources */,
+				A746C244200148E9001F4437 /* ChessBoardHash.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

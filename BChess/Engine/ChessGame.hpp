@@ -10,6 +10,7 @@
 
 #include "ChessBoard.hpp"
 #include "ChessMoveList.hpp"
+#include "GameHistory.hpp"
 
 #include <vector>
 #include <map>
@@ -29,6 +30,8 @@ public:
     std::string initialFEN;
     
     ChessBoard board;
+    
+    HistoryPtr history;
     
     ChessMoveList moves;
     int moveCursor = 0;

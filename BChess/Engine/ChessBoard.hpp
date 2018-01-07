@@ -10,6 +10,7 @@
 
 #include "FMove.hpp"
 #include "FBitboard.hpp"
+#include "Types.hpp"
 
 #include <stdio.h>
 #include <string>
@@ -75,7 +76,9 @@ public:
     bool isAttacked(Square square, Color byColor);
     
     bool isCheck(Color color);
-        
+    
+    BoardHash hash();
+    
     void setCastling(std::string castling) {
         whiteCanCastleKingSide = castling.find('K') != std::string::npos;
         whiteCanCastleQueenSide = castling.find('Q') != std::string::npos;

@@ -8,6 +8,8 @@
 
 #pragma once
 
+#include <cassert>
+
 const int MAX_MOVES = 256;
 
 template <class TMove>
