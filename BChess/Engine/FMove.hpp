@@ -17,13 +17,14 @@
 // A move needs 32 bits to be stored
 // bit 0-5: destination square (from 0 to 63)
 // bit 6-11: origin square (from 0 to 63)
-// bit 12: 1=BLACK, 0=WHITE
+// bit 12: 1=BLACK, 0=WHITE (color of piece being moved)
 // bit 13-15: 3 bits for PIECE (from 0 to 6)
 // bit 16: 0=move, 1=capture
 // bit 17: 1=en passant, 0 otherwise
 // bit 18-20: 3 bits for promotion PIECE (from 0 to 6). 0 means no promotion.
 // bit 21-23: 3 bits for captured PIECE (from 0 to 6).
 // bit 24: 0=nothing, 1=check move
+// bit 25: 1=BLACK, 0=WHITE (color of piece being attacked)
 typedef uint32_t Move;
 
 static const Move INVALID_MOVE = 0;
@@ -77,6 +78,11 @@ inline static Piece MOVE_CAPTURED_PIECE(Move move) {
     return Piece(test);
 }
 
+inline static Color MOVE_CAPTURED_PIECE_COLOR(Move move) {
+    uint16_t test = move & (1 << 25);
+    return test > 0 ? BLACK : WHITE;
+}
+
 inline static Square MOVE_FROM(Move move) {
     Square from = move & 63;
     return from;
@@ -98,15 +104,16 @@ inline static Move createPromotion(Square from, Square to, Color color, Piece pi
     return m;
 }
 
-inline static Move createCapture(Square from, Square to, Color color, Piece attackingPiece, Piece capturedPiece) {
+inline static Move createCapture(Square from, Square to, Color color, Piece attackingPiece, Color capturedPieceColor, Piece capturedPiece) {
     Move m = createMove(from, to, color, attackingPiece);
     m |= 1UL << 16;
     m |= capturedPiece << 21;
+    m |= capturedPieceColor << 25;
     return m;
 }
 
 inline static Move createEnPassant(Square from, Square to, Color color, Piece piece) {
-    Move m = createCapture(from, to, color, piece, PAWN);
+    Move m = createCapture(from, to, color, piece, INVERSE(color), PAWN);
     m |= 1UL << 17;
     return m;
 }

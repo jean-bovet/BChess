@@ -19,7 +19,7 @@ struct ChessMoveList : MinMaxMoveList<Move> {
         
     void addMove(ChessBoard &board, Move move);
     void addMoves(ChessBoard &board, Square from, Bitboard moves, Piece piece);
-    void addCaptures(ChessBoard &board, Square from, Bitboard moves, Piece attackingPiece, Piece capturedPiece);
+    void addCaptures(ChessBoard &board, Square from, Bitboard moves, Color attackingPieceColor, Piece attackingPiece, Color capturedPieceColor, Piece capturedPiece);
 };
 
 

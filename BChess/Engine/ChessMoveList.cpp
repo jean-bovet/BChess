@@ -51,12 +51,12 @@ void ChessMoveList::addMoves(ChessBoard &board, Square from, Bitboard moves, Pie
     }
 }
 
-void ChessMoveList::addCaptures(ChessBoard &board, Square from, Bitboard moves, Piece attackingPiece, Piece capturedPiece) {
+void ChessMoveList::addCaptures(ChessBoard &board, Square from, Bitboard moves, Color attackingPieceColor, Piece attackingPiece, Color capturedPieceColor, Piece capturedPiece) {
     while (moves > 0) {
         Square to = lsb(moves);
         bb_clear(moves, to);
         
-        addMove(board, createCapture(from, to, board.color, attackingPiece, capturedPiece));
+        addMove(board, createCapture(from, to, attackingPieceColor, attackingPiece, capturedPieceColor, capturedPiece));
     }
 }
 

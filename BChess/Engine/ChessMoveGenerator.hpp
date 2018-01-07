@@ -33,7 +33,8 @@ public:
     enum class Mode {
         allMoves,
         quiescenceMoveOnly,
-        firstMoveOnly
+        firstMoveOnly,
+        moveCaptureAndDefenseMoves
     };
     
     static ChessMoveList generateQuiescenceMoves(ChessBoard &board);

@@ -106,6 +106,8 @@ void ChessMoveGenerator::sortMoves(ChessMoveList & moves) {
     std::stable_sort(std::begin(moves.moves), std::begin(moves.moves) + moves.count, moveComparison);
 }
 
+#pragma mark -
+
 ChessMoveList ChessMoveGenerator::generateQuiescenceMoves(ChessBoard &board) {
     return generateQuiescenceMoves(board, board.color);
 }
@@ -117,6 +119,8 @@ ChessMoveList ChessMoveGenerator::generateQuiescenceMoves(ChessBoard &board, Col
 ChessMoveList ChessMoveGenerator::generateMoves(ChessBoard &board) {
     return generateMoves(board, board.color);
 }
+
+#pragma mark -
 
 ChessMoveList ChessMoveGenerator::generateMoves(ChessBoard &board, Color color, Mode mode, Square specificSquare) {
     ChessMoveList moveList;
@@ -146,8 +150,18 @@ void ChessMoveGenerator::generateAttackMoves(ChessBoard &board, Color color, Che
     for (unsigned capturedPiece = PAWN; capturedPiece < PCOUNT; capturedPiece++) {
         auto attacks = attackingSquares & board.pieces[attackedColor][capturedPiece];
         if (attacks > 0) {
-            moveList.addCaptures(board, fromSquare, attacks, attackingPiece, Piece(capturedPiece));
+            moveList.addCaptures(board, fromSquare, attacks, color, attackingPiece, attackedColor, Piece(capturedPiece));
             if (mode == Mode::firstMoveOnly && moveList.count > 0) return;
+        }
+    }
+    
+    if (mode == Mode::moveCaptureAndDefenseMoves) {
+        auto attackedColor = color;
+        for (unsigned capturedPiece = PAWN; capturedPiece < PCOUNT; capturedPiece++) {
+            auto attacks = attackingSquares & board.pieces[attackedColor][capturedPiece];
+            if (attacks > 0) {
+                moveList.addCaptures(board, fromSquare, attacks, color, attackingPiece, attackedColor, Piece(capturedPiece));
+            }
         }
     }
 }

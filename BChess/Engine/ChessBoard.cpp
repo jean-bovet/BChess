@@ -347,16 +347,17 @@ Move ChessBoard::getMove(std::string from, std::string to) {
     Square toSquare = squareForName(to);
     for (unsigned piece=PAWN; piece<Piece::PCOUNT; piece++) {
         if (bb_test(pieces[color][piece], fromSquare)) {
-            bool capture = bb_test(allPieces(INVERSE(color)), toSquare);
+            auto attackedColor = INVERSE(color);
+            bool capture = bb_test(allPieces(attackedColor), toSquare);
             if (capture) {
                 unsigned attackedPiece = PAWN;
                 for (; attackedPiece<PCOUNT; attackedPiece++) {
-                    if (bb_test(pieces[INVERSE(color)][attackedPiece], toSquare)) {
+                    if (bb_test(pieces[attackedColor][attackedPiece], toSquare)) {
                         break;
                     }
                 }
                 assert(attackedPiece != PCOUNT);
-                Move m = createCapture(fromSquare, toSquare, color, Piece(piece), Piece(attackedPiece));
+                Move m = createCapture(fromSquare, toSquare, color, Piece(piece), attackedColor, Piece(attackedPiece));
                 return m;
             } else {
                 Move m = createMove(fromSquare, toSquare, color, Piece(piece));
