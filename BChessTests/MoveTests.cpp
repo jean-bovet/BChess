@@ -47,6 +47,19 @@ TEST(Move, MoveCapture) {
     ASSERT_TRUE(MOVE_ISVALID(m));
 }
 
+TEST(Move, MoveDefense) {
+    Move m = createCapture(12, 62, BLACK, BISHOP, BLACK, ROOK);
+    ASSERT_EQ(MOVE_FROM(m), 12);
+    ASSERT_EQ(MOVE_TO(m), 62);
+    ASSERT_EQ(MOVE_COLOR(m), BLACK);
+    ASSERT_EQ(MOVE_PIECE(m), BISHOP);
+    ASSERT_EQ(MOVE_CAPTURED_PIECE(m), ROOK);
+    ASSERT_EQ(MOVE_CAPTURED_PIECE_COLOR(m), BLACK);
+    ASSERT_TRUE(MOVE_IS_CAPTURE(m));
+    ASSERT_FALSE(MOVE_IS_ENPASSANT(m));
+    ASSERT_TRUE(MOVE_ISVALID(m));
+}
+
 TEST(Move, MoveEnPassant) {
     Move m = createEnPassant(12, 62, BLACK, BISHOP);
     ASSERT_EQ(MOVE_FROM(m), 12);

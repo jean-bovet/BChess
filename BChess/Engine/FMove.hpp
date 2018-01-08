@@ -25,6 +25,7 @@
 // bit 21-23: 3 bits for captured PIECE (from 0 to 6).
 // bit 24: 0=nothing, 1=check move
 // bit 25: 1=BLACK, 0=WHITE (color of piece being attacked)
+// bit 26: 0=nothing, 1=castling
 typedef uint32_t Move;
 
 static const Move INVALID_MOVE = 0;
@@ -50,6 +51,11 @@ inline static bool MOVE_IS_CAPTURE(Move move) {
 
 inline static bool MOVE_IS_ENPASSANT(Move move) {
     uint32_t test = move & (1UL << 17);
+    return test > 0;
+}
+
+inline static bool MOVE_IS_CASTLING(Move move) {
+    uint32_t test = move & (1UL << 26);
     return test > 0;
 }
 
@@ -79,7 +85,7 @@ inline static Piece MOVE_CAPTURED_PIECE(Move move) {
 }
 
 inline static Color MOVE_CAPTURED_PIECE_COLOR(Move move) {
-    uint16_t test = move & (1 << 25);
+    uint32_t test = move & (1UL << 25);
     return test > 0 ? BLACK : WHITE;
 }
 
@@ -95,6 +101,12 @@ inline static Square MOVE_TO(Move move) {
 
 inline static Move createMove(Square from, Square to, Color color, Piece piece) {
     Move m = (Move)(from | (Move)to << 6 | color << 12 | piece << 13);
+    return m;
+}
+
+inline static Move createCastling(Square from, Square to, Color color, Piece piece) {
+    Move m = createMove(from, to, color, piece);
+    m |= 1UL << 26;
     return m;
 }
 

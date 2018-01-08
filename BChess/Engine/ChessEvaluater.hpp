@@ -28,5 +28,9 @@ public:
 
     static int evaluate(ChessBoard board, HistoryPtr history, ChessMoveList moves);
 
+    static int evaluateAction(Color color, ChessMoveList moves);
+    
+    static int evaluateMobility(Color color, ChessMoveList moves);
+
     static int getBonus(Piece piece, Color color, Square square);
 };

@@ -16,6 +16,13 @@
 #include <vector>
 #include <map>
 
+class SearchChessTests: public ::testing::Test {
+public:
+    void SetUp() {
+        ChessEngine::initialize();
+    }
+};
+
 static void assertChessSearch(int expectedVisitedNodes, int expectedValue, Configuration config, ChessBoard rootBoard = ChessBoard()) {
     ChessMinMaxSearch alphaBeta;
     alphaBeta.config = config;
@@ -32,7 +39,7 @@ static void assertChessSearch(int expectedVisitedNodes, int expectedValue, Confi
     ASSERT_EQ(expectedValue, score);
 }
 
-TEST(Chess, ChessTree) {
+TEST_F(SearchChessTests, ChessTree) {
     Configuration config;
     config.quiescenceSearch = false;
 
@@ -43,7 +50,7 @@ TEST(Chess, ChessTree) {
     assertChessSearch(206603, 50, config); // without alpha-beta
 }
 
-TEST(Chess, OrderedMove) {
+TEST_F(SearchChessTests, OrderedMove) {
     auto fen = "r1bqkbnr/pppp1ppp/2n5/3P4/8/8/PPP2PPP/RNBQKBNR b KQkq - 0 5";
     ChessBoard board;
     ASSERT_TRUE(FFEN::setFEN(fen, board));
@@ -51,8 +58,8 @@ TEST(Chess, OrderedMove) {
     Configuration config;
 
     config.sortMoves = true;
-    assertChessSearch(26983, 105, config, board);
+    assertChessSearch(26985, 105, config, board);
     
     config.sortMoves = false;
-    assertChessSearch(231447, 105, config, board);
+    assertChessSearch(231818, 105, config, board);
 }

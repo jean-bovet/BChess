@@ -156,11 +156,10 @@ void ChessMoveGenerator::generateAttackMoves(ChessBoard &board, Color color, Che
     }
     
     if (mode == Mode::moveCaptureAndDefenseMoves) {
-        auto attackedColor = color;
-        for (unsigned capturedPiece = PAWN; capturedPiece < PCOUNT; capturedPiece++) {
-            auto attacks = attackingSquares & board.pieces[attackedColor][capturedPiece];
-            if (attacks > 0) {
-                moveList.addCaptures(board, fromSquare, attacks, color, attackingPiece, attackedColor, Piece(capturedPiece));
+        for (unsigned ownPiece = PAWN; ownPiece < PCOUNT; ownPiece++) {
+            auto defenses = attackingSquares & board.pieces[color][ownPiece];
+            if (defenses > 0) {
+                moveList.addCaptures(board, fromSquare, defenses, color, attackingPiece, color, Piece(ownPiece));
             }
         }
     }
@@ -287,14 +286,14 @@ void ChessMoveGenerator::generateKingsMoves(ChessBoard &board, Color color, Ches
             if (board.whiteCanCastleKingSide) {
                 Bitboard kingMoves = 1 << (square+1) | 1 << (square+2);
                 if ((kingMoves & emptySquares) == kingMoves && !board.isAttacked(square+1, otherColor) && !board.isAttacked(square+2, otherColor)) {
-                    moveList.addMove(board, createMove(square, square+2, color, KING));
+                    moveList.addMove(board, createCastling(square, square+2, color, KING));
                     if (mode == Mode::firstMoveOnly && moveList.count > 0) return;
                 }
             }
             if (board.whiteCanCastleQueenSide) {
                 Bitboard kingMoves = 1 << (square-1) | 1 << (square-2) | 1 << (square-3);
                 if ((kingMoves & emptySquares) == kingMoves && !board.isAttacked(square-1, otherColor) && !board.isAttacked(square-2, otherColor) && !board.isAttacked(square-3, otherColor)) {
-                    moveList.addMove(board, createMove(square, square-2, color, KING));
+                    moveList.addMove(board, createCastling(square, square-2, color, KING));
                     if (mode == Mode::firstMoveOnly && moveList.count > 0) return;
                 }
             }
@@ -303,14 +302,14 @@ void ChessMoveGenerator::generateKingsMoves(ChessBoard &board, Color color, Ches
             if (board.blackCanCastleKingSide) {
                 Bitboard kingMoves = 1UL << (square+1) | 1UL << (square+2);
                 if ((kingMoves & emptySquares) == kingMoves && !board.isAttacked(square+1, otherColor) && !board.isAttacked(square+2, otherColor)) {
-                    moveList.addMove(board, createMove(square, square+2, color, KING));
+                    moveList.addMove(board, createCastling(square, square+2, color, KING));
                     if (mode == Mode::firstMoveOnly && moveList.count > 0) return;
                 }
             }
             if (board.blackCanCastleQueenSide) {
                 Bitboard kingMoves = 1UL << (square-1) | 1UL << (square-2) | 1UL << (square-3);
                 if ((kingMoves & emptySquares) == kingMoves && !board.isAttacked(square-1, otherColor) && !board.isAttacked(square-2, otherColor) && !board.isAttacked(square-3, otherColor)) {
-                    moveList.addMove(board, createMove(square, square-2, color, KING));
+                    moveList.addMove(board, createCastling(square, square-2, color, KING));
                     if (mode == Mode::firstMoveOnly && moveList.count > 0) return;
                 }
             }

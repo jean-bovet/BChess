@@ -136,15 +136,18 @@ bool ChessEvaluater::isDraw(ChessBoard board, HistoryPtr history) {
 }
 
 int ChessEvaluater::evaluate(ChessBoard board, HistoryPtr history) {
-    auto moves = ChessMoveGenerator::generateMoves(board, board.color, ChessMoveGenerator::Mode::firstMoveOnly);
+    auto moves = ChessMoveGenerator::generateMoves(board, board.color, ChessMoveGenerator::Mode::moveCaptureAndDefenseMoves);
     return evaluate(board, history, moves);
 }
+
+static int PieceActionValue[PCOUNT] = { 6, 3, 3, 2, 1, 1 };
 
 int ChessEvaluater::evaluate(ChessBoard board, HistoryPtr history, ChessMoveList moves) {
     if (moves.count == 0) {
         if (board.isCheck(board.color)) {
             // No moves but a check, that's a mat
-            return board.color == WHITE ? -MAT_VALUE : MAT_VALUE;
+            // Note: always evaluate from white's point of view
+            return -MAT_VALUE;
         } else {
             // No moves and not check, that's a draw
             return 0;
@@ -157,9 +160,10 @@ int ChessEvaluater::evaluate(ChessBoard board, HistoryPtr history, ChessMoveList
         return 0;
     }
     
+    // Compute the piece balance value
     int value = 0;
     for (unsigned color=0; color<COUNT; color++) {
-        // Always evaluate from white point of view
+        // Note: always evaluate from white's point of view
         int colorSign = (color == WHITE) ? 1 : -1;
         
         // The bonus of the pieces' locations, for that particular color
@@ -189,5 +193,80 @@ int ChessEvaluater::evaluate(ChessBoard board, HistoryPtr history, ChessMoveList
         value += colorSign * totalBonus;
     }
     
+    // Compute the piece action value (either attacked, defended or hanging)
+//    value += evaluateActionAndMobility(board.color, moves);
+    
     return value;
+}
+
+int ChessEvaluater::evaluateAction(Color color, ChessMoveList moves) {
+    int attackedValues[2][64] = { };
+    int defendedValues[2][64] = { };
+    
+    for (int index=0; index<moves.count; index++) {
+        auto move = moves[index];
+        auto moveColor = MOVE_COLOR(move);
+        
+        if (MOVE_IS_CAPTURE(move)) {
+            auto to = MOVE_TO(move);
+            if (MOVE_CAPTURED_PIECE_COLOR(move) == MOVE_COLOR(move)) {
+                // Same color, means defense. Doesn't count towards
+                // mobility because in reality that piece cannot move.
+                defendedValues[moveColor][to]++;
+            } else {
+                // Different color means capture.
+                // This count also towards mobility.
+                attackedValues[INVERSE(moveColor)][to]++;
+            }
+        }
+    }
+    
+    int value = 0;
+    
+    for (int index=0; index<64; index++) {
+        for (unsigned color=0; color<COUNT; color++) {
+            auto colorSign = (color == WHITE) ? 1 : -1;
+            
+            auto attacked = attackedValues[color][index];
+            auto defended = defendedValues[color][index];
+            
+            value -= colorSign * attacked;
+            value += colorSign * defended;
+            
+            if (defended < attacked) {
+                value -= colorSign * ((attacked - defended) * 10);
+            }
+        }
+    }
+        
+    return value;
+}
+
+int ChessEvaluater::evaluateMobility(Color color2, ChessMoveList moves) {
+    int mobility = 0;
+    
+    for (int index=0; index<moves.count; index++) {
+        auto move = moves[index];
+        auto moveColor = MOVE_COLOR(move);
+        auto whiteMove = moveColor == WHITE;
+        auto colorSign = whiteMove ? 1 : -1;
+        
+        if (MOVE_IS_CAPTURE(move)) {
+            if (MOVE_CAPTURED_PIECE_COLOR(move) != MOVE_COLOR(move)) {
+                // Different color means capture.
+                // This count also towards mobility.
+                mobility += colorSign * 1;
+            }
+        } else {
+            // Regular move, just count towards mobility
+            mobility += colorSign * 1;
+            
+            // One more bonus when castling because two pieces are moving
+            if (MOVE_IS_CASTLING(move)) {
+                mobility += colorSign * 1;
+            }
+        }
+    }
+    
+    return mobility;
 }
