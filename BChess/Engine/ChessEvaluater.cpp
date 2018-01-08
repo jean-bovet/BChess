@@ -136,11 +136,9 @@ bool ChessEvaluater::isDraw(ChessBoard board, HistoryPtr history) {
 }
 
 int ChessEvaluater::evaluate(ChessBoard board, HistoryPtr history) {
-    auto moves = ChessMoveGenerator::generateMoves(board, board.color, ChessMoveGenerator::Mode::moveCaptureAndDefenseMoves);
+    auto moves = ChessMoveGenerator::generateMoves(board, board.color, ChessMoveGenerator::Mode::firstMoveOnly);
     return evaluate(board, history, moves);
 }
-
-static int PieceActionValue[PCOUNT] = { 6, 3, 3, 2, 1, 1 };
 
 int ChessEvaluater::evaluate(ChessBoard board, HistoryPtr history, ChessMoveList moves) {
     if (moves.count == 0) {
@@ -194,6 +192,7 @@ int ChessEvaluater::evaluate(ChessBoard board, HistoryPtr history, ChessMoveList
     }
     
     // Compute the piece action value (either attacked, defended or hanging) and mobility
+    // See http://www.chessbin.com/post/Chess-Board-Evaluation
     auto moveList = ChessMoveGenerator::generateMoves(board, board.color, ChessMoveGenerator::Mode::moveCaptureAndDefenseMoves);
     auto opponentMoveList = ChessMoveGenerator::generateMoves(board, INVERSE(board.color), ChessMoveGenerator::Mode::moveCaptureAndDefenseMoves);
 
@@ -208,6 +207,9 @@ int ChessEvaluater::evaluateAction(ChessBoard board) {
     auto opponentMoveList = ChessMoveGenerator::generateMoves(board, INVERSE(board.color), ChessMoveGenerator::Mode::moveCaptureAndDefenseMoves);
     return evaluateAction(moveList) + evaluateAction(opponentMoveList);
 }
+
+// TODO: at some point, give more value to pawn when attacking or defending than queen?
+//static int PieceActionValue[PCOUNT] = { 6, 3, 3, 2, 1, 1 };
 
 int ChessEvaluater::evaluateAction(ChessMoveList moves) {
     int attackedValues[2][64] = { };
