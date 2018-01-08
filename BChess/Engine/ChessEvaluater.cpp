@@ -193,8 +193,12 @@ int ChessEvaluater::evaluate(ChessBoard board, HistoryPtr history, ChessMoveList
         value += colorSign * totalBonus;
     }
     
-    // Compute the piece action value (either attacked, defended or hanging)
-//    value += evaluateActionAndMobility(board.color, moves);
+    // Compute the piece action value (either attacked, defended or hanging) and mobility
+    auto moveList = ChessMoveGenerator::generateMoves(board, board.color, ChessMoveGenerator::Mode::moveCaptureAndDefenseMoves);
+    auto opponentMoveList = ChessMoveGenerator::generateMoves(board, INVERSE(board.color), ChessMoveGenerator::Mode::moveCaptureAndDefenseMoves);
+
+    value += evaluateAction(moveList) + evaluateAction(opponentMoveList);
+    value += evaluateMobility(moveList) + evaluateMobility(opponentMoveList);
     
     return value;
 }
