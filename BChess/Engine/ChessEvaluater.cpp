@@ -145,7 +145,7 @@ int ChessEvaluater::evaluate(ChessBoard board, HistoryPtr history, ChessMoveList
         if (board.isCheck(board.color)) {
             // No moves but a check, that's a mat
             // Note: always evaluate from white's point of view
-            return -MAT_VALUE;
+            return board.color == WHITE ? -MAT_VALUE : MAT_VALUE;
         } else {
             // No moves and not check, that's a draw
             return 0;

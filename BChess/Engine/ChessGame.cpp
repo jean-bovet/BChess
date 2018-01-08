@@ -26,7 +26,7 @@ void ChessGame::reset() {
 }
 
 bool ChessGame::setFEN(std::string fen) {
-    moveCursor = 0;
+    reset();
     if (FFEN::setFEN(fen, board)) {
         initialFEN = fen;
         return true;

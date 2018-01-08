@@ -126,3 +126,10 @@ TEST_F(BestMoveTests, BlackMoveToMate) {
     assertBestMove(start, end, "Qf2xg2", config );
 }
 
+TEST_F(BestMoveTests, WhiteThreatenMate) {
+    std::string start = "3r1k1r/1pp2ppp/pq6/3P4/5Q2/P1P4P/1P1R2P1/5R1K b - - 2 24";
+    std::string end = "5k1r/1ppr1pp1/pq5p/3P4/2P2Q2/P6P/1P1R2P1/4R2K b - - 0 26";
+    // Note: black king is about to get mate.
+    assertBestMove(start, end, "Rd8d7 Rf1e1 h7h6 c3c4");
+}
+

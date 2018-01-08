@@ -100,6 +100,7 @@
         
         // Copy the current game and play the best line.
         ChessGame lineGame = self.game;
+        lineGame.history = NEW_HISTORY; // TODO hack to avoid coping the history from self.game and got it overwritten here
         for (int index=0; index<self.info.line.count; index++) {
             Move move = self.info.line[index];
             lineGame.move(move);
