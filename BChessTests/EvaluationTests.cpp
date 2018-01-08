@@ -17,6 +17,12 @@ public:
         ChessEngine::initialize();
     }
     
+    ChessBoard boardFor(std::string fen) {
+        ChessBoard board;
+        assert(FFEN::setFEN(fen, board));
+        return board;
+    }
+    
     ChessMoveList generateMoves(std::string fen) {
         ChessBoard board;
         assert(FFEN::setFEN(fen, board));
@@ -38,7 +44,6 @@ TEST_F(EvaluationTests, BonusPosition) {
     
     ASSERT_EQ(ChessEvaluater::getBonus(KNIGHT, Color::BLACK, e7), 5);
     ASSERT_EQ(ChessEvaluater::getBonus(KNIGHT, Color::WHITE, e7), 0);
-
 }
 
 TEST_F(EvaluationTests, InvalidMove) {
@@ -47,25 +52,37 @@ TEST_F(EvaluationTests, InvalidMove) {
 }
 
 TEST_F(EvaluationTests, WhitePieceMobility) {
-    auto moveList = generateMoves("8/8/8/8/8/8/P7/R3K3 w Q - 0 1");
-    int value = ChessEvaluater::evaluateMobility(WHITE, moveList);
+    auto board = boardFor("8/8/8/8/8/8/P7/R3K3 w Q - 0 1");
+    int value = ChessEvaluater::evaluateMobility(board);
     ASSERT_EQ(12, value); // 10 moves and 1 castling (that count double)
 }
 
 TEST_F(EvaluationTests, WhitePieceAction) {
-    auto moveList = generateMoves("8/8/8/8/8/8/P7/R3K3 w Q - 0 1");
-    int value = ChessEvaluater::evaluateAction(WHITE, moveList);
+    auto board = boardFor("8/8/8/8/8/8/P7/R3K3 w Q - 0 1");
+    int value = ChessEvaluater::evaluateAction(board);
     ASSERT_EQ(2, value);
 }
 
 TEST_F(EvaluationTests, BlackPieceMobility) {
-    auto moveList = generateMoves("r3k3/p7/8/8/8/8/8/8 b q - 0 1");
-    int value = ChessEvaluater::evaluateMobility(BLACK, moveList);
+    auto board = boardFor("r3k3/p7/8/8/8/8/8/8 b q - 0 1");
+    int value = ChessEvaluater::evaluateMobility(board);
     ASSERT_EQ(-12, value); // 10 moves and 1 castling (that count double)
 }
 
 TEST_F(EvaluationTests, BlackPieceAction) {
-    auto moveList = generateMoves("r3k3/p7/8/8/8/8/8/8 b q - 0 1");
-    int value = ChessEvaluater::evaluateAction(BLACK, moveList);
+    auto board = boardFor("r3k3/p7/8/8/8/8/8/8 b q - 0 1");
+    int value = ChessEvaluater::evaluateAction(board);
     ASSERT_EQ(-2, value);
+}
+
+TEST_F(EvaluationTests, EvenAttacks) {
+    auto board = boardFor("8/8/8/8/2p5/3P4/8/8 w - - 0 1");
+    int value = ChessEvaluater::evaluateAction(board);
+    ASSERT_EQ(0, value);
+}
+
+TEST_F(EvaluationTests, HangingWhitePiece) {
+    auto board = boardFor("8/8/8/4n3/2p5/3P4/8/8 w - - 0 1");
+    int value = ChessEvaluater::evaluateAction(board);
+    ASSERT_EQ(-12, value);
 }

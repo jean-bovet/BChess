@@ -20,17 +20,18 @@ public:
     // the line of moves to the mat).
     static const int MAT_VALUE = 100000;
     
-    static bool isQuiet(Move move);
-    
+    static bool isQuiet(Move move);    
     static bool isDraw(ChessBoard board, HistoryPtr history);
 
     static int evaluate(ChessBoard board, HistoryPtr history);
-
     static int evaluate(ChessBoard board, HistoryPtr history, ChessMoveList moves);
 
-    static int evaluateAction(Color color, ChessMoveList moves);
-    
-    static int evaluateMobility(Color color, ChessMoveList moves);
+    static int evaluateAction(ChessBoard board);
+    static int evaluateMobility(ChessBoard board);
 
     static int getBonus(Piece piece, Color color, Square square);
+    
+private:
+    static int evaluateAction(ChessMoveList moves);
+    static int evaluateMobility(ChessMoveList moves);
 };

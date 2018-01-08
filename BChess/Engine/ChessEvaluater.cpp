@@ -199,7 +199,13 @@ int ChessEvaluater::evaluate(ChessBoard board, HistoryPtr history, ChessMoveList
     return value;
 }
 
-int ChessEvaluater::evaluateAction(Color color, ChessMoveList moves) {
+int ChessEvaluater::evaluateAction(ChessBoard board) {
+    auto moveList = ChessMoveGenerator::generateMoves(board, board.color, ChessMoveGenerator::Mode::moveCaptureAndDefenseMoves);
+    auto opponentMoveList = ChessMoveGenerator::generateMoves(board, INVERSE(board.color), ChessMoveGenerator::Mode::moveCaptureAndDefenseMoves);
+    return evaluateAction(moveList) + evaluateAction(opponentMoveList);
+}
+
+int ChessEvaluater::evaluateAction(ChessMoveList moves) {
     int attackedValues[2][64] = { };
     int defendedValues[2][64] = { };
     
@@ -242,7 +248,13 @@ int ChessEvaluater::evaluateAction(Color color, ChessMoveList moves) {
     return value;
 }
 
-int ChessEvaluater::evaluateMobility(Color color2, ChessMoveList moves) {
+int ChessEvaluater::evaluateMobility(ChessBoard board) {
+    auto moveList = ChessMoveGenerator::generateMoves(board, board.color, ChessMoveGenerator::Mode::moveCaptureAndDefenseMoves);
+    auto opponentMoveList = ChessMoveGenerator::generateMoves(board, INVERSE(board.color), ChessMoveGenerator::Mode::moveCaptureAndDefenseMoves);
+    return evaluateMobility(moveList) + evaluateMobility(opponentMoveList);
+}
+
+int ChessEvaluater::evaluateMobility(ChessMoveList moves) {
     int mobility = 0;
     
     for (int index=0; index<moves.count; index++) {
