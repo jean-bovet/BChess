@@ -188,6 +188,7 @@ ChessBoard::ChessBoard() {
 void ChessBoard::clear() {
     memset(pieces, 0, sizeof(pieces));
     occupancyDirty = true;
+    hash = 0; // need to recompute it
 }
 
 void ChessBoard::reset() {
@@ -332,6 +333,10 @@ void ChessBoard::move(Move move) {
     color = INVERSE(color);
 }
 
+void ChessBoard::undo_move(Move move) {
+    ChessBoard::move(MOVE_COLOR(move), MOVE_PIECE(move), MOVE_TO(move), MOVE_FROM(move));
+}
+
 Bitboard ChessBoard::getOccupancy() {
     if (occupancyDirty) {
         auto whitePieces = allPieces(Color::WHITE);
@@ -372,6 +377,8 @@ Move ChessBoard::getMove(std::string from, std::string to) {
 void ChessBoard::move(Color color, Piece piece, Square from, Square to) {
     bb_clear(pieces[color][piece], from);
     bb_set(pieces[color][piece], to);
+    hash = hash ^ ChessBoardHash::getPseudoNumber(from, color, piece);
+    hash = hash ^ ChessBoardHash::getPseudoNumber(to, color, piece);
     occupancyDirty = true;
 }
 
@@ -445,6 +452,7 @@ void ChessBoard::set(BoardSquare square, File file, Rank rank) {
     } else {
         bb_set(pieces[square.color][square.piece], file, rank);
     }
+    hash = 0; // Need to recompute it
     occupancyDirty = true;
 }
 
@@ -513,7 +521,10 @@ bool ChessBoard::isCheck(Color color) {
     return isAttacked(kingSquare, otherColor);
 }
 
-BoardHash ChessBoard::hash() {
-    return ChessBoardHash::hash(*this);
+BoardHash ChessBoard::getHash() {
+    if (hash == 0) {
+        hash = ChessBoardHash::hash(*this);
+    }
+    return hash;
 }
 

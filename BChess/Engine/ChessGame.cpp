@@ -68,7 +68,7 @@ void ChessGame::move(Move move) {
 
     board.move(move);
     
-    history->push_back(board.hash());
+    history->push_back(board.getHash());
 
     // Update the outcome after each move
     ChessMoveGenerator generator = ChessMoveGenerator();

@@ -132,7 +132,7 @@ int ChessEvaluater::getBonus(Piece piece, Color color, Square square) {
 }
 
 bool ChessEvaluater::isDraw(ChessBoard board, HistoryPtr history) {
-    return ChessHistory::isThreefoldRepetition(board.hash(), history);
+    return ChessHistory::isThreefoldRepetition(board.getHash(), history);
 }
 
 int ChessEvaluater::evaluate(ChessBoard board, HistoryPtr history) {
@@ -193,11 +193,11 @@ int ChessEvaluater::evaluate(ChessBoard board, HistoryPtr history, ChessMoveList
     
     // Compute the piece action value (either attacked, defended or hanging) and mobility
     // See http://www.chessbin.com/post/Chess-Board-Evaluation
-    auto moveList = ChessMoveGenerator::generateMoves(board, board.color, ChessMoveGenerator::Mode::moveCaptureAndDefenseMoves);
-    auto opponentMoveList = ChessMoveGenerator::generateMoves(board, INVERSE(board.color), ChessMoveGenerator::Mode::moveCaptureAndDefenseMoves);
+//    auto moveList = ChessMoveGenerator::generateMoves(board, board.color, ChessMoveGenerator::Mode::moveCaptureAndDefenseMoves);
+//    auto opponentMoveList = ChessMoveGenerator::generateMoves(board, INVERSE(board.color), ChessMoveGenerator::Mode::moveCaptureAndDefenseMoves);
 
-    value += evaluateAction(moveList) + evaluateAction(opponentMoveList);
-    value += evaluateMobility(moveList) + evaluateMobility(opponentMoveList);
+//    value += evaluateAction(moveList) + evaluateAction(opponentMoveList);
+//    value += evaluateMobility(moveList) + evaluateMobility(opponentMoveList);
     
     return value;
 }

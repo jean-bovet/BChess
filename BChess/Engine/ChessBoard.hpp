@@ -28,7 +28,8 @@ struct BoardSquare {
 struct ChessBoard {
 private:
     Bitboard occupancy = 0;
-
+    BoardHash hash = 0;
+    
 public:
     Color color = WHITE;
     
@@ -66,6 +67,8 @@ public:
     Move getMove(std::string from, std::string to);
 
     void move(Move move);
+    void undo_move(Move move);
+    
     void move(Color color, Piece piece, Square from, Square to);
     
     Bitboard allPieces(Color color);
@@ -77,7 +80,7 @@ public:
     
     bool isCheck(Color color);
     
-    BoardHash hash();
+    BoardHash getHash();
     
     void setCastling(std::string castling) {
         whiteCanCastleKingSide = castling.find('K') != std::string::npos;

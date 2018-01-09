@@ -140,7 +140,7 @@ private:
             newNode.move(move);
             
             cv.moves.push(move);
-            history->push_back(newNode.hash());
+            history->push_back(newNode.getHash());
             
             Variation line;
             Variation bestLine = (move == bestMove) ? bv : Variation();
@@ -205,7 +205,7 @@ private:
             newNode.move(move);
 
             cv.moves.push(move);
-            history->push_back(newNode.hash());
+            history->push_back(newNode.getHash());
 
             Variation line;
             score = -quiescence(newNode, history, depth+1, -beta, -alpha, -color, line, cv);

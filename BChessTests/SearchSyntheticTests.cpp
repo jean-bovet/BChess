@@ -100,7 +100,7 @@ struct TestBoard {
         return text;
     }
     
-    int hash() {
+    int getHash() {
         return 0;
     }
 };

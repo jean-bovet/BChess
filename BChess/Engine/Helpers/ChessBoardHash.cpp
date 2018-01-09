@@ -34,9 +34,13 @@ BoardHash ChessBoardHash::hash(ChessBoard board) {
         auto boardSquare = board.get(file, rank);
         if (boardSquare.empty) continue;
         
-        int offset = boardSquare.color == WHITE ? 0 : PCOUNT;
-        int pieceIndex = boardSquare.piece + offset;
-        h = h xor zobristTable[square][pieceIndex];
+        h = h xor getPseudoNumber(square, boardSquare.color, boardSquare.piece);
     }
     return h;
+}
+
+uint64_t ChessBoardHash::getPseudoNumber(Square square, Color color, Piece piece) {
+    int offset = color == WHITE ? 0 : PCOUNT;
+    int pieceIndex = piece + offset;
+    return zobristTable[square][pieceIndex];
 }
