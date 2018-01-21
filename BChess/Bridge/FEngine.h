@@ -19,6 +19,7 @@ typedef void(^FEngineDidUpdateCallback)();
 @property (nonatomic, assign) int moveCount;
 @property (nonatomic, assign) BOOL async;
 @property (nonatomic, assign) BOOL useOpeningBook;
+@property (nonatomic, assign) BOOL positionalAnalysis;
 @property (nonatomic, assign) NSTimeInterval thinkingTime;
 
 @property (nonatomic, strong) FEngineDidUpdateCallback _Nullable updateCallback;

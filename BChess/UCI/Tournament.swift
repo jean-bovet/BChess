@@ -43,7 +43,7 @@ class PlayerChessEngine: Player {
     }
 
     func play(completion: @escaping Callback) {
-        engine.evaluate(2) { (info, completed) in
+        engine.evaluate(4) { (info, completed) in
             if completed {
                 self.engine.move(info.bestMove)
 //                if !info.mat {

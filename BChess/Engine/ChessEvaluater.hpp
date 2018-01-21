@@ -20,6 +20,8 @@ public:
     // the line of moves to the mat).
     static const int MAT_VALUE = 100000;
     
+    static bool positionalAnalysis;
+    
     static bool isQuiet(Move move);    
     static bool isDraw(ChessBoard board, HistoryPtr history);
 

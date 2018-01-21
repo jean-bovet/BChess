@@ -8,8 +8,11 @@
 
 import Foundation
 
-let uci = UCI()
-uci.performance()
+let tournament = TournamentEngine()
+tournament.go()
+
+//let uci = UCI()
+//uci.performance()
 //uci.run()
 
 

@@ -261,11 +261,13 @@
 }
 
 - (void)searchBestMove:(NSInteger)maxDepth callback:(FEngineSearchCallback)callback {
+    ChessEvaluater::positionalAnalysis = self.positionalAnalysis;
     ChessEvaluation info = iterativeSearch.search(currentGame.board, currentGame.history, (int)maxDepth, [self, callback](ChessEvaluation info) {
         if (!iterativeSearch.cancelled()) {
             callback([self infoFor:info], NO);
         }
     });
+    ChessEvaluater::positionalAnalysis = false;
     if (!iterativeSearch.cancelled()) {
         callback([self infoFor:info], YES);
     }

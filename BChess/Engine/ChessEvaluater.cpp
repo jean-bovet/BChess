@@ -15,6 +15,8 @@
 
 #include <iostream>
 
+bool ChessEvaluater::positionalAnalysis = false;
+
 // All these numbers are taken from https://chessprogramming.wikispaces.com/Simplified+evaluation+function
 static int PawnPositionBonus[64] = {
     0,  0,  0,  0,  0,  0,  0,  0,
@@ -193,11 +195,13 @@ int ChessEvaluater::evaluate(ChessBoard board, HistoryPtr history, ChessMoveList
     
     // Compute the piece action value (either attacked, defended or hanging) and mobility
     // See http://www.chessbin.com/post/Chess-Board-Evaluation
-//    auto moveList = ChessMoveGenerator::generateMoves(board, board.color, ChessMoveGenerator::Mode::moveCaptureAndDefenseMoves);
-//    auto opponentMoveList = ChessMoveGenerator::generateMoves(board, INVERSE(board.color), ChessMoveGenerator::Mode::moveCaptureAndDefenseMoves);
-
-//    value += evaluateAction(moveList) + evaluateAction(opponentMoveList);
-//    value += evaluateMobility(moveList) + evaluateMobility(opponentMoveList);
+    if (positionalAnalysis) {
+        auto moveList = ChessMoveGenerator::generateMoves(board, board.color, ChessMoveGenerator::Mode::moveCaptureAndDefenseMoves);
+        auto opponentMoveList = ChessMoveGenerator::generateMoves(board, INVERSE(board.color), ChessMoveGenerator::Mode::moveCaptureAndDefenseMoves);
+        
+        value += evaluateAction(moveList) + evaluateAction(opponentMoveList);
+        value += evaluateMobility(moveList) + evaluateMobility(opponentMoveList);
+    }
     
     return value;
 }
