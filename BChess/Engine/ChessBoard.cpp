@@ -375,10 +375,18 @@ Move ChessBoard::getMove(std::string from, std::string to) {
 }
 
 void ChessBoard::move(Color color, Piece piece, Square from, Square to) {
+    // Removes the piece from the square it comes from
     bb_clear(pieces[color][piece], from);
+    hash ^= ChessBoardHash::getPseudoNumber(from, color, piece);
+    
+    // Sets the piece to the square it arrives to
     bb_set(pieces[color][piece], to);
-    hash = hash ^ ChessBoardHash::getPseudoNumber(from, color, piece);
-    hash = hash ^ ChessBoardHash::getPseudoNumber(to, color, piece);
+    hash ^= ChessBoardHash::getPseudoNumber(to, color, piece);
+    
+    // Switch the side that is moving
+    hash = hash ^ ChessBoardHash::getWhiteTurn();
+
+    // Needs to re-compute the occupancy bitboard
     occupancyDirty = true;
 }
 

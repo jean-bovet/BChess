@@ -14,11 +14,13 @@ class TournamentEngine: TournamentDelegate {
     
     init() {
         let playerA = PlayerChessEngine(name: "Bob")
-        playerA.engine.positionalAnalysis = false
+//        playerA.engine.positionalAnalysis = false
+        playerA.engine.ttEnabled = false
 
         let playerB = PlayerChessEngine(name: "Alice")
-        playerB.engine.positionalAnalysis = true
-        
+//        playerB.engine.positionalAnalysis = true
+        playerB.engine.ttEnabled = false
+
         tournament = Tournament(playerA: playerA, playerB: playerB)
         tournament.delegate = self
     }

@@ -177,7 +177,8 @@ static void assertAlphaBeta(TestMinMaxSearch alphaBeta, TestTreeNode rootNode, i
     board.node = &rootNode;
     
     HistoryPtr history = NEW_HISTORY;
-    int eval = alphaBeta.alphabeta(board, history, 0, true, pv, bv);
+    TranspositionTable table;
+    int eval = alphaBeta.alphabeta(board, history, table, 0, true, pv, bv);
 //    std::cout << alphaBeta.visitedNodes << " => " << eval << std::endl;
     ASSERT_EQ(expectedValue, eval);
     ASSERT_EQ(expectedVisitedNodes, alphaBeta.visitedNodes);

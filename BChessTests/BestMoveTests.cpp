@@ -33,7 +33,8 @@ static void assertBestMove(std::string fen, std::string expectedFinalFEN, std::s
     ChessMinMaxSearch::Variation bv;
     
     HistoryPtr history = NEW_HISTORY;
-    search.alphabeta(board, history, 0, board.color == WHITE, pv, bv);
+    TranspositionTable table;
+    search.alphabeta(board, history, table, 0, board.color == WHITE, pv, bv);
     
 //    std::cout << pv.depth << "/" << pv.qsDepth << std::endl;
 //    std::cout << pv.moves.description() << std::endl;

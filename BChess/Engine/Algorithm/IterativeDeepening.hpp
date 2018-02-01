@@ -10,6 +10,7 @@
 
 #include "ChessEvaluation.hpp"
 #include "ChessEvaluater.hpp"
+#include "TranspositionTable.hpp"
 
 #include <chrono>
 using namespace std::chrono;
@@ -37,11 +38,12 @@ public:
 
 template<class Node, class MoveGenerator, class TMoveList, class Evaluater>
 class IterativeDeepening {
-    ChessMinMaxSearch minMaxSearch;
     
 public:
     typedef std::function<void(ChessEvaluation)> SearchCallback;
-    
+
+    ChessMinMaxSearch minMaxSearch;
+
     enum class Status {
         running,
         stopped,
@@ -68,18 +70,23 @@ public:
             minMaxSearch.reset();
             
             ChessMinMaxSearch::Variation pv;
-                        
-            int score = minMaxSearch.alphabeta(board, history, 0, board.color == WHITE, pv, bestVariation);
+            
+            TranspositionTable table;
+
+            int score = minMaxSearch.alphabeta(board, history, table, 0, board.color == WHITE, pv, bestVariation);
             
             moveClock.stop();
             
+//            int percentCollision = (float)table.collisionCount / table.storeCount * 100;
+//            std::cout << "Entry count = " << table.storeCount << ", collision = " << table.collisionCount << " (" << percentCollision << "%)" << ", new = " << table.newStoreCount << std::endl;
+
             double movesPerSingleMs = minMaxSearch.visitedNodes / moveClock.elapsedMilli();
             int movesPerSecond = int(movesPerSingleMs * 1e3);
             
             if (status == Status::cancelled) {
                 break;
-                
             }
+            
             if (running()) {
                 bestVariation = pv;
                 

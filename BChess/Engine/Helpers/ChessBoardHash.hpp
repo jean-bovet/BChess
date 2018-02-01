@@ -19,4 +19,5 @@ public:
     
     static uint64_t getPseudoNumber(Square square, Color color, Piece piece);
     
+    static uint64_t getWhiteTurn();
 };

@@ -14,6 +14,7 @@
 #include <iostream>
 
 #include "MinMaxMoveList.hpp"
+#include "TranspositionTable.hpp"
 
 struct Configuration {
     int maxDepth = 4;
@@ -21,6 +22,7 @@ struct Configuration {
     bool alphaBetaPrunning = true;
     bool quiescenceSearch = true;
     bool sortMoves = true;
+    bool transpositionTable = true;
 };
 
 template <class TMoveList, class TMove>
@@ -66,11 +68,11 @@ public:
     
     // pv: Principal Variation that will be available when this method returns.
     // bv: Best Variation that is provided from an earlier search (typically by the iterative deepening algorithm).
-    int alphabeta(TNode node, HistoryPtr history, int depth, bool maximizingPlayer, Variation &pv, Variation &bv) {
+    int alphabeta(TNode node, HistoryPtr history, TranspositionTable &table, int depth, bool maximizingPlayer, Variation &pv, Variation &bv) {
         analyzing = true;
         Variation currentLine;
         int color = maximizingPlayer ? 1 : -1;
-        int score = alphabeta(node, history, depth, -INT_MAX, INT_MAX, color, pv, currentLine, bv);
+        int score = alphabeta(node, history, table, depth, -INT_MAX, INT_MAX, color, pv, currentLine, bv);
         return score * color;
     }
     
@@ -81,10 +83,40 @@ private:
     // bv: Best Variation - if available
     // https://en.wikipedia.org/wiki/Negamax
     // https://chessprogramming.wikispaces.com/Principal+variation
-    int alphabeta(TNode node, HistoryPtr history, int depth, int alpha, int beta, int color, Variation &pv, Variation &cv, Variation &bv) {
+    int alphabeta(TNode node, HistoryPtr history, TranspositionTable &table, int depth, int alpha, int beta, int color, Variation &pv, Variation &cv, Variation &bv) {
         pv.depth = depth;
 
+        int evalDepth = config.maxDepth - depth;
+        
+        // Check if we have the same node already in our transposition table.
+        if (config.transpositionTable && table.exists(node.getHash())) {
+            auto entry = table.get(node.getHash());
+            
+            // Make sure the entry exists and that its depth is at least what we are at right now
+            if (entry.depth >= evalDepth) {
+                switch (entry.type) {
+                    case TranspositionEntryType::EXACT:
+                        // Exact value: use it right away
+                        return entry.value;
+                        
+                    case TranspositionEntryType::ALPHA:
+                        //
+                        if (entry.value <= alpha) {
+                            return entry.value;
+                        }
+                        break;
+                        
+                    case TranspositionEntryType::BETA:
+                        if (entry.value >= beta) {
+                            return entry.value;
+                        }
+                        break;
+                }
+            }
+        }
+
         if (TNodeEvaluater::isDraw(node, history)) {
+            table.store(evalDepth, node.getHash(), 0, TranspositionEntryType::EXACT);
             return 0;
         }
 
@@ -112,6 +144,8 @@ private:
         auto bestMove = bv.moves.lookup(depth);
 
         int bestValue = -INT_MAX;
+        TranspositionEntryType entryType = TranspositionEntryType::ALPHA;
+        
         for (int index=-1; index<moves.count && analyzing; index++) {
             TMove move = TMove();
             if (index == -1) {
@@ -144,7 +178,7 @@ private:
             
             Variation line;
             Variation bestLine = (move == bestMove) ? bv : Variation();
-            int score = -alphabeta(newNode, history, depth + 1, -beta, -alpha, -color, line, cv, bestLine);
+            int score = -alphabeta(newNode, history, table, depth + 1, -beta, -alpha, -color, line, cv, bestLine);
             
             cv.moves.pop();
             history->pop_back();
@@ -153,13 +187,21 @@ private:
                 bestValue = score;
             
                 pv.push(score, move, line);
-            }
-            
-            alpha = std::max(alpha, score);
-            if (config.alphaBetaPrunning && beta <= alpha) {
-                break; // Beta cut-off
+                
+                if (score > alpha) {
+                    alpha = score;
+                    entryType = TranspositionEntryType::EXACT;
+                }
+                
+                if (config.alphaBetaPrunning && beta <= alpha) {
+                    entryType = TranspositionEntryType::BETA;
+                    break; // Beta cut-off
+                }
             }
         }
+
+        table.store(evalDepth, node.getHash(), bestValue, entryType);
+
         return bestValue;
     }
     

@@ -200,6 +200,7 @@
 		A7C92AB31FF86BF200160D2E /* FEngineMove.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = FEngineMove.mm; sourceTree = "<group>"; };
 		A7C92AB71FF86F6800160D2E /* FEngineUtility.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FEngineUtility.h; sourceTree = "<group>"; };
 		A7C92AB81FF86F6800160D2E /* FEngineUtility.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = FEngineUtility.mm; sourceTree = "<group>"; };
+		A7CEB0F320154597002AFDF7 /* TranspositionTable.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = TranspositionTable.hpp; sourceTree = "<group>"; };
 		A7E3B6881FF6C85500DBB66B /* OpeningsTests.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = OpeningsTests.cpp; sourceTree = "<group>"; };
 		A7E490E41FEA1C0600970EAD /* SearchChessTests.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SearchChessTests.cpp; sourceTree = "<group>"; };
 		A7E490E51FEA1C0600970EAD /* SearchSyntheticTests.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SearchSyntheticTests.cpp; sourceTree = "<group>"; };
@@ -352,6 +353,7 @@
 		A765D8621FF6C1B30045BB36 /* Algorithm */ = {
 			isa = PBXGroup;
 			children = (
+				A7CEB0F320154597002AFDF7 /* TranspositionTable.hpp */,
 				A75CB2611FED9693005487BD /* IterativeDeepening.hpp */,
 				A7EF55CB1FF22FE7004CF2DA /* MinMaxMoveList.hpp */,
 				A75BFAC61FE8C05E001EE942 /* MinMaxSearch.hpp */,

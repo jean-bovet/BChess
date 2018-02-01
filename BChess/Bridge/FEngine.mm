@@ -44,6 +44,7 @@
 - (id)init {
     if (self = [super init]) {
         _async = YES;
+        _ttEnabled = YES;
         _thinkingTime = 5;
         _stateIndex = 0;
     }
@@ -262,6 +263,7 @@
 
 - (void)searchBestMove:(NSInteger)maxDepth callback:(FEngineSearchCallback)callback {
     ChessEvaluater::positionalAnalysis = self.positionalAnalysis;
+    iterativeSearch.minMaxSearch.config.transpositionTable = self.ttEnabled;
     ChessEvaluation info = iterativeSearch.search(currentGame.board, currentGame.history, (int)maxDepth, [self, callback](ChessEvaluation info) {
         if (!iterativeSearch.cancelled()) {
             callback([self infoFor:info], NO);

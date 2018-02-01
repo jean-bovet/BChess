@@ -33,7 +33,8 @@ static void assertChessSearch(int expectedVisitedNodes, int expectedValue, Confi
     ASSERT_EQ(0, alphaBeta.visitedNodes);
     
     HistoryPtr history = NEW_HISTORY;
-    int score = alphaBeta.alphabeta(rootBoard, history, 0, rootBoard.color == WHITE, pv, bv);
+    TranspositionTable table;
+    int score = alphaBeta.alphabeta(rootBoard, history, table, 0, rootBoard.color == WHITE, pv, bv);
 //    std::cout << alphaBeta.visitedNodes << " => " << score << " " << pv.moves.description() << std::endl;
     ASSERT_EQ(expectedVisitedNodes, alphaBeta.visitedNodes); // n initial moves + 1 for the root node
     ASSERT_EQ(expectedValue, score);
