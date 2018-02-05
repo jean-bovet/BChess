@@ -16,6 +16,10 @@
 #include "MinMaxMoveList.hpp"
 #include "TranspositionTable.hpp"
 
+#ifdef ASSERT_TT_KEY_COLLISION
+#include "FFEN.hpp"
+#endif
+
 struct Configuration {
     int maxDepth = 4;
     bool debugLog = false;
@@ -89,7 +93,12 @@ private:
         int evalDepth = config.maxDepth - depth;
         
         // Check if we have the same node already in our transposition table.
-        if (config.transpositionTable && table.exists(node.getHash())) {
+        if (config.transpositionTable &&
+            table.exists(node.getHash()
+#ifdef ASSERT_TT_KEY_COLLISION
+                         , FFEN::getFEN(node, true)
+#endif
+                         )) {
             auto entry = table.get(node.getHash());
             
             // Make sure the entry exists and that its depth is at least what we are at right now
@@ -97,17 +106,22 @@ private:
                 switch (entry.type) {
                     case TranspositionEntryType::EXACT:
                         // Exact value: use it right away
+                        assert(TMoveGenerator::isValid(entry.bestMove));
+                        pv.push(entry.value, entry.bestMove, Variation());
                         return entry.value;
                         
                     case TranspositionEntryType::ALPHA:
-                        //
                         if (entry.value <= alpha) {
+                            assert(TMoveGenerator::isValid(entry.bestMove));
+                            pv.push(entry.value, entry.bestMove, Variation());
                             return entry.value;
                         }
                         break;
                         
                     case TranspositionEntryType::BETA:
                         if (entry.value >= beta) {
+                            assert(TMoveGenerator::isValid(entry.bestMove));
+                            pv.push(entry.value, entry.bestMove, Variation());
                             return entry.value;
                         }
                         break;
@@ -116,7 +130,6 @@ private:
         }
 
         if (TNodeEvaluater::isDraw(node, history)) {
-            table.store(evalDepth, node.getHash(), 0, TranspositionEntryType::EXACT);
             return 0;
         }
 
@@ -141,19 +154,20 @@ private:
         }
         
         // Lookup the best move if available in the best variation
-        auto bestMove = bv.moves.lookup(depth);
+        auto bestMovePV = bv.moves.lookup(depth);
 
         int bestValue = -INT_MAX;
         TranspositionEntryType entryType = TranspositionEntryType::ALPHA;
         
+        TMove bestMove = TMove();
         for (int index=-1; index<moves.count && analyzing; index++) {
             TMove move = TMove();
             if (index == -1) {
                 // At index -1 we try to evaluate the previously detected
                 // best move, if available.
-                if (TMoveGenerator::isValid(bestMove)) {
+                if (TMoveGenerator::isValid(bestMovePV)) {
                     // Analyze the best move first
-                    move = bestMove;
+                    move = bestMovePV;
                 } else {
                     // Let's skip this best move and start with the generated moves
                     continue;
@@ -163,7 +177,7 @@ private:
                 move = moves.moves[index];
                 
                 // Skip this move if it is the best move (which has been analyzed first)
-                if (move == bestMove) {
+                if (move == bestMovePV) {
                     continue;
                 }
             }
@@ -177,7 +191,7 @@ private:
             history->push_back(newNode.getHash());
             
             Variation line;
-            Variation bestLine = (move == bestMove) ? bv : Variation();
+            Variation bestLine = (move == bestMovePV) ? bv : Variation();
             int score = -alphabeta(newNode, history, table, depth + 1, -beta, -alpha, -color, line, cv, bestLine);
             
             cv.moves.pop();
@@ -185,7 +199,8 @@ private:
             
             if (score > bestValue) {
                 bestValue = score;
-            
+                bestMove = move;
+                
                 pv.push(score, move, line);
                 
                 if (score > alpha) {
@@ -200,7 +215,13 @@ private:
             }
         }
 
-        table.store(evalDepth, node.getHash(), bestValue, entryType);
+        if (TMoveGenerator::isValid(bestMove)) {
+            table.store(evalDepth, node.getHash(), bestValue, bestMove, entryType
+#ifdef ASSERT_TT_KEY_COLLISION
+                        , FFEN::getFEN(node, true)
+#endif
+                        );
+        }
 
         return bestValue;
     }

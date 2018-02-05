@@ -20,7 +20,7 @@ public:
     }
 };
 
-static void assertBestMove(std::string fen, std::string expectedFinalFEN, std::string expectedLine, Configuration config) {
+static void assertBestMove(std::string fen, std::string expectedFinalFEN, std::string expectedLine, Configuration config, TranspositionTable &table) {
     ChessBoard board;
     ASSERT_TRUE(FFEN::setFEN(fen, board));
     std::string boardFEN = FFEN::getFEN(board);
@@ -33,7 +33,6 @@ static void assertBestMove(std::string fen, std::string expectedFinalFEN, std::s
     ChessMinMaxSearch::Variation bv;
     
     HistoryPtr history = NEW_HISTORY;
-    TranspositionTable table;
     search.alphabeta(board, history, table, 0, board.color == WHITE, pv, bv);
     
 //    std::cout << pv.depth << "/" << pv.qsDepth << std::endl;
@@ -54,6 +53,11 @@ static void assertBestMove(std::string fen, std::string expectedFinalFEN, std::s
     }
     auto finalBoardFEN = FFEN::getFEN(finalBoard);
     ASSERT_STREQ(expectedFinalFEN.c_str(), finalBoardFEN.c_str());
+}
+
+static void assertBestMove(std::string fen, std::string expectedFinalFEN, std::string expectedLine, Configuration config) {
+    TranspositionTable table;
+    assertBestMove(fen, expectedFinalFEN, expectedLine, config, table);
 }
 
 static void assertBestMove(std::string fen, std::string expectedFinalFEN, std::string expectedLine) {
@@ -134,3 +138,16 @@ TEST_F(BestMoveTests, WhiteThreatenMate) {
     assertBestMove(start, end, "Rd8d7 Rf1e1 Qb6d6 Qf4xd6 Rd7xd6");
 }
 
+TEST_F(BestMoveTests, WithAndWithoutTT) {
+    std::string start = "rnbqkb1r/ppp1pppp/5n2/3p4/3P4/5N2/PPP1PPPP/RNBQKB1R w KQkq - 0 3";
+    std::string end = "rnbqkb1r/ppp1pppp/5n2/3p4/3P4/2N2N2/PPP1PPPP/R1BQKB1R b KQkq - 1 3";
+    Configuration config;
+    config.maxDepth = 5;
+    config.transpositionTable = false;
+    assertBestMove(start, end, "Nb1c3 Nb8d7 Qd1d3 e7e6 e2e4 d5xe4 Nc3xe4 Nf6xe4 Qd3xe4", config);
+    
+    config.transpositionTable = true;
+    TranspositionTable table;
+    assertBestMove(start, end, "Nb1c3 Nb8d7 e2e3 a7a6 Bf1d3", config, table);
+//    assertBestMove(start, end, "Nb1c3", config, table);
+}

@@ -30,7 +30,6 @@ class PlayerChessEngine: Player {
 
     init(name: String) {
         self.name = name
-        engine.async = false
     }
     
     var state: String {
@@ -43,14 +42,10 @@ class PlayerChessEngine: Player {
     }
 
     func play(completion: @escaping Callback) {
-        // TODO: do engine thinking time
-//        engine.thinkingTime = 10;
-        engine.evaluate(5) { (info, completed) in
+        engine.evaluate { (info, completed) in
             if completed {
+                print("\(self.name): \(info.uciInfoMessage)")
                 self.engine.move(info.bestMove)
-//                if !info.mat {
-//                    self.engine.move(info.bestMove)
-//                }
                 completion()
             }
         }

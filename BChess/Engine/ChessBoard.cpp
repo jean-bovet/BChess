@@ -218,6 +218,9 @@ void ChessBoard::reset() {
     enPassant = 0;
     halfMoveClock = 0;
     fullMoveCount = 1;
+    
+    // Make sure to start with the hash representation of the initial board
+    hash = getHash();
 }
 
 void ChessBoard::move(Move move) {
@@ -271,6 +274,10 @@ void ChessBoard::move(Move move) {
     if (promotionPiece > PAWN) {
         bb_clear(pieces[color][movePiece], to);
         bb_set(pieces[color][promotionPiece], to);
+        
+        // Update the hash
+        hash ^= ChessBoardHash::getPseudoNumber(to, color, movePiece); // Remove the piece that is going to be promoted
+        hash ^= ChessBoardHash::getPseudoNumber(to, color, promotionPiece); // Set the promoted piece
     }
     
     // First detect if the move is the "en-passant" move
@@ -285,11 +292,9 @@ void ChessBoard::move(Move move) {
         }
         
         bb_clear(pieces[otherColor][PAWN], enPassantSquare);
-        bb_clear(pieces[otherColor][KNIGHT], enPassantSquare);
-        bb_clear(pieces[otherColor][BISHOP], enPassantSquare);
-        bb_clear(pieces[otherColor][ROOK], enPassantSquare);
-        bb_clear(pieces[otherColor][QUEEN], enPassantSquare);
-        bb_clear(pieces[otherColor][KING], enPassantSquare);
+        
+        // Update the hash by removing the pawn being captured by the "en-passant" move
+        hash ^= ChessBoardHash::getPseudoNumber(enPassantSquare, otherColor, PAWN);
     }
     
     // Detect if a pawn moves two squares in order to enable
@@ -314,23 +319,20 @@ void ChessBoard::move(Move move) {
         }
     }
     
-    auto otherColor = INVERSE(moveColor);
-    bb_clear(pieces[otherColor][PAWN], to);
-    bb_clear(pieces[otherColor][KNIGHT], to);
-    bb_clear(pieces[otherColor][BISHOP], to);
-    bb_clear(pieces[otherColor][ROOK], to);
-    bb_clear(pieces[otherColor][QUEEN], to);
-    bb_clear(pieces[otherColor][KING], to);
-
     if (MOVE_IS_CAPTURE(move)) {
         halfMoveClock = 0; // reset halfmove clock if capture is done
         
         auto otherColor = INVERSE(moveColor);
         auto capturedPiece = MOVE_CAPTURED_PIECE(move);
         bb_clear(pieces[otherColor][capturedPiece], to);
+        
+        // Update the hash by removing the piece being captured
+        hash ^= ChessBoardHash::getPseudoNumber(to, otherColor, capturedPiece);
     }
 
+    // Switch the side that is moving
     color = INVERSE(color);
+    hash = hash ^ ChessBoardHash::getWhiteTurn();
 }
 
 void ChessBoard::undo_move(Move move) {
@@ -383,9 +385,6 @@ void ChessBoard::move(Color color, Piece piece, Square from, Square to) {
     bb_set(pieces[color][piece], to);
     hash ^= ChessBoardHash::getPseudoNumber(to, color, piece);
     
-    // Switch the side that is moving
-    hash = hash ^ ChessBoardHash::getWhiteTurn();
-
     // Needs to re-compute the occupancy bitboard
     occupancyDirty = true;
 }

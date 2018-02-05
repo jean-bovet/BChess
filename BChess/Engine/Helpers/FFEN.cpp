@@ -85,7 +85,7 @@ struct Coordinate {
     File file = 0;
 };
 
-std::string FFEN::getFEN(ChessBoard board) {
+std::string FFEN::getFEN(ChessBoard board, bool hash) {
     // "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
     std::string fen = "";
     for (Rank rank=8; rank>0; rank--) {
@@ -117,6 +117,10 @@ std::string FFEN::getFEN(ChessBoard board) {
         fen += " w";
     } else {
         fen += " b";
+    }
+    
+    if (hash) {
+        return fen;
     }
     
     // Castling availability

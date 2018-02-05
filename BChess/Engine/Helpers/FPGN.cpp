@@ -217,6 +217,8 @@ static std::vector<Move> getMatchingMoves(ChessBoard board, Square to, Piece mov
 }
 
 static bool IsCastlingKingSide(Move move) {
+    if (!MOVE_IS_CASTLING(move)) return false;
+    
     if (MOVE_COLOR(move) == WHITE) {
         return MOVE_FROM(move) == e1 && MOVE_TO(move) == g1;
     } else {
@@ -225,6 +227,8 @@ static bool IsCastlingKingSide(Move move) {
 }
 
 static bool IsCastlingQueenSide(Move move) {
+    if (!MOVE_IS_CASTLING(move)) return false;
+
     if (MOVE_COLOR(move) == WHITE) {
         return MOVE_FROM(move) == e1 && MOVE_TO(move) == c1;
     } else {

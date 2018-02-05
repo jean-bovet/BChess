@@ -44,6 +44,8 @@ public:
 
     ChessMinMaxSearch minMaxSearch;
 
+    TranspositionTable table;
+
     enum class Status {
         running,
         stopped,
@@ -71,8 +73,6 @@ public:
             
             ChessMinMaxSearch::Variation pv;
             
-            TranspositionTable table;
-
             int score = minMaxSearch.alphabeta(board, history, table, 0, board.color == WHITE, pv, bestVariation);
             
             moveClock.stop();

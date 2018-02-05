@@ -87,7 +87,6 @@
 		A7EBE7CF1FF6C93600ACDF85 /* ChessOpenings.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A765D85F1FF6C1950045BB36 /* ChessOpenings.cpp */; };
 		A7EF55C81FF191B1004CF2DA /* SearchChessTests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A7E490E41FEA1C0600970EAD /* SearchChessTests.cpp */; };
 		A7EF55C91FF1CF77004CF2DA /* BestMoveTests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A70A61BD1FD3196400AFDF0E /* BestMoveTests.cpp */; };
-		A7EF55CA1FF1D8C2004CF2DA /* SearchSyntheticTests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A7E490E51FEA1C0600970EAD /* SearchSyntheticTests.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -691,7 +690,6 @@
 				A70A61D51FD4D42100AFDF0E /* FEngineInfo.mm in Sources */,
 				A7E490F21FEA2E7E00970EAD /* GoogleTests.mm in Sources */,
 				A7EF55C91FF1CF77004CF2DA /* BestMoveTests.cpp in Sources */,
-				A7EF55CA1FF1D8C2004CF2DA /* SearchSyntheticTests.cpp in Sources */,
 				A7C92AAD1FF6F19D00160D2E /* OpeningTests.swift in Sources */,
 				A70A61DB1FD4D49500AFDF0E /* ChessEvaluater.cpp in Sources */,
 				A75CB25F1FED8F9E005487BD /* CheckTests.cpp in Sources */,

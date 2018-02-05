@@ -15,7 +15,7 @@ static const char * StartFEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQ
 
 class FFEN {
 public:
-    static std::string getFEN(ChessBoard board);
+    static std::string getFEN(ChessBoard board, bool hash = false);
     static bool setFEN(std::string fen, ChessBoard &board);
 };
 

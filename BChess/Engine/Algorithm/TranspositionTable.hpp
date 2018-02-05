@@ -9,6 +9,7 @@
 #pragma once
 
 #include "Types.hpp"
+#include "FMove.hpp"
 
 #define TRANSPO_SIZE (size_t)(18*1000*1000)
 
@@ -33,7 +34,11 @@ struct TranspositionEntry {
     int depth;
     BoardHash hash;
     int value;
+    Move bestMove;
     TranspositionEntryType type;
+#ifdef ASSERT_TT_KEY_COLLISION
+    std::string shortFEN;
+#endif
 };
 
 class TranspositionTable {
@@ -55,7 +60,11 @@ public:
         free(table);
     }
     
-    void store(int depth, BoardHash hash, int value, TranspositionEntryType type) {
+    void store(int depth, BoardHash hash, int value, Move bestMove, TranspositionEntryType type
+#ifdef ASSERT_TT_KEY_COLLISION
+               , std::string shortFEN
+#endif
+               ) {
         unsigned long index = hash % TRANSPO_SIZE;
         storeCount++;
         if (depth >= table[index].depth) {
@@ -72,7 +81,11 @@ public:
             table[index].depth = depth;
             table[index].hash = hash;
             table[index].value = value;
+            table[index].bestMove = bestMove;
             table[index].type = type;
+#ifdef ASSERT_TT_KEY_COLLISION
+            table[index].shortFEN = shortFEN;
+#endif
         }
     }
     
@@ -81,8 +94,19 @@ public:
         return table[index];
     }
     
-    bool exists(BoardHash hash) {
+    bool exists(BoardHash hash
+#ifdef ASSERT_TT_KEY_COLLISION
+                std::string shortFEN
+#endif
+                ) {
         int index = hash % TRANSPO_SIZE;
-        return table[index].hash == hash;
+        if (table[index].hash == hash) {
+#ifdef ASSERT_TT_KEY_COLLISION
+            assert(table[index].shortFEN != shortFEN);
+#endif
+            return true;
+        } else {
+            return false;
+        }
     }
 };

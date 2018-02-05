@@ -45,6 +45,7 @@
     if (self = [super init]) {
         _async = YES;
         _ttEnabled = YES;
+        _searchDepth = INT_MAX;
         _thinkingTime = 5;
         _stateIndex = 0;
     }
@@ -201,7 +202,7 @@
 }
 
 - (void)evaluate:(FEngineSearchCallback _Nonnull)callback {
-    [self evaluate:INT_MAX time:self.thinkingTime callback:callback];
+    [self evaluate:self.searchDepth time:self.thinkingTime callback:callback];
 }
 
 - (void)evaluate:(NSInteger)depth callback:(FEngineSearchCallback)callback {
