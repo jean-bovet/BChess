@@ -67,12 +67,12 @@
 		A77372031FE334BB0001A90F /* FPGN.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A77371FF1FE320010001A90F /* FPGN.cpp */; };
 		A77372051FE443D70001A90F /* FPGN.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A77371FF1FE320010001A90F /* FPGN.cpp */; };
 		A77372061FE443DA0001A90F /* ChessGame.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A77371FC1FE31FEF0001A90F /* ChessGame.cpp */; };
+		A78E754C202C080E00445360 /* MovesTests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A78E754B202C080E00445360 /* MovesTests.cpp */; };
+		A78E7551202C110200445360 /* UnitTestHelper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A78E754F202C110200445360 /* UnitTestHelper.cpp */; };
 		A7AFCCAA1FB4E40D00AE3D85 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7AFCCA91FB4E40D00AE3D85 /* main.swift */; };
-		A7B18F581FD9BAE500A605B8 /* MovesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7B18F571FD9BAE500A605B8 /* MovesTests.swift */; };
 		A7C92AA81FF6D74400160D2E /* ChessOpenings.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A765D85F1FF6C1950045BB36 /* ChessOpenings.cpp */; };
 		A7C92AAA1FF6EE5500160D2E /* Openings.pgn in Resources */ = {isa = PBXBuildFile; fileRef = A7C92AA91FF6EE5500160D2E /* Openings.pgn */; };
 		A7C92AAB1FF6F19100160D2E /* Openings.pgn in Resources */ = {isa = PBXBuildFile; fileRef = A7C92AA91FF6EE5500160D2E /* Openings.pgn */; };
-		A7C92AAD1FF6F19D00160D2E /* OpeningTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7C92AAC1FF6F19D00160D2E /* OpeningTests.swift */; };
 		A7C92AB41FF86BF200160D2E /* FEngineMove.mm in Sources */ = {isa = PBXBuildFile; fileRef = A7C92AB31FF86BF200160D2E /* FEngineMove.mm */; };
 		A7C92AB51FF86C4300160D2E /* FEngineMove.mm in Sources */ = {isa = PBXBuildFile; fileRef = A7C92AB31FF86BF200160D2E /* FEngineMove.mm */; };
 		A7C92AB61FF86C4300160D2E /* FEngineMove.mm in Sources */ = {isa = PBXBuildFile; fileRef = A7C92AB31FF86BF200160D2E /* FEngineMove.mm */; };
@@ -189,12 +189,13 @@
 		A77371FF1FE320010001A90F /* FPGN.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = FPGN.cpp; sourceTree = "<group>"; };
 		A77372001FE320010001A90F /* FPGN.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = FPGN.hpp; sourceTree = "<group>"; };
 		A77372041FE340780001A90F /* PGNTests.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PGNTests.cpp; sourceTree = "<group>"; };
+		A78E754B202C080E00445360 /* MovesTests.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MovesTests.cpp; sourceTree = "<group>"; };
+		A78E754F202C110200445360 /* UnitTestHelper.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = UnitTestHelper.cpp; sourceTree = "<group>"; };
+		A78E7550202C110200445360 /* UnitTestHelper.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = UnitTestHelper.hpp; sourceTree = "<group>"; };
 		A7AFCCA61FB4E40D00AE3D85 /* BChess */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = BChess; sourceTree = BUILT_PRODUCTS_DIR; };
 		A7AFCCA91FB4E40D00AE3D85 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
-		A7B18F571FD9BAE500A605B8 /* MovesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MovesTests.swift; sourceTree = "<group>"; };
 		A7B1B0F41FF2D97300EAF157 /* FEngineInfo+Private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "FEngineInfo+Private.h"; sourceTree = "<group>"; };
 		A7C92AA91FF6EE5500160D2E /* Openings.pgn */ = {isa = PBXFileReference; lastKnownFileType = text; path = Openings.pgn; sourceTree = "<group>"; };
-		A7C92AAC1FF6F19D00160D2E /* OpeningTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpeningTests.swift; sourceTree = "<group>"; };
 		A7C92AB21FF86BF200160D2E /* FEngineMove.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FEngineMove.h; sourceTree = "<group>"; };
 		A7C92AB31FF86BF200160D2E /* FEngineMove.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = FEngineMove.mm; sourceTree = "<group>"; };
 		A7C92AB71FF86F6800160D2E /* FEngineUtility.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FEngineUtility.h; sourceTree = "<group>"; };
@@ -202,7 +203,6 @@
 		A7CEB0F320154597002AFDF7 /* TranspositionTable.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = TranspositionTable.hpp; sourceTree = "<group>"; };
 		A7E3B6881FF6C85500DBB66B /* OpeningsTests.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = OpeningsTests.cpp; sourceTree = "<group>"; };
 		A7E490E41FEA1C0600970EAD /* SearchChessTests.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SearchChessTests.cpp; sourceTree = "<group>"; };
-		A7E490E51FEA1C0600970EAD /* SearchSyntheticTests.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SearchSyntheticTests.cpp; sourceTree = "<group>"; };
 		A7E490EA1FEA207100970EAD /* gtest-all.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "gtest-all.cc"; path = "BChessTests/Helper/gtest-all.cc"; sourceTree = SOURCE_ROOT; };
 		A7E490F11FEA2E7E00970EAD /* GoogleTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = GoogleTests.mm; sourceTree = "<group>"; };
 		A7EF55C71FEF17A1004CF2DA /* ChessEngine.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = ChessEngine.hpp; sourceTree = "<group>"; };
@@ -364,9 +364,8 @@
 			isa = PBXGroup;
 			children = (
 				A7712D321FC8957500E7E802 /* GamesTests.swift */,
-				A7B18F571FD9BAE500A605B8 /* MovesTests.swift */,
-				A7C92AAC1FF6F19D00160D2E /* OpeningTests.swift */,
 				A72E2B56200496CC006CBB1C /* BoardHashTests.cpp */,
+				A78E754B202C080E00445360 /* MovesTests.cpp */,
 				A75CB25A1FED8F2B005487BD /* MoveTests.cpp */,
 				A75CB25C1FED8F82005487BD /* EvaluationTests.cpp */,
 				A75CB25E1FED8F9E005487BD /* CheckTests.cpp */,
@@ -374,7 +373,6 @@
 				A7E3B6881FF6C85500DBB66B /* OpeningsTests.cpp */,
 				A77372041FE340780001A90F /* PGNTests.cpp */,
 				A7E490E41FEA1C0600970EAD /* SearchChessTests.cpp */,
-				A7E490E51FEA1C0600970EAD /* SearchSyntheticTests.cpp */,
 				A7E490F01FEA2E6F00970EAD /* Helper */,
 				A7712D181FB916E900E7E802 /* Info.plist */,
 			);
@@ -432,6 +430,8 @@
 		A7E490F01FEA2E6F00970EAD /* Helper */ = {
 			isa = PBXGroup;
 			children = (
+				A78E7550202C110200445360 /* UnitTestHelper.hpp */,
+				A78E754F202C110200445360 /* UnitTestHelper.cpp */,
 				A7E490F11FEA2E7E00970EAD /* GoogleTests.mm */,
 				A7E490EA1FEA207100970EAD /* gtest-all.cc */,
 			);
@@ -674,9 +674,11 @@
 			files = (
 				A746C245200148ED001F4437 /* ChessBoardHash.cpp in Sources */,
 				A75CB25B1FED8F2C005487BD /* MoveTests.cpp in Sources */,
+				A78E7551202C110200445360 /* UnitTestHelper.cpp in Sources */,
 				A70A61DD1FD4D49500AFDF0E /* FFEN.cpp in Sources */,
 				A7EBE7CF1FF6C93600ACDF85 /* ChessOpenings.cpp in Sources */,
 				A746C24D2001A2FD001F4437 /* GameHistory.cpp in Sources */,
+				A78E754C202C080E00445360 /* MovesTests.cpp in Sources */,
 				A7712D341FC895D100E7E802 /* UCI.swift in Sources */,
 				A70A61DA1FD4D49500AFDF0E /* ChessBoard.cpp in Sources */,
 				A75CB25D1FED8F82005487BD /* EvaluationTests.cpp in Sources */,
@@ -690,14 +692,12 @@
 				A70A61D51FD4D42100AFDF0E /* FEngineInfo.mm in Sources */,
 				A7E490F21FEA2E7E00970EAD /* GoogleTests.mm in Sources */,
 				A7EF55C91FF1CF77004CF2DA /* BestMoveTests.cpp in Sources */,
-				A7C92AAD1FF6F19D00160D2E /* OpeningTests.swift in Sources */,
 				A70A61DB1FD4D49500AFDF0E /* ChessEvaluater.cpp in Sources */,
 				A75CB25F1FED8F9E005487BD /* CheckTests.cpp in Sources */,
 				A7E490EB1FEA207100970EAD /* gtest-all.cc in Sources */,
 				A7C92ABB1FF8712800160D2E /* FEngineUtility.mm in Sources */,
 				A7EF55C81FF191B1004CF2DA /* SearchChessTests.cpp in Sources */,
 				A77372021FE334BB0001A90F /* ChessGame.cpp in Sources */,
-				A7B18F581FD9BAE500A605B8 /* MovesTests.swift in Sources */,
 				A70A61D81FD4D49500AFDF0E /* ChessMoveList.cpp in Sources */,
 				A72E2B57200496CD006CBB1C /* BoardHashTests.cpp in Sources */,
 				A70A61D91FD4D49500AFDF0E /* ChessMoveGenerator.cpp in Sources */,

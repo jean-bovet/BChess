@@ -26,6 +26,8 @@
 #import <gtest/gtest.h>
 #import <objc/runtime.h>
 
+#import "UnitTestHelper.hpp"
+
 using testing::TestCase;
 using testing::TestInfo;
 using testing::TestPartResult;
@@ -176,6 +178,7 @@ static bool loaded = false;
     [[NSNotificationCenter defaultCenter] addObserverForName:NSBundleDidLoadNotification object:bundle queue:nil usingBlock:^(NSNotification *notification) {
         if (!loaded) {
             loaded = true;
+            UnitTestHelper::pathToResources = std::string([[bundle resourcePath] cStringUsingEncoding:NSASCIIStringEncoding]);
             [self registerTestClasses];
         }
 //        if ([notification.userInfo[@"NSLoadedClasses"] count] > 0) {

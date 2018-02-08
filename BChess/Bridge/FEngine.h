@@ -29,7 +29,6 @@ typedef void(^FEngineDidUpdateCallback)();
 - (id _Nonnull)init;
 
 - (BOOL)loadOpening:(NSString* _Nonnull)pgn;
-- (NSDictionary<NSString*, id>* _Nullable)openingFor:(NSString * _Nonnull)moves;
 
 - (BOOL)setFEN:(NSString* _Nonnull)FEN;
 - (NSString* _Nonnull)FEN;
@@ -71,8 +70,6 @@ typedef void(^FEngineDidUpdateCallback)();
 - (void)evaluate:(FEngineSearchCallback _Nonnull)callback;
 - (void)evaluate:(NSInteger)depth callback:(FEngineSearchCallback _Nonnull)callback;
 - (void)evaluate:(NSInteger)depth time:(NSTimeInterval)time callback:(FEngineSearchCallback _Nonnull)callback;
-
-- (NSArray<NSString*>* _Nonnull)moveFENsFrom:(NSString* _Nonnull)startingFEN squareName:(NSString* _Nullable)squareName;
 
 - (void)debugEvaluate;
 

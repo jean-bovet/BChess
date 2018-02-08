@@ -17,13 +17,13 @@ class TournamentEngine: TournamentDelegate {
 //        playerA.engine.positionalAnalysis = false
         playerA.engine.ttEnabled = true
 //        playerA.engine.searchDepth = 5
-        playerA.engine.thinkingTime = 3
+        playerA.engine.thinkingTime = 4
 
         let playerB = PlayerChessEngine(name: "Alice")
 //        playerB.engine.positionalAnalysis = true
         playerB.engine.ttEnabled = false
 //        playerB.engine.searchDepth = 5
-        playerB.engine.thinkingTime = 3
+        playerB.engine.thinkingTime = 4
 
         tournament = Tournament(playerA: playerA, playerB: playerB)
         tournament.delegate = self

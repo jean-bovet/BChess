@@ -16,6 +16,10 @@
 #include "MinMaxMoveList.hpp"
 #include "TranspositionTable.hpp"
 
+#include "ChessMoveList.hpp"
+#include "ChessEvaluater.hpp"
+#include "ChessMoveGenerator.hpp"
+
 #ifdef ASSERT_TT_KEY_COLLISION
 #include "FFEN.hpp"
 #endif
@@ -29,16 +33,15 @@ struct Configuration {
     bool transpositionTable = true;
 };
 
-template <class TMoveList, class TMove>
 struct MinMaxVariation {
-    TMoveList moves;
+    ChessMoveList moves;
     
     int depth = 0;
     int qsDepth = 0;
     
     int value = 0;
 
-    void push(int score, TMove move, MinMaxVariation<TMoveList, TMove> line) {
+    void push(int score, Move move, MinMaxVariation line) {
         value = score;
         
         depth = std::max(depth, line.depth);
@@ -51,7 +54,6 @@ struct MinMaxVariation {
 
 };
 
-template <class TNode, class TNodeEvaluater, class TMoveGenerator, class TMoveList, class TMove>
 class MinMaxSearch {
     bool analyzing = false;
     
@@ -68,11 +70,11 @@ public:
         analyzing = false;
     }
     
-    typedef MinMaxVariation<TMoveList, TMove> Variation;
+    typedef MinMaxVariation Variation;
     
     // pv: Principal Variation that will be available when this method returns.
     // bv: Best Variation that is provided from an earlier search (typically by the iterative deepening algorithm).
-    int alphabeta(TNode node, HistoryPtr history, TranspositionTable &table, int depth, bool maximizingPlayer, Variation &pv, Variation &bv) {
+    int alphabeta(ChessBoard node, HistoryPtr history, TranspositionTable &table, int depth, bool maximizingPlayer, Variation &pv, Variation &bv) {
         analyzing = true;
         Variation currentLine;
         int color = maximizingPlayer ? 1 : -1;
@@ -87,7 +89,7 @@ private:
     // bv: Best Variation - if available
     // https://en.wikipedia.org/wiki/Negamax
     // https://chessprogramming.wikispaces.com/Principal+variation
-    int alphabeta(TNode node, HistoryPtr history, TranspositionTable &table, int depth, int alpha, int beta, int color, Variation &pv, Variation &cv, Variation &bv) {
+    int alphabeta(ChessBoard node, HistoryPtr history, TranspositionTable &table, int depth, int alpha, int beta, int color, Variation &pv, Variation &cv, Variation &bv) {
         pv.depth = depth;
 
         int evalDepth = config.maxDepth - depth;
@@ -106,13 +108,13 @@ private:
                 switch (entry.type) {
                     case TranspositionEntryType::EXACT:
                         // Exact value: use it right away
-                        assert(TMoveGenerator::isValid(entry.bestMove));
+                        assert(ChessMoveGenerator::isValid(entry.bestMove));
                         pv.push(entry.value, entry.bestMove, Variation());
                         return entry.value;
                         
                     case TranspositionEntryType::ALPHA:
                         if (entry.value <= alpha) {
-                            assert(TMoveGenerator::isValid(entry.bestMove));
+                            assert(ChessMoveGenerator::isValid(entry.bestMove));
                             pv.push(entry.value, entry.bestMove, Variation());
                             return entry.value;
                         }
@@ -120,7 +122,7 @@ private:
                         
                     case TranspositionEntryType::BETA:
                         if (entry.value >= beta) {
-                            assert(TMoveGenerator::isValid(entry.bestMove));
+                            assert(ChessMoveGenerator::isValid(entry.bestMove));
                             pv.push(entry.value, entry.bestMove, Variation());
                             return entry.value;
                         }
@@ -129,7 +131,7 @@ private:
             }
         }
 
-        if (TNodeEvaluater::isDraw(node, history)) {
+        if (ChessEvaluater::isDraw(node, history)) {
             return 0;
         }
 
@@ -138,19 +140,19 @@ private:
                 int score = quiescence(node, history, depth, alpha, beta, color, pv, cv);
                 return score;
             } else {
-                int score = TNodeEvaluater::evaluate(node, history) * color;
+                int score = ChessEvaluater::evaluate(node, history) * color;
                 return score;
             }
         }
         
-        auto moves = TMoveGenerator::generateMoves(node);
+        auto moves = ChessMoveGenerator::generateMoves(node);
         if (moves.count == 0) {
-            int score = TNodeEvaluater::evaluate(node, history, moves) * color;
+            int score = ChessEvaluater::evaluate(node, history, moves) * color;
             return score;
         }
         
         if (config.sortMoves) {
-            TMoveGenerator::sortMoves(moves);
+            ChessMoveGenerator::sortMoves(moves);
         }
         
         // Lookup the best move if available in the best variation
@@ -159,13 +161,13 @@ private:
         int bestValue = -INT_MAX;
         TranspositionEntryType entryType = TranspositionEntryType::ALPHA;
         
-        TMove bestMove = TMove();
+        Move bestMove = INVALID_MOVE;
         for (int index=-1; index<moves.count && analyzing; index++) {
-            TMove move = TMove();
+            Move move = Move();
             if (index == -1) {
                 // At index -1 we try to evaluate the previously detected
                 // best move, if available.
-                if (TMoveGenerator::isValid(bestMovePV)) {
+                if (ChessMoveGenerator::isValid(bestMovePV)) {
                     // Analyze the best move first
                     move = bestMovePV;
                 } else {
@@ -215,7 +217,7 @@ private:
             }
         }
 
-        if (TMoveGenerator::isValid(bestMove)) {
+        if (ChessMoveGenerator::isValid(bestMove)) {
             table.store(evalDepth, node.getHash(), bestValue, bestMove, entryType
 #ifdef ASSERT_TT_KEY_COLLISION
                         , FFEN::getFEN(node, true)
@@ -233,14 +235,14 @@ private:
     // this link shows quiescence search that returns the score, like regular negamax
     // and this is way better IMO:
     // https://www.ics.uci.edu/~eppstein/180a/990204.html
-    int quiescence(TNode node, HistoryPtr history, int depth, int alpha, int beta, int color, Variation &pv, Variation &cv) {
+    int quiescence(ChessBoard node, HistoryPtr history, int depth, int alpha, int beta, int color, Variation &pv, Variation &cv) {
         pv.qsDepth = depth;
         
-        if (TNodeEvaluater::isDraw(node, history)) {
+        if (ChessEvaluater::isDraw(node, history)) {
             return 0;
         }
 
-        auto stand_pat = TNodeEvaluater::evaluate(node, history) * color;
+        auto stand_pat = ChessEvaluater::evaluate(node, history) * color;
         if (stand_pat >= beta) {
             return stand_pat;
         }
@@ -249,13 +251,13 @@ private:
             alpha = stand_pat;
         }
 
-        auto moves = TMoveGenerator::generateQuiescenceMoves(node);
+        auto moves = ChessMoveGenerator::generateQuiescenceMoves(node);
         if (moves.count == 0) {
             return stand_pat;
         }
         
         if (config.sortMoves) {
-            TMoveGenerator::sortMoves(moves);
+            ChessMoveGenerator::sortMoves(moves);
         }
         
         int score = stand_pat;

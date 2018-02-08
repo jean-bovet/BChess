@@ -66,33 +66,12 @@
     return openings.load(StringFromNSString(pgn));
 }
 
-- (NSDictionary*)openingFor:(NSString *)pgn {
-    ChessGame temp;
-    if (!FPGN::setGame(StringFromNSString(pgn), temp)) {
-        return nil;
-    }
-    
-    NSMutableDictionary *info = [NSMutableDictionary dictionary];
-    bool result = openings.lookup(temp.moves, [&](auto & node) {
-        info[@"Score"] = @(node.score);
-        info[@"Name"] = NSStringFromString(node.name);
-        info[@"ECO"] = NSStringFromString(node.eco);
-    });
-    
-    if (result) {
-        return info;
-    } else {
-        return nil;
-    }
-}
-
 - (BOOL)setFEN:(NSString *)FEN {
     return currentGame.setFEN(StringFromNSString(FEN));
 }
 
 - (NSString*)FEN {
-    auto fen = currentGame.getFEN();
-    return NSStringFromString(fen);
+    return NSStringFromString(currentGame.getFEN());
 }
 
 - (BOOL)setPGN:(NSString *)PGN {
@@ -100,13 +79,11 @@
 }
 
 - (NSString*)PGN {
-    auto pgn = FPGN::getGame(currentGame);
-    return NSStringFromString(pgn);
+    return NSStringFromString(FPGN::getGame(currentGame));
 }
 
 - (NSString*)PGNFormattedForDisplay {
-    auto pgn = FPGN::getGame(currentGame, FPGN::Formatting::history);
-    return NSStringFromString(pgn);
+    return NSStringFromString(FPGN::getGame(currentGame, FPGN::Formatting::history));
 }
 
 - (NSString* _Nullable)pieceAt:(NSUInteger)rank file:(NSUInteger)file {
@@ -274,34 +251,6 @@
     if (!iterativeSearch.cancelled()) {
         callback([self infoFor:info], YES);
     }
-}
-
-- (NSArray<NSString*>* _Nonnull)moveFENsFrom:(NSString* _Nonnull)startingFEN squareName:(NSString* _Nullable)squareName {
-    auto fen = StringFromNSString(startingFEN);
-    ChessBoard board;
-    FFEN::setFEN(fen, board);
-    std::string boardFEN = FFEN::getFEN(board);
-    assert(boardFEN == fen);
-    
-    Square square;
-    if (squareName) {
-        square = squareForName(StringFromNSString(squareName));
-    } else {
-        square = SquareUndefined;
-    }
-    
-    ChessMoveGenerator generator;
-    ChessMoveList moves = generator.generateMoves(board, board.color, ChessMoveGenerator::Mode::allMoves, square);
-    NSMutableArray<NSString*>* moveFENs = [NSMutableArray array];
-    for (int index=0; index<moves.count; index++) {
-        auto move = moves.moves[index];
-        ChessBoard newBoard = board;
-        newBoard.move(move);
-        std::string moveFEN = FFEN::getFEN(newBoard);
-
-        [moveFENs addObject:NSStringFromString(moveFEN)];
-    }
-    return moveFENs;
 }
 
 - (void)generatePositions {

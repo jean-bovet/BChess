@@ -24,7 +24,7 @@ static void assertBestMove(std::string fen, std::string expectedFinalFEN, std::s
     ChessBoard board;
     ASSERT_TRUE(FFEN::setFEN(fen, board));
     std::string boardFEN = FFEN::getFEN(board);
-    ASSERT_STREQ(boardFEN.c_str(), fen.c_str());
+    ASSERT_EQ(boardFEN, fen);
 
     ChessMinMaxSearch search;
     search.config = config;
@@ -39,7 +39,7 @@ static void assertBestMove(std::string fen, std::string expectedFinalFEN, std::s
 //    std::cout << pv.moves.description() << std::endl;
     
     // Assert the best line
-    ASSERT_STREQ(expectedLine.c_str(), pv.moves.description().c_str());
+    ASSERT_EQ(expectedLine, pv.moves.description());
     
     // Assert the best move
     auto actualMove = FPGN::to_string(pv.moves.bestMove());
@@ -52,7 +52,7 @@ static void assertBestMove(std::string fen, std::string expectedFinalFEN, std::s
         finalBoard.move(move);
     }
     auto finalBoardFEN = FFEN::getFEN(finalBoard);
-    ASSERT_STREQ(expectedFinalFEN.c_str(), finalBoardFEN.c_str());
+    ASSERT_EQ(expectedFinalFEN, finalBoardFEN);
 }
 
 static void assertBestMove(std::string fen, std::string expectedFinalFEN, std::string expectedLine, Configuration config) {

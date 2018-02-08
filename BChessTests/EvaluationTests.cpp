@@ -47,7 +47,7 @@ TEST_F(EvaluationTests, BonusPosition) {
 }
 
 TEST_F(EvaluationTests, InvalidMove) {
-    MinMaxMoveList<Move> moveList;
+    MinMaxMoveList moveList;
     ASSERT_EQ(INVALID_MOVE, moveList.bestMove());
 }
 

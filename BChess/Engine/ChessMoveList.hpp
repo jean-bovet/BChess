@@ -14,7 +14,7 @@
 
 class ChessBoard;
 
-struct ChessMoveList : MinMaxMoveList<Move> {
+struct ChessMoveList : MinMaxMoveList {
     std::string description();
         
     void addMove(ChessBoard &board, Move move);

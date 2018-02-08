@@ -59,8 +59,8 @@ TEST(BoardHash, PlayAndTestForCollision) {
     ASSERT_TRUE(FPGN::setGame("1.Nf3 Nf6 2.e4 Nxe4 3.g4 Nxf2", gameB));
 
     // First, check the short FEN
-    ASSERT_STREQ(FFEN::getFEN(gameA.board, true).c_str(), "rnbqkb1r/pppppppp/8/8/4P3/5N2/PPPP1n1P/RNBQKB1R w");
-    ASSERT_STREQ(FFEN::getFEN(gameB.board, true).c_str(), "rnbqkb1r/pppppppp/8/8/6P1/5N2/PPPP1n1P/RNBQKB1R w");
+    ASSERT_EQ(FFEN::getFEN(gameA.board, true), "rnbqkb1r/pppppppp/8/8/4P3/5N2/PPPP1n1P/RNBQKB1R w");
+    ASSERT_EQ(FFEN::getFEN(gameB.board, true), "rnbqkb1r/pppppppp/8/8/6P1/5N2/PPPP1n1P/RNBQKB1R w");
 
     // Check each hash, to make sure the hash from the board has been incrementally updated correctly
     // to be equal to the hash computed with the final board position.

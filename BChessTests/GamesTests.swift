@@ -103,6 +103,7 @@ class GamesTests: XCTestCase {
     func assert(command: String, resultingFEN: String, bestMove: String, depth: Int = UCI.defaultDepth) {
         let uci = UCI()
         uci.engine.useOpeningBook = false
+        
         var tokens = command.split(separator: " ").map { String($0) }
         uci.process(&tokens)
                 

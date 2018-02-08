@@ -9,29 +9,29 @@
 #pragma once
 
 #include <cassert>
+#include "FMove.hpp"
 
 const int MAX_MOVES = 256;
 
-template <class TMove>
 struct MinMaxMoveList {
-    TMove moves[MAX_MOVES];
+    Move moves[MAX_MOVES];
     int count = 0;
     
-    TMove &operator[] (int index) {
+    Move &operator[] (int index) {
         assert(index < MAX_MOVES);
         assert(index < count);
         return moves[index];
     }
 
-    void push(TMove move) {
+    void push(Move move) {
         assert(count < MAX_MOVES);
         moves[count] = move;
         count++;
     }
     
-    void push(MinMaxMoveList<TMove> line) {
+    void push(MinMaxMoveList line) {
         assert(count+line.count < MAX_MOVES);
-        memcpy(moves+count, line.moves, line.count * sizeof(TMove));
+        memcpy(moves+count, line.moves, line.count * sizeof(Move));
         count += line.count;
     }
     
@@ -40,19 +40,19 @@ struct MinMaxMoveList {
         count--;
     }
     
-    TMove lookup(int index) {
+    Move lookup(int index) {
         if (index < count) {
             return moves[index];
         } else {
-            return TMove();
+            return INVALID_MOVE;
         }
     }
     
-    TMove bestMove() {
+    Move bestMove() {
         if (count > 0) {
             return moves[0];
         } else {
-            return TMove();
+            return INVALID_MOVE;
         }
     }
 };
