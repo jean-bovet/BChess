@@ -8,7 +8,7 @@
 
 #include <gtest/gtest.h>
 
-#include "FMove.hpp"
+#include "Move.hpp"
 
 TEST(Move, InvalidMove) {
     Move m = 0;

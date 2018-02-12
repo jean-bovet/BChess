@@ -53,7 +53,7 @@ bool ChessOpenings::load(std::string pgn) {
     }
 }
 
-bool ChessOpenings::lookup(ChessMoveList moves, OpeningTreeNode::NodeCallback callback) {
+bool ChessOpenings::lookup(MoveList moves, OpeningTreeNode::NodeCallback callback) {
     return root.lookup(moves, 0, callback);
 }
 
@@ -61,7 +61,7 @@ bool nodeComparison(OpeningTreeNode i, OpeningTreeNode j) {
     return i.score > j.score;
 }
 
-bool ChessOpenings::best(ChessMoveList moves, OpeningTreeNode::NodeCallback callback) {
+bool ChessOpenings::best(MoveList moves, OpeningTreeNode::NodeCallback callback) {
     bool bestFound = false;
     bool result = lookup(moves, [&](auto & node) {
         // Check if the opening book has some more moves for that particular node

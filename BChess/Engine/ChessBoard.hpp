@@ -8,8 +8,8 @@
 
 #pragma once
 
-#include "FMove.hpp"
-#include "FBitboard.hpp"
+#include "Move.hpp"
+#include "Bitboard.hpp"
 #include "Types.hpp"
 
 #include <stdio.h>

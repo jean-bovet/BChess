@@ -8,9 +8,9 @@
 
 #pragma once
 
-#include "FColor.hpp"
-#include "FPiece.hpp"
-#include "FCoordinate.hpp"
+#include "Color.hpp"
+#include "Piece.hpp"
+#include "Coordinate.hpp"
 
 #include <string>
 

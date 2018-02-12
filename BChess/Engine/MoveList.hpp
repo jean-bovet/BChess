@@ -9,11 +9,12 @@
 #pragma once
 
 #include <cassert>
-#include "FMove.hpp"
+#include "Move.hpp"
+#include "ChessBoard.hpp"
 
 const int MAX_MOVES = 256;
 
-struct MinMaxMoveList {
+struct MoveList {
     Move moves[MAX_MOVES];
     int count = 0;
     
@@ -29,7 +30,7 @@ struct MinMaxMoveList {
         count++;
     }
     
-    void push(MinMaxMoveList line) {
+    void push(MoveList line) {
         assert(count+line.count < MAX_MOVES);
         memcpy(moves+count, line.moves, line.count * sizeof(Move));
         count += line.count;
@@ -55,6 +56,13 @@ struct MinMaxMoveList {
             return INVALID_MOVE;
         }
     }
+    
+    std::string description();
+    
+    void addMove(ChessBoard &board, Move move);
+    void addMoves(ChessBoard &board, Square from, Bitboard moves, Piece piece);
+    void addCaptures(ChessBoard &board, Square from, Bitboard moves, Color attackingPieceColor, Piece attackingPiece, Color capturedPieceColor, Piece capturedPiece);
+
 };
 
 

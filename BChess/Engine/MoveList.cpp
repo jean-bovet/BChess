@@ -6,11 +6,11 @@
 //  Copyright © 2017 Jean Bovet. All rights reserved.
 //
 
-#include "ChessMoveList.hpp"
+#include "MoveList.hpp"
 #include "ChessBoard.hpp"
 #include "FPGN.hpp"
 
-std::string ChessMoveList::description() {
+std::string MoveList::description() {
     std::string text = "";
     for (int index=0; index<count; index++) {
         auto move = moves[index];
@@ -22,7 +22,7 @@ std::string ChessMoveList::description() {
     return text;
 }
 
-void ChessMoveList::addMove(ChessBoard &board, Move move) {
+void MoveList::addMove(ChessBoard &board, Move move) {
     ChessBoard validBoard = board;
     validBoard.move(move);
     // Note: make sure the move that was just played doesn't make it's king in check.
@@ -33,16 +33,16 @@ void ChessMoveList::addMove(ChessBoard &board, Move move) {
         // TODO: careful, we cannot just use check move in quiescence search just like that.
         // Seems that we need to read more about when we can use the stand_pat score.
         // See http://www.talkchess.com/forum/viewtopic.php?topic_view=threads&p=681015&t=60962
-//        if (validBoard.isCheck(validBoard.color)) {
-//            SET_MOVE_IS_CHECK(move);
-//        }
+        //        if (validBoard.isCheck(validBoard.color)) {
+        //            SET_MOVE_IS_CHECK(move);
+        //        }
         
         // Add the valid move to the list
         push(move);
     }
 }
 
-void ChessMoveList::addMoves(ChessBoard &board, Square from, Bitboard moves, Piece piece) {
+void MoveList::addMoves(ChessBoard &board, Square from, Bitboard moves, Piece piece) {
     while (moves > 0) {
         Square to = lsb(moves);
         bb_clear(moves, to);
@@ -51,7 +51,7 @@ void ChessMoveList::addMoves(ChessBoard &board, Square from, Bitboard moves, Pie
     }
 }
 
-void ChessMoveList::addCaptures(ChessBoard &board, Square from, Bitboard moves, Color attackingPieceColor, Piece attackingPiece, Color capturedPieceColor, Piece capturedPiece) {
+void MoveList::addCaptures(ChessBoard &board, Square from, Bitboard moves, Color attackingPieceColor, Piece attackingPiece, Color capturedPieceColor, Piece capturedPiece) {
     while (moves > 0) {
         Square to = lsb(moves);
         bb_clear(moves, to);
@@ -59,4 +59,3 @@ void ChessMoveList::addCaptures(ChessBoard &board, Square from, Bitboard moves, 
         addMove(board, createCapture(from, to, attackingPieceColor, attackingPiece, capturedPieceColor, capturedPiece));
     }
 }
-

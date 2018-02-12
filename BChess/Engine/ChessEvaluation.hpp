@@ -8,10 +8,10 @@
 
 #pragma once
 
-#include "ChessMoveList.hpp"
+#include "MoveList.hpp"
 
 struct ChessEvaluation {
-    ChessMoveList line;
+    MoveList line;
     
     std::string opening;
     

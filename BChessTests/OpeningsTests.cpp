@@ -71,7 +71,7 @@ TEST_F(OpeningsTests, Loading) {
 
 TEST_F(OpeningsTests, KingsPawnOpening) {
     Move m;
-    ChessMoveList moves;
+    MoveList moves;
     moves.push(m = createMove(e2, e4, WHITE, PAWN));
     
     bool result = openings.lookup(moves, [&](auto & node) {
@@ -94,7 +94,7 @@ TEST_F(OpeningsTests, KingsPawnOpening) {
 }
 
 TEST_F(OpeningsTests, BestMove) {
-    ChessMoveList moves;
+    MoveList moves;
     
     bool result = openings.best(moves, [&](auto & node) {
         ASSERT_EQ(createMove(d2, d4, WHITE, PAWN), node.move);

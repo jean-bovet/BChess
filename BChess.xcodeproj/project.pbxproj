@@ -9,11 +9,11 @@
 /* Begin PBXBuildFile section */
 		A70A61BB1FD132D200AFDF0E /* FFEN.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A70A61B91FD132D200AFDF0E /* FFEN.cpp */; };
 		A70A61C41FD458DE00AFDF0E /* ChessMoveGenerator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A70A61C21FD458DE00AFDF0E /* ChessMoveGenerator.cpp */; };
-		A70A61C61FD4592700AFDF0E /* ChessMoveList.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A70A61C51FD4592700AFDF0E /* ChessMoveList.cpp */; };
+		A70A61C61FD4592700AFDF0E /* MoveList.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A70A61C51FD4592700AFDF0E /* MoveList.cpp */; };
 		A70A61CA1FD46E3C00AFDF0E /* ChessEvaluater.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A70A61C81FD46E3C00AFDF0E /* ChessEvaluater.cpp */; };
 		A70A61D11FD4AA9600AFDF0E /* FEngineInfo.mm in Sources */ = {isa = PBXBuildFile; fileRef = A70A61D01FD4AA9600AFDF0E /* FEngineInfo.mm */; };
 		A70A61D51FD4D42100AFDF0E /* FEngineInfo.mm in Sources */ = {isa = PBXBuildFile; fileRef = A70A61D01FD4AA9600AFDF0E /* FEngineInfo.mm */; };
-		A70A61D81FD4D49500AFDF0E /* ChessMoveList.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A70A61C51FD4592700AFDF0E /* ChessMoveList.cpp */; };
+		A70A61D81FD4D49500AFDF0E /* MoveList.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A70A61C51FD4592700AFDF0E /* MoveList.cpp */; };
 		A70A61D91FD4D49500AFDF0E /* ChessMoveGenerator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A70A61C21FD458DE00AFDF0E /* ChessMoveGenerator.cpp */; };
 		A70A61DA1FD4D49500AFDF0E /* ChessBoard.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A7712D451FCBC13100E7E802 /* ChessBoard.cpp */; };
 		A70A61DB1FD4D49500AFDF0E /* ChessEvaluater.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A70A61C81FD46E3C00AFDF0E /* ChessEvaluater.cpp */; };
@@ -42,7 +42,7 @@
 		A75359C41FDE4031008D1DEE /* FEngineInfo.mm in Sources */ = {isa = PBXBuildFile; fileRef = A70A61D01FD4AA9600AFDF0E /* FEngineInfo.mm */; };
 		A75359C51FDE4031008D1DEE /* FEngine.mm in Sources */ = {isa = PBXBuildFile; fileRef = A75683281FCD28A000CF1408 /* FEngine.mm */; };
 		A75359C61FDE4031008D1DEE /* magicmoves.c in Sources */ = {isa = PBXBuildFile; fileRef = A7712D411FCB97A900E7E802 /* magicmoves.c */; };
-		A75359C71FDE4038008D1DEE /* ChessMoveList.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A70A61C51FD4592700AFDF0E /* ChessMoveList.cpp */; };
+		A75359C71FDE4038008D1DEE /* MoveList.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A70A61C51FD4592700AFDF0E /* MoveList.cpp */; };
 		A75359C81FDE4038008D1DEE /* ChessMoveGenerator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A70A61C21FD458DE00AFDF0E /* ChessMoveGenerator.cpp */; };
 		A75359C91FDE4038008D1DEE /* ChessBoard.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A7712D451FCBC13100E7E802 /* ChessBoard.cpp */; };
 		A75359CA1FDE4038008D1DEE /* ChessEvaluater.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A70A61C81FD46E3C00AFDF0E /* ChessEvaluater.cpp */; };
@@ -123,13 +123,12 @@
 		A70A61BA1FD132D200AFDF0E /* FFEN.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = FFEN.hpp; sourceTree = "<group>"; };
 		A70A61BC1FD1333300AFDF0E /* FUtility.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = FUtility.hpp; sourceTree = "<group>"; };
 		A70A61BD1FD3196400AFDF0E /* BestMoveTests.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = BestMoveTests.cpp; sourceTree = "<group>"; };
-		A70A61BE1FD38C7500AFDF0E /* FColor.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = FColor.hpp; sourceTree = "<group>"; };
-		A70A61BF1FD38D4100AFDF0E /* FPiece.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = FPiece.hpp; sourceTree = "<group>"; };
-		A70A61C01FD4587B00AFDF0E /* FMove.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = FMove.hpp; sourceTree = "<group>"; };
-		A70A61C11FD4589800AFDF0E /* ChessMoveList.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = ChessMoveList.hpp; sourceTree = "<group>"; };
+		A70A61BE1FD38C7500AFDF0E /* Color.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Color.hpp; sourceTree = "<group>"; };
+		A70A61BF1FD38D4100AFDF0E /* Piece.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Piece.hpp; sourceTree = "<group>"; };
+		A70A61C01FD4587B00AFDF0E /* Move.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Move.hpp; sourceTree = "<group>"; };
 		A70A61C21FD458DE00AFDF0E /* ChessMoveGenerator.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ChessMoveGenerator.cpp; sourceTree = "<group>"; };
 		A70A61C31FD458DE00AFDF0E /* ChessMoveGenerator.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = ChessMoveGenerator.hpp; sourceTree = "<group>"; };
-		A70A61C51FD4592700AFDF0E /* ChessMoveList.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ChessMoveList.cpp; sourceTree = "<group>"; };
+		A70A61C51FD4592700AFDF0E /* MoveList.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = MoveList.cpp; sourceTree = "<group>"; };
 		A70A61C81FD46E3C00AFDF0E /* ChessEvaluater.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ChessEvaluater.cpp; sourceTree = "<group>"; };
 		A70A61C91FD46E3C00AFDF0E /* ChessEvaluater.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = ChessEvaluater.hpp; sourceTree = "<group>"; };
 		A70A61CF1FD4AA9600AFDF0E /* FEngineInfo.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FEngineInfo.h; sourceTree = "<group>"; };
@@ -144,8 +143,8 @@
 		A746C2482001707F001F4437 /* GameHistory.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = GameHistory.hpp; sourceTree = "<group>"; };
 		A746C24B20017351001F4437 /* Types.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Types.hpp; sourceTree = "<group>"; };
 		A75359831FDC51B2008D1DEE /* FENgineInfo+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FENgineInfo+Extension.swift"; sourceTree = "<group>"; };
-		A75359871FDCF8D6008D1DEE /* FBitboard.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = FBitboard.hpp; sourceTree = "<group>"; };
-		A753598A1FDCF95E008D1DEE /* FCoordinate.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = FCoordinate.hpp; sourceTree = "<group>"; };
+		A75359871FDCF8D6008D1DEE /* Bitboard.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Bitboard.hpp; sourceTree = "<group>"; };
+		A753598A1FDCF95E008D1DEE /* Coordinate.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Coordinate.hpp; sourceTree = "<group>"; };
 		A75359901FDE0947008D1DEE /* BChessMac.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; name = BChessMac.app; path = BChess.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A75359921FDE0947008D1DEE /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		A75359941FDE0947008D1DEE /* ChessViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChessViewController.swift; sourceTree = "<group>"; };
@@ -206,7 +205,7 @@
 		A7E490EA1FEA207100970EAD /* gtest-all.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "gtest-all.cc"; path = "BChessTests/Helper/gtest-all.cc"; sourceTree = SOURCE_ROOT; };
 		A7E490F11FEA2E7E00970EAD /* GoogleTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = GoogleTests.mm; sourceTree = "<group>"; };
 		A7EF55C71FEF17A1004CF2DA /* ChessEngine.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = ChessEngine.hpp; sourceTree = "<group>"; };
-		A7EF55CB1FF22FE7004CF2DA /* MinMaxMoveList.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = MinMaxMoveList.hpp; sourceTree = "<group>"; };
+		A7EF55CB1FF22FE7004CF2DA /* MoveList.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = MoveList.hpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -284,13 +283,13 @@
 			isa = PBXGroup;
 			children = (
 				A746C24B20017351001F4437 /* Types.hpp */,
-				A753598A1FDCF95E008D1DEE /* FCoordinate.hpp */,
-				A75359871FDCF8D6008D1DEE /* FBitboard.hpp */,
-				A70A61BE1FD38C7500AFDF0E /* FColor.hpp */,
-				A70A61BF1FD38D4100AFDF0E /* FPiece.hpp */,
-				A70A61C01FD4587B00AFDF0E /* FMove.hpp */,
-				A70A61C11FD4589800AFDF0E /* ChessMoveList.hpp */,
-				A70A61C51FD4592700AFDF0E /* ChessMoveList.cpp */,
+				A753598A1FDCF95E008D1DEE /* Coordinate.hpp */,
+				A75359871FDCF8D6008D1DEE /* Bitboard.hpp */,
+				A70A61BE1FD38C7500AFDF0E /* Color.hpp */,
+				A70A61BF1FD38D4100AFDF0E /* Piece.hpp */,
+				A70A61C01FD4587B00AFDF0E /* Move.hpp */,
+				A7EF55CB1FF22FE7004CF2DA /* MoveList.hpp */,
+				A70A61C51FD4592700AFDF0E /* MoveList.cpp */,
 				A75A283D1FEC8506003AC5EF /* ChessEvaluation.hpp */,
 				A70A61C31FD458DE00AFDF0E /* ChessMoveGenerator.hpp */,
 				A70A61C21FD458DE00AFDF0E /* ChessMoveGenerator.cpp */,
@@ -350,7 +349,6 @@
 			children = (
 				A7CEB0F320154597002AFDF7 /* TranspositionTable.hpp */,
 				A75CB2611FED9693005487BD /* IterativeDeepening.hpp */,
-				A7EF55CB1FF22FE7004CF2DA /* MinMaxMoveList.hpp */,
 				A75BFAC61FE8C05E001EE942 /* MinMaxSearch.hpp */,
 			);
 			path = Algorithm;
@@ -648,7 +646,7 @@
 				A75359951FDE0947008D1DEE /* ChessViewController.swift in Sources */,
 				A77372061FE443DA0001A90F /* ChessGame.cpp in Sources */,
 				A75359931FDE0947008D1DEE /* AppDelegate.swift in Sources */,
-				A75359C71FDE4038008D1DEE /* ChessMoveList.cpp in Sources */,
+				A75359C71FDE4038008D1DEE /* MoveList.cpp in Sources */,
 				A75359CC1FDE4038008D1DEE /* FFEN.cpp in Sources */,
 				A75359C51FDE4031008D1DEE /* FEngine.mm in Sources */,
 				A746C246200148ED001F4437 /* ChessBoardHash.cpp in Sources */,
@@ -706,7 +704,7 @@
 				A7C92ABB1FF8712800160D2E /* FEngineUtility.mm in Sources */,
 				A7EF55C81FF191B1004CF2DA /* SearchChessTests.cpp in Sources */,
 				A77372021FE334BB0001A90F /* ChessGame.cpp in Sources */,
-				A70A61D81FD4D49500AFDF0E /* ChessMoveList.cpp in Sources */,
+				A70A61D81FD4D49500AFDF0E /* MoveList.cpp in Sources */,
 				A72E2B57200496CD006CBB1C /* BoardHashTests.cpp in Sources */,
 				A70A61D91FD4D49500AFDF0E /* ChessMoveGenerator.cpp in Sources */,
 				A75A283F1FECD7DD003AC5EF /* FEngine.mm in Sources */,
@@ -731,7 +729,7 @@
 				A70A61CA1FD46E3C00AFDF0E /* ChessEvaluater.cpp in Sources */,
 				A70A61C41FD458DE00AFDF0E /* ChessMoveGenerator.cpp in Sources */,
 				A70A61D11FD4AA9600AFDF0E /* FEngineInfo.mm in Sources */,
-				A70A61C61FD4592700AFDF0E /* ChessMoveList.cpp in Sources */,
+				A70A61C61FD4592700AFDF0E /* MoveList.cpp in Sources */,
 				A765D8611FF6C1950045BB36 /* ChessOpenings.cpp in Sources */,
 				A7C92AB91FF86F6800160D2E /* FEngineUtility.mm in Sources */,
 				A731BD392000A513004C13EF /* TournamentEngines.swift in Sources */,

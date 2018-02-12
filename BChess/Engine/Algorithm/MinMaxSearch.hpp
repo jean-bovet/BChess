@@ -13,10 +13,10 @@
 #include <algorithm>
 #include <iostream>
 
-#include "MinMaxMoveList.hpp"
+#include "MoveList.hpp"
 #include "TranspositionTable.hpp"
 
-#include "ChessMoveList.hpp"
+#include "MoveList.hpp"
 #include "ChessEvaluater.hpp"
 #include "ChessMoveGenerator.hpp"
 
@@ -34,7 +34,7 @@ struct Configuration {
 };
 
 struct MinMaxVariation {
-    ChessMoveList moves;
+    MoveList moves;
     
     int depth = 0;
     int qsDepth = 0;

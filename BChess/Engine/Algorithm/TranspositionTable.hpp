@@ -9,7 +9,7 @@
 #pragma once
 
 #include "Types.hpp"
-#include "FMove.hpp"
+#include "Move.hpp"
 
 #define TRANSPO_SIZE (size_t)(18*1000*1000)
 

@@ -9,7 +9,7 @@
 #pragma once
 
 #include "ChessBoard.hpp"
-#include "ChessMoveList.hpp"
+#include "MoveList.hpp"
 #include "GameHistory.hpp"
 
 #include <vector>
@@ -33,7 +33,7 @@ public:
     
     HistoryPtr history;
     
-    ChessMoveList moves;
+    MoveList moves;
     int moveCursor = 0;
     
     Outcome outcome = Outcome::in_progress;

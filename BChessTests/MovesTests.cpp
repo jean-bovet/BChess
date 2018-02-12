@@ -40,7 +40,7 @@ public:
         }
         
         ChessMoveGenerator generator;
-        ChessMoveList moves = generator.generateMoves(board, board.color, ChessMoveGenerator::Mode::allMoves, square);
+        MoveList moves = generator.generateMoves(board, board.color, ChessMoveGenerator::Mode::allMoves, square);
         std::vector<std::string> moveFENs;
         for (int index=0; index<moves.count; index++) {
             auto move = moves.moves[index];

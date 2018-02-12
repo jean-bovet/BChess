@@ -8,9 +8,9 @@
 
 #pragma once
 
-#include "ChessMoveList.hpp"
+#include "MoveList.hpp"
 #include "ChessBoard.hpp"
-#include "FCoordinate.hpp"
+#include "Coordinate.hpp"
 
 // Without this, the C file won't be linked
 extern "C" void initmagicmoves(void);
@@ -24,7 +24,7 @@ private:
 public:
     static void initialize();
 
-    static void sortMoves(ChessMoveList & moves);
+    static void sortMoves(MoveList & moves);
 
     static bool isValid(Move move) {
         return MOVE_ISVALID(move);
@@ -37,17 +37,17 @@ public:
         moveCaptureAndDefenseMoves
     };
     
-    static ChessMoveList generateQuiescenceMoves(ChessBoard &board);
-    static ChessMoveList generateQuiescenceMoves(ChessBoard &board, Color color);
+    static MoveList generateQuiescenceMoves(ChessBoard &board);
+    static MoveList generateQuiescenceMoves(ChessBoard &board, Color color);
 
-    static ChessMoveList generateMoves(ChessBoard &board);
-    static ChessMoveList generateMoves(ChessBoard &board, Color color, Mode mode = Mode::allMoves, Square specificSquare = SquareUndefined);
+    static MoveList generateMoves(ChessBoard &board);
+    static MoveList generateMoves(ChessBoard &board, Color color, Mode mode = Mode::allMoves, Square specificSquare = SquareUndefined);
     
-    static void generateAttackMoves(ChessBoard &board, Color color, ChessMoveList &moveList, Square fromSquare, Piece attackingPiece, Bitboard attackingSquares, Mode mode);
+    static void generateAttackMoves(ChessBoard &board, Color color, MoveList &moveList, Square fromSquare, Piece attackingPiece, Bitboard attackingSquares, Mode mode);
     
-    static void generatePawnsMoves(ChessBoard &board, Color color, ChessMoveList &moveList, Mode mode, Square specificSquare = SquareUndefined);
-    static void generateKingsMoves(ChessBoard &board, Color color, ChessMoveList &moveList, Mode mode, Square specificSquare = SquareUndefined);
-    static void generateKnightsMoves(ChessBoard &board, Color color, ChessMoveList &moveList, Mode mode, Square specificSquare = SquareUndefined);
-    static void generateSlidingMoves(ChessBoard &board, Color color, Piece piece, ChessMoveList &moveList, Mode mode, Square specificSquare = SquareUndefined);
+    static void generatePawnsMoves(ChessBoard &board, Color color, MoveList &moveList, Mode mode, Square specificSquare = SquareUndefined);
+    static void generateKingsMoves(ChessBoard &board, Color color, MoveList &moveList, Mode mode, Square specificSquare = SquareUndefined);
+    static void generateKnightsMoves(ChessBoard &board, Color color, MoveList &moveList, Mode mode, Square specificSquare = SquareUndefined);
+    static void generateSlidingMoves(ChessBoard &board, Color color, Piece piece, MoveList &moveList, Mode mode, Square specificSquare = SquareUndefined);
 };
 

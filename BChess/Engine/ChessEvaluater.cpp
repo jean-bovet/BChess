@@ -142,7 +142,7 @@ int ChessEvaluater::evaluate(ChessBoard board, HistoryPtr history) {
     return evaluate(board, history, moves);
 }
 
-int ChessEvaluater::evaluate(ChessBoard board, HistoryPtr history, ChessMoveList moves) {
+int ChessEvaluater::evaluate(ChessBoard board, HistoryPtr history, MoveList moves) {
     if (moves.count == 0) {
         if (board.isCheck(board.color)) {
             // No moves but a check, that's a mat
@@ -215,7 +215,7 @@ int ChessEvaluater::evaluateAction(ChessBoard board) {
 // TODO: at some point, give more value to pawn when attacking or defending than queen?
 //static int PieceActionValue[PCOUNT] = { 6, 3, 3, 2, 1, 1 };
 
-int ChessEvaluater::evaluateAction(ChessMoveList moves) {
+int ChessEvaluater::evaluateAction(MoveList moves) {
     int attackedValues[2][64] = { };
     int defendedValues[2][64] = { };
     
@@ -264,7 +264,7 @@ int ChessEvaluater::evaluateMobility(ChessBoard board) {
     return evaluateMobility(moveList) + evaluateMobility(opponentMoveList);
 }
 
-int ChessEvaluater::evaluateMobility(ChessMoveList moves) {
+int ChessEvaluater::evaluateMobility(MoveList moves) {
     int mobility = 0;
     
     for (int index=0; index<moves.count; index++) {

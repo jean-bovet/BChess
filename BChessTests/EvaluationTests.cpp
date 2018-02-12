@@ -23,7 +23,7 @@ public:
         return board;
     }
     
-    ChessMoveList generateMoves(std::string fen) {
+    MoveList generateMoves(std::string fen) {
         ChessBoard board;
         assert(FFEN::setFEN(fen, board));
         
@@ -47,7 +47,7 @@ TEST_F(EvaluationTests, BonusPosition) {
 }
 
 TEST_F(EvaluationTests, InvalidMove) {
-    MinMaxMoveList moveList;
+    MoveList moveList;
     ASSERT_EQ(INVALID_MOVE, moveList.bestMove());
 }
 

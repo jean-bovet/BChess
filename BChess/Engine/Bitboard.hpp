@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include "FCoordinate.hpp"
+#include "Coordinate.hpp"
 
 #include <cstdint>
 #include <iostream>

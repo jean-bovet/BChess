@@ -14,7 +14,7 @@
 #import "ChessGame.hpp"
 #import "ChessBoard.hpp"
 #import "FFEN.hpp"
-#import "FMove.hpp"
+#import "Move.hpp"
 #import "FPGN.hpp"
 #import "ChessEngine.hpp"
 #import "ChessOpenings.hpp"

@@ -8,7 +8,7 @@
 
 #import "FEngineInfo+Private.h"
 #import "FEngineUtility.h"
-#import "FMove.hpp"
+#import "Move.hpp"
 #import "FPGN.hpp"
 #import "ChessEvaluater.hpp"
 

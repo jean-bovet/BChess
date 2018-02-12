@@ -12,7 +12,7 @@
 #include <map>
 #include <vector>
 
-#include "ChessMoveList.hpp"
+#include "MoveList.hpp"
 
 struct OpeningTreeNode {
     Move move;
@@ -29,14 +29,14 @@ struct OpeningTreeNode {
     }
 
     void push(std::vector<Move> moves, NodeCallback callback) {
-        ChessMoveList moveList;
+        MoveList moveList;
         for (auto move : moves) {
             moveList.push(move);
         }
         push(moveList, 0, callback);
     }
     
-    void push(ChessMoveList moves, int moveIndex, NodeCallback callback) {
+    void push(MoveList moves, int moveIndex, NodeCallback callback) {
         if (moveIndex == moves.count) {
             callback(*this);
         } else {
@@ -47,7 +47,7 @@ struct OpeningTreeNode {
         }
     }
     
-    bool lookup(ChessMoveList moves, int moveIndex, NodeCallback callback) {
+    bool lookup(MoveList moves, int moveIndex, NodeCallback callback) {
         if (moveIndex < moves.count) {
             Move move = moves[moveIndex];
             if (children.count(move) == 0) {
@@ -72,8 +72,8 @@ public:
     
     bool load(std::string pgn);
     
-    bool lookup(ChessMoveList moves, OpeningTreeNode::NodeCallback callback);
+    bool lookup(MoveList moves, OpeningTreeNode::NodeCallback callback);
 
-    bool best(ChessMoveList moves, OpeningTreeNode::NodeCallback callback);
+    bool best(MoveList moves, OpeningTreeNode::NodeCallback callback);
     
 };
