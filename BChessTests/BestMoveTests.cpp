@@ -140,14 +140,17 @@ TEST_F(BestMoveTests, WhiteThreatenMate) {
 
 TEST_F(BestMoveTests, WithAndWithoutTT) {
     std::string start = "rnbqkb1r/ppp1pppp/5n2/3p4/3P4/5N2/PPP1PPPP/RNBQKB1R w KQkq - 0 3";
-    std::string end = "rnbqkb1r/ppp1pppp/5n2/3p4/3P4/2N2N2/PPP1PPPP/R1BQKB1R b KQkq - 1 3";
     Configuration config;
     config.maxDepth = 5;
     config.transpositionTable = false;
-    assertBestMove(start, end, "Nb1c3 Nb8d7 Qd1d3 e7e6 e2e4 d5xe4 Nc3xe4 Nf6xe4 Qd3xe4", config);
+    assertBestMove(start,
+                   "r1bqkb1r/pppn1ppp/4p3/8/3PQ3/5N2/PPP2PPP/R1B1KB1R b KQkq - 0 7",
+                   "Nb1c3 Nb8d7 Qd1d3 e7e6 e2e4 d5xe4 Nc3xe4 Nf6xe4 Qd3xe4", config);
     
     config.transpositionTable = true;
     TranspositionTable table;
-    assertBestMove(start, end, "Nb1c3 Nb8d7 e2e3 a7a6 Bf1d3", config, table);
+    assertBestMove(start,
+                   "r1bqkb1r/1ppnpppp/p4n2/3p4/3P4/2NBPN2/PPP2PPP/R1BQK2R b KQkq - 1 5",
+                   "Nb1c3 Nb8d7 e2e3 a7a6 Bf1d3", config, table);
 //    assertBestMove(start, end, "Nb1c3", config, table);
 }

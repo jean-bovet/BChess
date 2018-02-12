@@ -282,12 +282,6 @@
 		A70A61D41FD4D37E00AFDF0E /* Engine */ = {
 			isa = PBXGroup;
 			children = (
-				A746C24B20017351001F4437 /* Types.hpp */,
-				A753598A1FDCF95E008D1DEE /* Coordinate.hpp */,
-				A75359871FDCF8D6008D1DEE /* Bitboard.hpp */,
-				A70A61BE1FD38C7500AFDF0E /* Color.hpp */,
-				A70A61BF1FD38D4100AFDF0E /* Piece.hpp */,
-				A70A61C01FD4587B00AFDF0E /* Move.hpp */,
 				A7EF55CB1FF22FE7004CF2DA /* MoveList.hpp */,
 				A70A61C51FD4592700AFDF0E /* MoveList.cpp */,
 				A75A283D1FEC8506003AC5EF /* ChessEvaluation.hpp */,
@@ -299,6 +293,7 @@
 				A7712D451FCBC13100E7E802 /* ChessBoard.cpp */,
 				A746C2482001707F001F4437 /* GameHistory.hpp */,
 				A746C2472001707F001F4437 /* GameHistory.cpp */,
+				A78E7553203126B500445360 /* Types */,
 				A78E7552203122ED00445360 /* Engine */,
 				A765D8621FF6C1B30045BB36 /* Algorithm */,
 				A70A61D31FD4D37600AFDF0E /* Helpers */,
@@ -394,6 +389,19 @@
 				A765D85F1FF6C1950045BB36 /* ChessOpenings.cpp */,
 			);
 			path = Engine;
+			sourceTree = "<group>";
+		};
+		A78E7553203126B500445360 /* Types */ = {
+			isa = PBXGroup;
+			children = (
+				A746C24B20017351001F4437 /* Types.hpp */,
+				A753598A1FDCF95E008D1DEE /* Coordinate.hpp */,
+				A75359871FDCF8D6008D1DEE /* Bitboard.hpp */,
+				A70A61BE1FD38C7500AFDF0E /* Color.hpp */,
+				A70A61BF1FD38D4100AFDF0E /* Piece.hpp */,
+				A70A61C01FD4587B00AFDF0E /* Move.hpp */,
+			);
+			path = Types;
 			sourceTree = "<group>";
 		};
 		A7AFCC9D1FB4E40D00AE3D85 = {
