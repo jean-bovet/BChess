@@ -36,13 +36,12 @@ public:
     }
 };
 
-template<class Node, class MoveGenerator, class TMoveList, class Evaluater>
 class IterativeDeepening {
     
 public:
     typedef std::function<void(ChessEvaluation)> SearchCallback;
 
-    ChessMinMaxSearch minMaxSearch;
+    MinMaxSearch minMaxSearch;
 
     TranspositionTable table;
 
@@ -60,7 +59,7 @@ public:
         }
         
         ChessEvaluation evaluation;
-        ChessMinMaxSearch::Variation bestVariation;
+        MinMaxSearch::Variation bestVariation;
 
         status = Status::running;
         
@@ -71,7 +70,7 @@ public:
             minMaxSearch.config.maxDepth = curMaxDepth;
             minMaxSearch.reset();
             
-            ChessMinMaxSearch::Variation pv;
+            MinMaxSearch::Variation pv;
             
             int score = minMaxSearch.alphabeta(board, history, table, 0, board.color == WHITE, pv, bestVariation);
             

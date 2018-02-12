@@ -296,15 +296,11 @@
 				A70A61C21FD458DE00AFDF0E /* ChessMoveGenerator.cpp */,
 				A70A61C91FD46E3C00AFDF0E /* ChessEvaluater.hpp */,
 				A70A61C81FD46E3C00AFDF0E /* ChessEvaluater.cpp */,
-				A77371FD1FE31FEF0001A90F /* ChessGame.hpp */,
-				A77371FC1FE31FEF0001A90F /* ChessGame.cpp */,
 				A7712D461FCBC13100E7E802 /* ChessBoard.hpp */,
 				A7712D451FCBC13100E7E802 /* ChessBoard.cpp */,
-				A7EF55C71FEF17A1004CF2DA /* ChessEngine.hpp */,
-				A765D8601FF6C1950045BB36 /* ChessOpenings.hpp */,
-				A765D85F1FF6C1950045BB36 /* ChessOpenings.cpp */,
 				A746C2482001707F001F4437 /* GameHistory.hpp */,
 				A746C2472001707F001F4437 /* GameHistory.cpp */,
+				A78E7552203122ED00445360 /* Engine */,
 				A765D8621FF6C1B30045BB36 /* Algorithm */,
 				A70A61D31FD4D37600AFDF0E /* Helpers */,
 			);
@@ -388,6 +384,18 @@
 				A731BD382000A513004C13EF /* TournamentEngines.swift */,
 			);
 			path = UCI;
+			sourceTree = "<group>";
+		};
+		A78E7552203122ED00445360 /* Engine */ = {
+			isa = PBXGroup;
+			children = (
+				A7EF55C71FEF17A1004CF2DA /* ChessEngine.hpp */,
+				A77371FD1FE31FEF0001A90F /* ChessGame.hpp */,
+				A77371FC1FE31FEF0001A90F /* ChessGame.cpp */,
+				A765D8601FF6C1950045BB36 /* ChessOpenings.hpp */,
+				A765D85F1FF6C1950045BB36 /* ChessOpenings.cpp */,
+			);
+			path = Engine;
 			sourceTree = "<group>";
 		};
 		A7AFCC9D1FB4E40D00AE3D85 = {

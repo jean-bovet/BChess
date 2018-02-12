@@ -18,12 +18,9 @@
 #import "FPGN.hpp"
 #import "ChessEngine.hpp"
 #import "ChessOpenings.hpp"
-#import "IterativeDeepening.hpp"
 
 @interface FEngine () {
-    IterativeDeepening<ChessBoard, ChessMoveGenerator, ChessMoveList, ChessEvaluater> iterativeSearch;
-    ChessGame currentGame;
-    ChessOpenings openings;
+    ChessEngine engine;
 }
 
 // This index is used to keep track of which engine session is currently analyzing.
@@ -63,37 +60,48 @@
 }
 
 - (BOOL)loadOpening:(NSString* _Nonnull)pgn {
-    return openings.load(StringFromNSString(pgn));
+    return engine.loadOpening(StringFromNSString(pgn));
 }
 
+#pragma mark -
+
 - (BOOL)setFEN:(NSString *)FEN {
-    return currentGame.setFEN(StringFromNSString(FEN));
+    return engine.setFEN(StringFromNSString(FEN));
 }
 
 - (NSString*)FEN {
-    return NSStringFromString(currentGame.getFEN());
+    return NSStringFromString(engine.getFEN());
 }
 
 - (BOOL)setPGN:(NSString *)PGN {
-    return FPGN::setGame(StringFromNSString(PGN), currentGame);
+    return engine.setPGN(StringFromNSString(PGN));
 }
 
 - (NSString*)PGN {
-    return NSStringFromString(FPGN::getGame(currentGame));
+    return NSStringFromString(engine.getPGN());
 }
 
 - (NSString*)PGNFormattedForDisplay {
-    return NSStringFromString(FPGN::getGame(currentGame, FPGN::Formatting::history));
+    return NSStringFromString(engine.getPGNForDisplay());
 }
 
 - (NSString* _Nullable)pieceAt:(NSUInteger)rank file:(NSUInteger)file {
-    BoardSquare square = currentGame.getPieceAt((File)file, (Rank)rank);
-    if (square.empty) {
+    auto piece = engine.getPieceAt(file, rank);
+    if (piece.empty()) {
         return nil;
     } else {
-        char p = pieceToChar(square.piece, square.color == WHITE);
-        return [NSString stringWithFormat:@"%c", p];
+        return NSStringFromString(piece);
     }
+}
+
+#pragma mark -
+
+- (NSArray<FEngineMove*>* _Nonnull)movesAt:(NSUInteger)rank file:(NSUInteger)file {
+    NSMutableArray *moves = [NSMutableArray array];
+    for (Move move : engine.getMovesAt((File)file, (Rank)rank)) {
+        [moves addObject:[self engineMoveFromMove:move]];
+    }
+    return moves;
 }
 
 - (FEngineMove*)engineMoveFromMove:(Move)fmove {
@@ -106,71 +114,65 @@
     return move;
 }
 
-- (NSArray<FEngineMove*>* _Nonnull)movesAt:(NSUInteger)rank file:(NSUInteger)file {
-    NSMutableArray *moves = [NSMutableArray array];
-    for (Move move : currentGame.movesAt((File)file, (Rank)rank)) {
-        [moves addObject:[self engineMoveFromMove:move]];
-    }
-    return moves;
-}
-
 - (void)move:(NSUInteger)move {
-    currentGame.move((Move)move);
+    engine.move((Move)move);
     [self fireUpdate:self.stateIndex];
 }
 
 - (void)move:(NSString*)from to:(NSString*)to {
-    currentGame.move(std::string([from cStringUsingEncoding:NSUTF8StringEncoding]),
-                      std::string([to cStringUsingEncoding:NSUTF8StringEncoding]));
+    engine.move(std::string([from cStringUsingEncoding:NSUTF8StringEncoding]),
+                std::string([to cStringUsingEncoding:NSUTF8StringEncoding]));
     [self fireUpdate:self.stateIndex];
 }
 
 - (BOOL)canUndoMove {
-    return currentGame.canUndoMove();
+    return engine.canUndoMove();
 }
 
 - (BOOL)canRedoMove {
-    return currentGame.canRedoMove();
+    return engine.canRedoMove();
 }
 
 - (void)undoMove {
     // TODO: handle the cancel with a callback when the cancel actually really happened
     [self cancel];
-    currentGame.undoMove();
+    engine.undoMove();
     [self fireUpdate:self.stateIndex];
 }
 
 - (void)redoMove {
     [self cancel];
-    currentGame.redoMove();
+    engine.redoMove();
     [self fireUpdate:self.stateIndex];
 }
 
+#pragma mark -
+
 - (void)stop {
-    iterativeSearch.stop();
+    engine.stop();
 }
 
 - (void)cancel {
     self.stateIndex += 1;
-    iterativeSearch.cancel();
+    engine.cancel();
 }
 
 - (BOOL)isAnalyzing {
-    return iterativeSearch.running();
+    return engine.running();
 }
 
 - (BOOL)isWhite {
-    return currentGame.board.color == WHITE;
+    return engine.isWhite();
 }
 
 - (BOOL)canPlay {
-    return currentGame.outcome == ChessGame::Outcome::in_progress;
+    return engine.canPlay();
 }
 
 - (FEngineInfo*)infoFor:(ChessEvaluation)info {
     FEngineInfo *ei = [[FEngineInfo alloc] init];
     ei.info = info;
-    ei.game = currentGame;
+    ei.game = engine.game;
     return ei;
 }
 
@@ -222,35 +224,22 @@
 }
 
 - (FEngineInfo*)lookupOpeningMove {
-    FEngineInfo *info = nil;
-    if (currentGame.moves.count == 0 && currentGame.board.fullMoveCount != 0) {
-        return info;
-    }
-    bool result = openings.best(currentGame.moves, [&info, self](OpeningTreeNode & node) {
-        ChessEvaluation evaluation;
-        evaluation.line.push(node.move);
-        evaluation.opening = node.name;
-        info = [self infoFor:evaluation];
-    });
-    if (!result) {
-        return nil;
+    ChessEvaluation evaluation;
+    if (engine.lookupOpeningMove(evaluation)) {
+        return [self infoFor:evaluation];
     } else {
-        return info;
+        return nil;
     }
 }
 
 - (void)searchBestMove:(NSInteger)maxDepth callback:(FEngineSearchCallback)callback {
+    // TODO ??
     ChessEvaluater::positionalAnalysis = self.positionalAnalysis;
-    iterativeSearch.minMaxSearch.config.transpositionTable = self.ttEnabled;
-    ChessEvaluation info = iterativeSearch.search(currentGame.board, currentGame.history, (int)maxDepth, [self, callback](ChessEvaluation info) {
-        if (!iterativeSearch.cancelled()) {
-            callback([self infoFor:info], NO);
-        }
+    engine.transpositionTable = self.ttEnabled;
+    
+    engine.searchBestMove((int)maxDepth, [self, callback](ChessEvaluation evaluation, bool done) {
+        callback([self infoFor:evaluation], done);
     });
-    ChessEvaluater::positionalAnalysis = false;
-    if (!iterativeSearch.cancelled()) {
-        callback([self infoFor:info], YES);
-    }
 }
 
 - (void)generatePositions {
@@ -259,10 +248,6 @@
     
     ChessMoveGenerator generator;
     generator.generateMoves(board);
-}
-
-- (void)debugEvaluate {
-    currentGame.debugEvaluate();
 }
 
 @end

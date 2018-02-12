@@ -65,13 +65,6 @@
                                                 <action selector="newGame:" target="Ady-hI-5gd" id="tbm-Fu-PRk"/>
                                             </connections>
                                         </menuItem>
-                                        <menuItem isSeparatorItem="YES" id="McZ-7g-ahd"/>
-                                        <menuItem title="Debug Evaluate" id="1Mn-CX-f1p">
-                                            <modifierMask key="keyEquivalentModifierMask"/>
-                                            <connections>
-                                                <action selector="debugEvaluate:" target="Ady-hI-5gd" id="f1L-1e-2eo"/>
-                                            </connections>
-                                        </menuItem>
                                     </items>
                                 </menu>
                             </menuItem>

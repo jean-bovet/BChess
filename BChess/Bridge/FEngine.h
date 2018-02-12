@@ -71,6 +71,4 @@ typedef void(^FEngineDidUpdateCallback)();
 - (void)evaluate:(NSInteger)depth callback:(FEngineSearchCallback _Nonnull)callback;
 - (void)evaluate:(NSInteger)depth time:(NSTimeInterval)time callback:(FEngineSearchCallback _Nonnull)callback;
 
-- (void)debugEvaluate;
-
 @end

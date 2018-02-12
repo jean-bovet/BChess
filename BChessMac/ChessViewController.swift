@@ -158,10 +158,6 @@ class ChessViewController: NSViewController {
         engine.redoMove()
     }
 
-    @IBAction func debugEvaluate(_ sender: NSMenuItem) {
-        engine.debugEvaluate()
-    }
-
     @IBAction func startAnalysis(_ sender: NSMenuItem) {
         if (engine.isAnalyzing()) {
             engine.stop()
