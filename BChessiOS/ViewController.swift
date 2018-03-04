@@ -11,30 +11,28 @@ import UIKit
 class ViewController: UIViewController {
 
     let engine = FEngine()
-
-    var chessView: ChessView {
-        get {
-            return self.view as! ChessView
-        }
-    }
+    let attributedInfo = EngineInfo()
+    
+    @IBOutlet weak var chessView: ChessView!
+    @IBOutlet weak var infoTextView: UITextView!
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        engine.useOpeningBook = true
         chessView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(chessViewTapped(gesture:))))
-        
-        chessView.state = engine.state
     }
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        chessView.layout()
+        chessView.state = engine.state
+        infoTextView.attributedText = attributedInfo.information(forInfo: nil, engine: engine)
     }
-
+    
     func enginePlay() {
-        engine.evaluate(4) { (info, completed) in
-            if completed {
-                DispatchQueue.main.async {
+        engine.evaluate(Int.max, time: 5) { (info, completed) in
+            DispatchQueue.main.async {
+                if completed {
                     self.engine.move(info.bestMove)
                     
                     // TODO: refactor?
@@ -45,9 +43,10 @@ class ViewController: UIViewController {
                     move.toRank = info.toRank
                     move.rawMoveValue = info.bestMove
                     self.chessView.lastMove = move
-
+                    
                     self.applyState { }
                 }
+                self.infoTextView.attributedText = self.attributedInfo.information(forInfo: info, engine: self.engine)
             }
         }
     }

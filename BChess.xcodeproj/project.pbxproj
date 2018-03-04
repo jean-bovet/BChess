@@ -95,6 +95,7 @@
 		A77372051FE443D70001A90F /* FPGN.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A77371FF1FE320010001A90F /* FPGN.cpp */; };
 		A77372061FE443DA0001A90F /* ChessGame.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A77371FC1FE31FEF0001A90F /* ChessGame.cpp */; };
 		A77E6C39204BBDB600ECF6CD /* ChessState.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A7688F5E204B6E91004B1E9E /* ChessState.cpp */; };
+		A77E6C3B204BCFF900ECF6CD /* EngineInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = A77E6C3A204BCFF900ECF6CD /* EngineInfo.swift */; };
 		A78E754C202C080E00445360 /* MovesTests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A78E754B202C080E00445360 /* MovesTests.cpp */; };
 		A78E7551202C110200445360 /* UnitTestHelper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A78E754F202C110200445360 /* UnitTestHelper.cpp */; };
 		A7AFCCAA1FB4E40D00AE3D85 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7AFCCA91FB4E40D00AE3D85 /* main.swift */; };
@@ -215,7 +216,7 @@
 		A765D85D1FF61AA70045BB36 /* PromotionPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromotionPicker.swift; sourceTree = "<group>"; };
 		A765D85F1FF6C1950045BB36 /* ChessOpenings.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ChessOpenings.cpp; sourceTree = "<group>"; };
 		A765D8601FF6C1950045BB36 /* ChessOpenings.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = ChessOpenings.hpp; sourceTree = "<group>"; };
-		A7688F1F204A6911004B1E9E /* BChessiOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BChessiOS.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		A7688F1F204A6911004B1E9E /* BChess.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BChess.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A7688F21204A6911004B1E9E /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		A7688F23204A6911004B1E9E /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		A7688F26204A6911004B1E9E /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
@@ -247,6 +248,7 @@
 		A77371FF1FE320010001A90F /* FPGN.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = FPGN.cpp; sourceTree = "<group>"; };
 		A77372001FE320010001A90F /* FPGN.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = FPGN.hpp; sourceTree = "<group>"; };
 		A77372041FE340780001A90F /* PGNTests.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PGNTests.cpp; sourceTree = "<group>"; };
+		A77E6C3A204BCFF900ECF6CD /* EngineInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EngineInfo.swift; sourceTree = "<group>"; };
 		A78E754B202C080E00445360 /* MovesTests.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MovesTests.cpp; sourceTree = "<group>"; };
 		A78E754F202C110200445360 /* UnitTestHelper.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = UnitTestHelper.cpp; sourceTree = "<group>"; };
 		A78E7550202C110200445360 /* UnitTestHelper.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = UnitTestHelper.hpp; sourceTree = "<group>"; };
@@ -435,6 +437,7 @@
 				A7688F21204A6911004B1E9E /* AppDelegate.swift */,
 				A7688F23204A6911004B1E9E /* ViewController.swift */,
 				A7688F4D204A699F004B1E9E /* ChessView.swift */,
+				A77E6C3A204BCFF900ECF6CD /* EngineInfo.swift */,
 				A7688F25204A6911004B1E9E /* Main.storyboard */,
 				A7688F28204A6911004B1E9E /* Assets.xcassets */,
 				A7688F2A204A6911004B1E9E /* LaunchScreen.storyboard */,
@@ -543,7 +546,7 @@
 				A75359901FDE0947008D1DEE /* BChessMac.app */,
 				A75359A11FDE0947008D1DEE /* BChessMacTests.xctest */,
 				A75359AC1FDE0947008D1DEE /* BChessMacUITests.xctest */,
-				A7688F1F204A6911004B1E9E /* BChessiOS.app */,
+				A7688F1F204A6911004B1E9E /* BChess.app */,
 				A7688F32204A6911004B1E9E /* BChessiOSTests.xctest */,
 				A7688F3D204A6912004B1E9E /* BChessiOSUITests.xctest */,
 			);
@@ -643,7 +646,7 @@
 			);
 			name = BChessiOS;
 			productName = BChessiOS;
-			productReference = A7688F1F204A6911004B1E9E /* BChessiOS.app */;
+			productReference = A7688F1F204A6911004B1E9E /* BChess.app */;
 			productType = "com.apple.product-type.application";
 		};
 		A7688F31204A6911004B1E9E /* BChessiOSTests */ = {
@@ -915,6 +918,7 @@
 				A7688F24204A6911004B1E9E /* ViewController.swift in Sources */,
 				A7688F50204A6A0F004B1E9E /* FEngineUtility.mm in Sources */,
 				A7688F22204A6911004B1E9E /* AppDelegate.swift in Sources */,
+				A77E6C3B204BCFF900ECF6CD /* EngineInfo.swift in Sources */,
 				A7688F5A204A6A27004B1E9E /* FFEN.cpp in Sources */,
 				A7688F4F204A6A0C004B1E9E /* FEngine.mm in Sources */,
 				A7688F4E204A699F004B1E9E /* ChessView.swift in Sources */,
@@ -1171,7 +1175,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 11.2;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "ch.arizona-software.BChessiOS";
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = BChess;
 				SDKROOT = iphoneos;
 				SWIFT_OBJC_BRIDGING_HEADER = "BChess/BChess-Bridging-Header.h";
 				SWIFT_VERSION = 4.0;
@@ -1190,7 +1194,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 11.2;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "ch.arizona-software.BChessiOS";
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = BChess;
 				SDKROOT = iphoneos;
 				SWIFT_OBJC_BRIDGING_HEADER = "BChess/BChess-Bridging-Header.h";
 				SWIFT_VERSION = 4.0;
