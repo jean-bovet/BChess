@@ -66,6 +66,12 @@ class ViewController: UIViewController {
             return
         }
         
+        if !handleUserInitiatedMove(file: file, rank: rank) {
+            showPossibleMoves(file: file, rank: rank)
+        }
+    }
+    
+    func handleUserInitiatedMove(file: UInt, rank: UInt) -> Bool {
         for move in chessView.possibleMoves {
             if move.toRank == rank && move.toFile == file {
                 chessView.possibleMoves = []
@@ -73,13 +79,15 @@ class ViewController: UIViewController {
                 applyState {
                     self.enginePlay()
                 }
-                return
+                return true
             }
         }
-        
+        return false
+    }
+    
+    func showPossibleMoves(file: UInt, rank: UInt) {
         let moves = engine.moves(at: UInt(rank), file: UInt(file))
         chessView.possibleMoves = moves
     }
-    
 }
 
