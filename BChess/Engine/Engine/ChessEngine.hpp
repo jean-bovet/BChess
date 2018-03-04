@@ -145,4 +145,8 @@ public:
             callback(info, true);
         }
     }
+    
+    std::string getState() {
+        return game.getState();
+    }
 };

@@ -26,6 +26,8 @@ typedef void(^FEngineDidUpdateCallback)();
 
 @property (nonatomic, strong) FEngineDidUpdateCallback _Nullable updateCallback;
 
+@property (nonatomic, strong, readonly) NSString * _Nonnull state;
+
 - (id _Nonnull)init;
 
 - (BOOL)loadOpening:(NSString* _Nonnull)pgn;

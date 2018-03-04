@@ -96,6 +96,10 @@
 
 #pragma mark -
 
+- (NSString*)state {
+    return NSStringFromString(engine.getState());
+}
+
 - (NSArray<FEngineMove*>* _Nonnull)movesAt:(NSUInteger)rank file:(NSUInteger)file {
     NSMutableArray *moves = [NSMutableArray array];
     for (Move move : engine.getMovesAt((File)file, (Rank)rank)) {

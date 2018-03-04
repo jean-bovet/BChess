@@ -58,6 +58,33 @@
 		A765D85C1FF60DED0045BB36 /* NSView+Chess.swift in Sources */ = {isa = PBXBuildFile; fileRef = A765D85B1FF60DED0045BB36 /* NSView+Chess.swift */; };
 		A765D85E1FF61AA70045BB36 /* PromotionPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = A765D85D1FF61AA70045BB36 /* PromotionPicker.swift */; };
 		A765D8611FF6C1950045BB36 /* ChessOpenings.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A765D85F1FF6C1950045BB36 /* ChessOpenings.cpp */; };
+		A7688F22204A6911004B1E9E /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7688F21204A6911004B1E9E /* AppDelegate.swift */; };
+		A7688F24204A6911004B1E9E /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7688F23204A6911004B1E9E /* ViewController.swift */; };
+		A7688F27204A6911004B1E9E /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A7688F25204A6911004B1E9E /* Main.storyboard */; };
+		A7688F29204A6911004B1E9E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A7688F28204A6911004B1E9E /* Assets.xcassets */; };
+		A7688F2C204A6911004B1E9E /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A7688F2A204A6911004B1E9E /* LaunchScreen.storyboard */; };
+		A7688F37204A6912004B1E9E /* BChessiOSTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7688F36204A6912004B1E9E /* BChessiOSTests.swift */; };
+		A7688F42204A6912004B1E9E /* BChessiOSUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7688F41204A6912004B1E9E /* BChessiOSUITests.swift */; };
+		A7688F4E204A699F004B1E9E /* ChessView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7688F4D204A699F004B1E9E /* ChessView.swift */; };
+		A7688F4F204A6A0C004B1E9E /* FEngine.mm in Sources */ = {isa = PBXBuildFile; fileRef = A75683281FCD28A000CF1408 /* FEngine.mm */; };
+		A7688F50204A6A0F004B1E9E /* FEngineUtility.mm in Sources */ = {isa = PBXBuildFile; fileRef = A7C92AB81FF86F6800160D2E /* FEngineUtility.mm */; };
+		A7688F51204A6A14004B1E9E /* FEngineInfo.mm in Sources */ = {isa = PBXBuildFile; fileRef = A70A61D01FD4AA9600AFDF0E /* FEngineInfo.mm */; };
+		A7688F52204A6A14004B1E9E /* FEngineMove.mm in Sources */ = {isa = PBXBuildFile; fileRef = A7C92AB31FF86BF200160D2E /* FEngineMove.mm */; };
+		A7688F53204A6A27004B1E9E /* MoveList.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A70A61C51FD4592700AFDF0E /* MoveList.cpp */; };
+		A7688F54204A6A27004B1E9E /* ChessMoveGenerator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A70A61C21FD458DE00AFDF0E /* ChessMoveGenerator.cpp */; };
+		A7688F55204A6A27004B1E9E /* ChessEvaluater.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A70A61C81FD46E3C00AFDF0E /* ChessEvaluater.cpp */; };
+		A7688F56204A6A27004B1E9E /* ChessBoard.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A7712D451FCBC13100E7E802 /* ChessBoard.cpp */; };
+		A7688F57204A6A27004B1E9E /* GameHistory.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A746C2472001707F001F4437 /* GameHistory.cpp */; };
+		A7688F58204A6A27004B1E9E /* magicmoves.c in Sources */ = {isa = PBXBuildFile; fileRef = A7712D411FCB97A900E7E802 /* magicmoves.c */; };
+		A7688F59204A6A27004B1E9E /* ChessBoardHash.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A746C242200148E9001F4437 /* ChessBoardHash.cpp */; };
+		A7688F5A204A6A27004B1E9E /* FFEN.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A70A61B91FD132D200AFDF0E /* FFEN.cpp */; };
+		A7688F5B204A6A27004B1E9E /* FPGN.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A77371FF1FE320010001A90F /* FPGN.cpp */; };
+		A7688F5C204A6A30004B1E9E /* ChessGame.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A77371FC1FE31FEF0001A90F /* ChessGame.cpp */; };
+		A7688F5D204A6A30004B1E9E /* ChessOpenings.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A765D85F1FF6C1950045BB36 /* ChessOpenings.cpp */; };
+		A7688F60204B6E91004B1E9E /* ChessState.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A7688F5E204B6E91004B1E9E /* ChessState.cpp */; };
+		A7688F61204B6FFA004B1E9E /* ChessState.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A7688F5E204B6E91004B1E9E /* ChessState.cpp */; };
+		A7688F62204B739E004B1E9E /* ChessState.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A7688F5E204B6E91004B1E9E /* ChessState.cpp */; };
+		A7688F64204B73BF004B1E9E /* StateTests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A7688F63204B73BF004B1E9E /* StateTests.cpp */; };
 		A7712D2F1FC7C4CD00E7E802 /* UCI.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7712D2E1FC7C4CD00E7E802 /* UCI.swift */; };
 		A7712D341FC895D100E7E802 /* UCI.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7712D2E1FC7C4CD00E7E802 /* UCI.swift */; };
 		A7712D471FCBC13100E7E802 /* ChessBoard.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A7712D451FCBC13100E7E802 /* ChessBoard.cpp */; };
@@ -67,6 +94,7 @@
 		A77372031FE334BB0001A90F /* FPGN.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A77371FF1FE320010001A90F /* FPGN.cpp */; };
 		A77372051FE443D70001A90F /* FPGN.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A77371FF1FE320010001A90F /* FPGN.cpp */; };
 		A77372061FE443DA0001A90F /* ChessGame.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A77371FC1FE31FEF0001A90F /* ChessGame.cpp */; };
+		A77E6C39204BBDB600ECF6CD /* ChessState.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A7688F5E204B6E91004B1E9E /* ChessState.cpp */; };
 		A78E754C202C080E00445360 /* MovesTests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A78E754B202C080E00445360 /* MovesTests.cpp */; };
 		A78E7551202C110200445360 /* UnitTestHelper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A78E754F202C110200445360 /* UnitTestHelper.cpp */; };
 		A7AFCCAA1FB4E40D00AE3D85 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7AFCCA91FB4E40D00AE3D85 /* main.swift */; };
@@ -103,6 +131,20 @@
 			proxyType = 1;
 			remoteGlobalIDString = A753598F1FDE0947008D1DEE;
 			remoteInfo = BChessMac;
+		};
+		A7688F33204A6912004B1E9E /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A7AFCC9E1FB4E40D00AE3D85 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = A7688F1E204A6911004B1E9E;
+			remoteInfo = BChessiOS;
+		};
+		A7688F3E204A6912004B1E9E /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A7AFCC9E1FB4E40D00AE3D85 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = A7688F1E204A6911004B1E9E;
+			remoteInfo = BChessiOS;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -173,6 +215,23 @@
 		A765D85D1FF61AA70045BB36 /* PromotionPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromotionPicker.swift; sourceTree = "<group>"; };
 		A765D85F1FF6C1950045BB36 /* ChessOpenings.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ChessOpenings.cpp; sourceTree = "<group>"; };
 		A765D8601FF6C1950045BB36 /* ChessOpenings.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = ChessOpenings.hpp; sourceTree = "<group>"; };
+		A7688F1F204A6911004B1E9E /* BChessiOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BChessiOS.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		A7688F21204A6911004B1E9E /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		A7688F23204A6911004B1E9E /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		A7688F26204A6911004B1E9E /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		A7688F28204A6911004B1E9E /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		A7688F2B204A6911004B1E9E /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		A7688F2D204A6911004B1E9E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		A7688F32204A6911004B1E9E /* BChessiOSTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BChessiOSTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		A7688F36204A6912004B1E9E /* BChessiOSTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BChessiOSTests.swift; sourceTree = "<group>"; };
+		A7688F38204A6912004B1E9E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		A7688F3D204A6912004B1E9E /* BChessiOSUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BChessiOSUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		A7688F41204A6912004B1E9E /* BChessiOSUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BChessiOSUITests.swift; sourceTree = "<group>"; };
+		A7688F43204A6912004B1E9E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		A7688F4D204A699F004B1E9E /* ChessView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChessView.swift; sourceTree = "<group>"; };
+		A7688F5E204B6E91004B1E9E /* ChessState.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ChessState.cpp; sourceTree = "<group>"; };
+		A7688F5F204B6E91004B1E9E /* ChessState.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = ChessState.hpp; sourceTree = "<group>"; };
+		A7688F63204B73BF004B1E9E /* StateTests.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = StateTests.cpp; sourceTree = "<group>"; };
 		A7712D141FB916E900E7E802 /* BChessTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BChessTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		A7712D181FB916E900E7E802 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		A7712D2E1FC7C4CD00E7E802 /* UCI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UCI.swift; sourceTree = "<group>"; };
@@ -224,6 +283,27 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		A75359A91FDE0947008D1DEE /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A7688F1C204A6911004B1E9E /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A7688F2F204A6911004B1E9E /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A7688F3A204A6912004B1E9E /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -349,6 +429,38 @@
 			path = Algorithm;
 			sourceTree = "<group>";
 		};
+		A7688F20204A6911004B1E9E /* BChessiOS */ = {
+			isa = PBXGroup;
+			children = (
+				A7688F21204A6911004B1E9E /* AppDelegate.swift */,
+				A7688F23204A6911004B1E9E /* ViewController.swift */,
+				A7688F4D204A699F004B1E9E /* ChessView.swift */,
+				A7688F25204A6911004B1E9E /* Main.storyboard */,
+				A7688F28204A6911004B1E9E /* Assets.xcassets */,
+				A7688F2A204A6911004B1E9E /* LaunchScreen.storyboard */,
+				A7688F2D204A6911004B1E9E /* Info.plist */,
+			);
+			path = BChessiOS;
+			sourceTree = "<group>";
+		};
+		A7688F35204A6912004B1E9E /* BChessiOSTests */ = {
+			isa = PBXGroup;
+			children = (
+				A7688F36204A6912004B1E9E /* BChessiOSTests.swift */,
+				A7688F38204A6912004B1E9E /* Info.plist */,
+			);
+			path = BChessiOSTests;
+			sourceTree = "<group>";
+		};
+		A7688F40204A6912004B1E9E /* BChessiOSUITests */ = {
+			isa = PBXGroup;
+			children = (
+				A7688F41204A6912004B1E9E /* BChessiOSUITests.swift */,
+				A7688F43204A6912004B1E9E /* Info.plist */,
+			);
+			path = BChessiOSUITests;
+			sourceTree = "<group>";
+		};
 		A7712D151FB916E900E7E802 /* BChessTests */ = {
 			isa = PBXGroup;
 			children = (
@@ -362,6 +474,7 @@
 				A7E3B6881FF6C85500DBB66B /* OpeningsTests.cpp */,
 				A77372041FE340780001A90F /* PGNTests.cpp */,
 				A7E490E41FEA1C0600970EAD /* SearchChessTests.cpp */,
+				A7688F63204B73BF004B1E9E /* StateTests.cpp */,
 				A7E490F01FEA2E6F00970EAD /* Helper */,
 				A7712D181FB916E900E7E802 /* Info.plist */,
 			);
@@ -387,6 +500,8 @@
 				A77371FC1FE31FEF0001A90F /* ChessGame.cpp */,
 				A765D8601FF6C1950045BB36 /* ChessOpenings.hpp */,
 				A765D85F1FF6C1950045BB36 /* ChessOpenings.cpp */,
+				A7688F5F204B6E91004B1E9E /* ChessState.hpp */,
+				A7688F5E204B6E91004B1E9E /* ChessState.cpp */,
 			);
 			path = Engine;
 			sourceTree = "<group>";
@@ -413,6 +528,9 @@
 				A75359911FDE0947008D1DEE /* BChessMac */,
 				A75359A41FDE0947008D1DEE /* BChessMacTests */,
 				A75359AF1FDE0947008D1DEE /* BChessMacUITests */,
+				A7688F20204A6911004B1E9E /* BChessiOS */,
+				A7688F35204A6912004B1E9E /* BChessiOSTests */,
+				A7688F40204A6912004B1E9E /* BChessiOSUITests */,
 				A7AFCCA71FB4E40D00AE3D85 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -425,6 +543,9 @@
 				A75359901FDE0947008D1DEE /* BChessMac.app */,
 				A75359A11FDE0947008D1DEE /* BChessMacTests.xctest */,
 				A75359AC1FDE0947008D1DEE /* BChessMacUITests.xctest */,
+				A7688F1F204A6911004B1E9E /* BChessiOS.app */,
+				A7688F32204A6911004B1E9E /* BChessiOSTests.xctest */,
+				A7688F3D204A6912004B1E9E /* BChessiOSUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -508,6 +629,59 @@
 			productReference = A75359AC1FDE0947008D1DEE /* BChessMacUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
 		};
+		A7688F1E204A6911004B1E9E /* BChessiOS */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A7688F4A204A6912004B1E9E /* Build configuration list for PBXNativeTarget "BChessiOS" */;
+			buildPhases = (
+				A7688F1B204A6911004B1E9E /* Sources */,
+				A7688F1C204A6911004B1E9E /* Frameworks */,
+				A7688F1D204A6911004B1E9E /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = BChessiOS;
+			productName = BChessiOS;
+			productReference = A7688F1F204A6911004B1E9E /* BChessiOS.app */;
+			productType = "com.apple.product-type.application";
+		};
+		A7688F31204A6911004B1E9E /* BChessiOSTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A7688F4B204A6912004B1E9E /* Build configuration list for PBXNativeTarget "BChessiOSTests" */;
+			buildPhases = (
+				A7688F2E204A6911004B1E9E /* Sources */,
+				A7688F2F204A6911004B1E9E /* Frameworks */,
+				A7688F30204A6911004B1E9E /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				A7688F34204A6912004B1E9E /* PBXTargetDependency */,
+			);
+			name = BChessiOSTests;
+			productName = BChessiOSTests;
+			productReference = A7688F32204A6911004B1E9E /* BChessiOSTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		A7688F3C204A6912004B1E9E /* BChessiOSUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A7688F4C204A6912004B1E9E /* Build configuration list for PBXNativeTarget "BChessiOSUITests" */;
+			buildPhases = (
+				A7688F39204A6912004B1E9E /* Sources */,
+				A7688F3A204A6912004B1E9E /* Frameworks */,
+				A7688F3B204A6912004B1E9E /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				A7688F3F204A6912004B1E9E /* PBXTargetDependency */,
+			);
+			name = BChessiOSUITests;
+			productName = BChessiOSUITests;
+			productReference = A7688F3D204A6912004B1E9E /* BChessiOSUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
 		A7712D131FB916E900E7E802 /* BChessTests */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = A7712D191FB916E900E7E802 /* Build configuration list for PBXNativeTarget "BChessTests" */;
@@ -566,6 +740,20 @@
 						ProvisioningStyle = Automatic;
 						TestTargetID = A753598F1FDE0947008D1DEE;
 					};
+					A7688F1E204A6911004B1E9E = {
+						CreatedOnToolsVersion = 9.2;
+						ProvisioningStyle = Automatic;
+					};
+					A7688F31204A6911004B1E9E = {
+						CreatedOnToolsVersion = 9.2;
+						ProvisioningStyle = Automatic;
+						TestTargetID = A7688F1E204A6911004B1E9E;
+					};
+					A7688F3C204A6912004B1E9E = {
+						CreatedOnToolsVersion = 9.2;
+						ProvisioningStyle = Automatic;
+						TestTargetID = A7688F1E204A6911004B1E9E;
+					};
 					A7712D131FB916E900E7E802 = {
 						CreatedOnToolsVersion = 9.1;
 						ProvisioningStyle = Automatic;
@@ -595,6 +783,9 @@
 				A753598F1FDE0947008D1DEE /* BChessMac */,
 				A75359A01FDE0947008D1DEE /* BChessMacTests */,
 				A75359AB1FDE0947008D1DEE /* BChessMacUITests */,
+				A7688F1E204A6911004B1E9E /* BChessiOS */,
+				A7688F31204A6911004B1E9E /* BChessiOSTests */,
+				A7688F3C204A6912004B1E9E /* BChessiOSUITests */,
 			);
 		};
 /* End PBXProject section */
@@ -618,6 +809,30 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		A75359AA1FDE0947008D1DEE /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A7688F1D204A6911004B1E9E /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A7688F2C204A6911004B1E9E /* LaunchScreen.storyboard in Resources */,
+				A7688F29204A6911004B1E9E /* Assets.xcassets in Resources */,
+				A7688F27204A6911004B1E9E /* Main.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A7688F30204A6911004B1E9E /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A7688F3B204A6912004B1E9E /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -661,6 +876,7 @@
 				A75359C91FDE4038008D1DEE /* ChessBoard.cpp in Sources */,
 				A75359C41FDE4031008D1DEE /* FEngineInfo.mm in Sources */,
 				A7C92AB61FF86C4300160D2E /* FEngineMove.mm in Sources */,
+				A77E6C39204BBDB600ECF6CD /* ChessState.cpp in Sources */,
 				A75359C81FDE4038008D1DEE /* ChessMoveGenerator.cpp in Sources */,
 				A765D85A1FF60CEE0045BB36 /* PromotionPickerView.swift in Sources */,
 			);
@@ -682,6 +898,48 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		A7688F1B204A6911004B1E9E /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A7688F53204A6A27004B1E9E /* MoveList.cpp in Sources */,
+				A7688F61204B6FFA004B1E9E /* ChessState.cpp in Sources */,
+				A7688F58204A6A27004B1E9E /* magicmoves.c in Sources */,
+				A7688F52204A6A14004B1E9E /* FEngineMove.mm in Sources */,
+				A7688F5D204A6A30004B1E9E /* ChessOpenings.cpp in Sources */,
+				A7688F55204A6A27004B1E9E /* ChessEvaluater.cpp in Sources */,
+				A7688F5B204A6A27004B1E9E /* FPGN.cpp in Sources */,
+				A7688F51204A6A14004B1E9E /* FEngineInfo.mm in Sources */,
+				A7688F57204A6A27004B1E9E /* GameHistory.cpp in Sources */,
+				A7688F5C204A6A30004B1E9E /* ChessGame.cpp in Sources */,
+				A7688F24204A6911004B1E9E /* ViewController.swift in Sources */,
+				A7688F50204A6A0F004B1E9E /* FEngineUtility.mm in Sources */,
+				A7688F22204A6911004B1E9E /* AppDelegate.swift in Sources */,
+				A7688F5A204A6A27004B1E9E /* FFEN.cpp in Sources */,
+				A7688F4F204A6A0C004B1E9E /* FEngine.mm in Sources */,
+				A7688F4E204A699F004B1E9E /* ChessView.swift in Sources */,
+				A7688F59204A6A27004B1E9E /* ChessBoardHash.cpp in Sources */,
+				A7688F54204A6A27004B1E9E /* ChessMoveGenerator.cpp in Sources */,
+				A7688F56204A6A27004B1E9E /* ChessBoard.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A7688F2E204A6911004B1E9E /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A7688F37204A6912004B1E9E /* BChessiOSTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A7688F39204A6912004B1E9E /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A7688F42204A6912004B1E9E /* BChessiOSUITests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		A7712D101FB916E900E7E802 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -700,10 +958,12 @@
 				A7E490ED1FEA29B900970EAD /* GamesTests.swift in Sources */,
 				A77372031FE334BB0001A90F /* FPGN.cpp in Sources */,
 				A7E3B6891FF6C85500DBB66B /* OpeningsTests.cpp in Sources */,
+				A7688F62204B739E004B1E9E /* ChessState.cpp in Sources */,
 				A70A61DE1FD4D49F00AFDF0E /* magicmoves.c in Sources */,
 				A75359851FDC994E008D1DEE /* FENgineInfo+Extension.swift in Sources */,
 				A7C92AB51FF86C4300160D2E /* FEngineMove.mm in Sources */,
 				A70A61D51FD4D42100AFDF0E /* FEngineInfo.mm in Sources */,
+				A7688F64204B73BF004B1E9E /* StateTests.cpp in Sources */,
 				A7E490F21FEA2E7E00970EAD /* GoogleTests.mm in Sources */,
 				A7EF55C91FF1CF77004CF2DA /* BestMoveTests.cpp in Sources */,
 				A70A61DB1FD4D49500AFDF0E /* ChessEvaluater.cpp in Sources */,
@@ -733,6 +993,7 @@
 				A756832D1FD0B3FE00CF1408 /* magicmoves.c in Sources */,
 				A7712D471FCBC13100E7E802 /* ChessBoard.cpp in Sources */,
 				A77371FE1FE31FEF0001A90F /* ChessGame.cpp in Sources */,
+				A7688F60204B6E91004B1E9E /* ChessState.cpp in Sources */,
 				A7C92AB41FF86BF200160D2E /* FEngineMove.mm in Sources */,
 				A70A61CA1FD46E3C00AFDF0E /* ChessEvaluater.cpp in Sources */,
 				A70A61C41FD458DE00AFDF0E /* ChessMoveGenerator.cpp in Sources */,
@@ -759,6 +1020,16 @@
 			target = A753598F1FDE0947008D1DEE /* BChessMac */;
 			targetProxy = A75359AD1FDE0947008D1DEE /* PBXContainerItemProxy */;
 		};
+		A7688F34204A6912004B1E9E /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = A7688F1E204A6911004B1E9E /* BChessiOS */;
+			targetProxy = A7688F33204A6912004B1E9E /* PBXContainerItemProxy */;
+		};
+		A7688F3F204A6912004B1E9E /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = A7688F1E204A6911004B1E9E /* BChessiOS */;
+			targetProxy = A7688F3E204A6912004B1E9E /* PBXContainerItemProxy */;
+		};
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
@@ -768,6 +1039,22 @@
 				A75359991FDE0947008D1DEE /* Base */,
 			);
 			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+		A7688F25204A6911004B1E9E /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				A7688F26204A6911004B1E9E /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+		A7688F2A204A6911004B1E9E /* LaunchScreen.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				A7688F2B204A6911004B1E9E /* Base */,
+			);
+			name = LaunchScreen.storyboard;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */
@@ -870,6 +1157,125 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 4.0;
 				TEST_TARGET_NAME = BChessMac;
+			};
+			name = Release;
+		};
+		A7688F44204A6912004B1E9E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 28XRU7S6GA;
+				INFOPLIST_FILE = BChessiOS/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.2;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "ch.arizona-software.BChessiOS";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_OBJC_BRIDGING_HEADER = "BChess/BChess-Bridging-Header.h";
+				SWIFT_VERSION = 4.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		A7688F45204A6912004B1E9E /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 28XRU7S6GA;
+				INFOPLIST_FILE = BChessiOS/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.2;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "ch.arizona-software.BChessiOS";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_OBJC_BRIDGING_HEADER = "BChess/BChess-Bridging-Header.h";
+				SWIFT_VERSION = 4.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		A7688F46204A6912004B1E9E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 28XRU7S6GA;
+				INFOPLIST_FILE = BChessiOSTests/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.2;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "ch.arizona-software.BChessiOSTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 4.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/BChessiOS.app/BChessiOS";
+			};
+			name = Debug;
+		};
+		A7688F47204A6912004B1E9E /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 28XRU7S6GA;
+				INFOPLIST_FILE = BChessiOSTests/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.2;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "ch.arizona-software.BChessiOSTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 4.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/BChessiOS.app/BChessiOS";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		A7688F48204A6912004B1E9E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 28XRU7S6GA;
+				INFOPLIST_FILE = BChessiOSUITests/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.2;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "ch.arizona-software.BChessiOSUITests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 4.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = BChessiOS;
+			};
+			name = Debug;
+		};
+		A7688F49204A6912004B1E9E /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 28XRU7S6GA;
+				INFOPLIST_FILE = BChessiOSUITests/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.2;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "ch.arizona-software.BChessiOSUITests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 4.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = BChessiOS;
+				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;
 		};
@@ -1080,6 +1486,33 @@
 			buildConfigurations = (
 				A75359BA1FDE0947008D1DEE /* Debug */,
 				A75359BB1FDE0947008D1DEE /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A7688F4A204A6912004B1E9E /* Build configuration list for PBXNativeTarget "BChessiOS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A7688F44204A6912004B1E9E /* Debug */,
+				A7688F45204A6912004B1E9E /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A7688F4B204A6912004B1E9E /* Build configuration list for PBXNativeTarget "BChessiOSTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A7688F46204A6912004B1E9E /* Debug */,
+				A7688F47204A6912004B1E9E /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A7688F4C204A6912004B1E9E /* Build configuration list for PBXNativeTarget "BChessiOSUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A7688F48204A6912004B1E9E /* Debug */,
+				A7688F49204A6912004B1E9E /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

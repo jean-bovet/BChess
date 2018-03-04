@@ -11,6 +11,7 @@
 #include "ChessMoveGenerator.hpp"
 #include "ChessEvaluater.hpp"
 #include "ChessBoardHash.hpp"
+#include "ChessState.hpp"
 
 ChessGame::ChessGame() {
     history = NEW_HISTORY;
@@ -122,7 +123,17 @@ void ChessGame::replayMoves() {
     }
 }
 
-void ChessGame::debugEvaluate() {
-    std::cout << ChessEvaluater::evaluate(board, history) << std::endl;
+std::string ChessGame::getState() {
+    ChessBoard replay;
+    assert(FFEN::setFEN(initialFEN, replay));
+    
+    ChessState state;
+    state.set(replay);
+    
+    for (int index=0; index<moveCursor; index++) {
+        replay.move(moves[index]);
+        state.update(replay);
+    }
+    
+    return state.getState();
 }
-

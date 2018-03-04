@@ -57,7 +57,7 @@ public:
     
     void undoMove();
     void redoMove();
-    
-    void debugEvaluate();
+
+    std::string getState();
 };
 
