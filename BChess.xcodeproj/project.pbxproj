@@ -54,6 +54,9 @@
 		A75CB25B1FED8F2C005487BD /* MoveTests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A75CB25A1FED8F2B005487BD /* MoveTests.cpp */; };
 		A75CB25D1FED8F82005487BD /* EvaluationTests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A75CB25C1FED8F82005487BD /* EvaluationTests.cpp */; };
 		A75CB25F1FED8F9E005487BD /* CheckTests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A75CB25E1FED8F9E005487BD /* CheckTests.cpp */; };
+		A75CF029204CC80700974912 /* UIActionPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = A75CF028204CC80700974912 /* UIActionPresenter.swift */; };
+		A75CF02B204CC86800974912 /* UIAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = A75CF02A204CC86800974912 /* UIAction.swift */; };
+		A75CF02D204CC8A200974912 /* UIActionNewGame.swift in Sources */ = {isa = PBXBuildFile; fileRef = A75CF02C204CC8A200974912 /* UIActionNewGame.swift */; };
 		A765D85A1FF60CEE0045BB36 /* PromotionPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A765D8591FF60CEE0045BB36 /* PromotionPickerView.swift */; };
 		A765D85C1FF60DED0045BB36 /* NSView+Chess.swift in Sources */ = {isa = PBXBuildFile; fileRef = A765D85B1FF60DED0045BB36 /* NSView+Chess.swift */; };
 		A765D85E1FF61AA70045BB36 /* PromotionPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = A765D85D1FF61AA70045BB36 /* PromotionPicker.swift */; };
@@ -113,6 +116,10 @@
 		A7E490EC1FEA23DD00970EAD /* PGNTests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A77372041FE340780001A90F /* PGNTests.cpp */; };
 		A7E490ED1FEA29B900970EAD /* GamesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7712D321FC8957500E7E802 /* GamesTests.swift */; };
 		A7E490F21FEA2E7E00970EAD /* GoogleTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = A7E490F11FEA2E7E00970EAD /* GoogleTests.mm */; };
+		A7E8B701204CC9D200DD2323 /* FENgineInfo+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = A75359831FDC51B2008D1DEE /* FENgineInfo+Extension.swift */; };
+		A7E8B703204CCBC500DD2323 /* ChessViewState.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7E8B702204CCBC500DD2323 /* ChessViewState.swift */; };
+		A7E8B705204CDAD900DD2323 /* ChessViewLayouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7E8B704204CDAD900DD2323 /* ChessViewLayouter.swift */; };
+		A7E8B707204CDAF900DD2323 /* ChessViewFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7E8B706204CDAF900DD2323 /* ChessViewFactory.swift */; };
 		A7EBE7CF1FF6C93600ACDF85 /* ChessOpenings.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A765D85F1FF6C1950045BB36 /* ChessOpenings.cpp */; };
 		A7EF55C81FF191B1004CF2DA /* SearchChessTests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A7E490E41FEA1C0600970EAD /* SearchChessTests.cpp */; };
 		A7EF55C91FF1CF77004CF2DA /* BestMoveTests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A70A61BD1FD3196400AFDF0E /* BestMoveTests.cpp */; };
@@ -211,6 +218,9 @@
 		A75CB25C1FED8F82005487BD /* EvaluationTests.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = EvaluationTests.cpp; sourceTree = "<group>"; };
 		A75CB25E1FED8F9E005487BD /* CheckTests.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CheckTests.cpp; sourceTree = "<group>"; };
 		A75CB2611FED9693005487BD /* IterativeDeepening.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = IterativeDeepening.hpp; sourceTree = "<group>"; };
+		A75CF028204CC80700974912 /* UIActionPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIActionPresenter.swift; sourceTree = "<group>"; };
+		A75CF02A204CC86800974912 /* UIAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIAction.swift; sourceTree = "<group>"; };
+		A75CF02C204CC8A200974912 /* UIActionNewGame.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIActionNewGame.swift; sourceTree = "<group>"; };
 		A765D8591FF60CEE0045BB36 /* PromotionPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromotionPickerView.swift; sourceTree = "<group>"; };
 		A765D85B1FF60DED0045BB36 /* NSView+Chess.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSView+Chess.swift"; sourceTree = "<group>"; };
 		A765D85D1FF61AA70045BB36 /* PromotionPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromotionPicker.swift; sourceTree = "<group>"; };
@@ -265,6 +275,9 @@
 		A7E490E41FEA1C0600970EAD /* SearchChessTests.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SearchChessTests.cpp; sourceTree = "<group>"; };
 		A7E490EA1FEA207100970EAD /* gtest-all.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "gtest-all.cc"; path = "BChessTests/Helper/gtest-all.cc"; sourceTree = SOURCE_ROOT; };
 		A7E490F11FEA2E7E00970EAD /* GoogleTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = GoogleTests.mm; sourceTree = "<group>"; };
+		A7E8B702204CCBC500DD2323 /* ChessViewState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChessViewState.swift; sourceTree = "<group>"; };
+		A7E8B704204CDAD900DD2323 /* ChessViewLayouter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChessViewLayouter.swift; sourceTree = "<group>"; };
+		A7E8B706204CDAF900DD2323 /* ChessViewFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChessViewFactory.swift; sourceTree = "<group>"; };
 		A7EF55C71FEF17A1004CF2DA /* ChessEngine.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = ChessEngine.hpp; sourceTree = "<group>"; };
 		A7EF55CB1FF22FE7004CF2DA /* MoveList.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = MoveList.hpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -421,6 +434,16 @@
 			path = BChessMacUITests;
 			sourceTree = "<group>";
 		};
+		A75CF02E204CC8EF00974912 /* UIAction */ = {
+			isa = PBXGroup;
+			children = (
+				A75CF028204CC80700974912 /* UIActionPresenter.swift */,
+				A75CF02A204CC86800974912 /* UIAction.swift */,
+				A75CF02C204CC8A200974912 /* UIActionNewGame.swift */,
+			);
+			path = UIAction;
+			sourceTree = "<group>";
+		};
 		A765D8621FF6C1B30045BB36 /* Algorithm */ = {
 			isa = PBXGroup;
 			children = (
@@ -437,7 +460,11 @@
 				A7688F21204A6911004B1E9E /* AppDelegate.swift */,
 				A7688F23204A6911004B1E9E /* ViewController.swift */,
 				A7688F4D204A699F004B1E9E /* ChessView.swift */,
+				A7E8B704204CDAD900DD2323 /* ChessViewLayouter.swift */,
+				A7E8B706204CDAF900DD2323 /* ChessViewFactory.swift */,
+				A7E8B702204CCBC500DD2323 /* ChessViewState.swift */,
 				A77E6C3A204BCFF900ECF6CD /* EngineInfo.swift */,
+				A75CF02E204CC8EF00974912 /* UIAction */,
 				A7688F25204A6911004B1E9E /* Main.storyboard */,
 				A7688F28204A6911004B1E9E /* Assets.xcassets */,
 				A7688F2A204A6911004B1E9E /* LaunchScreen.storyboard */,
@@ -914,17 +941,24 @@
 				A7688F5B204A6A27004B1E9E /* FPGN.cpp in Sources */,
 				A7688F51204A6A14004B1E9E /* FEngineInfo.mm in Sources */,
 				A7688F57204A6A27004B1E9E /* GameHistory.cpp in Sources */,
+				A75CF029204CC80700974912 /* UIActionPresenter.swift in Sources */,
 				A7688F5C204A6A30004B1E9E /* ChessGame.cpp in Sources */,
 				A7688F24204A6911004B1E9E /* ViewController.swift in Sources */,
+				A7E8B705204CDAD900DD2323 /* ChessViewLayouter.swift in Sources */,
 				A7688F50204A6A0F004B1E9E /* FEngineUtility.mm in Sources */,
 				A7688F22204A6911004B1E9E /* AppDelegate.swift in Sources */,
+				A7E8B701204CC9D200DD2323 /* FENgineInfo+Extension.swift in Sources */,
 				A77E6C3B204BCFF900ECF6CD /* EngineInfo.swift in Sources */,
 				A7688F5A204A6A27004B1E9E /* FFEN.cpp in Sources */,
 				A7688F4F204A6A0C004B1E9E /* FEngine.mm in Sources */,
+				A75CF02B204CC86800974912 /* UIAction.swift in Sources */,
 				A7688F4E204A699F004B1E9E /* ChessView.swift in Sources */,
 				A7688F59204A6A27004B1E9E /* ChessBoardHash.cpp in Sources */,
+				A75CF02D204CC8A200974912 /* UIActionNewGame.swift in Sources */,
 				A7688F54204A6A27004B1E9E /* ChessMoveGenerator.cpp in Sources */,
 				A7688F56204A6A27004B1E9E /* ChessBoard.cpp in Sources */,
+				A7E8B703204CCBC500DD2323 /* ChessViewState.swift in Sources */,
+				A7E8B707204CDAF900DD2323 /* ChessViewFactory.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

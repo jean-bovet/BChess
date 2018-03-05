@@ -48,28 +48,25 @@ class EngineInfo {
         infoString.append(boldText(text: infoColorToPlay))
         infoString.append(regularText(text: "\n"))
 
-        if let info = info {
-            if let opening = info.opening {
-                infoString.append(boldText(text: "Opening: "))
-                infoString.append(regularText(text: opening))
-                infoString.append(regularText(text: "\n"))
+        if let opening = info?.opening {
+            infoString.append(regularText(text: opening))
+            infoString.append(regularText(text: "\n"))
+        } else if let info = info {
+            let value: String
+            if info.mat {
+                value = "#"
             } else {
-                let value: String
-                if info.mat {
-                    value = "#"
-                } else {
-                    value = valueFormatter.string(from: NSNumber(value: Double(info.value) / 100.0))!
-                }
-                let line = info.bestLine(false)
-                infoString.append(regularText(text: "\(value) – \(line)"))
-                infoString.append(regularText(text: "\n"))
-                
-                let nodes = numberFormatter.string(from: NSNumber(value: info.nodeEvaluated))!
-                let speed = numberFormatter.string(from: NSNumber(value: info.movesPerSecond))!
-
-                infoString.append(regularText(text: "Depth \(info.depth)/\(info.quiescenceDepth) with \(nodes) nodes at \(speed) n/s"))
-
+                value = valueFormatter.string(from: NSNumber(value: Double(info.value) / 100.0))!
             }
+            let line = info.bestLine(false)
+            infoString.append(regularText(text: "\(value) – \(line)"))
+            infoString.append(regularText(text: "\n"))
+            
+            let nodes = numberFormatter.string(from: NSNumber(value: info.nodeEvaluated))!
+            let speed = numberFormatter.string(from: NSNumber(value: info.movesPerSecond))!
+            
+            infoString.append(regularText(text: "Depth \(info.depth)/\(info.quiescenceDepth) with \(nodes) nodes at \(speed) n/s"))
+            
         }
         return infoString
     }
