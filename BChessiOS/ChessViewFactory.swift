@@ -40,8 +40,8 @@ class ChessViewFactory {
         return imageView
     }
     
-    func pieceViews(forState state: String) -> [ChessPieceViewState] {
-        var pieces = [ChessPieceViewState]()
+    func pieceViews(forState state: String) -> [ChessViewPiece] {
+        var pieces = [ChessViewPiece]()
         var cursor = state.startIndex
         while cursor < state.endIndex {
             let nextCursor = state.index(cursor, offsetBy: 4)
@@ -52,14 +52,14 @@ class ChessViewFactory {
         return pieces
     }
     
-    func pieceView(forToken token: String) -> ChessPieceViewState {
+    func pieceView(forToken token: String) -> ChessViewPiece {
         let pieceName = String(token.prefix(2))
         let pieceFile = UInt(String(token[token.index(token.startIndex, offsetBy: 2)]))!
         let pieceRank = UInt(String(token[token.index(token.startIndex, offsetBy: 3)]))!
         
         let pieceView = self.pieceView(forName: pieceName)
         
-        return ChessPieceViewState(name: pieceName, file: pieceFile, rank: pieceRank, view: pieceView)
+        return ChessViewPiece(name: pieceName, file: pieceFile, rank: pieceRank, view: pieceView)
     }
     
     func pieceView(forName name: String) -> UIView {

@@ -10,10 +10,11 @@ import UIKit
 
 class ChessView: UIView {
     
-    let factory = ChessViewFactory()
-    let layouter = ChessViewLayouter()
-    
-    var cachedPieces = [String:ChessPieceViewState]()
+    let piecesCache = ChessViewPiecesCache()
+
+    var layouter: ChessViewLayouter {
+        return piecesCache.layouter
+    }
     
     var state: ChessViewState? = nil {
         didSet {
@@ -26,32 +27,11 @@ class ChessView: UIView {
             return
         }
 
-        layouter.viewSize = bounds.size
+        piecesCache.layouter.viewSize = bounds.size
         
         if let boardState = state.boardState {
-            let pieces = factory.pieceViews(forState: boardState)
-            
-            var piecesToRemove = Set<String>(cachedPieces.keys)
-            for piece in pieces {
-                piecesToRemove.remove(piece.name)
-                if let cachedPiece = cachedPieces[piece.name] {
-                    layouter.layout(file: piece.file, rank: piece.rank, callback: { rect in
-                        cachedPiece.view.frame = rect
-                        cachedPiece.view.alpha = 1
-                    })
-                } else {
-                    cachedPieces[piece.name] = piece
-                    addSubview(piece.view)
-                    layouter.layout(file: piece.file, rank: piece.rank, callback: { rect in
-                        piece.view.frame = rect
-                    })
-                }
-            }
-            
-//            Remove all views that have not been processed
-            for pieceName in piecesToRemove {
-                cachedPieces[pieceName]?.view.alpha = 0
-            }
+            let pieces = piecesCache.update(boardState: boardState)
+            pieces.forEach { addSubview($0.view) }
         }
         
         setNeedsDisplay()

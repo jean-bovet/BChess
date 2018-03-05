@@ -9,7 +9,7 @@
 import Foundation
 import UIKit
 
-struct ChessPieceViewState {
+struct ChessViewPiece {
     let name: String
     let file: UInt
     let rank: UInt
