@@ -46,8 +46,7 @@ class ViewController: UIViewController {
     // MARK: - State -
 
     func updateState() {
-        state.layouter.viewSize = chessView.bounds.size
-        state.update(state: engine.state)
+        state.boardState = engine.state
         chessView.state = state
         infoTextView.attributedText = attributedInfo.information(forInfo: nil, engine: engine)
     }
@@ -90,7 +89,7 @@ class ViewController: UIViewController {
     // MARK: - Functions -
     
     func coordinate(location: CGPoint) -> (UInt, UInt)? {
-        return state.layouter.coordinate(location: location)
+        return chessView.layouter.coordinate(location: location)
     }
     
     func enginePlay() {

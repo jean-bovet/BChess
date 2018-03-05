@@ -120,6 +120,7 @@
 		A7E8B703204CCBC500DD2323 /* ChessViewState.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7E8B702204CCBC500DD2323 /* ChessViewState.swift */; };
 		A7E8B705204CDAD900DD2323 /* ChessViewLayouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7E8B704204CDAD900DD2323 /* ChessViewLayouter.swift */; };
 		A7E8B707204CDAF900DD2323 /* ChessViewFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7E8B706204CDAF900DD2323 /* ChessViewFactory.swift */; };
+		A7E8B709204CE63100DD2323 /* ChessPieceViewState.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7E8B708204CE63100DD2323 /* ChessPieceViewState.swift */; };
 		A7EBE7CF1FF6C93600ACDF85 /* ChessOpenings.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A765D85F1FF6C1950045BB36 /* ChessOpenings.cpp */; };
 		A7EF55C81FF191B1004CF2DA /* SearchChessTests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A7E490E41FEA1C0600970EAD /* SearchChessTests.cpp */; };
 		A7EF55C91FF1CF77004CF2DA /* BestMoveTests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A70A61BD1FD3196400AFDF0E /* BestMoveTests.cpp */; };
@@ -278,6 +279,7 @@
 		A7E8B702204CCBC500DD2323 /* ChessViewState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChessViewState.swift; sourceTree = "<group>"; };
 		A7E8B704204CDAD900DD2323 /* ChessViewLayouter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChessViewLayouter.swift; sourceTree = "<group>"; };
 		A7E8B706204CDAF900DD2323 /* ChessViewFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChessViewFactory.swift; sourceTree = "<group>"; };
+		A7E8B708204CE63100DD2323 /* ChessPieceViewState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChessPieceViewState.swift; sourceTree = "<group>"; };
 		A7EF55C71FEF17A1004CF2DA /* ChessEngine.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = ChessEngine.hpp; sourceTree = "<group>"; };
 		A7EF55CB1FF22FE7004CF2DA /* MoveList.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = MoveList.hpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -462,6 +464,7 @@
 				A7688F4D204A699F004B1E9E /* ChessView.swift */,
 				A7E8B704204CDAD900DD2323 /* ChessViewLayouter.swift */,
 				A7E8B706204CDAF900DD2323 /* ChessViewFactory.swift */,
+				A7E8B708204CE63100DD2323 /* ChessPieceViewState.swift */,
 				A7E8B702204CCBC500DD2323 /* ChessViewState.swift */,
 				A77E6C3A204BCFF900ECF6CD /* EngineInfo.swift */,
 				A75CF02E204CC8EF00974912 /* UIAction */,
@@ -936,6 +939,7 @@
 				A7688F61204B6FFA004B1E9E /* ChessState.cpp in Sources */,
 				A7688F58204A6A27004B1E9E /* magicmoves.c in Sources */,
 				A7688F52204A6A14004B1E9E /* FEngineMove.mm in Sources */,
+				A7E8B709204CE63100DD2323 /* ChessPieceViewState.swift in Sources */,
 				A7688F5D204A6A30004B1E9E /* ChessOpenings.cpp in Sources */,
 				A7688F55204A6A27004B1E9E /* ChessEvaluater.cpp in Sources */,
 				A7688F5B204A6A27004B1E9E /* FPGN.cpp in Sources */,

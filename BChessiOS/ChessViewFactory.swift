@@ -39,5 +39,33 @@ class ChessViewFactory {
         let imageView = UIImageView(image: image)
         return imageView
     }
+    
+    func pieceViews(forState state: String) -> [ChessPieceViewState] {
+        var pieces = [ChessPieceViewState]()
+        var cursor = state.startIndex
+        while cursor < state.endIndex {
+            let nextCursor = state.index(cursor, offsetBy: 4)
+            let token = state[cursor..<nextCursor]
+            pieces.append(pieceView(forToken: String(token)))
+            cursor = nextCursor
+        }
+        return pieces
+    }
+    
+    func pieceView(forToken token: String) -> ChessPieceViewState {
+        let pieceName = String(token.prefix(2))
+        let pieceFile = UInt(String(token[token.index(token.startIndex, offsetBy: 2)]))!
+        let pieceRank = UInt(String(token[token.index(token.startIndex, offsetBy: 3)]))!
+        
+        let pieceView = self.pieceView(forName: pieceName)
+        
+        return ChessPieceViewState(name: pieceName, file: pieceFile, rank: pieceRank, view: pieceView)
+    }
+    
+    func pieceView(forName name: String) -> UIView {
+        let view = create(name: String(name.prefix(1)))
+        return view
+    }
+    
 }
 
