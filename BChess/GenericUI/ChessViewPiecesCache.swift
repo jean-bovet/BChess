@@ -34,7 +34,7 @@ class ChessViewPiecesCache {
             }
         }
         
-        //            Remove all views that have not been processed
+        // Remove all views that have not been processed
         for pieceName in piecesToRemove {
             cachedPieces[pieceName]?.view.alpha = 0
         }

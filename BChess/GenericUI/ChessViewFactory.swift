@@ -7,7 +7,6 @@
 //
 
 import Foundation
-import UIKit
 
 class ChessViewFactory {
     
@@ -26,17 +25,17 @@ class ChessViewFactory {
         "K" : "king_w",
         ]
     
-    func image(forPiece piece: String) -> UIImage? {
+    func image(forPiece piece: String) -> Image? {
         if let imageName = pieceImageNames[piece] {
-            return UIImage(named: imageName)
+            return Image(named: imageName)
         } else {
             return nil
         }
     }
     
-    func create(name: String) -> UIView {
+    func create(name: String) -> View {
         let image = self.image(forPiece: name)!
-        let imageView = UIImageView(image: image)
+        let imageView = ImageView(image: image)
         return imageView
     }
     
@@ -62,7 +61,7 @@ class ChessViewFactory {
         return ChessViewPiece(name: pieceName, file: pieceFile, rank: pieceRank, view: pieceView)
     }
     
-    func pieceView(forName name: String) -> UIView {
+    func pieceView(forName name: String) -> View {
         let view = create(name: String(name.prefix(1)))
         return view
     }

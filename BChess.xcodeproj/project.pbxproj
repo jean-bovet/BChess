@@ -118,10 +118,24 @@
 		A7E490F21FEA2E7E00970EAD /* GoogleTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = A7E490F11FEA2E7E00970EAD /* GoogleTests.mm */; };
 		A7E8B701204CC9D200DD2323 /* FENgineInfo+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = A75359831FDC51B2008D1DEE /* FENgineInfo+Extension.swift */; };
 		A7E8B703204CCBC500DD2323 /* ChessViewState.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7E8B702204CCBC500DD2323 /* ChessViewState.swift */; };
-		A7E8B705204CDAD900DD2323 /* ChessViewLayouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7E8B704204CDAD900DD2323 /* ChessViewLayouter.swift */; };
 		A7E8B707204CDAF900DD2323 /* ChessViewFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7E8B706204CDAF900DD2323 /* ChessViewFactory.swift */; };
 		A7E8B709204CE63100DD2323 /* ChessViewPiece.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7E8B708204CE63100DD2323 /* ChessViewPiece.swift */; };
 		A7E8B70B204CE70A00DD2323 /* ChessViewPiecesCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7E8B70A204CE70A00DD2323 /* ChessViewPiecesCache.swift */; };
+		A7E8B70F204D180400DD2323 /* ChessViewLayouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7E8B704204CDAD900DD2323 /* ChessViewLayouter.swift */; };
+		A7E8B710204D190100DD2323 /* ChessViewFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7E8B706204CDAF900DD2323 /* ChessViewFactory.swift */; };
+		A7E8B711204D190400DD2323 /* ChessViewLayouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7E8B704204CDAD900DD2323 /* ChessViewLayouter.swift */; };
+		A7E8B713204D192900DD2323 /* Image.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7E8B712204D192900DD2323 /* Image.swift */; };
+		A7E8B714204D192900DD2323 /* Image.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7E8B712204D192900DD2323 /* Image.swift */; };
+		A7E8B717204D19BB00DD2323 /* View.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7E8B715204D19B800DD2323 /* View.swift */; };
+		A7E8B718204D19BC00DD2323 /* View.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7E8B715204D19B800DD2323 /* View.swift */; };
+		A7E8B71B204D1A4F00DD2323 /* ChessViewPiece.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7E8B708204CE63100DD2323 /* ChessViewPiece.swift */; };
+		A7E8B71C204D1A9500DD2323 /* ImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7E8B719204D1A0300DD2323 /* ImageView.swift */; };
+		A7E8B71D204D1A9600DD2323 /* ImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7E8B719204D1A0300DD2323 /* ImageView.swift */; };
+		A7E8B71E204D1AA700DD2323 /* ChessViewState.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7E8B702204CCBC500DD2323 /* ChessViewState.swift */; };
+		A7E8B71F204D1ABB00DD2323 /* ChessViewPiecesCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7E8B70A204CE70A00DD2323 /* ChessViewPiecesCache.swift */; };
+		A7E8B720204D1BEC00DD2323 /* ChessView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7688F4D204A699F004B1E9E /* ChessView.swift */; };
+		A7E8B722204D1D0300DD2323 /* Color.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7E8B721204D1D0300DD2323 /* Color.swift */; };
+		A7E8B723204D1D0300DD2323 /* Color.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7E8B721204D1D0300DD2323 /* Color.swift */; };
 		A7EBE7CF1FF6C93600ACDF85 /* ChessOpenings.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A765D85F1FF6C1950045BB36 /* ChessOpenings.cpp */; };
 		A7EF55C81FF191B1004CF2DA /* SearchChessTests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A7E490E41FEA1C0600970EAD /* SearchChessTests.cpp */; };
 		A7EF55C91FF1CF77004CF2DA /* BestMoveTests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A70A61BD1FD3196400AFDF0E /* BestMoveTests.cpp */; };
@@ -282,6 +296,10 @@
 		A7E8B706204CDAF900DD2323 /* ChessViewFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChessViewFactory.swift; sourceTree = "<group>"; };
 		A7E8B708204CE63100DD2323 /* ChessViewPiece.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChessViewPiece.swift; sourceTree = "<group>"; };
 		A7E8B70A204CE70A00DD2323 /* ChessViewPiecesCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChessViewPiecesCache.swift; sourceTree = "<group>"; };
+		A7E8B712204D192900DD2323 /* Image.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Image.swift; sourceTree = "<group>"; };
+		A7E8B715204D19B800DD2323 /* View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = View.swift; sourceTree = "<group>"; };
+		A7E8B719204D1A0300DD2323 /* ImageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageView.swift; sourceTree = "<group>"; };
+		A7E8B721204D1D0300DD2323 /* Color.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Color.swift; sourceTree = "<group>"; };
 		A7EF55C71FEF17A1004CF2DA /* ChessEngine.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = ChessEngine.hpp; sourceTree = "<group>"; };
 		A7EF55CB1FF22FE7004CF2DA /* MoveList.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = MoveList.hpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -463,12 +481,6 @@
 			children = (
 				A7688F21204A6911004B1E9E /* AppDelegate.swift */,
 				A7688F23204A6911004B1E9E /* ViewController.swift */,
-				A7688F4D204A699F004B1E9E /* ChessView.swift */,
-				A7E8B704204CDAD900DD2323 /* ChessViewLayouter.swift */,
-				A7E8B706204CDAF900DD2323 /* ChessViewFactory.swift */,
-				A7E8B708204CE63100DD2323 /* ChessViewPiece.swift */,
-				A7E8B70A204CE70A00DD2323 /* ChessViewPiecesCache.swift */,
-				A7E8B702204CCBC500DD2323 /* ChessViewState.swift */,
 				A77E6C3A204BCFF900ECF6CD /* EngineInfo.swift */,
 				A75CF02E204CC8EF00974912 /* UIAction */,
 				A7688F25204A6911004B1E9E /* Main.storyboard */,
@@ -592,6 +604,7 @@
 				A7AFCCA91FB4E40D00AE3D85 /* main.swift */,
 				A7712D3F1FCB97A800E7E802 /* BChess-Bridging-Header.h */,
 				A7712D301FC7C4D300E7E802 /* UCI */,
+				A7E8B70D204D17EE00DD2323 /* GenericUI */,
 				A70A61CE1FD4AA8500AFDF0E /* Bridge */,
 				A70A61D41FD4D37E00AFDF0E /* Engine */,
 			);
@@ -607,6 +620,23 @@
 				A7E490EA1FEA207100970EAD /* gtest-all.cc */,
 			);
 			path = Helper;
+			sourceTree = "<group>";
+		};
+		A7E8B70D204D17EE00DD2323 /* GenericUI */ = {
+			isa = PBXGroup;
+			children = (
+				A7E8B704204CDAD900DD2323 /* ChessViewLayouter.swift */,
+				A7E8B706204CDAF900DD2323 /* ChessViewFactory.swift */,
+				A7E8B708204CE63100DD2323 /* ChessViewPiece.swift */,
+				A7E8B702204CCBC500DD2323 /* ChessViewState.swift */,
+				A7E8B70A204CE70A00DD2323 /* ChessViewPiecesCache.swift */,
+				A7688F4D204A699F004B1E9E /* ChessView.swift */,
+				A7E8B712204D192900DD2323 /* Image.swift */,
+				A7E8B715204D19B800DD2323 /* View.swift */,
+				A7E8B719204D1A0300DD2323 /* ImageView.swift */,
+				A7E8B721204D1D0300DD2323 /* Color.swift */,
+			);
+			path = GenericUI;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -891,25 +921,35 @@
 			buildActionMask = 2147483647;
 			files = (
 				A765D85C1FF60DED0045BB36 /* NSView+Chess.swift in Sources */,
+				A7E8B71E204D1AA700DD2323 /* ChessViewState.swift in Sources */,
 				A7C92ABA1FF86F6800160D2E /* FEngineUtility.mm in Sources */,
+				A7E8B71C204D1A9500DD2323 /* ImageView.swift in Sources */,
 				A75359CA1FDE4038008D1DEE /* ChessEvaluater.cpp in Sources */,
 				A75359CF1FDE4385008D1DEE /* PieceView.swift in Sources */,
 				A746C24E2001A306001F4437 /* GameHistory.cpp in Sources */,
 				A75359C31FDE4023008D1DEE /* FENgineInfo+Extension.swift in Sources */,
 				A765D85E1FF61AA70045BB36 /* PromotionPicker.swift in Sources */,
+				A7E8B71F204D1ABB00DD2323 /* ChessViewPiecesCache.swift in Sources */,
 				A7460F011FDF2465002B0740 /* BoardView.swift in Sources */,
+				A7E8B71B204D1A4F00DD2323 /* ChessViewPiece.swift in Sources */,
 				A75359BF1FDE0E3B008D1DEE /* BoardSquareView.swift in Sources */,
 				A7C92AA81FF6D74400160D2E /* ChessOpenings.cpp in Sources */,
 				A77372051FE443D70001A90F /* FPGN.cpp in Sources */,
 				A75359C61FDE4031008D1DEE /* magicmoves.c in Sources */,
 				A75359951FDE0947008D1DEE /* ChessViewController.swift in Sources */,
 				A77372061FE443DA0001A90F /* ChessGame.cpp in Sources */,
+				A7E8B711204D190400DD2323 /* ChessViewLayouter.swift in Sources */,
+				A7E8B720204D1BEC00DD2323 /* ChessView.swift in Sources */,
 				A75359931FDE0947008D1DEE /* AppDelegate.swift in Sources */,
 				A75359C71FDE4038008D1DEE /* MoveList.cpp in Sources */,
 				A75359CC1FDE4038008D1DEE /* FFEN.cpp in Sources */,
+				A7E8B722204D1D0300DD2323 /* Color.swift in Sources */,
 				A75359C51FDE4031008D1DEE /* FEngine.mm in Sources */,
+				A7E8B710204D190100DD2323 /* ChessViewFactory.swift in Sources */,
 				A746C246200148ED001F4437 /* ChessBoardHash.cpp in Sources */,
+				A7E8B713204D192900DD2323 /* Image.swift in Sources */,
 				A75359C91FDE4038008D1DEE /* ChessBoard.cpp in Sources */,
+				A7E8B717204D19BB00DD2323 /* View.swift in Sources */,
 				A75359C41FDE4031008D1DEE /* FEngineInfo.mm in Sources */,
 				A7C92AB61FF86C4300160D2E /* FEngineMove.mm in Sources */,
 				A77E6C39204BBDB600ECF6CD /* ChessState.cpp in Sources */,
@@ -940,23 +980,26 @@
 			files = (
 				A7688F53204A6A27004B1E9E /* MoveList.cpp in Sources */,
 				A7688F61204B6FFA004B1E9E /* ChessState.cpp in Sources */,
+				A7E8B723204D1D0300DD2323 /* Color.swift in Sources */,
 				A7688F58204A6A27004B1E9E /* magicmoves.c in Sources */,
 				A7E8B70B204CE70A00DD2323 /* ChessViewPiecesCache.swift in Sources */,
 				A7688F52204A6A14004B1E9E /* FEngineMove.mm in Sources */,
 				A7E8B709204CE63100DD2323 /* ChessViewPiece.swift in Sources */,
 				A7688F5D204A6A30004B1E9E /* ChessOpenings.cpp in Sources */,
 				A7688F55204A6A27004B1E9E /* ChessEvaluater.cpp in Sources */,
+				A7E8B71D204D1A9600DD2323 /* ImageView.swift in Sources */,
 				A7688F5B204A6A27004B1E9E /* FPGN.cpp in Sources */,
 				A7688F51204A6A14004B1E9E /* FEngineInfo.mm in Sources */,
 				A7688F57204A6A27004B1E9E /* GameHistory.cpp in Sources */,
 				A75CF029204CC80700974912 /* UIActionPresenter.swift in Sources */,
 				A7688F5C204A6A30004B1E9E /* ChessGame.cpp in Sources */,
 				A7688F24204A6911004B1E9E /* ViewController.swift in Sources */,
-				A7E8B705204CDAD900DD2323 /* ChessViewLayouter.swift in Sources */,
+				A7E8B70F204D180400DD2323 /* ChessViewLayouter.swift in Sources */,
 				A7688F50204A6A0F004B1E9E /* FEngineUtility.mm in Sources */,
 				A7688F22204A6911004B1E9E /* AppDelegate.swift in Sources */,
 				A7E8B701204CC9D200DD2323 /* FENgineInfo+Extension.swift in Sources */,
 				A77E6C3B204BCFF900ECF6CD /* EngineInfo.swift in Sources */,
+				A7E8B714204D192900DD2323 /* Image.swift in Sources */,
 				A7688F5A204A6A27004B1E9E /* FFEN.cpp in Sources */,
 				A7688F4F204A6A0C004B1E9E /* FEngine.mm in Sources */,
 				A75CF02B204CC86800974912 /* UIAction.swift in Sources */,
@@ -964,6 +1007,7 @@
 				A7688F59204A6A27004B1E9E /* ChessBoardHash.cpp in Sources */,
 				A75CF02D204CC8A200974912 /* UIActionNewGame.swift in Sources */,
 				A7688F54204A6A27004B1E9E /* ChessMoveGenerator.cpp in Sources */,
+				A7E8B718204D19BC00DD2323 /* View.swift in Sources */,
 				A7688F56204A6A27004B1E9E /* ChessBoard.cpp in Sources */,
 				A7E8B703204CCBC500DD2323 /* ChessViewState.swift in Sources */,
 				A7E8B707204CDAF900DD2323 /* ChessViewFactory.swift in Sources */,

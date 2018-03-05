@@ -93,7 +93,7 @@ class ViewController: UIViewController {
     }
     
     func enginePlay() {
-        engine.evaluate(Int.max, time: 5) { (info, completed) in
+        engine.evaluate(Int.max, time: 2) { (info, completed) in
             DispatchQueue.main.async {
                 if completed {
                     self.engine.move(info.bestMove)

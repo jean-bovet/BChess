@@ -7,11 +7,10 @@
 //
 
 import Foundation
-import UIKit
 
 struct ChessViewPiece {
     let name: String
     let file: UInt
     let rank: UInt
-    let view: UIView
+    let view: View
 }

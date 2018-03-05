@@ -6,9 +6,9 @@
 //  Copyright © 2018 Jean Bovet. All rights reserved.
 //
 
-import UIKit
+import CoreGraphics
 
-class ChessView: UIView {
+class ChessView: View {
     
     let piecesCache = ChessViewPiecesCache()
 
@@ -40,7 +40,7 @@ class ChessView: UIView {
     override func draw(_ rect: CGRect) {
         super.draw(rect)
         
-        guard let context = UIGraphicsGetCurrentContext() else {
+        guard let context = context else {
             return
         }
         
@@ -54,9 +54,9 @@ class ChessView: UIView {
         for rank: UInt in 0...7 {
             for file: UInt in 0...7 {
                 if black {
-                    context.setFillColor(UIColor.gray.cgColor)
+                    context.setFillColor(Color.gray.cgColor)
                 } else {
-                    context.setFillColor(UIColor(red: 0.9, green: 0.9, blue: 0.9, alpha: 1).cgColor)
+                    context.setFillColor(Color(red: 0.9, green: 0.9, blue: 0.9, alpha: 1).cgColor)
                 }
                 layouter.layout(file: file, rank: rank, callback: { rect in
                     context.fill(rect)
@@ -73,7 +73,7 @@ class ChessView: UIView {
         }
 
         for move in moves {
-            context.setFillColor(UIColor.yellow.withAlphaComponent(0.4).cgColor)
+            context.setFillColor(Color.yellow.withAlphaComponent(0.4).cgColor)
             layouter.layout(file: move.fromFile, rank: move.fromRank, callback: { rect in
                 context.fill(rect)
             })
@@ -88,7 +88,7 @@ class ChessView: UIView {
             return
         }
 
-        context.setStrokeColor(UIColor.orange.cgColor)
+        context.setStrokeColor(Color.orange.cgColor)
         layouter.layout(file: move.fromFile, rank: move.fromRank, callback: { rect in
             context.setLineWidth(1.5)
             context.stroke(rect)
