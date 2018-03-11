@@ -9,8 +9,6 @@
 import Foundation
 import UIKit
 
-typealias CompletionBlock = () -> ()
-
 class UIAction {
     
     var title: String?

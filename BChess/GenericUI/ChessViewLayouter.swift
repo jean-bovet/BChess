@@ -17,13 +17,27 @@ class ChessViewLayouter {
         }
     }
     
+    var boardFrame: CGRect {
+        return CGRect(x: squareHorizontalOffset, y: squareVerticalOffset, width: squareSize*8, height: squareSize*8)
+    }
+    
+    let margin: CGFloat = 10
+    
     var squareSize: CGFloat = 0
     var squareHorizontalOffset: CGFloat = 0
     var squareVerticalOffset: CGFloat = 0
     
+    var flip : Bool {
+        #if os(OSX)
+            return false
+        #else
+            return true
+        #endif
+    }
+    
     func update() {
-        let width = round(viewSize.width/8)
-        let height = round(viewSize.height/8)
+        let width = round((viewSize.width-2*margin)/8)
+        let height = round((viewSize.height-2*margin)/8)
         
         squareSize = min(width, height)
         
@@ -46,7 +60,11 @@ class ChessViewLayouter {
     }
     
     func layout(file: UInt, rank: UInt, callback: (CGRect) -> Void) {
-        let rect = CGRect(x: squareHorizontalOffset + CGFloat(file) * squareSize, y: squareVerticalOffset + CGFloat(7 - rank) * squareSize, width: squareSize, height: squareSize)
+        let actualRank = flip ? 7 - rank : rank
+        let rect = CGRect(x: squareHorizontalOffset + CGFloat(file) * squareSize,
+                          y: squareVerticalOffset + CGFloat(actualRank) * squareSize,
+                          width: squareSize,
+                          height: squareSize)
         callback(rect)
     }
     

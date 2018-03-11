@@ -38,7 +38,13 @@ import Foundation
     var context: CGContext? {
         return UIGraphicsGetCurrentContext()
     }
-
+    
+    extension View {
+        // Proxy to what OS X requires to do animation
+        func animator() -> View {
+            return self
+        }
+    }
     
 #endif
 

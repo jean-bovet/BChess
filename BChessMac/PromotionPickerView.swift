@@ -38,25 +38,25 @@ class PromotionPickerView: NSView {
         }
         borderView!.frame = NSMakeRect(0, verticalOffset, bounds.size.width, size + 2)
         
-        var blackSquare = true
+//        var blackSquare = true
         
-        for index in 0..<pieces.count {
-            let frame = NSMakeRect(CGFloat(index) * size + 1, verticalOffset + 1, size, size)
-            
-            let square = boardSquareView(rank: 0, file: index, blackSquare: blackSquare)
-            square.frame = frame
-            
-            let piece = pieceSquareView(rank: 0, file: index, action: #selector(pieceSelected(sender:)))
-            piece.image = image(forPiece: pieces[index])
-            piece.frame = frame
-            
-            blackSquare = !blackSquare
-        }
+//        for index in 0..<pieces.count {
+//            let frame = NSMakeRect(CGFloat(index) * size + 1, verticalOffset + 1, size, size)
+//
+//            let square = boardSquareView(rank: 0, file: index, blackSquare: blackSquare)
+//            square.frame = frame
+//
+//            let piece = pieceSquareView(rank: 0, file: index, action: #selector(pieceSelected(sender:)))
+//            piece.image = image(forPiece: pieces[index])
+//            piece.frame = frame
+//
+//            blackSquare = !blackSquare
+//        }
     }
     
     @objc func pieceSelected(sender: NSGestureRecognizer) {
-        if let pickerView = sender.view as? PieceView {
-            NSApp.mainWindow!.endSheet(window!, returnCode: NSApplication.ModalResponse(rawValue: pickerView.file))
-        }
+//        if let pickerView = sender.view as? PieceView {
+//            NSApp.mainWindow!.endSheet(window!, returnCode: NSApplication.ModalResponse(rawValue: pickerView.file))
+//        }
     }
 }

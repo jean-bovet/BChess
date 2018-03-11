@@ -23,13 +23,13 @@ class ChessViewPiecesCache {
             piecesToRemove.remove(piece.name)
             if let cachedPiece = cachedPieces[piece.name] {
                 layouter.layout(file: piece.file, rank: piece.rank, callback: { rect in
-                    cachedPiece.view.frame = rect
+                    cachedPiece.view.animator().frame = rect
                     cachedPiece.view.alpha = 1
                 })
             } else {
                 cachedPieces[piece.name] = piece
                 layouter.layout(file: piece.file, rank: piece.rank, callback: { rect in
-                    piece.view.frame = rect
+                    piece.view.animator().frame = rect
                 })
             }
         }

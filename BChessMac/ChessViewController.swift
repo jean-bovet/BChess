@@ -15,6 +15,8 @@ class ChessViewController: NSViewController {
     @IBOutlet weak var gameInfoScrollView: NSScrollView!
     @IBOutlet var gameInfoTextView: NSTextView!
     
+    var interaction: ChessViewInteraction!
+    
     var engine : FEngine {
         return chessView.engine
     }
@@ -24,8 +26,20 @@ class ChessViewController: NSViewController {
         
         restoreFromDefaults()
         
+        registerGesture()
+        
         loadOpenings()
         
+        interaction = ChessViewInteraction(view: chessView.chessView, engine: engine, animateState: { completion in
+            NSAnimationContext.runAnimationGroup({ _ in
+                NSAnimationContext.current.duration = 0.5
+                NSAnimationContext.current.timingFunction = CAMediaTimingFunction(name: kCAAnimationLinear)
+                self.chessView.chessView.stateChanged()
+            }, completionHandler: {
+                completion()
+            })
+        })
+
         engine.updateCallback = {
             self.updateUI()
             self.saveToDefaults()
@@ -58,6 +72,19 @@ class ChessViewController: NSViewController {
         gameInfoTextView.textStorage?.setAttributedString(text)
     }
     
+    // MARK: Gesture
+
+    func registerGesture() {
+        view.addGestureRecognizer(NSClickGestureRecognizer(target: self, action: #selector(clickDetected(sender:))))
+    }
+    
+    @objc func clickDetected(sender: NSClickGestureRecognizer) {
+        let loc = sender.location(in: chessView)
+        interaction.handleTap(atLocation: loc)
+    }
+    
+    // MARK: Defaults
+
     func saveToDefaults() {
         UserDefaults.standard.set(engine.pgn(), forKey: "pgn")
     }
@@ -68,15 +95,17 @@ class ChessViewController: NSViewController {
         }
     }
     
+    // MARK: UI
+    
     override func validateMenuItem(_ menuItem: NSMenuItem) -> Bool {
         if menuItem.action == #selector(playAgaintComputerWhite) {
-            menuItem.state = chessView.playAgainstComputer == .white ? .on : .off
+            menuItem.state = interaction.playAgainstComputer == .white ? .on : .off
         }
         if menuItem.action == #selector(playAgaintComputerBlack) {
-            menuItem.state = chessView.playAgainstComputer == .black ? .on : .off
+            menuItem.state = interaction.playAgainstComputer == .black ? .on : .off
         }
         if menuItem.action == #selector(playAgaintHuman) {
-            menuItem.state = chessView.playAgainstComputer == .human ? .on : .off
+            menuItem.state = interaction.playAgainstComputer == .human ? .on : .off
         }
         if menuItem.action == #selector(level) {
             menuItem.state = engine.thinkingTime == TimeInterval(menuItem.tag) ? .on : .off
@@ -125,8 +154,6 @@ class ChessViewController: NSViewController {
                 // Could not past FEN, maybe PGN?
                 engine.setPGN(text);
             }
-            chessView.clearEngineMoveIndicators()
-            chessView.clearAllViewIndicators()
             chessView.invalidateUI()
             saveToDefaults()
         }
@@ -135,19 +162,19 @@ class ChessViewController: NSViewController {
     // MARK: Menu Game
 
     @IBAction func newGame(_ sender: NSMenuItem) {
-        chessView.newGame()
+        interaction.newGame()
     }
     
     @IBAction func playAgaintComputerWhite(_ sender: NSMenuItem) {
-        chessView.playAgainstComputer = .white
+        interaction.playAgainstComputer = .white
     }
 
     @IBAction func playAgaintComputerBlack(_ sender: NSMenuItem) {
-        chessView.playAgainstComputer = .black
+        interaction.playAgainstComputer = .black
     }
 
     @IBAction func playAgaintHuman(_ sender: NSMenuItem) {
-        chessView.playAgainstComputer = .human
+        interaction.playAgainstComputer = .human
     }
 
     @IBAction func undoMove(_ sender: NSMenuItem) {

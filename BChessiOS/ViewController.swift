@@ -12,8 +12,10 @@ class ViewController: UIViewController {
 
     let engine = FEngine()
     let state = ChessViewState()
-    
     let attributedInfo = EngineInfo()
+    
+    var interaction: ChessViewInteraction!
+    
     var actions = [UIAction]()
     
     @IBOutlet weak var chessView: ChessView!
@@ -22,6 +24,12 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        interaction = ChessViewInteraction(view: chessView, engine: engine, animateState: { completion in
+            self.animateUpdateState({
+                completion()
+            })
+        })
+
         navigationController?.setNavigationBarHidden(true, animated: false)
         
         initializeActions()
@@ -61,6 +69,10 @@ class ViewController: UIViewController {
 
     // MARK: - User Actions -
 
+    func newGame() {
+        interaction.newGame()
+    }
+    
     @IBAction func actionsTapped(_ sender: Any) {
         let presenter = UIActionPresenter()
         presenter.present(parentViewController: self, actions: actions) {
@@ -70,13 +82,7 @@ class ViewController: UIViewController {
     
     @objc func chessViewTapped(gesture: UITapGestureRecognizer) {
         let loc = gesture.location(in: gesture.view)
-        guard let (file, rank) = coordinate(location: loc) else {
-            return
-        }
-        
-        if !handleUserInitiatedMove(file: file, rank: rank) {
-            showPossibleMoves(file: file, rank: rank)
-        }
+        interaction.handleTap(atLocation: loc)
     }
     
     @objc func backgroundViewTapped(gesture: UITapGestureRecognizer) {
@@ -86,61 +92,5 @@ class ViewController: UIViewController {
         }
     }
     
-    // MARK: - Functions -
-    
-    func coordinate(location: CGPoint) -> (UInt, UInt)? {
-        return chessView.layouter.coordinate(location: location)
-    }
-    
-    func enginePlay() {
-        engine.evaluate(Int.max, time: 2) { (info, completed) in
-            DispatchQueue.main.async {
-                if completed {
-                    self.engine.move(info.bestMove)
-                    
-                    // TODO: refactor?
-                    let move = FEngineMove()
-                    move.fromFile = info.fromFile
-                    move.fromRank = info.fromRank
-                    move.toFile = info.toFile
-                    move.toRank = info.toRank
-                    move.rawMoveValue = info.bestMove
-                    self.state.lastMove = move
-                    
-                    self.animateUpdateState { }
-                }
-                self.infoTextView.attributedText = self.attributedInfo.information(forInfo: info, engine: self.engine)
-            }
-        }
-    }
-    
-    func handleUserInitiatedMove(file: UInt, rank: UInt) -> Bool {
-        if let moves = state.possibleMoves {
-            for move in moves {
-                if move.toRank == rank && move.toFile == file {
-                    state.possibleMoves = nil
-                    engine.move(move.rawMoveValue)
-                    animateUpdateState {
-                        self.enginePlay()
-                    }
-                    return true
-                }
-            }
-        }
-        return false
-    }
-    
-    func showPossibleMoves(file: UInt, rank: UInt) {
-        let moves = engine.moves(at: UInt(rank), file: UInt(file))
-        state.possibleMoves = moves
-        animateUpdateState { }
-    }
-    
-    func newGame() {
-        engine.setFEN(StartPosFEN)
-        state.possibleMoves = nil
-        state.lastMove = nil
-        animateUpdateState { }
-    }
 }
 
