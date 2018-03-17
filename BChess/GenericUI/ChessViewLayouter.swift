@@ -68,4 +68,16 @@ class ChessViewLayouter {
         callback(rect)
     }
     
+    func layoutPromotion(pieces: Int, callback: (Int, CGRect) -> Void) {
+        let pieceSize = squareSize * 2
+        
+        let width = pieceSize * CGFloat(pieces)
+        let height = pieceSize
+        
+        var frameCursor = CGRect(x: (viewSize.width-width)/2, y: (viewSize.height-height)/2, width: pieceSize, height: pieceSize)
+        for pieceIndex in 0..<pieces {
+            callback(pieceIndex, frameCursor)
+            frameCursor = frameCursor.offsetBy(dx: pieceSize, dy: 0)
+        }
+    }
 }

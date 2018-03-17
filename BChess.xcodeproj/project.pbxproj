@@ -55,6 +55,12 @@
 		A75CF029204CC80700974912 /* UIActionPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = A75CF028204CC80700974912 /* UIActionPresenter.swift */; };
 		A75CF02B204CC86800974912 /* UIAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = A75CF02A204CC86800974912 /* UIAction.swift */; };
 		A75CF02D204CC8A200974912 /* UIActionNewGame.swift in Sources */ = {isa = PBXBuildFile; fileRef = A75CF02C204CC8A200974912 /* UIActionNewGame.swift */; };
+		A7622E02205DD4B0000ACF55 /* PieceImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7622E01205DD4B0000ACF55 /* PieceImageView.swift */; };
+		A7622E03205DD4B0000ACF55 /* PieceImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7622E01205DD4B0000ACF55 /* PieceImageView.swift */; };
+		A7622E05205DD5DE000ACF55 /* Rect.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7622E04205DD5DE000ACF55 /* Rect.swift */; };
+		A7622E06205DD5DE000ACF55 /* Rect.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7622E04205DD5DE000ACF55 /* Rect.swift */; };
+		A7622E08205DD704000ACF55 /* GestureRecognizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7622E07205DD704000ACF55 /* GestureRecognizer.swift */; };
+		A7622E09205DD704000ACF55 /* GestureRecognizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7622E07205DD704000ACF55 /* GestureRecognizer.swift */; };
 		A765D85A1FF60CEE0045BB36 /* PromotionPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A765D8591FF60CEE0045BB36 /* PromotionPickerView.swift */; };
 		A765D85E1FF61AA70045BB36 /* PromotionPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = A765D85D1FF61AA70045BB36 /* PromotionPicker.swift */; };
 		A765D8611FF6C1950045BB36 /* ChessOpenings.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A765D85F1FF6C1950045BB36 /* ChessOpenings.cpp */; };
@@ -100,6 +106,8 @@
 		A78E7551202C110200445360 /* UnitTestHelper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A78E754F202C110200445360 /* UnitTestHelper.cpp */; };
 		A7AA42A920538C7F00FAACA2 /* ChessViewInteraction.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7AA42A820538C7F00FAACA2 /* ChessViewInteraction.swift */; };
 		A7AA42AA20538C7F00FAACA2 /* ChessViewInteraction.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7AA42A820538C7F00FAACA2 /* ChessViewInteraction.swift */; };
+		A7AA42AC205608ED00FAACA2 /* ChessViewPromotionPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7AA42AB205608ED00FAACA2 /* ChessViewPromotionPicker.swift */; };
+		A7AA42AD205608ED00FAACA2 /* ChessViewPromotionPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7AA42AB205608ED00FAACA2 /* ChessViewPromotionPicker.swift */; };
 		A7AFCCAA1FB4E40D00AE3D85 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7AFCCA91FB4E40D00AE3D85 /* main.swift */; };
 		A7C92AA81FF6D74400160D2E /* ChessOpenings.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A765D85F1FF6C1950045BB36 /* ChessOpenings.cpp */; };
 		A7C92AAA1FF6EE5500160D2E /* Openings.pgn in Resources */ = {isa = PBXBuildFile; fileRef = A7C92AA91FF6EE5500160D2E /* Openings.pgn */; };
@@ -236,6 +244,9 @@
 		A75CF028204CC80700974912 /* UIActionPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIActionPresenter.swift; sourceTree = "<group>"; };
 		A75CF02A204CC86800974912 /* UIAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIAction.swift; sourceTree = "<group>"; };
 		A75CF02C204CC8A200974912 /* UIActionNewGame.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIActionNewGame.swift; sourceTree = "<group>"; };
+		A7622E01205DD4B0000ACF55 /* PieceImageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PieceImageView.swift; sourceTree = "<group>"; };
+		A7622E04205DD5DE000ACF55 /* Rect.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Rect.swift; sourceTree = "<group>"; };
+		A7622E07205DD704000ACF55 /* GestureRecognizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GestureRecognizer.swift; sourceTree = "<group>"; };
 		A765D8591FF60CEE0045BB36 /* PromotionPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromotionPickerView.swift; sourceTree = "<group>"; };
 		A765D85D1FF61AA70045BB36 /* PromotionPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromotionPicker.swift; sourceTree = "<group>"; };
 		A765D85F1FF6C1950045BB36 /* ChessOpenings.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ChessOpenings.cpp; sourceTree = "<group>"; };
@@ -277,6 +288,7 @@
 		A78E754F202C110200445360 /* UnitTestHelper.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = UnitTestHelper.cpp; sourceTree = "<group>"; };
 		A78E7550202C110200445360 /* UnitTestHelper.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = UnitTestHelper.hpp; sourceTree = "<group>"; };
 		A7AA42A820538C7F00FAACA2 /* ChessViewInteraction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChessViewInteraction.swift; sourceTree = "<group>"; };
+		A7AA42AB205608ED00FAACA2 /* ChessViewPromotionPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChessViewPromotionPicker.swift; sourceTree = "<group>"; };
 		A7AFCCA61FB4E40D00AE3D85 /* BChess */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = BChess; sourceTree = BUILT_PRODUCTS_DIR; };
 		A7AFCCA91FB4E40D00AE3D85 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		A7B1B0F41FF2D97300EAF157 /* FEngineInfo+Private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "FEngineInfo+Private.h"; sourceTree = "<group>"; };
@@ -628,12 +640,16 @@
 				A7E8B702204CCBC500DD2323 /* ChessViewState.swift */,
 				A7E8B70A204CE70A00DD2323 /* ChessViewPiecesCache.swift */,
 				A7AA42A820538C7F00FAACA2 /* ChessViewInteraction.swift */,
+				A7AA42AB205608ED00FAACA2 /* ChessViewPromotionPicker.swift */,
 				A7688F4D204A699F004B1E9E /* ChessView.swift */,
 				A7E8B712204D192900DD2323 /* Image.swift */,
 				A7E8B715204D19B800DD2323 /* View.swift */,
 				A7E8B719204D1A0300DD2323 /* ImageView.swift */,
 				A7E8B721204D1D0300DD2323 /* Color.swift */,
 				A7E8B724204FAED800DD2323 /* Font.swift */,
+				A7622E04205DD5DE000ACF55 /* Rect.swift */,
+				A7622E01205DD4B0000ACF55 /* PieceImageView.swift */,
+				A7622E07205DD704000ACF55 /* GestureRecognizer.swift */,
 			);
 			path = GenericUI;
 			sourceTree = "<group>";
@@ -932,12 +948,14 @@
 				A7C92AA81FF6D74400160D2E /* ChessOpenings.cpp in Sources */,
 				A77372051FE443D70001A90F /* FPGN.cpp in Sources */,
 				A75359C61FDE4031008D1DEE /* magicmoves.c in Sources */,
+				A7622E08205DD704000ACF55 /* GestureRecognizer.swift in Sources */,
 				A75359951FDE0947008D1DEE /* ChessViewController.swift in Sources */,
 				A77372061FE443DA0001A90F /* ChessGame.cpp in Sources */,
 				A7E8B711204D190400DD2323 /* ChessViewLayouter.swift in Sources */,
 				A7E8B720204D1BEC00DD2323 /* ChessView.swift in Sources */,
 				A75359931FDE0947008D1DEE /* AppDelegate.swift in Sources */,
 				A75359C71FDE4038008D1DEE /* MoveList.cpp in Sources */,
+				A7622E02205DD4B0000ACF55 /* PieceImageView.swift in Sources */,
 				A75359CC1FDE4038008D1DEE /* FFEN.cpp in Sources */,
 				A7AA42A920538C7F00FAACA2 /* ChessViewInteraction.swift in Sources */,
 				A7E8B722204D1D0300DD2323 /* Color.swift in Sources */,
@@ -949,8 +967,10 @@
 				A7E8B717204D19BB00DD2323 /* View.swift in Sources */,
 				A75359C41FDE4031008D1DEE /* FEngineInfo.mm in Sources */,
 				A7C92AB61FF86C4300160D2E /* FEngineMove.mm in Sources */,
+				A7622E05205DD5DE000ACF55 /* Rect.swift in Sources */,
 				A7E8B725204FAED800DD2323 /* Font.swift in Sources */,
 				A77E6C39204BBDB600ECF6CD /* ChessState.cpp in Sources */,
+				A7AA42AC205608ED00FAACA2 /* ChessViewPromotionPicker.swift in Sources */,
 				A75359C81FDE4038008D1DEE /* ChessMoveGenerator.cpp in Sources */,
 				A765D85A1FF60CEE0045BB36 /* PromotionPickerView.swift in Sources */,
 			);
@@ -979,13 +999,16 @@
 				A7688F53204A6A27004B1E9E /* MoveList.cpp in Sources */,
 				A7688F61204B6FFA004B1E9E /* ChessState.cpp in Sources */,
 				A7E8B723204D1D0300DD2323 /* Color.swift in Sources */,
+				A7AA42AD205608ED00FAACA2 /* ChessViewPromotionPicker.swift in Sources */,
 				A7688F58204A6A27004B1E9E /* magicmoves.c in Sources */,
+				A7622E03205DD4B0000ACF55 /* PieceImageView.swift in Sources */,
 				A7E8B70B204CE70A00DD2323 /* ChessViewPiecesCache.swift in Sources */,
 				A7688F52204A6A14004B1E9E /* FEngineMove.mm in Sources */,
 				A7E8B709204CE63100DD2323 /* ChessViewPiece.swift in Sources */,
 				A7688F5D204A6A30004B1E9E /* ChessOpenings.cpp in Sources */,
 				A7688F55204A6A27004B1E9E /* ChessEvaluater.cpp in Sources */,
 				A7E8B71D204D1A9600DD2323 /* ImageView.swift in Sources */,
+				A7622E09205DD704000ACF55 /* GestureRecognizer.swift in Sources */,
 				A7688F5B204A6A27004B1E9E /* FPGN.cpp in Sources */,
 				A7688F51204A6A14004B1E9E /* FEngineInfo.mm in Sources */,
 				A7E8B726204FAED800DD2323 /* Font.swift in Sources */,
@@ -1009,6 +1032,7 @@
 				A7688F54204A6A27004B1E9E /* ChessMoveGenerator.cpp in Sources */,
 				A7E8B718204D19BC00DD2323 /* View.swift in Sources */,
 				A7688F56204A6A27004B1E9E /* ChessBoard.cpp in Sources */,
+				A7622E06205DD5DE000ACF55 /* Rect.swift in Sources */,
 				A7E8B703204CCBC500DD2323 /* ChessViewState.swift in Sources */,
 				A7E8B707204CDAF900DD2323 /* ChessViewFactory.swift in Sources */,
 			);

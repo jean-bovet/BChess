@@ -19,6 +19,8 @@ class ChessViewInteraction {
 
     let animateState: AnimateStateBlock
 
+    let promotionPicker: ChessViewPromotionPicker
+    
     var layouter: ChessViewLayouter {
         return view.layouter
     }
@@ -43,6 +45,7 @@ class ChessViewInteraction {
         self.view = view
         self.engine = engine
         self.animateState = animateState
+        promotionPicker = ChessViewPromotionPicker(layouter: view.layouter, factory: view.piecesCache.factory, parent: view)
     }
     
     func handleTap(atLocation loc: CGPoint) {
@@ -59,16 +62,29 @@ class ChessViewInteraction {
         if let moves = state.possibleMoves {
             for move in moves {
                 if move.toRank == rank && move.toFile == file {
-                    state.possibleMoves = nil
-                    engine.move(move.rawMoveValue)
-                    self.animateState({
-                        self.enginePlay()
-                    })
+                    if move.isPromotion {
+                        promotionPicker.choose(isWhite: engine.isWhite(), callback: { (pieceName) in
+                            if let pieceName = pieceName {
+                                move.setPromotionPiece(pieceName)
+                                self.doMove(move: move)
+                            }
+                        })
+                    } else {
+                        self.doMove(move: move)
+                    }
                     return true
                 }
             }
         }
         return false
+    }
+    
+    func doMove(move: FEngineMove) {
+        state.possibleMoves = nil
+        engine.move(move.rawMoveValue)
+        animateState({
+            self.enginePlay()
+        })
     }
     
     func showPossibleMoves(file: UInt, rank: UInt) {

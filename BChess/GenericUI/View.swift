@@ -27,6 +27,20 @@ import Foundation
             return NSGraphicsContext.current?.cgContext
         }
         
+        var backgroundColor: NSColor? {
+            get {
+                if let color = layer?.backgroundColor {
+                    return NSColor(cgColor: color)
+                } else {
+                    return nil
+                }
+            }
+            set {
+                wantsLayer = true
+                layer?.backgroundColor = newValue?.cgColor
+            }
+        }
+        
         func setNeedsDisplay() {
             setNeedsDisplay(bounds)
         }

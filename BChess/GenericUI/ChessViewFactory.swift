@@ -35,7 +35,8 @@ class ChessViewFactory {
     
     func create(name: String) -> View {
         let image = self.image(forPiece: name)!
-        let imageView = ImageView(image: image)
+        let imageView = PieceImageView(image: image)
+        imageView.name = name
         return imageView
     }
     
