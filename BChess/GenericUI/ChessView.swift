@@ -23,6 +23,11 @@ class ChessView: View {
         }
     }
     
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        stateChanged()
+    }
+    
     func stateChanged() {
         guard let state = state else {
             return
@@ -83,14 +88,24 @@ class ChessView: View {
         for file: UInt in 0...7 {
             layouter.layout(file: file, rank: 0, callback: { rect in
                 let white = file % 2 == 0
-                drawText(context: context, x: rect.origin.x + rect.size.width - 2, y: rect.origin.y, text: files[Int(file)], white: white, hAlign: .Right)
+                #if os(OSX)
+                    let y = rect.origin.y
+                #else
+                    let y = rect.origin.y + rect.size.height
+                #endif
+                drawText(context: context, x: rect.origin.x + rect.size.width - 2, y: y, text: files[Int(file)], white: white, hAlign: .Right)
             })
         }
         
         for rank: UInt in 0...7 {
             layouter.layout(file: 0, rank: rank, callback: { rect in
                 let white = rank % 2 == 0
-                drawText(context: context, x: rect.origin.x + 2, y: rect.origin.y + rect.size.height, text: String(rank+1), white: white, vAlign: .Top)
+                #if os(OSX)
+                    let y = rect.origin.y + rect.size.height
+                #else
+                    let y = rect.origin.y
+                #endif
+                drawText(context: context, x: rect.origin.x + 2, y: y, text: String(rank+1), white: white, vAlign: .Top)
             })
         }
     }
@@ -105,11 +120,17 @@ class ChessView: View {
         case Right
     }
 
-    func drawText(context: CGContext, x: CGFloat, y: CGFloat, text: String, white: Bool, vAlign: VAlign = .Bottom, hAlign: HAlign = .Left) {
+    func drawText(context: CGContext, x: CGFloat, y _y: CGFloat, text: String, white: Bool, vAlign: VAlign = .Bottom, hAlign: HAlign = .Left) {
         context.saveGState()
         
         context.textMatrix = CGAffineTransform.identity;
-//        context.scaleBy(x: 1.0, y: -1.0);
+        #if os(OSX)
+            let y = _y
+        #else
+            context.translateBy(x: 0, y: bounds.size.height)
+            context.scaleBy(x: 1.0, y: -1.0)
+            let y = bounds.size.height - _y
+        #endif
         
         let str = NSMutableAttributedString(string: text)
         

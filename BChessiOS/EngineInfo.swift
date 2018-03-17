@@ -29,7 +29,7 @@ class EngineInfo {
         return NSAttributedString(string: text,
                                   attributes: [
                                     NSAttributedStringKey.font : UIFont.boldSystemFont(ofSize: 12),
-                                    NSAttributedStringKey.foregroundColor : UIColor.white
+                                    NSAttributedStringKey.foregroundColor : UIColor.black
             ])
     }
     
@@ -37,7 +37,7 @@ class EngineInfo {
         return NSAttributedString(string: text,
                                   attributes: [
                                     NSAttributedStringKey.font : UIFont.systemFont(ofSize: 12),
-                                    NSAttributedStringKey.foregroundColor : UIColor.white
+                                    NSAttributedStringKey.foregroundColor : UIColor.black
             ])
     }
     

@@ -22,15 +22,23 @@ class ChessViewPiecesCache {
         for piece in pieces {
             piecesToRemove.remove(piece.name)
             if let cachedPiece = cachedPieces[piece.name] {
-                layouter.layout(file: piece.file, rank: piece.rank, callback: { rect in
-                    cachedPiece.view.animator().frame = rect
-                    cachedPiece.view.alpha = 1
-                })
+                if cachedPiece.view.alpha == 0 {
+                    layouter.layout(file: piece.file, rank: piece.rank, callback: { rect in
+                        cachedPiece.view.frame = rect
+                    })
+                    cachedPiece.view.animator().alpha = 1
+                } else {
+                    layouter.layout(file: piece.file, rank: piece.rank, callback: { rect in
+                        cachedPiece.view.animator().frame = rect
+                    })
+                }
             } else {
                 cachedPieces[piece.name] = piece
+                piece.view.alpha = 0
                 layouter.layout(file: piece.file, rank: piece.rank, callback: { rect in
-                    piece.view.animator().frame = rect
+                    piece.view.frame = rect
                 })
+                piece.view.animator().alpha = 1
             }
         }
         

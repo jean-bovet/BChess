@@ -21,23 +21,21 @@
                         <subviews>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="MWm-xc-uA9" customClass="ChessView" customModule="BChess" customModuleProvider="target">
                                 <rect key="frame" x="0.0" y="114" width="375" height="375"/>
-                                <color key="backgroundColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <constraints>
                                     <constraint firstAttribute="width" secondItem="MWm-xc-uA9" secondAttribute="height" multiplier="1:1" id="giD-kF-LHs"/>
                                 </constraints>
                             </view>
                             <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" editable="NO" translatesAutoresizingMaskIntoConstraints="NO" id="1PM-xG-FQ5">
                                 <rect key="frame" x="0.0" y="489" width="375" height="114"/>
-                                <color key="backgroundColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <string key="text">Line 1
 Line 2
 Line 3</string>
-                                <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                 <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
                             </textView>
                         </subviews>
-                        <color key="backgroundColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
                             <constraint firstItem="1PM-xG-FQ5" firstAttribute="top" secondItem="MWm-xc-uA9" secondAttribute="bottom" id="d3M-gz-CdN"/>
                             <constraint firstItem="MWm-xc-uA9" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" id="dXU-KC-ZHe"/>
@@ -70,7 +68,7 @@ Line 3</string>
             <objects>
                 <navigationController automaticallyAdjustsScrollViewInsets="NO" id="hiw-9r-K1l" sceneMemberID="viewController">
                     <toolbarItems/>
-                    <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" barStyle="black" translucent="NO" id="ueu-hI-n2W">
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" translucent="NO" id="ueu-hI-n2W">
                         <rect key="frame" x="0.0" y="20" width="375" height="44"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>

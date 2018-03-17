@@ -61,8 +61,6 @@
 		A7622E06205DD5DE000ACF55 /* Rect.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7622E04205DD5DE000ACF55 /* Rect.swift */; };
 		A7622E08205DD704000ACF55 /* GestureRecognizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7622E07205DD704000ACF55 /* GestureRecognizer.swift */; };
 		A7622E09205DD704000ACF55 /* GestureRecognizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7622E07205DD704000ACF55 /* GestureRecognizer.swift */; };
-		A765D85A1FF60CEE0045BB36 /* PromotionPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A765D8591FF60CEE0045BB36 /* PromotionPickerView.swift */; };
-		A765D85E1FF61AA70045BB36 /* PromotionPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = A765D85D1FF61AA70045BB36 /* PromotionPicker.swift */; };
 		A765D8611FF6C1950045BB36 /* ChessOpenings.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A765D85F1FF6C1950045BB36 /* ChessOpenings.cpp */; };
 		A7688F22204A6911004B1E9E /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7688F21204A6911004B1E9E /* AppDelegate.swift */; };
 		A7688F24204A6911004B1E9E /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7688F23204A6911004B1E9E /* ViewController.swift */; };
@@ -247,8 +245,6 @@
 		A7622E01205DD4B0000ACF55 /* PieceImageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PieceImageView.swift; sourceTree = "<group>"; };
 		A7622E04205DD5DE000ACF55 /* Rect.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Rect.swift; sourceTree = "<group>"; };
 		A7622E07205DD704000ACF55 /* GestureRecognizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GestureRecognizer.swift; sourceTree = "<group>"; };
-		A765D8591FF60CEE0045BB36 /* PromotionPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromotionPickerView.swift; sourceTree = "<group>"; };
-		A765D85D1FF61AA70045BB36 /* PromotionPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromotionPicker.swift; sourceTree = "<group>"; };
 		A765D85F1FF6C1950045BB36 /* ChessOpenings.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ChessOpenings.cpp; sourceTree = "<group>"; };
 		A765D8601FF6C1950045BB36 /* ChessOpenings.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = ChessOpenings.hpp; sourceTree = "<group>"; };
 		A7688F1F204A6911004B1E9E /* BChess.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BChess.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -436,8 +432,6 @@
 				A75359921FDE0947008D1DEE /* AppDelegate.swift */,
 				A75359941FDE0947008D1DEE /* ChessViewController.swift */,
 				A7460F001FDF2465002B0740 /* BoardView.swift */,
-				A765D85D1FF61AA70045BB36 /* PromotionPicker.swift */,
-				A765D8591FF60CEE0045BB36 /* PromotionPickerView.swift */,
 				A75359961FDE0947008D1DEE /* Assets.xcassets */,
 				A75359981FDE0947008D1DEE /* Main.storyboard */,
 				A753599B1FDE0947008D1DEE /* Info.plist */,
@@ -642,14 +636,14 @@
 				A7AA42A820538C7F00FAACA2 /* ChessViewInteraction.swift */,
 				A7AA42AB205608ED00FAACA2 /* ChessViewPromotionPicker.swift */,
 				A7688F4D204A699F004B1E9E /* ChessView.swift */,
-				A7E8B712204D192900DD2323 /* Image.swift */,
 				A7E8B715204D19B800DD2323 /* View.swift */,
 				A7E8B719204D1A0300DD2323 /* ImageView.swift */,
+				A7622E01205DD4B0000ACF55 /* PieceImageView.swift */,
+				A7E8B712204D192900DD2323 /* Image.swift */,
+				A7622E07205DD704000ACF55 /* GestureRecognizer.swift */,
 				A7E8B721204D1D0300DD2323 /* Color.swift */,
 				A7E8B724204FAED800DD2323 /* Font.swift */,
 				A7622E04205DD5DE000ACF55 /* Rect.swift */,
-				A7622E01205DD4B0000ACF55 /* PieceImageView.swift */,
-				A7622E07205DD704000ACF55 /* GestureRecognizer.swift */,
 			);
 			path = GenericUI;
 			sourceTree = "<group>";
@@ -941,7 +935,6 @@
 				A75359CA1FDE4038008D1DEE /* ChessEvaluater.cpp in Sources */,
 				A746C24E2001A306001F4437 /* GameHistory.cpp in Sources */,
 				A75359C31FDE4023008D1DEE /* FENgineInfo+Extension.swift in Sources */,
-				A765D85E1FF61AA70045BB36 /* PromotionPicker.swift in Sources */,
 				A7E8B71F204D1ABB00DD2323 /* ChessViewPiecesCache.swift in Sources */,
 				A7460F011FDF2465002B0740 /* BoardView.swift in Sources */,
 				A7E8B71B204D1A4F00DD2323 /* ChessViewPiece.swift in Sources */,
@@ -972,7 +965,6 @@
 				A77E6C39204BBDB600ECF6CD /* ChessState.cpp in Sources */,
 				A7AA42AC205608ED00FAACA2 /* ChessViewPromotionPicker.swift in Sources */,
 				A75359C81FDE4038008D1DEE /* ChessMoveGenerator.cpp in Sources */,
-				A765D85A1FF60CEE0045BB36 /* PromotionPickerView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -33,39 +33,6 @@ class BoardView: NSView {
         chessView.stateChanged()
     }
     
-    @objc func pieceSquareViewTapped(sender: NSClickGestureRecognizer) {
-//        if let view = sender.view as? PieceView {
-//            if view.moveIndicator {
-//                if view.move!.isPromotion {
-//                    let picker = PromotionPicker(isWhite: true)
-//                    picker.choosePromotionPiece { (piece) in
-//                        view.move!.setPromotionPiece(piece!)
-//                        self.playUserMove(move: view.move!)
-//                    }
-//                } else {
-//                    playUserMove(move: view.move!)
-//                }
-//                // Perform move
-//            } else if view.selected {
-//                clearAllViewIndicators()
-//                needsLayout = true
-//            } else {
-//                clearAllViewIndicators()
-//                
-//                // Select the square
-//                view.selected = true
-//                
-//                let moves = engine.moves(at: UInt(view.rank), file: UInt(view.file))
-//                for move in moves {
-//                    let moveView = pieceSquareView(rank: Int(move.toRank), file: Int(move.toFile))
-//                    moveView.moveIndicator = true
-//                    moveView.move = move
-//                }
-//            }
-//            self.needsDisplay = true
-//        }
-    }
-    
     // MARK: Actions
     
     var info: FEngineInfo? = nil
@@ -73,17 +40,6 @@ class BoardView: NSView {
     func engineAnalyze() {
         engine.analyze { (info, completed) in
             self.info = info
-        }
-    }
-    
-    func enginePlay() {
-        engine.evaluate() { (info, completed) in
-            self.info = info
-            if completed {
-                DispatchQueue.main.async {
-//                    self.animateMove(info: info)
-                }
-            }
         }
     }
     
