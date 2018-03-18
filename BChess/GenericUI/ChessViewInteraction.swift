@@ -61,12 +61,7 @@ class ChessViewInteraction {
         }
         
         if !handleUserInitiatedMove(file: file, rank: rank) {
-            if state.possibleMoves != nil {
-                state.possibleMoves = nil
-                animateState { }
-            } else {
-                showPossibleMoves(file: file, rank: rank)
-            }
+            showPossibleMoves(file: file, rank: rank)
         }
     }
     
@@ -101,8 +96,16 @@ class ChessViewInteraction {
     
     func showPossibleMoves(file: UInt, rank: UInt) {
         let moves = engine.moves(at: UInt(rank), file: UInt(file))
-        state.possibleMoves = moves
-        animateState({ })
+        if moves.isEmpty {
+            state.possibleMoves = nil
+            animateState { }
+        } else if let currentMoves = state.possibleMoves, currentMoves == moves {
+            state.possibleMoves = nil
+            animateState { }
+        } else {
+            state.possibleMoves = moves
+            animateState({ })
+        }
     }
     
     func coordinate(location: CGPoint) -> (UInt, UInt)? {
@@ -142,26 +145,38 @@ class ChessViewInteraction {
     
     func newGame() {
         engine.setFEN(StartPosFEN)
-        state.boardState = engine.state
-        state.possibleMoves = nil
-        state.lastMove = nil
-        infoChanged?(nil)
-        animateState({ })
+        
+        engineChanged()
     }
 
     func takeBack() {
         if engine.isAnalyzing() {
             engine.stop()
-            engine.undoMove() // user move only
+            if engine.canUndoMove() {
+                engine.undoMove() // user move only
+            }
         } else {
-            engine.undoMove() // engine move
-            engine.undoMove() // user move
+            if engine.canUndoMove() {
+                engine.undoMove() // engine move
+            }
+            if engine.canUndoMove() {
+                engine.undoMove() // user move
+            }
         }
-        
+        engineChanged()
+    }
+    
+    func setPGN(pgn: String) {
+        engine.setPGN(pgn)
+        engineChanged()
+    }
+    
+    func engineChanged() {
         state.boardState = engine.state
         state.possibleMoves = nil
         state.lastMove = nil
         infoChanged?(nil)
+        
         animateState({ })
     }
 }

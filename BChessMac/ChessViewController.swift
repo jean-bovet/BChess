@@ -25,8 +25,6 @@ class ChessViewController: NSViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        restoreFromDefaults()
-        
         registerGesture()
         
         loadOpenings()
@@ -50,7 +48,11 @@ class ChessViewController: NSViewController {
             self.updateUI()
             self.saveToDefaults()
         }
+
+        chessView.state = state // TODO refactor with iOS counterpart
         
+        restoreFromDefaults()
+
         updateUI()
     }
     
@@ -103,7 +105,7 @@ class ChessViewController: NSViewController {
     
     func restoreFromDefaults() {
         if let pgn = UserDefaults.standard.string(forKey: "pgn") {
-            engine.setPGN(pgn)
+            interaction.setPGN(pgn: pgn)
         }
     }
     

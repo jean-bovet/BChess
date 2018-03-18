@@ -50,6 +50,12 @@ class ViewController: UIViewController {
         
         chessView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(chessViewTapped(gesture:))))
         view.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(backgroundViewTapped(gesture:))))
+        
+        chessView.state = state // TODO refactor into interaction?
+
+        restoreFromDefaults()
+        
+        interaction.playEngineIfPossible()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -69,14 +75,33 @@ class ViewController: UIViewController {
     func updateState() {
         state.boardState = engine.state
         chessView.state = state
+        saveToDefaults()
     }
     
     func animateUpdateState(_ completion: CompletionBlock?) {
-        UIView.animate(withDuration: 0.3, delay: 0, options: .curveLinear, animations: { [unowned self] in
-            self.updateState()
-        }, completion: { completed in
+        if self.view.window == nil {
+            // No animation if no window
+            updateState()
             completion?()
-        })
+        } else {
+            UIView.animate(withDuration: 0.3, delay: 0, options: .curveLinear, animations: { [unowned self] in
+                self.updateState()
+                }, completion: { completed in
+                    completion?()
+            })
+        }
+    }
+
+    // MARK: - Defaults-
+    
+    func saveToDefaults() {
+        UserDefaults.standard.set(engine.pgn(), forKey: "pgn")
+    }
+    
+    func restoreFromDefaults() {
+        if let pgn = UserDefaults.standard.string(forKey: "pgn") {
+            interaction.setPGN(pgn: pgn)
+        }
     }
 
     // MARK: - User Actions -

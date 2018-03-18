@@ -34,6 +34,13 @@
     _rawMoveValue = m;
 }
 
+- (BOOL)isEqual:(id)other {
+    if (other == self)
+        return YES;
+       
+    return self.rawMoveValue == ((FEngineMove*)other).rawMoveValue;
+}
+
 @end
 
 
