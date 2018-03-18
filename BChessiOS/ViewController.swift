@@ -18,9 +18,19 @@ class ViewController: UIViewController {
     
     var actions = [UIAction]()
     
+    var relaxingMode = false {
+        didSet {
+            relaxModeChanged()
+        }
+    }
+    
     @IBOutlet weak var chessView: ChessView!
     @IBOutlet weak var infoTextView: UITextView!
-        
+    
+    override var prefersStatusBarHidden: Bool {
+        return relaxingMode
+    }
+
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -87,11 +97,21 @@ class ViewController: UIViewController {
     }
     
     @objc func backgroundViewTapped(gesture: UITapGestureRecognizer) {
-        if let navBar = navigationController {
-            let hidden = navBar.isNavigationBarHidden
-            navBar.setNavigationBarHidden(!hidden, animated: true)
-        }
+        relaxingMode = !relaxingMode
     }
     
+    func relaxModeChanged() {
+        navigationController?.setNavigationBarHidden(relaxingMode, animated: true)
+        
+        setNeedsStatusBarAppearanceUpdate()
+        
+        UIView.animate(withDuration: 0.3, animations: { [unowned self] in
+            if self.relaxingMode {
+                self.view.backgroundColor = .black
+            } else {
+                self.view.backgroundColor = .white
+            }
+        })
+    }
 }
 

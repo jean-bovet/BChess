@@ -69,7 +69,7 @@ class ChessView: View {
     }
     
     func drawBorders(context: CGContext) {
-        context.setStrokeColor(Color.black.cgColor)
+        context.setStrokeColor(Color.lightGray.cgColor)
         context.setLineWidth(2.0)
         context.stroke(layouter.boardFrame)
     }
