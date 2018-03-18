@@ -320,7 +320,7 @@
                             <stackView distribution="fill" orientation="horizontal" alignment="centerY" spacing="0.0" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="a6M-pX-2Vm">
                                 <rect key="frame" x="0.0" y="0.0" width="952" height="563"/>
                                 <subviews>
-                                    <customView translatesAutoresizingMaskIntoConstraints="NO" id="Q8S-Oy-e6A" customClass="BoardView" customModule="BChess" customModuleProvider="target">
+                                    <customView translatesAutoresizingMaskIntoConstraints="NO" id="Q8S-Oy-e6A" customClass="ChessView" customModule="BChess" customModuleProvider="target">
                                         <rect key="frame" x="0.0" y="0.0" width="692" height="563"/>
                                     </customView>
                                     <scrollView borderType="none" autohidesScrollers="YES" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" hasVerticalScroller="NO" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="40J-P2-23o">

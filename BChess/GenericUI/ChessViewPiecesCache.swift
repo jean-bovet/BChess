@@ -15,7 +15,7 @@ class ChessViewPiecesCache {
     
     var cachedPieces = [String:ChessViewPiece]()
     
-    func update(boardState: String) -> [ChessViewPiece] {
+    func update(boardState: String, animated: Bool = true) -> [ChessViewPiece] {
         let pieces = factory.pieceViews(forState: boardState)
         
         var piecesToRemove = Set<String>(cachedPieces.keys)
@@ -26,10 +26,10 @@ class ChessViewPiecesCache {
                     layouter.layout(file: piece.file, rank: piece.rank, callback: { rect in
                         cachedPiece.view.frame = rect
                     })
-                    cachedPiece.view.animator().alpha = 1
+                    cachedPiece.view.animator(animated: animated).alpha = 1
                 } else {
                     layouter.layout(file: piece.file, rank: piece.rank, callback: { rect in
-                        cachedPiece.view.animator().frame = rect
+                        cachedPiece.view.animator(animated: animated).frame = rect
                     })
                 }
             } else {
@@ -38,7 +38,7 @@ class ChessViewPiecesCache {
                 layouter.layout(file: piece.file, rank: piece.rank, callback: { rect in
                     piece.view.frame = rect
                 })
-                piece.view.animator().alpha = 1
+                piece.view.animator(animated: animated).alpha = 1
             }
         }
         

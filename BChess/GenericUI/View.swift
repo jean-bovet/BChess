@@ -44,6 +44,14 @@ import Foundation
         func setNeedsDisplay() {
             setNeedsDisplay(bounds)
         }
+        
+        func animator(animated: Bool) -> NSView {
+            if animated {
+                return animator()
+            } else {
+                return self
+            }
+        }
     }
 #else
     import UIKit.UIView
@@ -55,7 +63,7 @@ import Foundation
     
     extension View {
         // Proxy to what OS X requires to do animation
-        func animator() -> View {
+        func animator(animated: Bool) -> View {
             return self
         }
     }

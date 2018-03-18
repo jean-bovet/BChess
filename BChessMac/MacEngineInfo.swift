@@ -8,41 +8,16 @@
 
 import Cocoa
 
-class BoardView: NSView {
+class MacEngineInfo {
     
-    let engine = FEngine()
     let numberFormatter = NumberFormatter()
     
-    let chessView = ChessView()
-    let chessState = ChessViewState()
-    
-    required init?(coder decoder: NSCoder) {
-        super.init(coder: decoder)
-        
+    init() {
         numberFormatter.numberStyle = .decimal
         numberFormatter.thousandSeparator = ","
         numberFormatter.hasThousandSeparators = true
-                
-        addSubview(chessView)
     }
-    
-    override func layout() {
-        super.layout()
         
-        chessView.frame = bounds
-        chessView.stateChanged()
-    }
-    
-    // MARK: Actions
-    
-    var info: FEngineInfo? = nil
-    
-    func engineAnalyze() {
-        engine.analyze { (info, completed) in
-            self.info = info
-        }
-    }
-    
     func boldText(text: String) -> NSAttributedString {
         return NSAttributedString(string: text, attributes: [ NSAttributedStringKey.font : NSFont.boldSystemFont(ofSize: 12)])
     }
@@ -51,7 +26,7 @@ class BoardView: NSView {
         return NSAttributedString(string: text, attributes: [ NSAttributedStringKey.font : NSFont.systemFont(ofSize: 12)])
     }
 
-    var infoLine: NSAttributedString {
+    func attributedString(forInfo info: FEngineInfo?, engine: FEngine) -> NSAttributedString {
         let infoColorToPlay = engine.isWhite() ? "White" : "Black"
 
         if let info = info {
@@ -101,15 +76,6 @@ class BoardView: NSView {
             infoString.append(regularText(text: infoColorToPlay))
             return infoString
         }
-    }
-    
-    // MARK: Rank and File Labels
-    
-    func invalidateUI() {
-        needsLayout = true
-        
-        chessState.boardState = engine.state
-        chessView.state = chessState
     }
     
 }

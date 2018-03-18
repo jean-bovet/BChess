@@ -23,14 +23,19 @@ class ChessView: View {
         }
     }
     
-    #if os(iOS)
+    #if os(OSX)
+    override func resize(withOldSuperviewSize oldSize: NSSize) {
+        super.resize(withOldSuperviewSize: oldSize)
+        stateChanged(animated: false)
+    }
+    #else
     override func layoutSubviews() {
         super.layoutSubviews()
         stateChanged()
     }
     #endif
     
-    func stateChanged() {
+    func stateChanged(animated: Bool = true) {
         guard let state = state else {
             return
         }
@@ -38,7 +43,7 @@ class ChessView: View {
         piecesCache.layouter.viewSize = bounds.size
         
         if let boardState = state.boardState {
-            let pieces = piecesCache.update(boardState: boardState)
+            let pieces = piecesCache.update(boardState: boardState, animated: animated)
             pieces.forEach { addSubview($0.view) }
         }
         

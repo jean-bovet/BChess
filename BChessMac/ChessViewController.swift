@@ -10,16 +10,17 @@ import Cocoa
 
 class ChessViewController: NSViewController {
 
-    @IBOutlet weak var chessView: BoardView!
+    @IBOutlet weak var chessView: ChessView!
     @IBOutlet weak var stackView: NSStackView!
     @IBOutlet weak var gameInfoScrollView: NSScrollView!
     @IBOutlet var gameInfoTextView: NSTextView!
     
-    var interaction: ChessViewInteraction!
+    let engine = FEngine()
+    let state = ChessViewState()
+    let engineInfo = MacEngineInfo()
+    var info: FEngineInfo?
     
-    var engine : FEngine {
-        return chessView.engine
-    }
+    var interaction: ChessViewInteraction!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -30,18 +31,18 @@ class ChessViewController: NSViewController {
         
         loadOpenings()
         
-        interaction = ChessViewInteraction(view: chessView.chessView, engine: engine, animateState: { [unowned self] completion in
+        interaction = ChessViewInteraction(view: chessView, engine: engine, animateState: { [unowned self] completion in
             NSAnimationContext.runAnimationGroup({ _ in
                 NSAnimationContext.current.duration = 0.5
                 NSAnimationContext.current.timingFunction = CAMediaTimingFunction(name: kCAAnimationLinear)
-                self.chessView.chessView.stateChanged()
+                self.chessView.stateChanged()
             }, completionHandler: {
                 completion()
             })
         })
 
         interaction.infoChanged = { [unowned self] info in
-            self.chessView.info = info
+            self.info = info
             self.updateGameInfo()
         }
         
@@ -65,13 +66,19 @@ class ChessViewController: NSViewController {
     }
     
     func updateUI() {
-        chessView.invalidateUI()
+        chessView.needsLayout = true
+        
+        chessView.state = state
+        chessView.state?.boardState = engine.state
+
+        chessView.stateChanged()
+        
         updateGameInfo()
     }
     
     func updateGameInfo() {
         let text = NSMutableAttributedString()
-        text.append(chessView.infoLine)
+        text.append(engineInfo.attributedString(forInfo: info, engine: engine))
         text.append(NSAttributedString(string: "\n\n"))
         text.append(NSAttributedString(string: engine.pgnFormattedForDisplay()))
         gameInfoTextView.textStorage?.setAttributedString(text)
@@ -159,7 +166,7 @@ class ChessViewController: NSViewController {
                 // Could not past FEN, maybe PGN?
                 engine.setPGN(text);
             }
-            chessView.invalidateUI()
+            updateUI()
             saveToDefaults()
         }
     }
@@ -194,7 +201,12 @@ class ChessViewController: NSViewController {
         if (engine.isAnalyzing()) {
             engine.stop()
         } else {
-            chessView.engineAnalyze()
+            engine.analyze({ info, completed in
+                DispatchQueue.main.async { [unowned self] in
+                    self.info = info
+                    self.updateGameInfo()
+                }
+            })
         }
     }
 
