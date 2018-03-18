@@ -149,4 +149,19 @@ class ChessViewInteraction {
         animateState({ })
     }
 
+    func takeBack() {
+        if engine.isAnalyzing() {
+            engine.stop()
+            engine.undoMove() // user move only
+        } else {
+            engine.undoMove() // engine move
+            engine.undoMove() // user move
+        }
+        
+        state.boardState = engine.state
+        state.possibleMoves = nil
+        state.lastMove = nil
+        infoChanged?(nil)
+        animateState({ })
+    }
 }

@@ -61,6 +61,7 @@ class ViewController: UIViewController {
     
     func initializeActions() {
         actions.append(UIActionNewGame(viewController: self))
+        actions.append(UIActionTakeBack(viewController: self))
     }
     
     // MARK: - State -
@@ -79,10 +80,6 @@ class ViewController: UIViewController {
     }
 
     // MARK: - User Actions -
-
-    func newGame() {
-        interaction.newGame()
-    }
     
     @IBAction func actionsTapped(_ sender: Any) {
         let presenter = UIActionPresenter()

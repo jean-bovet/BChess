@@ -102,6 +102,7 @@
 		A77E6C3B204BCFF900ECF6CD /* EngineInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = A77E6C3A204BCFF900ECF6CD /* EngineInfo.swift */; };
 		A78E754C202C080E00445360 /* MovesTests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A78E754B202C080E00445360 /* MovesTests.cpp */; };
 		A78E7551202C110200445360 /* UnitTestHelper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A78E754F202C110200445360 /* UnitTestHelper.cpp */; };
+		A79CC9AF205E20A800CF5324 /* UIActionTakeBack.swift in Sources */ = {isa = PBXBuildFile; fileRef = A79CC9AE205E20A800CF5324 /* UIActionTakeBack.swift */; };
 		A7AA42A920538C7F00FAACA2 /* ChessViewInteraction.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7AA42A820538C7F00FAACA2 /* ChessViewInteraction.swift */; };
 		A7AA42AA20538C7F00FAACA2 /* ChessViewInteraction.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7AA42A820538C7F00FAACA2 /* ChessViewInteraction.swift */; };
 		A7AA42AC205608ED00FAACA2 /* ChessViewPromotionPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7AA42AB205608ED00FAACA2 /* ChessViewPromotionPicker.swift */; };
@@ -283,6 +284,7 @@
 		A78E754B202C080E00445360 /* MovesTests.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MovesTests.cpp; sourceTree = "<group>"; };
 		A78E754F202C110200445360 /* UnitTestHelper.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = UnitTestHelper.cpp; sourceTree = "<group>"; };
 		A78E7550202C110200445360 /* UnitTestHelper.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = UnitTestHelper.hpp; sourceTree = "<group>"; };
+		A79CC9AE205E20A800CF5324 /* UIActionTakeBack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIActionTakeBack.swift; sourceTree = "<group>"; };
 		A7AA42A820538C7F00FAACA2 /* ChessViewInteraction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChessViewInteraction.swift; sourceTree = "<group>"; };
 		A7AA42AB205608ED00FAACA2 /* ChessViewPromotionPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChessViewPromotionPicker.swift; sourceTree = "<group>"; };
 		A7AFCCA61FB4E40D00AE3D85 /* BChess */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = BChess; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -465,6 +467,7 @@
 				A75CF028204CC80700974912 /* UIActionPresenter.swift */,
 				A75CF02A204CC86800974912 /* UIAction.swift */,
 				A75CF02C204CC8A200974912 /* UIActionNewGame.swift */,
+				A79CC9AE205E20A800CF5324 /* UIActionTakeBack.swift */,
 			);
 			path = UIAction;
 			sourceTree = "<group>";
@@ -999,6 +1002,7 @@
 				A7E8B709204CE63100DD2323 /* ChessViewPiece.swift in Sources */,
 				A7688F5D204A6A30004B1E9E /* ChessOpenings.cpp in Sources */,
 				A7688F55204A6A27004B1E9E /* ChessEvaluater.cpp in Sources */,
+				A79CC9AF205E20A800CF5324 /* UIActionTakeBack.swift in Sources */,
 				A7E8B71D204D1A9600DD2323 /* ImageView.swift in Sources */,
 				A7622E09205DD704000ACF55 /* GestureRecognizer.swift in Sources */,
 				A7688F5B204A6A27004B1E9E /* FPGN.cpp in Sources */,
