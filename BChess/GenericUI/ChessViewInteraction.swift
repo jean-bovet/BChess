@@ -61,7 +61,12 @@ class ChessViewInteraction {
         }
         
         if !handleUserInitiatedMove(file: file, rank: rank) {
-            showPossibleMoves(file: file, rank: rank)
+            if state.possibleMoves != nil {
+                state.possibleMoves = nil
+                animateState { }
+            } else {
+                showPossibleMoves(file: file, rank: rank)
+            }
         }
     }
     

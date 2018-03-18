@@ -26,7 +26,7 @@
                                     <constraint firstAttribute="width" secondItem="MWm-xc-uA9" secondAttribute="height" multiplier="1:1" id="giD-kF-LHs"/>
                                 </constraints>
                             </view>
-                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" editable="NO" translatesAutoresizingMaskIntoConstraints="NO" id="1PM-xG-FQ5">
+                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" editable="NO" selectable="NO" translatesAutoresizingMaskIntoConstraints="NO" id="1PM-xG-FQ5">
                                 <rect key="frame" x="0.0" y="521" width="375" height="146"/>
                                 <string key="text">Line 1
 Line 2

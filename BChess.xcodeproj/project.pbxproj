@@ -218,7 +218,7 @@
 		A75359831FDC51B2008D1DEE /* FENgineInfo+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FENgineInfo+Extension.swift"; sourceTree = "<group>"; };
 		A75359871FDCF8D6008D1DEE /* Bitboard.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Bitboard.hpp; sourceTree = "<group>"; };
 		A753598A1FDCF95E008D1DEE /* Coordinate.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Coordinate.hpp; sourceTree = "<group>"; };
-		A75359901FDE0947008D1DEE /* BChessMac.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; name = BChessMac.app; path = BChess.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		A75359901FDE0947008D1DEE /* BChess.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BChess.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A75359921FDE0947008D1DEE /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		A75359941FDE0947008D1DEE /* ChessViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChessViewController.swift; sourceTree = "<group>"; };
 		A75359961FDE0947008D1DEE /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -591,7 +591,7 @@
 			children = (
 				A7AFCCA61FB4E40D00AE3D85 /* BChess */,
 				A7712D141FB916E900E7E802 /* BChessTests.xctest */,
-				A75359901FDE0947008D1DEE /* BChessMac.app */,
+				A75359901FDE0947008D1DEE /* BChess.app */,
 				A75359A11FDE0947008D1DEE /* BChessMacTests.xctest */,
 				A75359AC1FDE0947008D1DEE /* BChessMacUITests.xctest */,
 				A7688F1F204A6911004B1E9E /* BChess.app */,
@@ -665,7 +665,7 @@
 			);
 			name = BChessMac;
 			productName = BChessMac;
-			productReference = A75359901FDE0947008D1DEE /* BChessMac.app */;
+			productReference = A75359901FDE0947008D1DEE /* BChess.app */;
 			productType = "com.apple.product-type.application";
 		};
 		A75359A01FDE0947008D1DEE /* BChessMacTests */ = {
@@ -1176,7 +1176,7 @@
 				DEVELOPMENT_TEAM = 28XRU7S6GA;
 				INFOPLIST_FILE = BChessMac/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = "ch.arizona-software.BChessMac";
+				PRODUCT_BUNDLE_IDENTIFIER = ch.arizonasoftware.BChess;
 				PRODUCT_NAME = BChess;
 				SWIFT_OBJC_BRIDGING_HEADER = "BChess/BChess-Bridging-Header.h";
 				SWIFT_VERSION = 4.0;
@@ -1193,7 +1193,7 @@
 				DEVELOPMENT_TEAM = 28XRU7S6GA;
 				INFOPLIST_FILE = BChessMac/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = "ch.arizona-software.BChessMac";
+				PRODUCT_BUNDLE_IDENTIFIER = ch.arizonasoftware.BChess;
 				PRODUCT_NAME = BChess;
 				SWIFT_OBJC_BRIDGING_HEADER = "BChess/BChess-Bridging-Header.h";
 				SWIFT_VERSION = 4.0;
@@ -1276,7 +1276,7 @@
 				INFOPLIST_FILE = BChessiOS/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 11.2;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = "ch.arizona-software.BChessiOS";
+				PRODUCT_BUNDLE_IDENTIFIER = ch.arizonasoftware.BChess;
 				PRODUCT_NAME = BChess;
 				SDKROOT = iphoneos;
 				SWIFT_OBJC_BRIDGING_HEADER = "BChess/BChess-Bridging-Header.h";
@@ -1295,7 +1295,7 @@
 				INFOPLIST_FILE = BChessiOS/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 11.2;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = "ch.arizona-software.BChessiOS";
+				PRODUCT_BUNDLE_IDENTIFIER = ch.arizonasoftware.BChess;
 				PRODUCT_NAME = BChess;
 				SDKROOT = iphoneos;
 				SWIFT_OBJC_BRIDGING_HEADER = "BChess/BChess-Bridging-Header.h";

@@ -23,6 +23,10 @@ class ChessView: View {
         }
     }
     
+    var labelsInside: Bool {
+        return false
+    }
+    
     #if os(OSX)
     override func resize(withOldSuperviewSize oldSize: NSSize) {
         super.resize(withOldSuperviewSize: oldSize)
@@ -94,25 +98,51 @@ class ChessView: View {
 
         for file: UInt in 0...7 {
             layouter.layout(file: file, rank: 0, callback: { rect in
-                let white = file % 2 == 0
-                #if os(OSX)
-                    let y = rect.origin.y
-                #else
-                    let y = rect.origin.y + rect.size.height
-                #endif
-                drawText(context: context, x: rect.origin.x + rect.size.width - 2, y: y, text: files[Int(file)], white: white, hAlign: .Right)
+                let white: Bool
+                let x, y : CGFloat
+                let vAlign: VAlign
+                let hAlign: HAlign
+                if labelsInside {
+                    white = file % 2 == 0
+                    x = rect.maxX - 2
+                    y = rect.origin.y
+                    vAlign = VAlign.Bottom
+                    hAlign = HAlign.Right
+                } else {
+                    white = false
+                    x = rect.midX
+                    #if os(OSX)
+                        y = rect.minY
+                    #else
+                        y = rect.maxY
+                    #endif
+                    vAlign = VAlign.Top
+                    hAlign = HAlign.Center
+                }
+                drawText(context: context, x: x, y: y, text: files[Int(file)], white: white, vAlign: vAlign, hAlign: hAlign)
             })
         }
         
         for rank: UInt in 0...7 {
             layouter.layout(file: 0, rank: rank, callback: { rect in
-                let white = rank % 2 == 0
-                #if os(OSX)
-                    let y = rect.origin.y + rect.size.height
-                #else
-                    let y = rect.origin.y
-                #endif
-                drawText(context: context, x: rect.origin.x + 2, y: y, text: String(rank+1), white: white, vAlign: .Top)
+                let white: Bool
+                let x, y : CGFloat
+                let vAlign: VAlign
+                let hAlign: HAlign
+                if labelsInside {
+                    white = rank % 2 == 0
+                    x = rect.origin.x + 2
+                    y = rect.maxY
+                    vAlign = VAlign.Top
+                    hAlign = HAlign.Left
+                } else {
+                    white = false
+                    x = rect.origin.x - 2
+                    y = rect.midY
+                    vAlign = VAlign.Center
+                    hAlign = HAlign.Right
+                }
+                drawText(context: context, x: x, y: y, text: String(rank+1), white: white, vAlign: vAlign, hAlign: hAlign)
             })
         }
     }
@@ -120,11 +150,13 @@ class ChessView: View {
     enum VAlign {
         case Top
         case Bottom
+        case Center
     }
 
     enum HAlign {
         case Left
         case Right
+        case Center
     }
 
     func drawText(context: CGContext, x: CGFloat, y _y: CGFloat, text: String, white: Bool, vAlign: VAlign = .Bottom, hAlign: HAlign = .Left) {
@@ -144,7 +176,7 @@ class ChessView: View {
         str.addAttribute(NSAttributedStringKey(rawValue: kCTForegroundColorAttributeName as String),
                          value: white ? Color.white : Color.black , range: NSMakeRange(0,str.length))
         
-        let fontRef = Font.systemFont(ofSize: 10, weight: Font.Weight.bold)
+        let fontRef = Font.systemFont(ofSize: layouter.fontSize, weight: Font.Weight.bold)
         let attributes = [NSAttributedStringKey(rawValue: kCTFontAttributeName as String) : fontRef]
         str.addAttribute(NSAttributedStringKey(rawValue: kCTFontAttributeName as String), value: fontRef, range:NSMakeRange(0, str.length))
         
@@ -161,6 +193,8 @@ class ChessView: View {
             hoffset = 0
         case .Right:
             hoffset = -path.boundingBox.size.width
+        case .Center:
+            hoffset = -path.boundingBox.size.width/2
         }
         
         var voffset: CGFloat = 0
@@ -169,6 +203,8 @@ class ChessView: View {
             voffset = -path.boundingBox.size.height
         case .Bottom:
             voffset = 0
+        case .Center:
+            voffset = -path.boundingBox.size.height/2
         }
 
         context.translateBy(x: x + hoffset, y: y + voffset);

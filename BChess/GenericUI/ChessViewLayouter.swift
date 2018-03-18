@@ -21,7 +21,8 @@ class ChessViewLayouter {
         return CGRect(x: squareHorizontalOffset, y: squareVerticalOffset, width: squareSize*8, height: squareSize*8)
     }
     
-    let margin: CGFloat = 10
+    let fontSize: CGFloat = 10
+    let margin: CGFloat = 16
     
     var squareSize: CGFloat = 0
     var squareHorizontalOffset: CGFloat = 0

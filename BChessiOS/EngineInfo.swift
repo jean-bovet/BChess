@@ -59,7 +59,7 @@ class EngineInfo {
                 value = valueFormatter.string(from: NSNumber(value: Double(info.value) / 100.0))!
             }
             let line = info.bestLine(false)
-            infoString.append(regularText(text: "\(value) – \(line)"))
+            infoString.append(regularText(text: "[\(value)] \(line)"))
             infoString.append(regularText(text: "\n"))
             
             let nodes = numberFormatter.string(from: NSNumber(value: info.nodeEvaluated))!

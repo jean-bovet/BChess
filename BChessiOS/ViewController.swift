@@ -33,8 +33,6 @@ class ViewController: UIViewController {
         interaction.infoChanged = { [unowned self] info in
             self.infoTextView.attributedText = self.attributedInfo.information(forInfo: info, engine: self.engine)
         }
-
-        navigationController?.setNavigationBarHidden(true, animated: false)
         
         initializeActions()
         
@@ -63,7 +61,7 @@ class ViewController: UIViewController {
     }
     
     func animateUpdateState(_ completion: CompletionBlock?) {
-        UIView.animate(withDuration: 0.3, delay: 0, options: .curveLinear, animations: {
+        UIView.animate(withDuration: 0.3, delay: 0, options: .curveLinear, animations: { [unowned self] in
             self.updateState()
         }, completion: { completed in
             completion?()
