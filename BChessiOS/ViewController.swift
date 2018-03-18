@@ -24,11 +24,15 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        interaction = ChessViewInteraction(view: chessView, engine: engine, animateState: { completion in
+        interaction = ChessViewInteraction(view: chessView, engine: engine, animateState: { [unowned self] completion in
             self.animateUpdateState({
                 completion()
             })
         })
+        
+        interaction.infoChanged = { [unowned self] info in
+            self.infoTextView.attributedText = self.attributedInfo.information(forInfo: info, engine: self.engine)
+        }
 
         navigationController?.setNavigationBarHidden(true, animated: false)
         
@@ -56,7 +60,6 @@ class ViewController: UIViewController {
     func updateState() {
         state.boardState = engine.state
         chessView.state = state
-        infoTextView.attributedText = attributedInfo.information(forInfo: nil, engine: engine)
     }
     
     func animateUpdateState(_ completion: CompletionBlock?) {

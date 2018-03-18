@@ -30,7 +30,7 @@ class ChessViewController: NSViewController {
         
         loadOpenings()
         
-        interaction = ChessViewInteraction(view: chessView.chessView, engine: engine, animateState: { completion in
+        interaction = ChessViewInteraction(view: chessView.chessView, engine: engine, animateState: { [unowned self] completion in
             NSAnimationContext.runAnimationGroup({ _ in
                 NSAnimationContext.current.duration = 0.5
                 NSAnimationContext.current.timingFunction = CAMediaTimingFunction(name: kCAAnimationLinear)
@@ -40,7 +40,12 @@ class ChessViewController: NSViewController {
             })
         })
 
-        engine.updateCallback = {
+        interaction.infoChanged = { [unowned self] info in
+            self.chessView.info = info
+            self.updateGameInfo()
+        }
+        
+        engine.updateCallback = { [unowned self] in
             self.updateUI()
             self.saveToDefaults()
         }

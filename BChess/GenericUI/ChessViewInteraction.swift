@@ -11,6 +11,7 @@ import CoreGraphics
 
 typealias CompletionBlock = () -> ()
 typealias AnimateStateBlock = (@escaping CompletionBlock) -> ()
+typealias InfoChangedBlock = (FEngineInfo?) -> ()
 
 class ChessViewInteraction {
     
@@ -20,6 +21,12 @@ class ChessViewInteraction {
     let animateState: AnimateStateBlock
 
     let promotionPicker: ChessViewPromotionPicker
+    
+    var infoChanged: InfoChangedBlock? {
+        didSet {
+            infoChanged?(nil)
+        }
+    }
     
     var layouter: ChessViewLayouter {
         return view.layouter
@@ -114,8 +121,7 @@ class ChessViewInteraction {
                     
                     self.animateState { }
                 }
-                // TODO
-//                self.infoTextView.attributedText = self.attributedInfo.information(forInfo: info, engine: self.engine)
+                self.infoChanged?(info)
             }
         }
     }
@@ -134,6 +140,7 @@ class ChessViewInteraction {
         state.boardState = engine.state
         state.possibleMoves = nil
         state.lastMove = nil
+        infoChanged?(nil)
         animateState({ })
     }
 

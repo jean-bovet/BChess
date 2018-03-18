@@ -23,10 +23,12 @@ class ChessView: View {
         }
     }
     
+    #if os(iOS)
     override func layoutSubviews() {
         super.layoutSubviews()
         stateChanged()
     }
+    #endif
     
     func stateChanged() {
         guard let state = state else {
