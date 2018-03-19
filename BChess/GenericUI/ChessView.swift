@@ -27,6 +27,8 @@ class ChessView: View {
         return false
     }
     
+    var animated = true
+    
     #if os(OSX)
     override func resize(withOldSuperviewSize oldSize: NSSize) {
         super.resize(withOldSuperviewSize: oldSize)
@@ -38,6 +40,10 @@ class ChessView: View {
         stateChanged()
     }
     #endif
+    
+    func stateChanged() {
+        stateChanged(animated: animated)
+    }
     
     func stateChanged(animated: Bool = true) {
         guard let state = state else {

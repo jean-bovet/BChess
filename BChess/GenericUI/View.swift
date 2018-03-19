@@ -11,7 +11,8 @@ import Foundation
 #if os(OSX)
     import AppKit.NSView
     public typealias View = NSView
-    
+    public typealias AnimateCallback = (View) -> Void
+
     extension View {
         
         var alpha: CGFloat {
@@ -45,27 +46,36 @@ import Foundation
             setNeedsDisplay(bounds)
         }
         
-        func animator(animated: Bool) -> NSView {
+        func animate(animated: Bool, callback: @escaping AnimateCallback) {
             if animated {
-                return animator()
+                callback(animator())
             } else {
-                return self
+                callback(self)
             }
         }
+
     }
 #else
     import UIKit.UIView
     public typealias View = UIView
-    
+    public typealias AnimateCallback = (View) -> Void
+
     var context: CGContext? {
         return UIGraphicsGetCurrentContext()
     }
     
     extension View {
-        // Proxy to what OS X requires to do animation
-        func animator(animated: Bool) -> View {
-            return self
+
+        func animate(animated: Bool, callback: @escaping AnimateCallback) {
+            if animated {
+                UIView.animate(withDuration: 0.3, animations: {
+                    callback(self)
+                })
+            } else {
+                callback(self)
+            }
         }
+        
     }
     
 #endif

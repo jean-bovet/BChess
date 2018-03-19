@@ -44,7 +44,13 @@ class EngineInfo {
     func information(forInfo info: FEngineInfo?, engine: FEngine) -> NSAttributedString {
         let infoString = NSMutableAttributedString()
         
-        let infoColorToPlay = engine.isWhite() ? "White to play" : "Black to play"
+        var infoColorToPlay = engine.isWhite() ? "White" : "Black"
+        if engine.isAnalyzing() {
+            infoColorToPlay.append(" is thinking")
+        } else {
+            infoColorToPlay.append("'s turn")
+        }
+        
         infoString.append(boldText(text: infoColorToPlay))
         infoString.append(regularText(text: "\n"))
 

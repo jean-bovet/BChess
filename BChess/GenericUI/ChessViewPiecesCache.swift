@@ -26,10 +26,14 @@ class ChessViewPiecesCache {
                     layouter.layout(file: piece.file, rank: piece.rank, callback: { rect in
                         cachedPiece.view.frame = rect
                     })
-                    cachedPiece.view.animator(animated: animated).alpha = 1
+                    cachedPiece.view.animate(animated: animated, callback: { view in
+                        view.alpha = 1
+                    })
                 } else {
                     layouter.layout(file: piece.file, rank: piece.rank, callback: { rect in
-                        cachedPiece.view.animator(animated: animated).frame = rect
+                        cachedPiece.view.animate(animated: animated, callback: { view in
+                            view.frame = rect
+                        })
                     })
                 }
             } else {
@@ -38,7 +42,9 @@ class ChessViewPiecesCache {
                 layouter.layout(file: piece.file, rank: piece.rank, callback: { rect in
                     piece.view.frame = rect
                 })
-                piece.view.animator(animated: animated).alpha = 1
+                piece.view.animate(animated: animated, callback: { view in
+                    view.alpha = 1
+                })
             }
         }
         

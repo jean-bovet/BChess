@@ -81,15 +81,13 @@ class ViewController: UIViewController {
     func animateUpdateState(_ completion: CompletionBlock?) {
         if self.view.window == nil {
             // No animation if no window
+            chessView.animated = false
             updateState()
-            completion?()
+            chessView.animated = true
         } else {
-            UIView.animate(withDuration: 0.3, delay: 0, options: .curveLinear, animations: { [unowned self] in
-                self.updateState()
-                }, completion: { completed in
-                    completion?()
-            })
+            updateState()
         }
+        completion?()
     }
 
     // MARK: - Defaults-
