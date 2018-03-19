@@ -87,6 +87,7 @@ class ChessViewInteraction {
     }
     
     func doMove(move: FEngineMove) {
+        state.lastMove = nil
         state.possibleMoves = nil
         engine.move(move.rawMoveValue)
         animateState({
