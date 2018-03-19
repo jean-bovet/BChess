@@ -313,9 +313,17 @@ void ChessBoard::move(Move move) {
 
     if (movePiece == ROOK) {
         if (moveColor == WHITE) {
-            whiteCanCastleKingSide = whiteCanCastleQueenSide = false;
+            if (from == a1) {
+                whiteCanCastleQueenSide = false;
+            } else if (from == h1) {
+                whiteCanCastleKingSide = false;
+            }
         } else {
-            blackCanCastleKingSide = blackCanCastleQueenSide = false;
+            if (from == a8) {
+                blackCanCastleQueenSide = false;
+            } else if (from == h8) {
+                blackCanCastleKingSide = false;
+            }
         }
     }
     
