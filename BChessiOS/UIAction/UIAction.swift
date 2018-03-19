@@ -17,7 +17,7 @@ class UIAction {
     var accessibilityIdentifier: String?
     var destructive: Bool = false
         
-    func execute(completion: @escaping CompletionBlock) {
+    func execute(viewController: ViewController, completion: @escaping CompletionBlock) {
         
     }
     

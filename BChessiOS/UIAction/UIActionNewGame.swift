@@ -11,20 +11,12 @@ import UIKit
 
 class UIActionNewGame: UIAction {
     
-    let viewController: ViewController
-    
-    init(viewController: ViewController) {
-        self.viewController = viewController
-
-        super.init()
-        
+    override init() {
+        super.init()        
         title = NSLocalizedString("New Game", comment: "")
-        accessibilityIdentifier = "new-game"
-        color = UIColor(red: 0.0, green: 0.5, blue: 0.0, alpha: 1.0)
-//        image = UIImage(named: "action-deposit")
     }
     
-    override func execute(completion: @escaping CompletionBlock) {
+    override func execute(viewController: ViewController, completion: @escaping CompletionBlock) {
         viewController.interaction.newGame()
         completion()
     }

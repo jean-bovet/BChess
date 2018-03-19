@@ -22,6 +22,8 @@
 		A72E2B57200496CD006CBB1C /* BoardHashTests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A72E2B56200496CC006CBB1C /* BoardHashTests.cpp */; };
 		A731BD3720009856004C13EF /* Tournament.swift in Sources */ = {isa = PBXBuildFile; fileRef = A731BD3620009856004C13EF /* Tournament.swift */; };
 		A731BD392000A513004C13EF /* TournamentEngines.swift in Sources */ = {isa = PBXBuildFile; fileRef = A731BD382000A513004C13EF /* TournamentEngines.swift */; };
+		A74215AE205F69D700604018 /* UIActionCopyGame.swift in Sources */ = {isa = PBXBuildFile; fileRef = A74215AD205F69D700604018 /* UIActionCopyGame.swift */; };
+		A74215B0205F6A0000604018 /* UIActionPasteGame.swift in Sources */ = {isa = PBXBuildFile; fileRef = A74215AF205F6A0000604018 /* UIActionPasteGame.swift */; };
 		A7460F011FDF2465002B0740 /* MacEngineInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7460F001FDF2465002B0740 /* MacEngineInfo.swift */; };
 		A746C244200148E9001F4437 /* ChessBoardHash.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A746C242200148E9001F4437 /* ChessBoardHash.cpp */; };
 		A746C245200148ED001F4437 /* ChessBoardHash.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A746C242200148E9001F4437 /* ChessBoardHash.cpp */; };
@@ -210,6 +212,8 @@
 		A72E2B56200496CC006CBB1C /* BoardHashTests.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BoardHashTests.cpp; sourceTree = "<group>"; };
 		A731BD3620009856004C13EF /* Tournament.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tournament.swift; sourceTree = "<group>"; };
 		A731BD382000A513004C13EF /* TournamentEngines.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TournamentEngines.swift; sourceTree = "<group>"; };
+		A74215AD205F69D700604018 /* UIActionCopyGame.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIActionCopyGame.swift; sourceTree = "<group>"; };
+		A74215AF205F6A0000604018 /* UIActionPasteGame.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIActionPasteGame.swift; sourceTree = "<group>"; };
 		A7460F001FDF2465002B0740 /* MacEngineInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacEngineInfo.swift; sourceTree = "<group>"; };
 		A746C242200148E9001F4437 /* ChessBoardHash.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ChessBoardHash.cpp; sourceTree = "<group>"; };
 		A746C243200148E9001F4437 /* ChessBoardHash.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = ChessBoardHash.hpp; sourceTree = "<group>"; };
@@ -468,6 +472,8 @@
 				A75CF02A204CC86800974912 /* UIAction.swift */,
 				A75CF02C204CC8A200974912 /* UIActionNewGame.swift */,
 				A79CC9AE205E20A800CF5324 /* UIActionTakeBack.swift */,
+				A74215AD205F69D700604018 /* UIActionCopyGame.swift */,
+				A74215AF205F6A0000604018 /* UIActionPasteGame.swift */,
 			);
 			path = UIAction;
 			sourceTree = "<group>";
@@ -996,6 +1002,7 @@
 				A7E8B723204D1D0300DD2323 /* Color.swift in Sources */,
 				A7AA42AD205608ED00FAACA2 /* ChessViewPromotionPicker.swift in Sources */,
 				A7688F58204A6A27004B1E9E /* magicmoves.c in Sources */,
+				A74215B0205F6A0000604018 /* UIActionPasteGame.swift in Sources */,
 				A7622E03205DD4B0000ACF55 /* PieceImageView.swift in Sources */,
 				A7E8B70B204CE70A00DD2323 /* ChessViewPiecesCache.swift in Sources */,
 				A7688F52204A6A14004B1E9E /* FEngineMove.mm in Sources */,
@@ -1006,6 +1013,7 @@
 				A7E8B71D204D1A9600DD2323 /* ImageView.swift in Sources */,
 				A7622E09205DD704000ACF55 /* GestureRecognizer.swift in Sources */,
 				A7688F5B204A6A27004B1E9E /* FPGN.cpp in Sources */,
+				A74215AE205F69D700604018 /* UIActionCopyGame.swift in Sources */,
 				A7688F51204A6A14004B1E9E /* FEngineInfo.mm in Sources */,
 				A7E8B726204FAED800DD2323 /* Font.swift in Sources */,
 				A7688F57204A6A27004B1E9E /* GameHistory.cpp in Sources */,

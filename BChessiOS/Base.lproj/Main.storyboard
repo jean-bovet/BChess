@@ -27,7 +27,7 @@
                                 </constraints>
                             </view>
                             <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" editable="NO" selectable="NO" translatesAutoresizingMaskIntoConstraints="NO" id="1PM-xG-FQ5">
-                                <rect key="frame" x="0.0" y="521" width="375" height="146"/>
+                                <rect key="frame" x="0.0" y="521" width="375" height="117.5"/>
                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <string key="text">Line 1
 Line 2
@@ -35,27 +35,36 @@ Line 3</string>
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                 <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
                             </textView>
+                            <stackView opaque="NO" contentMode="scaleToFill" distribution="fillProportionally" alignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="dXS-m1-iHG">
+                                <rect key="frame" x="0.0" y="646.5" width="375" height="20.5"/>
+                                <subviews>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="&lt;Actions&gt;" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="gMc-Xc-2Bu">
+                                        <rect key="frame" x="0.0" y="0.0" width="375" height="20.5"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                        <nil key="textColor"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                </subviews>
+                            </stackView>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
+                            <constraint firstItem="dXS-m1-iHG" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" id="Hoi-He-eTo"/>
+                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="bottom" secondItem="dXS-m1-iHG" secondAttribute="bottom" id="PqU-jq-edn"/>
+                            <constraint firstItem="dXS-m1-iHG" firstAttribute="top" secondItem="1PM-xG-FQ5" secondAttribute="bottom" constant="8" symbolic="YES" id="VXE-2j-62d"/>
                             <constraint firstItem="1PM-xG-FQ5" firstAttribute="top" secondItem="MWm-xc-uA9" secondAttribute="bottom" id="d3M-gz-CdN"/>
                             <constraint firstItem="MWm-xc-uA9" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" id="dXU-KC-ZHe"/>
                             <constraint firstItem="1PM-xG-FQ5" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" id="mxT-bA-wpm"/>
                             <constraint firstItem="MWm-xc-uA9" firstAttribute="centerY" secondItem="8bC-Xf-vdC" secondAttribute="centerY" id="tSM-pj-3JO"/>
-                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="bottom" secondItem="1PM-xG-FQ5" secondAttribute="bottom" id="tTh-rj-LJ5"/>
+                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="dXS-m1-iHG" secondAttribute="trailing" id="xIs-37-mMK"/>
                             <constraint firstItem="MWm-xc-uA9" firstAttribute="trailing" secondItem="6Tk-OE-BBY" secondAttribute="trailing" id="xSs-Gp-pXP"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="1PM-xG-FQ5" secondAttribute="trailing" id="zkO-7M-iLV"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                     </view>
-                    <navigationItem key="navigationItem" title="BChess" id="CZD-nq-rJd">
-                        <barButtonItem key="rightBarButtonItem" systemItem="action" id="hU7-e5-NJQ">
-                            <connections>
-                                <action selector="actionsTapped:" destination="BYZ-38-t0r" id="HgZ-v0-J7O"/>
-                            </connections>
-                        </barButtonItem>
-                    </navigationItem>
+                    <navigationItem key="navigationItem" title="BChess" id="CZD-nq-rJd"/>
                     <connections>
+                        <outlet property="actionsStackView" destination="dXS-m1-iHG" id="J0m-XV-4cJ"/>
                         <outlet property="chessView" destination="MWm-xc-uA9" id="kkY-gS-GIU"/>
                         <outlet property="infoTextView" destination="1PM-xG-FQ5" id="2MH-2U-h7m"/>
                     </connections>

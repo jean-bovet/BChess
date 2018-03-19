@@ -18,6 +18,8 @@ class ViewController: UIViewController {
     
     var actions = [UIAction]()
     
+    var presenter: UIActionPresenter!
+
     var relaxingMode = false {
         didSet {
             relaxModeChanged()
@@ -26,6 +28,7 @@ class ViewController: UIViewController {
     
     @IBOutlet weak var chessView: ChessView!
     @IBOutlet weak var infoTextView: UITextView!
+    @IBOutlet weak var actionsStackView: UIStackView!
     
     override var prefersStatusBarHidden: Bool {
         return relaxingMode
@@ -61,15 +64,30 @@ class ViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         updateState()
+        refreshButtons()
     }
     
-    // MARK: - Init -
+    // MARK: - Actions -
     
     func initializeActions() {
-        actions.append(UIActionNewGame(viewController: self))
-        actions.append(UIActionTakeBack(viewController: self))
+        actions.append(UIActionNewGame())
+        actions.append(UIActionTakeBack())
+        actions.append(UIActionCopyGame())
+        actions.append(UIActionPasteGame())
+
+        presenter = UIActionPresenter(actions: actions, viewController: self)
     }
     
+    func refreshButtons() {
+        for view in actionsStackView.arrangedSubviews {
+            view.removeFromSuperview()
+        }
+        
+        for button in presenter.actionButtons() {
+            actionsStackView.addArrangedSubview(button)
+        }
+    }
+
     // MARK: - State -
 
     func updateState() {
@@ -103,14 +121,7 @@ class ViewController: UIViewController {
     }
 
     // MARK: - User Actions -
-    
-    @IBAction func actionsTapped(_ sender: Any) {
-        let presenter = UIActionPresenter()
-        presenter.present(parentViewController: self, actions: actions) {
-
-        }
-    }
-    
+        
     @objc func chessViewTapped(gesture: UITapGestureRecognizer) {
         let loc = gesture.location(in: gesture.view)
         interaction.handleTap(atLocation: loc)
