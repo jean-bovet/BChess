@@ -11,11 +11,9 @@ import CoreText
 
 class ChessView: View {
     
-    let piecesCache = ChessViewPiecesCache()
-
-    var layouter: ChessViewLayouter {
-        return piecesCache.layouter
-    }
+    let layouter = ChessViewLayouter()
+    let factory = ChessViewFactory()
+    let piecesCache: ChessViewPieces
     
     var state: ChessViewState? = nil {
         didSet {
@@ -23,11 +21,23 @@ class ChessView: View {
         }
     }
     
-    var labelsInside: Bool {
-        return false
-    }
+    var labelsInside = false
     
     var animated = true
+    
+    override init(frame frameRect: Rect) {
+        piecesCache = ChessView.initCache(factory: factory, layouter: layouter)
+        super.init(frame: frameRect)
+    }
+    
+    required init?(coder decoder: NSCoder) {
+        piecesCache = ChessView.initCache(factory: factory, layouter: layouter)
+        super.init(coder: decoder)
+    }
+    
+    private static func initCache(factory: ChessViewFactory, layouter: ChessViewLayouter) -> ChessViewPieces {
+        return ChessViewPieces(factory: factory, layouter: layouter)
+    }
     
     #if os(OSX)
     override func resize(withOldSuperviewSize oldSize: NSSize) {
@@ -41,11 +51,13 @@ class ChessView: View {
     }
     #endif
     
+    // MARK: - State -
+
     func stateChanged() {
         stateChanged(animated: animated)
     }
     
-    func stateChanged(animated: Bool = true) {
+    func stateChanged(animated: Bool) {
         guard let state = state else {
             return
         }
@@ -59,6 +71,8 @@ class ChessView: View {
         
         setNeedsDisplay()
     }
+    
+    // MARK: - Drawing -
     
     override func draw(_ rect: CGRect) {
         super.draw(rect)
