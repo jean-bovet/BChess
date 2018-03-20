@@ -41,7 +41,7 @@ class EngineInfo {
             ])
     }
     
-    func information(forInfo info: FEngineInfo?, engine: FEngine) -> NSAttributedString {
+    func upperInformation(forInfo info: FEngineInfo?, engine: FEngine) -> NSAttributedString {
         let infoString = NSMutableAttributedString()
         
         var infoColorToPlay = engine.isWhite() ? "White" : "Black"
@@ -52,8 +52,14 @@ class EngineInfo {
         }
         
         infoString.append(boldText(text: infoColorToPlay))
-        infoString.append(regularText(text: "\n"))
-
+        infoString.append(regularText(text: "\n"))        
+        infoString.append(regularText(text: "\(engine.pgnFormattedForDisplay())"))
+        return infoString
+    }
+    
+    func information(forInfo info: FEngineInfo?, engine: FEngine) -> NSAttributedString {
+        let infoString = NSMutableAttributedString()
+        
         if let opening = info?.opening {
             infoString.append(regularText(text: opening))
             infoString.append(regularText(text: "\n"))
@@ -72,7 +78,6 @@ class EngineInfo {
             let speed = numberFormatter.string(from: NSNumber(value: info.movesPerSecond))!
             
             infoString.append(regularText(text: "Depth \(info.depth)/\(info.quiescenceDepth) with \(nodes) nodes at \(speed) n/s"))
-            
         }
         return infoString
     }

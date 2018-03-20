@@ -27,6 +27,7 @@ class ViewController: UIViewController {
     }
     
     @IBOutlet weak var chessView: ChessView!
+    @IBOutlet weak var upperInfoTextView: UITextView!
     @IBOutlet weak var infoTextView: UITextView!
     @IBOutlet weak var actionsStackView: UIStackView!
     
@@ -44,6 +45,7 @@ class ViewController: UIViewController {
         })
         
         interaction.infoChanged = { [unowned self] info in
+            self.upperInfoTextView.attributedText = self.attributedInfo.upperInformation(forInfo: info, engine: self.engine)
             self.infoTextView.attributedText = self.attributedInfo.information(forInfo: info, engine: self.engine)
         }
         
