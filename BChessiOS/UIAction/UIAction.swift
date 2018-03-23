@@ -10,15 +10,43 @@ import Foundation
 import UIKit
 
 class UIAction {
-    
+
+    typealias ActionExecuteBlock = (UIAction, CompletionBlock) -> Void
+    typealias ActionEnabledBlock = () -> Bool
+
     var title: String?
     var color: UIColor?
     var image: UIImage?
     var accessibilityIdentifier: String?
-    var destructive: Bool = false
-        
-    func execute(viewController: ViewController, completion: @escaping CompletionBlock) {
-        
+    var destructive = false
+    var enabled: Bool {
+        if let block = enabledBlock {
+            return block()
+        } else {
+            return true
+        }
+    }
+    var executeBlock: ActionExecuteBlock?
+    var enabledBlock: ActionEnabledBlock?
+
+    convenience init(title: String, executeBlock: @escaping ActionExecuteBlock) {
+        self.init()
+        self.title = title
+        self.executeBlock = executeBlock
+    }
+
+    convenience init(title: String, executeBlock: @escaping ActionExecuteBlock, enabledBlock: @escaping ActionEnabledBlock) {
+        self.init()
+        self.title = title
+        self.executeBlock = executeBlock
+        self.enabledBlock = enabledBlock
+    }
+
+    func execute(completion: @escaping CompletionBlock) {
+        guard let block = executeBlock else {
+            return
+        }
+        block(self, completion)
     }
     
     static func confirmDestructiveAction(viewController: UIViewController, message: String, completion: @escaping (_ doIt: Bool) -> ()) {

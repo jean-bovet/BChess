@@ -144,13 +144,15 @@ class ChessViewInteraction {
         }
     }
     
-    func newGame() {
+    func newGame(black: Bool) {
         engine.setFEN(StartPosFEN)
-        
+        if black {
+            playAgainstComputer = .white
+        }
         engineChanged()
     }
 
-    func takeBack() {
+    func undoMove() {
         if engine.isAnalyzing() {
             engine.stop()
             if engine.canUndoMove() {
@@ -164,9 +166,28 @@ class ChessViewInteraction {
                 engine.undoMove() // user move
             }
         }
+        playEngineIfPossible()
         engineChanged()
     }
-    
+
+    func redoMove() {
+        if engine.isAnalyzing() {
+            engine.stop()
+            if engine.canRedoMove() {
+                engine.redoMove() // user move only
+            }
+        } else {
+            if engine.canRedoMove() {
+                engine.redoMove() // engine move
+            }
+            if engine.canRedoMove() {
+                engine.redoMove() // user move
+            }
+        }
+        playEngineIfPossible()
+        engineChanged()
+    }
+
     func setPGN(pgn: String) {
         engine.setPGN(pgn)
         engineChanged()

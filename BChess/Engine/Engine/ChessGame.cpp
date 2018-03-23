@@ -20,6 +20,7 @@ ChessGame::ChessGame() {
 
 void ChessGame::reset() {
     moveCursor = 0;
+    moves.count = 0;
     history->clear();
     board.reset();
     outcome = Outcome::in_progress;

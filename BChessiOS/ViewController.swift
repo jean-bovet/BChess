@@ -72,10 +72,49 @@ class ViewController: UIViewController {
     // MARK: - Actions -
     
     func initializeActions() {
-        actions.append(UIActionNewGame())
-        actions.append(UIActionTakeBack())
-        actions.append(UIActionCopyGame())
-        actions.append(UIActionPasteGame())
+        actions.append(UIAction(title: NSLocalizedString("Undo Move", comment: ""),
+                                executeBlock: { [unowned self] action, completion in
+                                    self.interaction.undoMove()
+                                    completion()
+            },
+                                enabledBlock: { [unowned self] in
+                                    return self.interaction.engine.canUndoMove()
+        }))
+        
+        actions.append(UIAction(title: NSLocalizedString("Redo Move", comment: ""),
+                                executeBlock: { [unowned self] action, completion in
+                                    self.interaction.redoMove()
+                                    completion()
+            },
+                                enabledBlock: { [unowned self] in
+                                    return self.interaction.engine.canRedoMove()
+        }))
+
+        actions.append(UIAction(title: NSLocalizedString("New Game (White)", comment: ""),
+                                executeBlock: { [unowned self] action, completion in
+                                    self.interaction.newGame(black: false)
+                                    completion()
+        }))
+        
+        actions.append(UIAction(title: NSLocalizedString("New Game (Black)", comment: ""),
+                                executeBlock: { [unowned self] action, completion in
+                                    self.interaction.newGame(black: true)
+                                    completion()
+        }))
+        
+        actions.append(UIAction(title: NSLocalizedString("Copy Game", comment: ""),
+                                executeBlock: { [unowned self] action, completion in
+                                    UIPasteboard.general.string = self.interaction.engine.pgn()
+                                    completion()
+        }))
+
+        actions.append(UIAction(title: NSLocalizedString("Paste Game", comment: ""),
+                                executeBlock: { [unowned self] action, completion in
+                                    if UIPasteboard.general.hasStrings, let pgn = UIPasteboard.general.string {
+                                        self.interaction.setPGN(pgn: pgn)
+                                    }
+                                    completion()
+        }))
 
         presenter = UIActionPresenter(actions: actions, viewController: self)
     }
@@ -85,7 +124,7 @@ class ViewController: UIViewController {
             view.removeFromSuperview()
         }
         
-        for button in presenter.actionButtons() {
+        for button in presenter.buttons {
             actionsStackView.addArrangedSubview(button)
         }
     }
@@ -95,6 +134,7 @@ class ViewController: UIViewController {
     func updateState() {
         state.boardState = engine.state
         chessView.state = state
+        presenter.update()
         saveToDefaults()
     }
     

@@ -11,14 +11,21 @@ import UIKit
 
 class UIActionPresenter {
     
-    let MaxActionsForRow = 0
+    class UIActionButton: UIButton {
+        var action: UIAction?
+    }
+    
+    let MaxActionsForRow = 2
     
     let actions: [UIAction]
     let viewController: ViewController
 
+    var buttons = [UIActionButton]()
+
     init(actions: [UIAction], viewController: ViewController) {
         self.actions = actions
         self.viewController = viewController
+        self.buttons = actionButtons()
     }
     
     func present(completion: @escaping CompletionBlock) {
@@ -31,10 +38,15 @@ class UIActionPresenter {
         for action in actions {
             let style = action.destructive ? UIAlertActionStyle.destructive : UIAlertActionStyle.default
             let alertAction = UIAlertAction(title: action.title, style: style, handler: { (alertAction) in
-                action.execute(viewController: self.viewController) {
+                action.execute() {
                     completion()
                 }
             })
+            if let enabledBlock = action.enabledBlock {
+                alertAction.isEnabled = enabledBlock()
+            } else {
+                alertAction.isEnabled = true
+            }
             if let image = action.image {
                 alertAction.setValue(image, forKey: "image")
             }
@@ -48,13 +60,14 @@ class UIActionPresenter {
         viewController.present(controller, animated: true, completion: nil)
     }
     
-    func actionButtons() -> [UIButton] {
+    private func actionButtons() -> [UIActionButton] {
         let maxActionsInRow = min(MaxActionsForRow - 1, actions.count - 1)
         
-        var buttons = [UIButton]()
+        var buttons = [UIActionButton]()
         if maxActionsInRow > 0 {
             for (index, action) in actions[0...maxActionsInRow].enumerated() {
-                let button = UIButton(type: .roundedRect)
+                let button = UIActionButton(type: .roundedRect)
+                button.action = action
                 if let image = action.image {
                     button.setImage(image, for: .normal)
                 } else {
@@ -68,7 +81,7 @@ class UIActionPresenter {
         }
         
         if actions.count > MaxActionsForRow {
-            let button = UIButton(type: .roundedRect)
+            let button = UIActionButton(type: .roundedRect)
             button.setImage(UIImage(named: "more"), for: .normal)
             button.addTarget(self, action: #selector(moreButtonDidTrigger(button:)), for: .touchDown)
             button.tag = Int.max
@@ -78,10 +91,18 @@ class UIActionPresenter {
         return buttons
     }
 
+    func update() {
+        buttons.forEach({ actionButton in
+            if let action = actionButton.action {
+                actionButton.isEnabled = action.enabled
+            }
+        })
+    }
+    
     @objc func actionButtonDidTrigger(button: UIButton) {
         let action = actions[button.tag]
-        action.execute(viewController: viewController) {
-            // no-op
+        action.execute() {
+            self.update()
         }
     }
     
