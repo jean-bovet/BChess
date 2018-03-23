@@ -10,14 +10,18 @@ import Foundation
 import CoreGraphics
 
 extension UInt {
+    
     func actualRank(_ flipped: Bool) -> UInt {
         var _value = self
         if flipped {
             _value = 7 - _value
         }
-        if #available(iOS 10.0, *) {
+        #if os(OSX)
+        #else
+            // iOS needs to have inverted rank to have
+            // white at the bottom of the screen by default
             _value = 7 - _value
-        }
+        #endif
         return _value
     }
     
@@ -46,7 +50,7 @@ class ChessViewLayouter {
     // True if the board needs to be flipped to show black
     // at the bottom and white on top (used when the player
     // plays black).
-    var flipped = false
+    var rotated = false
     
     let fontSize: CGFloat = 10
     let margin: CGFloat = 16
@@ -80,8 +84,8 @@ class ChessViewLayouter {
     }
     
     func layout(file: UInt, rank: UInt, callback: (CGRect) -> Void) {
-        let rect = CGRect(x: squareHorizontalOffset + CGFloat(file.actualFile(flipped)) * squareSize,
-                          y: squareVerticalOffset + CGFloat(rank.actualRank(flipped)) * squareSize,
+        let rect = CGRect(x: squareHorizontalOffset + CGFloat(file.actualFile(rotated)) * squareSize,
+                          y: squareVerticalOffset + CGFloat(rank.actualRank(rotated)) * squareSize,
                           width: squareSize,
                           height: squareSize)
         callback(rect)

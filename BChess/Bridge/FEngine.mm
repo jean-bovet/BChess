@@ -85,15 +85,6 @@
     return NSStringFromString(engine.getPGNForDisplay());
 }
 
-- (NSString* _Nullable)pieceAt:(NSUInteger)rank file:(NSUInteger)file {
-    auto piece = engine.getPieceAt(file, rank);
-    if (piece.empty()) {
-        return nil;
-    } else {
-        return NSStringFromString(piece);
-    }
-}
-
 #pragma mark -
 
 - (NSString*)state {
@@ -244,14 +235,6 @@
     engine.searchBestMove((int)maxDepth, [self, callback](ChessEvaluation evaluation, bool done) {
         callback([self infoFor:evaluation], done);
     });
-}
-
-- (void)generatePositions {
-    ChessBoard board;
-    FFEN::setFEN("3r3k/5Npp/8/8/2Q5/1B6/8/7K b - - 1 1", board);
-    
-    ChessMoveGenerator generator;
-    generator.generateMoves(board);
 }
 
 @end

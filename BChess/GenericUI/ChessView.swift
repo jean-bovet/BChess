@@ -23,9 +23,9 @@ class ChessView: View {
     
     var labelsInside = false
     
-    var flipped = false {
+    var rotated = false {
         didSet {
-            layouter.flipped = flipped
+            layouter.rotated = rotated
             stateChanged()
         }
     }
@@ -142,7 +142,7 @@ class ChessView: View {
                         y = rect.minY
                         vAlign = VAlign.Top
                     #else
-                        if layouter.flipped {
+                        if layouter.rotated {
                             y = rect.minY
                             vAlign = VAlign.Bottom
                         } else {
@@ -172,7 +172,7 @@ class ChessView: View {
                     white = false
                     y = rect.midY
                     vAlign = VAlign.Center
-                    if layouter.flipped {
+                    if layouter.rotated {
                         x = rect.maxX + 2
                         hAlign = HAlign.Left
                     } else {

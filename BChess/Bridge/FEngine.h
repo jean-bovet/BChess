@@ -16,7 +16,6 @@ typedef void(^FEngineDidUpdateCallback)();
 
 @interface FEngine : NSObject
 
-@property (nonatomic, assign) int moveCount;
 @property (nonatomic, assign) BOOL async;
 @property (nonatomic, assign) BOOL useOpeningBook;
 @property (nonatomic, assign) BOOL positionalAnalysis;
@@ -39,8 +38,6 @@ typedef void(^FEngineDidUpdateCallback)();
 - (NSString* _Nonnull)PGN;
 
 - (NSString* _Nonnull)PGNFormattedForDisplay;
-
-- (NSString* _Nullable)pieceAt:(NSUInteger)rank file:(NSUInteger)file;
 
 - (NSArray<FEngineMove*>* _Nonnull)movesAt:(NSUInteger)rank file:(NSUInteger)file;
 - (void)move:(NSUInteger)move;

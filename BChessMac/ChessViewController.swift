@@ -176,7 +176,7 @@ class ChessViewController: NSViewController {
     // MARK: Menu Game
 
     @IBAction func newGame(_ sender: NSMenuItem) {
-        interaction.newGame()
+        interaction.newGame(black: false)
     }
     
     @IBAction func playAgaintComputerWhite(_ sender: NSMenuItem) {
