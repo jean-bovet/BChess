@@ -11,40 +11,31 @@
 #include "FUtility.hpp"
 
 ChessOpenings::ChessOpenings() {
-    root.push({ createMove(e2, e4, WHITE, PAWN) }, [](auto & node) {
-        node.score = 55;
-    });
-
-    root.push({ createMove(e2, e4, WHITE, PAWN), createMove(c7, c5, BLACK, PAWN) }, [](auto & node) {
-        node.score = 54;
-        node.name = "Sicilian defense";
-        node.eco = "B20";
-    });
-    
-    root.push({ createMove(e2, e4, WHITE, PAWN), createMove(e7, e5, BLACK, PAWN) }, [](auto & node) {
-        node.score = 56;
-        node.name = "King's pawn game";
-        node.eco = "C20";
-    });
-
-    root.push({ createMove(d2, d4, WHITE, PAWN) }, [](auto & node) {
-        node.score = 56;
-    });
-    
 }
 
 bool ChessOpenings::load(std::string pgn) {
     std::vector<ChessGame> games;
     if (FPGN::setGames(pgn, games)) {
         root.clear();
+        
         for (auto game : games) {
+            auto scoreString = game.tags["Score"];
+            auto score = 0;
+            if (scoreString.length() > 0) {
+                score = integer(scoreString);
+            }
+            auto name = game.tags["Name"];
+            auto eco = game.tags["ECO"];
+
             root.push(game.moves, 0, [&](auto & node) {
-                auto score = game.tags["Score"];
-                if (score.length() > 0) {
-                    node.score = integer(score);
+                // Make sure the node always contain
+                // the best score so that branch is always
+                // taken upon lookup.
+                if (node.score < score) {
+                    node.score = score;
+                    node.name = name;
+                    node.eco = eco;
                 }
-                node.name = game.tags["Name"];
-                node.eco = game.tags["ECO"];
             });
         }
         return true;

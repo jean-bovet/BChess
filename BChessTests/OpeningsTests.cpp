@@ -19,14 +19,36 @@
 #include "FPGN.hpp"
 
 class OpeningsTests: public ::testing::Test {
-public:
-    
+public:    
     ChessOpenings openings;
     
     void SetUp() {
         ChessEngine::initialize();
+        loadOpenings();
     }
 
+    void loadOpenings() {
+        openings.root.push({ createMove(e2, e4, WHITE, PAWN) }, [](auto & node) {
+            node.score = 55;
+        });
+        
+        openings.root.push({ createMove(e2, e4, WHITE, PAWN), createMove(c7, c5, BLACK, PAWN) }, [](auto & node) {
+            node.score = 54;
+            node.name = "Sicilian defense";
+            node.eco = "B20";
+        });
+        
+        openings.root.push({ createMove(e2, e4, WHITE, PAWN), createMove(e7, e5, BLACK, PAWN) }, [](auto & node) {
+            node.score = 56;
+            node.name = "King's pawn game";
+            node.eco = "C20";
+        });
+        
+        openings.root.push({ createMove(d2, d4, WHITE, PAWN) }, [](auto & node) {
+            node.score = 56;
+        });
+    }
+    
     bool lookupOpeningNode(ChessOpenings &openings, std::string pgn, OpeningTreeNode &outNode) {
         ChessGame temp;
         if (!FPGN::setGame(pgn, temp)) {
@@ -56,7 +78,6 @@ TEST_F(OpeningsTests, Loading) {
     auto path = UnitTestHelper::pathToResources;
     auto pathToFile = path + "/Openings.pgn";
     
-    ChessOpenings openings;
     auto pgn = readFromFile(pathToFile);
     ASSERT_FALSE(pgn.empty());
     ASSERT_TRUE(openings.load(pgn));

@@ -124,7 +124,7 @@ public:
     }
     
     bool lookupOpeningMove(ChessEvaluation & evaluation) {
-        if (game.moves.count == 0 && game.board.fullMoveCount != 0) {
+        if (game.moves.count == 0 && game.board.fullMoveCount > 1) {
             return false;
         }
         bool result = openings.best(game.moves, [&evaluation](OpeningTreeNode & node) {

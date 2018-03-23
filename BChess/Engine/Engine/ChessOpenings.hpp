@@ -37,9 +37,8 @@ struct OpeningTreeNode {
     }
     
     void push(MoveList moves, int moveIndex, NodeCallback callback) {
-        if (moveIndex == moves.count) {
-            callback(*this);
-        } else {
+        callback(*this);
+        if (moveIndex < moves.count) {
             auto key = moves[moveIndex];
             auto & child = children[key];
             child.move = key;
@@ -65,9 +64,9 @@ struct OpeningTreeNode {
 };
 
 class ChessOpenings {
-    OpeningTreeNode root;
-    
 public:
+    OpeningTreeNode root;
+
     ChessOpenings();
     
     bool load(std::string pgn);

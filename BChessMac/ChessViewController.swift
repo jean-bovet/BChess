@@ -26,9 +26,7 @@ class ChessViewController: NSViewController {
         super.viewDidLoad()
         
         registerGesture()
-        
-        loadOpenings()
-        
+                
         interaction = ChessViewInteraction(view: chessView, engine: engine, animateState: { [unowned self] completion in
             NSAnimationContext.runAnimationGroup({ _ in
                 NSAnimationContext.current.duration = 0.5
@@ -54,17 +52,6 @@ class ChessViewController: NSViewController {
         restoreFromDefaults()
 
         updateUI()
-    }
-    
-    func loadOpenings() {
-        engine.useOpeningBook = true
-
-        let path = Bundle.main.path(forResource: "Openings", ofType: "pgn")
-        assert(path != nil)
-        
-        let pgn = try! String(contentsOfFile: path!)
-
-        assert(engine.loadOpening(pgn))
     }
     
     func updateUI() {

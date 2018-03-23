@@ -29,6 +29,7 @@
 		A746C2492001707F001F4437 /* GameHistory.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A746C2472001707F001F4437 /* GameHistory.cpp */; };
 		A746C24D2001A2FD001F4437 /* GameHistory.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A746C2472001707F001F4437 /* GameHistory.cpp */; };
 		A746C24E2001A306001F4437 /* GameHistory.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A746C2472001707F001F4437 /* GameHistory.cpp */; };
+		A753420B2064BBD100C5BA36 /* Openings.pgn in Resources */ = {isa = PBXBuildFile; fileRef = A7C92AA91FF6EE5500160D2E /* Openings.pgn */; };
 		A75359841FDC51B2008D1DEE /* FENgineInfo+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = A75359831FDC51B2008D1DEE /* FENgineInfo+Extension.swift */; };
 		A75359851FDC994E008D1DEE /* FENgineInfo+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = A75359831FDC51B2008D1DEE /* FENgineInfo+Extension.swift */; };
 		A75359931FDE0947008D1DEE /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A75359921FDE0947008D1DEE /* AppDelegate.swift */; };
@@ -448,7 +449,6 @@
 				A75359981FDE0947008D1DEE /* Main.storyboard */,
 				A753599B1FDE0947008D1DEE /* Info.plist */,
 				A753599C1FDE0947008D1DEE /* BChessMac.entitlements */,
-				A7C92AA91FF6EE5500160D2E /* Openings.pgn */,
 			);
 			path = BChessMac;
 			sourceTree = "<group>";
@@ -617,6 +617,7 @@
 			children = (
 				A7AFCCA91FB4E40D00AE3D85 /* main.swift */,
 				A7712D3F1FCB97A800E7E802 /* BChess-Bridging-Header.h */,
+				A7C92AA91FF6EE5500160D2E /* Openings.pgn */,
 				A7712D301FC7C4D300E7E802 /* UCI */,
 				A7E8B70D204D17EE00DD2323 /* GenericUI */,
 				A74215B1205F7C5100604018 /* Crossplatform UI */,
@@ -901,6 +902,7 @@
 			files = (
 				A7688F2C204A6911004B1E9E /* LaunchScreen.storyboard in Resources */,
 				A7688F29204A6911004B1E9E /* Assets.xcassets in Resources */,
+				A753420B2064BBD100C5BA36 /* Openings.pgn in Resources */,
 				A7688F27204A6911004B1E9E /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

@@ -53,6 +53,18 @@ class ChessViewInteraction {
         self.engine = engine
         self.animateState = animateState
         promotionPicker = ChessViewPromotionPicker(layouter: view.layouter, factory: view.piecesCache.factory, parent: view)
+        loadOpenings()
+    }
+    
+    func loadOpenings() {
+        engine.useOpeningBook = true
+        
+        let path = Bundle.main.path(forResource: "Openings", ofType: "pgn")
+        assert(path != nil)
+        
+        let pgn = try! String(contentsOfFile: path!)
+        
+        assert(engine.loadOpening(pgn))
     }
     
     func handleTap(atLocation loc: CGPoint) {
