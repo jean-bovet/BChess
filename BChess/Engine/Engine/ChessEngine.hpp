@@ -125,6 +125,10 @@ public:
     
     bool lookupOpeningMove(ChessEvaluation & evaluation) {
         if (game.moves.count == 0 && game.board.fullMoveCount > 1) {
+            // If the game is not at the starting position, that is,
+            // there are no moves recorded yet but the fullMoveCount is greater
+            // than one (meaning the game has one or more move already), don't use
+            // any openings.
             return false;
         }
         bool result = openings.best(game.moves, [&evaluation](OpeningTreeNode & node) {
