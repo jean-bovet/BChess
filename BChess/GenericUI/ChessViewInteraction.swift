@@ -146,6 +146,7 @@ class ChessViewInteraction {
     
     func newGame(black: Bool) {
         engine.setFEN(StartPosFEN)
+        view.flipped = black
         if black {
             playAgainstComputer = .white
         }

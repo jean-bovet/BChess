@@ -2,6 +2,9 @@
 
 ## ToDo
 
+- Opening for white when playing black
+- Hide actions when in "zen" mode
+
 - Finish Zobrist hashing unit test with all the scenarios: castling, attack, etc.
 - Ensure that when a Game is copied, the history is also copied, not just referenced because it will get messed up (see FEngineInfo)
 - Better handling of openings when a FEN is passed (and the board is not in the expected state for the opening)

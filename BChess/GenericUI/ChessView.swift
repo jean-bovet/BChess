@@ -23,6 +23,13 @@ class ChessView: View {
     
     var labelsInside = false
     
+    var flipped = false {
+        didSet {
+            layouter.flipped = flipped
+            stateChanged()
+        }
+    }
+    
     var animated = true
     
     override init(frame frameRect: Rect) {
@@ -133,10 +140,16 @@ class ChessView: View {
                     x = rect.midX
                     #if os(OSX)
                         y = rect.minY
+                        vAlign = VAlign.Top
                     #else
-                        y = rect.maxY
+                        if layouter.flipped {
+                            y = rect.minY
+                            vAlign = VAlign.Bottom
+                        } else {
+                            y = rect.maxY
+                            vAlign = VAlign.Top
+                        }
                     #endif
-                    vAlign = VAlign.Top
                     hAlign = HAlign.Center
                 }
                 drawText(context: context, x: x, y: y, text: files[Int(file)], white: white, vAlign: vAlign, hAlign: hAlign)
@@ -157,10 +170,15 @@ class ChessView: View {
                     hAlign = HAlign.Left
                 } else {
                     white = false
-                    x = rect.origin.x - 2
                     y = rect.midY
                     vAlign = VAlign.Center
-                    hAlign = HAlign.Right
+                    if layouter.flipped {
+                        x = rect.maxX + 2
+                        hAlign = HAlign.Left
+                    } else {
+                        x = rect.origin.x - 2
+                        hAlign = HAlign.Right
+                    }
                 }
                 drawText(context: context, x: x, y: y, text: String(rank+1), white: white, vAlign: vAlign, hAlign: hAlign)
             })

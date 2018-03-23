@@ -20,9 +20,9 @@ class ViewController: UIViewController {
     
     var presenter: UIActionPresenter!
 
-    var relaxingMode = false {
+    var zenMode = false {
         didSet {
-            relaxModeChanged()
+            zenModeChanged()
         }
     }
     
@@ -32,7 +32,7 @@ class ViewController: UIViewController {
     @IBOutlet weak var actionsStackView: UIStackView!
     
     override var prefersStatusBarHidden: Bool {
-        return relaxingMode
+        return zenMode
     }
 
     override func viewDidLoad() {
@@ -170,20 +170,21 @@ class ViewController: UIViewController {
     }
     
     @objc func backgroundViewTapped(gesture: UITapGestureRecognizer) {
-        relaxingMode = !relaxingMode
+        zenMode = !zenMode
     }
     
-    func relaxModeChanged() {
-        navigationController?.setNavigationBarHidden(relaxingMode, animated: true)
+    func zenModeChanged() {
+        navigationController?.setNavigationBarHidden(zenMode, animated: true)
         
         setNeedsStatusBarAppearanceUpdate()
         
         UIView.animate(withDuration: 0.3, animations: { [unowned self] in
-            if self.relaxingMode {
+            if self.zenMode {
                 self.view.backgroundColor = .black
             } else {
                 self.view.backgroundColor = .white
             }
+            self.actionsStackView.isHidden = self.zenMode
         })
     }
 }

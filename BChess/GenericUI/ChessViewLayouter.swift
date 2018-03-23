@@ -9,6 +9,28 @@
 import Foundation
 import CoreGraphics
 
+extension UInt {
+    func actualRank(_ flipped: Bool) -> UInt {
+        var _value = self
+        if flipped {
+            _value = 7 - _value
+        }
+        if #available(iOS 10.0, *) {
+            _value = 7 - _value
+        }
+        return _value
+    }
+    
+    func actualFile(_ flipped: Bool) -> UInt {
+        var _value = self
+        if flipped {
+            _value = 7 - _value
+        }
+        return _value
+    }
+    
+}
+
 class ChessViewLayouter {
     
     var viewSize: CGSize = CGSize(width: 0, height: 0) {
@@ -21,20 +43,17 @@ class ChessViewLayouter {
         return CGRect(x: squareHorizontalOffset, y: squareVerticalOffset, width: squareSize*8, height: squareSize*8)
     }
     
+    // True if the board needs to be flipped to show black
+    // at the bottom and white on top (used when the player
+    // plays black).
+    var flipped = false
+    
     let fontSize: CGFloat = 10
     let margin: CGFloat = 16
     
     var squareSize: CGFloat = 0
     var squareHorizontalOffset: CGFloat = 0
     var squareVerticalOffset: CGFloat = 0
-    
-    var flip : Bool {
-        #if os(OSX)
-            return false
-        #else
-            return true
-        #endif
-    }
     
     func update() {
         let width = round((viewSize.width-2*margin)/8)
@@ -61,9 +80,8 @@ class ChessViewLayouter {
     }
     
     func layout(file: UInt, rank: UInt, callback: (CGRect) -> Void) {
-        let actualRank = flip ? 7 - rank : rank
-        let rect = CGRect(x: squareHorizontalOffset + CGFloat(file) * squareSize,
-                          y: squareVerticalOffset + CGFloat(actualRank) * squareSize,
+        let rect = CGRect(x: squareHorizontalOffset + CGFloat(file.actualFile(flipped)) * squareSize,
+                          y: squareVerticalOffset + CGFloat(rank.actualRank(flipped)) * squareSize,
                           width: squareSize,
                           height: squareSize)
         callback(rect)
@@ -81,4 +99,5 @@ class ChessViewLayouter {
             frameCursor = frameCursor.offsetBy(dx: pieceSize, dy: 0)
         }
     }
+    
 }
