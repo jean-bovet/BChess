@@ -17,7 +17,7 @@ class ChessViewInteraction {
     
     let view: ChessView
     let engine: FEngine
-
+    
     let animateState: AnimateStateBlock
 
     let promotionPicker: ChessViewPromotionPicker
@@ -53,11 +53,13 @@ class ChessViewInteraction {
     
     var playLevel: PlayLevel = ._5s
     
-    init(view: ChessView, engine: FEngine, animateState: @escaping AnimateStateBlock) {
+    init(view: ChessView, state: ChessViewState, engine: FEngine, animateState: @escaping AnimateStateBlock) {
         self.view = view
         self.engine = engine
         self.animateState = animateState
         promotionPicker = ChessViewPromotionPicker(layouter: view.layouter, factory: view.piecesCache.factory, parent: view)
+        
+        self.view.state = state
         
         loadOpenings()
     }
@@ -73,6 +75,26 @@ class ChessViewInteraction {
         assert(engine.loadOpening(pgn))
     }
     
+    func saveToDefaults() {
+        UserDefaults.standard.set(playAgainst.rawValue, forKey: "playAgainst")
+        UserDefaults.standard.set(playLevel.rawValue, forKey: "playLevel")
+        UserDefaults.standard.set(engine.pgn(), forKey: "pgn")
+    }
+    
+    func restoreFromDefaults() {
+        if let playAgainst = ChessViewInteraction.PlayAgainst(rawValue: UserDefaults.standard.integer(forKey: "playAgainst")) {
+            self.playAgainst = playAgainst
+        }
+        if let playLevel = ChessViewInteraction.PlayLevel(rawValue: UserDefaults.standard.integer(forKey: "playLevel")) {
+            self.playLevel = playLevel
+        }
+        if let pgn = UserDefaults.standard.string(forKey: "pgn") {
+            setPGN(pgn: pgn)
+        }
+        playLevelChanged()
+        playAgainstChanged()
+    }
+
     func playAgainstChanged() {
         view.rotated = playAgainst == .white
         playEngineIfPossible()

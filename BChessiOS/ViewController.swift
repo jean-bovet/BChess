@@ -10,6 +10,11 @@ import UIKit
 
 class ViewController: UIViewController {
 
+    @IBOutlet weak var chessView: ChessView!
+    @IBOutlet weak var upperInfoTextView: UITextView!
+    @IBOutlet weak var infoTextView: UITextView!
+    @IBOutlet weak var actionsStackView: UIStackView!
+
     let engine = FEngine()
     let state = ChessViewState()
     let attributedInfo = EngineInfo()
@@ -26,11 +31,6 @@ class ViewController: UIViewController {
         }
     }
     
-    @IBOutlet weak var chessView: ChessView!
-    @IBOutlet weak var upperInfoTextView: UITextView!
-    @IBOutlet weak var infoTextView: UITextView!
-    @IBOutlet weak var actionsStackView: UIStackView!
-    
     override var prefersStatusBarHidden: Bool {
         return zenMode
     }
@@ -38,7 +38,7 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        interaction = ChessViewInteraction(view: chessView, engine: engine, animateState: { [unowned self] completion in
+        interaction = ChessViewInteraction(view: chessView, state: state, engine: engine, animateState: { [unowned self] completion in
             self.animateUpdateState({
                 completion()
             })
@@ -50,15 +50,11 @@ class ViewController: UIViewController {
         }
         
         initializeActions()
-        
-        engine.useOpeningBook = true
-        
+                
         chessView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(chessViewTapped(gesture:))))
         view.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(backgroundViewTapped(gesture:))))
         
-        chessView.state = state // TODO refactor into interaction?
-
-        restoreFromDefaults()
+        interaction.restoreFromDefaults()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -167,7 +163,7 @@ class ViewController: UIViewController {
         state.boardState = engine.state
         chessView.state = state
         presenter.update()
-        saveToDefaults()
+        interaction.saveToDefaults()
     }
     
     func animateUpdateState(_ completion: CompletionBlock?) {
@@ -180,29 +176,6 @@ class ViewController: UIViewController {
             updateState()
         }
         completion?()
-    }
-
-    // MARK: - Defaults-
-    
-    // TODO: do that inside interaction and do the same for the Mac
-    func saveToDefaults() {
-        UserDefaults.standard.set(interaction.playAgainst.rawValue, forKey: "playAgainst")
-        UserDefaults.standard.set(interaction.playLevel.rawValue, forKey: "playLevel")
-        UserDefaults.standard.set(engine.pgn(), forKey: "pgn")
-    }
-    
-    func restoreFromDefaults() {
-        if let playAgainst = ChessViewInteraction.PlayAgainst(rawValue: UserDefaults.standard.integer(forKey: "playAgainst")) {
-            interaction.playAgainst = playAgainst
-        }
-        if let playLevel = ChessViewInteraction.PlayLevel(rawValue: UserDefaults.standard.integer(forKey: "playLevel")) {
-            interaction.playLevel = playLevel
-        }
-        if let pgn = UserDefaults.standard.string(forKey: "pgn") {
-            interaction.setPGN(pgn: pgn)
-        }
-        interaction.playLevelChanged()
-        interaction.playAgainstChanged()
     }
 
     // MARK: - User Actions -

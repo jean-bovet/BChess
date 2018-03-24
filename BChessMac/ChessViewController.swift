@@ -27,7 +27,7 @@ class ChessViewController: NSViewController {
         
         registerGesture()
                 
-        interaction = ChessViewInteraction(view: chessView, engine: engine, animateState: { [unowned self] completion in
+        interaction = ChessViewInteraction(view: chessView, state:state, engine: engine, animateState: { [unowned self] completion in
             NSAnimationContext.runAnimationGroup({ _ in
                 NSAnimationContext.current.duration = 0.5
                 NSAnimationContext.current.timingFunction = CAMediaTimingFunction(name: kCAAnimationLinear)
@@ -44,12 +44,10 @@ class ChessViewController: NSViewController {
         
         engine.updateCallback = { [unowned self] in
             self.updateUI()
-            self.saveToDefaults()
+            self.interaction.saveToDefaults()
         }
-
-        chessView.state = state // TODO refactor with iOS counterpart
         
-        restoreFromDefaults()
+        interaction.restoreFromDefaults()
 
         updateUI()
     }
@@ -82,18 +80,6 @@ class ChessViewController: NSViewController {
     @objc func clickDetected(sender: NSClickGestureRecognizer) {
         let loc = sender.location(in: chessView)
         interaction.handleTap(atLocation: loc)
-    }
-    
-    // MARK: Defaults
-
-    func saveToDefaults() {
-        UserDefaults.standard.set(engine.pgn(), forKey: "pgn")
-    }
-    
-    func restoreFromDefaults() {
-        if let pgn = UserDefaults.standard.string(forKey: "pgn") {
-            interaction.setPGN(pgn: pgn)
-        }
     }
     
     // MARK: UI
@@ -156,7 +142,7 @@ class ChessViewController: NSViewController {
                 engine.setPGN(text);
             }
             updateUI()
-            saveToDefaults()
+            interaction.saveToDefaults()
         }
     }
     
