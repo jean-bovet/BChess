@@ -20,6 +20,7 @@ class EngineInfo {
         numberFormatter.usesGroupingSeparator = true
         
         valueFormatter.numberStyle = .decimal
+        valueFormatter.minimumFractionDigits = 2
         valueFormatter.maximumFractionDigits = 2
         valueFormatter.groupingSeparator = ","
         valueFormatter.usesGroupingSeparator = true
@@ -71,13 +72,17 @@ class EngineInfo {
                 value = valueFormatter.string(from: NSNumber(value: Double(info.value) / 100.0))!
             }
             let line = info.bestLine(false)
-            infoString.append(regularText(text: "[\(value)] \(line)"))
+            infoString.append(regularText(text: "\(value) \(line)"))
             infoString.append(regularText(text: "\n"))
             
             let nodes = numberFormatter.string(from: NSNumber(value: info.nodeEvaluated))!
             let speed = numberFormatter.string(from: NSNumber(value: info.movesPerSecond))!
             
-            infoString.append(regularText(text: "Depth \(info.depth)/\(info.quiescenceDepth) with \(nodes) nodes at \(speed) n/s"))
+            infoString.append(regularText(text: "Depth \(info.depth)"))
+            if info.quiescenceDepth > 0 && info.quiescenceDepth != info.depth {
+                infoString.append(regularText(text: "/\(info.quiescenceDepth)"))
+            }
+            infoString.append(regularText(text: " with \(nodes) nodes at \(speed) n/s"))
         }
         return infoString
     }

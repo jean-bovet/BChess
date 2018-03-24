@@ -59,8 +59,6 @@ class ViewController: UIViewController {
         chessView.state = state // TODO refactor into interaction?
 
         restoreFromDefaults()
-        
-        interaction.playEngineIfPossible()
     }
     
     override func viewWillAppear(_ animated: Bool) {
