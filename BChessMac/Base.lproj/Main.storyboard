@@ -60,9 +60,15 @@
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <menu key="submenu" title="Game" id="PBs-cT-jNJ">
                                     <items>
-                                        <menuItem title="New" keyEquivalent="n" id="t6v-J4-Mvn">
+                                        <menuItem title="New as White" keyEquivalent="n" id="t6v-J4-Mvn">
                                             <connections>
-                                                <action selector="newGame:" target="Ady-hI-5gd" id="tbm-Fu-PRk"/>
+                                                <action selector="newGameAsWhite:" target="Ady-hI-5gd" id="jAA-BJ-ABs"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="New as Black" id="seS-D5-Tmw">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="newGameAsBlack:" target="Ady-hI-5gd" id="a98-x4-13N"/>
                                             </connections>
                                         </menuItem>
                                     </items>

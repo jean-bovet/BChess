@@ -596,7 +596,8 @@ std::string FPGN::getGame(ChessGame game, Formatting formatting, int fromIndex) 
                 if (matchingMoves.size() == 1) {
                     sanType = SANType::full;
                 } else {
-                    assert(false); // Should not happen
+                    // Should not happen
+                    printf("Unable to find matching moves\n");
                 }
             }
         }

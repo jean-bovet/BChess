@@ -72,7 +72,7 @@ class ViewController: UIViewController {
     // MARK: - Actions -
     
     func initializeActions() {
-        actions.append(UIAction(title: NSLocalizedString("Undo Move", comment: ""),
+        actions.append(UIAction(title: NSLocalizedString("Undo", comment: ""),
                                 executeBlock: { [unowned self] action, completion in
                                     self.interaction.undoMove()
                                     completion()
@@ -81,7 +81,7 @@ class ViewController: UIViewController {
                                     return self.interaction.engine.canUndoMove()
         }))
         
-        actions.append(UIAction(title: NSLocalizedString("Redo Move", comment: ""),
+        actions.append(UIAction(title: NSLocalizedString("Redo", comment: ""),
                                 executeBlock: { [unowned self] action, completion in
                                     self.interaction.redoMove()
                                     completion()
@@ -90,15 +90,21 @@ class ViewController: UIViewController {
                                     return self.interaction.engine.canRedoMove()
         }))
 
+        actions.append(UIAction(title: NSLocalizedString("Level", comment: ""),
+                                executeBlock: { [unowned self] action, completion in
+                                    self.selectLevel()
+                                    completion()
+        }))
+
         actions.append(UIAction(title: NSLocalizedString("New Game (White)", comment: ""),
                                 executeBlock: { [unowned self] action, completion in
-                                    self.interaction.newGame(black: false)
+                                    self.interaction.newGame(playAgainstWhite: false)
                                     completion()
         }))
         
         actions.append(UIAction(title: NSLocalizedString("New Game (Black)", comment: ""),
                                 executeBlock: { [unowned self] action, completion in
-                                    self.interaction.newGame(black: true)
+                                    self.interaction.newGame(playAgainstWhite: true)
                                     completion()
         }))
         
@@ -117,6 +123,34 @@ class ViewController: UIViewController {
         }))
 
         presenter = UIActionPresenter(actions: actions, viewController: self)
+    }
+    
+    func selectLevel() {
+        let actions = [
+            UIAction(title: "2 seconds", executeBlock: { [unowned self] action, completion in
+                self.interaction.playLevel = ._2s
+                self.interaction.playLevelChanged()
+            }),
+            UIAction(title: "5 seconds", executeBlock: { [unowned self] action, completion in
+                self.interaction.playLevel = ._5s
+                self.interaction.playLevelChanged()
+            }),
+            UIAction(title: "10 seconds", executeBlock: { [unowned self] action, completion in
+                self.interaction.playLevel = ._10s
+                self.interaction.playLevelChanged()
+            }),
+            UIAction(title: "15 seconds", executeBlock: { [unowned self] action, completion in
+                self.interaction.playLevel = ._15s
+                self.interaction.playLevelChanged()
+            }),
+        ]
+        
+        actions[interaction.playLevel.rawValue].selected = true
+
+        let levelPresenter = UIActionPresenter(actions: actions, viewController: self)
+        levelPresenter.present {
+            
+        }
     }
     
     func refreshButtons() {
@@ -152,14 +186,25 @@ class ViewController: UIViewController {
 
     // MARK: - Defaults-
     
+    // TODO: do that inside interaction and do the same for the Mac
     func saveToDefaults() {
+        UserDefaults.standard.set(interaction.playAgainst.rawValue, forKey: "playAgainst")
+        UserDefaults.standard.set(interaction.playLevel.rawValue, forKey: "playLevel")
         UserDefaults.standard.set(engine.pgn(), forKey: "pgn")
     }
     
     func restoreFromDefaults() {
+        if let playAgainst = ChessViewInteraction.PlayAgainst(rawValue: UserDefaults.standard.integer(forKey: "playAgainst")) {
+            interaction.playAgainst = playAgainst
+        }
+        if let playLevel = ChessViewInteraction.PlayLevel(rawValue: UserDefaults.standard.integer(forKey: "playLevel")) {
+            interaction.playLevel = playLevel
+        }
         if let pgn = UserDefaults.standard.string(forKey: "pgn") {
             interaction.setPGN(pgn: pgn)
         }
+        interaction.playLevelChanged()
+        interaction.playAgainstChanged()
     }
 
     // MARK: - User Actions -

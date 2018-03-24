@@ -139,8 +139,13 @@ class ChessView: View {
                     white = false
                     x = rect.midX
                     #if os(OSX)
-                        y = rect.minY
-                        vAlign = VAlign.Top
+                        if layouter.rotated {
+                            y = rect.maxY
+                            vAlign = VAlign.Bottom
+                        } else {
+                            y = rect.minY
+                            vAlign = VAlign.Top
+                        }
                     #else
                         if layouter.rotated {
                             y = rect.minY

@@ -100,13 +100,13 @@ class ChessViewController: NSViewController {
     
     override func validateMenuItem(_ menuItem: NSMenuItem) -> Bool {
         if menuItem.action == #selector(playAgaintComputerWhite) {
-            menuItem.state = interaction.playAgainstComputer == .white ? .on : .off
+            menuItem.state = interaction.playAgainst == .white ? .on : .off
         }
         if menuItem.action == #selector(playAgaintComputerBlack) {
-            menuItem.state = interaction.playAgainstComputer == .black ? .on : .off
+            menuItem.state = interaction.playAgainst == .black ? .on : .off
         }
         if menuItem.action == #selector(playAgaintHuman) {
-            menuItem.state = interaction.playAgainstComputer == .human ? .on : .off
+            menuItem.state = interaction.playAgainst == .human ? .on : .off
         }
         if menuItem.action == #selector(level) {
             menuItem.state = engine.thinkingTime == TimeInterval(menuItem.tag) ? .on : .off
@@ -162,20 +162,27 @@ class ChessViewController: NSViewController {
     
     // MARK: Menu Game
 
-    @IBAction func newGame(_ sender: NSMenuItem) {
-        interaction.newGame(black: false)
+    @IBAction func newGameAsWhite(_ sender: NSMenuItem) {
+        interaction.newGame(playAgainstWhite: false)
     }
-    
+
+    @IBAction func newGameAsBlack(_ sender: NSMenuItem) {
+        interaction.newGame(playAgainstWhite: true)
+    }
+
     @IBAction func playAgaintComputerWhite(_ sender: NSMenuItem) {
-        interaction.playAgainstComputer = .white
+        interaction.playAgainst = .white
+        interaction.playAgainstChanged()
     }
 
     @IBAction func playAgaintComputerBlack(_ sender: NSMenuItem) {
-        interaction.playAgainstComputer = .black
+        interaction.playAgainst = .black
+        interaction.playAgainstChanged()
     }
 
     @IBAction func playAgaintHuman(_ sender: NSMenuItem) {
-        interaction.playAgainstComputer = .human
+        interaction.playAgainst = .human
+        interaction.playAgainstChanged()
     }
 
     @IBAction func undoMove(_ sender: NSMenuItem) {

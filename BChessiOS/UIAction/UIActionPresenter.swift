@@ -15,7 +15,7 @@ class UIActionPresenter {
         var action: UIAction?
     }
     
-    let MaxActionsForRow = 2
+    let MaxActionsForRow = 3
     
     let actions: [UIAction]
     let viewController: ViewController
@@ -50,6 +50,7 @@ class UIActionPresenter {
             if let image = action.image {
                 alertAction.setValue(image, forKey: "image")
             }
+            alertAction.setValue(action.selected, forKey: "checked")
             controller.addAction(alertAction)
         }
         

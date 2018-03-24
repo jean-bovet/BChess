@@ -36,23 +36,29 @@ class ChessViewInteraction {
         return view.state!
     }
     
-    enum PlayAgainst {
+    enum PlayAgainst: Int {
         case white
         case black
         case human
     }
     
-    var playAgainstComputer : PlayAgainst = .black {
-        didSet {
-            playEngineIfPossible()
-        }
+    var playAgainst: PlayAgainst = .black
+    
+    enum PlayLevel: Int {
+        case _2s
+        case _5s
+        case _10s
+        case _15s
     }
+    
+    var playLevel: PlayLevel = ._5s
     
     init(view: ChessView, engine: FEngine, animateState: @escaping AnimateStateBlock) {
         self.view = view
         self.engine = engine
         self.animateState = animateState
         promotionPicker = ChessViewPromotionPicker(layouter: view.layouter, factory: view.piecesCache.factory, parent: view)
+        
         loadOpenings()
     }
     
@@ -65,6 +71,27 @@ class ChessViewInteraction {
         let pgn = try! String(contentsOfFile: path!)
         
         assert(engine.loadOpening(pgn))
+    }
+    
+    func playAgainstChanged() {
+        view.rotated = playAgainst == .white
+        playEngineIfPossible()
+    }
+    
+    func playLevelChanged() {
+        switch playLevel {
+        case ._2s:
+            engine.thinkingTime = 2
+            
+        case ._5s:
+            engine.thinkingTime = 5
+            
+        case ._10s:
+            engine.thinkingTime = 10
+            
+        case ._15s:
+            engine.thinkingTime = 15
+        }
     }
     
     func handleTap(atLocation loc: CGPoint) {
@@ -126,7 +153,7 @@ class ChessViewInteraction {
     }
 
     func enginePlay() {
-        engine.evaluate(Int.max, time: 2) { (info, completed) in
+        engine.evaluate { (info, completed) in
             DispatchQueue.main.async {
                 if completed {
                     self.engine.move(info.bestMove)
@@ -148,20 +175,22 @@ class ChessViewInteraction {
     }
     
     func playEngineIfPossible() {
-        if engine.isWhite() && playAgainstComputer == .white {
+        if engine.isWhite() && playAgainst == .white {
             enginePlay()
         }
-        if !engine.isWhite() && playAgainstComputer == .black {
+        if !engine.isWhite() && playAgainst == .black {
             enginePlay()
         }
     }
     
-    func newGame(black: Bool) {
+    func newGame(playAgainstWhite: Bool) {
         engine.setFEN(StartPosFEN)
-        view.rotated = black
-        if black {
-            playAgainstComputer = .white
+        if playAgainstWhite {
+            playAgainst = .white
+        } else {
+            playAgainst = .black
         }
+        playAgainstChanged()
         engineChanged()
     }
 

@@ -19,6 +19,7 @@ class UIAction {
     var image: UIImage?
     var accessibilityIdentifier: String?
     var destructive = false
+    var selected = false
     var enabled: Bool {
         if let block = enabledBlock {
             return block()
@@ -26,6 +27,7 @@ class UIAction {
             return true
         }
     }
+    
     var executeBlock: ActionExecuteBlock?
     var enabledBlock: ActionEnabledBlock?
 
