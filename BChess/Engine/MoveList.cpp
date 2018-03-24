@@ -22,7 +22,7 @@ std::string MoveList::description() {
     return text;
 }
 
-void MoveList::addMove(ChessBoard &board, Move move) {
+void MoveList::addSingleMove(ChessBoard &board, Move move) {
     ChessBoard validBoard = board;
     validBoard.move(move);
     // Note: make sure the move that was just played doesn't make it's king in check.
@@ -39,6 +39,30 @@ void MoveList::addMove(ChessBoard &board, Move move) {
         
         // Add the valid move to the list
         push(move);
+    }
+}
+
+void MoveList::addPromotionMove(ChessBoard &board, Move move, Piece promotedPiece) {
+    SET_MOVE_PROMOTION_PIECE(move, promotedPiece);
+    addSingleMove(board, move);
+}
+
+void MoveList::addMove(ChessBoard &board, Move move) {
+    // Handle any pawn promotion by generating the promoted moves
+    if (MOVE_PIECE(move) == PAWN) {
+        auto toRank = RankFrom(MOVE_TO(move));
+        auto whitePromotion = MOVE_COLOR(move) == WHITE && toRank == 7;
+        auto blackPromotion = MOVE_COLOR(move) == BLACK && toRank == 0;
+        if (whitePromotion || blackPromotion) {
+            addPromotionMove(board, move, QUEEN);
+            addPromotionMove(board, move, ROOK);
+            addPromotionMove(board, move, BISHOP);
+            addPromotionMove(board, move, KNIGHT);
+        } else {
+            addSingleMove(board, move);
+        }
+    } else {
+        addSingleMove(board, move);
     }
 }
 

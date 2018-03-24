@@ -59,6 +59,8 @@ struct MoveList {
     
     std::string description();
     
+    void addSingleMove(ChessBoard &board, Move move);
+    void addPromotionMove(ChessBoard &board, Move move, Piece promotedPiece);
     void addMove(ChessBoard &board, Move move);
     void addMoves(ChessBoard &board, Square from, Bitboard moves, Piece piece);
     void addCaptures(ChessBoard &board, Square from, Bitboard moves, Color attackingPieceColor, Piece attackingPiece, Color capturedPieceColor, Piece capturedPiece);

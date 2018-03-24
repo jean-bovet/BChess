@@ -207,14 +207,12 @@ void ChessMoveGenerator::generatePawnsMoves(ChessBoard &board, Color color, Move
         // - Two squares if the pawn is in its initial rank
         Square oneSquareForward, twoSquaresForward;
         Rank initialRank;
-        Rank rankBeforePromotion;
         Rank currentRank = RankFrom(square);
         if (color == WHITE) {
             if (currentRank == 7) {
                 continue; // cannot move anymore, we are on the last rank
             }
             initialRank = 1;
-            rankBeforePromotion = 6;
             oneSquareForward = square + 8;
             twoSquaresForward = square + 16;
         } else {
@@ -222,24 +220,14 @@ void ChessMoveGenerator::generatePawnsMoves(ChessBoard &board, Color color, Move
                 continue; // cannot move anymore, we are on the last rank
             }
             initialRank = 6;
-            rankBeforePromotion = 1;
             oneSquareForward = square - 8;
             twoSquaresForward = square - 16;
         }
         
         // Can we move the pawn forward one square?
         if (((1UL << oneSquareForward) & emptySquares) > 0) {
-            // Handle promotion in case the pawn reaches the last rank
-            if (currentRank == rankBeforePromotion) {
-                // Generate one move for each piece that can the pawn can be promoted to.
-                moveList.addMove(board, createPromotion(square, oneSquareForward, color, PAWN, KNIGHT));
-                moveList.addMove(board, createPromotion(square, oneSquareForward, color, PAWN, BISHOP));
-                moveList.addMove(board, createPromotion(square, oneSquareForward, color, PAWN, ROOK));
-                moveList.addMove(board, createPromotion(square, oneSquareForward, color, PAWN, QUEEN));
-            } else {
-                moveList.addMove(board, createMove(square, oneSquareForward, color, PAWN));
-            }
-            
+            moveList.addMove(board, createMove(square, oneSquareForward, color, PAWN));
+
             // Is pawn on the initial rank? Try two squares forward
             if (currentRank == initialRank && ((1UL << twoSquaresForward) & emptySquares) > 0) {
                 moveList.addMove(board, createMove(square, twoSquaresForward, color, PAWN));

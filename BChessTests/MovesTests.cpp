@@ -230,11 +230,29 @@ TEST_F(MovesTests, WhitePawnPromotion) {
     }, "g7");
 }
 
+TEST_F(MovesTests, WhitePawnPromotionByCapture) {
+    assertMoves("6kq/6P1/8/8/8/8/8/4K3 w - - 0 2", {
+        "6kB/8/8/8/8/8/8/4K3 b - - 0 2",
+        "6kN/8/8/8/8/8/8/4K3 b - - 0 2",
+        "6kQ/8/8/8/8/8/8/4K3 b - - 0 2",
+        "6kR/8/8/8/8/8/8/4K3 b - - 0 2",
+    }, "g7");
+}
+
 TEST_F(MovesTests, BlackPawnPromotion) {
     assertMoves("4k3/8/8/8/8/8/6p1/4K3 b - - 0 1", {
                                                     "4k3/8/8/8/8/8/8/4K1q1 w - - 0 2",
                                                     "4k3/8/8/8/8/8/8/4K1r1 w - - 0 2",
                                                     "4k3/8/8/8/8/8/8/4K1b1 w - - 0 2",
                                                     "4k3/8/8/8/8/8/8/4K1n1 w - - 0 2"
+    }, "g2");
+}
+
+TEST_F(MovesTests, BlackPawnPromotionByCapture) {
+    assertMoves("4k3/8/8/8/8/8/6p1/6KQ b - - 0 1", {
+        "4k3/8/8/8/8/8/8/6Kq w - - 0 2",
+        "4k3/8/8/8/8/8/8/6Kr w - - 0 2",
+        "4k3/8/8/8/8/8/8/6Kb w - - 0 2",
+        "4k3/8/8/8/8/8/8/6Kn w - - 0 2",
     }, "g2");
 }
