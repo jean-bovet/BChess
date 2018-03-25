@@ -447,7 +447,8 @@ Move FPGN::parseMove(std::string pgn, unsigned &cursor, ChessGame &game, bool &e
 bool FPGN::parseMoveText(std::string pgn, unsigned &cursor, ChessGame &game, bool &end) {
     // Indication of a move, for example:
     // 1. e4 e5
-    assert(parseMoveNumber(pgn, cursor));
+    auto result = parseMoveNumber(pgn, cursor);
+    assert(result);
     
     Move whiteMove = parseMove(pgn, cursor, game, end);
     if (end) {
@@ -525,20 +526,24 @@ bool FPGN::setGame(std::string pgn, ChessGame &game, unsigned & cursor) {
 
             std::string tagName;
             std::string tagValue;
-            assert(parseString(pgn, cursor, tagName));
+            auto result = parseString(pgn, cursor, tagName);
+            assert(result);
             eatWhiteSpace(pgn, cursor);
-            assert(parseQuotedString(pgn, cursor, tagValue));
+            result = parseQuotedString(pgn, cursor, tagValue);
+            assert(result);
 
             game.tags[tagName] = tagValue;
             
             if (tagName == "FEN") {
-                assert(game.setFEN(tagValue));
+                result = game.setFEN(tagValue);
+                assert(result);
             }
         } else if (c == '{') {
             // Indication for a comment
             cursor++; // go after the [
             std::string comment = "";
-            assert(parseUntil(pgn, cursor, comment, '}'));
+            auto result = parseUntil(pgn, cursor, comment, '}');
+            assert(result);
         } else if (c >= '0' && c <= '9') {
             if (!parseMoveText(pgn, cursor, game, end)) {
                 return false;

@@ -118,7 +118,8 @@ void ChessGame::redoMove() {
 
 void ChessGame::replayMoves() {
     board.reset();
-    assert(FFEN::setFEN(initialFEN, board));
+    auto result = FFEN::setFEN(initialFEN, board);
+    assert(result);
     for (int index=0; index<moveCursor; index++) {
         board.move(moves[index]);
     }
@@ -126,7 +127,8 @@ void ChessGame::replayMoves() {
 
 std::string ChessGame::getState() {
     ChessBoard replay;
-    assert(FFEN::setFEN(initialFEN, replay));
+    auto result = FFEN::setFEN(initialFEN, replay);
+    assert(result);
     
     ChessState state;
     state.set(replay);

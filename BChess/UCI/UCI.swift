@@ -67,7 +67,8 @@ class UCI {
     }
     
     func processCmdMove(_ tokens: inout [String]) {
-        assert(tokens.removeFirst() == "moves")
+        let result = tokens.removeFirst() == "moves"
+        assert(result)
         for moveToken in tokens {
             assert(moveToken.count == 4)
             let start = moveToken.startIndex

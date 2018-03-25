@@ -71,8 +71,8 @@ class ChessViewInteraction {
         assert(path != nil)
         
         let pgn = try! String(contentsOfFile: path!)
-        
-        assert(engine.loadOpening(pgn))
+        let result = engine.loadOpening(pgn);
+        assert(result)
     }
     
     func saveToDefaults() {
