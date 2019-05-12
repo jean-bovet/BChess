@@ -30,7 +30,7 @@ class ChessViewController: NSViewController {
         interaction = ChessViewInteraction(view: chessView, state:state, engine: engine, animateState: { [unowned self] completion in
             NSAnimationContext.runAnimationGroup({ _ in
                 NSAnimationContext.current.duration = 0.5
-                NSAnimationContext.current.timingFunction = CAMediaTimingFunction(name: kCAAnimationLinear)
+                NSAnimationContext.current.timingFunction = CAMediaTimingFunction(name: .linear)
                 self.chessView.stateChanged()
             }, completionHandler: {
                 completion()
@@ -84,7 +84,7 @@ class ChessViewController: NSViewController {
     
     // MARK: UI
     
-    override func validateMenuItem(_ menuItem: NSMenuItem) -> Bool {
+    func validateMenuItem(_ menuItem: NSMenuItem) -> Bool {
         if menuItem.action == #selector(playAgaintComputerWhite) {
             menuItem.state = interaction.playAgainst == .white ? .on : .off
         }

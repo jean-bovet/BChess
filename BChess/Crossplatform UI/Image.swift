@@ -10,16 +10,7 @@ import Foundation
 
 #if os(OSX)
     import AppKit.NSImage
-    public typealias Image = NSImage
-    
-    extension Image {
-        
-        public convenience init?(named: String) {
-            self.init(named: NSImage.Name(named))
-        }
-        
-    }
-
+    public typealias Image = NSImage    
 #else
     import UIKit
     public typealias Image = UIImage

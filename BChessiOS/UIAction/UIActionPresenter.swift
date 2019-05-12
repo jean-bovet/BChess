@@ -36,7 +36,7 @@ class UIActionPresenter {
         let controller = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
         
         for action in actions {
-            let style = action.destructive ? UIAlertActionStyle.destructive : UIAlertActionStyle.default
+            let style = action.destructive ? UIAlertAction.Style.destructive : UIAlertAction.Style.default
             let alertAction = UIAlertAction(title: action.title, style: style, handler: { (alertAction) in
                 action.execute() {
                     completion()

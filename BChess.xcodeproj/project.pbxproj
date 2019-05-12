@@ -206,6 +206,7 @@
 		A70A61C91FD46E3C00AFDF0E /* ChessEvaluater.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = ChessEvaluater.hpp; sourceTree = "<group>"; };
 		A70A61CF1FD4AA9600AFDF0E /* FEngineInfo.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FEngineInfo.h; sourceTree = "<group>"; };
 		A70A61D01FD4AA9600AFDF0E /* FEngineInfo.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = FEngineInfo.mm; sourceTree = "<group>"; };
+		A7195E73218C154C00E4C0D8 /* BChess.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = BChess.entitlements; sourceTree = "<group>"; };
 		A72E2B56200496CC006CBB1C /* BoardHashTests.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BoardHashTests.cpp; sourceTree = "<group>"; };
 		A731BD3620009856004C13EF /* Tournament.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tournament.swift; sourceTree = "<group>"; };
 		A731BD382000A513004C13EF /* TournamentEngines.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TournamentEngines.swift; sourceTree = "<group>"; };
@@ -493,6 +494,7 @@
 		A7688F20204A6911004B1E9E /* BChessiOS */ = {
 			isa = PBXGroup;
 			children = (
+				A7195E73218C154C00E4C0D8 /* BChess.entitlements */,
 				A7688F21204A6911004B1E9E /* AppDelegate.swift */,
 				A7688F23204A6911004B1E9E /* ViewController.swift */,
 				A77E6C3A204BCFF900ECF6CD /* EngineInfo.swift */,
@@ -804,26 +806,34 @@
 			isa = PBXProject;
 			attributes = {
 				LastSwiftUpdateCheck = 0920;
-				LastUpgradeCheck = 0910;
+				LastUpgradeCheck = 1020;
 				ORGANIZATIONNAME = "Jean Bovet";
 				TargetAttributes = {
 					A753598F1FDE0947008D1DEE = {
 						CreatedOnToolsVersion = 9.2;
+						LastSwiftMigration = 1000;
 						ProvisioningStyle = Automatic;
 					};
 					A75359A01FDE0947008D1DEE = {
 						CreatedOnToolsVersion = 9.2;
+						LastSwiftMigration = 1000;
 						ProvisioningStyle = Automatic;
 						TestTargetID = A753598F1FDE0947008D1DEE;
 					};
 					A75359AB1FDE0947008D1DEE = {
 						CreatedOnToolsVersion = 9.2;
+						LastSwiftMigration = 1000;
 						ProvisioningStyle = Automatic;
 						TestTargetID = A753598F1FDE0947008D1DEE;
 					};
 					A7688F1E204A6911004B1E9E = {
 						CreatedOnToolsVersion = 9.2;
 						ProvisioningStyle = Automatic;
+						SystemCapabilities = {
+							com.apple.AccessWiFi = {
+								enabled = 0;
+							};
+						};
 					};
 					A7688F31204A6911004B1E9E = {
 						CreatedOnToolsVersion = 9.2;
@@ -837,11 +847,12 @@
 					};
 					A7712D131FB916E900E7E802 = {
 						CreatedOnToolsVersion = 9.1;
+						LastSwiftMigration = 1000;
 						ProvisioningStyle = Automatic;
 					};
 					A7AFCCA51FB4E40D00AE3D85 = {
 						CreatedOnToolsVersion = 9.1;
-						LastSwiftMigration = 0910;
+						LastSwiftMigration = 1000;
 						ProvisioningStyle = Automatic;
 					};
 				};
@@ -1185,7 +1196,6 @@
 				PRODUCT_BUNDLE_IDENTIFIER = ch.arizonasoftware.BChess;
 				PRODUCT_NAME = BChess;
 				SWIFT_OBJC_BRIDGING_HEADER = "BChess/BChess-Bridging-Header.h";
-				SWIFT_VERSION = 4.0;
 			};
 			name = Debug;
 		};
@@ -1202,7 +1212,6 @@
 				PRODUCT_BUNDLE_IDENTIFIER = ch.arizonasoftware.BChess;
 				PRODUCT_NAME = BChess;
 				SWIFT_OBJC_BRIDGING_HEADER = "BChess/BChess-Bridging-Header.h";
-				SWIFT_VERSION = 4.0;
 			};
 			name = Release;
 		};
@@ -1218,8 +1227,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "ch.arizona-software.BChessMacTests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 4.0;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/BChessMac.app/Contents/MacOS/BChessMac";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/BChess.app/Contents/MacOS/BChess";
 			};
 			name = Debug;
 		};
@@ -1235,8 +1243,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "ch.arizona-software.BChessMacTests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 4.0;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/BChessMac.app/Contents/MacOS/BChessMac";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/BChess.app/Contents/MacOS/BChess";
 			};
 			name = Release;
 		};
@@ -1251,7 +1258,6 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "ch.arizona-software.BChessMacUITests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 4.0;
 				TEST_TARGET_NAME = BChessMac;
 			};
 			name = Debug;
@@ -1267,7 +1273,6 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "ch.arizona-software.BChessMacUITests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 4.0;
 				TEST_TARGET_NAME = BChessMac;
 			};
 			name = Release;
@@ -1286,7 +1291,6 @@
 				PRODUCT_NAME = BChess;
 				SDKROOT = iphoneos;
 				SWIFT_OBJC_BRIDGING_HEADER = "BChess/BChess-Bridging-Header.h";
-				SWIFT_VERSION = 4.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
@@ -1305,7 +1309,6 @@
 				PRODUCT_NAME = BChess;
 				SDKROOT = iphoneos;
 				SWIFT_OBJC_BRIDGING_HEADER = "BChess/BChess-Bridging-Header.h";
-				SWIFT_VERSION = 4.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
 			};
@@ -1325,9 +1328,8 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "ch.arizona-software.BChessiOSTests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
-				SWIFT_VERSION = 4.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/BChessiOS.app/BChessiOS";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/BChess.app/BChess";
 			};
 			name = Debug;
 		};
@@ -1345,9 +1347,8 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "ch.arizona-software.BChessiOSTests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
-				SWIFT_VERSION = 4.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/BChessiOS.app/BChessiOS";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/BChess.app/BChess";
 				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;
@@ -1365,7 +1366,6 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "ch.arizona-software.BChessiOSUITests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
-				SWIFT_VERSION = 4.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_TARGET_NAME = BChessiOS;
 			};
@@ -1384,7 +1384,6 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "ch.arizona-software.BChessiOSUITests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
-				SWIFT_VERSION = 4.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_TARGET_NAME = BChessiOS;
 				VALIDATE_PRODUCT = YES;
@@ -1411,7 +1410,6 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "ch.arizona-software.BChessTests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "BChess/BChess-Bridging-Header.h";
-				SWIFT_VERSION = 4.0;
 			};
 			name = Debug;
 		};
@@ -1435,7 +1433,6 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "ch.arizona-software.BChessTests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "BChess/BChess-Bridging-Header.h";
-				SWIFT_VERSION = 4.0;
 			};
 			name = Release;
 		};
@@ -1453,6 +1450,7 @@
 				CLANG_WARN_BOOL_CONVERSION = YES;
 				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_EMPTY_BODY = YES;
@@ -1460,6 +1458,7 @@
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
@@ -1493,6 +1492,7 @@
 				SDKROOT = macosx;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
 			};
 			name = Debug;
 		};
@@ -1510,6 +1510,7 @@
 				CLANG_WARN_BOOL_CONVERSION = YES;
 				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_EMPTY_BODY = YES;
@@ -1517,6 +1518,7 @@
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
@@ -1542,6 +1544,7 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = macosx;
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
+				SWIFT_VERSION = 5.0;
 			};
 			name = Release;
 		};
@@ -1555,7 +1558,6 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "BChess/BChess-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				SWIFT_VERSION = 4.0;
 			};
 			name = Debug;
 		};
@@ -1568,7 +1570,6 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "BChess/BChess-Bridging-Header.h";
-				SWIFT_VERSION = 4.0;
 			};
 			name = Release;
 		};

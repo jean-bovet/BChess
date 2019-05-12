@@ -19,11 +19,11 @@ class MacEngineInfo {
     }
         
     func boldText(text: String) -> NSAttributedString {
-        return NSAttributedString(string: text, attributes: [ NSAttributedStringKey.font : NSFont.boldSystemFont(ofSize: 12)])
+        return NSAttributedString(string: text, attributes: [ NSAttributedString.Key.font : NSFont.boldSystemFont(ofSize: 12)])
     }
     
     func regularText(text: String) -> NSAttributedString {
-        return NSAttributedString(string: text, attributes: [ NSAttributedStringKey.font : NSFont.systemFont(ofSize: 12)])
+        return NSAttributedString(string: text, attributes: [ NSAttributedString.Key.font : NSFont.systemFont(ofSize: 12)])
     }
 
     func attributedString(forInfo info: FEngineInfo?, engine: FEngine) -> NSAttributedString {

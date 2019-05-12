@@ -216,12 +216,12 @@ class ChessView: View {
         
         let str = NSMutableAttributedString(string: text)
         
-        str.addAttribute(NSAttributedStringKey(rawValue: kCTForegroundColorAttributeName as String),
+        str.addAttribute(NSAttributedString.Key(rawValue: kCTForegroundColorAttributeName as String),
                          value: white ? Color.white : Color.black , range: NSMakeRange(0,str.length))
         
         let fontRef = Font.systemFont(ofSize: layouter.fontSize, weight: Font.Weight.bold)
-        let attributes = [NSAttributedStringKey(rawValue: kCTFontAttributeName as String) : fontRef]
-        str.addAttribute(NSAttributedStringKey(rawValue: kCTFontAttributeName as String), value: fontRef, range:NSMakeRange(0, str.length))
+        let attributes = [NSAttributedString.Key(rawValue: kCTFontAttributeName as String) : fontRef]
+        str.addAttribute(NSAttributedString.Key(rawValue: kCTFontAttributeName as String), value: fontRef, range:NSMakeRange(0, str.length))
         
         let frameSetter = CTFramesetterCreateWithAttributedString(str)
         

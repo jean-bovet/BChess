@@ -29,16 +29,16 @@ class EngineInfo {
     func boldText(text: String) -> NSAttributedString {
         return NSAttributedString(string: text,
                                   attributes: [
-                                    NSAttributedStringKey.font : UIFont.boldSystemFont(ofSize: 12),
-                                    NSAttributedStringKey.foregroundColor : UIColor.black
+                                    NSAttributedString.Key.font : UIFont.boldSystemFont(ofSize: 12),
+                                    NSAttributedString.Key.foregroundColor : UIColor.black
             ])
     }
     
     func regularText(text: String) -> NSAttributedString {
         return NSAttributedString(string: text,
                                   attributes: [
-                                    NSAttributedStringKey.font : UIFont.systemFont(ofSize: 12),
-                                    NSAttributedStringKey.foregroundColor : UIColor.black
+                                    NSAttributedString.Key.font : UIFont.systemFont(ofSize: 12),
+                                    NSAttributedString.Key.foregroundColor : UIColor.black
             ])
     }
     
