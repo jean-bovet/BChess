@@ -46,7 +46,8 @@ struct Position {
 struct ContentView: View {
     @Binding var document: BChessUIDocument
     @State private var selection = Position.empty()
-
+    @State private var possibleMoves = [FEngineMove]()
+    
     func backgroundColor(rank: Int, file: Int) -> Color {
         if rank % 2 == 0 {
             return file % 2 == 0 ? .gray : .white
@@ -57,6 +58,10 @@ struct ContentView: View {
     
     func selected(rank: Int, file: Int) -> Bool {
         return selection.rank == rank && selection.file == file
+    }
+    
+    func isPossibleMove(_ rank: Int, _ file: Int) -> Bool {
+        return possibleMoves.filter { $0.fromFile == file && $0.fromRank == rank || $0.toFile == file && $0.toRank == rank }.count > 0
     }
     
     func pieceImage(atRank rank: Int, file: Int) -> Image? {
@@ -72,17 +77,22 @@ struct ContentView: View {
                             Rectangle()
                                 .fill(backgroundColor(rank: rank, file: file))
                                 .overlay(image.resizable())
-                                .if(selected(rank: rank, file: file)) { view in
+                                .if(selected(rank: rank, file: file) || isPossibleMove(rank, file)) { view in
                                     view.overlay(Color.yellow.opacity(0.8))
                                 }
                                 .onTapGesture {
                                     self.selection = Position(rank: rank, file: file)
+                                    self.possibleMoves = document.engine.moves(at: UInt(rank), file: UInt(file))
                                 }
                         } else {
                             Rectangle()
                                 .fill(backgroundColor(rank: rank, file: file))
+                                .if(isPossibleMove(rank, file)) { view in
+                                    view.overlay(Color.yellow.opacity(0.8))
+                                }
                                 .onTapGesture {
                                     self.selection = Position.empty()
+                                    self.possibleMoves.removeAll()
                                 }
                         }
                     }
