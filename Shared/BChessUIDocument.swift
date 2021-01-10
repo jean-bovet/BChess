@@ -21,14 +21,18 @@ struct BChessEngineFactory {
 }
 
 struct BChessUIDocument: FileDocument {
-    var text: String
+    
+    let engine = FEngine()
+    
+    var pgn: String
 
     var pieces: [Piece] {
-        return PiecesFactory().pieces(forState: text)
+        return PiecesFactory().pieces(forState: engine.state)
     }
     
-    init(text: String = BChessEngineFactory.engine.state) {
-        self.text = text
+    init(pgn: String = BChessEngineFactory.engine.pgn()) {
+        self.pgn = pgn
+        self.engine.setPGN(pgn)
     }
 
     static var readableContentTypes: [UTType] { [.exampleText] }
@@ -39,11 +43,11 @@ struct BChessUIDocument: FileDocument {
         else {
             throw CocoaError(.fileReadCorruptFile)
         }
-        text = string
+        pgn = string
     }
     
     func fileWrapper(configuration: WriteConfiguration) throws -> FileWrapper {
-        let data = text.data(using: .utf8)!
+        let data = pgn.data(using: .utf8)!
         return .init(regularFileWithContents: data)
     }
 }

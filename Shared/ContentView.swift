@@ -8,12 +8,46 @@
 
 import SwiftUI
 
-struct RankView: View {
-    
-    let rank: Int
-    let pieces: [Piece]
+extension View {
+    @ViewBuilder
+    func `if`<Content: View>(_ condition: Bool, content: (Self) -> Content) -> some View {
+        if condition {
+            content(self)
+        }
+        else {
+            self
+        }
+    }
+}
 
-    func backgroundColor(file: Int) -> Color {
+struct Position {
+    let rank: Int
+    let file: Int
+    
+    static func empty() -> Position {
+        return Position(rank: -1, file: -1)
+    }
+}
+    
+//    guard let moves = state?.possibleMoves else {
+//        return
+//    }
+//
+//    for move in moves {
+//        context.setFillColor(Color.yellow.withAlphaComponent(0.4).cgColor)
+//        layouter.layout(file: move.fromFile, rank: move.fromRank, callback: { rect in
+//            context.fill(rect)
+//        })
+//        layouter.layout(file: move.toFile, rank: move.toRank, callback: { rect in
+//            context.fill(rect)
+//        })
+//    }
+
+struct ContentView: View {
+    @Binding var document: BChessUIDocument
+    @State private var selection = Position.empty()
+
+    func backgroundColor(rank: Int, file: Int) -> Color {
         if rank % 2 == 0 {
             return file % 2 == 0 ? .gray : .white
         } else {
@@ -21,36 +55,38 @@ struct RankView: View {
         }
     }
     
-    func pieceImage(at file: Int) -> Image? {
-        return pieces.filter { $0.rank == rank && $0.file == file }.first?.image
+    func selected(rank: Int, file: Int) -> Bool {
+        return selection.rank == rank && selection.file == file
     }
     
-    var body: some View {
-        HStack(spacing: 0) {
-            ForEach((0...7), id: \.self) { file in
-                if let image = pieceImage(at: file) {
-                    Rectangle()
-                        .fill(backgroundColor(file: file))
-                        .overlay(image.resizable())
-                } else {
-                    Rectangle()
-                        .fill(backgroundColor(file: file))
-                }
-            }
-        }
+    func pieceImage(atRank rank: Int, file: Int) -> Image? {
+        return document.pieces.filter { $0.rank == rank && $0.file == file }.first?.image
     }
-}
 
-struct ContentView: View {
-    @Binding var document: BChessUIDocument
-    
-    let rows = [0, 1, 2, 3, 4, 5, 6, 7]
-    let columns = [0, 1, 2, 3, 4, 5, 6, 7]
-        
     var body: some View {
         VStack(spacing: 0) {
             ForEach((0...7).reversed(), id: \.self) { rank in
-                RankView(rank: rank, pieces: document.pieces)
+                HStack(spacing: 0) {
+                    ForEach((0...7), id: \.self) { file in
+                        if let image = pieceImage(atRank: rank, file: file) {
+                            Rectangle()
+                                .fill(backgroundColor(rank: rank, file: file))
+                                .overlay(image.resizable())
+                                .if(selected(rank: rank, file: file)) { view in
+                                    view.overlay(Color.yellow.opacity(0.8))
+                                }
+                                .onTapGesture {
+                                    self.selection = Position(rank: rank, file: file)
+                                }
+                        } else {
+                            Rectangle()
+                                .fill(backgroundColor(rank: rank, file: file))
+                                .onTapGesture {
+                                    self.selection = Position.empty()
+                                }
+                        }
+                    }
+                }
             }
         }
         .aspectRatio(1.0, contentMode: .fit)
