@@ -29,25 +29,45 @@ struct Position {
     }
 }
     
-//    guard let moves = state?.possibleMoves else {
-//        return
-//    }
-//
-//    for move in moves {
-//        context.setFillColor(Color.yellow.withAlphaComponent(0.4).cgColor)
-//        layouter.layout(file: move.fromFile, rank: move.fromRank, callback: { rect in
-//            context.fill(rect)
-//        })
-//        layouter.layout(file: move.toFile, rank: move.toRank, callback: { rect in
-//            context.fill(rect)
-//        })
-//    }
+struct LastMoveModifier: ViewModifier {
+    let rank: Int
+    let file: Int
+    let lastMove: FEngineMove?
+    
+    func isLastMoveStart(_ rank: Int, _ file: Int) -> Bool {
+        if let move = lastMove {
+            return move.fromRank == rank && move.fromFile == file
+        } else {
+            return false
+        }
+    }
+
+    func isLastMoveEnd(_ rank: Int, _ file: Int) -> Bool {
+        if let move = lastMove {
+            return move.toRank == rank && move.toFile == file
+        } else {
+            return false
+        }
+    }
+
+
+    func body(content: Content) -> some View {
+        return content
+            .if(isLastMoveStart(rank, file)) { view in
+                view.border(Color.orange.opacity(0.8), width: 3)
+            }
+            .if(isLastMoveEnd(rank, file)) { view in
+                view.border(Color.orange.opacity(0.8), width: 5)
+            }
+    }
+}
 
 struct ContentView: View {
     @Binding var document: BChessUIDocument
     @State private var selection = Position.empty()
     @State private var possibleMoves = [FEngineMove]()
-    
+    @State private var lastMove: FEngineMove?
+
     func backgroundColor(rank: Int, file: Int) -> Color {
         if rank % 2 == 0 {
             return file % 2 == 0 ? .gray : .white
@@ -61,13 +81,40 @@ struct ContentView: View {
     }
     
     func isPossibleMove(_ rank: Int, _ file: Int) -> Bool {
-        return possibleMoves.filter { $0.fromFile == file && $0.fromRank == rank || $0.toFile == file && $0.toRank == rank }.count > 0
+        return possibleMove(rank, file) != nil
+    }
+    
+    func possibleMove(_ rank: Int, _ file: Int) -> FEngineMove? {
+        return possibleMoves.filter { $0.fromFile == file && $0.fromRank == rank || $0.toFile == file && $0.toRank == rank }.first
     }
     
     func pieceImage(atRank rank: Int, file: Int) -> Image? {
         return document.pieces.filter { $0.rank == rank && $0.file == file }.first?.image
     }
 
+    func processTap(_ rank: Int, _ file: Int) {
+        if let move = possibleMove(rank, file) {
+            document.engine.move(move.rawMoveValue)
+            document.engine.evaluate { (info, completed) in
+                DispatchQueue.main.async {
+                    if completed {
+                        self.document.engine.move(info.bestMove)
+                        
+                        // TODO: refactor?
+                        let move = FEngineMove()
+                        move.fromFile = info.fromFile
+                        move.fromRank = info.fromRank
+                        move.toFile = info.toFile
+                        move.toRank = info.toRank
+                        move.rawMoveValue = info.bestMove
+                        self.lastMove = move
+                    }
+//                    self.infoChanged?(info)
+                }
+            }
+        }
+    }
+    
     var body: some View {
         VStack(spacing: 0) {
             ForEach((0...7).reversed(), id: \.self) { rank in
@@ -80,9 +127,10 @@ struct ContentView: View {
                                 .if(selected(rank: rank, file: file) || isPossibleMove(rank, file)) { view in
                                     view.overlay(Color.yellow.opacity(0.8))
                                 }
+                                .modifier(LastMoveModifier(rank: rank, file: file, lastMove: lastMove))
                                 .onTapGesture {
-                                    self.selection = Position(rank: rank, file: file)
-                                    self.possibleMoves = document.engine.moves(at: UInt(rank), file: UInt(file))
+                                    selection = Position(rank: rank, file: file)
+                                    possibleMoves = document.engine.moves(at: UInt(rank), file: UInt(file))
                                 }
                         } else {
                             Rectangle()
@@ -90,9 +138,13 @@ struct ContentView: View {
                                 .if(isPossibleMove(rank, file)) { view in
                                     view.overlay(Color.yellow.opacity(0.8))
                                 }
+                                .modifier(LastMoveModifier(rank: rank, file: file, lastMove: lastMove))
                                 .onTapGesture {
-                                    self.selection = Position.empty()
-                                    self.possibleMoves.removeAll()
+                                    withAnimation {
+                                        processTap(rank, file)
+                                        selection = Position.empty()
+                                        possibleMoves.removeAll()
+                                    }
                                 }
                         }
                     }

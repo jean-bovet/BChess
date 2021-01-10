@@ -32,6 +32,7 @@ struct BChessUIDocument: FileDocument {
     
     init(pgn: String = BChessEngineFactory.engine.pgn()) {
         self.pgn = pgn
+        self.engine.thinkingTime = 2
         self.engine.setPGN(pgn)
     }
 
