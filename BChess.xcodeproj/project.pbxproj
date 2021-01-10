@@ -100,6 +100,16 @@
 		A77372061FE443DA0001A90F /* ChessGame.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A77371FC1FE31FEF0001A90F /* ChessGame.cpp */; };
 		A77E6C39204BBDB600ECF6CD /* ChessState.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A7688F5E204B6E91004B1E9E /* ChessState.cpp */; };
 		A77E6C3B204BCFF900ECF6CD /* EngineInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = A77E6C3A204BCFF900ECF6CD /* EngineInfo.swift */; };
+		A77F66C825A832270030E61D /* Tests_iOS.swift in Sources */ = {isa = PBXBuildFile; fileRef = A77F66C725A832270030E61D /* Tests_iOS.swift */; };
+		A77F66D325A832270030E61D /* Tests_macOS.swift in Sources */ = {isa = PBXBuildFile; fileRef = A77F66D225A832270030E61D /* Tests_macOS.swift */; };
+		A77F66D525A832270030E61D /* BChessUIApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A77F66AC25A832230030E61D /* BChessUIApp.swift */; };
+		A77F66D625A832270030E61D /* BChessUIApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A77F66AC25A832230030E61D /* BChessUIApp.swift */; };
+		A77F66D725A832270030E61D /* BChessUIDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = A77F66AD25A832240030E61D /* BChessUIDocument.swift */; };
+		A77F66D825A832270030E61D /* BChessUIDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = A77F66AD25A832240030E61D /* BChessUIDocument.swift */; };
+		A77F66D925A832270030E61D /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A77F66AE25A832240030E61D /* ContentView.swift */; };
+		A77F66DA25A832270030E61D /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A77F66AE25A832240030E61D /* ContentView.swift */; };
+		A77F66DB25A832270030E61D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A77F66AF25A832270030E61D /* Assets.xcassets */; };
+		A77F66DC25A832270030E61D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A77F66AF25A832270030E61D /* Assets.xcassets */; };
 		A78E754C202C080E00445360 /* MovesTests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A78E754B202C080E00445360 /* MovesTests.cpp */; };
 		A78E7551202C110200445360 /* UnitTestHelper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A78E754F202C110200445360 /* UnitTestHelper.cpp */; };
 		A7AA42A920538C7F00FAACA2 /* ChessViewInteraction.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7AA42A820538C7F00FAACA2 /* ChessViewInteraction.swift */; };
@@ -146,6 +156,34 @@
 		A7EBE7CF1FF6C93600ACDF85 /* ChessOpenings.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A765D85F1FF6C1950045BB36 /* ChessOpenings.cpp */; };
 		A7EF55C81FF191B1004CF2DA /* SearchChessTests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A7E490E41FEA1C0600970EAD /* SearchChessTests.cpp */; };
 		A7EF55C91FF1CF77004CF2DA /* BestMoveTests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A70A61BD1FD3196400AFDF0E /* BestMoveTests.cpp */; };
+		A7FE31A525AA963F00A75936 /* FEngine.mm in Sources */ = {isa = PBXBuildFile; fileRef = A75683281FCD28A000CF1408 /* FEngine.mm */; };
+		A7FE31CA25AA96A800A75936 /* FEngineInfo.mm in Sources */ = {isa = PBXBuildFile; fileRef = A70A61D01FD4AA9600AFDF0E /* FEngineInfo.mm */; };
+		A7FE31CB25AA96A800A75936 /* FEngineUtility.mm in Sources */ = {isa = PBXBuildFile; fileRef = A7C92AB81FF86F6800160D2E /* FEngineUtility.mm */; };
+		A7FE31CC25AA96A800A75936 /* FEngineMove.mm in Sources */ = {isa = PBXBuildFile; fileRef = A7C92AB31FF86BF200160D2E /* FEngineMove.mm */; };
+		A7FE31D925AA96B800A75936 /* ChessBoard.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A7712D451FCBC13100E7E802 /* ChessBoard.cpp */; };
+		A7FE31DA25AA96B800A75936 /* MoveList.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A70A61C51FD4592700AFDF0E /* MoveList.cpp */; };
+		A7FE31DB25AA96B800A75936 /* GameHistory.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A746C2472001707F001F4437 /* GameHistory.cpp */; };
+		A7FE31DC25AA96B800A75936 /* ChessEvaluater.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A70A61C81FD46E3C00AFDF0E /* ChessEvaluater.cpp */; };
+		A7FE31DD25AA96B800A75936 /* ChessMoveGenerator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A70A61C21FD458DE00AFDF0E /* ChessMoveGenerator.cpp */; };
+		A7FE31EA25AA96B900A75936 /* ChessBoard.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A7712D451FCBC13100E7E802 /* ChessBoard.cpp */; };
+		A7FE31EB25AA96B900A75936 /* MoveList.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A70A61C51FD4592700AFDF0E /* MoveList.cpp */; };
+		A7FE31EC25AA96B900A75936 /* GameHistory.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A746C2472001707F001F4437 /* GameHistory.cpp */; };
+		A7FE31ED25AA96B900A75936 /* ChessEvaluater.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A70A61C81FD46E3C00AFDF0E /* ChessEvaluater.cpp */; };
+		A7FE31EE25AA96B900A75936 /* ChessMoveGenerator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A70A61C21FD458DE00AFDF0E /* ChessMoveGenerator.cpp */; };
+		A7FE31FB25AA96C500A75936 /* ChessGame.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A77371FC1FE31FEF0001A90F /* ChessGame.cpp */; };
+		A7FE31FC25AA96C500A75936 /* ChessOpenings.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A765D85F1FF6C1950045BB36 /* ChessOpenings.cpp */; };
+		A7FE31FD25AA96C500A75936 /* ChessState.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A7688F5E204B6E91004B1E9E /* ChessState.cpp */; };
+		A7FE320A25AA96C500A75936 /* ChessGame.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A77371FC1FE31FEF0001A90F /* ChessGame.cpp */; };
+		A7FE320B25AA96C500A75936 /* ChessOpenings.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A765D85F1FF6C1950045BB36 /* ChessOpenings.cpp */; };
+		A7FE320C25AA96C500A75936 /* ChessState.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A7688F5E204B6E91004B1E9E /* ChessState.cpp */; };
+		A7FE321925AA96D000A75936 /* FFEN.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A70A61B91FD132D200AFDF0E /* FFEN.cpp */; };
+		A7FE321A25AA96D000A75936 /* ChessBoardHash.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A746C242200148E9001F4437 /* ChessBoardHash.cpp */; };
+		A7FE321B25AA96D000A75936 /* FPGN.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A77371FF1FE320010001A90F /* FPGN.cpp */; };
+		A7FE321C25AA96D000A75936 /* magicmoves.c in Sources */ = {isa = PBXBuildFile; fileRef = A7712D411FCB97A900E7E802 /* magicmoves.c */; };
+		A7FE322925AA96D100A75936 /* FFEN.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A70A61B91FD132D200AFDF0E /* FFEN.cpp */; };
+		A7FE322A25AA96D100A75936 /* ChessBoardHash.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A746C242200148E9001F4437 /* ChessBoardHash.cpp */; };
+		A7FE322B25AA96D100A75936 /* FPGN.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A77371FF1FE320010001A90F /* FPGN.cpp */; };
+		A7FE322C25AA96D100A75936 /* magicmoves.c in Sources */ = {isa = PBXBuildFile; fileRef = A7712D411FCB97A900E7E802 /* magicmoves.c */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -176,6 +214,20 @@
 			proxyType = 1;
 			remoteGlobalIDString = A7688F1E204A6911004B1E9E;
 			remoteInfo = BChessiOS;
+		};
+		A77F66C425A832270030E61D /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A7AFCC9E1FB4E40D00AE3D85 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = A77F66B325A832270030E61D;
+			remoteInfo = "BChessUI (iOS)";
+		};
+		A77F66CF25A832270030E61D /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A7AFCC9E1FB4E40D00AE3D85 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = A77F66BA25A832270030E61D;
+			remoteInfo = "BChessUI (macOS)";
 		};
 /* End PBXContainerItemProxy section */
 
@@ -280,6 +332,21 @@
 		A77372001FE320010001A90F /* FPGN.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = FPGN.hpp; sourceTree = "<group>"; };
 		A77372041FE340780001A90F /* PGNTests.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PGNTests.cpp; sourceTree = "<group>"; };
 		A77E6C3A204BCFF900ECF6CD /* EngineInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EngineInfo.swift; sourceTree = "<group>"; };
+		A77F66AC25A832230030E61D /* BChessUIApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BChessUIApp.swift; sourceTree = "<group>"; };
+		A77F66AD25A832240030E61D /* BChessUIDocument.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BChessUIDocument.swift; sourceTree = "<group>"; };
+		A77F66AE25A832240030E61D /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		A77F66AF25A832270030E61D /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		A77F66B425A832270030E61D /* BChessUI.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BChessUI.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		A77F66B625A832270030E61D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		A77F66BB25A832270030E61D /* BChessUI.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BChessUI.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		A77F66BD25A832270030E61D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		A77F66BE25A832270030E61D /* macOS.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = macOS.entitlements; sourceTree = "<group>"; };
+		A77F66C325A832270030E61D /* Tests iOS.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Tests iOS.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		A77F66C725A832270030E61D /* Tests_iOS.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tests_iOS.swift; sourceTree = "<group>"; };
+		A77F66C925A832270030E61D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		A77F66CE25A832270030E61D /* Tests macOS.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Tests macOS.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		A77F66D225A832270030E61D /* Tests_macOS.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tests_macOS.swift; sourceTree = "<group>"; };
+		A77F66D425A832270030E61D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		A78E754B202C080E00445360 /* MovesTests.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MovesTests.cpp; sourceTree = "<group>"; };
 		A78E754F202C110200445360 /* UnitTestHelper.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = UnitTestHelper.cpp; sourceTree = "<group>"; };
 		A78E7550202C110200445360 /* UnitTestHelper.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = UnitTestHelper.hpp; sourceTree = "<group>"; };
@@ -310,6 +377,7 @@
 		A7E8B724204FAED800DD2323 /* Font.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Font.swift; sourceTree = "<group>"; };
 		A7EF55C71FEF17A1004CF2DA /* ChessEngine.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = ChessEngine.hpp; sourceTree = "<group>"; };
 		A7EF55CB1FF22FE7004CF2DA /* MoveList.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = MoveList.hpp; sourceTree = "<group>"; };
+		A7FE318C25AA95F600A75936 /* BChessEngine */ = {isa = PBXFileReference; lastKnownFileType = folder; name = BChessEngine; path = ../../../../../Desktop/BChessEngine; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -356,6 +424,34 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		A7712D111FB916E900E7E802 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A77F66B125A832270030E61D /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A77F66B825A832270030E61D /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A77F66C025A832270030E61D /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A77F66CB25A832270030E61D /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -556,6 +652,54 @@
 			path = UCI;
 			sourceTree = "<group>";
 		};
+		A77F66AB25A832230030E61D /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				A70A61CE1FD4AA8500AFDF0E /* Bridge */,
+				A70A61D41FD4D37E00AFDF0E /* Engine */,
+				A77F66AC25A832230030E61D /* BChessUIApp.swift */,
+				A77F66AD25A832240030E61D /* BChessUIDocument.swift */,
+				A77F66AE25A832240030E61D /* ContentView.swift */,
+				A77F66AF25A832270030E61D /* Assets.xcassets */,
+			);
+			path = Shared;
+			sourceTree = "<group>";
+		};
+		A77F66B525A832270030E61D /* iOS */ = {
+			isa = PBXGroup;
+			children = (
+				A77F66B625A832270030E61D /* Info.plist */,
+			);
+			path = iOS;
+			sourceTree = "<group>";
+		};
+		A77F66BC25A832270030E61D /* macOS */ = {
+			isa = PBXGroup;
+			children = (
+				A77F66BD25A832270030E61D /* Info.plist */,
+				A77F66BE25A832270030E61D /* macOS.entitlements */,
+			);
+			path = macOS;
+			sourceTree = "<group>";
+		};
+		A77F66C625A832270030E61D /* Tests iOS */ = {
+			isa = PBXGroup;
+			children = (
+				A77F66C725A832270030E61D /* Tests_iOS.swift */,
+				A77F66C925A832270030E61D /* Info.plist */,
+			);
+			path = "Tests iOS";
+			sourceTree = "<group>";
+		};
+		A77F66D125A832270030E61D /* Tests macOS */ = {
+			isa = PBXGroup;
+			children = (
+				A77F66D225A832270030E61D /* Tests_macOS.swift */,
+				A77F66D425A832270030E61D /* Info.plist */,
+			);
+			path = "Tests macOS";
+			sourceTree = "<group>";
+		};
 		A78E7552203122ED00445360 /* Engine */ = {
 			isa = PBXGroup;
 			children = (
@@ -586,6 +730,7 @@
 		A7AFCC9D1FB4E40D00AE3D85 = {
 			isa = PBXGroup;
 			children = (
+				A7FE318C25AA95F600A75936 /* BChessEngine */,
 				A7712D311FC7C5CF00E7E802 /* ToDo.md */,
 				A7AFCCA81FB4E40D00AE3D85 /* BChess */,
 				A7712D151FB916E900E7E802 /* BChessTests */,
@@ -595,6 +740,11 @@
 				A7688F20204A6911004B1E9E /* BChessiOS */,
 				A7688F35204A6912004B1E9E /* BChessiOSTests */,
 				A7688F40204A6912004B1E9E /* BChessiOSUITests */,
+				A77F66AB25A832230030E61D /* Shared */,
+				A77F66B525A832270030E61D /* iOS */,
+				A77F66BC25A832270030E61D /* macOS */,
+				A77F66C625A832270030E61D /* Tests iOS */,
+				A77F66D125A832270030E61D /* Tests macOS */,
 				A7AFCCA71FB4E40D00AE3D85 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -610,6 +760,10 @@
 				A7688F1F204A6911004B1E9E /* BChess.app */,
 				A7688F32204A6911004B1E9E /* BChessiOSTests.xctest */,
 				A7688F3D204A6912004B1E9E /* BChessiOSUITests.xctest */,
+				A77F66B425A832270030E61D /* BChessUI.app */,
+				A77F66BB25A832270030E61D /* BChessUI.app */,
+				A77F66C325A832270030E61D /* Tests iOS.xctest */,
+				A77F66CE25A832270030E61D /* Tests macOS.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -623,8 +777,6 @@
 				A7712D301FC7C4D300E7E802 /* UCI */,
 				A7E8B70D204D17EE00DD2323 /* GenericUI */,
 				A74215B1205F7C5100604018 /* Crossplatform UI */,
-				A70A61CE1FD4AA8500AFDF0E /* Bridge */,
-				A70A61D41FD4D37E00AFDF0E /* Engine */,
 			);
 			path = BChess;
 			sourceTree = "<group>";
@@ -782,6 +934,76 @@
 			productReference = A7712D141FB916E900E7E802 /* BChessTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
+		A77F66B325A832270030E61D /* BChessUI (iOS) */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A77F66DD25A832270030E61D /* Build configuration list for PBXNativeTarget "BChessUI (iOS)" */;
+			buildPhases = (
+				A77F66B025A832270030E61D /* Sources */,
+				A77F66B125A832270030E61D /* Frameworks */,
+				A77F66B225A832270030E61D /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "BChessUI (iOS)";
+			productName = "BChessUI (iOS)";
+			productReference = A77F66B425A832270030E61D /* BChessUI.app */;
+			productType = "com.apple.product-type.application";
+		};
+		A77F66BA25A832270030E61D /* BChessUI (macOS) */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A77F66E025A832270030E61D /* Build configuration list for PBXNativeTarget "BChessUI (macOS)" */;
+			buildPhases = (
+				A77F66B725A832270030E61D /* Sources */,
+				A77F66B825A832270030E61D /* Frameworks */,
+				A77F66B925A832270030E61D /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "BChessUI (macOS)";
+			productName = "BChessUI (macOS)";
+			productReference = A77F66BB25A832270030E61D /* BChessUI.app */;
+			productType = "com.apple.product-type.application";
+		};
+		A77F66C225A832270030E61D /* Tests iOS */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A77F66E325A832270030E61D /* Build configuration list for PBXNativeTarget "Tests iOS" */;
+			buildPhases = (
+				A77F66BF25A832270030E61D /* Sources */,
+				A77F66C025A832270030E61D /* Frameworks */,
+				A77F66C125A832270030E61D /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				A77F66C525A832270030E61D /* PBXTargetDependency */,
+			);
+			name = "Tests iOS";
+			productName = "Tests iOS";
+			productReference = A77F66C325A832270030E61D /* Tests iOS.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+		A77F66CD25A832270030E61D /* Tests macOS */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A77F66E625A832270030E61D /* Build configuration list for PBXNativeTarget "Tests macOS" */;
+			buildPhases = (
+				A77F66CA25A832270030E61D /* Sources */,
+				A77F66CB25A832270030E61D /* Frameworks */,
+				A77F66CC25A832270030E61D /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				A77F66D025A832270030E61D /* PBXTargetDependency */,
+			);
+			name = "Tests macOS";
+			productName = "Tests macOS";
+			productReference = A77F66CE25A832270030E61D /* Tests macOS.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
 		A7AFCCA51FB4E40D00AE3D85 /* BChess */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = A7AFCCAD1FB4E40D00AE3D85 /* Build configuration list for PBXNativeTarget "BChess" */;
@@ -805,8 +1027,8 @@
 		A7AFCC9E1FB4E40D00AE3D85 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastSwiftUpdateCheck = 0920;
-				LastUpgradeCheck = 1020;
+				LastSwiftUpdateCheck = 1230;
+				LastUpgradeCheck = 1230;
 				ORGANIZATIONNAME = "Jean Bovet";
 				TargetAttributes = {
 					A753598F1FDE0947008D1DEE = {
@@ -850,6 +1072,24 @@
 						LastSwiftMigration = 1000;
 						ProvisioningStyle = Automatic;
 					};
+					A77F66B325A832270030E61D = {
+						CreatedOnToolsVersion = 12.3;
+						ProvisioningStyle = Automatic;
+					};
+					A77F66BA25A832270030E61D = {
+						CreatedOnToolsVersion = 12.3;
+						ProvisioningStyle = Automatic;
+					};
+					A77F66C225A832270030E61D = {
+						CreatedOnToolsVersion = 12.3;
+						ProvisioningStyle = Automatic;
+						TestTargetID = A77F66B325A832270030E61D;
+					};
+					A77F66CD25A832270030E61D = {
+						CreatedOnToolsVersion = 12.3;
+						ProvisioningStyle = Automatic;
+						TestTargetID = A77F66BA25A832270030E61D;
+					};
 					A7AFCCA51FB4E40D00AE3D85 = {
 						CreatedOnToolsVersion = 9.1;
 						LastSwiftMigration = 1000;
@@ -878,6 +1118,10 @@
 				A7688F1E204A6911004B1E9E /* BChessiOS */,
 				A7688F31204A6911004B1E9E /* BChessiOSTests */,
 				A7688F3C204A6912004B1E9E /* BChessiOSUITests */,
+				A77F66B325A832270030E61D /* BChessUI (iOS) */,
+				A77F66BA25A832270030E61D /* BChessUI (macOS) */,
+				A77F66C225A832270030E61D /* Tests iOS */,
+				A77F66CD25A832270030E61D /* Tests macOS */,
 			);
 		};
 /* End PBXProject section */
@@ -937,6 +1181,36 @@
 			buildActionMask = 2147483647;
 			files = (
 				A7C92AAB1FF6F19100160D2E /* Openings.pgn in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A77F66B225A832270030E61D /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A77F66DB25A832270030E61D /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A77F66B925A832270030E61D /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A77F66DC25A832270030E61D /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A77F66C125A832270030E61D /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A77F66CC25A832270030E61D /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1102,6 +1376,70 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		A77F66B025A832270030E61D /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A7FE322925AA96D100A75936 /* FFEN.cpp in Sources */,
+				A7FE31ED25AA96B900A75936 /* ChessEvaluater.cpp in Sources */,
+				A7FE322A25AA96D100A75936 /* ChessBoardHash.cpp in Sources */,
+				A77F66D725A832270030E61D /* BChessUIDocument.swift in Sources */,
+				A7FE320A25AA96C500A75936 /* ChessGame.cpp in Sources */,
+				A7FE31EA25AA96B900A75936 /* ChessBoard.cpp in Sources */,
+				A7FE322B25AA96D100A75936 /* FPGN.cpp in Sources */,
+				A7FE31EE25AA96B900A75936 /* ChessMoveGenerator.cpp in Sources */,
+				A7FE31EB25AA96B900A75936 /* MoveList.cpp in Sources */,
+				A77F66D525A832270030E61D /* BChessUIApp.swift in Sources */,
+				A7FE320C25AA96C500A75936 /* ChessState.cpp in Sources */,
+				A7FE320B25AA96C500A75936 /* ChessOpenings.cpp in Sources */,
+				A7FE31EC25AA96B900A75936 /* GameHistory.cpp in Sources */,
+				A7FE322C25AA96D100A75936 /* magicmoves.c in Sources */,
+				A77F66D925A832270030E61D /* ContentView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A77F66B725A832270030E61D /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A7FE321B25AA96D000A75936 /* FPGN.cpp in Sources */,
+				A7FE31CC25AA96A800A75936 /* FEngineMove.mm in Sources */,
+				A7FE31CA25AA96A800A75936 /* FEngineInfo.mm in Sources */,
+				A7FE31DA25AA96B800A75936 /* MoveList.cpp in Sources */,
+				A7FE31CB25AA96A800A75936 /* FEngineUtility.mm in Sources */,
+				A7FE31DB25AA96B800A75936 /* GameHistory.cpp in Sources */,
+				A7FE321C25AA96D000A75936 /* magicmoves.c in Sources */,
+				A77F66D825A832270030E61D /* BChessUIDocument.swift in Sources */,
+				A7FE31DC25AA96B800A75936 /* ChessEvaluater.cpp in Sources */,
+				A7FE321A25AA96D000A75936 /* ChessBoardHash.cpp in Sources */,
+				A7FE31FD25AA96C500A75936 /* ChessState.cpp in Sources */,
+				A7FE321925AA96D000A75936 /* FFEN.cpp in Sources */,
+				A77F66D625A832270030E61D /* BChessUIApp.swift in Sources */,
+				A7FE31D925AA96B800A75936 /* ChessBoard.cpp in Sources */,
+				A7FE31A525AA963F00A75936 /* FEngine.mm in Sources */,
+				A77F66DA25A832270030E61D /* ContentView.swift in Sources */,
+				A7FE31DD25AA96B800A75936 /* ChessMoveGenerator.cpp in Sources */,
+				A7FE31FB25AA96C500A75936 /* ChessGame.cpp in Sources */,
+				A7FE31FC25AA96C500A75936 /* ChessOpenings.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A77F66BF25A832270030E61D /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A77F66C825A832270030E61D /* Tests_iOS.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A77F66CA25A832270030E61D /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A77F66D325A832270030E61D /* Tests_macOS.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		A7AFCCA21FB4E40D00AE3D85 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -1153,6 +1491,16 @@
 			target = A7688F1E204A6911004B1E9E /* BChessiOS */;
 			targetProxy = A7688F3E204A6912004B1E9E /* PBXContainerItemProxy */;
 		};
+		A77F66C525A832270030E61D /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = A77F66B325A832270030E61D /* BChessUI (iOS) */;
+			targetProxy = A77F66C425A832270030E61D /* PBXContainerItemProxy */;
+		};
+		A77F66D025A832270030E61D /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = A77F66BA25A832270030E61D /* BChessUI (macOS) */;
+			targetProxy = A77F66CF25A832270030E61D /* PBXContainerItemProxy */;
+		};
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
@@ -1188,6 +1536,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = BChessMac/BChessMac.entitlements;
+				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_TEAM = 28XRU7S6GA;
@@ -1204,6 +1553,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = BChessMac/BChessMac.entitlements;
+				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_TEAM = 28XRU7S6GA;
@@ -1285,7 +1635,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 28XRU7S6GA;
 				INFOPLIST_FILE = BChessiOS/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 11.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = ch.arizonasoftware.BChess;
 				PRODUCT_NAME = BChess;
@@ -1303,7 +1653,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 28XRU7S6GA;
 				INFOPLIST_FILE = BChessiOS/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 11.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = ch.arizonasoftware.BChess;
 				PRODUCT_NAME = BChess;
@@ -1323,7 +1673,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 28XRU7S6GA;
 				INFOPLIST_FILE = BChessiOSTests/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 11.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "ch.arizona-software.BChessiOSTests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1342,7 +1692,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 28XRU7S6GA;
 				INFOPLIST_FILE = BChessiOSTests/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 11.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "ch.arizona-software.BChessiOSTests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1361,7 +1711,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 28XRU7S6GA;
 				INFOPLIST_FILE = BChessiOSUITests/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 11.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "ch.arizona-software.BChessiOSUITests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1379,7 +1729,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 28XRU7S6GA;
 				INFOPLIST_FILE = BChessiOSUITests/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 11.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "ch.arizona-software.BChessiOSUITests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1436,6 +1786,180 @@
 			};
 			name = Release;
 		};
+		A77F66DE25A832270030E61D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 28XRU7S6GA;
+				ENABLE_PREVIEWS = YES;
+				INFOPLIST_FILE = iOS/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = "ch.arizona-software.BChessUI";
+				PRODUCT_NAME = BChessUI;
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		A77F66DF25A832270030E61D /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 28XRU7S6GA;
+				ENABLE_PREVIEWS = YES;
+				INFOPLIST_FILE = iOS/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = "ch.arizona-software.BChessUI";
+				PRODUCT_NAME = BChessUI;
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		A77F66E125A832270030E61D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CODE_SIGN_ENTITLEMENTS = macOS/macOS.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = 28XRU7S6GA;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_PREVIEWS = YES;
+				INFOPLIST_FILE = macOS/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 11.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = "ch.arizona-software.BChessUI";
+				PRODUCT_NAME = BChessUI;
+				SDKROOT = macosx;
+				SWIFT_OBJC_BRIDGING_HEADER = "BChess/BChess-Bridging-Header.h";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		A77F66E225A832270030E61D /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CODE_SIGN_ENTITLEMENTS = macOS/macOS.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = 28XRU7S6GA;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_PREVIEWS = YES;
+				INFOPLIST_FILE = macOS/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 11.0;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = "ch.arizona-software.BChessUI";
+				PRODUCT_NAME = BChessUI;
+				SDKROOT = macosx;
+				SWIFT_OBJC_BRIDGING_HEADER = "BChess/BChess-Bridging-Header.h";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		A77F66E425A832270030E61D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 28XRU7S6GA;
+				INFOPLIST_FILE = "Tests iOS/Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 14.3;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = "ch.arizona-software.Tests-iOS";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = "BChessUI (iOS)";
+			};
+			name = Debug;
+		};
+		A77F66E525A832270030E61D /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 28XRU7S6GA;
+				INFOPLIST_FILE = "Tests iOS/Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 14.3;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = "ch.arizona-software.Tests-iOS";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = "BChessUI (iOS)";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		A77F66E725A832270030E61D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = 28XRU7S6GA;
+				INFOPLIST_FILE = "Tests macOS/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 11.1;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = "ch.arizona-software.Tests-macOS";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TEST_TARGET_NAME = "BChessUI (macOS)";
+			};
+			name = Debug;
+		};
+		A77F66E825A832270030E61D /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = 28XRU7S6GA;
+				INFOPLIST_FILE = "Tests macOS/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 11.1;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = "ch.arizona-software.Tests-macOS";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TEST_TARGET_NAME = "BChessUI (macOS)";
+			};
+			name = Release;
+		};
 		A7AFCCAB1FB4E40D00AE3D85 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -1461,6 +1985,7 @@
 				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
@@ -1521,6 +2046,7 @@
 				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
@@ -1552,6 +2078,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 28XRU7S6GA;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
@@ -1565,6 +2092,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 28XRU7S6GA;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
@@ -1635,6 +2163,42 @@
 			buildConfigurations = (
 				A7712D1A1FB916E900E7E802 /* Debug */,
 				A7712D1B1FB916E900E7E802 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A77F66DD25A832270030E61D /* Build configuration list for PBXNativeTarget "BChessUI (iOS)" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A77F66DE25A832270030E61D /* Debug */,
+				A77F66DF25A832270030E61D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A77F66E025A832270030E61D /* Build configuration list for PBXNativeTarget "BChessUI (macOS)" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A77F66E125A832270030E61D /* Debug */,
+				A77F66E225A832270030E61D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A77F66E325A832270030E61D /* Build configuration list for PBXNativeTarget "Tests iOS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A77F66E425A832270030E61D /* Debug */,
+				A77F66E525A832270030E61D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A77F66E625A832270030E61D /* Build configuration list for PBXNativeTarget "Tests macOS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A77F66E725A832270030E61D /* Debug */,
+				A77F66E825A832270030E61D /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
