@@ -113,9 +113,16 @@ struct SelectionState {
 
 struct ContentView: View {
     @Binding var document: BChessUIDocument
+    
     @State private var selection = SelectionState(selection: Position.empty(), possibleMoves: [])
     @State private var lastMove: FEngineMove?
+    
+    @State private var level: Int = 0
 
+    var engine: FEngine {
+        return document.engine
+    }
+    
     func backgroundColor(rank: Int, file: Int) -> Color {
         if rank % 2 == 0 {
             return file % 2 == 0 ? .gray : .white
@@ -124,11 +131,26 @@ struct ContentView: View {
         }
     }
     
+    func applyLevelSettings() {
+        switch level {
+        case 0:
+            engine.thinkingTime = 2
+        case 1:
+            engine.thinkingTime = 5
+        case 2:
+            engine.thinkingTime = 10
+        case 3:
+            engine.thinkingTime = 15
+        default:
+            engine.thinkingTime = 2
+        }
+    }
+    
     func processTap(_ rank: Int, _ file: Int) {
         if let move = selection.possibleMove(rank, file) {
             withAnimation {
                 selection = SelectionState(selection: Position.empty(), possibleMoves: [])
-
+                applyLevelSettings()
                 document.engine.move(move.rawMoveValue)
                 document.engine.evaluate { (info, completed) in
                     DispatchQueue.main.async {
@@ -152,7 +174,7 @@ struct ContentView: View {
                                        possibleMoves: document.engine.moves(at: UInt(rank), file: UInt(file)))
         }
     }
-    
+
     var body: some View {
         VStack(spacing: 0) {
             ForEach((0...7).reversed(), id: \.self) { rank in
@@ -172,6 +194,34 @@ struct ContentView: View {
         }
         .aspectRatio(1.0, contentMode: .fit)
         .padding()
+        .toolbar {
+            ToolbarItem(placement: .primaryAction) {
+                Menu {
+                    Section {
+                        Button(action: {}) {
+                            Label("New Game as White", systemImage: "plus.circle.fill")
+                        }
+
+                        Button(action: {}) {
+                            Label("New Game as Black", systemImage: "plus.circle")
+                        }
+                    }
+
+                    Divider()
+                    
+                    Picker(selection: $level, label: Text("Level")) {
+                        Text("2 seconds").tag(0)
+                        Text("5 seconds").tag(1)
+                        Text("10 seconds").tag(2)
+                        Text("15 seconds").tag(3)
+                    }
+                }
+                label: {
+                    Label("Level", systemImage: "arrow.up.arrow.down")
+                }
+            }
+        }
+
     }
 }
 

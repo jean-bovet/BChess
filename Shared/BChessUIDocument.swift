@@ -15,9 +15,8 @@ extension UTType {
     }
 }
 
-struct BChessEngineFactory {
+struct BChessEngineFactory {    
     static let engine = FEngine()
-
 }
 
 struct BChessUIDocument: FileDocument {
@@ -32,7 +31,6 @@ struct BChessUIDocument: FileDocument {
     
     init(pgn: String = BChessEngineFactory.engine.pgn()) {
         self.pgn = pgn
-        self.engine.thinkingTime = 2
         self.engine.setPGN(pgn)
     }
 

@@ -184,6 +184,10 @@
 		A7FE322A25AA96D100A75936 /* ChessBoardHash.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A746C242200148E9001F4437 /* ChessBoardHash.cpp */; };
 		A7FE322B25AA96D100A75936 /* FPGN.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A77371FF1FE320010001A90F /* FPGN.cpp */; };
 		A7FE322C25AA96D100A75936 /* magicmoves.c in Sources */ = {isa = PBXBuildFile; fileRef = A7712D411FCB97A900E7E802 /* magicmoves.c */; };
+		A7FE324D25AAD61200A75936 /* FEngineMove.mm in Sources */ = {isa = PBXBuildFile; fileRef = A7C92AB31FF86BF200160D2E /* FEngineMove.mm */; };
+		A7FE324E25AAD61200A75936 /* FEngineUtility.mm in Sources */ = {isa = PBXBuildFile; fileRef = A7C92AB81FF86F6800160D2E /* FEngineUtility.mm */; };
+		A7FE324F25AAD61200A75936 /* FEngineInfo.mm in Sources */ = {isa = PBXBuildFile; fileRef = A70A61D01FD4AA9600AFDF0E /* FEngineInfo.mm */; };
+		A7FE326925AAD64500A75936 /* FEngine.mm in Sources */ = {isa = PBXBuildFile; fileRef = A75683281FCD28A000CF1408 /* FEngine.mm */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -1384,13 +1388,17 @@
 				A7FE31ED25AA96B900A75936 /* ChessEvaluater.cpp in Sources */,
 				A7FE322A25AA96D100A75936 /* ChessBoardHash.cpp in Sources */,
 				A77F66D725A832270030E61D /* BChessUIDocument.swift in Sources */,
+				A7FE324E25AAD61200A75936 /* FEngineUtility.mm in Sources */,
 				A7FE320A25AA96C500A75936 /* ChessGame.cpp in Sources */,
+				A7FE324F25AAD61200A75936 /* FEngineInfo.mm in Sources */,
 				A7FE31EA25AA96B900A75936 /* ChessBoard.cpp in Sources */,
 				A7FE322B25AA96D100A75936 /* FPGN.cpp in Sources */,
 				A7FE31EE25AA96B900A75936 /* ChessMoveGenerator.cpp in Sources */,
 				A7FE31EB25AA96B900A75936 /* MoveList.cpp in Sources */,
+				A7FE324D25AAD61200A75936 /* FEngineMove.mm in Sources */,
 				A77F66D525A832270030E61D /* BChessUIApp.swift in Sources */,
 				A7FE320C25AA96C500A75936 /* ChessState.cpp in Sources */,
+				A7FE326925AAD64500A75936 /* FEngine.mm in Sources */,
 				A7FE320B25AA96C500A75936 /* ChessOpenings.cpp in Sources */,
 				A7FE31EC25AA96B900A75936 /* GameHistory.cpp in Sources */,
 				A7FE322C25AA96D100A75936 /* magicmoves.c in Sources */,
@@ -1803,6 +1811,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "ch.arizona-software.BChessUI";
 				PRODUCT_NAME = BChessUI;
 				SDKROOT = iphoneos;
+				SWIFT_OBJC_BRIDGING_HEADER = "BChess/BChess-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -1824,6 +1833,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "ch.arizona-software.BChessUI";
 				PRODUCT_NAME = BChessUI;
 				SDKROOT = iphoneos;
+				SWIFT_OBJC_BRIDGING_HEADER = "BChess/BChess-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
