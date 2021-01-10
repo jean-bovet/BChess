@@ -112,6 +112,8 @@
 		A77F66DC25A832270030E61D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A77F66AF25A832270030E61D /* Assets.xcassets */; };
 		A78E754C202C080E00445360 /* MovesTests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A78E754B202C080E00445360 /* MovesTests.cpp */; };
 		A78E7551202C110200445360 /* UnitTestHelper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A78E754F202C110200445360 /* UnitTestHelper.cpp */; };
+		A79514EC25AAE2C400AEA95F /* FENgineInfo+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = A75359831FDC51B2008D1DEE /* FENgineInfo+Extension.swift */; };
+		A79514F925AAE2C500AEA95F /* FENgineInfo+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = A75359831FDC51B2008D1DEE /* FENgineInfo+Extension.swift */; };
 		A7AA42A920538C7F00FAACA2 /* ChessViewInteraction.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7AA42A820538C7F00FAACA2 /* ChessViewInteraction.swift */; };
 		A7AA42AA20538C7F00FAACA2 /* ChessViewInteraction.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7AA42A820538C7F00FAACA2 /* ChessViewInteraction.swift */; };
 		A7AA42AC205608ED00FAACA2 /* ChessViewPromotionPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7AA42AB205608ED00FAACA2 /* ChessViewPromotionPicker.swift */; };
@@ -1394,6 +1396,7 @@
 				A7FE31EA25AA96B900A75936 /* ChessBoard.cpp in Sources */,
 				A7FE322B25AA96D100A75936 /* FPGN.cpp in Sources */,
 				A7FE31EE25AA96B900A75936 /* ChessMoveGenerator.cpp in Sources */,
+				A79514EC25AAE2C400AEA95F /* FENgineInfo+Extension.swift in Sources */,
 				A7FE31EB25AA96B900A75936 /* MoveList.cpp in Sources */,
 				A7FE324D25AAD61200A75936 /* FEngineMove.mm in Sources */,
 				A77F66D525A832270030E61D /* BChessUIApp.swift in Sources */,
@@ -1420,6 +1423,7 @@
 				A77F66D825A832270030E61D /* BChessUIDocument.swift in Sources */,
 				A7FE31DC25AA96B800A75936 /* ChessEvaluater.cpp in Sources */,
 				A7FE321A25AA96D000A75936 /* ChessBoardHash.cpp in Sources */,
+				A79514F925AAE2C500AEA95F /* FENgineInfo+Extension.swift in Sources */,
 				A7FE31FD25AA96C500A75936 /* ChessState.cpp in Sources */,
 				A7FE321925AA96D000A75936 /* FFEN.cpp in Sources */,
 				A77F66D625A832270030E61D /* BChessUIApp.swift in Sources */,

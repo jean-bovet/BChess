@@ -113,6 +113,7 @@ struct SelectionState {
 
 struct TopInformationView: View {
     
+    let info: FEngineInfo?
     let engine: FEngine
     
     func whoIsPlaying() -> String {
@@ -207,6 +208,14 @@ struct ContentView: View {
     @State private var info: FEngineInfo?
     @State private var level: Int = 0
 
+    enum PlayAgainst: Int {
+        case white
+        case black
+        case human
+    }
+    
+    @State private var playAgainst: PlayAgainst = .black
+
     var engine: FEngine {
         return document.engine
     }
@@ -239,46 +248,84 @@ struct ContentView: View {
             withAnimation {
                 selection = SelectionState(selection: Position.empty(), possibleMoves: [])
                 applyLevelSettings()
-                document.engine.move(move.rawMoveValue)
-                document.engine.evaluate { (info, completed) in
-                    DispatchQueue.main.async {
-                        if completed {
-                            self.document.engine.move(info.bestMove)
-                            
-                            // TODO: refactor?
-                            let move = FEngineMove()
-                            move.fromFile = info.fromFile
-                            move.fromRank = info.fromRank
-                            move.toFile = info.toFile
-                            move.toRank = info.toRank
-                            move.rawMoveValue = info.bestMove
-                            self.lastMove = move                            
-                        }
-                        self.info = info
-                    }
-                }
+                engine.move(move.rawMoveValue)
+                enginePlay()
             }
         } else {
             selection = SelectionState(selection: Position(rank: rank, file: file),
-                                       possibleMoves: document.engine.moves(at: UInt(rank), file: UInt(file)))
+                                       possibleMoves: engine.moves(at: UInt(rank), file: UInt(file)))
+        }
+    }
+
+    func enginePlay() {
+        engine.evaluate { (info, completed) in
+            DispatchQueue.main.async {
+                if completed {
+                    self.engine.move(info.bestMove)
+                    
+                    // TODO: refactor?
+                    let move = FEngineMove()
+                    move.fromFile = info.fromFile
+                    move.fromRank = info.fromRank
+                    move.toFile = info.toFile
+                    move.toRank = info.toRank
+                    move.rawMoveValue = info.bestMove
+                    self.lastMove = move
+                }
+                self.info = info
+            }
+        }
+    }
+    
+    func newGame(playAgainstWhite: Bool) {
+        engine.setFEN(StartPosFEN)
+        if playAgainstWhite {
+            playAgainst = .white
+        } else {
+            playAgainst = .black
+        }
+        if engine.isWhite() && playAgainst == .white {
+            enginePlay()
+        }
+        if !engine.isWhite() && playAgainst == .black {
+            enginePlay()
+        }
+        selection = SelectionState(selection: Position.empty(), possibleMoves: [])
+    }
+
+    func actualRank(_ rank: Int) -> Int {
+        if playAgainst == .white {
+            return 7 - rank
+        } else {
+            return rank
+        }
+    }
+    
+    func actualFile(_ file: Int) -> Int {
+        if playAgainst == .white {
+            return 7 - file
+        } else {
+            return file
         }
     }
 
     var body: some View {
         VStack(alignment: .leading) {
-            TopInformationView(engine: engine)
+            TopInformationView(info: info, engine: engine)
             
             VStack(spacing: 0) {
                 ForEach((0...7).reversed(), id: \.self) { rank in
+                    let r = actualFile(rank)
                     HStack(spacing: 0) {
                         ForEach((0...7), id: \.self) { file in
+                            let f = actualFile(file)
                             Rectangle()
-                                .fill(backgroundColor(rank: rank, file: file))
-                                .modifier(PieceModifier(rank: rank, file: file, pieces: document.pieces))
-                                .modifier(SelectionModifier(rank: rank, file: file, selection: selection))
-                                .modifier(LastMoveModifier(rank: rank, file: file, lastMove: lastMove))
+                                .fill(backgroundColor(rank: r, file: f))
+                                .modifier(PieceModifier(rank: r, file: f, pieces: document.pieces))
+                                .modifier(SelectionModifier(rank: r, file: f, selection: selection))
+                                .modifier(LastMoveModifier(rank: r, file: f, lastMove: lastMove))
                                 .onTapGesture {
-                                    processTap(rank, file)
+                                    processTap(r, f)
                                 }
                         }
                     }
@@ -295,11 +342,11 @@ struct ContentView: View {
             ToolbarItem(placement: .primaryAction) {
                 Menu {
                     Section {
-                        Button(action: {}) {
+                        Button(action: { newGame(playAgainstWhite: false ) }) {
                             Label("New Game as White", systemImage: "plus.circle.fill")
                         }
 
-                        Button(action: {}) {
+                        Button(action: { newGame(playAgainstWhite: true ) }) {
                             Label("New Game as Black", systemImage: "plus.circle")
                         }
                     }
