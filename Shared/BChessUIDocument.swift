@@ -43,6 +43,7 @@ struct BChessUIDocument: FileDocument {
             throw CocoaError(.fileReadCorruptFile)
         }
         pgn = string
+        engine.setPGN(pgn)
     }
     
     func fileWrapper(configuration: WriteConfiguration) throws -> FileWrapper {

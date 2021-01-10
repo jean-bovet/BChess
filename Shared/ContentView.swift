@@ -248,7 +248,7 @@ struct ContentView: View {
             withAnimation {
                 selection = SelectionState(selection: Position.empty(), possibleMoves: [])
                 applyLevelSettings()
-                engine.move(move.rawMoveValue)
+                moveEngine(move: move.rawMoveValue)
                 enginePlay()
             }
         } else {
@@ -261,7 +261,7 @@ struct ContentView: View {
         engine.evaluate { (info, completed) in
             DispatchQueue.main.async {
                 if completed {
-                    self.engine.move(info.bestMove)
+                    self.moveEngine(move: info.bestMove)
                     
                     // TODO: refactor?
                     let move = FEngineMove()
@@ -275,6 +275,11 @@ struct ContentView: View {
                 self.info = info
             }
         }
+    }
+    
+    func moveEngine(move: UInt) {
+        engine.move(move)
+        document.pgn = engine.pgn()
     }
     
     func newGame(playAgainstWhite: Bool) {
