@@ -111,12 +111,100 @@ struct SelectionState {
     
 }
 
+struct TopInformationView: View {
+    
+    let engine: FEngine
+    
+    func whoIsPlaying() -> String {
+        var text = engine.isWhite() ? "White" : "Black"
+        if engine.isAnalyzing() {
+            text.append(" is thinking")
+        } else {
+            text.append("'s turn")
+        }
+        return text
+    }
+    
+    var body: some View {
+        VStack(alignment: .leading) {
+            Text(whoIsPlaying()).bold()
+            Text(engine.pgnFormattedForDisplay())
+        }
+    }
+}
+
+struct BottomInformationView: View {
+    
+    let info: FEngineInfo?
+
+    let numberFormatter = NumberFormatter()
+    let valueFormatter = NumberFormatter()
+
+    init(info: FEngineInfo?) {
+        self.info = info
+        
+        numberFormatter.numberStyle = .decimal
+        numberFormatter.groupingSeparator = ","
+        numberFormatter.usesGroupingSeparator = true
+        
+        valueFormatter.numberStyle = .decimal
+        valueFormatter.minimumFractionDigits = 2
+        valueFormatter.maximumFractionDigits = 2
+        valueFormatter.groupingSeparator = ","
+        valueFormatter.usesGroupingSeparator = true
+    }
+
+    func value() -> String {
+        guard let info = info else {
+            return " "
+        }
+        
+        let value: String
+        if info.mat {
+            value = "#"
+        } else {
+            value = valueFormatter.string(from: NSNumber(value: Double(info.value) / 100.0))!
+        }
+        let line = info.bestLine(false)
+        return "\(value) \(line)"
+    }
+    
+    func speed() -> String {
+        guard let info = info else {
+            return " "
+        }
+
+        let nodes = numberFormatter.string(from: NSNumber(value: info.nodeEvaluated))!
+        let speed = numberFormatter.string(from: NSNumber(value: info.movesPerSecond))!
+        
+        var text = "Depth \(info.depth)"
+        if info.quiescenceDepth > 0 && info.quiescenceDepth != info.depth {
+            text += "/\(info.quiescenceDepth)"
+        }
+        text += " with \(nodes) nodes at \(speed) n/s"
+        return text
+    }
+    
+    var body: some View {
+        VStack(alignment: .leading) {
+            if let opening = info?.opening {
+                Text(opening)
+            } else {
+                Text(value())
+                Text(speed())
+            }
+        }
+    }
+}
+
 struct ContentView: View {
     @Binding var document: BChessUIDocument
     
     @State private var selection = SelectionState(selection: Position.empty(), possibleMoves: [])
     @State private var lastMove: FEngineMove?
     
+    @State private var showInfo: Bool = false
+    @State private var info: FEngineInfo?
     @State private var level: Int = 0
 
     var engine: FEngine {
@@ -164,8 +252,9 @@ struct ContentView: View {
                             move.toFile = info.toFile
                             move.toRank = info.toRank
                             move.rawMoveValue = info.bestMove
-                            self.lastMove = move
+                            self.lastMove = move                            
                         }
+                        self.info = info
                     }
                 }
             }
@@ -176,23 +265,31 @@ struct ContentView: View {
     }
 
     var body: some View {
-        VStack(spacing: 0) {
-            ForEach((0...7).reversed(), id: \.self) { rank in
-                HStack(spacing: 0) {
-                    ForEach((0...7), id: \.self) { file in
-                        Rectangle()
-                            .fill(backgroundColor(rank: rank, file: file))
-                            .modifier(PieceModifier(rank: rank, file: file, pieces: document.pieces))
-                            .modifier(SelectionModifier(rank: rank, file: file, selection: selection))
-                            .modifier(LastMoveModifier(rank: rank, file: file, lastMove: lastMove))
-                            .onTapGesture {
-                                processTap(rank, file)
-                            }
+        VStack(alignment: .leading) {
+            TopInformationView(engine: engine)
+            
+            VStack(spacing: 0) {
+                ForEach((0...7).reversed(), id: \.self) { rank in
+                    HStack(spacing: 0) {
+                        ForEach((0...7), id: \.self) { file in
+                            Rectangle()
+                                .fill(backgroundColor(rank: rank, file: file))
+                                .modifier(PieceModifier(rank: rank, file: file, pieces: document.pieces))
+                                .modifier(SelectionModifier(rank: rank, file: file, selection: selection))
+                                .modifier(LastMoveModifier(rank: rank, file: file, lastMove: lastMove))
+                                .onTapGesture {
+                                    processTap(rank, file)
+                                }
+                        }
                     }
                 }
             }
+            .aspectRatio(1.0, contentMode: .fit)
+            
+            if (showInfo) {
+                BottomInformationView(info: info)
+            }
         }
-        .aspectRatio(1.0, contentMode: .fit)
         .padding()
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
@@ -214,6 +311,16 @@ struct ContentView: View {
                         Text("5 seconds").tag(1)
                         Text("10 seconds").tag(2)
                         Text("15 seconds").tag(3)
+                    }
+                    
+                    Divider()
+                    
+                    Button(action: { showInfo.toggle() }) {
+                        if (showInfo) {
+                            Label("Hide Information", systemImage: "info.circle")
+                        } else {
+                            Label("Show Information", systemImage: "info.circle")
+                        }
                     }
                 }
                 label: {
