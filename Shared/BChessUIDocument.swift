@@ -22,8 +22,16 @@ struct BChessEngineFactory {
 struct BChessUIDocument: FileDocument {
     
     let engine = FEngine()
-    
+        
     var pgn: String
+
+    var selection = SelectionState(position: Position.empty(), possibleMoves: [])
+    // TODO: save?
+    var lastMove: FEngineMove? = nil
+    var info: FEngineInfo? = nil
+    // TODO: save
+    var level: Int = 0
+    var playAgainst: PlayAgainst = .black
 
     var pieces: [Piece] {
         return PiecesFactory().pieces(forState: engine.state)
@@ -50,4 +58,5 @@ struct BChessUIDocument: FileDocument {
         let data = pgn.data(using: .utf8)!
         return .init(regularFileWithContents: data)
     }
+    
 }

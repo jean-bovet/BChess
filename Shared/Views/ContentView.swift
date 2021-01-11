@@ -31,42 +31,24 @@ struct PositionTransformer {
 
 struct ContentView: View {
     @Binding var document: BChessUIDocument
-    
-    @ObservedObject private var state = GameState()
-        
+            
     @State private var showInfo: Bool = false
 
     var engine: FEngine {
         return document.engine
     }
     
-    func newGame(playAgainstWhite: Bool) {
-//        engine.setFEN(StartPosFEN)
-//        if playAgainstWhite {
-//            playAgainst = .white
-//        } else {
-//            playAgainst = .black
-//        }
-//        if engine.isWhite() && playAgainst == .white {
-//            enginePlay()
-//        }
-//        if !engine.isWhite() && playAgainst == .black {
-//            enginePlay()
-//        }
-//        selection = SelectionState(selection: Position.empty(), possibleMoves: [])
-    }
-
     var body: some View {
         VStack(alignment: .leading) {
-            TopInformationView(info: state.info, engine: engine)
+            TopInformationView(info: document.info, engine: engine)
             
             ZStack {
-                BoardView(state: state)
-                PiecesView(state: state, engine: engine, pieces: document.pieces)
+                BoardView(document: $document)
+                PiecesView(document: $document, engine: engine, pieces: document.pieces)
             }
             
             if (showInfo) {
-                BottomInformationView(state: state)
+                BottomInformationView(document: document)
             }
         }
         .padding()
@@ -74,18 +56,18 @@ struct ContentView: View {
             ToolbarItem(placement: .primaryAction) {
                 Menu {
                     Section {
-                        Button(action: { newGame(playAgainstWhite: false ) }) {
+                        Button(action: { Actions(document: $document).newGame(playAgainstWhite: false ) }) {
                             Label("New Game as White", systemImage: "plus.circle.fill")
                         }
 
-                        Button(action: { newGame(playAgainstWhite: true ) }) {
+                        Button(action: { Actions(document: $document).newGame(playAgainstWhite: true ) }) {
                             Label("New Game as Black", systemImage: "plus.circle")
                         }
                     }
 
                     Divider()
                     
-                    Picker(selection: $state.level, label: Text("Level")) {
+                    Picker(selection: $document.level, label: Text("Level")) {
                         Text("2 seconds").tag(0)
                         Text("5 seconds").tag(1)
                         Text("10 seconds").tag(2)
@@ -115,7 +97,8 @@ struct ContentView_Previews: PreviewProvider {
     
     static var previews: some View {
         Group {
-            ContentView(document: .constant(BChessUIDocument()))
+            let doc = BChessUIDocument()
+            ContentView(document: .constant(doc))
         }
     }
 }

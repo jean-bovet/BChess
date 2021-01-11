@@ -10,7 +10,7 @@ import SwiftUI
 
 struct BoardView: View {
     
-    @ObservedObject var state: GameState
+    @Binding var document: BChessUIDocument
 
     func backgroundColor(rank: Int, file: Int) -> Color {
         if rank % 2 == 0 {
@@ -22,7 +22,7 @@ struct BoardView: View {
     
     var body: some View {
         VStack(spacing: 0) {
-            let pt = PositionTransformer(playAgainst: state.playAgainst)
+            let pt = PositionTransformer(playAgainst: document.playAgainst)
             ForEach((0...7).reversed(), id: \.self) { rank in
                 let r = pt.actualFile(rank)
                 HStack(spacing: 0) {
@@ -30,8 +30,8 @@ struct BoardView: View {
                         let f = pt.actualFile(file)
                         Rectangle()
                             .fill(backgroundColor(rank: r, file: f))
-                            .modifier(LastMoveModifier(rank: r, file: f, lastMove: state.lastMove))
-                            .modifier(SelectionModifier(rank: r, file: f, selection: state.selection))
+                            .modifier(LastMoveModifier(rank: r, file: f, lastMove: document.lastMove))
+                            .modifier(SelectionModifier(rank: r, file: f, selection: document.selection))
                     }
                 }
             }
@@ -42,7 +42,7 @@ struct BoardView: View {
 
 struct BoardView_Previews: PreviewProvider {
     static var previews: some View {
-        let state = GameState()
-        BoardView(state: state)
+        let doc = BChessUIDocument()
+        BoardView(document: .constant(doc))
     }
 }

@@ -11,7 +11,7 @@ import SwiftUI
 @main
 struct BChessUIApp: App {
     var body: some Scene {
-        DocumentGroup(newDocument: BChessUIDocument()) { file in
+        DocumentGroup(newDocument: BChessUIDocument()) { file in            
             ContentView(document: file.$document)
         }
     }

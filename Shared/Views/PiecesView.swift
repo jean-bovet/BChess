@@ -10,7 +10,7 @@ import SwiftUI
 
 struct PiecesView: View {
     
-    @ObservedObject var state: GameState
+    @Binding var document: BChessUIDocument
 
     let engine: FEngine
     let pieces: [Piece]
@@ -20,7 +20,7 @@ struct PiecesView: View {
     }
 
     func applyLevelSettings() {
-        switch state.level {
+        switch document.level {
         case 0:
             engine.thinkingTime = 2
         case 1:
@@ -34,44 +34,17 @@ struct PiecesView: View {
         }
     }
     
-    func enginePlay() {
-        engine.evaluate { (info, completed) in
-            DispatchQueue.main.async {
-                withAnimation {
-                    if completed {
-                        self.moveEngine(move: info.bestMove)
-                        
-                        // TODO: refactor?
-                        let move = FEngineMove()
-                        move.fromFile = info.fromFile
-                        move.fromRank = info.fromRank
-                        move.toFile = info.toFile
-                        move.toRank = info.toRank
-                        move.rawMoveValue = info.bestMove
-                        state.lastMove = move
-                    }
-                    state.info = info
-                }
-            }
-        }
-    }
-    
-    func moveEngine(move: UInt) {
-        engine.move(move)
-        // TODO
-//        document.pgn = engine.pgn()
-    }
-    
     func processTap(_ rank: Int, _ file: Int) {
-        if let move = state.selection.possibleMove(rank, file) {
+        if let move = document.selection.possibleMove(rank, file) {
             withAnimation {
-                state.selection = SelectionState(position: Position.empty(), possibleMoves: [])
+                document.selection = SelectionState(position: Position.empty(), possibleMoves: [])
                 applyLevelSettings()
-                moveEngine(move: move.rawMoveValue)
-                enginePlay()
+                document.engine.move(move.rawMoveValue)
+                document.pgn = document.engine.pgn()
+                Actions(document: $document).enginePlay()
             }
         } else {
-            state.selection = SelectionState(position: Position(rank: rank, file: file),
+            document.selection = SelectionState(position: Position(rank: rank, file: file),
                                        possibleMoves: engine.moves(at: UInt(rank), file: UInt(file)))
         }
     }
@@ -115,7 +88,6 @@ struct PiecesView: View {
 struct PiecesView_Previews: PreviewProvider {
     static var previews: some View {
         let doc = BChessUIDocument()
-        let state = GameState()
-        PiecesView(state: state, engine: doc.engine, pieces: doc.pieces)
+        PiecesView(document: .constant(doc), engine: doc.engine, pieces: doc.pieces)
     }
 }

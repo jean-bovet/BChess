@@ -29,7 +29,6 @@ struct LastMoveModifier: ViewModifier {
         }
     }
 
-
     func body(content: Content) -> some View {
         return content
             .if(isLastMoveStart(rank, file)) { view in

@@ -10,13 +10,13 @@ import SwiftUI
 
 struct BottomInformationView: View {
     
-    let state: GameState
+    let document: BChessUIDocument
 
     let numberFormatter = NumberFormatter()
     let valueFormatter = NumberFormatter()
 
-    init(state: GameState) {
-        self.state = state
+    init(document: BChessUIDocument) {
+        self.document = document
         
         numberFormatter.numberStyle = .decimal
         numberFormatter.groupingSeparator = ","
@@ -30,7 +30,7 @@ struct BottomInformationView: View {
     }
 
     func value() -> String {
-        guard let info = state.info else {
+        guard let info = document.info else {
             return " "
         }
         
@@ -45,7 +45,7 @@ struct BottomInformationView: View {
     }
     
     func speed() -> String {
-        guard let info = state.info else {
+        guard let info = document.info else {
             return " "
         }
 
@@ -62,7 +62,7 @@ struct BottomInformationView: View {
     
     var body: some View {
         VStack(alignment: .leading) {
-            if let opening = state.info?.opening {
+            if let opening = document.info?.opening {
                 Text(opening)
             } else {
                 Text(value())
