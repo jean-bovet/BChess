@@ -1,0 +1,18 @@
+//
+//  Square.swift
+//  BChess
+//
+//  Created by Jean Bovet on 1/10/21.
+//  Copyright © 2021 Jean Bovet. All rights reserved.
+//
+
+import Foundation
+
+struct Square: Identifiable {
+    var id: String {
+        return piece?.name ?? "\(UUID())"
+    }
+    let rank: Int
+    let file: Int
+    let piece: Piece?
+}
