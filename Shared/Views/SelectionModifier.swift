@@ -12,7 +12,7 @@ struct SelectionModifier: ViewModifier {
     
     let rank: Int
     let file: Int
-    let selection: SelectionState
+    let selection: Selection
 
     func body(content: Content) -> some View {
         return content.if(selection.selected(rank: rank, file: file) || selection.isPossibleMove(rank, file)) { view in

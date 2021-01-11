@@ -25,7 +25,7 @@ struct BChessUIDocument: FileDocument {
         
     var pgn: String
 
-    var selection = SelectionState(position: Position.empty(), possibleMoves: [])
+    var selection = Selection(position: Position.empty(), possibleMoves: [])
     // TODO: save?
     var lastMove: FEngineMove? = nil
     var info: FEngineInfo? = nil

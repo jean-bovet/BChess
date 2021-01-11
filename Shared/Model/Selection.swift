@@ -1,5 +1,5 @@
 //
-//  SelectionState.swift
+//  Selection.swift
 //  BChess
 //
 //  Created by Jean Bovet on 1/10/21.
@@ -8,7 +8,7 @@
 
 import Foundation
 
-struct SelectionState {
+struct Selection {
     let position: Position
     let possibleMoves: [FEngineMove]
     

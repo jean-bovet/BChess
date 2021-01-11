@@ -28,11 +28,11 @@ struct Actions {
         if !engine.isWhite() && document.playAgainst == .black {
             enginePlay()
         }
-        document.selection = SelectionState(position: Position.empty(), possibleMoves: [])
+        document.selection = Selection(position: Position.empty(), possibleMoves: [])
     }
 
     func playMove(move: FEngineMove) {
-        document.selection = SelectionState(position: Position.empty(), possibleMoves: [])
+        document.selection = Selection(position: Position.empty(), possibleMoves: [])
         document.applyLevelSettings()
         document.engine.move(move.rawMoveValue)
         document.pgn = document.engine.pgn()

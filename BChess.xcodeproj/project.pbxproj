@@ -124,8 +124,8 @@
 		A79515CB25ABE38F00AEA95F /* LastMoveModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = A79515C925ABE38F00AEA95F /* LastMoveModifier.swift */; };
 		A79515D525ABE3A400AEA95F /* SelectionModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = A79515D425ABE3A400AEA95F /* SelectionModifier.swift */; };
 		A79515D625ABE3A400AEA95F /* SelectionModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = A79515D425ABE3A400AEA95F /* SelectionModifier.swift */; };
-		A79515E025ABE3D300AEA95F /* SelectionState.swift in Sources */ = {isa = PBXBuildFile; fileRef = A79515DF25ABE3D300AEA95F /* SelectionState.swift */; };
-		A79515E125ABE3D300AEA95F /* SelectionState.swift in Sources */ = {isa = PBXBuildFile; fileRef = A79515DF25ABE3D300AEA95F /* SelectionState.swift */; };
+		A79515E025ABE3D300AEA95F /* Selection.swift in Sources */ = {isa = PBXBuildFile; fileRef = A79515DF25ABE3D300AEA95F /* Selection.swift */; };
+		A79515E125ABE3D300AEA95F /* Selection.swift in Sources */ = {isa = PBXBuildFile; fileRef = A79515DF25ABE3D300AEA95F /* Selection.swift */; };
 		A79515EB25ABE41000AEA95F /* Position.swift in Sources */ = {isa = PBXBuildFile; fileRef = A79515EA25ABE41000AEA95F /* Position.swift */; };
 		A79515EC25ABE41000AEA95F /* Position.swift in Sources */ = {isa = PBXBuildFile; fileRef = A79515EA25ABE41000AEA95F /* Position.swift */; };
 		A79515F625ABE44000AEA95F /* PiecesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A79515F525ABE44000AEA95F /* PiecesView.swift */; };
@@ -283,6 +283,7 @@
 		A75683271FCD28A000CF1408 /* FEngine.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FEngine.h; sourceTree = "<group>"; };
 		A75683281FCD28A000CF1408 /* FEngine.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = FEngine.mm; sourceTree = "<group>"; };
 		A758BB0525AC119C0092714E /* Actions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Actions.swift; sourceTree = "<group>"; };
+		A758BB1025AC16F80092714E /* Todo.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = Todo.txt; sourceTree = "<group>"; };
 		A75A283D1FEC8506003AC5EF /* ChessEvaluation.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = ChessEvaluation.hpp; sourceTree = "<group>"; };
 		A75BFAC61FE8C05E001EE942 /* MinMaxSearch.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = MinMaxSearch.hpp; sourceTree = "<group>"; };
 		A75CB25A1FED8F2B005487BD /* MoveTests.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MoveTests.cpp; sourceTree = "<group>"; };
@@ -347,7 +348,7 @@
 		A79515BE25ABE36700AEA95F /* BottomInformationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BottomInformationView.swift; sourceTree = "<group>"; };
 		A79515C925ABE38F00AEA95F /* LastMoveModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LastMoveModifier.swift; sourceTree = "<group>"; };
 		A79515D425ABE3A400AEA95F /* SelectionModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectionModifier.swift; sourceTree = "<group>"; };
-		A79515DF25ABE3D300AEA95F /* SelectionState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectionState.swift; sourceTree = "<group>"; };
+		A79515DF25ABE3D300AEA95F /* Selection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Selection.swift; sourceTree = "<group>"; };
 		A79515EA25ABE41000AEA95F /* Position.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Position.swift; sourceTree = "<group>"; };
 		A79515F525ABE44000AEA95F /* PiecesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PiecesView.swift; sourceTree = "<group>"; };
 		A795160B25ABE55E00AEA95F /* Square.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Square.swift; sourceTree = "<group>"; };
@@ -591,24 +592,30 @@
 			path = UCI;
 			sourceTree = "<group>";
 		};
+		A775234225AC2947009BFFD1 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				A79515DF25ABE3D300AEA95F /* Selection.swift */,
+				A79515EA25ABE41000AEA95F /* Position.swift */,
+				A795160B25ABE55E00AEA95F /* Square.swift */,
+				A795162125ABE59900AEA95F /* PlayAgainst.swift */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
 		A77F66AB25A832230030E61D /* Shared */ = {
 			isa = PBXGroup;
 			children = (
+				A758BB1025AC16F80092714E /* Todo.txt */,
 				A70A61CE1FD4AA8500AFDF0E /* Bridge */,
 				A70A61D41FD4D37E00AFDF0E /* Engine */,
 				A77F66AC25A832230030E61D /* BChessUIApp.swift */,
 				A77F66AD25A832240030E61D /* BChessUIDocument.swift */,
+				A795159D25ABE1D700AEA95F /* PiecesFactory.swift */,
+				A758BB0525AC119C0092714E /* Actions.swift */,
+				A775234225AC2947009BFFD1 /* Model */,
 				A795164725ABE6C700AEA95F /* Views */,
 				A77F66AF25A832270030E61D /* Assets.xcassets */,
-				A795159D25ABE1D700AEA95F /* PiecesFactory.swift */,
-				A79515C925ABE38F00AEA95F /* LastMoveModifier.swift */,
-				A79515D425ABE3A400AEA95F /* SelectionModifier.swift */,
-				A79515DF25ABE3D300AEA95F /* SelectionState.swift */,
-				A79515EA25ABE41000AEA95F /* Position.swift */,
-				A795160B25ABE55E00AEA95F /* Square.swift */,
-				A795161625ABE57C00AEA95F /* ConditionalView.swift */,
-				A795162125ABE59900AEA95F /* PlayAgainst.swift */,
-				A758BB0525AC119C0092714E /* Actions.swift */,
 			);
 			path = Shared;
 			sourceTree = "<group>";
@@ -678,6 +685,9 @@
 		A795164725ABE6C700AEA95F /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				A795161625ABE57C00AEA95F /* ConditionalView.swift */,
+				A79515C925ABE38F00AEA95F /* LastMoveModifier.swift */,
+				A79515D425ABE3A400AEA95F /* SelectionModifier.swift */,
 				A77F66AE25A832240030E61D /* ContentView.swift */,
 				A79515A825ABE31100AEA95F /* SquareView.swift */,
 				A79515B325ABE34300AEA95F /* TopInformationView.swift */,
@@ -1184,7 +1194,7 @@
 				A7FE324E25AAD61200A75936 /* FEngineUtility.mm in Sources */,
 				A79515F625ABE44000AEA95F /* PiecesView.swift in Sources */,
 				A758BB0625AC119C0092714E /* Actions.swift in Sources */,
-				A79515E025ABE3D300AEA95F /* SelectionState.swift in Sources */,
+				A79515E025ABE3D300AEA95F /* Selection.swift in Sources */,
 				A7FE320A25AA96C500A75936 /* ChessGame.cpp in Sources */,
 				A7FE324F25AAD61200A75936 /* FEngineInfo.mm in Sources */,
 				A7FE31EA25AA96B900A75936 /* ChessBoard.cpp in Sources */,
@@ -1225,7 +1235,7 @@
 				A7FE31CB25AA96A800A75936 /* FEngineUtility.mm in Sources */,
 				A79515F725ABE44000AEA95F /* PiecesView.swift in Sources */,
 				A758BB0725AC119C0092714E /* Actions.swift in Sources */,
-				A79515E125ABE3D300AEA95F /* SelectionState.swift in Sources */,
+				A79515E125ABE3D300AEA95F /* Selection.swift in Sources */,
 				A7FE31DB25AA96B800A75936 /* GameHistory.cpp in Sources */,
 				A7FE321C25AA96D000A75936 /* magicmoves.c in Sources */,
 				A77F66D825A832270030E61D /* BChessUIDocument.swift in Sources */,
