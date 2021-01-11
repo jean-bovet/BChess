@@ -12,40 +12,17 @@ struct PiecesView: View {
     
     @Binding var document: BChessUIDocument
 
-    let engine: FEngine
-    let pieces: [Piece]
-
-    func piece(atRank rank: Int, file: Int) -> Piece? {
-        return pieces.filter { $0.rank == rank && $0.file == file }.first
-    }
-
-    func applyLevelSettings() {
-        switch document.level {
-        case 0:
-            engine.thinkingTime = 2
-        case 1:
-            engine.thinkingTime = 5
-        case 2:
-            engine.thinkingTime = 10
-        case 3:
-            engine.thinkingTime = 15
-        default:
-            engine.thinkingTime = 2
-        }
-    }
-    
     func processTap(_ rank: Int, _ file: Int) {
         if let move = document.selection.possibleMove(rank, file) {
             withAnimation {
-                document.selection = SelectionState(position: Position.empty(), possibleMoves: [])
-                applyLevelSettings()
-                document.engine.move(move.rawMoveValue)
-                document.pgn = document.engine.pgn()
+                Actions(document: $document).playMove(move: move)
+            }
+            withAnimation {
                 Actions(document: $document).enginePlay()
             }
         } else {
             document.selection = SelectionState(position: Position(rank: rank, file: file),
-                                       possibleMoves: engine.moves(at: UInt(rank), file: UInt(file)))
+                                                possibleMoves: document.engine.moves(at: UInt(rank), file: UInt(file)))
         }
     }
 
@@ -67,7 +44,7 @@ struct PiecesView: View {
             let xOffset: CGFloat = (geometry.size.width - minSize) / 2
             let yOffset: CGFloat = (geometry.size.height - minSize) / 2
             let squareSize: CGFloat = minSize / 8
-            let b: [Square] = board(withPieces: pieces)
+            let b: [Square] = board(withPieces: document.pieces)
             ForEach(b) { square in
                 let r: Int = square.rank
                 let f: Int = square.file
@@ -88,6 +65,6 @@ struct PiecesView: View {
 struct PiecesView_Previews: PreviewProvider {
     static var previews: some View {
         let doc = BChessUIDocument()
-        PiecesView(document: .constant(doc), engine: doc.engine, pieces: doc.pieces)
+        PiecesView(document: .constant(doc))
     }
 }

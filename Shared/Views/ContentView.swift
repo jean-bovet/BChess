@@ -33,18 +33,14 @@ struct ContentView: View {
     @Binding var document: BChessUIDocument
             
     @State private var showInfo: Bool = false
-
-    var engine: FEngine {
-        return document.engine
-    }
     
     var body: some View {
         VStack(alignment: .leading) {
-            TopInformationView(info: document.info, engine: engine)
+            TopInformationView(document: document)
             
             ZStack {
                 BoardView(document: $document)
-                PiecesView(document: $document, engine: engine, pieces: document.pieces)
+                PiecesView(document: $document)
             }
             
             if (showInfo) {

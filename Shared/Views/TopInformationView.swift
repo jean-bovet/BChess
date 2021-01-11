@@ -10,12 +10,11 @@ import SwiftUI
 
 struct TopInformationView: View {
     
-    let info: FEngineInfo?
-    let engine: FEngine
-    
+    let document: BChessUIDocument
+
     func whoIsPlaying() -> String {
-        var text = engine.isWhite() ? "White" : "Black"
-        if engine.isAnalyzing() {
+        var text = document.engine.isWhite() ? "White" : "Black"
+        if document.engine.isAnalyzing() {
             text.append(" is thinking")
         } else {
             text.append("'s turn")
@@ -26,7 +25,7 @@ struct TopInformationView: View {
     var body: some View {
         VStack(alignment: .leading) {
             Text(whoIsPlaying()).bold()
-            Text(engine.pgnFormattedForDisplay())
+            Text(document.engine.pgnFormattedForDisplay())
         }
     }
 }

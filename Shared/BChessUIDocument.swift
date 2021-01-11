@@ -59,4 +59,19 @@ struct BChessUIDocument: FileDocument {
         return .init(regularFileWithContents: data)
     }
     
+    func applyLevelSettings() {
+        switch level {
+        case 0:
+            engine.thinkingTime = 2
+        case 1:
+            engine.thinkingTime = 5
+        case 2:
+            engine.thinkingTime = 10
+        case 3:
+            engine.thinkingTime = 15
+        default:
+            engine.thinkingTime = 2
+        }
+    }
+    
 }

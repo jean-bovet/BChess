@@ -31,6 +31,14 @@ struct Actions {
         document.selection = SelectionState(position: Position.empty(), possibleMoves: [])
     }
 
+    func playMove(move: FEngineMove) {
+        document.selection = SelectionState(position: Position.empty(), possibleMoves: [])
+        document.applyLevelSettings()
+        document.engine.move(move.rawMoveValue)
+        document.pgn = document.engine.pgn()
+        document.lastMove = nil
+    }
+    
     func enginePlay() {
         engine.evaluate { (info, completed) in
             DispatchQueue.main.async {
