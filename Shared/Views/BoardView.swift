@@ -22,12 +22,11 @@ struct BoardView: View {
     
     var body: some View {
         VStack(spacing: 0) {
-            let pt = PositionTransformer(playAgainst: document.playAgainst)
             ForEach((0...7).reversed(), id: \.self) { rank in
-                let r = pt.actualFile(rank)
                 HStack(spacing: 0) {
                     ForEach((0...7), id: \.self) { file in
-                        let f = pt.actualFile(file)
+                        let r = rank.actual(document.playAgainst)
+                        let f = file.actual(document.playAgainst)
                         Rectangle()
                             .fill(backgroundColor(rank: r, file: f))
                             .modifier(LastMoveModifier(rank: r, file: f, lastMove: document.lastMove))

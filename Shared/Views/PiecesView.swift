@@ -46,16 +46,14 @@ struct PiecesView: View {
             let squareSize: CGFloat = minSize / 8
             let b: [Square] = board(withPieces: document.pieces)
             ForEach(b) { square in
-                let r: Int = square.rank
-                let f: Int = square.file
-                let x: CGFloat = CGFloat(f) * squareSize + xOffset
-                let y: CGFloat = CGFloat(7 - r) * squareSize + yOffset
+                let x = CGFloat(square.file.actual(document.playAgainst)) * squareSize + xOffset
+                let y = CGFloat(7 - square.rank.actual(document.playAgainst)) * squareSize + yOffset
                 SquareView(piece: square.piece)
                     .frame(width: squareSize, height: squareSize)
                     .offset(x: x,
                             y: y)
                     .onTapGesture {
-                        processTap(r, f)
+                        processTap(square.rank, square.file)
                     }
             }
         }

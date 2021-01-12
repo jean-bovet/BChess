@@ -607,14 +607,14 @@
 			isa = PBXGroup;
 			children = (
 				A758BB1025AC16F80092714E /* Todo.txt */,
-				A70A61CE1FD4AA8500AFDF0E /* Bridge */,
-				A70A61D41FD4D37E00AFDF0E /* Engine */,
 				A77F66AC25A832230030E61D /* BChessUIApp.swift */,
 				A77F66AD25A832240030E61D /* BChessUIDocument.swift */,
 				A795159D25ABE1D700AEA95F /* PiecesFactory.swift */,
 				A758BB0525AC119C0092714E /* Actions.swift */,
 				A775234225AC2947009BFFD1 /* Model */,
 				A795164725ABE6C700AEA95F /* Views */,
+				A70A61CE1FD4AA8500AFDF0E /* Bridge */,
+				A70A61D41FD4D37E00AFDF0E /* Engine */,
 				A77F66AF25A832270030E61D /* Assets.xcassets */,
 			);
 			path = Shared;

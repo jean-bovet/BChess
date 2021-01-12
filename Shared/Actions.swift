@@ -29,14 +29,15 @@ struct Actions {
             enginePlay()
         }
         document.selection = Selection(position: Position.empty(), possibleMoves: [])
+        document.lastMove = nil
     }
 
     func playMove(move: FEngineMove) {
         document.selection = Selection(position: Position.empty(), possibleMoves: [])
+        document.lastMove = nil
         document.applyLevelSettings()
         document.engine.move(move.rawMoveValue)
         document.pgn = document.engine.pgn()
-        document.lastMove = nil
     }
     
     func enginePlay() {

@@ -13,3 +13,15 @@ enum PlayAgainst: Int {
     case black
     case human
 }
+
+extension Int {
+
+    func actual(_ playAgainst: PlayAgainst) -> Int {
+        if playAgainst == .black {
+            return self
+        } else {
+            return 7 - self
+        }
+    }
+    
+}

@@ -8,27 +8,6 @@
 
 import SwiftUI
 
-struct PositionTransformer {
-    
-    let playAgainst: PlayAgainst
-
-    func actualRank(_ rank: Int) -> Int {
-        if playAgainst == .white {
-            return 7 - rank
-        } else {
-            return rank
-        }
-    }
-    
-    func actualFile(_ file: Int) -> Int {
-        if playAgainst == .white {
-            return 7 - file
-        } else {
-            return file
-        }
-    }
-}
-
 struct ContentView: View {
     @Binding var document: BChessUIDocument
             
