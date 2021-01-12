@@ -11,14 +11,23 @@ import SwiftUI
 struct PiecesView: View {
     
     @Binding var document: BChessUIDocument
+    
+    // This state is used as a workaround to
+    // detect when the animation of the piece after
+    // a human plays a move is completed so the computer
+    // can start thinking. This is to avoid the computer
+    // replying at the same time as the animation is
+    // ongoing after the human has played.
+    @State private var humanPieceAnimation = 0.0
 
     func processTap(_ rank: Int, _ file: Int) {
         if let move = document.selection.possibleMove(rank, file) {
             withAnimation {
                 Actions(document: $document).playMove(move: move)
-            }
-            withAnimation {
-                Actions(document: $document).enginePlay()
+                
+                // Set the final value to detect when the animation ends
+                // (see below in onAnimationCompleted)
+                humanPieceAnimation = 1.0
             }
         } else {
             document.selection = Selection(position: Position(rank: rank, file: file),
@@ -55,6 +64,14 @@ struct PiecesView: View {
                     .onTapGesture {
                         processTap(square.rank, square.file)
                     }
+            }
+        }
+        .onAnimationCompleted(for: humanPieceAnimation) {
+            // Animation has completed, reset the value
+            humanPieceAnimation = 0
+            // And trigger the computer's move
+            withAnimation {
+                Actions(document: $document).enginePlay()
             }
         }
     }

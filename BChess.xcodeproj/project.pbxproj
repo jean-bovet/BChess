@@ -98,6 +98,8 @@
 		A77372061FE443DA0001A90F /* ChessGame.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A77371FC1FE31FEF0001A90F /* ChessGame.cpp */; };
 		A775236325AD6532009BFFD1 /* Openings.pgn in Resources */ = {isa = PBXBuildFile; fileRef = A7C92AA91FF6EE5500160D2E /* Openings.pgn */; };
 		A775236C25AD6533009BFFD1 /* Openings.pgn in Resources */ = {isa = PBXBuildFile; fileRef = A7C92AA91FF6EE5500160D2E /* Openings.pgn */; };
+		A775237625AD68FA009BFFD1 /* Animation.swift in Sources */ = {isa = PBXBuildFile; fileRef = A775237525AD68FA009BFFD1 /* Animation.swift */; };
+		A775237725AD68FA009BFFD1 /* Animation.swift in Sources */ = {isa = PBXBuildFile; fileRef = A775237525AD68FA009BFFD1 /* Animation.swift */; };
 		A77E6C39204BBDB600ECF6CD /* ChessState.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A7688F5E204B6E91004B1E9E /* ChessState.cpp */; };
 		A77E6C3B204BCFF900ECF6CD /* EngineInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = A77E6C3A204BCFF900ECF6CD /* EngineInfo.swift */; };
 		A77F66C825A832270030E61D /* Tests_iOS.swift in Sources */ = {isa = PBXBuildFile; fileRef = A77F66C725A832270030E61D /* Tests_iOS.swift */; };
@@ -325,6 +327,7 @@
 		A77371FF1FE320010001A90F /* FPGN.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = FPGN.cpp; sourceTree = "<group>"; };
 		A77372001FE320010001A90F /* FPGN.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = FPGN.hpp; sourceTree = "<group>"; };
 		A77372041FE340780001A90F /* PGNTests.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PGNTests.cpp; sourceTree = "<group>"; };
+		A775237525AD68FA009BFFD1 /* Animation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Animation.swift; sourceTree = "<group>"; };
 		A77E6C3A204BCFF900ECF6CD /* EngineInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EngineInfo.swift; sourceTree = "<group>"; };
 		A77F66AC25A832230030E61D /* BChessUIApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BChessUIApp.swift; sourceTree = "<group>"; };
 		A77F66AD25A832240030E61D /* BChessUIDocument.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BChessUIDocument.swift; sourceTree = "<group>"; };
@@ -613,6 +616,7 @@
 				A77F66AD25A832240030E61D /* BChessUIDocument.swift */,
 				A795159D25ABE1D700AEA95F /* PiecesFactory.swift */,
 				A758BB0525AC119C0092714E /* Actions.swift */,
+				A775237525AD68FA009BFFD1 /* Animation.swift */,
 				A775234225AC2947009BFFD1 /* Model */,
 				A795164725ABE6C700AEA95F /* Views */,
 				A70A61CE1FD4AA8500AFDF0E /* Bridge */,
@@ -1221,6 +1225,7 @@
 				A7FE322C25AA96D100A75936 /* magicmoves.c in Sources */,
 				A77F66D925A832270030E61D /* ContentView.swift in Sources */,
 				A79515D525ABE3A400AEA95F /* SelectionModifier.swift in Sources */,
+				A775237625AD68FA009BFFD1 /* Animation.swift in Sources */,
 				A795161725ABE57C00AEA95F /* ConditionalView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1262,6 +1267,7 @@
 				A7FE31FB25AA96C500A75936 /* ChessGame.cpp in Sources */,
 				A7FE31FC25AA96C500A75936 /* ChessOpenings.cpp in Sources */,
 				A79515D625ABE3A400AEA95F /* SelectionModifier.swift in Sources */,
+				A775237725AD68FA009BFFD1 /* Animation.swift in Sources */,
 				A795161825ABE57C00AEA95F /* ConditionalView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
