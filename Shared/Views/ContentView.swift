@@ -28,7 +28,7 @@ struct ContentView: View {
         }
         .padding()
         .toolbar {
-            ToolbarItem(placement: .primaryAction) {
+            ToolbarItem(placement: .automatic) {
                 Menu {
                     Section {
                         Button(action: { Actions(document: $document).newGame(playAgainstWhite: false ) }) {

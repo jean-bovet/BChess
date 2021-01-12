@@ -15,10 +15,6 @@ extension UTType {
     }
 }
 
-struct BChessEngineFactory {    
-    static let engine = FEngine()
-}
-
 struct BChessUIDocument: FileDocument {
     
     let engine = FEngine()
@@ -37,9 +33,21 @@ struct BChessUIDocument: FileDocument {
         return PiecesFactory().pieces(forState: engine.state)
     }
     
-    init(pgn: String = BChessEngineFactory.engine.pgn()) {
+    init(pgn: String = StartPosFEN) {
         self.pgn = pgn
         self.engine.setPGN(pgn)
+        loadOpenings()
+    }
+
+    func loadOpenings() {
+        engine.useOpeningBook = true
+        
+        let path = Bundle.main.path(forResource: "Openings", ofType: "pgn")
+        assert(path != nil)
+        
+        let pgn = try! String(contentsOfFile: path!)
+        let result = engine.loadOpening(pgn);
+        assert(result)
     }
 
     static var readableContentTypes: [UTType] { [.exampleText] }
@@ -50,8 +58,7 @@ struct BChessUIDocument: FileDocument {
         else {
             throw CocoaError(.fileReadCorruptFile)
         }
-        pgn = string
-        engine.setPGN(pgn)
+        self.init(pgn: string)
     }
     
     func fileWrapper(configuration: WriteConfiguration) throws -> FileWrapper {
