@@ -40,24 +40,29 @@ struct ContentView: View {
                         }
                     }
 
-                    Divider()
-                    
-                    Picker(selection: $document.level, label: Text("Level")) {
-                        Text("2 seconds").tag(0)
-                        Text("5 seconds").tag(1)
-                        Text("10 seconds").tag(2)
-                        Text("15 seconds").tag(3)
-                    }
-                    
-                    Divider()
-                    
-                    Button(action: { showInfo.toggle() }) {
-                        if (showInfo) {
-                            Label("Hide Information", systemImage: "info.circle")
-                        } else {
-                            Label("Show Information", systemImage: "info.circle")
+                    Section {
+                        Button(action: { Actions(document: $document).takeBackMove() }) {
+                            Label("Take Back Move", systemImage: "arrow.uturn.backward.square.fill")
                         }
                     }
+
+                    Section {
+                        Picker(selection: $document.level, label: Text("Level")) {
+                            Text("2 seconds").tag(0)
+                            Text("5 seconds").tag(1)
+                            Text("10 seconds").tag(2)
+                            Text("15 seconds").tag(3)
+                        }
+                        Button(action: { showInfo.toggle() }) {
+                            if (showInfo) {
+                                Label("Hide Information", systemImage: "info.circle")
+                            } else {
+                                Label("Show Information", systemImage: "info.circle")
+                            }
+                        }
+
+                    }
+                    
                 }
                 label: {
                     Label("Level", systemImage: "arrow.up.arrow.down")

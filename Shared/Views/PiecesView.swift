@@ -31,7 +31,7 @@ struct PiecesView: View {
             }
         } else {
             document.selection = Selection(position: Position(rank: rank, file: file),
-                                                possibleMoves: document.engine.moves(at: UInt(rank), file: UInt(file)))
+                                           possibleMoves: document.engine.moves(at: UInt(rank), file: UInt(file)))
         }
     }
 

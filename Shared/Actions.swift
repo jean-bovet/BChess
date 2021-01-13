@@ -40,6 +40,24 @@ struct Actions {
         document.pgn = document.engine.pgn()
     }
     
+    func takeBackMove() {
+        withAnimation {
+            document.selection = Selection(position: Position.empty(), possibleMoves: [])
+            document.lastMove = nil
+
+            if document.playAgainst == .human {
+                engine.undoMove()
+            } else {
+                if engine.isAnalyzing() {
+                    engine.cancel()
+                }
+                engine.undoMove() // last human move
+                engine.undoMove() // last engine move
+            }
+            document.pgn = document.engine.pgn()
+        }
+    }
+    
     func enginePlay() {
         engine.evaluate { (info, completed) in
             DispatchQueue.main.async {

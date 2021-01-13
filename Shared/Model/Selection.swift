@@ -21,7 +21,7 @@ struct Selection {
     }
     
     func possibleMove(_ rank: Int, _ file: Int) -> FEngineMove? {
-        return possibleMoves.filter { $0.fromFile == file && $0.fromRank == rank || $0.toFile == file && $0.toRank == rank }.first
+        return possibleMoves.filter { $0.toFile == file && $0.toRank == rank }.first
     }
     
 }

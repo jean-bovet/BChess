@@ -1,4 +1,2 @@
-- enable Undo/Redo
 - enable copy/paste board game
 - display rank/file (optional)
-- display actions on iOS in bottom bar?
