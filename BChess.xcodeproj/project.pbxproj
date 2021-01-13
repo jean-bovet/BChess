@@ -201,7 +201,6 @@
 		A75683271FCD28A000CF1408 /* FEngine.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FEngine.h; sourceTree = "<group>"; };
 		A75683281FCD28A000CF1408 /* FEngine.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = FEngine.mm; sourceTree = "<group>"; };
 		A758BB0525AC119C0092714E /* Actions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Actions.swift; sourceTree = "<group>"; };
-		A758BB1025AC16F80092714E /* Todo.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = Todo.txt; sourceTree = "<group>"; };
 		A75A283D1FEC8506003AC5EF /* ChessEvaluation.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = ChessEvaluation.hpp; sourceTree = "<group>"; };
 		A75BFAC61FE8C05E001EE942 /* MinMaxSearch.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = MinMaxSearch.hpp; sourceTree = "<group>"; };
 		A75CB25A1FED8F2B005487BD /* MoveTests.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MoveTests.cpp; sourceTree = "<group>"; };
@@ -464,7 +463,6 @@
 		A77F66AB25A832230030E61D /* Shared */ = {
 			isa = PBXGroup;
 			children = (
-				A758BB1025AC16F80092714E /* Todo.txt */,
 				A77F66AC25A832230030E61D /* BChessUIApp.swift */,
 				A77F66AD25A832240030E61D /* BChessUIDocument.swift */,
 				A795159D25ABE1D700AEA95F /* PiecesFactory.swift */,

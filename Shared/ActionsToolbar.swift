@@ -12,7 +12,7 @@ struct ShowHideInfoButton: View {
     @Binding var document: BChessUIDocument
     @Binding var showInfo: Bool
     var body: some View {
-        Button(action: { showInfo.toggle() }) {
+        Button(action: { withAnimation { showInfo.toggle() } }) {
             if (showInfo) {
                 Label("Hide Information", systemImage: "info.circle")
             } else {

@@ -97,21 +97,24 @@ struct Actions {
     func enginePlay() {
         engine.evaluate { (info, completed) in
             DispatchQueue.main.async {
-                withAnimation {
-                    if completed {
-                        self.engine.move(info.bestMove)
-                        
-                        // TODO: refactor?
-                        let move = FEngineMove()
-                        move.fromFile = info.fromFile
-                        move.fromRank = info.fromRank
-                        move.toFile = info.toFile
-                        move.toRank = info.toRank
-                        move.rawMoveValue = info.bestMove
-                        self.document.lastMove = move
-                    }
+                if completed {
+                    // TODO: refactor?
+                    let move = FEngineMove()
+                    move.fromFile = info.fromFile
+                    move.fromRank = info.fromRank
+                    move.toFile = info.toFile
+                    move.toRank = info.toRank
+                    move.rawMoveValue = info.bestMove
+                    
+                    self.document.lastMove = move
                     self.document.info = info
-                    self.document.pgn = self.engine.pgn()
+                    
+                    withAnimation {
+                        self.engine.move(info.bestMove)
+                        self.document.pgn = self.engine.pgn()
+                    }
+                } else {
+                    self.document.info = info
                 }
             }
         }
