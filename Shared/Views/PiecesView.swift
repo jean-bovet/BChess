@@ -50,9 +50,9 @@ struct PiecesView: View {
     var body: some View {
         GeometryReader { geometry in
             let minSize: CGFloat = min(geometry.size.width, geometry.size.height)
-            let xOffset: CGFloat = (geometry.size.width - minSize) / 2
+            let squareSize: CGFloat = minSize / (CGFloat(numberOfSquares) + 1)
+            let xOffset: CGFloat = (geometry.size.width - minSize) / 2 + squareSize
             let yOffset: CGFloat = (geometry.size.height - minSize) / 2
-            let squareSize: CGFloat = minSize / 8
             let b: [Square] = board(withPieces: document.pieces)
             ForEach(b) { square in
                 let x = CGFloat(square.file.actual(document.playAgainst)) * squareSize + xOffset
@@ -79,7 +79,19 @@ struct PiecesView: View {
 
 struct PiecesView_Previews: PreviewProvider {
     static var previews: some View {
-        let doc = BChessUIDocument()
-        PiecesView(document: .constant(doc))
+        Group {
+            let doc = BChessUIDocument()
+            ZStack {
+                BoardView(document: .constant(doc))
+                PiecesView(document: .constant(doc))
+            }
+        }
+        Group {
+            let doc = BChessUIDocument(playAgainst: .white)
+            ZStack {
+                BoardView(document: .constant(doc))
+                PiecesView(document: .constant(doc))
+            }
+        }
     }
 }

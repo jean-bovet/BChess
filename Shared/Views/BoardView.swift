@@ -20,17 +20,26 @@ struct BoardView: View {
         }
     }
     
+    // We draw a board that has one more rank and one more file
+    // which are going to be used to display the labels
     var body: some View {
         VStack(spacing: 0) {
-            ForEach((0...7).reversed(), id: \.self) { rank in
+            ForEach((0...8).reversed(), id: \.self) { rank in
                 HStack(spacing: 0) {
-                    ForEach((0...7), id: \.self) { file in
-                        let r = rank.actual(document.playAgainst)
-                        let f = file.actual(document.playAgainst)
-                        Rectangle()
-                            .fill(backgroundColor(rank: r, file: f))
-                            .modifier(LastMoveModifier(rank: r, file: f, lastMove: document.lastMove))
-                            .modifier(SelectionModifier(rank: r, file: f, selection: document.selection))
+                    ForEach(0...8, id: \.self) { file in
+                        if rank == 0 || file == 0 {
+                            // Display nothing for the first rank and file
+                            // as the labels will be displayed in there
+                            Rectangle()
+                                .fill(Color.clear)
+                        } else {
+                            let r = (rank - 1).actual(document.playAgainst)
+                            let f = (file - 1).actual(document.playAgainst)
+                            Rectangle()
+                                .fill(backgroundColor(rank: r, file: f))
+                                .modifier(LastMoveModifier(rank: r, file: f, lastMove: document.lastMove))
+                                .modifier(SelectionModifier(rank: r, file: f, selection: document.selection))
+                        }
                     }
                 }
             }

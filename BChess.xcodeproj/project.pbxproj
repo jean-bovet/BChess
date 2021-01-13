@@ -144,6 +144,8 @@
 		A795163E25ABE66600AEA95F /* BoardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A795163C25ABE66600AEA95F /* BoardView.swift */; };
 		A7A30EC225AEB28D00729432 /* ActionsToolbar.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7A30EC125AEB28D00729432 /* ActionsToolbar.swift */; };
 		A7A30EC325AEB28D00729432 /* ActionsToolbar.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7A30EC125AEB28D00729432 /* ActionsToolbar.swift */; };
+		A7A30EDD25AEBD7C00729432 /* LabelsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7A30EDC25AEBD7C00729432 /* LabelsView.swift */; };
+		A7A30EDE25AEBD7C00729432 /* LabelsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7A30EDC25AEBD7C00729432 /* LabelsView.swift */; };
 		A7AA42A920538C7F00FAACA2 /* ChessViewInteraction.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7AA42A820538C7F00FAACA2 /* ChessViewInteraction.swift */; };
 		A7AA42AA20538C7F00FAACA2 /* ChessViewInteraction.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7AA42A820538C7F00FAACA2 /* ChessViewInteraction.swift */; };
 		A7AA42AC205608ED00FAACA2 /* ChessViewPromotionPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7AA42AB205608ED00FAACA2 /* ChessViewPromotionPicker.swift */; };
@@ -363,6 +365,7 @@
 		A795162125ABE59900AEA95F /* PlayAgainst.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayAgainst.swift; sourceTree = "<group>"; };
 		A795163C25ABE66600AEA95F /* BoardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoardView.swift; sourceTree = "<group>"; };
 		A7A30EC125AEB28D00729432 /* ActionsToolbar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActionsToolbar.swift; sourceTree = "<group>"; };
+		A7A30EDC25AEBD7C00729432 /* LabelsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LabelsView.swift; sourceTree = "<group>"; };
 		A7AA42A820538C7F00FAACA2 /* ChessViewInteraction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChessViewInteraction.swift; sourceTree = "<group>"; };
 		A7AA42AB205608ED00FAACA2 /* ChessViewPromotionPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChessViewPromotionPicker.swift; sourceTree = "<group>"; };
 		A7AFCCA61FB4E40D00AE3D85 /* BChess */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = BChess; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -695,7 +698,6 @@
 		A795164725ABE6C700AEA95F /* Views */ = {
 			isa = PBXGroup;
 			children = (
-				A77F66AE25A832240030E61D /* ContentView.swift */,
 				A795161625ABE57C00AEA95F /* ConditionalView.swift */,
 				A79515C925ABE38F00AEA95F /* LastMoveModifier.swift */,
 				A79515D425ABE3A400AEA95F /* SelectionModifier.swift */,
@@ -704,6 +706,8 @@
 				A79515BE25ABE36700AEA95F /* BottomInformationView.swift */,
 				A795163C25ABE66600AEA95F /* BoardView.swift */,
 				A79515F525ABE44000AEA95F /* PiecesView.swift */,
+				A7A30EDC25AEBD7C00729432 /* LabelsView.swift */,
+				A77F66AE25A832240030E61D /* ContentView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -1209,6 +1213,7 @@
 				A758BB0625AC119C0092714E /* Actions.swift in Sources */,
 				A79515E025ABE3D300AEA95F /* Selection.swift in Sources */,
 				A7FE320A25AA96C500A75936 /* ChessGame.cpp in Sources */,
+				A7A30EDD25AEBD7C00729432 /* LabelsView.swift in Sources */,
 				A7FE324F25AAD61200A75936 /* FEngineInfo.mm in Sources */,
 				A7FE31EA25AA96B900A75936 /* ChessBoard.cpp in Sources */,
 				A795163D25ABE66600AEA95F /* BoardView.swift in Sources */,
@@ -1252,6 +1257,7 @@
 				A758BB0725AC119C0092714E /* Actions.swift in Sources */,
 				A79515E125ABE3D300AEA95F /* Selection.swift in Sources */,
 				A7FE31DB25AA96B800A75936 /* GameHistory.cpp in Sources */,
+				A7A30EDE25AEBD7C00729432 /* LabelsView.swift in Sources */,
 				A7FE321C25AA96D000A75936 /* magicmoves.c in Sources */,
 				A77F66D825A832270030E61D /* BChessUIDocument.swift in Sources */,
 				A795163E25ABE66600AEA95F /* BoardView.swift in Sources */,

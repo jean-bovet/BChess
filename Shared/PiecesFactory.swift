@@ -8,6 +8,8 @@
 
 import Foundation
 
+let numberOfSquares = 8
+
 struct Piece {
     let name: String
     let file: UInt

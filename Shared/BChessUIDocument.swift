@@ -33,9 +33,10 @@ struct BChessUIDocument: FileDocument {
         return PiecesFactory().pieces(forState: engine.state)
     }
     
-    init(pgn: String = StartPosFEN) {
+    init(pgn: String = StartPosFEN, playAgainst: PlayAgainst = .black) {
         self.pgn = pgn
         self.engine.setPGN(pgn)
+        self.playAgainst = playAgainst
         loadOpenings()
     }
 

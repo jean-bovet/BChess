@@ -19,6 +19,7 @@ struct ContentView: View {
             
             ZStack {
                 BoardView(document: $document)
+                LabelsView(document: $document)
                 PiecesView(document: $document)
             }
             
@@ -39,6 +40,10 @@ struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
         Group {
             let doc = BChessUIDocument()
+            ContentView(document: .constant(doc))
+        }
+        Group {
+            let doc = BChessUIDocument(playAgainst: .white)
             ContentView(document: .constant(doc))
         }
     }
