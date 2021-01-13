@@ -9,7 +9,7 @@
 import SwiftUI
 
 struct Actions {
-    @Binding var document: BChessUIDocument
+    @Binding var document: ChessDocument
     
     var engine: FEngine {
         return document.engine
@@ -98,15 +98,7 @@ struct Actions {
         engine.evaluate { (info, completed) in
             DispatchQueue.main.async {
                 if completed {
-                    // TODO: refactor?
-                    let move = FEngineMove()
-                    move.fromFile = info.fromFile
-                    move.fromRank = info.fromRank
-                    move.toFile = info.toFile
-                    move.toRank = info.toRank
-                    move.rawMoveValue = info.bestMove
-                    
-                    self.document.lastMove = move
+                    self.document.lastMove = info.bestEngineMove
                     self.document.info = info
                     
                     withAnimation {

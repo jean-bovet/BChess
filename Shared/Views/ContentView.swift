@@ -9,7 +9,7 @@
 import SwiftUI
 
 struct ContentView: View {
-    @Binding var document: BChessUIDocument
+    @Binding var document: ChessDocument
             
     @State private var showInfo: Bool = false
     
@@ -39,11 +39,11 @@ struct ContentView_Previews: PreviewProvider {
     
     static var previews: some View {
         Group {
-            let doc = BChessUIDocument()
+            let doc = ChessDocument()
             ContentView(document: .constant(doc))
         }
         Group {
-            let doc = BChessUIDocument(playAgainst: .white)
+            let doc = ChessDocument(playAgainst: .white)
             ContentView(document: .constant(doc))
         }
     }

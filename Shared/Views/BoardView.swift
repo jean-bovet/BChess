@@ -10,7 +10,7 @@ import SwiftUI
 
 struct BoardView: View {
     
-    @Binding var document: BChessUIDocument
+    @Binding var document: ChessDocument
 
     func backgroundColor(rank: Int, file: Int) -> Color {
         if rank % 2 == 0 {
@@ -50,7 +50,7 @@ struct BoardView: View {
 
 struct BoardView_Previews: PreviewProvider {
     static var previews: some View {
-        let doc = BChessUIDocument()
+        let doc = ChessDocument()
         BoardView(document: .constant(doc))
     }
 }

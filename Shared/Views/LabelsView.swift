@@ -9,7 +9,7 @@
 import SwiftUI
 
 struct LabelsView: View {
-    @Binding var document: BChessUIDocument
+    @Binding var document: ChessDocument
 
     func actualIndex(_ index: Int) -> Int {
         if document.playAgainst == .black {
@@ -50,14 +50,14 @@ struct LabelsView: View {
 struct LabelsView_Previews: PreviewProvider {
     static var previews: some View {
         Group {
-            let doc = BChessUIDocument()
+            let doc = ChessDocument()
             ZStack {
                 BoardView(document: .constant(doc))
                 LabelsView(document: .constant(doc))
             }
         }
         Group {
-            let doc = BChessUIDocument(playAgainst: .white)
+            let doc = ChessDocument(playAgainst: .white)
             ZStack {
                 BoardView(document: .constant(doc))
                 LabelsView(document: .constant(doc))

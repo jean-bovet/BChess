@@ -1,5 +1,5 @@
 //
-//  BChessUIDocument.swift
+//  ChessDocument.swift
 //  Shared
 //
 //  Created by Jean Bovet on 1/7/21.
@@ -15,7 +15,7 @@ extension UTType {
     }
 }
 
-struct BChessUIDocument: FileDocument {
+struct ChessDocument: FileDocument {
     
     let engine = FEngine()
         

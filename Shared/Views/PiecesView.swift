@@ -10,7 +10,7 @@ import SwiftUI
 
 struct PiecesView: View {
     
-    @Binding var document: BChessUIDocument
+    @Binding var document: ChessDocument
     
     // This state is used as a workaround to
     // detect when the animation of the piece after
@@ -80,14 +80,14 @@ struct PiecesView: View {
 struct PiecesView_Previews: PreviewProvider {
     static var previews: some View {
         Group {
-            let doc = BChessUIDocument()
+            let doc = ChessDocument()
             ZStack {
                 BoardView(document: .constant(doc))
                 PiecesView(document: .constant(doc))
             }
         }
         Group {
-            let doc = BChessUIDocument(playAgainst: .white)
+            let doc = ChessDocument(playAgainst: .white)
             ZStack {
                 BoardView(document: .constant(doc))
                 PiecesView(document: .constant(doc))

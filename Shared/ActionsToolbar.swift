@@ -9,7 +9,7 @@
 import SwiftUI
 
 struct ShowHideInfoButton: View {
-    @Binding var document: BChessUIDocument
+    @Binding var document: ChessDocument
     @Binding var showInfo: Bool
     var body: some View {
         Button(action: { withAnimation { showInfo.toggle() } }) {
@@ -23,7 +23,7 @@ struct ShowHideInfoButton: View {
 }
 
 struct UndoMoveButton: View {
-    @Binding var document: BChessUIDocument
+    @Binding var document: ChessDocument
     var body: some View {
         Button(action: { Actions(document: $document).undoMove() }) {
             Label("Undo Move", systemImage: "arrow.uturn.backward.square")
@@ -32,7 +32,7 @@ struct UndoMoveButton: View {
 }
 
 struct RedoMoveButton: View {
-    @Binding var document: BChessUIDocument
+    @Binding var document: ChessDocument
     var body: some View {
         Button(action: { Actions(document: $document).redoMove() }) {
             Label("Redo Move", systemImage: "arrow.uturn.forward.square")
@@ -41,7 +41,7 @@ struct RedoMoveButton: View {
 }
 
 struct CopyButton: View {
-    @Binding var document: BChessUIDocument
+    @Binding var document: ChessDocument
     var body: some View {
         Button(action: { Actions(document: $document).copyFEN() }) {
             Label("Copy", systemImage: "doc.on.doc")
@@ -50,7 +50,7 @@ struct CopyButton: View {
 }
 
 struct PasteButton: View {
-    @Binding var document: BChessUIDocument
+    @Binding var document: ChessDocument
     var body: some View {
         Button(action: { Actions(document: $document).pasteFEN() }) {
             Label("Paste", systemImage: "arrow.down.circle")
@@ -59,7 +59,7 @@ struct PasteButton: View {
 }
 
 struct LevelPicker: View {
-    @Binding var document: BChessUIDocument
+    @Binding var document: ChessDocument
     var body: some View {
         Picker(selection: $document.level, label: Text("Level")) {
             Text("2 seconds").tag(0)
@@ -71,7 +71,7 @@ struct LevelPicker: View {
 }
 
 struct NewGameMenu: View {
-    @Binding var document: BChessUIDocument
+    @Binding var document: ChessDocument
     
     var body: some View {
         Menu {
@@ -93,7 +93,7 @@ struct NewGameMenu: View {
 
 struct ActionsToolbar: ToolbarContent {
 
-    @Binding var document: BChessUIDocument
+    @Binding var document: ChessDocument
     @Binding var showInfo: Bool
     
     var body: some ToolbarContent {

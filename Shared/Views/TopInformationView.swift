@@ -10,7 +10,7 @@ import SwiftUI
 
 struct TopInformationView: View {
     
-    let document: BChessUIDocument
+    let document: ChessDocument
 
     func whoIsPlaying() -> String {
         var text = document.engine.isWhite() ? "White" : "Black"

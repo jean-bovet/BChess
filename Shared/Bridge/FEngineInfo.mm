@@ -8,6 +8,7 @@
 
 #import "FEngineInfo+Private.h"
 #import "FEngineUtility.h"
+#import "FEngineMove.h"
 #import "Move.hpp"
 #import "FPGN.hpp"
 #import "ChessEvaluater.hpp"
@@ -75,6 +76,16 @@
     } else {
         return nil;
     }
+}
+
+- (FEngineMove*)bestEngineMove {
+    FEngineMove *move = [[FEngineMove alloc] init];
+    move.fromFile = self.fromFile;
+    move.fromRank = self.fromRank;
+    move.toFile = self.toFile;
+    move.toRank = self.toRank;
+    move.rawMoveValue = self.bestMove;
+    return move;
 }
 
 - (NSString*)bestMove:(BOOL)uci {

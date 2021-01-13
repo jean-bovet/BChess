@@ -10,12 +10,12 @@ import SwiftUI
 
 struct BottomInformationView: View {
     
-    let document: BChessUIDocument
+    let document: ChessDocument
 
     let numberFormatter = NumberFormatter()
     let valueFormatter = NumberFormatter()
 
-    init(document: BChessUIDocument) {
+    init(document: ChessDocument) {
         self.document = document
         
         numberFormatter.numberStyle = .decimal

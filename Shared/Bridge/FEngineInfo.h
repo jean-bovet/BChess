@@ -8,11 +8,14 @@
 
 #import <Foundation/Foundation.h>
 
+@class FEngineMove;
+
 @interface FEngineInfo : NSObject
 
 @property (nonatomic, assign, readonly) NSUInteger fromRank, fromFile, toRank, toFile;
 
 @property (nonatomic, assign, readonly) NSUInteger bestMove;
+@property (nonatomic, strong, readonly) FEngineMove * _Nullable bestEngineMove;
 
 @property (nonatomic, assign, readonly) BOOL mat;
 @property (nonatomic, assign, readonly) BOOL isWhite;
