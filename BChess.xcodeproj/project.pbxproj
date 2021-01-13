@@ -22,29 +22,12 @@
 		A72E2B57200496CD006CBB1C /* BoardHashTests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A72E2B56200496CC006CBB1C /* BoardHashTests.cpp */; };
 		A731BD3720009856004C13EF /* Tournament.swift in Sources */ = {isa = PBXBuildFile; fileRef = A731BD3620009856004C13EF /* Tournament.swift */; };
 		A731BD392000A513004C13EF /* TournamentEngines.swift in Sources */ = {isa = PBXBuildFile; fileRef = A731BD382000A513004C13EF /* TournamentEngines.swift */; };
-		A7460F011FDF2465002B0740 /* MacEngineInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7460F001FDF2465002B0740 /* MacEngineInfo.swift */; };
 		A746C244200148E9001F4437 /* ChessBoardHash.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A746C242200148E9001F4437 /* ChessBoardHash.cpp */; };
 		A746C245200148ED001F4437 /* ChessBoardHash.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A746C242200148E9001F4437 /* ChessBoardHash.cpp */; };
-		A746C246200148ED001F4437 /* ChessBoardHash.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A746C242200148E9001F4437 /* ChessBoardHash.cpp */; };
 		A746C2492001707F001F4437 /* GameHistory.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A746C2472001707F001F4437 /* GameHistory.cpp */; };
 		A746C24D2001A2FD001F4437 /* GameHistory.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A746C2472001707F001F4437 /* GameHistory.cpp */; };
-		A746C24E2001A306001F4437 /* GameHistory.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A746C2472001707F001F4437 /* GameHistory.cpp */; };
-		A753420B2064BBD100C5BA36 /* Openings.pgn in Resources */ = {isa = PBXBuildFile; fileRef = A7C92AA91FF6EE5500160D2E /* Openings.pgn */; };
 		A75359841FDC51B2008D1DEE /* FENgineInfo+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = A75359831FDC51B2008D1DEE /* FENgineInfo+Extension.swift */; };
 		A75359851FDC994E008D1DEE /* FENgineInfo+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = A75359831FDC51B2008D1DEE /* FENgineInfo+Extension.swift */; };
-		A75359931FDE0947008D1DEE /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A75359921FDE0947008D1DEE /* AppDelegate.swift */; };
-		A75359951FDE0947008D1DEE /* ChessViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A75359941FDE0947008D1DEE /* ChessViewController.swift */; };
-		A75359971FDE0947008D1DEE /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A75359961FDE0947008D1DEE /* Assets.xcassets */; };
-		A753599A1FDE0947008D1DEE /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A75359981FDE0947008D1DEE /* Main.storyboard */; };
-		A75359C31FDE4023008D1DEE /* FENgineInfo+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = A75359831FDC51B2008D1DEE /* FENgineInfo+Extension.swift */; };
-		A75359C41FDE4031008D1DEE /* FEngineInfo.mm in Sources */ = {isa = PBXBuildFile; fileRef = A70A61D01FD4AA9600AFDF0E /* FEngineInfo.mm */; };
-		A75359C51FDE4031008D1DEE /* FEngine.mm in Sources */ = {isa = PBXBuildFile; fileRef = A75683281FCD28A000CF1408 /* FEngine.mm */; };
-		A75359C61FDE4031008D1DEE /* magicmoves.c in Sources */ = {isa = PBXBuildFile; fileRef = A7712D411FCB97A900E7E802 /* magicmoves.c */; };
-		A75359C71FDE4038008D1DEE /* MoveList.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A70A61C51FD4592700AFDF0E /* MoveList.cpp */; };
-		A75359C81FDE4038008D1DEE /* ChessMoveGenerator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A70A61C21FD458DE00AFDF0E /* ChessMoveGenerator.cpp */; };
-		A75359C91FDE4038008D1DEE /* ChessBoard.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A7712D451FCBC13100E7E802 /* ChessBoard.cpp */; };
-		A75359CA1FDE4038008D1DEE /* ChessEvaluater.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A70A61C81FD46E3C00AFDF0E /* ChessEvaluater.cpp */; };
-		A75359CC1FDE4038008D1DEE /* FFEN.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A70A61B91FD132D200AFDF0E /* FFEN.cpp */; };
 		A75683291FCD28A000CF1408 /* FEngine.mm in Sources */ = {isa = PBXBuildFile; fileRef = A75683281FCD28A000CF1408 /* FEngine.mm */; };
 		A756832D1FD0B3FE00CF1408 /* magicmoves.c in Sources */ = {isa = PBXBuildFile; fileRef = A7712D411FCB97A900E7E802 /* magicmoves.c */; };
 		A758BB0625AC119C0092714E /* Actions.swift in Sources */ = {isa = PBXBuildFile; fileRef = A758BB0525AC119C0092714E /* Actions.swift */; };
@@ -53,38 +36,8 @@
 		A75CB25B1FED8F2C005487BD /* MoveTests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A75CB25A1FED8F2B005487BD /* MoveTests.cpp */; };
 		A75CB25D1FED8F82005487BD /* EvaluationTests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A75CB25C1FED8F82005487BD /* EvaluationTests.cpp */; };
 		A75CB25F1FED8F9E005487BD /* CheckTests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A75CB25E1FED8F9E005487BD /* CheckTests.cpp */; };
-		A75CF029204CC80700974912 /* UIActionPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = A75CF028204CC80700974912 /* UIActionPresenter.swift */; };
-		A75CF02B204CC86800974912 /* UIAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = A75CF02A204CC86800974912 /* UIAction.swift */; };
-		A7622E02205DD4B0000ACF55 /* PieceImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7622E01205DD4B0000ACF55 /* PieceImageView.swift */; };
-		A7622E03205DD4B0000ACF55 /* PieceImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7622E01205DD4B0000ACF55 /* PieceImageView.swift */; };
-		A7622E05205DD5DE000ACF55 /* Rect.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7622E04205DD5DE000ACF55 /* Rect.swift */; };
-		A7622E06205DD5DE000ACF55 /* Rect.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7622E04205DD5DE000ACF55 /* Rect.swift */; };
-		A7622E08205DD704000ACF55 /* GestureRecognizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7622E07205DD704000ACF55 /* GestureRecognizer.swift */; };
-		A7622E09205DD704000ACF55 /* GestureRecognizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7622E07205DD704000ACF55 /* GestureRecognizer.swift */; };
 		A765D8611FF6C1950045BB36 /* ChessOpenings.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A765D85F1FF6C1950045BB36 /* ChessOpenings.cpp */; };
-		A7688F22204A6911004B1E9E /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7688F21204A6911004B1E9E /* AppDelegate.swift */; };
-		A7688F24204A6911004B1E9E /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7688F23204A6911004B1E9E /* ViewController.swift */; };
-		A7688F27204A6911004B1E9E /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A7688F25204A6911004B1E9E /* Main.storyboard */; };
-		A7688F29204A6911004B1E9E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A7688F28204A6911004B1E9E /* Assets.xcassets */; };
-		A7688F2C204A6911004B1E9E /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A7688F2A204A6911004B1E9E /* LaunchScreen.storyboard */; };
-		A7688F4E204A699F004B1E9E /* ChessView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7688F4D204A699F004B1E9E /* ChessView.swift */; };
-		A7688F4F204A6A0C004B1E9E /* FEngine.mm in Sources */ = {isa = PBXBuildFile; fileRef = A75683281FCD28A000CF1408 /* FEngine.mm */; };
-		A7688F50204A6A0F004B1E9E /* FEngineUtility.mm in Sources */ = {isa = PBXBuildFile; fileRef = A7C92AB81FF86F6800160D2E /* FEngineUtility.mm */; };
-		A7688F51204A6A14004B1E9E /* FEngineInfo.mm in Sources */ = {isa = PBXBuildFile; fileRef = A70A61D01FD4AA9600AFDF0E /* FEngineInfo.mm */; };
-		A7688F52204A6A14004B1E9E /* FEngineMove.mm in Sources */ = {isa = PBXBuildFile; fileRef = A7C92AB31FF86BF200160D2E /* FEngineMove.mm */; };
-		A7688F53204A6A27004B1E9E /* MoveList.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A70A61C51FD4592700AFDF0E /* MoveList.cpp */; };
-		A7688F54204A6A27004B1E9E /* ChessMoveGenerator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A70A61C21FD458DE00AFDF0E /* ChessMoveGenerator.cpp */; };
-		A7688F55204A6A27004B1E9E /* ChessEvaluater.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A70A61C81FD46E3C00AFDF0E /* ChessEvaluater.cpp */; };
-		A7688F56204A6A27004B1E9E /* ChessBoard.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A7712D451FCBC13100E7E802 /* ChessBoard.cpp */; };
-		A7688F57204A6A27004B1E9E /* GameHistory.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A746C2472001707F001F4437 /* GameHistory.cpp */; };
-		A7688F58204A6A27004B1E9E /* magicmoves.c in Sources */ = {isa = PBXBuildFile; fileRef = A7712D411FCB97A900E7E802 /* magicmoves.c */; };
-		A7688F59204A6A27004B1E9E /* ChessBoardHash.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A746C242200148E9001F4437 /* ChessBoardHash.cpp */; };
-		A7688F5A204A6A27004B1E9E /* FFEN.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A70A61B91FD132D200AFDF0E /* FFEN.cpp */; };
-		A7688F5B204A6A27004B1E9E /* FPGN.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A77371FF1FE320010001A90F /* FPGN.cpp */; };
-		A7688F5C204A6A30004B1E9E /* ChessGame.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A77371FC1FE31FEF0001A90F /* ChessGame.cpp */; };
-		A7688F5D204A6A30004B1E9E /* ChessOpenings.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A765D85F1FF6C1950045BB36 /* ChessOpenings.cpp */; };
 		A7688F60204B6E91004B1E9E /* ChessState.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A7688F5E204B6E91004B1E9E /* ChessState.cpp */; };
-		A7688F61204B6FFA004B1E9E /* ChessState.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A7688F5E204B6E91004B1E9E /* ChessState.cpp */; };
 		A7688F62204B739E004B1E9E /* ChessState.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A7688F5E204B6E91004B1E9E /* ChessState.cpp */; };
 		A7688F64204B73BF004B1E9E /* StateTests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A7688F63204B73BF004B1E9E /* StateTests.cpp */; };
 		A7712D2F1FC7C4CD00E7E802 /* UCI.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7712D2E1FC7C4CD00E7E802 /* UCI.swift */; };
@@ -94,14 +47,10 @@
 		A77372011FE320010001A90F /* FPGN.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A77371FF1FE320010001A90F /* FPGN.cpp */; };
 		A77372021FE334BB0001A90F /* ChessGame.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A77371FC1FE31FEF0001A90F /* ChessGame.cpp */; };
 		A77372031FE334BB0001A90F /* FPGN.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A77371FF1FE320010001A90F /* FPGN.cpp */; };
-		A77372051FE443D70001A90F /* FPGN.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A77371FF1FE320010001A90F /* FPGN.cpp */; };
-		A77372061FE443DA0001A90F /* ChessGame.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A77371FC1FE31FEF0001A90F /* ChessGame.cpp */; };
 		A775236325AD6532009BFFD1 /* Openings.pgn in Resources */ = {isa = PBXBuildFile; fileRef = A7C92AA91FF6EE5500160D2E /* Openings.pgn */; };
 		A775236C25AD6533009BFFD1 /* Openings.pgn in Resources */ = {isa = PBXBuildFile; fileRef = A7C92AA91FF6EE5500160D2E /* Openings.pgn */; };
 		A775237625AD68FA009BFFD1 /* Animation.swift in Sources */ = {isa = PBXBuildFile; fileRef = A775237525AD68FA009BFFD1 /* Animation.swift */; };
 		A775237725AD68FA009BFFD1 /* Animation.swift in Sources */ = {isa = PBXBuildFile; fileRef = A775237525AD68FA009BFFD1 /* Animation.swift */; };
-		A77E6C39204BBDB600ECF6CD /* ChessState.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A7688F5E204B6E91004B1E9E /* ChessState.cpp */; };
-		A77E6C3B204BCFF900ECF6CD /* EngineInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = A77E6C3A204BCFF900ECF6CD /* EngineInfo.swift */; };
 		A77F66C825A832270030E61D /* Tests_iOS.swift in Sources */ = {isa = PBXBuildFile; fileRef = A77F66C725A832270030E61D /* Tests_iOS.swift */; };
 		A77F66D325A832270030E61D /* Tests_macOS.swift in Sources */ = {isa = PBXBuildFile; fileRef = A77F66D225A832270030E61D /* Tests_macOS.swift */; };
 		A77F66D525A832270030E61D /* BChessUIApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A77F66AC25A832230030E61D /* BChessUIApp.swift */; };
@@ -146,47 +95,17 @@
 		A7A30EC325AEB28D00729432 /* ActionsToolbar.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7A30EC125AEB28D00729432 /* ActionsToolbar.swift */; };
 		A7A30EDD25AEBD7C00729432 /* LabelsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7A30EDC25AEBD7C00729432 /* LabelsView.swift */; };
 		A7A30EDE25AEBD7C00729432 /* LabelsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7A30EDC25AEBD7C00729432 /* LabelsView.swift */; };
-		A7AA42A920538C7F00FAACA2 /* ChessViewInteraction.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7AA42A820538C7F00FAACA2 /* ChessViewInteraction.swift */; };
-		A7AA42AA20538C7F00FAACA2 /* ChessViewInteraction.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7AA42A820538C7F00FAACA2 /* ChessViewInteraction.swift */; };
-		A7AA42AC205608ED00FAACA2 /* ChessViewPromotionPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7AA42AB205608ED00FAACA2 /* ChessViewPromotionPicker.swift */; };
-		A7AA42AD205608ED00FAACA2 /* ChessViewPromotionPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7AA42AB205608ED00FAACA2 /* ChessViewPromotionPicker.swift */; };
 		A7AFCCAA1FB4E40D00AE3D85 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7AFCCA91FB4E40D00AE3D85 /* main.swift */; };
-		A7C92AA81FF6D74400160D2E /* ChessOpenings.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A765D85F1FF6C1950045BB36 /* ChessOpenings.cpp */; };
-		A7C92AAA1FF6EE5500160D2E /* Openings.pgn in Resources */ = {isa = PBXBuildFile; fileRef = A7C92AA91FF6EE5500160D2E /* Openings.pgn */; };
 		A7C92AAB1FF6F19100160D2E /* Openings.pgn in Resources */ = {isa = PBXBuildFile; fileRef = A7C92AA91FF6EE5500160D2E /* Openings.pgn */; };
 		A7C92AB41FF86BF200160D2E /* FEngineMove.mm in Sources */ = {isa = PBXBuildFile; fileRef = A7C92AB31FF86BF200160D2E /* FEngineMove.mm */; };
 		A7C92AB51FF86C4300160D2E /* FEngineMove.mm in Sources */ = {isa = PBXBuildFile; fileRef = A7C92AB31FF86BF200160D2E /* FEngineMove.mm */; };
-		A7C92AB61FF86C4300160D2E /* FEngineMove.mm in Sources */ = {isa = PBXBuildFile; fileRef = A7C92AB31FF86BF200160D2E /* FEngineMove.mm */; };
 		A7C92AB91FF86F6800160D2E /* FEngineUtility.mm in Sources */ = {isa = PBXBuildFile; fileRef = A7C92AB81FF86F6800160D2E /* FEngineUtility.mm */; };
-		A7C92ABA1FF86F6800160D2E /* FEngineUtility.mm in Sources */ = {isa = PBXBuildFile; fileRef = A7C92AB81FF86F6800160D2E /* FEngineUtility.mm */; };
 		A7C92ABB1FF8712800160D2E /* FEngineUtility.mm in Sources */ = {isa = PBXBuildFile; fileRef = A7C92AB81FF86F6800160D2E /* FEngineUtility.mm */; };
 		A7E3B6891FF6C85500DBB66B /* OpeningsTests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A7E3B6881FF6C85500DBB66B /* OpeningsTests.cpp */; };
 		A7E490EB1FEA207100970EAD /* gtest-all.cc in Sources */ = {isa = PBXBuildFile; fileRef = A7E490EA1FEA207100970EAD /* gtest-all.cc */; };
 		A7E490EC1FEA23DD00970EAD /* PGNTests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A77372041FE340780001A90F /* PGNTests.cpp */; };
 		A7E490ED1FEA29B900970EAD /* GamesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7712D321FC8957500E7E802 /* GamesTests.swift */; };
 		A7E490F21FEA2E7E00970EAD /* GoogleTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = A7E490F11FEA2E7E00970EAD /* GoogleTests.mm */; };
-		A7E8B701204CC9D200DD2323 /* FENgineInfo+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = A75359831FDC51B2008D1DEE /* FENgineInfo+Extension.swift */; };
-		A7E8B703204CCBC500DD2323 /* ChessViewState.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7E8B702204CCBC500DD2323 /* ChessViewState.swift */; };
-		A7E8B707204CDAF900DD2323 /* ChessViewFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7E8B706204CDAF900DD2323 /* ChessViewFactory.swift */; };
-		A7E8B709204CE63100DD2323 /* ChessViewPiece.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7E8B708204CE63100DD2323 /* ChessViewPiece.swift */; };
-		A7E8B70B204CE70A00DD2323 /* ChessViewPieces.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7E8B70A204CE70A00DD2323 /* ChessViewPieces.swift */; };
-		A7E8B70F204D180400DD2323 /* ChessViewLayouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7E8B704204CDAD900DD2323 /* ChessViewLayouter.swift */; };
-		A7E8B710204D190100DD2323 /* ChessViewFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7E8B706204CDAF900DD2323 /* ChessViewFactory.swift */; };
-		A7E8B711204D190400DD2323 /* ChessViewLayouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7E8B704204CDAD900DD2323 /* ChessViewLayouter.swift */; };
-		A7E8B713204D192900DD2323 /* Image.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7E8B712204D192900DD2323 /* Image.swift */; };
-		A7E8B714204D192900DD2323 /* Image.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7E8B712204D192900DD2323 /* Image.swift */; };
-		A7E8B717204D19BB00DD2323 /* View.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7E8B715204D19B800DD2323 /* View.swift */; };
-		A7E8B718204D19BC00DD2323 /* View.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7E8B715204D19B800DD2323 /* View.swift */; };
-		A7E8B71B204D1A4F00DD2323 /* ChessViewPiece.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7E8B708204CE63100DD2323 /* ChessViewPiece.swift */; };
-		A7E8B71C204D1A9500DD2323 /* ImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7E8B719204D1A0300DD2323 /* ImageView.swift */; };
-		A7E8B71D204D1A9600DD2323 /* ImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7E8B719204D1A0300DD2323 /* ImageView.swift */; };
-		A7E8B71E204D1AA700DD2323 /* ChessViewState.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7E8B702204CCBC500DD2323 /* ChessViewState.swift */; };
-		A7E8B71F204D1ABB00DD2323 /* ChessViewPieces.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7E8B70A204CE70A00DD2323 /* ChessViewPieces.swift */; };
-		A7E8B720204D1BEC00DD2323 /* ChessView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7688F4D204A699F004B1E9E /* ChessView.swift */; };
-		A7E8B722204D1D0300DD2323 /* Color.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7E8B721204D1D0300DD2323 /* Color.swift */; };
-		A7E8B723204D1D0300DD2323 /* Color.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7E8B721204D1D0300DD2323 /* Color.swift */; };
-		A7E8B725204FAED800DD2323 /* Font.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7E8B724204FAED800DD2323 /* Font.swift */; };
-		A7E8B726204FAED800DD2323 /* Font.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7E8B724204FAED800DD2323 /* Font.swift */; };
 		A7EBE7CF1FF6C93600ACDF85 /* ChessOpenings.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A765D85F1FF6C1950045BB36 /* ChessOpenings.cpp */; };
 		A7EF55C81FF191B1004CF2DA /* SearchChessTests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A7E490E41FEA1C0600970EAD /* SearchChessTests.cpp */; };
 		A7EF55C91FF1CF77004CF2DA /* BestMoveTests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A70A61BD1FD3196400AFDF0E /* BestMoveTests.cpp */; };
@@ -268,11 +187,9 @@
 		A70A61C91FD46E3C00AFDF0E /* ChessEvaluater.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = ChessEvaluater.hpp; sourceTree = "<group>"; };
 		A70A61CF1FD4AA9600AFDF0E /* FEngineInfo.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FEngineInfo.h; sourceTree = "<group>"; };
 		A70A61D01FD4AA9600AFDF0E /* FEngineInfo.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = FEngineInfo.mm; sourceTree = "<group>"; };
-		A7195E73218C154C00E4C0D8 /* BChess.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = BChess.entitlements; sourceTree = "<group>"; };
 		A72E2B56200496CC006CBB1C /* BoardHashTests.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BoardHashTests.cpp; sourceTree = "<group>"; };
 		A731BD3620009856004C13EF /* Tournament.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tournament.swift; sourceTree = "<group>"; };
 		A731BD382000A513004C13EF /* TournamentEngines.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TournamentEngines.swift; sourceTree = "<group>"; };
-		A7460F001FDF2465002B0740 /* MacEngineInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacEngineInfo.swift; sourceTree = "<group>"; };
 		A746C242200148E9001F4437 /* ChessBoardHash.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ChessBoardHash.cpp; sourceTree = "<group>"; };
 		A746C243200148E9001F4437 /* ChessBoardHash.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = ChessBoardHash.hpp; sourceTree = "<group>"; };
 		A746C2472001707F001F4437 /* GameHistory.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = GameHistory.cpp; sourceTree = "<group>"; };
@@ -281,13 +198,6 @@
 		A75359831FDC51B2008D1DEE /* FENgineInfo+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FENgineInfo+Extension.swift"; sourceTree = "<group>"; };
 		A75359871FDCF8D6008D1DEE /* Bitboard.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Bitboard.hpp; sourceTree = "<group>"; };
 		A753598A1FDCF95E008D1DEE /* Coordinate.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Coordinate.hpp; sourceTree = "<group>"; };
-		A75359901FDE0947008D1DEE /* BChess.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BChess.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		A75359921FDE0947008D1DEE /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		A75359941FDE0947008D1DEE /* ChessViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChessViewController.swift; sourceTree = "<group>"; };
-		A75359961FDE0947008D1DEE /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		A75359991FDE0947008D1DEE /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
-		A753599B1FDE0947008D1DEE /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		A753599C1FDE0947008D1DEE /* BChessMac.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = BChessMac.entitlements; sourceTree = "<group>"; };
 		A75683271FCD28A000CF1408 /* FEngine.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FEngine.h; sourceTree = "<group>"; };
 		A75683281FCD28A000CF1408 /* FEngine.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = FEngine.mm; sourceTree = "<group>"; };
 		A758BB0525AC119C0092714E /* Actions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Actions.swift; sourceTree = "<group>"; };
@@ -298,20 +208,11 @@
 		A75CB25C1FED8F82005487BD /* EvaluationTests.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = EvaluationTests.cpp; sourceTree = "<group>"; };
 		A75CB25E1FED8F9E005487BD /* CheckTests.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CheckTests.cpp; sourceTree = "<group>"; };
 		A75CB2611FED9693005487BD /* IterativeDeepening.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = IterativeDeepening.hpp; sourceTree = "<group>"; };
-		A75CF028204CC80700974912 /* UIActionPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIActionPresenter.swift; sourceTree = "<group>"; };
-		A75CF02A204CC86800974912 /* UIAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIAction.swift; sourceTree = "<group>"; };
 		A7622E01205DD4B0000ACF55 /* PieceImageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PieceImageView.swift; sourceTree = "<group>"; };
 		A7622E04205DD5DE000ACF55 /* Rect.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Rect.swift; sourceTree = "<group>"; };
 		A7622E07205DD704000ACF55 /* GestureRecognizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GestureRecognizer.swift; sourceTree = "<group>"; };
 		A765D85F1FF6C1950045BB36 /* ChessOpenings.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ChessOpenings.cpp; sourceTree = "<group>"; };
 		A765D8601FF6C1950045BB36 /* ChessOpenings.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = ChessOpenings.hpp; sourceTree = "<group>"; };
-		A7688F1F204A6911004B1E9E /* BChess.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BChess.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		A7688F21204A6911004B1E9E /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		A7688F23204A6911004B1E9E /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
-		A7688F26204A6911004B1E9E /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
-		A7688F28204A6911004B1E9E /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		A7688F2B204A6911004B1E9E /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
-		A7688F2D204A6911004B1E9E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		A7688F4D204A699F004B1E9E /* ChessView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChessView.swift; sourceTree = "<group>"; };
 		A7688F5E204B6E91004B1E9E /* ChessState.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ChessState.cpp; sourceTree = "<group>"; };
 		A7688F5F204B6E91004B1E9E /* ChessState.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = ChessState.hpp; sourceTree = "<group>"; };
@@ -332,7 +233,6 @@
 		A77372001FE320010001A90F /* FPGN.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = FPGN.hpp; sourceTree = "<group>"; };
 		A77372041FE340780001A90F /* PGNTests.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PGNTests.cpp; sourceTree = "<group>"; };
 		A775237525AD68FA009BFFD1 /* Animation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Animation.swift; sourceTree = "<group>"; };
-		A77E6C3A204BCFF900ECF6CD /* EngineInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EngineInfo.swift; sourceTree = "<group>"; };
 		A77F66AC25A832230030E61D /* BChessUIApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BChessUIApp.swift; sourceTree = "<group>"; };
 		A77F66AD25A832240030E61D /* BChessUIDocument.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BChessUIDocument.swift; sourceTree = "<group>"; };
 		A77F66AE25A832240030E61D /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -396,20 +296,6 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		A753598D1FDE0947008D1DEE /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		A7688F1C204A6911004B1E9E /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		A7712D111FB916E900E7E802 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -523,29 +409,6 @@
 			path = "Crossplatform UI";
 			sourceTree = "<group>";
 		};
-		A75359911FDE0947008D1DEE /* BChessMac */ = {
-			isa = PBXGroup;
-			children = (
-				A75359921FDE0947008D1DEE /* AppDelegate.swift */,
-				A75359941FDE0947008D1DEE /* ChessViewController.swift */,
-				A7460F001FDF2465002B0740 /* MacEngineInfo.swift */,
-				A75359961FDE0947008D1DEE /* Assets.xcassets */,
-				A75359981FDE0947008D1DEE /* Main.storyboard */,
-				A753599B1FDE0947008D1DEE /* Info.plist */,
-				A753599C1FDE0947008D1DEE /* BChessMac.entitlements */,
-			);
-			path = BChessMac;
-			sourceTree = "<group>";
-		};
-		A75CF02E204CC8EF00974912 /* UIAction */ = {
-			isa = PBXGroup;
-			children = (
-				A75CF028204CC80700974912 /* UIActionPresenter.swift */,
-				A75CF02A204CC86800974912 /* UIAction.swift */,
-			);
-			path = UIAction;
-			sourceTree = "<group>";
-		};
 		A765D8621FF6C1B30045BB36 /* Algorithm */ = {
 			isa = PBXGroup;
 			children = (
@@ -554,22 +417,6 @@
 				A75BFAC61FE8C05E001EE942 /* MinMaxSearch.hpp */,
 			);
 			path = Algorithm;
-			sourceTree = "<group>";
-		};
-		A7688F20204A6911004B1E9E /* BChessiOS */ = {
-			isa = PBXGroup;
-			children = (
-				A7195E73218C154C00E4C0D8 /* BChess.entitlements */,
-				A7688F21204A6911004B1E9E /* AppDelegate.swift */,
-				A7688F23204A6911004B1E9E /* ViewController.swift */,
-				A77E6C3A204BCFF900ECF6CD /* EngineInfo.swift */,
-				A75CF02E204CC8EF00974912 /* UIAction */,
-				A7688F25204A6911004B1E9E /* Main.storyboard */,
-				A7688F28204A6911004B1E9E /* Assets.xcassets */,
-				A7688F2A204A6911004B1E9E /* LaunchScreen.storyboard */,
-				A7688F2D204A6911004B1E9E /* Info.plist */,
-			);
-			path = BChessiOS;
 			sourceTree = "<group>";
 		};
 		A7712D151FB916E900E7E802 /* BChessTests */ = {
@@ -718,8 +565,6 @@
 				A7712D311FC7C5CF00E7E802 /* ToDo.md */,
 				A7AFCCA81FB4E40D00AE3D85 /* BChess */,
 				A7712D151FB916E900E7E802 /* BChessTests */,
-				A75359911FDE0947008D1DEE /* BChessMac */,
-				A7688F20204A6911004B1E9E /* BChessiOS */,
 				A77F66AB25A832230030E61D /* Shared */,
 				A77F66B525A832270030E61D /* iOS */,
 				A77F66BC25A832270030E61D /* macOS */,
@@ -734,8 +579,6 @@
 			children = (
 				A7AFCCA61FB4E40D00AE3D85 /* BChess */,
 				A7712D141FB916E900E7E802 /* BChessTests.xctest */,
-				A75359901FDE0947008D1DEE /* BChess.app */,
-				A7688F1F204A6911004B1E9E /* BChess.app */,
 				A77F66B425A832270030E61D /* BChess.app */,
 				A77F66BB25A832270030E61D /* BChess.app */,
 				A77F66C325A832270030E61D /* Tests iOS.xctest */,
@@ -787,40 +630,6 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		A753598F1FDE0947008D1DEE /* BChessMac */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = A75359B31FDE0947008D1DEE /* Build configuration list for PBXNativeTarget "BChessMac" */;
-			buildPhases = (
-				A753598C1FDE0947008D1DEE /* Sources */,
-				A753598D1FDE0947008D1DEE /* Frameworks */,
-				A753598E1FDE0947008D1DEE /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			name = BChessMac;
-			productName = BChessMac;
-			productReference = A75359901FDE0947008D1DEE /* BChess.app */;
-			productType = "com.apple.product-type.application";
-		};
-		A7688F1E204A6911004B1E9E /* BChessiOS */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = A7688F4A204A6912004B1E9E /* Build configuration list for PBXNativeTarget "BChessiOS" */;
-			buildPhases = (
-				A7688F1B204A6911004B1E9E /* Sources */,
-				A7688F1C204A6911004B1E9E /* Frameworks */,
-				A7688F1D204A6911004B1E9E /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			name = BChessiOS;
-			productName = BChessiOS;
-			productReference = A7688F1F204A6911004B1E9E /* BChess.app */;
-			productType = "com.apple.product-type.application";
-		};
 		A7712D131FB916E900E7E802 /* BChessTests */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = A7712D191FB916E900E7E802 /* Build configuration list for PBXNativeTarget "BChessTests" */;
@@ -935,20 +744,6 @@
 				LastUpgradeCheck = 1230;
 				ORGANIZATIONNAME = "Jean Bovet";
 				TargetAttributes = {
-					A753598F1FDE0947008D1DEE = {
-						CreatedOnToolsVersion = 9.2;
-						LastSwiftMigration = 1000;
-						ProvisioningStyle = Automatic;
-					};
-					A7688F1E204A6911004B1E9E = {
-						CreatedOnToolsVersion = 9.2;
-						ProvisioningStyle = Automatic;
-						SystemCapabilities = {
-							com.apple.AccessWiFi = {
-								enabled = 0;
-							};
-						};
-					};
 					A7712D131FB916E900E7E802 = {
 						CreatedOnToolsVersion = 9.1;
 						LastSwiftMigration = 1000;
@@ -994,8 +789,6 @@
 			targets = (
 				A7AFCCA51FB4E40D00AE3D85 /* BChess */,
 				A7712D131FB916E900E7E802 /* BChessTests */,
-				A753598F1FDE0947008D1DEE /* BChessMac */,
-				A7688F1E204A6911004B1E9E /* BChessiOS */,
 				A77F66B325A832270030E61D /* BChess (iOS) */,
 				A77F66BA25A832270030E61D /* BChess (macOS) */,
 				A77F66C225A832270030E61D /* Tests iOS */,
@@ -1005,27 +798,6 @@
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		A753598E1FDE0947008D1DEE /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				A7C92AAA1FF6EE5500160D2E /* Openings.pgn in Resources */,
-				A75359971FDE0947008D1DEE /* Assets.xcassets in Resources */,
-				A753599A1FDE0947008D1DEE /* Main.storyboard in Resources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		A7688F1D204A6911004B1E9E /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				A7688F2C204A6911004B1E9E /* LaunchScreen.storyboard in Resources */,
-				A7688F29204A6911004B1E9E /* Assets.xcassets in Resources */,
-				A753420B2064BBD100C5BA36 /* Openings.pgn in Resources */,
-				A7688F27204A6911004B1E9E /* Main.storyboard in Resources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		A7712D121FB916E900E7E802 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -1069,94 +841,6 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		A753598C1FDE0947008D1DEE /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				A7E8B71E204D1AA700DD2323 /* ChessViewState.swift in Sources */,
-				A7C92ABA1FF86F6800160D2E /* FEngineUtility.mm in Sources */,
-				A7E8B71C204D1A9500DD2323 /* ImageView.swift in Sources */,
-				A75359CA1FDE4038008D1DEE /* ChessEvaluater.cpp in Sources */,
-				A746C24E2001A306001F4437 /* GameHistory.cpp in Sources */,
-				A75359C31FDE4023008D1DEE /* FENgineInfo+Extension.swift in Sources */,
-				A7E8B71F204D1ABB00DD2323 /* ChessViewPieces.swift in Sources */,
-				A7460F011FDF2465002B0740 /* MacEngineInfo.swift in Sources */,
-				A7E8B71B204D1A4F00DD2323 /* ChessViewPiece.swift in Sources */,
-				A7C92AA81FF6D74400160D2E /* ChessOpenings.cpp in Sources */,
-				A77372051FE443D70001A90F /* FPGN.cpp in Sources */,
-				A75359C61FDE4031008D1DEE /* magicmoves.c in Sources */,
-				A7622E08205DD704000ACF55 /* GestureRecognizer.swift in Sources */,
-				A75359951FDE0947008D1DEE /* ChessViewController.swift in Sources */,
-				A77372061FE443DA0001A90F /* ChessGame.cpp in Sources */,
-				A7E8B711204D190400DD2323 /* ChessViewLayouter.swift in Sources */,
-				A7E8B720204D1BEC00DD2323 /* ChessView.swift in Sources */,
-				A75359931FDE0947008D1DEE /* AppDelegate.swift in Sources */,
-				A75359C71FDE4038008D1DEE /* MoveList.cpp in Sources */,
-				A7622E02205DD4B0000ACF55 /* PieceImageView.swift in Sources */,
-				A75359CC1FDE4038008D1DEE /* FFEN.cpp in Sources */,
-				A7AA42A920538C7F00FAACA2 /* ChessViewInteraction.swift in Sources */,
-				A7E8B722204D1D0300DD2323 /* Color.swift in Sources */,
-				A75359C51FDE4031008D1DEE /* FEngine.mm in Sources */,
-				A7E8B710204D190100DD2323 /* ChessViewFactory.swift in Sources */,
-				A746C246200148ED001F4437 /* ChessBoardHash.cpp in Sources */,
-				A7E8B713204D192900DD2323 /* Image.swift in Sources */,
-				A75359C91FDE4038008D1DEE /* ChessBoard.cpp in Sources */,
-				A7E8B717204D19BB00DD2323 /* View.swift in Sources */,
-				A75359C41FDE4031008D1DEE /* FEngineInfo.mm in Sources */,
-				A7C92AB61FF86C4300160D2E /* FEngineMove.mm in Sources */,
-				A7622E05205DD5DE000ACF55 /* Rect.swift in Sources */,
-				A7E8B725204FAED800DD2323 /* Font.swift in Sources */,
-				A77E6C39204BBDB600ECF6CD /* ChessState.cpp in Sources */,
-				A7AA42AC205608ED00FAACA2 /* ChessViewPromotionPicker.swift in Sources */,
-				A75359C81FDE4038008D1DEE /* ChessMoveGenerator.cpp in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		A7688F1B204A6911004B1E9E /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				A7688F53204A6A27004B1E9E /* MoveList.cpp in Sources */,
-				A7688F61204B6FFA004B1E9E /* ChessState.cpp in Sources */,
-				A7E8B723204D1D0300DD2323 /* Color.swift in Sources */,
-				A7AA42AD205608ED00FAACA2 /* ChessViewPromotionPicker.swift in Sources */,
-				A7688F58204A6A27004B1E9E /* magicmoves.c in Sources */,
-				A7622E03205DD4B0000ACF55 /* PieceImageView.swift in Sources */,
-				A7E8B70B204CE70A00DD2323 /* ChessViewPieces.swift in Sources */,
-				A7688F52204A6A14004B1E9E /* FEngineMove.mm in Sources */,
-				A7E8B709204CE63100DD2323 /* ChessViewPiece.swift in Sources */,
-				A7688F5D204A6A30004B1E9E /* ChessOpenings.cpp in Sources */,
-				A7688F55204A6A27004B1E9E /* ChessEvaluater.cpp in Sources */,
-				A7E8B71D204D1A9600DD2323 /* ImageView.swift in Sources */,
-				A7622E09205DD704000ACF55 /* GestureRecognizer.swift in Sources */,
-				A7688F5B204A6A27004B1E9E /* FPGN.cpp in Sources */,
-				A7688F51204A6A14004B1E9E /* FEngineInfo.mm in Sources */,
-				A7E8B726204FAED800DD2323 /* Font.swift in Sources */,
-				A7688F57204A6A27004B1E9E /* GameHistory.cpp in Sources */,
-				A75CF029204CC80700974912 /* UIActionPresenter.swift in Sources */,
-				A7688F5C204A6A30004B1E9E /* ChessGame.cpp in Sources */,
-				A7688F24204A6911004B1E9E /* ViewController.swift in Sources */,
-				A7E8B70F204D180400DD2323 /* ChessViewLayouter.swift in Sources */,
-				A7AA42AA20538C7F00FAACA2 /* ChessViewInteraction.swift in Sources */,
-				A7688F50204A6A0F004B1E9E /* FEngineUtility.mm in Sources */,
-				A7688F22204A6911004B1E9E /* AppDelegate.swift in Sources */,
-				A7E8B701204CC9D200DD2323 /* FENgineInfo+Extension.swift in Sources */,
-				A77E6C3B204BCFF900ECF6CD /* EngineInfo.swift in Sources */,
-				A7E8B714204D192900DD2323 /* Image.swift in Sources */,
-				A7688F5A204A6A27004B1E9E /* FFEN.cpp in Sources */,
-				A7688F4F204A6A0C004B1E9E /* FEngine.mm in Sources */,
-				A75CF02B204CC86800974912 /* UIAction.swift in Sources */,
-				A7688F4E204A699F004B1E9E /* ChessView.swift in Sources */,
-				A7688F59204A6A27004B1E9E /* ChessBoardHash.cpp in Sources */,
-				A7688F54204A6A27004B1E9E /* ChessMoveGenerator.cpp in Sources */,
-				A7E8B718204D19BC00DD2323 /* View.swift in Sources */,
-				A7688F56204A6A27004B1E9E /* ChessBoard.cpp in Sources */,
-				A7622E06205DD5DE000ACF55 /* Rect.swift in Sources */,
-				A7E8B703204CCBC500DD2323 /* ChessViewState.swift in Sources */,
-				A7E8B707204CDAF900DD2323 /* ChessViewFactory.swift in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		A7712D101FB916E900E7E802 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -1343,105 +1027,7 @@
 		};
 /* End PBXTargetDependency section */
 
-/* Begin PBXVariantGroup section */
-		A75359981FDE0947008D1DEE /* Main.storyboard */ = {
-			isa = PBXVariantGroup;
-			children = (
-				A75359991FDE0947008D1DEE /* Base */,
-			);
-			name = Main.storyboard;
-			sourceTree = "<group>";
-		};
-		A7688F25204A6911004B1E9E /* Main.storyboard */ = {
-			isa = PBXVariantGroup;
-			children = (
-				A7688F26204A6911004B1E9E /* Base */,
-			);
-			name = Main.storyboard;
-			sourceTree = "<group>";
-		};
-		A7688F2A204A6911004B1E9E /* LaunchScreen.storyboard */ = {
-			isa = PBXVariantGroup;
-			children = (
-				A7688F2B204A6911004B1E9E /* Base */,
-			);
-			name = LaunchScreen.storyboard;
-			sourceTree = "<group>";
-		};
-/* End PBXVariantGroup section */
-
 /* Begin XCBuildConfiguration section */
-		A75359B41FDE0947008D1DEE /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_ENTITLEMENTS = BChessMac/BChessMac.entitlements;
-				CODE_SIGN_IDENTITY = "-";
-				CODE_SIGN_STYLE = Automatic;
-				COMBINE_HIDPI_IMAGES = YES;
-				DEVELOPMENT_TEAM = 28XRU7S6GA;
-				INFOPLIST_FILE = BChessMac/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = ch.arizonasoftware.BChess;
-				PRODUCT_NAME = BChess;
-				SWIFT_OBJC_BRIDGING_HEADER = "BChess/BChess-Bridging-Header.h";
-			};
-			name = Debug;
-		};
-		A75359B51FDE0947008D1DEE /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_ENTITLEMENTS = BChessMac/BChessMac.entitlements;
-				CODE_SIGN_IDENTITY = "-";
-				CODE_SIGN_STYLE = Automatic;
-				COMBINE_HIDPI_IMAGES = YES;
-				DEVELOPMENT_TEAM = 28XRU7S6GA;
-				INFOPLIST_FILE = BChessMac/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = ch.arizonasoftware.BChess;
-				PRODUCT_NAME = BChess;
-				SWIFT_OBJC_BRIDGING_HEADER = "BChess/BChess-Bridging-Header.h";
-			};
-			name = Release;
-		};
-		A7688F44204A6912004B1E9E /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = 28XRU7S6GA;
-				INFOPLIST_FILE = BChessiOS/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = ch.arizonasoftware.BChess;
-				PRODUCT_NAME = BChess;
-				SDKROOT = iphoneos;
-				SWIFT_OBJC_BRIDGING_HEADER = "BChess/BChess-Bridging-Header.h";
-				TARGETED_DEVICE_FAMILY = "1,2";
-			};
-			name = Debug;
-		};
-		A7688F45204A6912004B1E9E /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = 28XRU7S6GA;
-				INFOPLIST_FILE = BChessiOS/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = ch.arizonasoftware.BChess;
-				PRODUCT_NAME = BChess;
-				SDKROOT = iphoneos;
-				SWIFT_OBJC_BRIDGING_HEADER = "BChess/BChess-Bridging-Header.h";
-				TARGETED_DEVICE_FAMILY = "1,2";
-				VALIDATE_PRODUCT = YES;
-			};
-			name = Release;
-		};
 		A7712D1A1FB916E900E7E802 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -1808,24 +1394,6 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		A75359B31FDE0947008D1DEE /* Build configuration list for PBXNativeTarget "BChessMac" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				A75359B41FDE0947008D1DEE /* Debug */,
-				A75359B51FDE0947008D1DEE /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		A7688F4A204A6912004B1E9E /* Build configuration list for PBXNativeTarget "BChessiOS" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				A7688F44204A6912004B1E9E /* Debug */,
-				A7688F45204A6912004B1E9E /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
 		A7712D191FB916E900E7E802 /* Build configuration list for PBXNativeTarget "BChessTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
