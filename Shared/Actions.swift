@@ -70,6 +70,30 @@ struct Actions {
         }
     }
 
+    func copyFEN() {
+        #if os(macOS)
+        let pb = NSPasteboard.general
+        pb.declareTypes([.string], owner: nil)
+        pb.setString(engine.fen(), forType: .string)
+        #else
+        UIPasteboard.general.string = engine.fen()
+        #endif
+    }
+    
+    func pasteFEN() {
+        #if os(macOS)
+        guard let content = NSPasteboard.general.string(forType: .string) else {
+            return
+        }
+        #else
+        guard let content = UIPasteboard.general.string else {
+            return
+        }
+        #endif
+        engine.setFEN(content)
+        document.pgn = document.engine.pgn()
+    }
+    
     func enginePlay() {
         engine.evaluate { (info, completed) in
             DispatchQueue.main.async {

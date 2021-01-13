@@ -26,7 +26,7 @@ struct UndoMoveButton: View {
     @Binding var document: BChessUIDocument
     var body: some View {
         Button(action: { Actions(document: $document).undoMove() }) {
-            Label("Undo Move", systemImage: "arrow.uturn.backward.square.fill")
+            Label("Undo Move", systemImage: "arrow.uturn.backward.square")
         }.disabled(!document.engine.canUndoMove())
     }
 }
@@ -35,8 +35,26 @@ struct RedoMoveButton: View {
     @Binding var document: BChessUIDocument
     var body: some View {
         Button(action: { Actions(document: $document).redoMove() }) {
-            Label("Redo Move", systemImage: "arrow.uturn.forward.square.fill")
+            Label("Redo Move", systemImage: "arrow.uturn.forward.square")
         }.disabled(!document.engine.canRedoMove())
+    }
+}
+
+struct CopyButton: View {
+    @Binding var document: BChessUIDocument
+    var body: some View {
+        Button(action: { Actions(document: $document).copyFEN() }) {
+            Label("Copy", systemImage: "doc.on.doc")
+        }
+    }
+}
+
+struct PasteButton: View {
+    @Binding var document: BChessUIDocument
+    var body: some View {
+        Button(action: { Actions(document: $document).pasteFEN() }) {
+            Label("Paste", systemImage: "arrow.down.circle")
+        }
     }
 }
 
@@ -86,6 +104,9 @@ struct ActionsToolbar: ToolbarContent {
             UndoMoveButton(document: $document)
             RedoMoveButton(document: $document)
             
+            CopyButton(document: $document)
+            PasteButton(document: $document)
+
             LevelPicker(document: $document)
             
             NewGameMenu(document: $document)
@@ -102,6 +123,16 @@ struct ActionsToolbar: ToolbarContent {
             Spacer()
             
             RedoMoveButton(document: $document)
+            Spacer()
+
+            Menu {
+                CopyButton(document: $document)
+                PasteButton(document: $document)
+            }
+            label: {
+                Label("Copy", systemImage: "doc.on.doc")
+            }
+
             Spacer()
             
             Menu {

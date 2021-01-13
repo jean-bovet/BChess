@@ -1,2 +1,1 @@
-- enable copy/paste board game
 - display rank/file (optional)
