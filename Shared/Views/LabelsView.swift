@@ -27,9 +27,10 @@ struct LabelsView: View {
             let squareSize: CGFloat = minSize / (8 + 1)
             
             ForEach(0...7, id:\.self) { index in
+                let ai = actualIndex(index)
                 let x = xOffset
-                let y = yOffset + CGFloat(actualIndex(index)) * squareSize
-                Text("\(index+1)")
+                let y = yOffset + CGFloat(ai) * squareSize
+                Text("\(8 - ai)")
                     .font(.title)
                     .frame(width: squareSize, height: squareSize)
                     .offset(x: x, y: y)
