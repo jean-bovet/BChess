@@ -95,6 +95,8 @@
 		A7A30EC325AEB28D00729432 /* ActionsToolbar.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7A30EC125AEB28D00729432 /* ActionsToolbar.swift */; };
 		A7A30EDD25AEBD7C00729432 /* LabelsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7A30EDC25AEBD7C00729432 /* LabelsView.swift */; };
 		A7A30EDE25AEBD7C00729432 /* LabelsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7A30EDC25AEBD7C00729432 /* LabelsView.swift */; };
+		A7A30F2F25B2BAFC00729432 /* PromotionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7A30F2E25B2BAFC00729432 /* PromotionView.swift */; };
+		A7A30F3025B2BAFC00729432 /* PromotionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7A30F2E25B2BAFC00729432 /* PromotionView.swift */; };
 		A7AFCCAA1FB4E40D00AE3D85 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7AFCCA91FB4E40D00AE3D85 /* main.swift */; };
 		A7C92AAB1FF6F19100160D2E /* Openings.pgn in Resources */ = {isa = PBXBuildFile; fileRef = A7C92AA91FF6EE5500160D2E /* Openings.pgn */; };
 		A7C92AB41FF86BF200160D2E /* FEngineMove.mm in Sources */ = {isa = PBXBuildFile; fileRef = A7C92AB31FF86BF200160D2E /* FEngineMove.mm */; };
@@ -261,6 +263,7 @@
 		A795163C25ABE66600AEA95F /* BoardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoardView.swift; sourceTree = "<group>"; };
 		A7A30EC125AEB28D00729432 /* ActionsToolbar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActionsToolbar.swift; sourceTree = "<group>"; };
 		A7A30EDC25AEBD7C00729432 /* LabelsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LabelsView.swift; sourceTree = "<group>"; };
+		A7A30F2E25B2BAFC00729432 /* PromotionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromotionView.swift; sourceTree = "<group>"; };
 		A7AFCCA61FB4E40D00AE3D85 /* BChess */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = BChess; sourceTree = BUILT_PRODUCTS_DIR; };
 		A7AFCCA91FB4E40D00AE3D85 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		A7B1B0F41FF2D97300EAF157 /* FEngineInfo+Private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "FEngineInfo+Private.h"; sourceTree = "<group>"; };
@@ -523,6 +526,7 @@
 				A79515F525ABE44000AEA95F /* PiecesView.swift */,
 				A7A30EDC25AEBD7C00729432 /* LabelsView.swift */,
 				A77F66AE25A832240030E61D /* ContentView.swift */,
+				A7A30F2E25B2BAFC00729432 /* PromotionView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -834,6 +838,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A7A30F2F25B2BAFC00729432 /* PromotionView.swift in Sources */,
 				A7FE322925AA96D100A75936 /* FFEN.cpp in Sources */,
 				A7FE31ED25AA96B900A75936 /* ChessEvaluater.cpp in Sources */,
 				A795159E25ABE1D700AEA95F /* PiecesFactory.swift in Sources */,
@@ -878,6 +883,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A7A30F3025B2BAFC00729432 /* PromotionView.swift in Sources */,
 				A7FE321B25AA96D000A75936 /* FPGN.cpp in Sources */,
 				A7FE31CC25AA96A800A75936 /* FEngineMove.mm in Sources */,
 				A795159F25ABE1D700AEA95F /* PiecesFactory.swift in Sources */,

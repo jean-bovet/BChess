@@ -8,6 +8,11 @@
 
 import SwiftUI
 
+struct Promotion {
+    let move: FEngineMove
+    let isWhite: Bool
+}
+
 struct PiecesView: View {
     
     @Binding var document: ChessDocument
@@ -20,14 +25,16 @@ struct PiecesView: View {
     // ongoing after the human has played.
     @State private var humanPieceAnimation = 0.0
 
+    @State private var isPromotionViewShown = false
+    @State private var promotion = Promotion(move: FEngineMove(), isWhite: true)
+    
     func processTap(_ rank: Int, _ file: Int) {
         if let move = document.selection.possibleMove(rank, file) {
-            withAnimation {
-                Actions(document: $document).playMove(move: move)
-                
-                // Set the final value to detect when the animation ends
-                // (see below in onAnimationCompleted)
-                humanPieceAnimation = 1.0
+            if move.isPromotion {
+                promotion = Promotion(move: move, isWhite: document.playAgainst == .black)
+                isPromotionViewShown.toggle()
+            } else {
+                doMove(move)
             }
         } else {
             document.selection = Selection(position: Position(rank: rank, file: file),
@@ -35,6 +42,16 @@ struct PiecesView: View {
         }
     }
 
+    func doMove(_ move: FEngineMove) {
+        withAnimation {
+            Actions(document: $document).playMove(move: move)
+            
+            // Set the final value to detect when the animation ends
+            // (see below in onAnimationCompleted)
+            humanPieceAnimation = 1.0
+        }
+    }
+    
     func board(withPieces pieces: [Piece]) -> [Square] {
         var squares = [Square]()
         for rank in 0...7 {
@@ -45,6 +62,11 @@ struct PiecesView: View {
             }
         }
         return squares
+    }
+    
+    func applyPromotion(pieceName: String) {
+        promotion.move.setPromotionPiece(pieceName)
+        doMove(promotion.move)
     }
     
     var body: some View {
@@ -73,6 +95,10 @@ struct PiecesView: View {
             withAnimation {
                 Actions(document: $document).enginePlay()
             }
+        }.sheet(isPresented: $isPromotionViewShown) {
+            PromotionView(promotion: $promotion, callback: { name in
+                self.applyPromotion(pieceName: name)
+            })
         }
     }
 }
