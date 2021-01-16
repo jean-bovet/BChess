@@ -21,13 +21,24 @@ struct PromotionView: View {
         }
     }
     
+    func limitPieceSize() -> Bool {
+        #if os(macOS)
+        return true
+        #else
+        return false
+        #endif
+    }
+    
     var body: some View {
         VStack {
             HStack {
                 ForEach(pieceNames(), id: \.self) { name in
                     Image(Piece.pieceImageNames[name]!)
                         .resizable()
-                        .frame(width: 100, height: 100, alignment: .center)
+                        .aspectRatio(1.0, contentMode: .fit)
+                        .if(limitPieceSize()) { view in
+                            view.frame(width: 100, height: 100, alignment: .center)
+                        }
                         .padding()
                         .onTapGesture() {
                             callback?(name)
