@@ -95,6 +95,10 @@ struct Actions {
     }
     
     func enginePlay() {
+        guard engine.canPlay() else {
+            return
+        }
+        
         engine.evaluate { (info, completed) in
             DispatchQueue.main.async {
                 if completed {
