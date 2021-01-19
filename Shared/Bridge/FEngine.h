@@ -14,6 +14,7 @@
 typedef void(^FEngineSearchCallback)(FEngineInfo * _Nonnull info, BOOL completed);
 typedef void(^FEngineDidUpdateCallback)();
 
+/** This class is the interface between the C++ engine and the Objective-C/Swift world*/
 @interface FEngine : NSObject
 
 @property (nonatomic, assign) BOOL async;

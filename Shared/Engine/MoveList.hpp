@@ -66,5 +66,3 @@ struct MoveList {
     void addCaptures(ChessBoard &board, Square from, Bitboard moves, Color attackingPieceColor, Piece attackingPiece, Color capturedPieceColor, Piece capturedPiece);
 
 };
-
-
