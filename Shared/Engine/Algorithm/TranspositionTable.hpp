@@ -96,13 +96,13 @@ public:
     
     bool exists(BoardHash hash
 #ifdef ASSERT_TT_KEY_COLLISION
-                std::string shortFEN
+                , std::string shortFEN
 #endif
                 ) {
         int index = hash % TRANSPO_SIZE;
         if (table[index].hash == hash) {
 #ifdef ASSERT_TT_KEY_COLLISION
-            assert(table[index].shortFEN != shortFEN);
+            assert(table[index].shortFEN == shortFEN);
 #endif
             return true;
         } else {
