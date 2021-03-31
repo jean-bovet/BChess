@@ -102,10 +102,10 @@ struct Actions {
         engine.evaluate { (info, completed) in
             DispatchQueue.main.async {
                 if completed {
-                    self.document.lastMove = info.bestEngineMove
-                    self.document.info = info
-                    
                     withAnimation {
+                        self.document.lastMove = info.bestEngineMove
+                        self.document.info = info
+                        
                         self.engine.move(info.bestMove)
                         self.document.pgn = self.engine.pgn()
                     }

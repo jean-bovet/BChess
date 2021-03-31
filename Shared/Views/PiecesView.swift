@@ -92,9 +92,7 @@ struct PiecesView: View {
             // Animation has completed, reset the value
             humanPieceAnimation = 0
             // And trigger the computer's move
-            withAnimation {
-                Actions(document: $document).enginePlay()
-            }
+            Actions(document: $document).enginePlay()
         }.sheet(isPresented: $isPromotionViewShown) {
             PromotionView(promotion: $promotion, callback: { name in
                 self.applyPromotion(pieceName: name)
