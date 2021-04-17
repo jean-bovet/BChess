@@ -15,28 +15,34 @@ extension UTType {
     }
 }
 
+// The state of the game that is saved to the file
+struct GameState: Codable {
+    let pgn: String
+    let level: Int
+    let playAgainst: Int
+}
+
 struct ChessDocument: FileDocument {
     
     let engine = FEngine()
         
     var pgn: String
+    var playAgainst: PlayAgainst = .black
+    var level: Int = 0
 
     var selection = Selection(position: Position.empty(), possibleMoves: [])
-    // TODO: save?
     var lastMove: FEngineMove? = nil
     var info: FEngineInfo? = nil
-    // TODO: save
-    var level: Int = 0
-    var playAgainst: PlayAgainst = .black
 
     var pieces: [Piece] {
         return PiecesFactory().pieces(forState: engine.state)
     }
     
-    init(pgn: String = StartPosFEN, playAgainst: PlayAgainst = .black) {
+    init(pgn: String = StartPosFEN, playAgainst: PlayAgainst = .black, level: Int = 0) {
         self.pgn = pgn
         self.engine.setPGN(pgn)
         self.playAgainst = playAgainst
+        self.level = level
         loadOpenings()
     }
 
@@ -54,16 +60,19 @@ struct ChessDocument: FileDocument {
     static var readableContentTypes: [UTType] { [.exampleText] }
 
     init(configuration: ReadConfiguration) throws {
-        guard let data = configuration.file.regularFileContents,
-              let string = String(data: data, encoding: .utf8)
-        else {
+        guard let data = configuration.file.regularFileContents else {
             throw CocoaError(.fileReadCorruptFile)
         }
-        self.init(pgn: string)
+        let decoder = JSONDecoder()
+        let state = try decoder.decode(GameState.self, from: data)
+
+        self.init(pgn: state.pgn, playAgainst: PlayAgainst(rawValue: state.playAgainst) ?? .black, level: state.level)
     }
     
     func fileWrapper(configuration: WriteConfiguration) throws -> FileWrapper {
-        let data = pgn.data(using: .utf8)!
+        let state = GameState(pgn: pgn, level: level, playAgainst: playAgainst.rawValue)
+        let encoder = JSONEncoder()
+        let data = try encoder.encode(state)
         return .init(regularFileWithContents: data)
     }
     

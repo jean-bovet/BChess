@@ -15,13 +15,9 @@ struct Actions {
         return document.engine
     }
 
-    func newGame(playAgainstWhite: Bool) {
+    func newGame(playAgainst: PlayAgainst) {
         engine.setFEN(StartPosFEN)
-        if playAgainstWhite {
-            document.playAgainst = .white
-        } else {
-            document.playAgainst = .black
-        }
+        document.playAgainst = playAgainst
         if engine.isWhite() && document.playAgainst == .white {
             enginePlay()
         }
@@ -96,6 +92,10 @@ struct Actions {
     
     func enginePlay() {
         guard engine.canPlay() else {
+            return
+        }
+        
+        guard document.playAgainst != .human else {
             return
         }
         

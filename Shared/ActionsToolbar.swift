@@ -76,12 +76,16 @@ struct NewGameMenu: View {
     var body: some View {
         Menu {
             Section {
-                Button(action: { Actions(document: $document).newGame(playAgainstWhite: false ) }) {
-                    Label("New Game as White", systemImage: "plus.circle.fill")
+                Button(action: { Actions(document: $document).newGame(playAgainst: .black) }) {
+                    Label("New Game as White", systemImage: "plus.circle")
                 }
 
-                Button(action: { Actions(document: $document).newGame(playAgainstWhite: true ) }) {
-                    Label("New Game as Black", systemImage: "plus.circle")
+                Button(action: { Actions(document: $document).newGame(playAgainst: .white ) }) {
+                    Label("New Game as Black", systemImage: "plus.circle.fill")
+                }
+                
+                Button(action: { Actions(document: $document).newGame(playAgainst: .human ) }) {
+                    Label("New Game Human vs Human", systemImage: "plus.circle")
                 }
             }
         }

@@ -17,7 +17,7 @@ enum PlayAgainst: Int {
 extension Int {
 
     func actual(_ playAgainst: PlayAgainst) -> Int {
-        if playAgainst == .black {
+        if playAgainst == .black || playAgainst == .human {
             return self
         } else {
             return 7 - self
