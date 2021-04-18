@@ -29,7 +29,7 @@ struct LabelsView: View {
             ForEach(0...7, id:\.self) { index in
                 let ai = actualIndex(index)
                 let x = xOffset
-                let y = yOffset + CGFloat(ai) * squareSize
+                let y = yOffset + CGFloat(index) * squareSize
                 Text("\(8 - ai)")
                     .font(.title)
                     .frame(width: squareSize, height: squareSize)
@@ -51,7 +51,7 @@ struct LabelsView: View {
 struct LabelsView_Previews: PreviewProvider {
     static var previews: some View {
         Group {
-            let doc = ChessDocument()
+            let doc = ChessDocument(playAgainst: .black)
             ZStack {
                 BoardView(document: .constant(doc))
                 LabelsView(document: .constant(doc))
