@@ -13,9 +13,9 @@ struct LabelsView: View {
 
     func actualIndex(_ index: Int) -> Int {
         if document.rotated {
-            return index
-        } else {
             return 7 - index
+        } else {
+            return index
         }
     }
     
