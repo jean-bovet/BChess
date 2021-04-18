@@ -12,7 +12,7 @@ struct LabelsView: View {
     @Binding var document: ChessDocument
 
     func actualIndex(_ index: Int) -> Int {
-        if document.playAgainst == .black {
+        if document.rotated {
             return index
         } else {
             return 7 - index

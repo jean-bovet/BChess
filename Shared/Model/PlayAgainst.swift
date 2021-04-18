@@ -16,11 +16,11 @@ enum PlayAgainst: Int {
 
 extension Int {
 
-    func actual(_ playAgainst: PlayAgainst) -> Int {
-        if playAgainst == .black || playAgainst == .human {
-            return self
-        } else {
+    func actual(rotated: Bool) -> Int {
+        if rotated {
             return 7 - self
+        } else {
+            return self
         }
     }
     

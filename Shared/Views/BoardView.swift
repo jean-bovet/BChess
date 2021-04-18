@@ -33,8 +33,8 @@ struct BoardView: View {
                             Rectangle()
                                 .fill(Color.clear)
                         } else {
-                            let r = (rank - 1).actual(document.playAgainst)
-                            let f = (file - 1).actual(document.playAgainst)
+                            let r = (rank - 1).actual(rotated: document.rotated)
+                            let f = (file - 1).actual(rotated: document.rotated)
                             Rectangle()
                                 .fill(backgroundColor(rank: r, file: f))
                                 .modifier(LastMoveModifier(rank: r, file: f, lastMove: document.lastMove))

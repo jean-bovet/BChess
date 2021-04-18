@@ -77,8 +77,8 @@ struct PiecesView: View {
             let yOffset: CGFloat = (geometry.size.height - minSize) / 2
             let b: [Square] = board(withPieces: document.pieces)
             ForEach(b) { square in
-                let x = CGFloat(square.file.actual(document.playAgainst)) * squareSize + xOffset
-                let y = CGFloat(7 - square.rank.actual(document.playAgainst)) * squareSize + yOffset
+                let x = CGFloat(square.file.actual(rotated: document.rotated)) * squareSize + xOffset
+                let y = CGFloat(7 - square.rank.actual(rotated: document.rotated)) * squareSize + yOffset
                 SquareView(piece: square.piece)
                     .frame(width: squareSize, height: squareSize)
                     .offset(x: x,

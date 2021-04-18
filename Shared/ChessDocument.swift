@@ -20,6 +20,7 @@ struct GameState: Codable {
     let pgn: String
     let level: Int
     let playAgainst: Int
+    let rotated: Bool
 }
 
 struct ChessDocument: FileDocument {
@@ -29,6 +30,7 @@ struct ChessDocument: FileDocument {
     var pgn: String
     var playAgainst: PlayAgainst = .black
     var level: Int = 0
+    var rotated = false
 
     var selection = Selection(position: Position.empty(), possibleMoves: [])
     var lastMove: FEngineMove? = nil
@@ -38,7 +40,7 @@ struct ChessDocument: FileDocument {
         return PiecesFactory().pieces(forState: engine.state)
     }
     
-    init(pgn: String = StartPosFEN, playAgainst: PlayAgainst = .black, level: Int = 0) {
+    init(pgn: String = StartPosFEN, playAgainst: PlayAgainst = .black, level: Int = 0, rotate: Bool = false) {
         self.pgn = pgn
         self.engine.setPGN(pgn)
         self.playAgainst = playAgainst
@@ -66,11 +68,11 @@ struct ChessDocument: FileDocument {
         let decoder = JSONDecoder()
         let state = try decoder.decode(GameState.self, from: data)
 
-        self.init(pgn: state.pgn, playAgainst: PlayAgainst(rawValue: state.playAgainst) ?? .black, level: state.level)
+        self.init(pgn: state.pgn, playAgainst: PlayAgainst(rawValue: state.playAgainst) ?? .black, level: state.level, rotate: state.rotated)
     }
     
     func fileWrapper(configuration: WriteConfiguration) throws -> FileWrapper {
-        let state = GameState(pgn: pgn, level: level, playAgainst: playAgainst.rawValue)
+        let state = GameState(pgn: pgn, level: level, playAgainst: playAgainst.rawValue, rotated: rotated)
         let encoder = JSONEncoder()
         let data = try encoder.encode(state)
         return .init(regularFileWithContents: data)

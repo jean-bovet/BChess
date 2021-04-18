@@ -22,6 +22,15 @@ struct ShowHideInfoButton: View {
     }
 }
 
+struct RotateBoard: View {
+    @Binding var document: ChessDocument
+    var body: some View {
+        Button(action: { Actions(document: $document).rotateBoard() }) {
+            Label("Rotate Board", systemImage: "arrow.up.arrow.down.circle")
+        }
+    }
+}
+
 struct UndoMoveButton: View {
     @Binding var document: ChessDocument
     var body: some View {
@@ -74,23 +83,18 @@ struct NewGameMenu: View {
     @Binding var document: ChessDocument
     
     var body: some View {
-        Menu {
-            Section {
-                Button(action: { Actions(document: $document).newGame(playAgainst: .black) }) {
-                    Label("New Game as White", systemImage: "plus.circle")
-                }
-
-                Button(action: { Actions(document: $document).newGame(playAgainst: .white ) }) {
-                    Label("New Game as Black", systemImage: "plus.circle.fill")
-                }
-                
-                Button(action: { Actions(document: $document).newGame(playAgainst: .human ) }) {
-                    Label("New Game Human vs Human", systemImage: "plus.circle")
-                }
+        Section {
+            Button(action: { Actions(document: $document).newGame(playAgainst: .black) }) {
+                Label("New Game as White", systemImage: "plus.circle")
             }
-        }
-        label: {
-            Label("Actions", systemImage: "ellipsis.circle")
+
+            Button(action: { Actions(document: $document).newGame(playAgainst: .white ) }) {
+                Label("New Game as Black", systemImage: "plus.circle.fill")
+            }
+            
+            Button(action: { Actions(document: $document).newGame(playAgainst: .human ) }) {
+                Label("New Game Human vs Human", systemImage: "plus.circle")
+            }
         }
     }
 }
@@ -105,6 +109,8 @@ struct ActionsToolbar: ToolbarContent {
         ToolbarItemGroup(placement: .automatic) {
             ShowHideInfoButton(document: $document, showInfo: $showInfo)
             
+            RotateBoard(document: $document)
+            
             UndoMoveButton(document: $document)
             RedoMoveButton(document: $document)
             
@@ -113,11 +119,22 @@ struct ActionsToolbar: ToolbarContent {
 
             LevelPicker(document: $document)
             
-            NewGameMenu(document: $document)
+            Menu {
+                NewGameMenu(document: $document)
+            }
+            label: {
+                Label("Actions", systemImage: "ellipsis.circle")
+            }
         }
         #else
         ToolbarItemGroup(placement: .automatic) {
-            NewGameMenu(document: $document)
+            Menu {
+                NewGameMenu(document: $document)
+                RotateBoard(document: $document)
+            }
+            label: {
+                Label("Actions", systemImage: "ellipsis.circle")
+            }
         }
         ToolbarItemGroup(placement: .bottomBar) {
             ShowHideInfoButton(document: $document, showInfo: $showInfo)

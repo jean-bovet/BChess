@@ -15,6 +15,10 @@ struct Actions {
         return document.engine
     }
 
+    func rotateBoard() {
+        document.rotated = !document.rotated
+    }
+    
     func newGame(playAgainst: PlayAgainst) {
         engine.setFEN(StartPosFEN)
         document.playAgainst = playAgainst
