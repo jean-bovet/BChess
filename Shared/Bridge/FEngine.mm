@@ -41,7 +41,7 @@
 - (id)init {
     if (self = [super init]) {
         _async = YES;
-        _ttEnabled = YES;
+        _ttEnabled = NO;
         _searchDepth = INT_MAX;
         _thinkingTime = 5;
         _stateIndex = 0;

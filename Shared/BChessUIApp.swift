@@ -14,5 +14,10 @@ struct BChessUIApp: App {
         DocumentGroup(newDocument: ChessDocument()) { file in            
             ContentView(document: file.$document)
         }
+        #if os(macOS)
+        Settings {
+            SettingsView()
+        }
+        #endif
     }
 }

@@ -35,7 +35,7 @@ struct Actions {
     func playMove(move: FEngineMove) {
         document.selection = Selection(position: Position.empty(), possibleMoves: [])
         document.lastMove = nil
-        document.applyLevelSettings()
+        document.applyEngineSettings()
         document.engine.move(move.rawMoveValue)
         document.pgn = document.engine.pgn()
     }

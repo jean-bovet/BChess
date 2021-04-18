@@ -78,7 +78,7 @@ struct ChessDocument: FileDocument {
         return .init(regularFileWithContents: data)
     }
     
-    func applyLevelSettings() {
+    func applyEngineSettings() {
         switch level {
         case 0:
             engine.thinkingTime = 2
@@ -91,6 +91,8 @@ struct ChessDocument: FileDocument {
         default:
             engine.thinkingTime = 2
         }
+
+        engine.ttEnabled = UserDefaults.standard.bool(forKey: "useTranspositionTable")
     }
     
 }
