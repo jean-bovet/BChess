@@ -61,7 +61,7 @@ struct CopyButton: View {
 struct PasteButton: View {
     @Binding var document: ChessDocument
     var body: some View {
-        Button(action: { Actions(document: $document).pasteFEN() }) {
+        Button(action: { Actions(document: $document).pasteGame() }) {
             Label("Paste", systemImage: "arrow.down.circle")
         }
     }

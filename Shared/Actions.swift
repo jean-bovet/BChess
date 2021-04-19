@@ -70,6 +70,16 @@ struct Actions {
         }
     }
 
+    func pasteGame() {
+        // Try to paste first as FEN format and if it fails,
+        // try the PGN format
+        if pasteFEN() {
+            return
+        } else {
+            pastePGN()
+        }
+    }
+    
     func copyFEN() {
         #if os(macOS)
         let pb = NSPasteboard.general
@@ -80,20 +90,42 @@ struct Actions {
         #endif
     }
     
-    func pasteFEN() {
+    func pasteFEN() -> Bool {
         #if os(macOS)
         guard let content = NSPasteboard.general.string(forType: .string) else {
-            return
+            return false
         }
         #else
         guard let content = UIPasteboard.general.string else {
-            return
+            return false
         }
         #endif
-        engine.setFEN(content)
-        document.pgn = document.engine.pgn()
+        if engine.setFEN(content) {
+            document.pgn = document.engine.pgn()
+            return true
+        } else {
+            return false
+        }
     }
     
+    func pastePGN() -> Bool {
+        #if os(macOS)
+        guard let content = NSPasteboard.general.string(forType: .string) else {
+            return false
+        }
+        #else
+        guard let content = UIPasteboard.general.string else {
+            return false
+        }
+        #endif
+        if engine.setPGN(content) {
+            document.pgn = document.engine.pgn()
+            return true
+        } else {
+            return false
+        }
+    }
+
     func enginePlay() {
         guard engine.canPlay() else {
             return

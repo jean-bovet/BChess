@@ -66,12 +66,31 @@ static bool parseUntil(std::string pgn, unsigned &cursor, std::string &comment, 
 }
 
 
-// For example: "12. "
-static bool parseMoveNumber(std::string pgn, unsigned &cursor) {
+// For example:
+// "12. "
+// "1..." - to indicate a move for black
+static bool parseMoveNumber(std::string pgn, unsigned &cursor, bool &isMoveForBlack) {
+    // Parse the number portion of the move
     while (cursor < pgn.length() && pgn[cursor] != '.') {
         cursor++;
     }
-    cursor++;
+    
+    // Parse the number of dots, to determine if it is a white or black move
+    unsigned numberOfDots = 0;
+    while (cursor < pgn.length() && pgn[cursor] == '.') {
+        cursor++;
+        numberOfDots++;
+    }
+    
+    if (numberOfDots == 1) {
+        isMoveForBlack = false;
+    } else if (numberOfDots == 3) {
+        isMoveForBlack = true;
+    } else {
+        // Invalid number of dots
+        return false;
+    }
+    
     return true;
 }
 
@@ -433,7 +452,7 @@ Move FPGN::parseMove(std::string pgn, unsigned &cursor, ChessGame &game, bool &e
     
     Square to = SquareFrom(toFile, toRank);
     
-    // Now the original square can be not fully defined...
+    // Now the original square can be fully defined...
     auto matchingMoves = getMatchingMoves(game.board, to, movingPiece, promotedPiece, fromFile, fromRank);
     
     // After matching, one and only one move should be found
@@ -447,7 +466,9 @@ Move FPGN::parseMove(std::string pgn, unsigned &cursor, ChessGame &game, bool &e
 bool FPGN::parseMoveText(std::string pgn, unsigned &cursor, ChessGame &game, bool &end) {
     // Indication of a move, for example:
     // 1. e4 e5
-    auto result = parseMoveNumber(pgn, cursor);
+    // 2...d6
+    bool isMoveForBlack = false;
+    auto result = parseMoveNumber(pgn, cursor, isMoveForBlack);
     assert(result);
     
     Move whiteMove = parseMove(pgn, cursor, game, end);
@@ -459,6 +480,11 @@ bool FPGN::parseMoveText(std::string pgn, unsigned &cursor, ChessGame &game, boo
     }
     
     game.move(whiteMove);
+    
+    // Return now if the move was actually for the black player
+    if (isMoveForBlack) {
+        return true;
+    }
     
 //    std::cout << MOVE_DESCRIPTION(whiteMove) << std::endl;
 //    game.board.print();
@@ -540,7 +566,7 @@ bool FPGN::setGame(std::string pgn, ChessGame &game, unsigned & cursor) {
             }
         } else if (c == '{') {
             // Indication for a comment
-            cursor++; // go after the [
+            cursor++; // go after the {
             std::string comment = "";
             auto result = parseUntil(pgn, cursor, comment, '}');
             assert(result);
@@ -661,7 +687,7 @@ std::string FPGN::getGame(ChessGame game, Formatting formatting, int fromIndex) 
             // [FEN "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq - 0 1"]
             // [SetUp "1"]
             std::string tags = "[FEN \"" + game.initialFEN + "\"]\n";
-            tags += "Setup \"1\"\n";
+            tags += "[Setup \"1\"]\n";
             
             pgn = tags + pgn;
         }

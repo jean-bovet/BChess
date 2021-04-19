@@ -65,6 +65,16 @@ TEST(PGN, SingleMove) {
     EXPECT_FALSE(end);
 }
 
+TEST(PGN, SingleMoveForBlack) {
+    ChessGame game;
+    EXPECT_TRUE(FFEN::setFEN("rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq - 0 1", game.board));
+    unsigned cursor = 0;
+    bool end = false;
+    bool result = FPGN::parseMoveText("1...e5", cursor, game, end);
+    EXPECT_TRUE(result);
+    EXPECT_FALSE(end);
+}
+
 TEST(PGN, Moves) {
     assertMovetextSingle("e4", "e2e4");
     assertMovetextSingle("e5", "");
@@ -131,7 +141,7 @@ TEST(PGN, GameWithBlackFromFEN) {
     game.move("c1", "d1");
     
     auto pgn = FPGN::getGame(game);
-    ASSERT_EQ(pgn, "[FEN \"1K1k4/1P6/8/8/8/8/r7/2R5 w - - 0 1\"]\nSetup \"1\"\n1. Rd1+ *");
+    ASSERT_EQ(pgn, "[FEN \"1K1k4/1P6/8/8/8/8/r7/2R5 w - - 0 1\"]\n[Setup \"1\"]\n1. Rd1+ *");
 }
 
 TEST(PGN, GameWithBlackPromotion) {
@@ -174,14 +184,12 @@ TEST(PGN, OutputFromPosition) {
     ASSERT_EQ(fen.c_str(), game.initialFEN);
     
     auto pgn = FPGN::getGame(game);
-    ASSERT_EQ("[FEN \"r1bqkbnr/ppp1pppp/2n5/3p4/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 2 3\"]\nSetup \"1\"\n*", pgn);
+    ASSERT_EQ("[FEN \"r1bqkbnr/ppp1pppp/2n5/3p4/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 2 3\"]\n[Setup \"1\"]\n*", pgn);
 }
 
-TEST(PGN, InputFromPosition) {
-    std::string fen = "r1bqkbnr/ppp1pppp/2n5/3p4/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 2 3";
-    
+TEST(PGN, InputFromPosition) {    
     ChessGame game;
-    FPGN::setGame("[FEN \"r1bqkbnr/ppp1pppp/2n5/3p4/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 2 3\"]\nSetup \"1\"\n*", game);
+    FPGN::setGame("[FEN \"r1bqkbnr/ppp1pppp/2n5/3p4/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 2 3\"]\n*", game);
     
     ASSERT_EQ("r1bqkbnr/ppp1pppp/2n5/3p4/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 2 3", game.initialFEN);
     

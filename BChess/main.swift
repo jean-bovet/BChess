@@ -11,8 +11,8 @@ import Foundation
 //let tournament = TournamentEngine()
 //tournament.go()
 
-//let uci = UCI()
+let uci = UCI()
 //uci.performance()
-//uci.run()
+uci.run()
 
 

@@ -267,7 +267,7 @@
 		A7A30F2E25B2BAFC00729432 /* PromotionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromotionView.swift; sourceTree = "<group>"; };
 		A7A30F4725B4151A00729432 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		A7A30F4E25B654C700729432 /* ToDo.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = ToDo.md; sourceTree = "<group>"; };
-		A7AFCCA61FB4E40D00AE3D85 /* BChess */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = BChess; sourceTree = BUILT_PRODUCTS_DIR; };
+		A7AFCCA61FB4E40D00AE3D85 /* BChessUCI */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = BChessUCI; sourceTree = BUILT_PRODUCTS_DIR; };
 		A7AFCCA91FB4E40D00AE3D85 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		A7B1B0F41FF2D97300EAF157 /* FEngineInfo+Private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "FEngineInfo+Private.h"; sourceTree = "<group>"; };
 		A7C92AA91FF6EE5500160D2E /* Openings.pgn */ = {isa = PBXFileReference; lastKnownFileType = text; path = Openings.pgn; sourceTree = "<group>"; };
@@ -554,7 +554,7 @@
 		A7AFCCA71FB4E40D00AE3D85 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				A7AFCCA61FB4E40D00AE3D85 /* BChess */,
+				A7AFCCA61FB4E40D00AE3D85 /* BChessUCI */,
 				A7712D141FB916E900E7E802 /* BChessTests.xctest */,
 				A77F66B425A832270030E61D /* BChess.app */,
 				A77F66BB25A832270030E61D /* BChess.app */,
@@ -676,9 +676,9 @@
 			productReference = A77F66CE25A832270030E61D /* Tests macOS.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
 		};
-		A7AFCCA51FB4E40D00AE3D85 /* BChess */ = {
+		A7AFCCA51FB4E40D00AE3D85 /* BChessUCI */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = A7AFCCAD1FB4E40D00AE3D85 /* Build configuration list for PBXNativeTarget "BChess" */;
+			buildConfigurationList = A7AFCCAD1FB4E40D00AE3D85 /* Build configuration list for PBXNativeTarget "BChessUCI" */;
 			buildPhases = (
 				A7AFCCA21FB4E40D00AE3D85 /* Sources */,
 				A7AFCCA31FB4E40D00AE3D85 /* Frameworks */,
@@ -688,9 +688,9 @@
 			);
 			dependencies = (
 			);
-			name = BChess;
+			name = BChessUCI;
 			productName = BChess;
-			productReference = A7AFCCA61FB4E40D00AE3D85 /* BChess */;
+			productReference = A7AFCCA61FB4E40D00AE3D85 /* BChessUCI */;
 			productType = "com.apple.product-type.tool";
 		};
 /* End PBXNativeTarget section */
@@ -746,7 +746,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				A7AFCCA51FB4E40D00AE3D85 /* BChess */,
+				A7AFCCA51FB4E40D00AE3D85 /* BChessUCI */,
 				A7712D131FB916E900E7E802 /* BChessTests */,
 				A77F66B325A832270030E61D /* BChess (iOS) */,
 				A77F66BA25A832270030E61D /* BChess (macOS) */,
@@ -1412,7 +1412,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		A7AFCCAD1FB4E40D00AE3D85 /* Build configuration list for PBXNativeTarget "BChess" */ = {
+		A7AFCCAD1FB4E40D00AE3D85 /* Build configuration list for PBXNativeTarget "BChessUCI" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				A7AFCCAE1FB4E40D00AE3D85 /* Debug */,
