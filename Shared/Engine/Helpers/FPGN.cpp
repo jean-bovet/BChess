@@ -120,6 +120,25 @@ static bool parseQuotedString(std::string pgn, unsigned &cursor, std::string &st
     return true;
 }
 
+static void eatWhiteSpace(std::string pgn, unsigned &cursor) {
+    while (isSpaceOrNewLine(pgn[cursor])) {
+        cursor++;
+    }
+}
+
+// Parse comments in the form: { this is a comment }.
+// Don't do anything with the comment itself for now.
+static void parseComment(std::string pgn, unsigned &cursor) {
+    eatWhiteSpace(pgn, cursor);
+    
+    if (pgn[cursor] == '{') {
+        cursor++;
+        std::string comment = "";
+        auto result = parseUntil(pgn, cursor, comment, '}');
+        assert(result);
+    }
+}
+
 static std::string pgnPiece(Piece piece) {
     switch (piece) {
         case PAWN:
@@ -195,12 +214,6 @@ static File getFile(char c) {
 static Rank getRank(char c) {
     assert(isRank(c));
     return (Rank)(c - '1');
-}
-
-static void eatWhiteSpace(std::string pgn, unsigned &cursor) {
-    while (isSpaceOrNewLine(pgn[cursor])) {
-        cursor++;
-    }
 }
 
 static std::vector<Move> getMatchingMoves(ChessBoard board, Square to, Piece movingPiece, Piece promotedPiece, File fromFile, Rank fromRank) {
@@ -332,7 +345,7 @@ std::string FPGN::to_string(Move move, SANType sanType) {
     return pgn;
 }
 
-Move FPGN::parseMove(std::string pgn, unsigned &cursor, ChessGame &game, bool &end) {
+bool FPGN::parseMove(std::string pgn, unsigned &cursor, ChessGame &game, Move &move, bool &end) {
     eatWhiteSpace(pgn, cursor);
     
     Piece movingPiece = parsePiece(pgn, cursor);
@@ -427,11 +440,13 @@ Move FPGN::parseMove(std::string pgn, unsigned &cursor, ChessGame &game, bool &e
         end = true;
     } else {
         // Invalid SAN representation
-        return 0;
+        move = 0;
+        return false;
     }
 
     if (end) {
-        return 0;
+        move = 0;
+        return false;
     }
     
     // 8.2.3.5: Check and checkmate indication characters
@@ -457,49 +472,53 @@ Move FPGN::parseMove(std::string pgn, unsigned &cursor, ChessGame &game, bool &e
     
     // After matching, one and only one move should be found
     if (matchingMoves.size() == 1) {
-        return matchingMoves.front();
+        move = matchingMoves.front();
+        return true;
     } else {
-        return 0;
+        move = 0;
+        return false;
     }
 }
 
+/**
+ Parse a movetext block as defined in the PGN specifications. Not everything is yet supported.
+ [move number] [move] [comment] [move] [comment]
+ 
+ For example:
+    1. e4 e5
+    2...d6
+    1. e4 { comment }
+ */
 bool FPGN::parseMoveText(std::string pgn, unsigned &cursor, ChessGame &game, bool &end) {
-    // Indication of a move, for example:
-    // 1. e4 e5
-    // 2...d6
     bool isMoveForBlack = false;
     auto result = parseMoveNumber(pgn, cursor, isMoveForBlack);
     assert(result);
+
+    Move whiteMove = 0;
+    if (!parseMove(pgn, cursor, game, whiteMove, end)) {
+        return false;
+    }
     
-    Move whiteMove = parseMove(pgn, cursor, game, end);
     if (end) {
         return true;
     }
     if (!MOVE_ISVALID(whiteMove)) {
         return false;
     }
-    
+
+    //    std::cout << MOVE_DESCRIPTION(whiteMove) << std::endl;
+    //    game.board.print();
+
     game.move(whiteMove);
-    
-    // Return now if the move was actually for the black player
-    if (isMoveForBlack) {
-        return true;
-    }
-    
-//    std::cout << MOVE_DESCRIPTION(whiteMove) << std::endl;
-//    game.board.print();
-    
+
+    parseComment(pgn, cursor);
+            
     // Did we reach the end now?
     if (cursor >= pgn.length()) {
         end = true;
         return true;
     }
-    
-    if (!isSpaceOrNewLine(pgn[cursor++])) {
-        // Missing white space or new line
-        return false;
-    }
-    
+        
     eatWhiteSpace(pgn, cursor);
 
     // Did we reach the end now?
@@ -514,7 +533,10 @@ bool FPGN::parseMoveText(std::string pgn, unsigned &cursor, ChessGame &game, boo
         return true;
     }
     
-    Move blackMove = parseMove(pgn, cursor, game, end);
+    Move blackMove = 0;
+    if (!parseMove(pgn, cursor, game, blackMove, end)) {
+        return true;
+    }
     if (end) {
         return true;
     }
@@ -522,10 +544,18 @@ bool FPGN::parseMoveText(std::string pgn, unsigned &cursor, ChessGame &game, boo
         return false;
     }
     
+    //    std::cout << MOVE_DESCRIPTION(blackMove) << std::endl;
+    //    game.board.print();
     game.move(blackMove);
-//    std::cout << MOVE_DESCRIPTION(blackMove) << std::endl;
-//    game.board.print();
+
+    parseComment(pgn, cursor);
     
+    // Did we reach the end now?
+    if (cursor >= pgn.length()) {
+        end = true;
+        return true;
+    }
+
     return true;
 }
 

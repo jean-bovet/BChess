@@ -27,7 +27,7 @@ public:
     
     static std::string to_string(Move move, SANType sanType = SANType::full);
     
-    static Move parseMove(std::string pgn, unsigned &cursor, ChessGame &game, bool &end);
+    static bool parseMove(std::string pgn, unsigned &cursor, ChessGame &game, Move &move, bool &end);
     static bool parseMoveText(std::string pgn, unsigned &cursor, ChessGame &game, bool &end);
 
     static bool setGame(std::string pgn, ChessGame &game);

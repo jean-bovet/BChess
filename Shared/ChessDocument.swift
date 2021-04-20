@@ -25,6 +25,8 @@ struct GameState: Codable {
 
 struct ChessDocument: FileDocument {
     
+    static let startPosPGN = "*"
+    
     let engine = FEngine()
         
     var pgn: String
@@ -40,7 +42,7 @@ struct ChessDocument: FileDocument {
         return PiecesFactory().pieces(forState: engine.state)
     }
     
-    init(pgn: String = StartPosFEN, playAgainst: PlayAgainst = .black, level: Int = 0, rotate: Bool = false) {
+    init(pgn: String = startPosPGN, playAgainst: PlayAgainst = .black, level: Int = 0, rotate: Bool = false) {
         self.pgn = pgn
         self.engine.setPGN(pgn)
         self.playAgainst = playAgainst

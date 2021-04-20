@@ -324,7 +324,7 @@ void ChessMoveGenerator::generateKnightsMoves(ChessBoard &board, Color color, Mo
         
         // Generate a bitboard for all the moves that this white knight
         // can do. The attacks bitboard is masked to ensure it can only
-        // happy on an empty square or a square with a piece of the opposite color.
+        // move on an empty square or a square with a piece of the opposite color.
         generateAttackMoves(board, color, moveList, square, KNIGHT, KnightMoves[square], mode);
         if (mode == Mode::firstMoveOnly && moveList.count > 0) return;
 

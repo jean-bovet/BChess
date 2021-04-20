@@ -47,12 +47,13 @@ static void assertMovetextSingle(std::string pgn, std::string expectedMove) {
     unsigned cursor = 0;
     ChessGame game;
     bool end = false;
-    Move move = FPGN::parseMove(pgn, cursor, game, end);
+    Move move;
+    FPGN::parseMove(pgn, cursor, game, move, end);
     if (expectedMove.size() == 0) {
         EXPECT_FALSE(MOVE_ISVALID(move));
     } else {
         auto moveDescription = FPGN::to_string(move);
-        EXPECT_STREQ(moveDescription.c_str(), expectedMove.c_str());
+        EXPECT_STREQ(expectedMove.c_str(), moveDescription.c_str());
     }
 }
 
@@ -62,7 +63,16 @@ TEST(PGN, SingleMove) {
     bool end = false;
     bool result = FPGN::parseMoveText("1. e4 e5", cursor, game, end);
     EXPECT_TRUE(result);
-    EXPECT_FALSE(end);
+    EXPECT_TRUE(end);
+}
+
+TEST(PGN, SingleMoveWithComments) {
+    ChessGame game;
+    unsigned cursor = 0;
+    bool end = false;
+    bool result = FPGN::parseMoveText("1. e4 {hello} e5 {world}", cursor, game, end);
+    EXPECT_TRUE(result);
+    EXPECT_TRUE(end);
 }
 
 TEST(PGN, SingleMoveForBlack) {
@@ -72,7 +82,7 @@ TEST(PGN, SingleMoveForBlack) {
     bool end = false;
     bool result = FPGN::parseMoveText("1...e5", cursor, game, end);
     EXPECT_TRUE(result);
-    EXPECT_FALSE(end);
+    EXPECT_TRUE(end);
 }
 
 TEST(PGN, Moves) {

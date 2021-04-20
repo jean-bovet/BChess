@@ -76,7 +76,7 @@ struct Actions {
         if pasteFEN() {
             return
         } else {
-            pastePGN()
+            _ = pastePGN()
         }
     }
     
