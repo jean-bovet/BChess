@@ -266,7 +266,6 @@
 		A7A30EDC25AEBD7C00729432 /* LabelsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LabelsView.swift; sourceTree = "<group>"; };
 		A7A30F2E25B2BAFC00729432 /* PromotionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromotionView.swift; sourceTree = "<group>"; };
 		A7A30F4725B4151A00729432 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
-		A7A30F4E25B654C700729432 /* ToDo.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = ToDo.md; sourceTree = "<group>"; };
 		A7AFCCA61FB4E40D00AE3D85 /* BChessUCI */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = BChessUCI; sourceTree = BUILT_PRODUCTS_DIR; };
 		A7AFCCA91FB4E40D00AE3D85 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		A7B1B0F41FF2D97300EAF157 /* FEngineInfo+Private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "FEngineInfo+Private.h"; sourceTree = "<group>"; };
@@ -539,7 +538,6 @@
 			isa = PBXGroup;
 			children = (
 				A7A30F4725B4151A00729432 /* README.md */,
-				A7A30F4E25B654C700729432 /* ToDo.md */,
 				A7AFCCA81FB4E40D00AE3D85 /* BChess */,
 				A7712D151FB916E900E7E802 /* BChessTests */,
 				A77F66AB25A832230030E61D /* Shared */,
