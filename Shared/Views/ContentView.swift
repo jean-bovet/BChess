@@ -11,7 +11,7 @@ import SwiftUI
 struct ContentView: View {
     @Binding var document: ChessDocument
             
-    @State private var showInfo: Bool = false
+    @State private var showInfo: Bool = true
     
     var body: some View {
         VStack(alignment: .leading) {
