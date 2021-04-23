@@ -28,20 +28,20 @@ struct LabelsView: View {
             
             ForEach(0...7, id:\.self) { index in
                 let ai = actualIndex(index)
-                let x = xOffset
+                let x = xOffset - 0.1 * squareSize
                 let y = yOffset + CGFloat(index) * squareSize
                 Text("\(8 - ai)")
-                    .font(.title)
-                    .frame(width: squareSize, height: squareSize)
+                    .font(.title2)
+                    .frame(width: squareSize, height: squareSize, alignment: .trailing)
                     .offset(x: x, y: y)
             }
             
             ForEach(Array(["a", "b", "c", "d", "e", "f", "g", "h"].enumerated()), id:\.offset) { index, value in
                 let x = xOffset + CGFloat(actualIndex(index)) * squareSize + squareSize
-                let y = yOffset + CGFloat(numberOfSquares) * squareSize
+                let y = yOffset + CGFloat(numberOfSquares) * squareSize + 0.1 * squareSize
                 Text("\(value)")
-                    .font(.title)
-                    .frame(width: squareSize, height: squareSize)
+                    .font(.title2)
+                    .frame(width: squareSize, height: squareSize, alignment: .top)
                     .offset(x: x, y: y)
             }
         }
@@ -58,7 +58,7 @@ struct LabelsView_Previews: PreviewProvider {
             }
         }
         Group {
-            let doc = ChessDocument(playAgainst: .white)
+            let doc = ChessDocument(rotated: true)
             ZStack {
                 BoardView(document: .constant(doc))
                 LabelsView(document: .constant(doc))

@@ -42,11 +42,12 @@ struct ChessDocument: FileDocument {
         return PiecesFactory().pieces(forState: engine.state)
     }
     
-    init(pgn: String = startPosPGN, playAgainst: PlayAgainst = .black, level: Int = 0, rotate: Bool = false) {
+    init(pgn: String = startPosPGN, playAgainst: PlayAgainst = .black, level: Int = 0, rotated: Bool = false) {
         self.pgn = pgn
         self.engine.setPGN(pgn)
         self.playAgainst = playAgainst
         self.level = level
+        self.rotated = rotated
         loadOpenings()
     }
 
@@ -70,7 +71,7 @@ struct ChessDocument: FileDocument {
         let decoder = JSONDecoder()
         let state = try decoder.decode(GameState.self, from: data)
 
-        self.init(pgn: state.pgn, playAgainst: PlayAgainst(rawValue: state.playAgainst) ?? .black, level: state.level, rotate: state.rotated)
+        self.init(pgn: state.pgn, playAgainst: PlayAgainst(rawValue: state.playAgainst) ?? .black, level: state.level, rotated: state.rotated)
     }
     
     func fileWrapper(configuration: WriteConfiguration) throws -> FileWrapper {
