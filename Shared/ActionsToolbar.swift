@@ -95,6 +95,12 @@ struct NewGameMenu: View {
             Button(action: { Actions(document: $document).newGame(playAgainst: .human ) }) {
                 Label("New Game Human vs Human", systemImage: "plus.circle")
             }
+            
+            Divider()
+            
+            Button(action: { Actions(document: $document).enginePlay() }) {
+                Label("Computer to Play", systemImage: "play.fill")
+            }
         }
     }
 }
