@@ -91,6 +91,14 @@
     return NSStringFromString(engine.getState());
 }
 
+- (NSArray<FEngineMove*>* _Nonnull)allMoves {
+    NSMutableArray *moves = [NSMutableArray array];
+    for (Move move : engine.game.allMoves()) {
+        [moves addObject:[self engineMoveFromMove:move]];
+    }
+    return moves;
+}
+
 - (NSArray<FEngineMove*>* _Nonnull)movesAt:(NSUInteger)rank file:(NSUInteger)file {
     NSMutableArray *moves = [NSMutableArray array];
     for (Move move : engine.getMovesAt((File)file, (Rank)rank)) {

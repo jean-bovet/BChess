@@ -14,6 +14,10 @@
 @property (nonatomic, assign) NSUInteger fromRank, toRank;
 @property (nonatomic, assign) NSUInteger rawMoveValue;
 @property (nonatomic, assign, readonly) BOOL isPromotion;
+@property (nonatomic, assign, readonly) BOOL isWhite;
+@property (nonatomic, assign, readonly) BOOL isBlack;
+@property (nonatomic, assign, readonly) BOOL isCapture;
+@property (nonatomic, assign, readonly) NSString* _Nullable capturedPiece;
 
 - (void)setPromotionPiece:(NSString* _Nonnull)piece;
 

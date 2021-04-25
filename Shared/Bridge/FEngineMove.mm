@@ -15,6 +15,40 @@
     return MOVE_PROMOTION_PIECE((Move)self.rawMoveValue) > 0;
 }
 
+- (BOOL)isWhite {
+    return MOVE_COLOR((Move)self.rawMoveValue) == WHITE;
+}
+
+- (BOOL)isBlack {
+    return MOVE_COLOR((Move)self.rawMoveValue) == BLACK;
+}
+
+- (BOOL)isCapture {
+    return MOVE_IS_CAPTURE((Move)self.rawMoveValue);
+}
+
+- (NSString*)capturedPiece {
+    BOOL cw = MOVE_CAPTURED_PIECE_COLOR((Move)self.rawMoveValue) == WHITE;
+    Piece p = MOVE_CAPTURED_PIECE((Move)self.rawMoveValue);
+    switch (p) {
+        case PAWN:
+            return cw ? @"P" : @"p";
+        case KNIGHT:
+            return cw ? @"N" : @"n";
+        case BISHOP:
+            return cw ? @"B" : @"b";
+        case ROOK:
+            return cw ? @"R" : @"r";
+        case QUEEN:
+            return cw ? @"Q" : @"q";
+        case KING:
+            return cw ? @"K" : @"k";
+        case PCOUNT:
+            return NULL;
+    }
+    return NULL;
+}
+
 - (void)setPromotionPiece:(NSString*)piece {
     Piece promotionPiece = QUEEN;
     if ([[piece lowercaseString] isEqualToString:@"q"]) {

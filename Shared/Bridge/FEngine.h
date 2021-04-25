@@ -40,6 +40,7 @@ typedef void(^FEngineDidUpdateCallback)();
 
 - (NSString* _Nonnull)PGNFormattedForDisplay;
 
+- (NSArray<FEngineMove*>* _Nonnull)allMoves;
 - (NSArray<FEngineMove*>* _Nonnull)movesAt:(NSUInteger)rank file:(NSUInteger)file;
 - (void)move:(NSUInteger)move;
 

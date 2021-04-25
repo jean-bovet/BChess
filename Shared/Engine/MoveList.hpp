@@ -57,6 +57,15 @@ struct MoveList {
         }
     }
     
+    std::vector<Move> allMoves() {
+        std::vector<Move> movesVector;
+        for (int index=0; index<count; index++) {
+            auto move = moves[index];
+            movesVector.push_back(move);
+        }
+        return movesVector;
+    }
+
     std::string description();
     
     void addSingleMove(ChessBoard &board, Move move);

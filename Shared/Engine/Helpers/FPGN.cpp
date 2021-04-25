@@ -492,7 +492,9 @@ bool FPGN::parseMove(std::string pgn, unsigned &cursor, ChessGame &game, Move &m
 bool FPGN::parseMoveText(std::string pgn, unsigned &cursor, ChessGame &game, bool &end) {
     bool isMoveForBlack = false;
     auto result = parseMoveNumber(pgn, cursor, isMoveForBlack);
-    assert(result);
+    if (!result) {
+        return false;
+    }
 
     Move whiteMove = 0;
     if (!parseMove(pgn, cursor, game, whiteMove, end)) {

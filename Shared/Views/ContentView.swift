@@ -43,7 +43,7 @@ struct ContentView_Previews: PreviewProvider {
             ContentView(document: .constant(doc))
         }
         Group {
-            let doc = ChessDocument(playAgainst: .white)
+            let doc = ChessDocument(rotated: true)
             ContentView(document: .constant(doc))
         }
     }
