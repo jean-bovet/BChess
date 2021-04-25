@@ -89,7 +89,17 @@ struct Actions {
         UIPasteboard.general.string = engine.fen()
         #endif
     }
-    
+
+    func copyPGN() {
+        #if os(macOS)
+        let pb = NSPasteboard.general
+        pb.declareTypes([.string], owner: nil)
+        pb.setString(engine.pgn(), forType: .string)
+        #else
+        UIPasteboard.general.string = engine.pgn()
+        #endif
+    }
+
     func pasteFEN() -> Bool {
         #if os(macOS)
         guard let content = NSPasteboard.general.string(forType: .string) else {

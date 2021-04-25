@@ -26,7 +26,7 @@ struct RotateBoard: View {
     @Binding var document: ChessDocument
     var body: some View {
         Button(action: { Actions(document: $document).rotateBoard() }) {
-            Label("Rotate Board", systemImage: "arrow.up.arrow.down.circle")
+            Label("Flip Board", systemImage: "arrow.triangle.2.circlepath.circle")
         }
     }
 }
@@ -49,11 +49,20 @@ struct RedoMoveButton: View {
     }
 }
 
-struct CopyButton: View {
+struct CopyFENButton: View {
     @Binding var document: ChessDocument
     var body: some View {
         Button(action: { Actions(document: $document).copyFEN() }) {
-            Label("Copy", systemImage: "doc.on.doc")
+            Label("Copy Position", systemImage: "doc.on.doc")
+        }
+    }
+}
+
+struct CopyPGNButton: View {
+    @Binding var document: ChessDocument
+    var body: some View {
+        Button(action: { Actions(document: $document).copyPGN() }) {
+            Label("Copy Game", systemImage: "doc.on.doc")
         }
     }
 }
@@ -105,6 +114,18 @@ struct NewGameMenu: View {
     }
 }
 
+struct CopyPasteMenu: View {
+    @Binding var document: ChessDocument
+    
+    var body: some View {
+        Section {
+            CopyFENButton(document: $document)
+            CopyPGNButton(document: $document)
+            PasteButton(document: $document)
+        }
+    }
+}
+
 struct ActionsToolbar: ToolbarContent {
 
     @Binding var document: ChessDocument
@@ -120,8 +141,12 @@ struct ActionsToolbar: ToolbarContent {
             UndoMoveButton(document: $document)
             RedoMoveButton(document: $document)
             
-            CopyButton(document: $document)
-            PasteButton(document: $document)
+            Menu {
+                CopyPasteMenu(document: $document)
+            }
+            label: {
+                Label("Copy & Paste", systemImage: "doc.on.doc")
+            }
 
             LevelPicker(document: $document)
             
