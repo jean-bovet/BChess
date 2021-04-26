@@ -148,7 +148,8 @@ struct ActionsToolbar: ToolbarContent {
         #else
         ToolbarItemGroup(placement: .automatic) {
             Menu {
-                NewGameButton(document: $document, showNewGameSheet: $showNewGameSheet)
+                NewGameButton(document: $document, showNewGameSheet: $showNewGameSheet, newGameSheetEditMode: $newGameSheetEditMode)
+                EditGameButton(document: $document, showNewGameSheet: $showNewGameSheet, newGameSheetEditMode: $newGameSheetEditMode)
                 RotateBoard(document: $document)
             }
             label: {
