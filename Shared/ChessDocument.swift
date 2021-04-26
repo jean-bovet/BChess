@@ -23,6 +23,12 @@ struct GameState: Codable {
     let rotated: Bool
 }
 
+struct GamePlayer: Codable {
+    var name: String
+    var computer: Bool
+    var level: Int
+}
+
 struct ChessDocument: FileDocument {
     
     static let startPosPGN = "*"
@@ -32,6 +38,9 @@ struct ChessDocument: FileDocument {
     var pgn: String
     var playAgainst: PlayAgainst = .black
     var level: Int = 0
+    var whitePlayer = GamePlayer(name: "", computer: false, level: 0)
+    var blackPlayer = GamePlayer(name: "", computer: true, level: 0)
+
     var rotated = false
 
     var selection = Selection(position: Position.empty(), possibleMoves: [])

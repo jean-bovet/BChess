@@ -130,10 +130,20 @@ struct ActionsToolbar: ToolbarContent {
 
     @Binding var document: ChessDocument
     @Binding var showInfo: Bool
-    
+    @Binding var showNewGameSheet: Bool
+
     var body: some ToolbarContent {
         #if os(macOS)
         ToolbarItemGroup(placement: .automatic) {
+            Button(action: {
+                self.showNewGameSheet = true
+            }) {
+                Label("New Game", systemImage: "plus.circle")
+            }.sheet(isPresented: $showNewGameSheet) {
+                NewGameView(document: $document)
+                    .padding()
+            }
+
             ShowHideInfoButton(document: $document, showInfo: $showInfo)
             
             RotateBoard(document: $document)
@@ -178,11 +188,10 @@ struct ActionsToolbar: ToolbarContent {
             Spacer()
 
             Menu {
-                CopyButton(document: $document)
-                PasteButton(document: $document)
+                CopyPasteMenu(document: $document)
             }
             label: {
-                Label("Copy", systemImage: "doc.on.doc")
+                Label("Copy & Paste", systemImage: "doc.on.doc")
             }
 
             Spacer()

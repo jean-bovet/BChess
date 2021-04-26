@@ -12,7 +12,8 @@ struct ContentView: View {
     @Binding var document: ChessDocument
             
     @State private var showInfo: Bool = true
-    
+    @State private var showNewGameSheet: Bool = false
+
     var body: some View {
         VStack(alignment: .leading) {
             TopInformationView(document: document)
@@ -29,7 +30,7 @@ struct ContentView: View {
         }
         .padding()
         .toolbar {
-            ActionsToolbar(document: $document, showInfo: $showInfo)
+            ActionsToolbar(document: $document, showInfo: $showInfo, showNewGameSheet: $showNewGameSheet)
         }
 
     }
