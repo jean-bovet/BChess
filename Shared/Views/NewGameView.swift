@@ -14,12 +14,10 @@ struct NewPlayerConfigurationView: View {
 
     var body: some View {
         VStack(alignment: .leading) {
-            HStack {
-                TextField("Name", text: $player.name)
-                Toggle(isOn: $player.computer) {
-                    Text("Computer")
-                        .fixedSize()
-                }
+            TextField("Name", text: $player.name)
+            Toggle(isOn: $player.computer) {
+                Text("Computer")
+                    .fixedSize()
             }
             Picker(selection: $player.level, label: Text("Level")) {
                 Text("2 seconds").tag(0)
@@ -27,8 +25,8 @@ struct NewPlayerConfigurationView: View {
                 Text("10 seconds").tag(2)
                 Text("15 seconds").tag(3)
             }
-            .hide(!player.computer)
-        }
+            .hide(!player.computer, remove: true)
+        }.padding()
     }
 }
 
@@ -56,14 +54,7 @@ struct NewGameView: View {
                     presentationMode.wrappedValue.dismiss()
                 }
                 Button("New Game") {
-//                    Actions(document: $document).newGame(temporaryWhitePlayer, temporaryBlackPlayer)
-//                    whitePlayer.name = temporaryWhitePlayer.name
-//                    whitePlayer.computer = temporaryWhitePlayer.computer
-//                    whitePlayer.level = temporaryWhitePlayer.level
-//                    blackPlayer.name = temporaryBlackPlayer.name
-//                    blackPlayer.computer = temporaryBlackPlayer.computer
-//                    blackPlayer.level = temporaryBlackPlayer.level
-                    
+                    Actions(document: $document).newGame(white: temporaryWhitePlayer, black: temporaryBlackPlayer)
                     presentationMode.wrappedValue.dismiss()
                 }
             }

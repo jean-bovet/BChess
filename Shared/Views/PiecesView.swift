@@ -17,21 +17,20 @@ struct PiecesView: View {
     
     @Binding var document: ChessDocument
     
-    // This state is used as a workaround to
-    // detect when the animation of the piece after
-    // a human plays a move is completed so the computer
-    // can start thinking. This is to avoid the computer
-    // replying at the same time as the animation is
-    // ongoing after the human has played.
-    @State private var humanPieceAnimation = 0.0
-
     @State private var isPromotionViewShown = false
     @State private var promotion = Promotion(move: FEngineMove(), isWhite: true)
     
+    // This state is used as a workaround to
+    // detect when the animation of the piece after
+    // a move is completed so the computer can start thinking.
+    // This is to avoid the computer replying at the same time as the animation is
+    // ongoing after the human (or computer) has played.
+    @State private var pieceAnimationValue = 0.0
+
     func processTap(_ rank: Int, _ file: Int) {
         if let move = document.selection.possibleMove(rank, file) {
             if move.isPromotion {
-                promotion = Promotion(move: move, isWhite: document.playAgainst == .black)
+                promotion = Promotion(move: move, isWhite: document.engine.isWhite())
                 isPromotionViewShown.toggle()
             } else {
                 doMove(move)
@@ -44,11 +43,11 @@ struct PiecesView: View {
 
     func doMove(_ move: FEngineMove) {
         withAnimation {
-            Actions(document: $document).playMove(move: move)
+            playMove(move: move)
             
             // Set the final value to detect when the animation ends
             // (see below in onAnimationCompleted)
-            humanPieceAnimation = 1.0
+            pieceAnimationValue = 1.0
         }
     }
     
@@ -69,6 +68,53 @@ struct PiecesView: View {
         doMove(promotion.move)
     }
     
+    func triggerEngineEvaluationIfSuitable() {
+        // Only play the computer if the current color matches
+        // a player who is a computer.
+        guard document.engine.isWhite() && document.whitePlayer.computer || !document.engine.isWhite() && document.blackPlayer.computer else {
+            return
+        }
+
+        // Ensure the engine internal state allows it to play
+        guard document.engine.canPlay() else {
+            return
+        }
+                
+        // Trigger the engine evaluation
+        document.engine.evaluate { (info, completed) in
+            DispatchQueue.main.async {
+                if completed {
+                    withAnimation {
+                        playMove(info: info)
+                        
+                        // Set the final value to detect when the animation ends
+                        // (see below in onAnimationCompleted)
+                        pieceAnimationValue = 1.0
+                    }
+                } else {
+                    self.document.info = info
+                }
+            }
+        }
+    }
+
+    func playMove(move: FEngineMove) {
+        document.selection = Selection(position: Position.empty(), possibleMoves: [])
+        document.lastMove = nil
+        document.applyEngineSettings()
+        document.engine.move(move.rawMoveValue)
+        document.pgn = document.engine.pgn()
+    }
+    
+    func playMove(info: FEngineInfo) {
+        document.selection = Selection(position: Position.empty(), possibleMoves: [])
+        document.lastMove = info.bestEngineMove
+        document.info = info
+        document.applyEngineSettings()
+        document.engine.move(info.bestMove)
+        document.pgn = document.engine.pgn()
+    }
+        
     var body: some View {
         GeometryReader { geometry in
             let minSize: CGFloat = min(geometry.size.width, geometry.size.height)
@@ -88,11 +134,21 @@ struct PiecesView: View {
                     }
             }
         }
-        .onAnimationCompleted(for: humanPieceAnimation) {
+        .onAppear() {
+            // Start to play after this view appear which takes care of starting
+            // the engine when the document is first opened
+            triggerEngineEvaluationIfSuitable()
+        }
+        .onChange(of: document.engineShouldMove, perform: { value in
+            // Start to play after a change in this state, which is usually
+            // triggered after a new game is selected
+            triggerEngineEvaluationIfSuitable()
+        })
+        .onAnimationCompleted(for: pieceAnimationValue) {
             // Animation has completed, reset the value
-            humanPieceAnimation = 0
-            // And trigger the computer's move
-            Actions(document: $document).enginePlay()
+            pieceAnimationValue = 0
+            // And trigger the engine evaluation if suitable
+            triggerEngineEvaluationIfSuitable()
         }.sheet(isPresented: $isPromotionViewShown) {
             PromotionView(promotion: $promotion, callback: { name in
                 self.applyPromotion(pieceName: name)
@@ -111,7 +167,7 @@ struct PiecesView_Previews: PreviewProvider {
             }
         }
         Group {
-            let doc = ChessDocument(playAgainst: .white)
+            let doc = ChessDocument(rotated: true)
             ZStack {
                 BoardView(document: .constant(doc))
                 PiecesView(document: .constant(doc))

@@ -8,12 +8,6 @@
 
 import Foundation
 
-enum PlayAgainst: Int {
-    case white
-    case black
-    case human
-}
-
 extension Int {
 
     func actual(rotated: Bool) -> Int {

@@ -61,16 +61,12 @@ struct ColorInformationView: View {
     var body: some View {
         HStack {
             if isWhite {
-                Text("􀫥")
-                    .hide(!document.engine.isAnalyzing() || !document.engine.isWhite())
-                Text("􀓅")
-                    .hide(!document.engine.isWhite())
+                Image(systemName: "arrowtriangle.right").hide(!document.engine.isWhite())
+                Text(Image(systemName: document.whitePlayer.computer ? "cpu" : "person.fill"))
                 Text("White")
             } else {
-                Text("􀫥")
-                    .hide(!document.engine.isAnalyzing() || document.engine.isWhite())
-                Text("􀄧")
-                    .hide(document.engine.isWhite())
+                Image(systemName: "arrowtriangle.right.fill").hide(document.engine.isWhite())
+                Text(Image(systemName: document.blackPlayer.computer ? "cpu" : "person.fill"))
                 Text("Black")
             }
             

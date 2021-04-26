@@ -32,7 +32,10 @@ struct ContentView: View {
         .toolbar {
             ActionsToolbar(document: $document, showInfo: $showInfo, showNewGameSheet: $showNewGameSheet)
         }
-
+        .sheet(isPresented: $showNewGameSheet) {
+            NewGameView(document: $document)
+                .padding()
+        }        
     }
 }
 

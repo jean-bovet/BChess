@@ -20,9 +20,11 @@ extension View {
     }
     
     @ViewBuilder
-    func hide(_ condition: Bool) -> some View {
+    func hide(_ condition: Bool, remove: Bool = false) -> some View {
         if condition {
-            self.hidden()
+            if !remove {
+                self.hidden()
+            }
         }
         else {
             self

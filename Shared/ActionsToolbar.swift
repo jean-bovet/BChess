@@ -8,6 +8,19 @@
 
 import SwiftUI
 
+struct NewGameButton: View {
+    @Binding var document: ChessDocument
+    @Binding var showNewGameSheet: Bool
+
+    var body: some View {
+        Button(action: {
+            self.showNewGameSheet.toggle()
+        }) {
+            Label("New Game", systemImage: "plus.circle")
+        }
+    }
+}
+
 struct ShowHideInfoButton: View {
     @Binding var document: ChessDocument
     @Binding var showInfo: Bool
@@ -76,44 +89,6 @@ struct PasteButton: View {
     }
 }
 
-struct LevelPicker: View {
-    @Binding var document: ChessDocument
-    var body: some View {
-        Picker(selection: $document.level, label: Text("Level")) {
-            Text("2 seconds").tag(0)
-            Text("5 seconds").tag(1)
-            Text("10 seconds").tag(2)
-            Text("15 seconds").tag(3)
-        }
-    }
-}
-
-struct NewGameMenu: View {
-    @Binding var document: ChessDocument
-    
-    var body: some View {
-        Section {
-            Button(action: { Actions(document: $document).newGame(playAgainst: .black) }) {
-                Label("New Game as White", systemImage: "plus.circle")
-            }
-
-            Button(action: { Actions(document: $document).newGame(playAgainst: .white ) }) {
-                Label("New Game as Black", systemImage: "plus.circle.fill")
-            }
-            
-            Button(action: { Actions(document: $document).newGame(playAgainst: .human ) }) {
-                Label("New Game Human vs Human", systemImage: "plus.circle")
-            }
-            
-            Divider()
-            
-            Button(action: { Actions(document: $document).enginePlay() }) {
-                Label("Computer to Play", systemImage: "play.fill")
-            }
-        }
-    }
-}
-
 struct CopyPasteMenu: View {
     @Binding var document: ChessDocument
     
@@ -135,14 +110,7 @@ struct ActionsToolbar: ToolbarContent {
     var body: some ToolbarContent {
         #if os(macOS)
         ToolbarItemGroup(placement: .automatic) {
-            Button(action: {
-                self.showNewGameSheet = true
-            }) {
-                Label("New Game", systemImage: "plus.circle")
-            }.sheet(isPresented: $showNewGameSheet) {
-                NewGameView(document: $document)
-                    .padding()
-            }
+            NewGameButton(document: $document, showNewGameSheet: $showNewGameSheet)
 
             ShowHideInfoButton(document: $document, showInfo: $showInfo)
             
@@ -157,20 +125,11 @@ struct ActionsToolbar: ToolbarContent {
             label: {
                 Label("Copy & Paste", systemImage: "doc.on.doc")
             }
-
-            LevelPicker(document: $document)
-            
-            Menu {
-                NewGameMenu(document: $document)
-            }
-            label: {
-                Label("Actions", systemImage: "ellipsis.circle")
-            }
         }
         #else
         ToolbarItemGroup(placement: .automatic) {
             Menu {
-                NewGameMenu(document: $document)
+                NewGameButton(document: $document, showNewGameSheet: $showNewGameSheet)
                 RotateBoard(document: $document)
             }
             label: {
@@ -192,15 +151,6 @@ struct ActionsToolbar: ToolbarContent {
             }
             label: {
                 Label("Copy & Paste", systemImage: "doc.on.doc")
-            }
-
-            Spacer()
-            
-            Menu {
-                LevelPicker(document: $document)
-            }
-            label: {
-                Label("Level", systemImage: "hourglass")
             }
         }
         #endif

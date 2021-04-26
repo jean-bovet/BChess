@@ -19,43 +19,30 @@ struct Actions {
         document.rotated = !document.rotated
     }
     
-    func newGame(playAgainst: PlayAgainst) {
+    func newGame(white: GamePlayer, black: GamePlayer) {
+        document.whitePlayer = white
+        document.blackPlayer = black
+        
         engine.setFEN(StartPosFEN)
-        document.playAgainst = playAgainst
-        if engine.isWhite() && document.playAgainst == .white {
-            enginePlay()
-        }
-        if !engine.isWhite() && document.playAgainst == .black {
-            enginePlay()
-        }
+                
         document.selection = Selection(position: Position.empty(), possibleMoves: [])
         document.lastMove = nil
+        
+        document.engineShouldMove.toggle()
     }
 
-    func playMove(move: FEngineMove) {
-        document.selection = Selection(position: Position.empty(), possibleMoves: [])
-        document.lastMove = nil
-        document.applyEngineSettings()
-        document.engine.move(move.rawMoveValue)
-        document.pgn = document.engine.pgn()
-    }
-    
     func undoMove() {
         withAnimation {
             document.selection = Selection(position: Position.empty(), possibleMoves: [])
             document.lastMove = nil
 
-            if document.playAgainst == .human {
-                engine.undoMove()
-            } else {
-                if engine.isAnalyzing() {
-                    engine.cancel()
-                }
-                engine.undoMove() // last human move
-                if engine.canUndoMove() {
-                    engine.undoMove() // last engine move
-                }
+            if engine.isAnalyzing() {
+                engine.cancel()
             }
+            if engine.canUndoMove() {
+                engine.undoMove()
+            }
+            
             document.pgn = document.engine.pgn()
         }
     }
@@ -136,31 +123,4 @@ struct Actions {
         }
     }
 
-    func enginePlay() {
-        guard engine.canPlay() else {
-            return
-        }
-        
-        guard document.playAgainst != .human else {
-            return
-        }
-        
-        engine.evaluate { (info, completed) in
-            DispatchQueue.main.async {
-                if completed {
-                    withAnimation {
-                        self.document.lastMove = info.bestEngineMove
-                        self.document.info = info
-                        
-                        self.engine.move(info.bestMove)
-                        self.document.pgn = self.engine.pgn()
-                    }
-                } else {
-                    self.document.info = info
-                }
-            }
-        }
-    }
-
 }
-

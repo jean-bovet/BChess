@@ -18,11 +18,12 @@ extension UTType {
 // The state of the game that is saved to the file
 struct GameState: Codable {
     let pgn: String
-    let level: Int
-    let playAgainst: Int
     let rotated: Bool
+    let white: GamePlayer? // Optional for backwards compability
+    let black: GamePlayer? // Optional for backwards compability
 }
 
+// The model of a player
 struct GamePlayer: Codable {
     var name: String
     var computer: Bool
@@ -36,10 +37,8 @@ struct ChessDocument: FileDocument {
     let engine = FEngine()
         
     var pgn: String
-    var playAgainst: PlayAgainst = .black
-    var level: Int = 0
-    var whitePlayer = GamePlayer(name: "", computer: false, level: 0)
-    var blackPlayer = GamePlayer(name: "", computer: true, level: 0)
+    var whitePlayer: GamePlayer
+    var blackPlayer: GamePlayer
 
     var rotated = false
 
@@ -47,15 +46,20 @@ struct ChessDocument: FileDocument {
     var lastMove: FEngineMove? = nil
     var info: FEngineInfo? = nil
 
+    // This variable is used by any action that needs the engine to move
+    // if suitable. For example, after New Game or Edit Game.
+    // If is observed in the PiecesView view.
+    var engineShouldMove = false
+    
     var pieces: [Piece] {
         return PiecesFactory().pieces(forState: engine.state)
     }
     
-    init(pgn: String = startPosPGN, playAgainst: PlayAgainst = .black, level: Int = 0, rotated: Bool = false) {
+    init(pgn: String = startPosPGN, white: GamePlayer? = nil, black: GamePlayer? = nil, rotated: Bool = false) {
         self.pgn = pgn
         self.engine.setPGN(pgn)
-        self.playAgainst = playAgainst
-        self.level = level
+        self.whitePlayer = white ?? GamePlayer(name: "", computer: false, level: 0)
+        self.blackPlayer = black ?? GamePlayer(name: "", computer: true, level: 0)
         self.rotated = rotated
         loadOpenings()
     }
@@ -80,18 +84,18 @@ struct ChessDocument: FileDocument {
         let decoder = JSONDecoder()
         let state = try decoder.decode(GameState.self, from: data)
 
-        self.init(pgn: state.pgn, playAgainst: PlayAgainst(rawValue: state.playAgainst) ?? .black, level: state.level, rotated: state.rotated)
+        self.init(pgn: state.pgn, white: state.white, black: state.black, rotated: state.rotated)
     }
     
     func fileWrapper(configuration: WriteConfiguration) throws -> FileWrapper {
-        let state = GameState(pgn: pgn, level: level, playAgainst: playAgainst.rawValue, rotated: rotated)
+        let state = GameState(pgn: pgn, rotated: rotated, white: whitePlayer, black: blackPlayer)
         let encoder = JSONEncoder()
         let data = try encoder.encode(state)
         return .init(regularFileWithContents: data)
     }
     
     func applyEngineSettings() {
-        switch level {
+        switch engine.isWhite() ? whitePlayer.level : blackPlayer.level {
         case 0:
             engine.thinkingTime = 2
         case 1:

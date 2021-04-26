@@ -65,10 +65,19 @@ struct BottomInformationView: View {
             if let opening = document.info?.opening {
                 Text(opening)
             } else {
-                Text(value())
-                Text(speed())
+                HStack {
+                    Text("Eval").bold()
+                    Text(value())
+                }
+                HStack {
+                    Text("Stats").bold()
+                    Text(speed())
+                }
             }
-            Text(document.engine.pgnFormattedForDisplay())
+            HStack {
+                Text("Moves").bold()
+                Text(document.engine.pgnFormattedForDisplay())
+            }
         }
     }
 }
