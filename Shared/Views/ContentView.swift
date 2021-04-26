@@ -11,8 +11,10 @@ import SwiftUI
 struct ContentView: View {
     @Binding var document: ChessDocument
             
-    @State private var showInfo: Bool = true
-    @State private var showNewGameSheet: Bool = false
+    @State private var showInfo = true
+    
+    @State private var showNewGameSheet = false
+    @State private var newGameSheetEditMode = false
 
     var body: some View {
         VStack(alignment: .leading) {
@@ -30,12 +32,15 @@ struct ContentView: View {
         }
         .padding()
         .toolbar {
-            ActionsToolbar(document: $document, showInfo: $showInfo, showNewGameSheet: $showNewGameSheet)
+            ActionsToolbar(document: $document,
+                           showInfo: $showInfo,
+                           showNewGameSheet: $showNewGameSheet,
+                           newGameSheetEditMode: $newGameSheetEditMode)
         }
         .sheet(isPresented: $showNewGameSheet) {
-            NewGameView(document: $document)
+            NewGameView(document: $document, editMode: newGameSheetEditMode)
                 .padding()
-        }        
+        }
     }
 }
 

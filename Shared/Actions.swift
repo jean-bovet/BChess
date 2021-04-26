@@ -19,16 +19,11 @@ struct Actions {
         document.rotated = !document.rotated
     }
     
-    func newGame(white: GamePlayer, black: GamePlayer) {
-        document.whitePlayer = white
-        document.blackPlayer = black
-        
+    func newGame() {
         engine.setFEN(StartPosFEN)
                 
         document.selection = Selection(position: Position.empty(), possibleMoves: [])
-        document.lastMove = nil
-        
-        document.engineShouldMove.toggle()
+        document.lastMove = nil        
     }
 
     func undoMove() {

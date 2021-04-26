@@ -11,12 +11,29 @@ import SwiftUI
 struct NewGameButton: View {
     @Binding var document: ChessDocument
     @Binding var showNewGameSheet: Bool
+    @Binding var newGameSheetEditMode: Bool
 
     var body: some View {
         Button(action: {
+            self.newGameSheetEditMode = false
             self.showNewGameSheet.toggle()
         }) {
             Label("New Game", systemImage: "plus.circle")
+        }
+    }
+}
+
+struct EditGameButton: View {
+    @Binding var document: ChessDocument
+    @Binding var showNewGameSheet: Bool
+    @Binding var newGameSheetEditMode: Bool
+
+    var body: some View {
+        Button(action: {
+            self.newGameSheetEditMode = true
+            self.showNewGameSheet.toggle()
+        }) {
+            Label("Edit Game", systemImage: "pencil")
         }
     }
 }
@@ -106,11 +123,13 @@ struct ActionsToolbar: ToolbarContent {
     @Binding var document: ChessDocument
     @Binding var showInfo: Bool
     @Binding var showNewGameSheet: Bool
+    @Binding var newGameSheetEditMode: Bool
 
     var body: some ToolbarContent {
         #if os(macOS)
         ToolbarItemGroup(placement: .automatic) {
-            NewGameButton(document: $document, showNewGameSheet: $showNewGameSheet)
+            NewGameButton(document: $document, showNewGameSheet: $showNewGameSheet, newGameSheetEditMode: $newGameSheetEditMode)
+            EditGameButton(document: $document, showNewGameSheet: $showNewGameSheet, newGameSheetEditMode: $newGameSheetEditMode)
 
             ShowHideInfoButton(document: $document, showInfo: $showInfo)
             

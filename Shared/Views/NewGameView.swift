@@ -39,6 +39,8 @@ struct NewGameView: View {
     @State private var temporaryWhitePlayer = GamePlayer(name: "", computer: true, level: 0)
     @State private var temporaryBlackPlayer = GamePlayer(name: "", computer: true, level: 0)
 
+    var editMode: Bool
+    
     var body: some View {
         VStack {
             GroupBox(label: Text("White Player").bold()) {
@@ -50,12 +52,24 @@ struct NewGameView: View {
             
             HStack {
                 Spacer()
-                Button("Cancel") {
-                    presentationMode.wrappedValue.dismiss()
-                }
-                Button("New Game") {
-                    Actions(document: $document).newGame(white: temporaryWhitePlayer, black: temporaryBlackPlayer)
-                    presentationMode.wrappedValue.dismiss()
+                if editMode {
+                    Button("OK") {
+                        document.whitePlayer = temporaryWhitePlayer
+                        document.blackPlayer = temporaryBlackPlayer
+                        document.engineShouldMove.toggle()
+                        presentationMode.wrappedValue.dismiss()
+                    }
+                } else {
+                    Button("Cancel") {
+                        presentationMode.wrappedValue.dismiss()
+                    }
+                    Button("New Game") {
+                        document.whitePlayer = temporaryWhitePlayer
+                        document.blackPlayer = temporaryBlackPlayer
+                        Actions(document: $document).newGame()
+                        document.engineShouldMove.toggle()
+                        presentationMode.wrappedValue.dismiss()
+                    }
                 }
             }
         }
@@ -69,7 +83,13 @@ struct NewGameView: View {
 
 struct NewGameView_Previews: PreviewProvider {
     static var previews: some View {
-        let doc = ChessDocument()
-        NewGameView(document: .constant(doc))
+        Group {
+            let doc = ChessDocument()
+            NewGameView(document: .constant(doc), editMode: false)
+        }
+        Group {
+            let doc = ChessDocument()
+            NewGameView(document: .constant(doc), editMode: true)
+        }
     }
 }
