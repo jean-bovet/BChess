@@ -38,8 +38,11 @@ struct ContentView: View {
                            newGameSheetEditMode: $newGameSheetEditMode)
         }
         .sheet(isPresented: $showNewGameSheet) {
+            #if os(macOS)
             NewGameView(document: $document, editMode: newGameSheetEditMode)
-                .padding()
+            #else
+            NewGameView_iOS(document: $document, editMode: newGameSheetEditMode)
+            #endif
         }
     }
 }

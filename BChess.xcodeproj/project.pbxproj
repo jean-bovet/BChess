@@ -111,6 +111,7 @@
 		A7E490EC1FEA23DD00970EAD /* PGNTests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A77372041FE340780001A90F /* PGNTests.cpp */; };
 		A7E490ED1FEA29B900970EAD /* GamesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7712D321FC8957500E7E802 /* GamesTests.swift */; };
 		A7E490F21FEA2E7E00970EAD /* GoogleTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = A7E490F11FEA2E7E00970EAD /* GoogleTests.mm */; };
+		A7E4C6B72636849C00BE4955 /* NewGameView_iOS.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7E4C6B62636849C00BE4955 /* NewGameView_iOS.swift */; };
 		A7EBE7CF1FF6C93600ACDF85 /* ChessOpenings.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A765D85F1FF6C1950045BB36 /* ChessOpenings.cpp */; };
 		A7EF55C81FF191B1004CF2DA /* SearchChessTests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A7E490E41FEA1C0600970EAD /* SearchChessTests.cpp */; };
 		A7EF55C91FF1CF77004CF2DA /* BestMoveTests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A70A61BD1FD3196400AFDF0E /* BestMoveTests.cpp */; };
@@ -282,6 +283,7 @@
 		A7E490E41FEA1C0600970EAD /* SearchChessTests.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SearchChessTests.cpp; sourceTree = "<group>"; };
 		A7E490EA1FEA207100970EAD /* gtest-all.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "gtest-all.cc"; path = "BChessTests/Helper/gtest-all.cc"; sourceTree = SOURCE_ROOT; };
 		A7E490F11FEA2E7E00970EAD /* GoogleTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = GoogleTests.mm; sourceTree = "<group>"; };
+		A7E4C6B62636849C00BE4955 /* NewGameView_iOS.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewGameView_iOS.swift; sourceTree = "<group>"; };
 		A7EF55C71FEF17A1004CF2DA /* ChessEngine.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = ChessEngine.hpp; sourceTree = "<group>"; };
 		A7EF55CB1FF22FE7004CF2DA /* MoveList.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = MoveList.hpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -524,6 +526,7 @@
 			children = (
 				A795161625ABE57C00AEA95F /* ConditionalView.swift */,
 				A7BC72E32636003F008FBBB4 /* NewGameView.swift */,
+				A7E4C6B62636849C00BE4955 /* NewGameView_iOS.swift */,
 				A79515C925ABE38F00AEA95F /* LastMoveModifier.swift */,
 				A79515D425ABE3A400AEA95F /* SelectionModifier.swift */,
 				A79515A825ABE31100AEA95F /* SquareView.swift */,
@@ -846,6 +849,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				A7A30F2F25B2BAFC00729432 /* PromotionView.swift in Sources */,
+				A7E4C6B72636849C00BE4955 /* NewGameView_iOS.swift in Sources */,
 				A7FE322925AA96D100A75936 /* FFEN.cpp in Sources */,
 				A7FE31ED25AA96B900A75936 /* ChessEvaluater.cpp in Sources */,
 				A795159E25ABE1D700AEA95F /* PiecesFactory.swift in Sources */,
