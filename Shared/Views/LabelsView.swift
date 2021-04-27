@@ -24,11 +24,11 @@ struct LabelsView: View {
             let minSize: CGFloat = min(geometry.size.width, geometry.size.height)
             let xOffset: CGFloat = (geometry.size.width - minSize) / 2
             let yOffset: CGFloat = (geometry.size.height - minSize) / 2
-            let squareSize: CGFloat = minSize / (8 + 1)
+            let squareSize: CGFloat = minSize / 8
             
             ForEach(0...7, id:\.self) { index in
                 let ai = actualIndex(index)
-                let x = xOffset - 0.1 * squareSize
+                let x = xOffset - 0.1 * squareSize - squareSize
                 let y = yOffset + CGFloat(index) * squareSize
                 Text("\(8 - ai)")
                     .font(.title2)
@@ -37,7 +37,7 @@ struct LabelsView: View {
             }
             
             ForEach(Array(["a", "b", "c", "d", "e", "f", "g", "h"].enumerated()), id:\.offset) { index, value in
-                let x = xOffset + CGFloat(actualIndex(index)) * squareSize + squareSize
+                let x = xOffset + CGFloat(actualIndex(index)) * squareSize
                 let y = yOffset + CGFloat(numberOfSquares) * squareSize + 0.1 * squareSize
                 Text("\(value)")
                     .font(.title2)

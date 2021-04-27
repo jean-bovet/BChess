@@ -123,8 +123,8 @@ struct PiecesView: View {
     var body: some View {
         GeometryReader { geometry in
             let minSize: CGFloat = min(geometry.size.width, geometry.size.height)
-            let squareSize: CGFloat = minSize / (CGFloat(numberOfSquares) + 1)
-            let xOffset: CGFloat = (geometry.size.width - minSize) / 2 + squareSize
+            let squareSize: CGFloat = minSize / CGFloat(numberOfSquares)
+            let xOffset: CGFloat = (geometry.size.width - minSize) / 2
             let yOffset: CGFloat = (geometry.size.height - minSize) / 2
             let b: [Square] = board(withPieces: document.pieces)
             ForEach(b) { square in

@@ -24,12 +24,16 @@ struct ContentView: View {
             
             ZStack {
                 BoardView(document: $document)
+                    .if(document.analyzing) {
+                        $0.border(Color.yellow, width: 4)
+                    }
                 LabelsView(document: $document)
                 PiecesView(document: $document)
-            }
+            }.padding()
 
             if (showInfo) {
                 BottomInformationView(document: document)
+                    .padding(.top)
             }
         }
         .padding()
