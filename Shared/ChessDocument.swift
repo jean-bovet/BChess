@@ -45,6 +45,11 @@ struct ChessDocument: FileDocument {
     var selection = Selection.empty()
     var lastMove: FEngineMove? = nil
     var info: FEngineInfo? = nil
+    
+    // Contains the PGN before the analyze started, so we can restore it
+    var pgnBeforeAnalyzing = ""
+    // True when the user is manually analyzing the game
+    var analyzing = false
 
     // This variable is used by any action that needs the engine to move
     // if suitable. For example, after New Game or Edit Game.
@@ -74,9 +79,6 @@ struct ChessDocument: FileDocument {
         let result = engine.loadOpening(pgn);
         assert(result)
     }
-
-    var savedPGN = ""
-    var analyzing = false
     
     static var readableContentTypes: [UTType] { [.exampleText] }
 
@@ -91,7 +93,9 @@ struct ChessDocument: FileDocument {
     }
     
     func fileWrapper(configuration: WriteConfiguration) throws -> FileWrapper {
-        let state = GameState(pgn: pgn, rotated: rotated, white: whitePlayer, black: blackPlayer)
+        // If analyzing, don't save the pgn but rather the savedPGN which is the PGN before the analyze started
+        let actualPGN = analyzing ? pgnBeforeAnalyzing : pgn
+        let state = GameState(pgn: actualPGN, rotated: rotated, white: whitePlayer, black: blackPlayer)
         let encoder = JSONEncoder()
         let data = try encoder.encode(state)
         return .init(regularFileWithContents: data)

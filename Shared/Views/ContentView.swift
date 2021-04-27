@@ -21,7 +21,11 @@ struct ContentView: View {
             if (showInfo) {
                 TopInformationView(document: document)
             }
-            
+
+            if (document.analyzing) {                
+                AnalyzeActionsView(document: $document)
+            }
+
             ZStack {
                 BoardView(document: $document)
                     .if(document.analyzing) {
@@ -30,7 +34,7 @@ struct ContentView: View {
                 LabelsView(document: $document)
                 PiecesView(document: $document)
             }.padding()
-
+            
             if (showInfo) {
                 BottomInformationView(document: document)
                     .padding(.top)

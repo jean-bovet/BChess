@@ -22,22 +22,31 @@ struct Actions {
     func analyze() {
         document.analyzing.toggle()
         if document.analyzing {
-            document.savedPGN = document.pgn
+            document.pgnBeforeAnalyzing = document.pgn
         } else {
-            document.selection = Selection.empty()
-            document.pgn = document.savedPGN
-            document.engine.setPGN(document.pgn)
+            analyzeReset()
         }
+    }
+    
+    func analyzeReset() {
+        document.selection = Selection.empty()
+        document.pgn = document.pgnBeforeAnalyzing
+        document.engine.setPGN(document.pgn)
     }
     
     func newGame() {
         engine.setFEN(StartPosFEN)
+        document.pgn = engine.pgn()
                 
         document.selection = Selection.empty()
         document.lastMove = nil        
     }
 
     func undoMove() {
+        guard engine.canUndoMove() else {
+            return
+        }
+
         withAnimation {
             document.selection = Selection.empty()
             document.lastMove = nil
@@ -45,15 +54,16 @@ struct Actions {
             if engine.isAnalyzing() {
                 engine.cancel()
             }
-            if engine.canUndoMove() {
-                engine.undoMove()
-            }
-            
+            engine.undoMove()
             document.pgn = document.engine.pgn()
         }
     }
 
     func redoMove() {
+        guard engine.canRedoMove() else {
+            return
+        }
+        
         withAnimation {
             document.selection = Selection.empty()
             document.lastMove = nil
