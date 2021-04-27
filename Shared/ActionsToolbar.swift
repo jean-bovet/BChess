@@ -23,6 +23,15 @@ struct NewGameButton: View {
     }
 }
 
+struct AnalyzeBoard: View {
+    @Binding var document: ChessDocument
+    var body: some View {
+        Button(action: { Actions(document: $document).analyze() }) {
+            Label("Analyze", systemImage: "magnifyingglass.circle")
+        }
+    }
+}
+
 struct EditGameButton: View {
     @Binding var document: ChessDocument
     @Binding var showNewGameSheet: Bool
@@ -130,13 +139,24 @@ struct ActionsToolbar: ToolbarContent {
         ToolbarItemGroup(placement: .automatic) {
             NewGameButton(document: $document, showNewGameSheet: $showNewGameSheet, newGameSheetEditMode: $newGameSheetEditMode)
             EditGameButton(document: $document, showNewGameSheet: $showNewGameSheet, newGameSheetEditMode: $newGameSheetEditMode)
+            
+            AnalyzeBoard(document: $document)
+            
+            Menu {
+                UndoMoveButton(document: $document)
+                RedoMoveButton(document: $document)
 
-            ShowHideInfoButton(document: $document, showInfo: $showInfo)
-            
-            RotateBoard(document: $document)
-            
-            UndoMoveButton(document: $document)
-            RedoMoveButton(document: $document)
+                Divider()
+                
+                RotateBoard(document: $document)
+
+                Divider()
+
+                ShowHideInfoButton(document: $document, showInfo: $showInfo)
+            }
+            label: {
+                Label("Board", systemImage: "checkerboard.rectangle")
+            }
             
             Menu {
                 CopyPasteMenu(document: $document)

@@ -12,6 +12,10 @@ struct Selection {
     let position: Position
     let possibleMoves: [FEngineMove]
     
+    static func empty() -> Selection {
+        return Selection(position: Position.empty(), possibleMoves: [])
+    }
+    
     func selected(rank: Int, file: Int) -> Bool {
         return position.rank == rank && position.file == file
     }

@@ -19,16 +19,27 @@ struct Actions {
         document.rotated = !document.rotated
     }
     
+    func analyze() {
+        document.analyzing.toggle()
+        if document.analyzing {
+            document.savedPGN = document.pgn
+        } else {
+            document.selection = Selection.empty()
+            document.pgn = document.savedPGN
+            document.engine.setPGN(document.pgn)
+        }
+    }
+    
     func newGame() {
         engine.setFEN(StartPosFEN)
                 
-        document.selection = Selection(position: Position.empty(), possibleMoves: [])
+        document.selection = Selection.empty()
         document.lastMove = nil        
     }
 
     func undoMove() {
         withAnimation {
-            document.selection = Selection(position: Position.empty(), possibleMoves: [])
+            document.selection = Selection.empty()
             document.lastMove = nil
 
             if engine.isAnalyzing() {
@@ -44,7 +55,7 @@ struct Actions {
 
     func redoMove() {
         withAnimation {
-            document.selection = Selection(position: Position.empty(), possibleMoves: [])
+            document.selection = Selection.empty()
             document.lastMove = nil
 
             engine.redoMove()

@@ -69,6 +69,11 @@ struct PiecesView: View {
     }
     
     func triggerEngineEvaluationIfSuitable() {
+        // Don't play the engine while the user is analyzing the board
+        guard !document.analyzing else {
+            return
+        }
+        
         // Only play the computer if the current color matches
         // a player who is a computer.
         guard document.engine.isWhite() && document.whitePlayer.computer || !document.engine.isWhite() && document.blackPlayer.computer else {
@@ -99,7 +104,7 @@ struct PiecesView: View {
     }
 
     func playMove(move: FEngineMove) {
-        document.selection = Selection(position: Position.empty(), possibleMoves: [])
+        document.selection = Selection.empty()
         document.lastMove = nil
         document.applyEngineSettings()
         document.engine.move(move.rawMoveValue)
@@ -107,7 +112,7 @@ struct PiecesView: View {
     }
     
     func playMove(info: FEngineInfo) {
-        document.selection = Selection(position: Position.empty(), possibleMoves: [])
+        document.selection = Selection.empty()
         document.lastMove = info.bestEngineMove
         document.info = info
         document.applyEngineSettings()

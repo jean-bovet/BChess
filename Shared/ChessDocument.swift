@@ -42,7 +42,7 @@ struct ChessDocument: FileDocument {
 
     var rotated = false
 
-    var selection = Selection(position: Position.empty(), possibleMoves: [])
+    var selection = Selection.empty()
     var lastMove: FEngineMove? = nil
     var info: FEngineInfo? = nil
 
@@ -75,6 +75,9 @@ struct ChessDocument: FileDocument {
         assert(result)
     }
 
+    var savedPGN = ""
+    var analyzing = false
+    
     static var readableContentTypes: [UTType] { [.exampleText] }
 
     init(configuration: ReadConfiguration) throws {

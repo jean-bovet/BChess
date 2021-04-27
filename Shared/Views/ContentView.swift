@@ -18,14 +18,16 @@ struct ContentView: View {
 
     var body: some View {
         VStack(alignment: .leading) {
-            TopInformationView(document: document)
+            if (showInfo) {
+                TopInformationView(document: document)
+            }
             
             ZStack {
                 BoardView(document: $document)
                 LabelsView(document: $document)
                 PiecesView(document: $document)
             }
-            
+
             if (showInfo) {
                 BottomInformationView(document: document)
             }
