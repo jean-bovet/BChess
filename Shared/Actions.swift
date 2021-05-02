@@ -29,6 +29,7 @@ struct Actions {
     
     func analyzeReset() {
         document.selection = Selection.empty()
+        document.lastMove = nil
         document.pgn = document.pgnBeforeAnalyzing
         document.engine.setPGN(document.pgn)
     }
