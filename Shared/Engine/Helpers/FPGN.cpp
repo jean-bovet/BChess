@@ -121,7 +121,7 @@ static bool parseQuotedString(std::string pgn, unsigned &cursor, std::string &st
 }
 
 static void eatWhiteSpace(std::string pgn, unsigned &cursor) {
-    while (isSpaceOrNewLine(pgn[cursor])) {
+    while (cursor < pgn.length() && isSpaceOrNewLine(pgn[cursor])) {
         cursor++;
     }
 }
@@ -589,27 +589,27 @@ bool FPGN::setGame(std::string pgn, ChessGame &game, unsigned & cursor) {
             eatWhiteSpace(pgn, cursor);
             result = parseQuotedString(pgn, cursor, tagValue);
             assert(result);
-
+            eatWhiteSpace(pgn, cursor);
+            assert(pgn[cursor] == ']');
+            cursor++;
+            
             game.tags[tagName] = tagValue;
             
             if (tagName == "FEN") {
                 result = game.setFEN(tagValue);
                 assert(result);
             }
-        } else if (c == '{') {
-            // Indication for a comment
-            cursor++; // go after the {
-            std::string comment = "";
-            auto result = parseUntil(pgn, cursor, comment, '}');
-            assert(result);
         } else if (c >= '0' && c <= '9') {
             if (!parseMoveText(pgn, cursor, game, end)) {
                 return false;
             }
             parsedMoveText = true; // we are done parsing the move text section
-        } else {
-            // Any other character, such as white space or new line are ignored
+        } else if (c == '*') {
+            // The game continues (but the PGN representation stops here for that game)
             cursor++;
+            return true;
+        } else {
+            eatWhiteSpace(pgn, cursor);
         }
     }
     
