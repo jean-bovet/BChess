@@ -31,6 +31,8 @@ typedef void(^FEngineDidUpdateCallback)();
 - (id _Nonnull)init;
 
 - (BOOL)loadOpening:(NSString* _Nonnull)pgn;
+- (BOOL)isValidOpeningMoves;
+- (NSString* _Nullable)openingName;
 
 - (BOOL)setFEN:(NSString* _Nonnull)FEN;
 - (NSString* _Nonnull)FEN;

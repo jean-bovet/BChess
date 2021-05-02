@@ -123,6 +123,21 @@ public:
         return game.outcome == ChessGame::Outcome::in_progress;
     }
     
+    // Returns true if the current moves are following a valid opening line as defined
+    // by the openings loaded with loadOpening()
+    bool isValidOpeningMoves(std::string &name) {
+        name = "";
+        if (game.moves.count > 0) {
+            bool result = openings.lookup(game.moves, [&](auto & node) {
+                // no-op
+                name = node.name;
+            });
+            return result;
+        } else {
+            return false;
+        }
+    }
+    
     bool lookupOpeningMove(ChessEvaluation & evaluation) {
         if (game.moves.count == 0 && game.board.fullMoveCount > 1) {
             // If the game is not at the starting position, that is,
@@ -133,7 +148,6 @@ public:
         }
         bool result = openings.best(game.moves, [&evaluation](OpeningTreeNode & node) {
             evaluation.line.push(node.move);
-            evaluation.opening = node.name;
         });
         return result;
     }

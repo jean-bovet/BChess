@@ -69,15 +69,6 @@
     return self.info.line.bestMove();
 }
 
-- (NSString*)opening {
-    auto name = self.info.opening;
-    if (name.size() > 0) {
-        return NSStringFromString(name);
-    } else {
-        return nil;
-    }
-}
-
 - (FEngineMove*)bestEngineMove {
     FEngineMove *move = [[FEngineMove alloc] init];
     move.fromFile = self.fromFile;

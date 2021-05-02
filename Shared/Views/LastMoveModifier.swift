@@ -11,10 +11,22 @@ import SwiftUI
 struct LastMoveModifier: ViewModifier {
     let rank: Int
     let file: Int
-    let lastMove: FEngineMove?
+    let document: ChessDocument
+    
+    func moveColor() -> Color {
+        if document.state == .train {
+            if document.engine.isValidOpeningMoves() {
+                return Color.green.opacity(0.8)
+            } else {
+                return Color.red.opacity(0.8)
+            }
+        } else {
+            return Color.orange.opacity(0.8)
+        }
+    }
     
     func isLastMoveStart(_ rank: Int, _ file: Int) -> Bool {
-        if let move = lastMove {
+        if let move = document.lastMove {
             return move.fromRank == rank && move.fromFile == file
         } else {
             return false
@@ -22,7 +34,7 @@ struct LastMoveModifier: ViewModifier {
     }
 
     func isLastMoveEnd(_ rank: Int, _ file: Int) -> Bool {
-        if let move = lastMove {
+        if let move = document.lastMove {
             return move.toRank == rank && move.toFile == file
         } else {
             return false
@@ -32,10 +44,10 @@ struct LastMoveModifier: ViewModifier {
     func body(content: Content) -> some View {
         return content
             .if(isLastMoveStart(rank, file)) { view in
-                view.border(Color.orange.opacity(0.8), width: 3)
+                view.border(moveColor(), width: 3)
             }
             .if(isLastMoveEnd(rank, file)) { view in
-                view.border(Color.orange.opacity(0.8), width: 5)
+                view.border(moveColor(), width: 5)
             }
     }
 }

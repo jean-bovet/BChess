@@ -63,6 +63,20 @@
     return engine.loadOpening(StringFromNSString(pgn));
 }
 
+- (BOOL)isValidOpeningMoves {
+    std::string name = "";
+    return engine.isValidOpeningMoves(name);
+}
+
+- (NSString* _Nullable)openingName {
+    std::string name = "";
+    if (engine.isValidOpeningMoves(name)) {
+        return NSStringFromString(name);
+    } else {
+        return NULL;
+    }
+}
+
 #pragma mark -
 
 - (BOOL)setFEN:(NSString *)FEN {

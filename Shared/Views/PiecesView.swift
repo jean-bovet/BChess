@@ -105,7 +105,7 @@ struct PiecesView: View {
 
     func playMove(move: FEngineMove) {
         document.selection = Selection.empty()
-        document.lastMove = nil
+        document.lastMove = move
         document.applyEngineSettings()
         document.engine.move(move.rawMoveValue)
         document.pgn = document.engine.pgn()

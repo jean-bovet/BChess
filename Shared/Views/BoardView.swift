@@ -31,7 +31,7 @@ struct BoardView: View {
                         let f = file.actual(rotated: document.rotated)
                         Rectangle()
                             .fill(backgroundColor(rank: r, file: f))
-                            .modifier(LastMoveModifier(rank: r, file: f, lastMove: document.lastMove))
+                            .modifier(LastMoveModifier(rank: r, file:f, document: document))
                             .modifier(SelectionModifier(rank: r, file: f, selection: document.selection))
                     }
                 }

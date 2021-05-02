@@ -62,16 +62,18 @@ struct BottomInformationView: View {
     
     var body: some View {
         VStack(alignment: .leading) {
-            if let opening = document.info?.opening {
+            if let opening = document.engine.openingName() {
                 Text(opening)
             } else {
-                HStack {
-                    Text("Eval").bold()
-                    Text(value())
-                }
-                HStack {
-                    Text("Stats").bold()
-                    Text(speed())
+                if document.state == .play {
+                    HStack {
+                        Text("Eval").bold()
+                        Text(value())
+                    }
+                    HStack {
+                        Text("Stats").bold()
+                        Text(speed())
+                    }
                 }
             }
             HStack {
