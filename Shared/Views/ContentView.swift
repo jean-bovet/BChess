@@ -18,18 +18,23 @@ struct ContentView: View {
 
     var body: some View {
         VStack(alignment: .leading) {
-            if (showInfo) {
-                TopInformationView(document: document)
-            }
-
-            if (document.analyzing) {                
-                AnalyzeActionsView(document: $document)
+            if (showInfo || document.state != .play) {
+                HStack {
+                    TopInformationView(document: document)
+                    Spacer()
+                    AnalyzeActionsView(document: $document)
+                        .hide(document.state == .play)
+                    Spacer()
+                }
             }
 
             ZStack {
                 BoardView(document: $document)
-                    .if(document.analyzing) {
+                    .if(document.state == .analyze) {
                         $0.border(Color.yellow, width: 4)
+                    }
+                    .if(document.state == .train) {
+                        $0.border(Color.green, width: 4)
                     }
                 LabelsView(document: $document)
                 PiecesView(document: $document)
@@ -61,7 +66,11 @@ struct ContentView_Previews: PreviewProvider {
     
     static var previews: some View {
         Group {
-            let doc = ChessDocument()
+            let doc = ChessDocument(state: .analyze)
+            ContentView(document: .constant(doc))
+        }
+        Group {
+            let doc = ChessDocument(state: .train)
             ContentView(document: .constant(doc))
         }
         Group {

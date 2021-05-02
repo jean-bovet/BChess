@@ -14,7 +14,6 @@ struct AnalyzeActionsView: View {
     
     var body: some View {
         HStack() {
-            Spacer()
             Button(action: {
                 Actions(document: $document).analyzeReset()
             }) {
@@ -30,7 +29,6 @@ struct AnalyzeActionsView: View {
             }) {
                 Image(systemName: "arrowtriangle.forward.fill")
             }
-            Spacer()                        
         }
     }
 }

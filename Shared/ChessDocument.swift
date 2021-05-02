@@ -46,10 +46,16 @@ struct ChessDocument: FileDocument {
     var lastMove: FEngineMove? = nil
     var info: FEngineInfo? = nil
     
+    enum State {
+        case play
+        case analyze
+        case train
+    }
+    
     // Contains the PGN before the analyze started, so we can restore it
     var pgnBeforeAnalyzing = ""
-    // True when the user is manually analyzing the game
-    var analyzing = false
+    // The state of the board (see enum above)
+    var state: State = .play
 
     // This variable is used by any action that needs the engine to move
     // if suitable. For example, after New Game or Edit Game.
@@ -60,12 +66,13 @@ struct ChessDocument: FileDocument {
         return PiecesFactory().pieces(forState: engine.state)
     }
     
-    init(pgn: String = startPosPGN, white: GamePlayer? = nil, black: GamePlayer? = nil, rotated: Bool = false) {
+    init(pgn: String = startPosPGN, white: GamePlayer? = nil, black: GamePlayer? = nil, rotated: Bool = false, state: State = .play) {
         self.pgn = pgn
         self.engine.setPGN(pgn)
         self.whitePlayer = white ?? GamePlayer(name: "", computer: false, level: 0)
         self.blackPlayer = black ?? GamePlayer(name: "", computer: true, level: 0)
         self.rotated = rotated
+        self.state = state
         loadOpenings()
     }
 
@@ -94,7 +101,7 @@ struct ChessDocument: FileDocument {
     
     func fileWrapper(configuration: WriteConfiguration) throws -> FileWrapper {
         // If analyzing, don't save the pgn but rather the savedPGN which is the PGN before the analyze started
-        let actualPGN = analyzing ? pgnBeforeAnalyzing : pgn
+        let actualPGN = state != .play ? pgnBeforeAnalyzing : pgn
         let state = GameState(pgn: actualPGN, rotated: rotated, white: whitePlayer, black: blackPlayer)
         let encoder = JSONEncoder()
         let data = try encoder.encode(state)

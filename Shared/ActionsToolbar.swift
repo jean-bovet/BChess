@@ -32,6 +32,15 @@ struct AnalyzeBoard: View {
     }
 }
 
+struct TrainButton: View {
+    @Binding var document: ChessDocument
+    var body: some View {
+        Button(action: { Actions(document: $document).train() }) {
+            Label("Train", systemImage: "book")
+        }
+    }
+}
+
 struct EditGameButton: View {
     @Binding var document: ChessDocument
     @Binding var showNewGameSheet: Bool
@@ -141,7 +150,8 @@ struct ActionsToolbar: ToolbarContent {
             EditGameButton(document: $document, showNewGameSheet: $showNewGameSheet, newGameSheetEditMode: $newGameSheetEditMode)
             
             AnalyzeBoard(document: $document)
-            
+            TrainButton(document: $document)
+
             Menu {
                 UndoMoveButton(document: $document)
                 RedoMoveButton(document: $document)

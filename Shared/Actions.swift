@@ -20,12 +20,11 @@ struct Actions {
     }
     
     func analyze() {
-        document.analyzing.toggle()
-        if document.analyzing {
-            document.pgnBeforeAnalyzing = document.pgn
-        } else {
-            analyzeReset()
-        }
+        changeBoardState(state: .analyze)
+    }
+    
+    func train() {
+        changeBoardState(state: .train)
     }
     
     func analyzeReset() {
@@ -33,7 +32,17 @@ struct Actions {
         document.pgn = document.pgnBeforeAnalyzing
         document.engine.setPGN(document.pgn)
     }
-    
+        
+    func changeBoardState(state: ChessDocument.State) {
+        if document.state == .play {
+            document.state = state
+            document.pgnBeforeAnalyzing = document.pgn
+        } else {
+            document.state = .play
+            analyzeReset()
+        }
+    }
+
     func newGame() {
         engine.setFEN(StartPosFEN)
         document.pgn = engine.pgn()
