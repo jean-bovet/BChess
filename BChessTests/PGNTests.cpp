@@ -220,11 +220,7 @@ TEST_F(PGN, InputMultipleGames) {
     ASSERT_EQ(2, games.size());
 }
 
-TEST_F(PGN, PGNWithVariations) {
-//    std::string pgn = "1. e4 e5 2. Nc3 Nf6 3. f4 d5 4. fxe5 Nxe4 5. Qf3 Nxc3 {We want them to take\
-//    this knight so we will recapture with the b2 pawn and go for d2-d4, with a\
-//    large center, and Bd3/Ne2 setup.} (5... Nc6 {A tricky and challenging move. We\
-//    must prevent Nxe5.}) 6. bxc3 Be7";
+TEST_F(PGN, PGNWithSimpleWhiteVariation) {
     std::string pgn = "1. e4 (1. d4)";
     
     ChessGame game;
@@ -233,7 +229,32 @@ TEST_F(PGN, PGNWithVariations) {
     ASSERT_EQ(1, game.getNumberOfMoves());
     ASSERT_EQ(2, game.getRoot().variations.size());
     
-    // TODO: generate PGN with variation included
     auto pgnAgain = FPGN::getGame(game);
-    ASSERT_EQ("1. e4 *", pgnAgain);
+    ASSERT_EQ("1. e4 (1. d4) *", pgnAgain);
+}
+
+TEST_F(PGN, PGNWithSimpleBlackVariation) {
+//    std::string pgn = "1. e4 e5 2. Nc3 Nf6 3. f4 d5 4. fxe5 Nxe4 5. Qf3 Nxc3 {We want them to take\
+//    this knight so we will recapture with the b2 pawn and go for d2-d4, with a\
+//    large center, and Bd3/Ne2 setup.} (5... Nc6 {A tricky and challenging move. We\
+//    must prevent Nxe5.}) 6. bxc3 Be7";
+    std::string pgn = "1. e4 e5 (1... c5)";
+    
+    ChessGame game;
+    ASSERT_TRUE(FPGN::setGame(pgn, game));
+    
+    ASSERT_EQ(2, game.getNumberOfMoves());
+    ASSERT_EQ(1, game.getRoot().variations.size());
+    ASSERT_EQ(2, game.getRoot().variations[0].variations.size());
+
+    auto pgnAgain = FPGN::getGame(game);
+    ASSERT_EQ("1. e4 e5 (1... c5) *", pgnAgain);
+}
+
+TEST_F(PGN, LineFromCursor) {
+    ChessGame game;
+    ASSERT_TRUE(FPGN::setGame(move1to3, game));
+    
+    auto line = FPGN::getGame(game, FPGN::Formatting::line, 2);
+    ASSERT_EQ("Nf3 Nc6 Bb5 a6", line);
 }

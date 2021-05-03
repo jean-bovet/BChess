@@ -694,6 +694,97 @@ bool FPGN::setGames(std::string pgn, std::vector<ChessGame> & games) {
     return true;
 }
 
+// Returns a PGN representation of a particular node in the game, including all its descendant.
+static void getPGN(ChessBoard board, FPGN::Formatting formatting, ChessGame::MoveNode & node, std::string & pgn, int index, int fromIndex, int fullMoveIndex, bool mainLine) {
+    auto move = node.move;
+    auto piece = MOVE_PIECE(move);
+
+    if (formatting == FPGN::Formatting::line && index == fromIndex) {
+        pgn = "";
+    }
+    
+    FPGN::SANType sanType = FPGN::SANType::full;
+    auto matchingMoves = getMatchingMoves(board, MOVE_TO(move), piece, MOVE_PROMOTION_PIECE(move), FileUndefined, RankUndefined);
+    if (matchingMoves.size() == 1) {
+        // Only one matching move, we can use the shortest form for PGN
+        // For example: Ne3
+        sanType = FPGN::SANType::tight;
+    } else {
+        matchingMoves = getMatchingMoves(board, MOVE_TO(move), piece, MOVE_PROMOTION_PIECE(move), FileFrom(MOVE_FROM(move)), RankUndefined);
+        if (matchingMoves.size() == 1) {
+            // Use the File to specify the move. For example: Nge3
+            sanType = FPGN::SANType::medium;
+        } else {
+            matchingMoves = getMatchingMoves(board, MOVE_TO(move), piece, MOVE_PROMOTION_PIECE(move), FileFrom(MOVE_FROM(move)), RankFrom(MOVE_FROM(move)));
+            if (matchingMoves.size() == 1) {
+                sanType = FPGN::SANType::full;
+            } else {
+                // Should not happen
+                printf("Unable to find matching moves\n");
+            }
+        }
+    }
+    
+    if (mainLine) {
+        // In the main line, only display the move number for white
+        if (index % 2 == 0) {
+            fullMoveIndex++;
+            if (formatting != FPGN::Formatting::line) {
+                if (pgn.size() > 0) {
+                    pgn += " ";
+                }
+                pgn += std::to_string(fullMoveIndex) + ".";
+            }
+        }
+    } else {
+        // We are in a variation, which means we need to display
+        // the full move number and if it is white or black
+        // to play. For example:
+        // (1. d4)   // variation for white
+        // (1... c5) // variation for black
+        if (index % 2 == 0) {
+            fullMoveIndex++;
+        }
+        if (formatting != FPGN::Formatting::line) {
+            pgn += std::to_string(fullMoveIndex);
+        }
+        if (index % 2 == 0) {
+            pgn += ".";
+        } else {
+            pgn += "...";
+        }
+    }
+            
+    if (pgn.size() > 0) {
+        pgn += " ";
+    }
+    pgn += FPGN::to_string(move, sanType);
+
+    board.move(move);
+    
+    // Determine if the position is check or mate
+    if (board.isCheck(board.color)) {
+        ChessMoveGenerator generator;
+        auto moveList = generator.generateMoves(board);
+        if (moveList.count == 0) {
+            pgn += "#";
+        } else {
+            pgn += "+";
+        }
+    }
+        
+    for (int vindex=0; vindex<node.variations.size(); vindex++) {
+        auto & vnode = node.variations[vindex];
+        if (vindex > 0) {
+            pgn += " (";
+        }
+        getPGN(board, formatting, vnode, pgn, index+1, fromIndex, fullMoveIndex, vindex == 0);
+        if (vindex > 0) {
+            pgn += ")";
+        }
+    }
+}
+
 std::string FPGN::getGame(ChessGame game, Formatting formatting, int fromIndex) {
     // Game used to compute the optimum PGN representation for each move
     ChessBoard outputBoard;
@@ -701,65 +792,27 @@ std::string FPGN::getGame(ChessGame game, Formatting formatting, int fromIndex) 
     
     std::string pgn;
     unsigned fullMoveIndex = 0;
-    for (int index=0; index<game.getNumberOfMoves() && fromIndex < game.getNumberOfMoves(); index++) {
-        auto move = game.getMoveAtIndex(index);
-        auto piece = MOVE_PIECE(move);
-
-        if (index == fromIndex) {
-            pgn = "";
+    
+    auto rootNode = game.getRoot();
+    for (int index=0; index<rootNode.variations.size(); index++) {
+        auto & node = rootNode.variations[index];
+        if (index > 0) {
+            pgn += " (";
         }
-        
-        SANType sanType = SANType::full;
-        auto matchingMoves = getMatchingMoves(outputBoard, MOVE_TO(move), piece, MOVE_PROMOTION_PIECE(move), FileUndefined, RankUndefined);
-        if (matchingMoves.size() == 1) {
-            // Only one matching move, we can use the shortest form for PGN
-            // For example: Ne3
-            sanType = SANType::tight;
-        } else {
-            matchingMoves = getMatchingMoves(outputBoard, MOVE_TO(move), piece, MOVE_PROMOTION_PIECE(move), FileFrom(MOVE_FROM(move)), RankUndefined);
-            if (matchingMoves.size() == 1) {
-                // Use the File to specify the move. For example: Nge3
-                sanType = SANType::medium;
-            } else {
-                matchingMoves = getMatchingMoves(outputBoard, MOVE_TO(move), piece, MOVE_PROMOTION_PIECE(move), FileFrom(MOVE_FROM(move)), RankFrom(MOVE_FROM(move)));
-                if (matchingMoves.size() == 1) {
-                    sanType = SANType::full;
-                } else {
-                    // Should not happen
-                    printf("Unable to find matching moves\n");
-                }
-            }
+        getPGN(outputBoard, formatting, node, pgn, 0, fromIndex, fullMoveIndex, index == 0);
+        if (index > 0) {
+            pgn += ")";
         }
-        
-        if (index % 2 == 0) {
-            fullMoveIndex++;
-            if (formatting != Formatting::line) {
-                pgn += std::to_string(fullMoveIndex) + ". ";
-            }
-        }
-                
-        pgn += to_string(move, sanType);
-
-        outputBoard.move(move);
-        
-        // Determine if the position is check or mate
-        if (outputBoard.isCheck(outputBoard.color)) {
-            ChessMoveGenerator generator;
-            auto moveList = generator.generateMoves(outputBoard);
-            if (moveList.count == 0) {
-                pgn += "#";
-            } else {
-                pgn += "+";
-            }
-        }
-        
-        pgn += " ";
     }
     
     if (formatting == Formatting::line) {
         return pgn;
     }
-        
+    
+    if (pgn.size() > 0) {
+        pgn += " ";
+    }
+
     switch (game.outcome) {
         case ChessGame::Outcome::black_wins:
             pgn += "0-1";

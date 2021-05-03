@@ -44,7 +44,8 @@ public:
         history, // for displaying the history of the game, with new lines every two ply.
     };
     
-    // compact: true to return a compact form of PGN for display in the UI. For example: "Na3 Bxc4 e5+"
-    // fromIndex: the index from which to start building the PGN. Used to display a line from a game.
+    // fromIndex: the index from which to start building the PGN. Used to display a line from a game during analysis,
+    //            which means we only want to display the game after the current move (to show the thinking of the computer).
+    //            This parameter takes effect only if the Formatting is set to line
     static std::string getGame(ChessGame game, Formatting formatting = FPGN::Formatting::storage, int fromIndex = 0);
 };
