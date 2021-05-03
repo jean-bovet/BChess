@@ -181,8 +181,6 @@ static bool loaded = false;
             UnitTestHelper::pathToResources = std::string([[bundle resourcePath] cStringUsingEncoding:NSASCIIStringEncoding]);
             [self registerTestClasses];
         }
-//        if ([notification.userInfo[@"NSLoadedClasses"] count] > 0) {
-//        }
     }];
 }
 

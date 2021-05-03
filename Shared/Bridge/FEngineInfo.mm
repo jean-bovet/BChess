@@ -98,7 +98,7 @@
     } else {
         // Remember the number of moves in the game
         // so we only display the PGN for the best line.
-        int cursor = (int)self.game.moveCursor;
+        int cursor = (int)self.game.getNumberOfMoves();
         
         // Copy the current game and play the best line.
         ChessGame lineGame = self.game;

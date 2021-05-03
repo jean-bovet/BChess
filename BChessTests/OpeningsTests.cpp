@@ -56,10 +56,10 @@ public:
         }
         
         OpeningTreeNode node;
-        bool result = openings.lookup(temp.moves, [&](auto & node) {
+        bool result = openings.lookup(temp.allMoves(), [&](auto & node) {
             outNode = node;
         });
-        
+
         return result;
     }
     
@@ -92,22 +92,22 @@ TEST_F(OpeningsTests, Loading) {
 
 TEST_F(OpeningsTests, KingsPawnOpening) {
     Move m;
-    MoveList moves;
-    moves.push(m = createMove(e2, e4, WHITE, PAWN));
+    std::vector<Move> moves;
+    moves.push_back(m = createMove(e2, e4, WHITE, PAWN));
     
     bool result = openings.lookup(moves, [&](auto & node) {
         ASSERT_EQ(m, node.move);
     });
     ASSERT_TRUE(result);
     
-    moves.push(m = createMove(e7, e5, BLACK, PAWN));
+    moves.push_back(m = createMove(e7, e5, BLACK, PAWN));
     result = openings.lookup(moves, [&](auto & node) {
         ASSERT_EQ(m, node.move);
         ASSERT_EQ("King's pawn game", node.name);
     });
     ASSERT_TRUE(result);
 
-    moves.push(createMove(e2, e4, WHITE, PAWN));
+    moves.push_back(createMove(e2, e4, WHITE, PAWN));
     result = openings.lookup(moves, [&](auto & node) {
         FAIL();
     });
@@ -115,14 +115,14 @@ TEST_F(OpeningsTests, KingsPawnOpening) {
 }
 
 TEST_F(OpeningsTests, BestMove) {
-    MoveList moves;
-    
+    std::vector<Move> moves;
+
     bool result = openings.best(moves, [&](auto & node) {
         ASSERT_EQ(createMove(d2, d4, WHITE, PAWN), node.move);
     });
     ASSERT_TRUE(result);
     
-    moves.push(createMove(e2, e4, WHITE, PAWN));
+    moves.push_back(createMove(e2, e4, WHITE, PAWN));
     
     result = openings.best(moves, [&](auto & node) {
         ASSERT_EQ(createMove(e7, e5, BLACK, PAWN), node.move);

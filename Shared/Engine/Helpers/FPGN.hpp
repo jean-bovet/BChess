@@ -24,9 +24,11 @@ public:
         full, // Nd4e6
         uci // d4e6
     };
-    
+
     static std::string to_string(Move move, SANType sanType = SANType::full);
     
+    static bool parseVariation(std::string pgn, unsigned &cursor, ChessGame &game, bool &end);
+
     static bool parseMove(std::string pgn, unsigned &cursor, ChessGame &game, Move &move, bool &end);
     static bool parseMoveText(std::string pgn, unsigned &cursor, ChessGame &game, bool &end);
 

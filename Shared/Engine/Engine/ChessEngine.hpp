@@ -127,8 +127,8 @@ public:
     // by the openings loaded with loadOpening()
     bool isValidOpeningMoves(std::string &name) {
         name = "";
-        if (game.moves.count > 0) {
-            bool result = openings.lookup(game.moves, [&](auto & node) {
+        if (game.getNumberOfMoves() > 0) {
+            bool result = openings.lookup(game.allMoves(), [&](auto & node) {
                 // no-op
                 name = node.name;
             });
@@ -139,14 +139,14 @@ public:
     }
     
     bool lookupOpeningMove(ChessEvaluation & evaluation) {
-        if (game.moves.count == 0 && game.board.fullMoveCount > 1) {
+        if (game.getNumberOfMoves() == 0 && game.board.fullMoveCount > 1) {
             // If the game is not at the starting position, that is,
             // there are no moves recorded yet but the fullMoveCount is greater
             // than one (meaning the game has one or more move already), don't use
             // any openings.
             return false;
         }
-        bool result = openings.best(game.moves, [&evaluation](OpeningTreeNode & node) {
+        bool result = openings.best(game.allMoves(), [&evaluation](OpeningTreeNode & node) {
             evaluation.line.push(node.move);
         });
         return result;

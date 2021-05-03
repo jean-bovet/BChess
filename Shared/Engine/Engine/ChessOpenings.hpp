@@ -45,6 +45,14 @@ struct OpeningTreeNode {
             child.push(moves, moveIndex+1, callback);
         }
     }
+
+    bool lookup(std::vector<Move> moves, NodeCallback callback) {
+        MoveList moveList;
+        for (auto move : moves) {
+            moveList.push(move);
+        }
+        return lookup(moveList, 0, callback);
+    }
     
     bool lookup(MoveList moves, int moveIndex, NodeCallback callback) {
         if (moveIndex < moves.count) {
@@ -71,8 +79,8 @@ public:
     
     bool load(std::string pgn);
     
-    bool lookup(MoveList moves, OpeningTreeNode::NodeCallback callback);
+    bool lookup(std::vector<Move> moves, OpeningTreeNode::NodeCallback callback);
 
-    bool best(MoveList moves, OpeningTreeNode::NodeCallback callback);
+    bool best(std::vector<Move> moves, OpeningTreeNode::NodeCallback callback);
     
 };

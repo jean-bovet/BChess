@@ -27,7 +27,7 @@ bool ChessOpenings::load(std::string pgn) {
             auto name = game.tags["Name"];
             auto eco = game.tags["ECO"];
 
-            root.push(game.moves, 0, [&](auto & node) {
+            root.push(game.allMoves(), [&](auto & node) {
                 // Make sure the node always contain
                 // the best score so that branch is always
                 // taken upon lookup.
@@ -44,15 +44,15 @@ bool ChessOpenings::load(std::string pgn) {
     }
 }
 
-bool ChessOpenings::lookup(MoveList moves, OpeningTreeNode::NodeCallback callback) {
-    return root.lookup(moves, 0, callback);
+bool ChessOpenings::lookup(std::vector<Move> moves, OpeningTreeNode::NodeCallback callback) {
+    return root.lookup(moves, callback);
 }
 
 bool nodeComparison(OpeningTreeNode i, OpeningTreeNode j) {
     return i.score > j.score;
 }
 
-bool ChessOpenings::best(MoveList moves, OpeningTreeNode::NodeCallback callback) {
+bool ChessOpenings::best(std::vector<Move> moves, OpeningTreeNode::NodeCallback callback) {
     bool bestFound = false;
     bool result = lookup(moves, [&](auto & node) {
         // Check if the opening book has some more moves for that particular node

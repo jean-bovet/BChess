@@ -380,7 +380,7 @@ bool FPGN::parseMove(std::string pgn, unsigned &cursor, ChessGame &game, Move &m
         fromRank = getRank(pgn[cursor++]);
         toFile = getFile(pgn[cursor++]);
         toRank = getRank(pgn[cursor++]);
-    } else if (isFile(pgn[cursor]) && isRank(pgn[cursor+1]) && (isSpaceOrNewLine(pgn[cursor+2]) || isCheckOrMate(pgn[cursor+2]) || isPromotion(pgn[cursor+2]) || cursor+2 == pgn.size())) {
+    } else if (isFile(pgn[cursor]) && isRank(pgn[cursor+1])) {
         // e4
         // Ba4
         toFile = getFile(pgn[cursor++]);
@@ -480,6 +480,55 @@ bool FPGN::parseMove(std::string pgn, unsigned &cursor, ChessGame &game, Move &m
     }
 }
 
+// A variation is simply an alternative line to the move that has just been played
+bool FPGN::parseVariation(std::string pgn, unsigned &cursor, ChessGame &game, bool &end) {
+    eatWhiteSpace(pgn, cursor);
+    
+    if (cursor >= pgn.length()) {
+        end = true;
+        return false;
+    }
+    
+    if (pgn[cursor] != '(') {
+        return false;
+    }
+        
+//    std::cout << "Before variation begins " << game.getMoveIndexes().moveCursor << std::endl;
+//    game.board.print();
+    
+    // Remember the move indexes so we can restore it once
+    // we are done parsing the variation.
+    auto moveIndexes = game.getMoveIndexes();
+    
+    // Restore the game as it was before the last move, so we
+    // apply correctly the variation.
+    moveIndexes.moveCursor--;
+    game.setMoveIndexes(moveIndexes);
+    moveIndexes.moveCursor++;
+
+//    std::cout << "Backtracking one move for the variation " << game.getMoveIndexes().moveCursor << std::endl;
+//    game.board.print();
+
+    // Parse the variation (potentially recursively)
+    parseMoveText(pgn, cursor, game, end);
+    
+    // Restore the move indexes as it was before the variation
+    // so the internal game state is properly restored and
+    // ready to consume the next moves.
+    game.setMoveIndexes(moveIndexes);
+
+//    std::cout << "After variation is explored " << game.getMoveIndexes().moveCursor << std::endl;
+//    game.board.print();
+
+    eatWhiteSpace(pgn, cursor);
+    if (cursor < pgn.length() && pgn[cursor] == ')') {
+        cursor++;
+        return true;
+    } else {
+        return false;
+    }
+}
+
 /**
  Parse a movetext block as defined in the PGN specifications. Not everything is yet supported.
  [move number] [move] [comment] [move] [comment]
@@ -508,13 +557,18 @@ bool FPGN::parseMoveText(std::string pgn, unsigned &cursor, ChessGame &game, boo
         return false;
     }
 
-    //    std::cout << MOVE_DESCRIPTION(whiteMove) << std::endl;
-    //    game.board.print();
-
     game.move(whiteMove);
+
+//    std::cout << to_string(whiteMove, SANType::full) << std::endl;
+//    game.board.print();
 
     parseComment(pgn, cursor);
             
+    parseVariation(pgn, cursor, game, end);
+    if (end) {
+        return true;
+    }
+
     // Did we reach the end now?
     if (cursor >= pgn.length()) {
         end = true;
@@ -534,7 +588,14 @@ bool FPGN::parseMoveText(std::string pgn, unsigned &cursor, ChessGame &game, boo
         end = true;
         return true;
     }
-    
+
+    if (pgn[cursor] == ')') {
+        // End of a variation after white move,
+        // so return early to avoid parsing
+        // the non-existent black move
+        return true;
+    }
+
     Move blackMove = 0;
     if (!parseMove(pgn, cursor, game, blackMove, end)) {
         return true;
@@ -552,6 +613,11 @@ bool FPGN::parseMoveText(std::string pgn, unsigned &cursor, ChessGame &game, boo
 
     parseComment(pgn, cursor);
     
+    parseVariation(pgn, cursor, game, end);
+    if (end) {
+        return true;
+    }
+
     // Did we reach the end now?
     if (cursor >= pgn.length()) {
         end = true;
@@ -635,8 +701,8 @@ std::string FPGN::getGame(ChessGame game, Formatting formatting, int fromIndex) 
     
     std::string pgn;
     unsigned fullMoveIndex = 0;
-    for (int index=0; index<game.moveCursor && fromIndex < game.moveCursor; index++) {
-        auto move = game.moves[index];
+    for (int index=0; index<game.getNumberOfMoves() && fromIndex < game.getNumberOfMoves(); index++) {
+        auto move = game.getMoveAtIndex(index);
         auto piece = MOVE_PIECE(move);
 
         if (index == fromIndex) {
