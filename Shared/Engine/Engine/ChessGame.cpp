@@ -53,10 +53,9 @@ std::vector<Move> ChessGame::movesAt(File file, Rank rank) {
 std::vector<Move> ChessGame::allMoves() {
     std::vector<Move> all;
     MoveNode currentNode = root;
-    for (int index=0; index<getNumberOfMoves(); index++) {
-        currentNode = currentNode.variations[0]; // return only the main variation
-        all.push_back(currentNode.move);
-    }
+    root.visit(0, moveIndexes, [&all](auto & node) {
+        all.push_back(node.move);
+    });
     return all;
 }
 

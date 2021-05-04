@@ -695,11 +695,21 @@ bool FPGN::setGames(std::string pgn, std::vector<ChessGame> & games) {
 }
 
 // Returns a PGN representation of a particular node in the game, including all its descendant.
-static void getPGN(ChessBoard board, FPGN::Formatting formatting, ChessGame::MoveNode & node, std::string & pgn, int index, int fromIndex, int fullMoveIndex, bool mainLine) {
+static void getPGN(ChessBoard board, // The chess board representation which is used to determine the actual move and state of the board
+                   FPGN::Formatting formatting, // The type of desired formatting
+                   ChessGame::MoveNode & node, // The current node representing the move being output
+                   std::string & pgn, // The PGN being constructed
+                   int moveIndex, // The current move index
+                   int fromMoveIndex, // The move index at which we starts to build up the PGN
+                   int fullMoveIndex, // The number of full move that have been done so far
+                   bool mainLine, // True if this node/move represents the main line, false if it represents a variation
+                   bool recursive, // True if this method should continue to traverse the next move and all its variation, false to just output this move and return
+                   bool skip // True if the PGN output should be skipped for this method executed
+) {
     auto move = node.move;
     auto piece = MOVE_PIECE(move);
-
-    if (formatting == FPGN::Formatting::line && index == fromIndex) {
+    
+    if (formatting == FPGN::Formatting::line && moveIndex == fromMoveIndex && !skip) {
         pgn = "";
     }
     
@@ -725,45 +735,50 @@ static void getPGN(ChessBoard board, FPGN::Formatting formatting, ChessGame::Mov
         }
     }
     
-    if (mainLine) {
-        // In the main line, only display the move number for white
-        if (index % 2 == 0) {
-            fullMoveIndex++;
-            if (formatting != FPGN::Formatting::line) {
+    if (moveIndex % 2 == 0) {
+        fullMoveIndex++;
+    }
+
+    // Output the move number
+    if (!skip) {
+        if (mainLine) {
+            // In the main line, only display the move number for white
+            if (moveIndex % 2 == 0 && formatting != FPGN::Formatting::line) {
                 if (pgn.size() > 0) {
                     pgn += " ";
                 }
                 pgn += std::to_string(fullMoveIndex) + ".";
             }
-        }
-    } else {
-        // We are in a variation, which means we need to display
-        // the full move number and if it is white or black
-        // to play. For example:
-        // (1. d4)   // variation for white
-        // (1... c5) // variation for black
-        if (index % 2 == 0) {
-            fullMoveIndex++;
-        }
-        if (formatting != FPGN::Formatting::line) {
-            pgn += std::to_string(fullMoveIndex);
-        }
-        if (index % 2 == 0) {
-            pgn += ".";
         } else {
-            pgn += "...";
+            // We are in a variation, which means we need to display
+            // the full move number and if it is white or black
+            // to play. For example:
+            // (1. d4)   // variation for white
+            // (1... c5) // variation for black
+            if (formatting != FPGN::Formatting::line) {
+                pgn += std::to_string(fullMoveIndex);
+            }
+            if (moveIndex % 2 == 0) {
+                pgn += ".";
+            } else {
+                pgn += "...";
+            }
         }
     }
-            
-    if (pgn.size() > 0) {
-        pgn += " ";
-    }
-    pgn += FPGN::to_string(move, sanType);
-
-    board.move(move);
     
+    // Output the actual move
+    if (!skip) {
+        if (pgn.size() > 0) {
+            pgn += " ";
+        }
+        pgn += FPGN::to_string(move, sanType);
+    }
+    
+    // Execute the move on the board
+    board.move(move);
+
     // Determine if the position is check or mate
-    if (board.isCheck(board.color)) {
+    if (board.isCheck(board.color) && !skip) {
         ChessMoveGenerator generator;
         auto moveList = generator.generateMoves(board);
         if (moveList.count == 0) {
@@ -772,15 +787,39 @@ static void getPGN(ChessBoard board, FPGN::Formatting formatting, ChessGame::Mov
             pgn += "+";
         }
     }
-        
-    for (int vindex=0; vindex<node.variations.size(); vindex++) {
-        auto & vnode = node.variations[vindex];
-        if (vindex > 0) {
-            pgn += " (";
-        }
-        getPGN(board, formatting, vnode, pgn, index+1, fromIndex, fullMoveIndex, vindex == 0);
-        if (vindex > 0) {
-            pgn += ")";
+
+    // If we are not doing any recursive output, return now.
+    if (!recursive) {
+        return;
+    }
+    
+    // Now deal with the variations
+    // Note: the first variation always represents the main line
+    if (node.variations.size() > 0) {
+        if (node.variations.size() == 1) {
+            // If there is only one variation, it is easy: it is the main line
+            // so continue recursively to traverse it.
+            auto & main = node.variations[0];
+            getPGN(board, formatting, main, pgn, moveIndex+1, fromMoveIndex, fullMoveIndex, /*mainline*/true, /*recursive*/true, /*skip*/false);
+        } else {
+            // If there are more than one variation, we need to print first the main variation but for only one move
+            // For example: 1. e4 e5
+            auto & main = node.variations[0];
+            getPGN(board, formatting, main, pgn, moveIndex+1, fromMoveIndex, fullMoveIndex, /*mainline*/true, /*recursive*/false, /*skip*/false);
+            
+            // And then print all the other variations in full (recursively)
+            // For example: 1. e4 e5 (1... d5)
+            for (int vindex=1; vindex<node.variations.size(); vindex++) {
+                auto & vnode = node.variations[vindex];
+                pgn += " (";
+                getPGN(board, formatting, vnode, pgn, moveIndex+1, fromMoveIndex, fullMoveIndex, /*mainline*/false, /*recursive*/true, /*skip*/false);
+                pgn += ")";
+            }
+            
+            // And finally resume the main line output, recursively, but skipping this time the next move
+            // because it was already output above
+            // For example: 1. e4 e5 (1... d5) 2. Nf3 *
+            getPGN(board, formatting, main, pgn, moveIndex+1, fromMoveIndex, fullMoveIndex, /*mainline*/true, /*recursive*/true, /*skip*/true);
         }
     }
 }
@@ -794,13 +833,13 @@ std::string FPGN::getGame(ChessGame game, Formatting formatting, int fromIndex) 
     unsigned fullMoveIndex = 0;
     
     auto rootNode = game.getRoot();
-    for (int index=0; index<rootNode.variations.size(); index++) {
-        auto & node = rootNode.variations[index];
-        if (index > 0) {
+    for (int vindex=0; vindex<rootNode.variations.size(); vindex++) {
+        auto & node = rootNode.variations[vindex];
+        if (vindex > 0) {
             pgn += " (";
         }
-        getPGN(outputBoard, formatting, node, pgn, 0, fromIndex, fullMoveIndex, index == 0);
-        if (index > 0) {
+        getPGN(outputBoard, formatting, node, pgn, 0, fromIndex, fullMoveIndex, /*mainline*/vindex == 0, /*recursive*/true, /*skip*/false);
+        if (vindex > 0) {
             pgn += ")";
         }
     }

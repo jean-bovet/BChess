@@ -64,6 +64,14 @@ public:
                 variations[varIndex].lookupNode(cursor+1, atIndex, indexes, callback);
             }
         }
+        
+        void visit(int cursor, MoveIndexes indexes, NodeCallback callback) {
+            if (cursor < indexes.moveCursor) {
+                int varIndex = indexes.moves[cursor];
+                callback(variations[varIndex]);
+                variations[varIndex].visit(cursor+1, indexes, callback);
+            }
+        }
     };
     
     ChessGame();
@@ -84,8 +92,9 @@ public:
         
         // Always replay the moves to update the internal
         // board state when the move indexes change,
-        // because that mean we are starting another
+        // because that means we are starting at another
         // location in the tree of moves.
+        // TODO: consider never doing that and replaying the game only when needed?
         replayMoves();
     }
     

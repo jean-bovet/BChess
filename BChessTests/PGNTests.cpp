@@ -33,10 +33,10 @@ static void assertOutputPGN(const char *pgnGame, std::string expectedFEN, std::s
     
     // Assert the FEN for the end position
     std::string actualFEN = FFEN::getFEN(game.board);
-    EXPECT_STREQ(actualFEN.c_str(), expectedFEN.c_str());
+    EXPECT_STREQ(expectedFEN.c_str(), actualFEN.c_str());
     
     auto generatedPGN = FPGN::getGame(game);
-    EXPECT_STREQ(generatedPGN.c_str(), outputPGN.c_str());
+    EXPECT_STREQ(outputPGN.c_str(), generatedPGN.c_str());
     
     // Now let's try again the assert the game using the generated PGN and the expected FEN of the game
     // in the final position.
@@ -234,10 +234,6 @@ TEST_F(PGN, PGNWithSimpleWhiteVariation) {
 }
 
 TEST_F(PGN, PGNWithSimpleBlackVariation) {
-//    std::string pgn = "1. e4 e5 2. Nc3 Nf6 3. f4 d5 4. fxe5 Nxe4 5. Qf3 Nxc3 {We want them to take\
-//    this knight so we will recapture with the b2 pawn and go for d2-d4, with a\
-//    large center, and Bd3/Ne2 setup.} (5... Nc6 {A tricky and challenging move. We\
-//    must prevent Nxe5.}) 6. bxc3 Be7";
     std::string pgn = "1. e4 e5 (1... c5)";
     
     ChessGame game;
@@ -249,6 +245,22 @@ TEST_F(PGN, PGNWithSimpleBlackVariation) {
 
     auto pgnAgain = FPGN::getGame(game);
     ASSERT_EQ("1. e4 e5 (1... c5) *", pgnAgain);
+}
+
+TEST_F(PGN, PGNWithVariation1) {
+//    std::string pgn = "1. e4 e5 2. Nc3 Nf6 3. f4 d5 4. fxe5 Nxe4 5. Qf3 Nxc3 {We want them to take\
+//    this knight so we will recapture with the b2 pawn and go for d2-d4, with a\
+//    large center, and Bd3/Ne2 setup.} (5... Nc6 {A tricky and challenging move. We\
+//    must prevent Nxe5.}) 6. bxc3 Be7";
+    std::string pgn = "1. e4 e5 2. Nc3 Nf6 3. f4 d5 4. fxe5 Nxe4 5. Qf3 Nxc3 (5... Nc6) 6. bxc3 Be7";
+
+    ChessGame game;
+    ASSERT_TRUE(FPGN::setGame(pgn, game));
+    
+    ASSERT_EQ(12, game.getNumberOfMoves());
+
+    auto pgnAgain = FPGN::getGame(game);
+    ASSERT_EQ("1. e4 e5 2. Nc3 Nf6 3. f4 d5 4. fxe5 Nxe4 5. Qf3 Nxc3 (5... Nc6) 6. bxc3 Be7 *", pgnAgain);
 }
 
 TEST_F(PGN, LineFromCursor) {
