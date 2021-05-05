@@ -60,27 +60,36 @@ std::vector<Move> ChessGame::allMoves() {
     return all;
 }
 
-void ChessGame::move(Move move) {
+// move: the move to perform
+// replace: true to replace any variations by this move only,
+//          false to add as a new variation if the move does not exist already
+void ChessGame::move(Move move, bool replace) {
     assert(MOVE_ISVALID(move));
     
     // Lookup the node representing the last move by `moveIndexes`
-    root.lookupNode(0, moveIndexes.moveCursor, moveIndexes, [&move, this](auto & node) {
-        // First try to match the move with an existing move for that node.
-        // This happens, for example, when a PGN has been loaded and
-        // the player is playing a series of move that correspond to that PGN.
+    root.lookupNode(0, moveIndexes.moveCursor, moveIndexes, [&move, replace, this](auto & node) {
         bool found = false;
-        for (int index=0; index<node.variations.size(); index++) {
-            if (node.variations[index].move == move) {
-                moveIndexes.moves.push_back(index);
-                moveIndexes.moveCursor++;
-                found = true;
-                break;
+        if (replace) {
+            // Clear all the variations so this move
+            // becomes the only one available.
+            node.variations.clear();
+        } else {
+            // First try to match the move with an existing move for that node.
+            // This happens, for example, when a PGN has been loaded and
+            // the player is playing a series of move that correspond to that PGN.
+            for (int index=0; index<node.variations.size(); index++) {
+                if (node.variations[index].move == move) {
+                    moveIndexes.moves.push_back(index);
+                    moveIndexes.moveCursor++;
+                    found = true;
+                    break;
+                }
             }
         }
         
         // If the move is not found in any variations of this node, this mean
         // this is a new variation (either main variation if no variation exists yet).
-        if (!found) {
+        if (!found || replace) {
             MoveNode newNode = MoveNode();
             newNode.move = move;
             node.variations.push_back(newNode);
@@ -115,7 +124,7 @@ void ChessGame::move(Move move) {
 void ChessGame::move(std::string from, std::string to) {
     auto move = board.getMove(from, to);
     if (MOVE_ISVALID(move)) {
-        ChessGame::move(move);
+        ChessGame::move(move, false);
     }
 }
 

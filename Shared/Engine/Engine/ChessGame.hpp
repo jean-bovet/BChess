@@ -135,7 +135,7 @@ public:
     std::vector<Move> movesAt(File file, Rank rank);
     std::vector<Move> allMoves();
 
-    void move(Move move);
+    void move(Move move, bool replace);
     void move(std::string from, std::string to);
     
     bool canUndoMove();

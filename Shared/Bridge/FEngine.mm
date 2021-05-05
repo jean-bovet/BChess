@@ -132,7 +132,7 @@
 }
 
 - (void)move:(NSUInteger)move {
-    engine.move((Move)move);
+    engine.move((Move)move, true);
     [self fireUpdate:self.stateIndex];
 }
 

@@ -105,7 +105,7 @@
         lineGame.history = NEW_HISTORY; // TODO hack to avoid coping the history from self.game and got it overwritten here
         for (int index=0; index<self.info.line.count; index++) {
             Move move = self.info.line[index];
-            lineGame.move(move);
+            lineGame.move(move, false);
         }
 
         // Get the PGN representation of the best line only

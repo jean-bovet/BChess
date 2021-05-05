@@ -557,7 +557,7 @@ bool FPGN::parseMoveText(std::string pgn, unsigned &cursor, ChessGame &game, boo
         return false;
     }
 
-    game.move(whiteMove);
+    game.move(whiteMove, false);
 
 //    std::cout << to_string(whiteMove, SANType::full) << std::endl;
 //    game.board.print();
@@ -609,7 +609,7 @@ bool FPGN::parseMoveText(std::string pgn, unsigned &cursor, ChessGame &game, boo
     
     //    std::cout << MOVE_DESCRIPTION(blackMove) << std::endl;
     //    game.board.print();
-    game.move(blackMove);
+    game.move(blackMove, false);
 
     parseComment(pgn, cursor);
     
