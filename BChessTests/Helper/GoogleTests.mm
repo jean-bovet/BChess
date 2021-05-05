@@ -69,10 +69,15 @@ public:
         const char *fileName = test_part_result.file_name();
         NSString *path = fileName ? [@(fileName) stringByStandardizingPath] : nil;
         NSString *description = @(test_part_result.message());
-        [_testCase recordFailureWithDescription:description
-                                         inFile:path
-                                         atLine:(lineNumber >= 0 ? (NSUInteger)lineNumber : 0)
-                                       expected:YES];
+
+        XCTSourceCodeLocation *location = [[XCTSourceCodeLocation alloc] initWithFilePath:path lineNumber:(lineNumber >= 0 ? (NSUInteger)lineNumber : 0)];
+        XCTSourceCodeContext *context = [[XCTSourceCodeContext alloc] initWithLocation:location];
+        [_testCase recordIssue:[[XCTIssue alloc] initWithType:XCTIssueTypeAssertionFailure
+                                           compactDescription:description
+                                          detailedDescription:description
+                                            sourceCodeContext:context
+                                              associatedError:nil
+                                                  attachments:@[]]];
     }
 
 private:
