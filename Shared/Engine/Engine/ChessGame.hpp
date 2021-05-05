@@ -72,6 +72,10 @@ public:
                 variations[varIndex].visit(cursor+1, indexes, callback);
             }
         }
+        
+        void clear() {
+            variations.clear();
+        }
     };
     
     ChessGame();

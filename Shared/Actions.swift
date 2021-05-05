@@ -46,6 +46,7 @@ struct Actions {
 
     func newGame() {
         engine.setFEN(StartPosFEN)
+        document.info = nil
         document.pgn = engine.pgn()
                 
         document.selection = Selection.empty()

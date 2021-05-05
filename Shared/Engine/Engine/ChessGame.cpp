@@ -19,6 +19,7 @@ ChessGame::ChessGame() {
 }
 
 void ChessGame::reset() {
+    root.clear();
     moveIndexes.reset();
     history->clear();
     board.reset();
