@@ -73,6 +73,22 @@ public:
             }
         }
         
+        // This function takes an array of moves and returns true if and only if
+        // all the moves match at least one variation starting with this node.
+        bool matches(int cursor, std::vector<Move> moves, NodeCallback callback) {
+            if (cursor < moves.size()) {
+                for (int vindex=0; vindex<variations.size(); vindex++) {
+                    if (variations[vindex].move == moves[cursor]) {
+                        return variations[vindex].matches(cursor+1, moves, callback);
+                    }
+                }
+                return false;
+            } else {
+                callback(*this);
+                return true;
+            }
+        }
+
         void clear() {
             variations.clear();
         }

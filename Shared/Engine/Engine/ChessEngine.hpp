@@ -128,9 +128,8 @@ public:
     bool isValidOpeningMoves(std::string &name) {
         name = "";
         if (game.getNumberOfMoves() > 0) {
-            bool result = openings.lookup(game.allMoves(), [&](auto & node) {
-                // no-op
-                name = node.name;
+            bool result = openings.lookup(game.allMoves(), [&](auto opening) {
+                name = opening.name;
             });
             return result;
         } else {
@@ -146,8 +145,8 @@ public:
             // any openings.
             return false;
         }
-        bool result = openings.best(game.allMoves(), [&evaluation](OpeningTreeNode & node) {
-            evaluation.line.push(node.move);
+        bool result = openings.best(game.allMoves(), [&evaluation](auto opening) {
+            evaluation.line.push(opening.move);
         });
         return result;
     }

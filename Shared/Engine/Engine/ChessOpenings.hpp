@@ -12,75 +12,47 @@
 #include <map>
 #include <vector>
 
-#include "MoveList.hpp"
-
-struct OpeningTreeNode {
-    Move move;
-    int score = 0;
-    std::string name;
-    std::string eco;
-        
-    std::map<Move, OpeningTreeNode> children;
-    
-    typedef std::function<void(OpeningTreeNode &node)> NodeCallback;
-
-    void clear() {
-        children.clear();
-    }
-
-    void push(std::vector<Move> moves, NodeCallback callback) {
-        MoveList moveList;
-        for (auto move : moves) {
-            moveList.push(move);
-        }
-        push(moveList, 0, callback);
-    }
-    
-    void push(MoveList moves, int moveIndex, NodeCallback callback) {
-        callback(*this);
-        if (moveIndex < moves.count) {
-            auto key = moves[moveIndex];
-            auto & child = children[key];
-            child.move = key;
-            child.push(moves, moveIndex+1, callback);
-        }
-    }
-
-    bool lookup(std::vector<Move> moves, NodeCallback callback) {
-        MoveList moveList;
-        for (auto move : moves) {
-            moveList.push(move);
-        }
-        return lookup(moveList, 0, callback);
-    }
-    
-    bool lookup(MoveList moves, int moveIndex, NodeCallback callback) {
-        if (moveIndex < moves.count) {
-            Move move = moves[moveIndex];
-            if (children.count(move) == 0) {
-                return false;
-            } else {
-                auto & child = children[move];
-                return child.lookup(moves, moveIndex+1, callback);
-            }
-        } else {
-            callback(*this);
-            return true;
-        }
-    }
-    
-};
+#include "ChessGame.hpp"
 
 class ChessOpenings {
+private:
+    std::vector<ChessGame> games;
+
 public:
-    OpeningTreeNode root;
 
     ChessOpenings();
     
     bool load(std::string pgn);
     
-    bool lookup(std::vector<Move> moves, OpeningTreeNode::NodeCallback callback);
+    // Structure containing the information about a specific move in an opening
+    struct OpeningMove {
+        // The move itself
+        Move move;
+        // The name of the opening containing this move
+        std::string name;
+        // The score of the opening containing this move
+        int score;
+        // The array of moves after this one as defined by the opening.
+        // The first element in the array is always the main line.
+        std::vector<Move> nextMoves;        
+    };
+    
+    typedef std::function<void(OpeningMove move)> OpeningCallback;
+    typedef std::function<void(std::vector<OpeningMove> moves)> OpeningsCallback;
 
-    bool best(std::vector<Move> moves, OpeningTreeNode::NodeCallback callback);
+    // This function looks up the best opening corresponding to
+    // the specified list of moves (which can be empty).
+    // Returns false if no opening is found
+    bool lookup(std::vector<Move> moves, OpeningCallback callback);
+
+    // This function looks up all the openins corresponding to
+    // the specified list of moves (which can be empty).
+    // Returns false if no opening is found
+    bool lookupAll(std::vector<Move> moves, OpeningsCallback callback);
+
+    // This function looks up the best next move given by the opening
+    // that matches the list of moves (which can be empty).
+    // Returns false if no opening is found
+    bool best(std::vector<Move> moves, OpeningCallback callback);
     
 };
