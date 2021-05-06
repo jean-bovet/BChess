@@ -397,23 +397,23 @@ void ChessBoard::move(Color color, Piece piece, Square from, Square to) {
     occupancyDirty = true;
 }
 
-inline static char charForPiece(Color color, Piece piece) {
+inline static std::string charForPiece(Color color, Piece piece) {
     auto white = color == WHITE;
     switch (piece) {
         case PAWN:
-            return white ? 'P' : 'p';
+            return white ? "♙" : "♟︎";
         case ROOK:
-            return white ? 'R' : 'r';
+            return white ? "♖" : "♜";
         case KNIGHT:
-            return white ? 'N' : 'n';
+            return white ? "♘" : "♞";
         case BISHOP:
-            return white ? 'B' : 'b';
+            return white ? "♗" : "♝";
         case QUEEN:
-            return white ? 'Q' : 'q';
+            return white ? "♕" : "♛";
         case KING:
-            return white ? 'K' : 'k';
+            return white ? "♔" : "♚";
         case PCOUNT:
-            return '?';
+            return "?";
     }
 }
 
@@ -421,7 +421,7 @@ void ChessBoard::print() {
     for (Rank reverseRank = 0; reverseRank < 8; reverseRank++) {
         Rank rank = 7 - reverseRank;
         for (File file = 0; file < 8; file++) {
-            char c = '.';
+            std::string c = "·";
             
             for (unsigned color=0; color<Color::COUNT; color++) {
                 for (unsigned piece=0; piece<Piece::PCOUNT; piece++) {
