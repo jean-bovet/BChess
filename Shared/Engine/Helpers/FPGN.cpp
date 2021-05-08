@@ -38,10 +38,14 @@
 
 #define REMEMBER unsigned savedCursor = cursor;
 
-#define RETURN_FAILURE(error) { \
+#define RETURN_FAILURE_SILENT(error, silent) { \
     cursor = savedCursor; \
+    if (!silent) { \
     std::cout << error << " around '" << character(-2) << character(-1) << character() << character(1) << character(2) << "' at " << __FUNCTION__ << ":" << __LINE__ << std::endl; \
+    } \
     return false; }
+
+#define RETURN_FAILURE(error) RETURN_FAILURE_SILENT(error, false)
 
 static bool isFile(char c) {
     return c >= 'a' && c <= 'h';
@@ -385,7 +389,7 @@ bool FPGN::parseTerminationMarker() {
         game.outcome = ChessGame::Outcome::in_progress;
         return true;
     } else {
-        RETURN_FAILURE("Unexpected termination marker")
+        RETURN_FAILURE_SILENT("Unexpected termination marker", true)
     }
 }
 
@@ -515,7 +519,7 @@ bool FPGN::parseVariation() {
     eatWhiteSpaces(); // TODO: should we do this at a high level?
         
     if (character() != '(') {
-        RETURN_FAILURE("Unexpected start of variation")
+        RETURN_FAILURE_SILENT("Unexpected start of variation", true)
     } else {
         cursor++;
     }
@@ -649,7 +653,7 @@ bool FPGN::parseComment() {
                 
         return true;
     } else {
-        RETURN_FAILURE("Unexpected comment starting character")
+        RETURN_FAILURE_SILENT("Unexpected comment starting character", true)
     }
 }
 
@@ -664,7 +668,7 @@ bool FPGN::parseTag(bool lookahead) {
     
     // Expecting a tag opening bracket
     if (character() != '[') {
-        RETURN_FAILURE("Unexpected start TAG character")
+        RETURN_FAILURE_SILENT("Unexpected start TAG character", true)
     }
     
     if (lookahead) {
@@ -706,6 +710,18 @@ bool FPGN::setGame(std::string pgn, ChessGame &game, unsigned & cursor) {
     fpgn.cursor = cursor;
     bool parsedMoveText = false;
     while (fpgn.hasMoreCharacters()) {
+        fpgn.eatWhiteSpaces();
+
+        if (fpgn.character() == '*') {
+            // We have reached the end of this game
+            fpgn.cursor++;
+            fpgn.eatWhiteSpaces();
+
+            game = fpgn.game;
+            cursor = fpgn.cursor;
+            return true;
+        }
+
         // Check if there is tag ahead and if we have already
         // parsed at least one moveText section. If that is the case,
         // it means we are now parsing the tag section of another game.
@@ -724,19 +740,7 @@ bool FPGN::setGame(std::string pgn, ChessGame &game, unsigned & cursor) {
         } else {
             return false;
         }
-        
-        fpgn.eatWhiteSpaces();
-
-        if (fpgn.character() == '*') {
-            // We have reached the end of this game
-            fpgn.cursor++;
-            fpgn.eatWhiteSpaces();
-
-            game = fpgn.game;
-            cursor = fpgn.cursor;
-            return true;
-        }
-        
+                
         fpgn.eatWhiteSpaces();
     }
     
