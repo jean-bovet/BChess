@@ -32,6 +32,15 @@ public:
         // The current index in the index of moves above
         int moveCursor = 0;
         
+        void add(int move) {
+            if (moveCursor < moves.size()) {
+                moves[moveCursor] = move;
+            } else {
+                moves.push_back(move);
+            }
+            moveCursor++;
+        }
+        
         void reset() {
             moveCursor = 0;
             moves.clear();
@@ -110,7 +119,7 @@ public:
     
     void setMoveIndexes(MoveIndexes indexes) {
         moveIndexes = indexes;
-        
+                
         // Always replay the moves to update the internal
         // board state when the move indexes change,
         // because that means we are starting at another

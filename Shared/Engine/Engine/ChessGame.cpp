@@ -79,8 +79,7 @@ void ChessGame::move(Move move, bool replace) {
             // the player is playing a series of move that correspond to that PGN.
             for (int index=0; index<node.variations.size(); index++) {
                 if (node.variations[index].move == move) {
-                    moveIndexes.moves.push_back(index);
-                    moveIndexes.moveCursor++;
+                    moveIndexes.add(index);
                     found = true;
                     break;
                 }
@@ -95,8 +94,7 @@ void ChessGame::move(Move move, bool replace) {
             node.variations.push_back(newNode);
             
             // Insert the index of that new variation to the current move indexes
-            moveIndexes.moves.push_back((int)node.variations.size() - 1);
-            moveIndexes.moveCursor++;
+            moveIndexes.add((int)node.variations.size() - 1);
         }
     });
 

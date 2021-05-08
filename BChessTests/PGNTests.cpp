@@ -296,7 +296,7 @@ TEST_F(PGN, PGNWithVariation2) {
     ChessGame game;
     ASSERT_TRUE(FPGN::setGame(pgn, game));
     
-    ASSERT_EQ(12, game.getNumberOfMoves());
+    ASSERT_EQ(3, game.getNumberOfMoves());
 
     auto pgnAgain = FPGN::getGame(game);
     ASSERT_EQ("1. e4 e5 2. Nc3 (2. Nf3 Nc6 3. Nc3 Nf6) *", pgnAgain);
