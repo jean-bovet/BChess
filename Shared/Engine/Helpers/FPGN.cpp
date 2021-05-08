@@ -36,6 +36,13 @@
  Nf2 42. g4 Bd3 43. Re6 1/2-1/2
  */
 
+#define REMEMBER unsigned savedCursor = cursor;
+
+#define RETURN_FAILURE(error) { \
+    cursor = savedCursor; \
+    std::cout << error << " around '" << character(-2) << character(-1) << character() << character(1) << character(2) << "' at " << __FUNCTION__ << ":" << __LINE__ << std::endl; \
+    return false; }
+
 static bool isFile(char c) {
     return c >= 'a' && c <= 'h';
 }
@@ -56,42 +63,18 @@ static bool isPromotion(char c) {
     return c == '=';
 }
 
-static bool parseUntil(std::string pgn, unsigned &cursor, std::string &comment, char endCharacter) {
-    while (cursor < pgn.length() && pgn[cursor] != endCharacter) {
-        comment += pgn[cursor];
-        cursor++;
-    }
-    cursor++; // go after the endCharacter
-    return true;
+static bool isDigit(char c) {
+    return c >= '0' && c <= '9';
 }
 
+static File getFile(char c) {
+    assert(isFile(c));
+    return (File)(c - 'a');
+}
 
-// For example:
-// "12. "
-// "1..." - to indicate a move for black
-static bool parseMoveNumber(std::string pgn, unsigned &cursor, bool &isMoveForBlack) {
-    // Parse the number portion of the move
-    while (cursor < pgn.length() && pgn[cursor] != '.') {
-        cursor++;
-    }
-    
-    // Parse the number of dots, to determine if it is a white or black move
-    unsigned numberOfDots = 0;
-    while (cursor < pgn.length() && pgn[cursor] == '.') {
-        cursor++;
-        numberOfDots++;
-    }
-    
-    if (numberOfDots == 1) {
-        isMoveForBlack = false;
-    } else if (numberOfDots == 3) {
-        isMoveForBlack = true;
-    } else {
-        // Invalid number of dots
-        return false;
-    }
-    
-    return true;
+static Rank getRank(char c) {
+    assert(isRank(c));
+    return (Rank)(c - '1');
 }
 
 static bool parseString(std::string pgn, unsigned &cursor, std::string & string) {
@@ -120,22 +103,32 @@ static bool parseQuotedString(std::string pgn, unsigned &cursor, std::string &st
     return true;
 }
 
-static void eatWhiteSpace(std::string pgn, unsigned &cursor) {
-    while (cursor < pgn.length() && isSpaceOrNewLine(pgn[cursor])) {
+static bool parseUntil(std::string pgn, unsigned &cursor, std::string &comment, char endCharacter) {
+    while (cursor < pgn.length() && pgn[cursor] != endCharacter) {
+        comment += pgn[cursor];
         cursor++;
+    }
+    cursor++; // go after the endCharacter
+    return true;
+}
+
+static bool IsCastlingKingSide(Move move) {
+    if (!MOVE_IS_CASTLING(move)) return false;
+    
+    if (MOVE_COLOR(move) == WHITE) {
+        return MOVE_FROM(move) == e1 && MOVE_TO(move) == g1;
+    } else {
+        return MOVE_FROM(move) == e8 && MOVE_TO(move) == g8;
     }
 }
 
-// Parse comments in the form: { this is a comment }.
-// Don't do anything with the comment itself for now.
-static void parseComment(std::string pgn, unsigned &cursor) {
-    eatWhiteSpace(pgn, cursor);
-    
-    if (pgn[cursor] == '{') {
-        cursor++;
-        std::string comment = "";
-        auto result = parseUntil(pgn, cursor, comment, '}');
-        assert(result);
+static bool IsCastlingQueenSide(Move move) {
+    if (!MOVE_IS_CASTLING(move)) return false;
+
+    if (MOVE_COLOR(move) == WHITE) {
+        return MOVE_FROM(move) == e1 && MOVE_TO(move) == c1;
+    } else {
+        return MOVE_FROM(move) == e8 && MOVE_TO(move) == c8;
     }
 }
 
@@ -161,110 +154,6 @@ static std::string pgnPiece(Piece piece) {
             
         default:
             return "?";
-    }
-}
-
-static Piece parsePiece(std::string pgn, unsigned &cursor) {
-    auto c = pgn[cursor];
-    Piece piece;
-    switch (c) {
-        case 'N':
-            piece = KNIGHT;
-            cursor++;
-            break;
-            
-        case 'K':
-            piece = KING;
-            cursor++;
-            break;
-            
-        case 'Q':
-            piece = QUEEN;
-            cursor++;
-            break;
-            
-        case 'B':
-            piece = BISHOP;
-            cursor++;
-            break;
-            
-        case 'R':
-            piece = ROOK;
-            cursor++;
-            break;
-            
-        case 'P':
-            piece = PAWN;
-            cursor++;
-            break;
-
-        default:
-            // Pawn is usually omitted, so don't move the cursor
-            piece = PAWN;
-            break;
-    }
-    return piece;
-}
-
-static File getFile(char c) {
-    assert(isFile(c));
-    return (File)(c - 'a');
-}
-
-static Rank getRank(char c) {
-    assert(isRank(c));
-    return (Rank)(c - '1');
-}
-
-static std::vector<Move> getMatchingMoves(ChessBoard board, Square to, Piece movingPiece, Piece promotedPiece, File fromFile, Rank fromRank) {
-    ChessMoveGenerator generator;
-    auto moveList = generator.generateMoves(board);
-    std::vector<Move> matchingMoves;
-    for (int index=0; index<moveList.count; index++) {
-        auto m = moveList.moves[index];
-        if (MOVE_TO(m) != to) {
-            continue;
-        }
-        
-        if (MOVE_PIECE(m) != movingPiece) {
-            continue;
-        }
-
-        if (MOVE_PROMOTION_PIECE(m) != promotedPiece) {
-            continue;
-        }
-
-        if (fromFile != FileUndefined && FileFrom(MOVE_FROM(m)) != fromFile) {
-            continue;
-        }
-        
-        if (fromRank != RankUndefined && RankFrom(MOVE_FROM(m)) != fromRank) {
-            continue;
-        }
-        
-        matchingMoves.push_back(m);
-    }
-    
-    return matchingMoves;
-}
-
-static bool IsCastlingKingSide(Move move) {
-    if (!MOVE_IS_CASTLING(move)) return false;
-    
-    if (MOVE_COLOR(move) == WHITE) {
-        return MOVE_FROM(move) == e1 && MOVE_TO(move) == g1;
-    } else {
-        return MOVE_FROM(move) == e8 && MOVE_TO(move) == g8;
-    }
-}
-
-static bool IsCastlingQueenSide(Move move) {
-    if (!MOVE_IS_CASTLING(move)) return false;
-
-    if (MOVE_COLOR(move) == WHITE) {
-        return MOVE_FROM(move) == e1 && MOVE_TO(move) == c1;
-    } else {
-        return MOVE_FROM(move) == e8 && MOVE_TO(move) == c8;
     }
 }
 
@@ -345,10 +234,170 @@ std::string FPGN::to_string(Move move, SANType sanType) {
     return pgn;
 }
 
-bool FPGN::parseMove(std::string pgn, unsigned &cursor, ChessGame &game, Move &move, bool &end) {
-    eatWhiteSpace(pgn, cursor);
+std::vector<Move> getMatchingMoves(ChessBoard board, Square to, Piece movingPiece, Piece promotedPiece, File fromFile, Rank fromRank) {
+    ChessMoveGenerator generator;
+    auto moveList = generator.generateMoves(board);
+    std::vector<Move> matchingMoves;
+    for (int index=0; index<moveList.count; index++) {
+        auto m = moveList.moves[index];
+        if (MOVE_TO(m) != to) {
+            continue;
+        }
+        
+        if (MOVE_PIECE(m) != movingPiece) {
+            continue;
+        }
+
+        if (MOVE_PROMOTION_PIECE(m) != promotedPiece) {
+            continue;
+        }
+
+        if (fromFile != FileUndefined && FileFrom(MOVE_FROM(m)) != fromFile) {
+            continue;
+        }
+        
+        if (fromRank != RankUndefined && RankFrom(MOVE_FROM(m)) != fromRank) {
+            continue;
+        }
+        
+        matchingMoves.push_back(m);
+    }
     
-    Piece movingPiece = parsePiece(pgn, cursor);
+    return matchingMoves;
+}
+
+bool FPGN::parseMoveNumber(unsigned &moveNumber, bool &isMoveForBlack) {
+    REMEMBER
+    eatWhiteSpaces();
+    
+    // Parse the number portion of the move
+    std::string moveNumberString = "";
+    while(true) {
+        if (cursor >= pgn.length()) {
+            RETURN_FAILURE("Unexpected end of PGN")
+        }
+        
+        if (character() == '.') {
+            // A dot means we are done with the number portion
+            // Make sure the number string is not empty!
+            if (moveNumberString.empty()) {
+                RETURN_FAILURE("Unexpected empty moveNumber")
+            }
+            moveNumber = integer(moveNumberString);
+            break;
+        } else if (isDigit(character())) {
+            moveNumberString += character();
+            cursor++;
+        } else {
+            RETURN_FAILURE("Unexpected character")
+        }
+    }
+        
+    // Parse the number of dots, to determine if it is a white or black move
+    unsigned numberOfDots = 0;
+    while (hasMoreCharacters() && character() == '.') {
+        cursor++;
+        numberOfDots++;
+    }
+    
+    if (numberOfDots == 1) {
+        isMoveForBlack = false;
+        return true;
+    } else if (numberOfDots == 3) {
+        isMoveForBlack = true;
+        return true;
+    } else {
+        // Invalid number of dots
+        RETURN_FAILURE("Invalid number of dots in move number")
+    }    
+}
+
+void FPGN::eatWhiteSpaces() {
+    while (cursor < pgn.length() && isSpaceOrNewLine(pgn[cursor])) {
+        cursor++;
+    }
+}
+
+bool FPGN::parsePiece(Piece &piece) {
+    auto c = pgn[cursor];
+    switch (c) {
+        case 'N':
+            piece = KNIGHT;
+            cursor++;
+            break;
+            
+        case 'K':
+            piece = KING;
+            cursor++;
+            break;
+            
+        case 'Q':
+            piece = QUEEN;
+            cursor++;
+            break;
+            
+        case 'B':
+            piece = BISHOP;
+            cursor++;
+            break;
+            
+        case 'R':
+            piece = ROOK;
+            cursor++;
+            break;
+            
+        case 'P':
+            piece = PAWN;
+            cursor++;
+            break;
+
+        default:
+            // Pawn is usually omitted, so don't move the cursor
+            piece = PAWN;
+            break;
+    }
+    
+    return true;
+}
+
+bool FPGN::parseTerminationMarker() {
+    REMEMBER
+    eatWhiteSpaces();
+    
+    if (pgn[cursor] == '1' && pgn[cursor+1] == '-' && pgn[cursor+2] == '0') {
+        // Termination marker: white wins
+        cursor+=3;
+        game.outcome = ChessGame::Outcome::white_wins;
+        return true;
+    } else if (pgn[cursor] == '0' && pgn[cursor+1] == '-' && pgn[cursor+2] == '1') {
+        // Termination marker: black wins
+        cursor+=3;
+        game.outcome = ChessGame::Outcome::black_wins;
+        return true;
+    } else if (pgn[cursor] == '1' && pgn[cursor+1] == '/' && pgn[cursor+2] == '2' && pgn[cursor+3] == '-' && pgn[cursor+4] == '1' && pgn[cursor+5] == '/' && pgn[cursor+6] == '2') {
+        // Termination marker: draw
+        cursor+=7;
+        game.outcome = ChessGame::Outcome::draw;
+        return true;
+    } else if (pgn[cursor] == '*') {
+        // Termination marker: game in progress or result unknown
+        cursor++;
+        game.outcome = ChessGame::Outcome::in_progress;
+        return true;
+    } else {
+        RETURN_FAILURE("Unexpected termination marker")
+    }
+}
+
+bool FPGN::parseMove(Move &move) {
+    REMEMBER
+    
+    eatWhiteSpaces();
+        
+    Piece movingPiece;
+    if (!parsePiece(movingPiece)) {
+        RETURN_FAILURE("Unable to parse piece")
+    }
     
     File fromFile = FileUndefined;
     Rank fromRank = RankUndefined;
@@ -418,37 +467,12 @@ bool FPGN::parseMove(std::string pgn, unsigned &cursor, ChessGame &game, Move &m
             toRank = getRank('8');
         }
         cursor+=3;
-    } else if (pgn[cursor] == '1' && pgn[cursor+1] == '-' && pgn[cursor+2] == '0') {
-        // Termination marker: white wins
-        cursor+=3;
-        game.outcome = ChessGame::Outcome::white_wins;
-        end = true;
-    } else if (pgn[cursor] == '0' && pgn[cursor+1] == '-' && pgn[cursor+2] == '1') {
-        // Termination marker: black wins
-        cursor+=3;
-        game.outcome = ChessGame::Outcome::black_wins;
-        end = true;
-    } else if (pgn[cursor] == '1' && pgn[cursor+1] == '/' && pgn[cursor+2] == '2' && pgn[cursor+3] == '-' && pgn[cursor+4] == '1' && pgn[cursor+5] == '/' && pgn[cursor+6] == '2') {
-        // Termination marker: draw
-        cursor+=7;
-        game.outcome = ChessGame::Outcome::draw;
-        end = true;
-    } else if (pgn[cursor] == '*') {
-        // Termination marker: game in progress or result unknown
-        cursor++;
-        game.outcome = ChessGame::Outcome::in_progress;
-        end = true;
     } else {
         // Invalid SAN representation
         move = 0;
-        return false;
+        RETURN_FAILURE("Invalid SAN representation of the move")
     }
 
-    if (end) {
-        move = 0;
-        return false;
-    }
-    
     // 8.2.3.5: Check and checkmate indication characters
     if (isCheckOrMate(pgn[cursor])) {
         cursor++;
@@ -458,7 +482,7 @@ bool FPGN::parseMove(std::string pgn, unsigned &cursor, ChessGame &game, Move &m
     Piece promotedPiece = (Piece)0;
     if (isPromotion(pgn[cursor])) {
         cursor++;
-        promotedPiece = parsePiece(pgn, cursor);
+        parsePiece(promotedPiece);
     }
     
     // The target square must be fully defined at this point
@@ -473,27 +497,30 @@ bool FPGN::parseMove(std::string pgn, unsigned &cursor, ChessGame &game, Move &m
     // After matching, one and only one move should be found
     if (matchingMoves.size() == 1) {
         move = matchingMoves.front();
-        return true;
+        if (MOVE_ISVALID(move)) {
+            return true;
+        } else {
+            RETURN_FAILURE("Invalid matched move")
+        }
     } else {
         move = 0;
-        return false;
+        RETURN_FAILURE("No matching moves found")
     }
 }
 
 // A variation is simply an alternative line to the move that has just been played
-bool FPGN::parseVariation(std::string pgn, unsigned &cursor, ChessGame &game, bool &end) {
-    eatWhiteSpace(pgn, cursor);
+bool FPGN::parseVariation() {
+    REMEMBER
     
-    if (cursor >= pgn.length()) {
-        end = true;
-        return false;
-    }
-    
-    if (pgn[cursor] != '(') {
-        return false;
+    eatWhiteSpaces(); // TODO: should we do this at a high level?
+        
+    if (character() != '(') {
+        RETURN_FAILURE("Unexpected start of variation")
+    } else {
+        cursor++;
     }
         
-//    std::cout << "Before variation begins " << game.getMoveIndexes().moveCursor << std::endl;
+//    std::cout << "Start variation at " << game.getMoveIndexes().moveCursor << std::endl;
 //    game.board.print();
     
     // Remember the move indexes so we can restore it once
@@ -509,24 +536,35 @@ bool FPGN::parseVariation(std::string pgn, unsigned &cursor, ChessGame &game, bo
 //    std::cout << "Backtracking one move for the variation " << game.getMoveIndexes().moveCursor << std::endl;
 //    game.board.print();
 
-    // Parse the variation (potentially recursively)
-    parseMoveText(pgn, cursor, game, end);
+    // Parse the variation, which consist of one or more moveText.
+    // (moveText1 [moveText2]...)
+    while (parseMoveText()) {
+        if (!hasMoreCharacters()) {
+            RETURN_FAILURE("Unexpected end of PGN while parsing a variation")
+        }
+        if (character() == ')') {
+            break;;
+        }
+    }
+    
+    eatWhiteSpaces();
+
+    // Check we have reached the end of the variation
+    if (character() != ')') {
+        RETURN_FAILURE("Unexpected end of variation")
+    }
+
+    cursor++;
     
     // Restore the move indexes as it was before the variation
     // so the internal game state is properly restored and
     // ready to consume the next moves.
     game.setMoveIndexes(moveIndexes);
 
-//    std::cout << "After variation is explored " << game.getMoveIndexes().moveCursor << std::endl;
+//    std::cout << "End variation at " << game.getMoveIndexes().moveCursor << std::endl;
 //    game.board.print();
 
-    eatWhiteSpace(pgn, cursor);
-    if (cursor < pgn.length() && pgn[cursor] == ')') {
-        cursor++;
-        return true;
-    } else {
-        return false;
-    }
+    return true;
 }
 
 /**
@@ -538,93 +576,81 @@ bool FPGN::parseVariation(std::string pgn, unsigned &cursor, ChessGame &game, bo
     2...d6
     1. e4 { comment }
  */
-bool FPGN::parseMoveText(std::string pgn, unsigned &cursor, ChessGame &game, bool &end) {
+bool FPGN::parseMoveText() {
+    REMEMBER
+    
     bool isMoveForBlack = false;
-    auto result = parseMoveNumber(pgn, cursor, isMoveForBlack);
-    if (!result) {
-        return false;
+    unsigned moveNumber;
+    if (!parseMoveNumber(moveNumber, isMoveForBlack)) {
+        RETURN_FAILURE("Invalid move number")
     }
 
     Move whiteMove = 0;
-    if (!parseMove(pgn, cursor, game, whiteMove, end)) {
-        return false;
+    if (!parseMove(whiteMove)) {
+        RETURN_FAILURE("Invalid move")
     }
     
-    if (end) {
-        return true;
-    }
-    if (!MOVE_ISVALID(whiteMove)) {
-        return false;
-    }
-
     game.move(whiteMove, false);
 
-//    std::cout << to_string(whiteMove, SANType::full) << std::endl;
+//    if (isMoveForBlack) {
+//        std::cout << "Parse black move: " << to_string(whiteMove, SANType::full) << std::endl;
+//    } else {
+//        std::cout << "Parse white move: " << to_string(whiteMove, SANType::full) << std::endl;
+//    }
 //    game.board.print();
 
-    parseComment(pgn, cursor);
-            
-    parseVariation(pgn, cursor, game, end);
-    if (end) {
-        return true;
-    }
-
-    // Did we reach the end now?
-    if (cursor >= pgn.length()) {
-        end = true;
-        return true;
-    }
+    parseComment(); // optional
+    parseVariation(); // optional
         
-    eatWhiteSpace(pgn, cursor);
-
-    // Did we reach the end now?
-    if (cursor >= pgn.length()) {
-        end = true;
+    // Return now if the moveText was actually only for black
+    if (isMoveForBlack) {
         return true;
     }
 
-    if (pgn[cursor] == '[') {
-        // Start of a new game
-        end = true;
+    // Return now if a termination marker is detected
+    if (parseTerminationMarker()) {
         return true;
-    }
-
-    if (pgn[cursor] == ')') {
-        // End of a variation after white move,
-        // so return early to avoid parsing
-        // the non-existent black move
-        return true;
-    }
-
-    Move blackMove = 0;
-    if (!parseMove(pgn, cursor, game, blackMove, end)) {
-        return true;
-    }
-    if (end) {
-        return true;
-    }
-    if (!MOVE_ISVALID(blackMove)) {
-        return false;
     }
     
-    //    std::cout << MOVE_DESCRIPTION(blackMove) << std::endl;
+    // Return now if the end of a variation is detected
+    eatWhiteSpaces();
+    if (character() == ')') {
+        return true;
+    }
+    
+    Move blackMove = 0;
+    if (!parseMove(blackMove)) {
+        RETURN_FAILURE("Invalid black move")
+    }
+    
+//    std::cout << "Parse black move: " << to_string(blackMove, SANType::full) << std::endl;
     //    game.board.print();
     game.move(blackMove, false);
 
-    parseComment(pgn, cursor);
-    
-    parseVariation(pgn, cursor, game, end);
-    if (end) {
-        return true;
-    }
-
-    // Did we reach the end now?
-    if (cursor >= pgn.length()) {
-        end = true;
-        return true;
-    }
+    parseComment(); // optional
+    parseVariation(); // optional
 
     return true;
+}
+
+// Parse comments in the form: { this is a comment }.
+// Don't do anything with the comment itself for now.
+bool FPGN::parseComment() {
+    REMEMBER
+
+    eatWhiteSpaces();
+
+    if (character() == '{') {
+        cursor++;
+        std::string comment = "";
+        if (!parseUntil(pgn, cursor, comment, '}')) {
+            RETURN_FAILURE("Unable to parse until a specific character")
+        }
+                
+        return true;
+    } else {
+        RETURN_FAILURE("Unexpected comment starting character")
+    }
 }
 
 bool FPGN::setGame(std::string pgn, ChessGame &game) {
@@ -632,53 +658,90 @@ bool FPGN::setGame(std::string pgn, ChessGame &game) {
     return setGame(pgn, game, cursor);
 }
 
+bool FPGN::parseTag(bool lookahead) {
+    REMEMBER
+    eatWhiteSpaces();
+    
+    // Expecting a tag opening bracket
+    if (character() != '[') {
+        RETURN_FAILURE("Unexpected start TAG character")
+    }
+    
+    if (lookahead) {
+        cursor = savedCursor;
+        return true;
+    }
+    
+    cursor++; // go after the [
+
+    std::string tagName;
+    std::string tagValue;
+    auto result = parseString(pgn, cursor, tagName);
+    assert(result);
+    
+    eatWhiteSpaces();
+    result = parseQuotedString(pgn, cursor, tagValue);
+    assert(result);
+    
+    eatWhiteSpaces();
+    if (character() != ']') {
+        RETURN_FAILURE("Unexpected end TAG character")
+    }
+    
+    cursor++;
+    
+    game.tags[tagName] = tagValue;
+    
+    if (tagName == "FEN" && !game.setFEN(tagValue)) {
+        RETURN_FAILURE("Failed to set FEN to the game")
+    }
+    
+    return true;
+}
+
 bool FPGN::setGame(std::string pgn, ChessGame &game, unsigned & cursor) {
     game.reset();
     
-    bool end = false;
+    auto fpgn = FPGN(pgn);
+    fpgn.cursor = cursor;
     bool parsedMoveText = false;
-    while (cursor < pgn.length() && !end) {
-        auto c = pgn[cursor];
-        if (c == '[') {
-            // If we already parsed the moveText section, it means
-            // we are hitting another game.
-            if (parsedMoveText) {
-                return true;
-            }
-            
-            cursor++; // go after the [
-
-            std::string tagName;
-            std::string tagValue;
-            auto result = parseString(pgn, cursor, tagName);
-            assert(result);
-            eatWhiteSpace(pgn, cursor);
-            result = parseQuotedString(pgn, cursor, tagValue);
-            assert(result);
-            eatWhiteSpace(pgn, cursor);
-            assert(pgn[cursor] == ']');
-            cursor++;
-            
-            game.tags[tagName] = tagValue;
-            
-            if (tagName == "FEN") {
-                result = game.setFEN(tagValue);
-                assert(result);
-            }
-        } else if (c >= '0' && c <= '9') {
-            if (!parseMoveText(pgn, cursor, game, end)) {
-                return false;
-            }
-            parsedMoveText = true; // we are done parsing the move text section
-        } else if (c == '*') {
-            // The game continues (but the PGN representation stops here for that game)
-            cursor++;
+    while (fpgn.hasMoreCharacters()) {
+        // Check if there is tag ahead and if we have already
+        // parsed at least one moveText section. If that is the case,
+        // it means we are now parsing the tag section of another game.
+        if (fpgn.parseTag(true) && parsedMoveText) {
+            game = fpgn.game;
+            cursor = fpgn.cursor;
             return true;
-        } else {
-            eatWhiteSpace(pgn, cursor);
         }
+        
+        while (fpgn.parseTag()) {
+            // no-op
+        }
+        
+        if (fpgn.parseMoveText()) {
+            parsedMoveText = true; // remember that we parsed at least one move text section
+        } else {
+            return false;
+        }
+        
+        fpgn.eatWhiteSpaces();
+
+        if (fpgn.character() == '*') {
+            // We have reached the end of this game
+            fpgn.cursor++;
+            fpgn.eatWhiteSpaces();
+
+            game = fpgn.game;
+            cursor = fpgn.cursor;
+            return true;
+        }
+        
+        fpgn.eatWhiteSpaces();
     }
     
+    game = fpgn.game;
+    cursor = fpgn.cursor;
     return true;
 }
 

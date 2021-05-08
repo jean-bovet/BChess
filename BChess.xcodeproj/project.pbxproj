@@ -54,6 +54,12 @@
 		A775236C25AD6533009BFFD1 /* Openings.pgn in Resources */ = {isa = PBXBuildFile; fileRef = A7C92AA91FF6EE5500160D2E /* Openings.pgn */; };
 		A775237625AD68FA009BFFD1 /* Animation.swift in Sources */ = {isa = PBXBuildFile; fileRef = A775237525AD68FA009BFFD1 /* Animation.swift */; };
 		A775237725AD68FA009BFFD1 /* Animation.swift in Sources */ = {isa = PBXBuildFile; fileRef = A775237525AD68FA009BFFD1 /* Animation.swift */; };
+		A77BA8B42645AEDD00ABA501 /* e4NYStyle.pgn in Resources */ = {isa = PBXBuildFile; fileRef = A77BA8B22645AEDD00ABA501 /* e4NYStyle.pgn */; };
+		A77BA8B52645AEDD00ABA501 /* e4NYStyle.pgn in Resources */ = {isa = PBXBuildFile; fileRef = A77BA8B22645AEDD00ABA501 /* e4NYStyle.pgn */; };
+		A77BA8B62645AEDD00ABA501 /* e4NYStyle.pgn in Resources */ = {isa = PBXBuildFile; fileRef = A77BA8B22645AEDD00ABA501 /* e4NYStyle.pgn */; };
+		A77BA8B72645AEDD00ABA501 /* CaroKann.pgn in Resources */ = {isa = PBXBuildFile; fileRef = A77BA8B32645AEDD00ABA501 /* CaroKann.pgn */; };
+		A77BA8B82645AEDD00ABA501 /* CaroKann.pgn in Resources */ = {isa = PBXBuildFile; fileRef = A77BA8B32645AEDD00ABA501 /* CaroKann.pgn */; };
+		A77BA8B92645AEDD00ABA501 /* CaroKann.pgn in Resources */ = {isa = PBXBuildFile; fileRef = A77BA8B32645AEDD00ABA501 /* CaroKann.pgn */; };
 		A77F66C825A832270030E61D /* Tests_iOS.swift in Sources */ = {isa = PBXBuildFile; fileRef = A77F66C725A832270030E61D /* Tests_iOS.swift */; };
 		A77F66D325A832270030E61D /* Tests_macOS.swift in Sources */ = {isa = PBXBuildFile; fileRef = A77F66D225A832270030E61D /* Tests_macOS.swift */; };
 		A77F66D525A832270030E61D /* BChessUIApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A77F66AC25A832230030E61D /* BChessUIApp.swift */; };
@@ -237,6 +243,8 @@
 		A77372001FE320010001A90F /* FPGN.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = FPGN.hpp; sourceTree = "<group>"; };
 		A77372041FE340780001A90F /* PGNTests.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PGNTests.cpp; sourceTree = "<group>"; };
 		A775237525AD68FA009BFFD1 /* Animation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Animation.swift; sourceTree = "<group>"; };
+		A77BA8B22645AEDD00ABA501 /* e4NYStyle.pgn */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = e4NYStyle.pgn; sourceTree = "<group>"; };
+		A77BA8B32645AEDD00ABA501 /* CaroKann.pgn */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = CaroKann.pgn; sourceTree = "<group>"; };
 		A77F66AC25A832230030E61D /* BChessUIApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BChessUIApp.swift; sourceTree = "<group>"; };
 		A77F66AD25A832240030E61D /* ChessDocument.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChessDocument.swift; sourceTree = "<group>"; };
 		A77F66AE25A832240030E61D /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -578,6 +586,8 @@
 			children = (
 				A7AFCCA91FB4E40D00AE3D85 /* main.swift */,
 				A7712D3F1FCB97A800E7E802 /* BChess-Bridging-Header.h */,
+				A77BA8B32645AEDD00ABA501 /* CaroKann.pgn */,
+				A77BA8B22645AEDD00ABA501 /* e4NYStyle.pgn */,
 				A7C92AA91FF6EE5500160D2E /* Openings.pgn */,
 				A7712D301FC7C4D300E7E802 /* UCI */,
 			);
@@ -770,7 +780,9 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A77BA8B72645AEDD00ABA501 /* CaroKann.pgn in Resources */,
 				A7C92AAB1FF6F19100160D2E /* Openings.pgn in Resources */,
+				A77BA8B42645AEDD00ABA501 /* e4NYStyle.pgn in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -778,8 +790,10 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A77BA8B82645AEDD00ABA501 /* CaroKann.pgn in Resources */,
 				A775236C25AD6533009BFFD1 /* Openings.pgn in Resources */,
 				A77F66DB25A832270030E61D /* Assets.xcassets in Resources */,
+				A77BA8B52645AEDD00ABA501 /* e4NYStyle.pgn in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -787,8 +801,10 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A77BA8B92645AEDD00ABA501 /* CaroKann.pgn in Resources */,
 				A775236325AD6532009BFFD1 /* Openings.pgn in Resources */,
 				A77F66DC25A832270030E61D /* Assets.xcassets in Resources */,
+				A77BA8B62645AEDD00ABA501 /* e4NYStyle.pgn in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

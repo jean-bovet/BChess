@@ -61,6 +61,7 @@ public:
                 callback(*this);
             } else if (cursor < indexes.moveCursor) {
                 int varIndex = indexes.moves[cursor];
+                assert(varIndex < variations.size());
                 variations[varIndex].lookupNode(cursor+1, atIndex, indexes, callback);
             }
         }

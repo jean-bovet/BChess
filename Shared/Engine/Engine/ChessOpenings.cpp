@@ -14,6 +14,7 @@ ChessOpenings::ChessOpenings() {
 }
 
 bool ChessOpenings::load(std::string pgn) {
+    games.clear();
     return FPGN::setGames(pgn, games);
 }
 

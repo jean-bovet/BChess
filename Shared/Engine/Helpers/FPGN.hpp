@@ -18,6 +18,43 @@
 
 class FPGN {
 public:
+    FPGN(std::string pgn = "") {
+        FPGN::pgn = pgn;
+    }
+    
+    ChessGame & getGame() {
+        return game;
+    }
+    
+    const char character(int offset = 0) {
+        int desiredCursor = cursor + offset;
+        if (desiredCursor >= 0 && desiredCursor < pgn.length()) {
+            return pgn[desiredCursor];
+        } else {
+            return 0;
+        }
+    }
+    
+    bool hasMoreCharacters() {
+        return cursor < pgn.length();
+    }
+
+    bool parseTag(bool lookahead = false);
+    bool parseMoveText();
+
+    bool parseVariation();
+
+    bool parseMoveNumber(unsigned &moveNumber, bool &isMoveForBlack);
+    bool parsePiece(Piece &p);
+    bool parseMove(Move &move);
+    
+    bool parseTerminationMarker();
+    bool parseComment();
+    
+    void eatWhiteSpaces();
+
+    // Utilities
+    
     enum class SANType {
         tight, // Ne6
         medium, // Nde6
@@ -27,14 +64,7 @@ public:
 
     static std::string to_string(Move move, SANType sanType = SANType::full);
     
-    static bool parseVariation(std::string pgn, unsigned &cursor, ChessGame &game, bool &end);
-
-    static bool parseMove(std::string pgn, unsigned &cursor, ChessGame &game, Move &move, bool &end);
-    static bool parseMoveText(std::string pgn, unsigned &cursor, ChessGame &game, bool &end);
-
     static bool setGame(std::string pgn, ChessGame &game);
-
-    static bool setGame(std::string pgn, ChessGame &game, unsigned & cursor);
     
     static bool setGames(std::string pgn, std::vector<ChessGame> & games);
     
@@ -48,4 +78,12 @@ public:
     //            which means we only want to display the game after the current move (to show the thinking of the computer).
     //            This parameter takes effect only if the Formatting is set to line
     static std::string getGame(ChessGame game, Formatting formatting = FPGN::Formatting::storage, int fromIndex = 0);
+    
+private:
+    std::string pgn = "";
+    unsigned cursor = 0;
+    ChessGame game;
+
+    static bool setGame(std::string pgn, ChessGame &game, unsigned & cursor);
+
 };
