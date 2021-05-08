@@ -551,6 +551,11 @@ bool FPGN::parseVariation() {
 bool FPGN::parseMoveText() {
     PARSE_BEGIN
     
+    // Return now if a termination marker is detected
+    if (parseTerminationMarker()) {
+        return true;
+    }
+
     bool isMoveForBlack = false;
     unsigned moveNumber;
     if (!parseMoveNumber(moveNumber, isMoveForBlack)) {

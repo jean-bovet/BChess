@@ -140,10 +140,6 @@ TEST_F(OpeningsTests, BestMove) {
     ASSERT_TRUE(result);
 }
 
-TEST_F(OpeningsTests, e4NYStyle) {
-    loadOpenings("e4NYStyle.pgn");
-}
-
 TEST_F(OpeningsTests, MultipleWhiteVariations) {
     ASSERT_TRUE(openings.load("1.e4 e5 2.Nf3 ( 2.Nc3 ) ( 2.d4 ) *"));
 }
