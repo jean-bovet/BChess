@@ -8,14 +8,14 @@
 
 #pragma once
 
-// https://en.wikipedia.org/wiki/Portable_Game_Notation
-
 #include <stdio.h>
 #include <string>
 
 #include "ChessGame.hpp"
 #include "ChessBoard.hpp"
 
+// This class knows how to parse PGN
+// https://en.wikipedia.org/wiki/Portable_Game_Notation
 class FPGN {
 public:
     FPGN(std::string pgn = "") {

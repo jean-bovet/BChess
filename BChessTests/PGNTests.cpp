@@ -309,3 +309,15 @@ TEST_F(PGN, LineFromCursor) {
     auto line = FPGN::getGame(game, FPGN::Formatting::line, 2);
     ASSERT_EQ("Nf3 Nc6 Bb5 a6", line);
 }
+
+TEST_F(PGN, MoveWithNumberInFront) {
+    std::string pgn = "1.e4 1... e5 2.Nf3 2... Nc6 *";
+
+    ChessGame game;
+    ASSERT_TRUE(FPGN::setGame(pgn, game));
+    
+    ASSERT_EQ(4, game.getNumberOfMoves());
+
+    auto pgnAgain = FPGN::getGame(game);
+    ASSERT_EQ("1. e4 e5 2. Nf3 Nc6 *", pgnAgain);
+}

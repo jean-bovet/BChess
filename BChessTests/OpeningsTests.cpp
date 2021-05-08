@@ -41,8 +41,12 @@ public:
     }
     
     void initializeDefaultOpenings() {
+        loadOpenings("Openings.pgn");
+    }
+    
+    void loadOpenings(std::string name) {
         auto path = UnitTestHelper::pathToResources;
-        auto pathToFile = path + "/Openings.pgn";
+        auto pathToFile = path + "/" + name;
         
         auto pgn = readFromFile(pathToFile);
         ASSERT_FALSE(pgn.empty());
@@ -134,4 +138,16 @@ TEST_F(OpeningsTests, BestMove) {
         ASSERT_EQ(createMove(e7, e5, BLACK, PAWN), node.move);
     });
     ASSERT_TRUE(result);
+}
+
+TEST_F(OpeningsTests, e4NYStyle) {
+    loadOpenings("e4NYStyle.pgn");
+}
+
+TEST_F(OpeningsTests, MultipleWhiteVariations) {
+    ASSERT_TRUE(openings.load("1.e4 e5 2.Nf3 ( 2.Nc3 ) ( 2.d4 ) *"));
+}
+
+TEST_F(OpeningsTests, MultipleBlackVariations) {
+    ASSERT_TRUE(openings.load("1.e4 e5 ( 1...Nf6 ) ( 1...c6 ) *"));
 }
