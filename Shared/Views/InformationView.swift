@@ -65,28 +65,33 @@ struct InformationView: View {
             if let opening = document.engine.openingName() {
                 Text(opening)
                     .padding(.bottom)
-            } else {
-                if document.state == .play {
-                    HStack() {
-                        Image(systemName: "cpu")
-                        Text(value())
-                    }
-                    .padding(.bottom)
-                    HStack {
-                        Text(Image(systemName: "speedometer"))
-                        Text(speed())
-                    }
-                    .padding(.bottom)
-                }
             }
             Text(document.engine.pgnFormattedForDisplay())
+            Spacer()
+            if document.state == .play {
+                HStack() {
+                    Image(systemName: "cpu")
+                    Text(value())
+                }
+                .padding(.bottom)
+                HStack {
+                    Text(Image(systemName: "speedometer"))
+                    Text(speed())
+                }
+            }
         }
     }
 }
 
 struct BottomInformationView_Previews: PreviewProvider {
     static var previews: some View {
-        let doc = ChessDocument(pgn: "1. e4 e5 2. Nf3 Nf6 3. Nxe5 d6 4. Nc3 dxe5 *")
-        InformationView(document: doc)
+        Group {
+            let doc = ChessDocument(pgn: "1. e4 e5 *")
+            InformationView(document: doc)
+        }
+        Group {
+            let doc = ChessDocument(pgn: "1. e4 e5 2. Nf3 Nf6 3. Nxe5 d6 4. Nc3 dxe5 *")
+            InformationView(document: doc)
+        }
     }
 }
