@@ -27,7 +27,7 @@ struct AnalyzeBoard: View {
     @Binding var document: ChessDocument
     var body: some View {
         Button(action: { withAnimation { Actions(document: $document).analyze() } }) {
-            Label("Analyze", systemImage: "magnifyingglass.circle")
+            Label("Analyze Game", systemImage: "magnifyingglass.circle")
         }
     }
 }
@@ -36,7 +36,7 @@ struct TrainButton: View {
     @Binding var document: ChessDocument
     var body: some View {
         Button(action: { withAnimation { Actions(document: $document).train() } }) {
-            Label("Train", systemImage: "book")
+            Label("Practice Openings", systemImage: "book")
         }
     }
 }
@@ -146,11 +146,18 @@ struct ActionsToolbar: ToolbarContent {
     var body: some ToolbarContent {
         #if os(macOS)
         ToolbarItemGroup(placement: .automatic) {
-            NewGameButton(document: $document, showNewGameSheet: $showNewGameSheet, newGameSheetEditMode: $newGameSheetEditMode)
-            EditGameButton(document: $document, showNewGameSheet: $showNewGameSheet, newGameSheetEditMode: $newGameSheetEditMode)
-            
-            AnalyzeBoard(document: $document)
-            TrainButton(document: $document)
+            Menu {
+                NewGameButton(document: $document, showNewGameSheet: $showNewGameSheet, newGameSheetEditMode: $newGameSheetEditMode)
+                EditGameButton(document: $document, showNewGameSheet: $showNewGameSheet, newGameSheetEditMode: $newGameSheetEditMode)
+
+                Divider()
+                
+                AnalyzeBoard(document: $document)
+                TrainButton(document: $document)
+            }
+            label: {
+                Label("Game", systemImage: "ellipsis.circle")
+            }
 
             Menu {
                 UndoMoveButton(document: $document)

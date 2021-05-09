@@ -38,6 +38,9 @@ struct Actions {
         if document.state == .play {
             document.state = state
             document.pgnBeforeAnalyzing = document.pgn
+            if state == .train {
+                engine.setFEN(StartPosFEN)
+            }
         } else {
             document.state = .play
             analyzeReset()
