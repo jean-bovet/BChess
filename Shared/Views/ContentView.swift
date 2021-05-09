@@ -36,15 +36,17 @@ struct ContentView: View {
                 ColorInformationView(document: $document, isWhite: document.rotated ? false: true)
             }
             
-            VStack {
-                AnalyzeActionsView(document: $document)
-                    .hide(document.state == .play)
+            VStack(alignment: .leading) {
+                if (document.state != .play) {
+                    AnalyzeActionsView(document: $document)
+                        .hide(document.state == .play)
+                }
 
                 if (showInfo) {
                     InformationView(document: document)
-                        .frame(minWidth: 250, idealWidth: 250, maxWidth: 300, alignment: .center)
                 }
             }
+            .frame(minWidth: 250, idealWidth: 250, maxWidth: 250, alignment: .leading)
         }
         .padding()
         .toolbar {

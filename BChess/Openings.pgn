@@ -12,3 +12,6 @@
 [Score "58"]
 [Name "Ruy López Opening: Morphy Defense, Columbus Variation, 4...Nf6"]
 1. e4 e5 2. Nf3 Nc6 3. Bb5 a6 4. Ba4 Nf6 *
+
+[Name "Vienna Gambit"]
+1. e4 e5 2. Nc3 Nf6 3. f4 d5 4. fxe5 Nxe4 5. Qf3 Nxc3 (5... f5) *
