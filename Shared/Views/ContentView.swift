@@ -17,32 +17,33 @@ struct ContentView: View {
     @State private var newGameSheetEditMode = false
 
     var body: some View {
-        VStack(alignment: .leading) {
-            if (showInfo || document.state != .play) {
-                HStack {
-                    TopInformationView(document: document)
-                    Spacer()
-                    AnalyzeActionsView(document: $document)
-                        .hide(document.state == .play)
-                    Spacer()
+        HStack(alignment: .top) {
+            VStack(alignment: .leading) {
+                ColorInformationView(document: $document, isWhite: document.rotated ? true: false)
+                ZStack {
+                    BoardView(document: $document)
+                        .if(document.state == .analyze) {
+                            $0.border(Color.yellow, width: 4)
+                        }
+                        .if(document.state == .train) {
+                            $0.border(Color.green, width: 4)
+                        }
+                    LabelsView(document: $document)
+                    PiecesView(document: $document)
                 }
+                .padding()
+                .padding(.bottom, 20) // Because the labels are "leaking" a bit below the board space itself
+                ColorInformationView(document: $document, isWhite: document.rotated ? false: true)
             }
-
-            ZStack {
-                BoardView(document: $document)
-                    .if(document.state == .analyze) {
-                        $0.border(Color.yellow, width: 4)
-                    }
-                    .if(document.state == .train) {
-                        $0.border(Color.green, width: 4)
-                    }
-                LabelsView(document: $document)
-                PiecesView(document: $document)
-            }.padding()
             
-            if (showInfo) {
-                BottomInformationView(document: document)
-                    .padding(.top)
+            VStack {
+                AnalyzeActionsView(document: $document)
+                    .hide(document.state == .play)
+
+                if (showInfo) {
+                    InformationView(document: document)
+                        .frame(minWidth: 250, idealWidth: 250, maxWidth: 300, alignment: .center)
+                }
             }
         }
         .padding()

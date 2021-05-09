@@ -751,6 +751,7 @@ static void getPGN(ChessBoard board, // The chess board representation which is 
                    std::string & pgn, // The PGN being constructed
                    int moveIndex, // The current move index
                    int fromMoveIndex, // The move index at which we starts to build up the PGN
+                   int toMoveIndex, // The move index at which to stop building up the PGN
                    int fullMoveIndex, // The number of full move that have been done so far
                    bool mainLine, // True if this node/move represents the main line, false if it represents a variation
                    bool recursive, // True if this method should continue to traverse the next move and all its variation, false to just output this move and return
@@ -761,6 +762,10 @@ static void getPGN(ChessBoard board, // The chess board representation which is 
     
     if (formatting == FPGN::Formatting::line && moveIndex == fromMoveIndex && !skip) {
         pgn = "";
+    }
+
+    if (moveIndex >= toMoveIndex && !skip) {
+        return;
     }
     
     FPGN::SANType sanType = FPGN::SANType::full;
@@ -850,31 +855,31 @@ static void getPGN(ChessBoard board, // The chess board representation which is 
             // If there is only one variation, it is easy: it is the main line
             // so continue recursively to traverse it.
             auto & main = node.variations[0];
-            getPGN(board, formatting, main, pgn, moveIndex+1, fromMoveIndex, fullMoveIndex, /*mainline*/true, /*recursive*/true, /*skip*/false);
+            getPGN(board, formatting, main, pgn, moveIndex+1, fromMoveIndex, toMoveIndex, fullMoveIndex, /*mainline*/true, /*recursive*/true, /*skip*/false);
         } else {
             // If there are more than one variation, we need to print first the main variation but for only one move
             // For example: 1. e4 e5
             auto & main = node.variations[0];
-            getPGN(board, formatting, main, pgn, moveIndex+1, fromMoveIndex, fullMoveIndex, /*mainline*/true, /*recursive*/false, /*skip*/false);
+            getPGN(board, formatting, main, pgn, moveIndex+1, fromMoveIndex, toMoveIndex, fullMoveIndex, /*mainline*/true, /*recursive*/false, /*skip*/false);
             
             // And then print all the other variations in full (recursively)
             // For example: 1. e4 e5 (1... d5)
             for (int vindex=1; vindex<node.variations.size(); vindex++) {
                 auto & vnode = node.variations[vindex];
                 pgn += " (";
-                getPGN(board, formatting, vnode, pgn, moveIndex+1, fromMoveIndex, fullMoveIndex, /*mainline*/false, /*recursive*/true, /*skip*/false);
+                getPGN(board, formatting, vnode, pgn, moveIndex+1, fromMoveIndex, toMoveIndex, fullMoveIndex, /*mainline*/false, /*recursive*/true, /*skip*/false);
                 pgn += ")";
             }
             
             // And finally resume the main line output, recursively, but skipping this time the next move
             // because it was already output above
             // For example: 1. e4 e5 (1... d5) 2. Nf3 *
-            getPGN(board, formatting, main, pgn, moveIndex+1, fromMoveIndex, fullMoveIndex, /*mainline*/true, /*recursive*/true, /*skip*/true);
+            getPGN(board, formatting, main, pgn, moveIndex+1, fromMoveIndex, toMoveIndex, fullMoveIndex, /*mainline*/true, /*recursive*/true, /*skip*/true);
         }
     }
 }
 
-std::string FPGN::getGame(ChessGame game, Formatting formatting, int fromIndex) {
+std::string FPGN::getGame(ChessGame game, Formatting formatting, int fromIndex, int toIndex) {
     // Game used to compute the optimum PGN representation for each move
     ChessBoard outputBoard;
     FFEN::setFEN(game.initialFEN, outputBoard);
@@ -888,7 +893,7 @@ std::string FPGN::getGame(ChessGame game, Formatting formatting, int fromIndex) 
         if (vindex > 0) {
             pgn += " (";
         }
-        getPGN(outputBoard, formatting, node, pgn, 0, fromIndex, fullMoveIndex, /*mainline*/vindex == 0, /*recursive*/true, /*skip*/false);
+        getPGN(outputBoard, formatting, node, pgn, 0, fromIndex, toIndex, fullMoveIndex, /*mainline*/vindex == 0, /*recursive*/true, /*skip*/false);
         if (vindex > 0) {
             pgn += ")";
         }

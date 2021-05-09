@@ -77,7 +77,8 @@ public:
     // fromIndex: the index from which to start building the PGN. Used to display a line from a game during analysis,
     //            which means we only want to display the game after the current move (to show the thinking of the computer).
     //            This parameter takes effect only if the Formatting is set to line
-    static std::string getGame(ChessGame game, Formatting formatting = FPGN::Formatting::storage, int fromIndex = 0);
+    // toIndex: the index at which to stop building the PGN.
+    static std::string getGame(ChessGame game, Formatting formatting = FPGN::Formatting::storage, int fromIndex = 0, int toIndex = INT_MAX);
     
 private:
     std::string pgn = "";

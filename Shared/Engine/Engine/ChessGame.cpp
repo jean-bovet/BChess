@@ -131,7 +131,7 @@ bool ChessGame::canUndoMove() {
 }
 
 bool ChessGame::canRedoMove() {
-    return moveIndexes.moveCursor < getNumberOfMoves();
+    return moveIndexes.moveCursor < moveIndexes.moves.size();
 }
 
 void ChessGame::undoMove() {

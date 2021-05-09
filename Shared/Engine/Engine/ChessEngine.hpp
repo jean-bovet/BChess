@@ -62,7 +62,7 @@ public:
     }
     
     std::string getPGNForDisplay() {
-        return FPGN::getGame(game, FPGN::Formatting::history);
+        return FPGN::getGame(game, FPGN::Formatting::history, 0, game.getNumberOfMoves());
     }
     
     std::string getPieceAt(File file, Rank rank) {

@@ -10,7 +10,7 @@ import SwiftUI
 
 struct ColorInformationView: View {
 
-    let document: ChessDocument
+    @Binding var document: ChessDocument
     let isWhite: Bool
     
     func capturedPieces() -> [String] {
@@ -86,13 +86,12 @@ struct ColorInformationView: View {
 
 struct TopInformationView: View {
     
-    let document: ChessDocument
-            
-    
+    @Binding var document: ChessDocument
+                
     var body: some View {
         VStack(alignment: .leading) {
-            ColorInformationView(document: document, isWhite: true)
-            ColorInformationView(document: document, isWhite: false)
+            ColorInformationView(document: $document, isWhite: true)
+            ColorInformationView(document: $document, isWhite: false)
         }
     }
 }
@@ -101,15 +100,15 @@ struct TopInformationView_Previews: PreviewProvider {
     static var previews: some View {
         Group {
             let doc = ChessDocument(pgn: "1. e4 e5")
-            TopInformationView(document: doc)
+            TopInformationView(document: .constant(doc))
         }
         Group {
             let doc = ChessDocument(pgn: "1. e4 e5 2. Nf3 Nf6 3. Nxe5 d6 4. Nc3 dxe5 ")
-            TopInformationView(document: doc)
+            TopInformationView(document: .constant(doc))
         }
         Group {
             let doc = ChessDocument(pgn: "1. e4 e5 2. Nf3 Nf6 3. Nxe5 d6 4. Nc3 dxe5 5. d4 exd4 6. Qxd4 Qxd4 7. Nd5 Nxd5 8. Bb5+ c6 9. Bxc6+ Nxc6 *")
-            TopInformationView(document: doc)
+            TopInformationView(document: .constant(doc))
         }
     }
 }
