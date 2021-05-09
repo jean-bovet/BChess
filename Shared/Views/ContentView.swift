@@ -39,7 +39,6 @@ struct ContentView: View {
             VStack(alignment: .leading) {
                 if (document.state != .play) {
                     AnalyzeActionsView(document: $document)
-                        .hide(document.state == .play)
                 }
 
                 if (showInfo) {

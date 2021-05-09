@@ -26,7 +26,7 @@ struct NewGameButton: View {
 struct AnalyzeBoard: View {
     @Binding var document: ChessDocument
     var body: some View {
-        Button(action: { Actions(document: $document).analyze() }) {
+        Button(action: { withAnimation { Actions(document: $document).analyze() } }) {
             Label("Analyze", systemImage: "magnifyingglass.circle")
         }
     }
@@ -35,7 +35,7 @@ struct AnalyzeBoard: View {
 struct TrainButton: View {
     @Binding var document: ChessDocument
     var body: some View {
-        Button(action: { Actions(document: $document).train() }) {
+        Button(action: { withAnimation { Actions(document: $document).train() } }) {
             Label("Train", systemImage: "book")
         }
     }

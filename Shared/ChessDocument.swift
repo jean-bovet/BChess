@@ -13,6 +13,9 @@ extension UTType {
     static var exampleText: UTType {
         UTType(importedAs: "com.example.plain-text")
     }
+    static var pgn: UTType {
+        UTType(importedAs: "com.apple.chess.pgn")
+    }
 }
 
 // The state of the game that is saved to the file
@@ -87,25 +90,46 @@ struct ChessDocument: FileDocument {
         assert(result)
     }
     
-    static var readableContentTypes: [UTType] { [.exampleText] }
+    static var readableContentTypes: [UTType] { [.exampleText, .pgn] }
 
     init(configuration: ReadConfiguration) throws {
         guard let data = configuration.file.regularFileContents else {
             throw CocoaError(.fileReadCorruptFile)
         }
-        let decoder = JSONDecoder()
-        let state = try decoder.decode(GameState.self, from: data)
+        
+        if configuration.contentType == .exampleText {
+            let decoder = JSONDecoder()
+            let state = try decoder.decode(GameState.self, from: data)
 
-        self.init(pgn: state.pgn, white: state.white, black: state.black, rotated: state.rotated)
+            self.init(pgn: state.pgn, white: state.white, black: state.black, rotated: state.rotated)
+        } else if configuration.contentType == .pgn {
+            self.init(pgn: String(decoding: data, as: UTF8.self),
+                      white: GamePlayer(name: "", computer: false, level: 0),
+                      black: GamePlayer(name: "", computer: false, level: 0))
+        } else {
+            throw CocoaError(.fileReadUnknown)
+        }
     }
     
     func fileWrapper(configuration: WriteConfiguration) throws -> FileWrapper {
         // If analyzing, don't save the pgn but rather the savedPGN which is the PGN before the analyze started
         let actualPGN = state != .play ? pgnBeforeAnalyzing : pgn
-        let state = GameState(pgn: actualPGN, rotated: rotated, white: whitePlayer, black: blackPlayer)
-        let encoder = JSONEncoder()
-        let data = try encoder.encode(state)
-        return .init(regularFileWithContents: data)
+        
+        switch configuration.contentType {
+        case .exampleText:
+            let state = GameState(pgn: actualPGN, rotated: rotated, white: whitePlayer, black: blackPlayer)
+            let encoder = JSONEncoder()
+            let data = try encoder.encode(state)
+            return .init(regularFileWithContents: data)
+        case .pgn:
+            if let data = actualPGN.data(using: .utf8) {
+                return .init(regularFileWithContents: data)
+            } else {
+                throw CocoaError(.fileWriteInapplicableStringEncoding)
+            }
+        default:
+            throw CocoaError(.fileWriteUnsupportedScheme)
+        }
     }
     
     func applyEngineSettings() {
