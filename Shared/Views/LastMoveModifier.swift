@@ -14,7 +14,7 @@ struct LastMoveModifier: ViewModifier {
     let document: ChessDocument
     
     func moveColor() -> Color {
-        if document.state == .train {
+        if document.mode.value == .train {
             if document.engine.isValidOpeningMoves() {
                 return Color.green.opacity(0.8)
             } else {

@@ -22,10 +22,10 @@ struct ContentView: View {
                 ColorInformationView(document: $document, isWhite: document.rotated ? true: false)
                 ZStack {
                     BoardView(document: $document)
-                        .if(document.state == .analyze) {
+                        .if(document.mode.value == .analyze) {
                             $0.border(Color.yellow, width: 4)
                         }
-                        .if(document.state == .train) {
+                        .if(document.mode.value == .train) {
                             $0.border(Color.green, width: 4)
                         }
                     LabelsView(document: $document)
@@ -38,7 +38,7 @@ struct ContentView: View {
             
             if (showInfo) {
                 VStack(alignment: .leading) {
-                    if (document.state != .play) {
+                    if (document.mode.value != .play) {
                         AnalyzeActionsView(document: $document)
                     }
                     
@@ -68,11 +68,11 @@ struct ContentView_Previews: PreviewProvider {
     
     static var previews: some View {
         Group {
-            let doc = ChessDocument(state: .analyze)
+            let doc = ChessDocument(mode: GameMode(value: .analyze))
             ContentView(document: .constant(doc))
         }
         Group {
-            let doc = ChessDocument(state: .train)
+            let doc = ChessDocument(mode: GameMode(value: .train))
             ContentView(document: .constant(doc))
         }
         Group {

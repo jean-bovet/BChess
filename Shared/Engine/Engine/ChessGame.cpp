@@ -63,11 +63,11 @@ std::vector<Move> ChessGame::allMoves() {
 // move: the move to perform
 // replace: true to replace any variations by this move only,
 //          false to add as a new variation if the move does not exist already
-void ChessGame::move(Move move, bool replace) {
+void ChessGame::move(Move move, std::string comment, bool replace) {
     assert(MOVE_ISVALID(move));
     
     // Lookup the node representing the last move by `moveIndexes`
-    root.lookupNode(0, moveIndexes.moveCursor, moveIndexes, [&move, replace, this](auto & node) {
+    root.lookupNode(0, moveIndexes.moveCursor, moveIndexes, [&move, &comment, replace, this](auto & node) {
         bool found = false;
         if (replace) {
             // Clear all the variations so this move
@@ -90,6 +90,7 @@ void ChessGame::move(Move move, bool replace) {
         // this is a new variation (either main variation if no variation exists yet).
         if (!found || replace) {
             MoveNode newNode = MoveNode();
+            newNode.comment = comment;
             newNode.move = move;
             node.variations.push_back(newNode);
             
@@ -122,7 +123,7 @@ void ChessGame::move(Move move, bool replace) {
 void ChessGame::move(std::string from, std::string to) {
     auto move = board.getMove(from, to);
     if (MOVE_ISVALID(move)) {
-        ChessGame::move(move, false);
+        ChessGame::move(move, "", false);
     }
 }
 

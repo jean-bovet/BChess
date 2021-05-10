@@ -566,8 +566,11 @@ bool FPGN::parseMoveText() {
     if (!parseMove(whiteMove)) {
         RETURN_FAILURE("Invalid move")
     }
-    
-    game.move(whiteMove, false);
+
+    std::string comment;
+    parseComment(comment); // optional
+
+    game.move(whiteMove, comment, false);
 
 //    if (isMoveForBlack) {
 //        std::cout << "Parse black move: " << to_string(whiteMove, SANType::full) << std::endl;
@@ -576,7 +579,6 @@ bool FPGN::parseMoveText() {
 //    }
 //    game.board.print();
 
-    parseComment(); // optional
     while (parseVariation()) { } // Parse zero or more variations
         
     // Return now if the moveText was actually only for black
@@ -612,9 +614,12 @@ bool FPGN::parseMoveText() {
     
 //    std::cout << "Parse black move: " << to_string(blackMove, SANType::full) << std::endl;
     //    game.board.print();
-    game.move(blackMove, false);
 
-    parseComment(); // optional
+    comment = "";
+    parseComment(comment); // optional
+
+    game.move(blackMove, comment, false);
+
     while (parseVariation()) { } // Parse zero or more variations
 
     return true;
@@ -622,12 +627,12 @@ bool FPGN::parseMoveText() {
 
 // Parse comments in the form: { this is a comment }.
 // Don't do anything with the comment itself for now.
-bool FPGN::parseComment() {
+bool FPGN::parseComment(std::string & comment) {
     PARSE_BEGIN
     
     if (character() == '{') {
         cursor++;
-        std::string comment = "";
+        comment = "";
         if (!parseUntil(pgn, cursor, comment, '}')) {
             RETURN_FAILURE("Unable to parse until a specific character")
         }
@@ -828,7 +833,15 @@ static void getPGN(ChessBoard board, // The chess board representation which is 
         }
         pgn += FPGN::to_string(move, sanType);
     }
-    
+
+    // Output the comment for the move
+    if (!skip && !node.comment.empty()) {
+        if (pgn.size() > 0) {
+            pgn += " ";
+        }
+        pgn += "{"+node.comment+"}";
+    }
+
     // Execute the move on the board
     board.move(move);
 
@@ -880,11 +893,47 @@ static void getPGN(ChessBoard board, // The chess board representation which is 
 }
 
 std::string FPGN::getGame(ChessGame game, Formatting formatting, int fromIndex, int toIndex) {
+    std::string pgn;
+    
+    // Write the tag pairs
+    if (formatting == Formatting::storage) {
+        // Seven Tag Roster
+        std::vector<std::string> tagRoster = { "Event", "Site", "Date", "Round", "White", "Black", "Result" };
+        for (int index=0; index<tagRoster.size(); index++) {
+            auto tagName = tagRoster[index];
+            auto value = game.tags[tagName];
+            pgn += "["+tagName+" \""+value+"\"]\n";
+        }
+        
+        auto it = game.tags.begin();
+        while (it != game.tags.end()) {
+            if (std::find(tagRoster.begin(), tagRoster.end(), it->first) == tagRoster.end()) {
+                // Write only non-roster tags
+                pgn += "["+it->first+" \""+it->second+"\"]\n";
+            }
+            it++;
+        }
+        
+        if (game.initialFEN != StartFEN) {
+            // [FEN "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq - 0 1"]
+            // [SetUp "1"]
+            std::string tags = "[FEN \"" + game.initialFEN + "\"]\n";
+            tags += "[Setup \"1\"]\n";
+            
+            pgn += tags;
+        }
+        
+        if (!pgn.empty()) {
+            // If there was any tag written, make sure
+            // to have a new line before the game starts
+            pgn += "\n";
+        }
+    }
+    
     // Game used to compute the optimum PGN representation for each move
     ChessBoard outputBoard;
     FFEN::setFEN(game.initialFEN, outputBoard);
     
-    std::string pgn;
     unsigned fullMoveIndex = 0;
     
     auto rootNode = game.getRoot();
@@ -923,19 +972,6 @@ std::string FPGN::getGame(ChessGame game, Formatting formatting, int fromIndex, 
         case ChessGame::Outcome::in_progress:
             pgn += "*";
             break;
-    }
-    
-    if (formatting == Formatting::storage) {
-        // Now let's add the tag pairs
-        // https://en.wikipedia.org/wiki/Portable_Game_Notation
-        if (game.initialFEN != StartFEN) {
-            // [FEN "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq - 0 1"]
-            // [SetUp "1"]
-            std::string tags = "[FEN \"" + game.initialFEN + "\"]\n";
-            tags += "[Setup \"1\"]\n";
-            
-            pgn = tags + pgn;
-        }
     }
     
     return pgn;

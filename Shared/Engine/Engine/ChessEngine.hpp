@@ -79,8 +79,8 @@ public:
         return game.movesAt(file, rank);
     }
     
-    void move(Move move, bool replace) {
-        game.move(move, replace);
+    void move(Move move, std::string comment, bool replace) {
+        game.move(move, comment, replace);
     }
     
     void move(std::string from, std::string to) {

@@ -49,7 +49,7 @@ public:
     bool parseMove(Move &move);
     
     bool parseTerminationMarker();
-    bool parseComment();
+    bool parseComment(std::string & comment);
     
     void eatWhiteSpaces();
 

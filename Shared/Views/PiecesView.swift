@@ -70,7 +70,7 @@ struct PiecesView: View {
     
     func triggerEngineEvaluationIfSuitable() {
         // Don't play the engine while the user is analyzing the board
-        guard document.state == .play else {
+        guard document.mode.value == .play else {
             return
         }
         

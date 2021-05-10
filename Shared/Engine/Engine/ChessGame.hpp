@@ -53,6 +53,8 @@ public:
     struct MoveNode {
         // Representation of this node's move
         Move move;
+        
+        std::string comment;
                 
         // List representing the next node following this one.
         // In other words, this list contains the moves that can be
@@ -161,7 +163,7 @@ public:
     std::vector<Move> movesAt(File file, Rank rank);
     std::vector<Move> allMoves();
 
-    void move(Move move, bool replace);
+    void move(Move move, std::string comment, bool replace);
     void move(std::string from, std::string to);
     
     bool canUndoMove();

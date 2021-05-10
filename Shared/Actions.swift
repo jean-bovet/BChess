@@ -30,19 +30,19 @@ struct Actions {
     func analyzeReset() {
         document.selection = Selection.empty()
         document.lastMove = nil
-        document.pgn = document.pgnBeforeAnalyzing
+        document.pgn = document.mode.pgnBeforeAnalyzing
         document.engine.setPGN(document.pgn)
     }
         
-    func changeBoardState(state: ChessDocument.State) {
-        if document.state == .play {
-            document.state = state
-            document.pgnBeforeAnalyzing = document.pgn
+    func changeBoardState(state: GameMode.Value) {
+        if document.mode.value == .play {
+            document.mode.value = state
+            document.mode.pgnBeforeAnalyzing = document.pgn
             if state == .train {
                 engine.setFEN(StartPosFEN)
             }
         } else {
-            document.state = .play
+            document.mode.value = .play
             analyzeReset()
         }
     }

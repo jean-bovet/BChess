@@ -33,6 +33,21 @@ struct GamePlayer: Codable {
     var level: Int
 }
 
+// The mode of game
+struct GameMode {
+    enum Value {
+        case play
+        case analyze
+        case train
+    }
+    
+    // Contains the PGN before the analyze started, so we can restore it
+    var pgnBeforeAnalyzing = ""
+    
+    // The state of the board (see enum above)
+    var value: Value = .play
+}
+
 struct ChessDocument: FileDocument {
     
     static let startPosPGN = "*"
@@ -49,17 +64,8 @@ struct ChessDocument: FileDocument {
     var lastMove: FEngineMove? = nil
     var info: FEngineInfo? = nil
     
-    enum State {
-        case play
-        case analyze
-        case train
-    }
+    var mode: GameMode
     
-    // Contains the PGN before the analyze started, so we can restore it
-    var pgnBeforeAnalyzing = ""
-    // The state of the board (see enum above)
-    var state: State = .play
-
     // This variable is used by any action that needs the engine to move
     // if suitable. For example, after New Game or Edit Game.
     // If is observed in the PiecesView view.
@@ -69,13 +75,13 @@ struct ChessDocument: FileDocument {
         return PiecesFactory().pieces(forState: engine.state)
     }
     
-    init(pgn: String = startPosPGN, white: GamePlayer? = nil, black: GamePlayer? = nil, rotated: Bool = false, state: State = .play) {
+    init(pgn: String = startPosPGN, white: GamePlayer? = nil, black: GamePlayer? = nil, rotated: Bool = false, mode: GameMode = GameMode(value: .play)) {
         self.pgn = pgn
         self.engine.setPGN(pgn)
         self.whitePlayer = white ?? GamePlayer(name: "", computer: false, level: 0)
         self.blackPlayer = black ?? GamePlayer(name: "", computer: true, level: 0)
         self.rotated = rotated
-        self.state = state
+        self.mode = mode
         loadOpenings()
     }
 
@@ -112,17 +118,15 @@ struct ChessDocument: FileDocument {
     }
     
     func fileWrapper(configuration: WriteConfiguration) throws -> FileWrapper {
-        // If analyzing, don't save the pgn but rather the savedPGN which is the PGN before the analyze started
-        let actualPGN = state != .play ? pgnBeforeAnalyzing : pgn
-        
+        let pgnToWrite = mode.value != .play ? mode.pgnBeforeAnalyzing : pgn
         switch configuration.contentType {
         case .exampleText:
-            let state = GameState(pgn: actualPGN, rotated: rotated, white: whitePlayer, black: blackPlayer)
+            let state = GameState(pgn: pgnToWrite, rotated: rotated, white: whitePlayer, black: blackPlayer)
             let encoder = JSONEncoder()
             let data = try encoder.encode(state)
             return .init(regularFileWithContents: data)
         case .pgn:
-            if let data = actualPGN.data(using: .utf8) {
+            if let data = pgnToWrite.data(using: .utf8) {
                 return .init(regularFileWithContents: data)
             } else {
                 throw CocoaError(.fileWriteInapplicableStringEncoding)

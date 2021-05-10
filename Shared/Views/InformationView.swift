@@ -68,7 +68,7 @@ struct InformationView: View {
             }
             Text(document.engine.pgnFormattedForDisplay())
             Spacer()
-            if document.state == .play {
+            if document.mode.value == .play {
                 HStack() {
                     Image(systemName: "cpu")
                     Text(value())
