@@ -66,7 +66,9 @@ struct InformationView: View {
                 Text(opening)
                     .padding(.bottom)
             }
-            Text(document.engine.pgnFormattedForDisplay())
+            ScrollView {
+                Text(document.engine.pgnFormattedForDisplay())
+            }
             Spacer()
             if document.mode.value == .play {
                 HStack() {
