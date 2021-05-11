@@ -51,9 +51,13 @@ public:
     // that a game represents. A node has a move associated with it, including
     // the next move node (or move nodes if there is more than one variation).
     struct MoveNode {
-        // Representation of this node's move
-        Move move;
+        // The move number
+        unsigned moveNumber;
         
+        // The move itself
+        Move move;
+
+        // The comment associated with the move
         std::string comment;
                 
         // List representing the next node following this one.

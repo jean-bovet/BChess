@@ -65,6 +65,10 @@ public:
         return FPGN::getGame(game, FPGN::Formatting::history, 0, game.getNumberOfMoves());
     }
     
+    ChessGame::MoveNode getRootMoveNode() {
+        return game.getRoot();
+    }
+    
     std::string getPieceAt(File file, Rank rank) {
         BoardSquare square = game.getPieceAt(file, rank);
         if (square.empty) {

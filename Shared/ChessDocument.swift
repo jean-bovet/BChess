@@ -54,7 +54,12 @@ struct ChessDocument: FileDocument {
     
     let engine = FEngine()
         
-    var pgn: String
+    var pgn: String {
+        didSet {
+            moveNodes.rebuild(engine: engine)
+        }
+    }
+    
     var whitePlayer: GamePlayer
     var blackPlayer: GamePlayer
 
@@ -63,6 +68,7 @@ struct ChessDocument: FileDocument {
     var selection = Selection.empty()
     var lastMove: FEngineMove? = nil
     var info: FEngineInfo? = nil
+    var moveNodes = MoveNodes()
     
     var mode: GameMode
     
@@ -82,6 +88,9 @@ struct ChessDocument: FileDocument {
         self.blackPlayer = black ?? GamePlayer(name: "", computer: true, level: 0)
         self.rotated = rotated
         self.mode = mode
+        
+        moveNodes.rebuild(engine: engine)
+
         loadOpenings()
     }
 

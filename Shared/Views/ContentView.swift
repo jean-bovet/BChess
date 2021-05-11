@@ -44,7 +44,7 @@ struct ContentView: View {
                     
                     InformationView(document: document)
                 }
-                .frame(minWidth: 250, idealWidth: 250, maxWidth: 250, alignment: .leading)
+                .frame(minWidth: 350, idealWidth: 350, maxWidth: 350, alignment: .leading)
             }
         }
         .padding()

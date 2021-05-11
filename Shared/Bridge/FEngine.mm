@@ -9,6 +9,8 @@
 #import "FEngine.h"
 #import "FEngineInfo+Private.h"
 #import "FEngineMove.h"
+#import "FEngineMoveNode.h"
+#import "FEngineMoveNode+Private.h"
 #import "FEngineInfo.h"
 #import "FEngineUtility.h"
 #import "ChessGame.hpp"
@@ -97,6 +99,30 @@
 
 - (NSString*)PGNFormattedForDisplay {
     return NSStringFromString(engine.getPGNForDisplay());
+}
+
+- (void)moveNodesFromNode:(ChessGame::MoveNode)node
+                 mainLine:(FEngineMoveNode*)mainLine {
+    FEngineMoveNode *mainLineNodeWithVariants = nil;
+    for (int index=0; index<node.variations.size(); index++) {
+        auto child = node.variations[index];
+        auto childNode = [[FEngineMoveNode alloc] initWithNode:child];
+        if (index == 0) {
+            mainLineNodeWithVariants = childNode;
+            [mainLine addVariation:childNode];
+            [self moveNodesFromNode:child mainLine:mainLine];
+        } else {
+            [mainLineNodeWithVariants addVariation:childNode];
+            [self moveNodesFromNode:child mainLine:childNode];
+        }
+    }
+}
+
+- (NSArray<FEngineMoveNode*>*)moveNodesTree {
+    auto root = engine.getRootMoveNode();
+    FEngineMoveNode *rootNode = [[FEngineMoveNode alloc] initWithNode:root];
+    [self moveNodesFromNode:root mainLine:rootNode];
+    return rootNode.variations;
 }
 
 #pragma mark -

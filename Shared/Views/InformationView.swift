@@ -66,8 +66,9 @@ struct InformationView: View {
                 Text(opening)
                     .padding(.bottom)
             }
-            ScrollView {
-                Text(document.engine.pgnFormattedForDisplay())
+            List(document.moveNodes.moveNodes, children: \FullMoveItem.children) { item in
+                FullMoveItemView(item: item)
+                    .font(.system(.body, design: .monospaced))
             }
             Spacer()
             if document.mode.value == .play {

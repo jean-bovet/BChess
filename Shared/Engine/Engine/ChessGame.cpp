@@ -12,6 +12,7 @@
 #include "ChessEvaluater.hpp"
 #include "ChessBoardHash.hpp"
 #include "ChessState.hpp"
+#include <math.h>
 
 ChessGame::ChessGame() {
     history = NEW_HISTORY;
@@ -90,6 +91,7 @@ void ChessGame::move(Move move, std::string comment, bool replace) {
         // this is a new variation (either main variation if no variation exists yet).
         if (!found || replace) {
             MoveNode newNode = MoveNode();
+            newNode.moveNumber = ceil(moveIndexes.moveCursor / 2) + 1;
             newNode.comment = comment;
             newNode.move = move;
             node.variations.push_back(newNode);

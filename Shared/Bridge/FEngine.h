@@ -10,6 +10,7 @@
 
 @class FEngineMove;
 @class FEngineInfo;
+@class FEngineMoveNode;
 
 typedef void(^FEngineSearchCallback)(FEngineInfo * _Nonnull info, BOOL completed);
 typedef void(^FEngineDidUpdateCallback)();
@@ -41,6 +42,7 @@ typedef void(^FEngineDidUpdateCallback)();
 - (NSString* _Nonnull)PGN;
 
 - (NSString* _Nonnull)PGNFormattedForDisplay;
+- (NSArray<FEngineMoveNode*>* _Nonnull)moveNodesTree;
 
 - (NSArray<FEngineMove*>* _Nonnull)allMoves;
 - (NSArray<FEngineMove*>* _Nonnull)movesAt:(NSUInteger)rank file:(NSUInteger)file;
