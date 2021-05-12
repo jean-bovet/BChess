@@ -25,8 +25,8 @@
 		A72E2B57200496CD006CBB1C /* BoardHashTests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A72E2B56200496CC006CBB1C /* BoardHashTests.cpp */; };
 		A731BD3720009856004C13EF /* Tournament.swift in Sources */ = {isa = PBXBuildFile; fileRef = A731BD3620009856004C13EF /* Tournament.swift */; };
 		A731BD392000A513004C13EF /* TournamentEngines.swift in Sources */ = {isa = PBXBuildFile; fileRef = A731BD382000A513004C13EF /* TournamentEngines.swift */; };
-		A746997C2637CCF7007E0058 /* AnalyzeActionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A746997B2637CCF7007E0058 /* AnalyzeActionsView.swift */; };
-		A746997D2637CCF7007E0058 /* AnalyzeActionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A746997B2637CCF7007E0058 /* AnalyzeActionsView.swift */; };
+		A746997C2637CCF7007E0058 /* NavigationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A746997B2637CCF7007E0058 /* NavigationView.swift */; };
+		A746997D2637CCF7007E0058 /* NavigationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A746997B2637CCF7007E0058 /* NavigationView.swift */; };
 		A746C244200148E9001F4437 /* ChessBoardHash.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A746C242200148E9001F4437 /* ChessBoardHash.cpp */; };
 		A746C245200148ED001F4437 /* ChessBoardHash.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A746C242200148E9001F4437 /* ChessBoardHash.cpp */; };
 		A746C2492001707F001F4437 /* GameHistory.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A746C2472001707F001F4437 /* GameHistory.cpp */; };
@@ -209,7 +209,7 @@
 		A72E2B56200496CC006CBB1C /* BoardHashTests.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BoardHashTests.cpp; sourceTree = "<group>"; };
 		A731BD3620009856004C13EF /* Tournament.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tournament.swift; sourceTree = "<group>"; };
 		A731BD382000A513004C13EF /* TournamentEngines.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TournamentEngines.swift; sourceTree = "<group>"; };
-		A746997B2637CCF7007E0058 /* AnalyzeActionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyzeActionsView.swift; sourceTree = "<group>"; };
+		A746997B2637CCF7007E0058 /* NavigationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationView.swift; sourceTree = "<group>"; };
 		A746C242200148E9001F4437 /* ChessBoardHash.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ChessBoardHash.cpp; sourceTree = "<group>"; };
 		A746C243200148E9001F4437 /* ChessBoardHash.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = ChessBoardHash.hpp; sourceTree = "<group>"; };
 		A746C2472001707F001F4437 /* GameHistory.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = GameHistory.cpp; sourceTree = "<group>"; };
@@ -561,7 +561,7 @@
 				A7A30EDC25AEBD7C00729432 /* LabelsView.swift */,
 				A77F66AE25A832240030E61D /* ContentView.swift */,
 				A7A30F2E25B2BAFC00729432 /* PromotionView.swift */,
-				A746997B2637CCF7007E0058 /* AnalyzeActionsView.swift */,
+				A746997B2637CCF7007E0058 /* NavigationView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -885,7 +885,7 @@
 				A7FE322A25AA96D100A75936 /* ChessBoardHash.cpp in Sources */,
 				A77F66D725A832270030E61D /* ChessDocument.swift in Sources */,
 				A795162225ABE59900AEA95F /* PlayAgainst.swift in Sources */,
-				A746997C2637CCF7007E0058 /* AnalyzeActionsView.swift in Sources */,
+				A746997C2637CCF7007E0058 /* NavigationView.swift in Sources */,
 				A7FE324E25AAD61200A75936 /* FEngineUtility.mm in Sources */,
 				A79515F625ABE44000AEA95F /* PiecesView.swift in Sources */,
 				A7BC72E42636003F008FBBB4 /* NewGameView.swift in Sources */,
@@ -937,7 +937,7 @@
 				A7FE31DA25AA96B800A75936 /* MoveList.cpp in Sources */,
 				A795162325ABE59900AEA95F /* PlayAgainst.swift in Sources */,
 				A7FE31CB25AA96A800A75936 /* FEngineUtility.mm in Sources */,
-				A746997D2637CCF7007E0058 /* AnalyzeActionsView.swift in Sources */,
+				A746997D2637CCF7007E0058 /* NavigationView.swift in Sources */,
 				A79515F725ABE44000AEA95F /* PiecesView.swift in Sources */,
 				A758BB0725AC119C0092714E /* Actions.swift in Sources */,
 				A716976D262BFF8C00156BD6 /* SettingsView.swift in Sources */,

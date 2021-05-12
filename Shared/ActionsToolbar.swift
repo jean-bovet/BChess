@@ -79,24 +79,6 @@ struct RotateBoard: View {
     }
 }
 
-struct UndoMoveButton: View {
-    @Binding var document: ChessDocument
-    var body: some View {
-        Button(action: { Actions(document: $document).undoMove() }) {
-            Label("Undo Move", systemImage: "arrow.uturn.backward.square")
-        }.disabled(!document.engine.canUndoMove())
-    }
-}
-
-struct RedoMoveButton: View {
-    @Binding var document: ChessDocument
-    var body: some View {
-        Button(action: { Actions(document: $document).redoMove() }) {
-            Label("Redo Move", systemImage: "arrow.uturn.forward.square")
-        }.disabled(!document.engine.canRedoMove())
-    }
-}
-
 struct CopyFENButton: View {
     @Binding var document: ChessDocument
     var body: some View {
@@ -154,17 +136,9 @@ struct ActionsToolbar: ToolbarContent {
                 
                 AnalyzeBoard(document: $document)
                 TrainButton(document: $document)
-            }
-            label: {
-                Label("Game", systemImage: "ellipsis.circle")
-            }
-
-            Menu {
-                UndoMoveButton(document: $document)
-                RedoMoveButton(document: $document)
 
                 Divider()
-                
+
                 RotateBoard(document: $document)
 
                 Divider()

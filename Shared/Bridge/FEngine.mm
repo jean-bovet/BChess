@@ -172,24 +172,26 @@
     [self fireUpdate:self.stateIndex];
 }
 
-- (BOOL)canUndoMove {
-    return engine.canUndoMove();
+- (ChessGame::Direction)gameDirection:(Direction)direction {
+    switch (direction) {
+        case start:
+            return ChessGame::Direction::start;
+        case end:
+            return ChessGame::Direction::end;
+        case backward:
+            return ChessGame::Direction::backward;
+        case forward:
+            return ChessGame::Direction::forward;
+    }
+}
+- (BOOL)canMoveTo:(Direction)direction {
+    return engine.game.canMoveTo([self gameDirection:direction]);
 }
 
-- (BOOL)canRedoMove {
-    return engine.canRedoMove();
-}
-
-- (void)undoMove {
+- (void)moveTo:(Direction)direction {
     // TODO: handle the cancel with a callback when the cancel actually really happened
     [self cancel];
-    engine.undoMove();
-    [self fireUpdate:self.stateIndex];
-}
-
-- (void)redoMove {
-    [self cancel];
-    engine.redoMove();
+    engine.game.moveTo([self gameDirection:direction]);
     [self fireUpdate:self.stateIndex];
 }
 

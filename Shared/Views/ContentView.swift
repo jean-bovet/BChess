@@ -38,7 +38,7 @@ struct ContentView: View {
             
             if (showInfo) {
                 VStack(alignment: .leading) {
-                    AnalyzeActionsView(document: $document)
+                    NavigationView(document: $document)
                     
                     InformationView(document: document)
                 }

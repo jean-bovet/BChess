@@ -56,8 +56,12 @@ struct Actions {
         document.lastMove = nil        
     }
 
-    func undoMove() {
-        guard engine.canUndoMove() else {
+    func canMove(to: Direction) -> Bool {
+        return engine.canMove(to: to);
+    }
+    
+    func move(to: Direction) {
+        guard engine.canMove(to: to) else {
             return
         }
 
@@ -68,21 +72,8 @@ struct Actions {
             if engine.isAnalyzing() {
                 engine.cancel()
             }
-            engine.undoMove()
-            document.pgn = document.engine.pgn()
-        }
-    }
-
-    func redoMove() {
-        guard engine.canRedoMove() else {
-            return
-        }
-        
-        withAnimation {
-            document.selection = Selection.empty()
-            document.lastMove = nil
-
-            engine.redoMove()
+            
+            engine.move(to: to)
             document.pgn = document.engine.pgn()
         }
     }

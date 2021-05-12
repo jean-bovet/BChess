@@ -183,11 +183,12 @@ public:
     void move(Move move, std::string comment, bool replace);
     void move(std::string from, std::string to);
     
-    bool canUndoMove();
-    bool canRedoMove();
+    enum class Direction {
+        start, end, backward, forward
+    };
     
-    void undoMove();
-    void redoMove();
+    bool canMoveTo(Direction direction);
+    void moveTo(Direction direction);
 
     std::string getState();
     

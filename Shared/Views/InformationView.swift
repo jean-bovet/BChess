@@ -68,7 +68,6 @@ struct InformationView: View {
             }
             List(document.moveNodes.moveNodes, children: \FullMoveItem.children) { item in
                 FullMoveItemView(item: item, currentMoveUUID: document.engine.currentMoveNodeUUID())
-                    .font(.system(.body, design: .monospaced))
             }
             Spacer()
             if document.mode.value == .play {

@@ -90,23 +90,7 @@ public:
     void move(std::string from, std::string to) {
         game.move(from, to);
     }
-    
-    bool canUndoMove() {
-        return game.canUndoMove();
-    }
-    
-    bool canRedoMove() {
-        return game.canRedoMove();
-    }
-    
-    void undoMove() {
-        game.undoMove();
-    }
-    
-    void redoMove() {
-        game.redoMove();
-    }
-    
+        
     void stop() {
         iterativeSearch.stop();
     }

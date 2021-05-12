@@ -130,23 +130,35 @@ void ChessGame::move(std::string from, std::string to) {
     }
 }
 
-bool ChessGame::canUndoMove() {
-    return moveIndexes.moveCursor > 0;
+bool ChessGame::canMoveTo(Direction direction) {
+    switch (direction) {
+        case Direction::start:
+            return moveIndexes.moveCursor > 0;
+        case Direction::end:
+            return moveIndexes.moveCursor < moveIndexes.moves.size();
+        case Direction::backward:
+            return moveIndexes.moveCursor > 0;
+        case Direction::forward:
+            return moveIndexes.moveCursor < moveIndexes.moves.size();
+    }
 }
 
-bool ChessGame::canRedoMove() {
-    return moveIndexes.moveCursor < moveIndexes.moves.size();
-}
-
-void ChessGame::undoMove() {
-    assert(canUndoMove());
-    moveIndexes.moveCursor--;
-    replayMoves();
-}
-
-void ChessGame::redoMove() {
-    assert(canRedoMove());
-    moveIndexes.moveCursor++;
+void ChessGame::moveTo(Direction direction) {
+    assert(canMoveTo(direction));
+    switch (direction) {
+        case Direction::start:
+            moveIndexes.moveCursor = 0;
+            break;
+        case Direction::end:
+            moveIndexes.moveCursor = (int)moveIndexes.moves.size();
+            break;
+        case Direction::backward:
+            moveIndexes.moveCursor--;
+            break;
+        case Direction::forward:
+            moveIndexes.moveCursor++;
+            break;
+    }
     replayMoves();
 }
 

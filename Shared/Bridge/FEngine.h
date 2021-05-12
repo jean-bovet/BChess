@@ -15,6 +15,13 @@
 typedef void(^FEngineSearchCallback)(FEngineInfo * _Nonnull info, BOOL completed);
 typedef void(^FEngineDidUpdateCallback)();
 
+typedef NS_ENUM(NSInteger, Direction){
+    start = 0,
+    end,
+    backward,
+    forward
+};
+
 /** This class is the interface between the C++ engine and the Objective-C/Swift world*/
 @interface FEngine : NSObject
 
@@ -49,11 +56,8 @@ typedef void(^FEngineDidUpdateCallback)();
 - (NSArray<FEngineMove*>* _Nonnull)movesAt:(NSUInteger)rank file:(NSUInteger)file;
 - (void)move:(NSUInteger)move;
 
-- (BOOL)canUndoMove;
-- (BOOL)canRedoMove;
-
-- (void)undoMove;
-- (void)redoMove;
+- (BOOL)canMoveTo:(Direction)direction;
+- (void)moveTo:(Direction)direction;
 
 - (void)move:(NSString* _Nonnull)from to:(NSString* _Nonnull)to;
 
