@@ -108,7 +108,7 @@ struct PiecesView: View {
         document.lastMove = move
         document.applyEngineSettings()
         document.engine.move(move.rawMoveValue)
-        document.pgn = document.engine.pgn()
+        document.pgn = document.engine.pgnAllGames()
     }
     
     func playMove(info: FEngineInfo) {
@@ -117,7 +117,7 @@ struct PiecesView: View {
         document.info = info
         document.applyEngineSettings()
         document.engine.move(info.bestMove)
-        document.pgn = document.engine.pgn()
+        document.pgn = document.engine.pgnAllGames()
     }
         
     var body: some View {

@@ -118,6 +118,18 @@ struct CopyPasteMenu: View {
     }
 }
 
+struct GameSelectionMenu: View {
+    @Binding var document: ChessDocument
+        
+    var body: some View {
+        Picker(selection: $document.currentGameIndex, label: Text("Games")) {
+            ForEach(document.engine.games, id:\.self) { game in
+                Text(game.name).tag(game.index)
+            }
+        }
+    }
+}
+
 struct ActionsToolbar: ToolbarContent {
 
     @Binding var document: ChessDocument
@@ -132,6 +144,8 @@ struct ActionsToolbar: ToolbarContent {
                 NewGameButton(document: $document, showNewGameSheet: $showNewGameSheet, newGameSheetEditMode: $newGameSheetEditMode)
                 EditGameButton(document: $document, showNewGameSheet: $showNewGameSheet, newGameSheetEditMode: $newGameSheetEditMode)
 
+                GameSelectionMenu(document: $document)
+                
                 Divider()
                 
                 AnalyzeBoard(document: $document)

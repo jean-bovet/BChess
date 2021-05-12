@@ -826,6 +826,9 @@ static void getPGN(ChessBoard board, // The chess board representation which is 
         }
     }
     
+    // Execute the move on the board
+    board.move(move);
+
     // Output the actual move
     if (!skip) {
         if (pgn.size() > 0) {
@@ -833,17 +836,6 @@ static void getPGN(ChessBoard board, // The chess board representation which is 
         }
         pgn += FPGN::to_string(move, sanType);
     }
-
-    // Output the comment for the move
-    if (!skip && !node.comment.empty()) {
-        if (pgn.size() > 0) {
-            pgn += " ";
-        }
-        pgn += "{"+node.comment+"}";
-    }
-
-    // Execute the move on the board
-    board.move(move);
 
     // Determine if the position is check or mate
     if (board.isCheck(board.color) && !skip) {
@@ -854,6 +846,14 @@ static void getPGN(ChessBoard board, // The chess board representation which is 
         } else {
             pgn += "+";
         }
+    }
+
+    // Output the comment for the move
+    if (!skip && !node.comment.empty()) {
+        if (pgn.size() > 0) {
+            pgn += " ";
+        }
+        pgn += "{"+node.comment+"}";
     }
 
     // If we are not doing any recursive output, return now.
@@ -890,6 +890,18 @@ static void getPGN(ChessBoard board, // The chess board representation which is 
             getPGN(board, formatting, main, pgn, moveIndex+1, fromMoveIndex, toMoveIndex, fullMoveIndex, /*mainline*/true, /*recursive*/true, /*skip*/true);
         }
     }
+}
+
+std::string FPGN::getGames(std::vector<ChessGame> & games) {
+    std::string allGamesPGN;
+    for (int index=0; index<games.size(); index++) {
+        auto pgn = FPGN::getGame(games[index]);
+        if (!allGamesPGN.empty()) {
+            allGamesPGN += "\n\n";
+        }
+        allGamesPGN += pgn;
+    }
+    return allGamesPGN;
 }
 
 std::string FPGN::getGame(ChessGame game, Formatting formatting, int fromIndex, int toIndex) {

@@ -74,6 +74,8 @@ public:
         history, // for displaying the history of the game, with new lines every two ply.
     };
     
+    static std::string getGames(std::vector<ChessGame> & games);
+    
     // fromIndex: the index from which to start building the PGN. Used to display a line from a game during analysis,
     //            which means we only want to display the game after the current move (to show the thinking of the computer).
     //            This parameter takes effect only if the Formatting is set to line

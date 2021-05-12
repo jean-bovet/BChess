@@ -50,7 +50,7 @@ struct Actions {
     func newGame() {
         engine.setFEN(StartPosFEN)
         document.info = nil
-        document.pgn = engine.pgn()
+        document.pgn = engine.pgnAllGames()
                 
         document.selection = Selection.empty()
         document.lastMove = nil        
@@ -74,7 +74,7 @@ struct Actions {
             }
             
             engine.move(to: to)
-            document.pgn = document.engine.pgn()
+            document.pgn = document.engine.pgnAllGames()
         }
     }
 
@@ -102,7 +102,7 @@ struct Actions {
         #if os(macOS)
         let pb = NSPasteboard.general
         pb.declareTypes([.string], owner: nil)
-        pb.setString(engine.pgn(), forType: .string)
+        pb.setString(engine.getPGNCurrentGame(), forType: .string)
         #else
         UIPasteboard.general.string = engine.pgn()
         #endif
@@ -119,7 +119,7 @@ struct Actions {
         }
         #endif
         if engine.setFEN(content) {
-            document.pgn = document.engine.pgn()
+            document.pgn = document.engine.pgnAllGames()
             return true
         } else {
             return false
@@ -137,7 +137,7 @@ struct Actions {
         }
         #endif
         if engine.setPGN(content) {
-            document.pgn = document.engine.pgn()
+            document.pgn = document.engine.pgnAllGames()
             return true
         } else {
             return false

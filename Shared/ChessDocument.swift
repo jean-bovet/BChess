@@ -60,6 +60,13 @@ struct ChessDocument: FileDocument {
         }
     }
     
+    var currentGameIndex: UInt = 0 {
+        didSet {
+            engine.currentGameIndex = currentGameIndex
+            moveNodes.rebuild(engine: engine)
+        }
+    }
+    
     var whitePlayer: GamePlayer
     var blackPlayer: GamePlayer
 
@@ -74,7 +81,7 @@ struct ChessDocument: FileDocument {
     
     // This variable is used by any action that needs the engine to move
     // if suitable. For example, after New Game or Edit Game.
-    // If is observed in the PiecesView view.
+    // It is observed in the PiecesView view.
     var engineShouldMove = false
     
     var pieces: [Piece] {
@@ -83,14 +90,14 @@ struct ChessDocument: FileDocument {
     
     init(pgn: String = startPosPGN, white: GamePlayer? = nil, black: GamePlayer? = nil, rotated: Bool = false, mode: GameMode = GameMode(value: .play)) {
         self.pgn = pgn
-        self.engine.setPGN(pgn)
+        self.engine.loadAllGames(pgn)
         self.whitePlayer = white ?? GamePlayer(name: "", computer: false, level: 0)
         self.blackPlayer = black ?? GamePlayer(name: "", computer: true, level: 0)
         self.rotated = rotated
         self.mode = mode
-        
-        moveNodes.rebuild(engine: engine)
 
+        moveNodes.rebuild(engine: engine)
+        
         loadOpenings()
     }
 

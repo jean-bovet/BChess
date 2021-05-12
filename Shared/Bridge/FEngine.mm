@@ -9,6 +9,7 @@
 #import "FEngine.h"
 #import "FEngineInfo+Private.h"
 #import "FEngineMove.h"
+#import "FEngineGame+Private.h"
 #import "FEngineMoveNode.h"
 #import "FEngineMoveNode+Private.h"
 #import "FEngineInfo.h"
@@ -33,6 +34,9 @@
 @end
 
 @implementation FEngine
+
+@synthesize games;
+@synthesize currentGameIndex;
 
 + (void)initialize {
     if (self == [FEngine class]) {
@@ -89,12 +93,43 @@
     return NSStringFromString(engine.getFEN());
 }
 
+- (NSArray<FEngineGame*>*)games {
+    NSMutableArray *engineGames = [NSMutableArray array];
+    auto games = engine.games;
+    for (int index=0; index<games.size(); index++) {
+        auto game = games[index];
+        FEngineGame *engineGame = [[FEngineGame alloc] initWithGame:game andIndex:index];
+        [engineGames addObject:engineGame];
+    }
+    return engineGames;
+}
+
+- (void)setCurrentGameIndex:(NSUInteger)index {
+    engine.gameIndex = (unsigned int)index;
+}
+
+- (NSUInteger)currentGameIndex {
+    return engine.gameIndex;
+}
+
+- (BOOL)loadAllGames:(NSString* _Nonnull)PGN {
+    return engine.loadAllGames(StringFromNSString(PGN));
+}
+
 - (BOOL)setPGN:(NSString *)PGN {
     return engine.setPGN(StringFromNSString(PGN));
 }
 
-- (NSString*)PGN {
-    return NSStringFromString(engine.getPGN());
+- (NSString*)getPGN:(BOOL)currentGame {
+    return NSStringFromString(engine.getPGN(currentGame));
+}
+
+- (NSString* _Nonnull)pgnAllGames {
+    return [self getPGN:false];
+}
+
+- (NSString* _Nonnull)getPGNCurrentGame {
+    return [self getPGN:true];
 }
 
 - (NSString*)PGNFormattedForDisplay {
@@ -126,7 +161,7 @@
 }
 
 - (NSUInteger)currentMoveNodeUUID {
-    return engine.game.getCurrentMoveUUID();
+    return engine.game().getCurrentMoveUUID();
 }
 
 #pragma mark -
@@ -137,7 +172,7 @@
 
 - (NSArray<FEngineMove*>* _Nonnull)allMoves {
     NSMutableArray *moves = [NSMutableArray array];
-    for (Move move : engine.game.allMoves()) {
+    for (Move move : engine.game().allMoves()) {
         [moves addObject:[self engineMoveFromMove:move]];
     }
     return moves;
@@ -185,13 +220,13 @@
     }
 }
 - (BOOL)canMoveTo:(Direction)direction {
-    return engine.game.canMoveTo([self gameDirection:direction]);
+    return engine.game().canMoveTo([self gameDirection:direction]);
 }
 
 - (void)moveTo:(Direction)direction {
     // TODO: handle the cancel with a callback when the cancel actually really happened
     [self cancel];
-    engine.game.moveTo([self gameDirection:direction]);
+    engine.game().moveTo([self gameDirection:direction]);
     [self fireUpdate:self.stateIndex];
 }
 
@@ -221,7 +256,7 @@
 - (FEngineInfo*)infoFor:(ChessEvaluation)info {
     FEngineInfo *ei = [[FEngineInfo alloc] init];
     ei.info = info;
-    ei.game = engine.game;
+    ei.game = engine.game();
     return ei;
 }
 

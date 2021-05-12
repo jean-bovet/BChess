@@ -10,7 +10,7 @@ import Foundation
 
 typealias Callback = () -> Void
 
-protocol Player : class {
+protocol Player : AnyObject {
 
     var state: String { get set }
     
@@ -37,7 +37,7 @@ class PlayerChessEngine: Player {
             engine.setPGN(newValue)
         }
         get {
-            return engine.pgn()
+            return engine.getPGNCurrentGame()
         }
     }
 

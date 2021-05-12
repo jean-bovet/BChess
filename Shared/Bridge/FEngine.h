@@ -11,6 +11,7 @@
 @class FEngineMove;
 @class FEngineInfo;
 @class FEngineMoveNode;
+@class FEngineGame;
 
 typedef void(^FEngineSearchCallback)(FEngineInfo * _Nonnull info, BOOL completed);
 typedef void(^FEngineDidUpdateCallback)();
@@ -36,6 +37,9 @@ typedef NS_ENUM(NSInteger, Direction){
 
 @property (nonatomic, strong, readonly) NSString * _Nonnull state;
 
+@property (nonatomic, strong, readonly) NSArray<FEngineGame*>* _Nonnull games;
+@property (nonatomic, assign) NSUInteger currentGameIndex;
+
 - (id _Nonnull)init;
 
 - (BOOL)loadOpening:(NSString* _Nonnull)pgn;
@@ -45,8 +49,10 @@ typedef NS_ENUM(NSInteger, Direction){
 - (BOOL)setFEN:(NSString* _Nonnull)FEN;
 - (NSString* _Nonnull)FEN;
 
+- (BOOL)loadAllGames:(NSString* _Nonnull)PGN;
 - (BOOL)setPGN:(NSString* _Nonnull)PGN;
-- (NSString* _Nonnull)PGN;
+- (NSString* _Nonnull)pgnAllGames;
+- (NSString* _Nonnull)getPGNCurrentGame;
 
 - (NSString* _Nonnull)PGNFormattedForDisplay;
 - (NSArray<FEngineMoveNode*>* _Nonnull)moveNodesTree;

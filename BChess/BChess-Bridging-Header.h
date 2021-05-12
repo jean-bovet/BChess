@@ -6,3 +6,4 @@
 #import "FEngineMove.h"
 #import "FEngineInfo.h"
 #import "FEngineMoveNode.h"
+#import "FEngineGame.h"

@@ -75,6 +75,15 @@
 		A77F66DC25A832270030E61D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A77F66AF25A832270030E61D /* Assets.xcassets */; };
 		A78E754C202C080E00445360 /* MovesTests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A78E754B202C080E00445360 /* MovesTests.cpp */; };
 		A78E7551202C110200445360 /* UnitTestHelper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A78E754F202C110200445360 /* UnitTestHelper.cpp */; };
+		A791117C264B923600F97FA7 /* FEngineGame.mm in Sources */ = {isa = PBXBuildFile; fileRef = A791117B264B923600F97FA7 /* FEngineGame.mm */; };
+		A791117D264B923600F97FA7 /* FEngineGame.mm in Sources */ = {isa = PBXBuildFile; fileRef = A791117B264B923600F97FA7 /* FEngineGame.mm */; };
+		A791117F264B92E500F97FA7 /* FEngineGame+Private.h in Sources */ = {isa = PBXBuildFile; fileRef = A791117E264B92E500F97FA7 /* FEngineGame+Private.h */; };
+		A7911180264B92E500F97FA7 /* FEngineGame+Private.h in Sources */ = {isa = PBXBuildFile; fileRef = A791117E264B92E500F97FA7 /* FEngineGame+Private.h */; };
+		A7911181264B98DC00F97FA7 /* FEngineGame.mm in Sources */ = {isa = PBXBuildFile; fileRef = A791117B264B923600F97FA7 /* FEngineGame.mm */; };
+		A7911183264B98E600F97FA7 /* FEngineMoveNode.mm in Sources */ = {isa = PBXBuildFile; fileRef = A757614E264A50E8006242F9 /* FEngineMoveNode.mm */; };
+		A7911184264B998900F97FA7 /* FEngineMoveNode.mm in Sources */ = {isa = PBXBuildFile; fileRef = A757614E264A50E8006242F9 /* FEngineMoveNode.mm */; };
+		A7911185264B998900F97FA7 /* FEngineGame.mm in Sources */ = {isa = PBXBuildFile; fileRef = A791117B264B923600F97FA7 /* FEngineGame.mm */; };
+		A7911186264B998900F97FA7 /* FEngineMove.mm in Sources */ = {isa = PBXBuildFile; fileRef = A7C92AB31FF86BF200160D2E /* FEngineMove.mm */; };
 		A79514EC25AAE2C400AEA95F /* FENgineInfo+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = A75359831FDC51B2008D1DEE /* FENgineInfo+Extension.swift */; };
 		A79514F925AAE2C500AEA95F /* FENgineInfo+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = A75359831FDC51B2008D1DEE /* FENgineInfo+Extension.swift */; };
 		A795159E25ABE1D700AEA95F /* PiecesFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = A795159D25ABE1D700AEA95F /* PiecesFactory.swift */; };
@@ -113,7 +122,6 @@
 		A7BC72E42636003F008FBBB4 /* NewGameView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7BC72E32636003F008FBBB4 /* NewGameView.swift */; };
 		A7BC72E52636003F008FBBB4 /* NewGameView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7BC72E32636003F008FBBB4 /* NewGameView.swift */; };
 		A7C92AAB1FF6F19100160D2E /* Openings.pgn in Resources */ = {isa = PBXBuildFile; fileRef = A7C92AA91FF6EE5500160D2E /* Openings.pgn */; };
-		A7C92AB41FF86BF200160D2E /* FEngineMove.mm in Sources */ = {isa = PBXBuildFile; fileRef = A7C92AB31FF86BF200160D2E /* FEngineMove.mm */; };
 		A7C92AB51FF86C4300160D2E /* FEngineMove.mm in Sources */ = {isa = PBXBuildFile; fileRef = A7C92AB31FF86BF200160D2E /* FEngineMove.mm */; };
 		A7C92AB91FF86F6800160D2E /* FEngineUtility.mm in Sources */ = {isa = PBXBuildFile; fileRef = A7C92AB81FF86F6800160D2E /* FEngineUtility.mm */; };
 		A7C92ABB1FF8712800160D2E /* FEngineUtility.mm in Sources */ = {isa = PBXBuildFile; fileRef = A7C92AB81FF86F6800160D2E /* FEngineUtility.mm */; };
@@ -270,6 +278,9 @@
 		A78E754B202C080E00445360 /* MovesTests.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MovesTests.cpp; sourceTree = "<group>"; };
 		A78E754F202C110200445360 /* UnitTestHelper.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = UnitTestHelper.cpp; sourceTree = "<group>"; };
 		A78E7550202C110200445360 /* UnitTestHelper.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = UnitTestHelper.hpp; sourceTree = "<group>"; };
+		A791117A264B923600F97FA7 /* FEngineGame.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FEngineGame.h; sourceTree = "<group>"; };
+		A791117B264B923600F97FA7 /* FEngineGame.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = FEngineGame.mm; sourceTree = "<group>"; };
+		A791117E264B92E500F97FA7 /* FEngineGame+Private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "FEngineGame+Private.h"; sourceTree = "<group>"; };
 		A795159D25ABE1D700AEA95F /* PiecesFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PiecesFactory.swift; sourceTree = "<group>"; };
 		A79515A825ABE31100AEA95F /* SquareView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SquareView.swift; sourceTree = "<group>"; };
 		A79515B325ABE34300AEA95F /* TopInformationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TopInformationView.swift; sourceTree = "<group>"; };
@@ -362,6 +373,9 @@
 				A7C92AB31FF86BF200160D2E /* FEngineMove.mm */,
 				A75683271FCD28A000CF1408 /* FEngine.h */,
 				A75683281FCD28A000CF1408 /* FEngine.mm */,
+				A791117A264B923600F97FA7 /* FEngineGame.h */,
+				A791117E264B92E500F97FA7 /* FEngineGame+Private.h */,
+				A791117B264B923600F97FA7 /* FEngineGame.mm */,
 				A757614D264A50E8006242F9 /* FEngineMoveNode.h */,
 				A7576151264A51BC006242F9 /* FEngineMoveNode+Private.h */,
 				A757614E264A50E8006242F9 /* FEngineMoveNode.mm */,
@@ -843,6 +857,7 @@
 				A78E754C202C080E00445360 /* MovesTests.cpp in Sources */,
 				A7712D341FC895D100E7E802 /* UCI.swift in Sources */,
 				A70A61DA1FD4D49500AFDF0E /* ChessBoard.cpp in Sources */,
+				A7911183264B98E600F97FA7 /* FEngineMoveNode.mm in Sources */,
 				A75CB25D1FED8F82005487BD /* EvaluationTests.cpp in Sources */,
 				A7E490EC1FEA23DD00970EAD /* PGNTests.cpp in Sources */,
 				A7E490ED1FEA29B900970EAD /* GamesTests.swift in Sources */,
@@ -854,6 +869,7 @@
 				A75359851FDC994E008D1DEE /* FENgineInfo+Extension.swift in Sources */,
 				A7C92AB51FF86C4300160D2E /* FEngineMove.mm in Sources */,
 				A70A61D51FD4D42100AFDF0E /* FEngineInfo.mm in Sources */,
+				A7911181264B98DC00F97FA7 /* FEngineGame.mm in Sources */,
 				A7688F64204B73BF004B1E9E /* StateTests.cpp in Sources */,
 				A7E490F21FEA2E7E00970EAD /* GoogleTests.mm in Sources */,
 				A7EF55C91FF1CF77004CF2DA /* BestMoveTests.cpp in Sources */,
@@ -884,6 +900,8 @@
 				A795160C25ABE55E00AEA95F /* Square.swift in Sources */,
 				A7FE322A25AA96D100A75936 /* ChessBoardHash.cpp in Sources */,
 				A77F66D725A832270030E61D /* ChessDocument.swift in Sources */,
+				A791117C264B923600F97FA7 /* FEngineGame.mm in Sources */,
+				A791117F264B92E500F97FA7 /* FEngineGame+Private.h in Sources */,
 				A795162225ABE59900AEA95F /* PlayAgainst.swift in Sources */,
 				A746997C2637CCF7007E0058 /* NavigationView.swift in Sources */,
 				A7FE324E25AAD61200A75936 /* FEngineUtility.mm in Sources */,
@@ -936,6 +954,8 @@
 				A7FE31CA25AA96A800A75936 /* FEngineInfo.mm in Sources */,
 				A7FE31DA25AA96B800A75936 /* MoveList.cpp in Sources */,
 				A795162325ABE59900AEA95F /* PlayAgainst.swift in Sources */,
+				A791117D264B923600F97FA7 /* FEngineGame.mm in Sources */,
+				A7911180264B92E500F97FA7 /* FEngineGame+Private.h in Sources */,
 				A7FE31CB25AA96A800A75936 /* FEngineUtility.mm in Sources */,
 				A746997D2637CCF7007E0058 /* NavigationView.swift in Sources */,
 				A79515F725ABE44000AEA95F /* PiecesView.swift in Sources */,
@@ -999,13 +1019,14 @@
 				A7712D2F1FC7C4CD00E7E802 /* UCI.swift in Sources */,
 				A77372011FE320010001A90F /* FPGN.cpp in Sources */,
 				A746C2492001707F001F4437 /* GameHistory.cpp in Sources */,
+				A7911186264B998900F97FA7 /* FEngineMove.mm in Sources */,
 				A70A61BB1FD132D200AFDF0E /* FFEN.cpp in Sources */,
 				A75359841FDC51B2008D1DEE /* FENgineInfo+Extension.swift in Sources */,
 				A756832D1FD0B3FE00CF1408 /* magicmoves.c in Sources */,
 				A7712D471FCBC13100E7E802 /* ChessBoard.cpp in Sources */,
+				A7911184264B998900F97FA7 /* FEngineMoveNode.mm in Sources */,
 				A77371FE1FE31FEF0001A90F /* ChessGame.cpp in Sources */,
 				A7688F60204B6E91004B1E9E /* ChessState.cpp in Sources */,
-				A7C92AB41FF86BF200160D2E /* FEngineMove.mm in Sources */,
 				A70A61CA1FD46E3C00AFDF0E /* ChessEvaluater.cpp in Sources */,
 				A70A61C41FD458DE00AFDF0E /* ChessMoveGenerator.cpp in Sources */,
 				A70A61D11FD4AA9600AFDF0E /* FEngineInfo.mm in Sources */,
@@ -1014,6 +1035,7 @@
 				A7C92AB91FF86F6800160D2E /* FEngineUtility.mm in Sources */,
 				A731BD392000A513004C13EF /* TournamentEngines.swift in Sources */,
 				A731BD3720009856004C13EF /* Tournament.swift in Sources */,
+				A7911185264B998900F97FA7 /* FEngineGame.mm in Sources */,
 				A746C244200148E9001F4437 /* ChessBoardHash.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

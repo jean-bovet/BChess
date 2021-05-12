@@ -61,21 +61,30 @@ struct InformationView: View {
     }
     
     var body: some View {
-        VStack(alignment: .leading) {
-            if let opening = document.engine.openingName() {
-                Text(opening)
-                    .padding(.bottom)
+        VStack(alignment: .leading, spacing: 10) {
+            HStack {
+                Image(systemName: "checkerboard.rectangle")
+                Text(document.engine.games[Int(document.currentGameIndex)].name)
             }
+            
+            if let opening = document.engine.openingName() {
+                HStack {
+                    Image(systemName: "book")
+                    Text(opening)
+                }
+            }
+            
             List(document.moveNodes.moveNodes, children: \FullMoveItem.children) { item in
                 FullMoveItemView(item: item, currentMoveUUID: document.engine.currentMoveNodeUUID())
             }
+            
             Spacer()
+            
             if document.mode.value == .play {
                 HStack() {
                     Image(systemName: "cpu")
                     Text(value())
                 }
-                .padding(.bottom)
                 HStack {
                     Text(Image(systemName: "speedometer"))
                     Text(speed())
