@@ -19,6 +19,7 @@
     if (self = [super init]) {
         self.moveNumber = node.moveNumber;
         self.whiteMove = MOVE_COLOR(node.move) == WHITE;
+        self.uuid = node.uuid;
         self.name = NSStringFromString(FPGN::to_string(node.move, FPGN::SANType::tight));
         self.comment = NSStringFromString(node.comment);
         self.variations = [NSMutableArray array];

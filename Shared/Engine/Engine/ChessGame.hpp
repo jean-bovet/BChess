@@ -51,7 +51,12 @@ public:
     // that a game represents. A node has a move associated with it, including
     // the next move node (or move nodes if there is more than one variation).
     struct MoveNode {
-        // The move number
+        // Unique ID for this move node, used to identify uniquely this node
+        // across any variations. For example, this is used to indicate
+        // which move node is the current one in the game.
+        unsigned int uuid;
+        
+        // The full move number
         unsigned moveNumber;
         
         // The move itself
@@ -149,6 +154,14 @@ public:
         return move;
     }
     
+    unsigned int getCurrentMoveUUID() {
+        unsigned int uuid = 0;
+        root.lookupNode(0, moveIndexes.moveCursor, moveIndexes, [&uuid](auto & node) {
+            uuid = node.uuid;
+        });
+        return uuid;
+    }
+    
     MoveNode getRoot() {
         return root;
     }
@@ -182,6 +195,20 @@ private:
     MoveNode root;
     MoveIndexes moveIndexes;
 
+    // Unique ID for each generated move.
+    // Simply incrementing this variable
+    // is sufficient.
+    unsigned int moveUUID;
+
+    unsigned int nextMoveUUID() {
+        if (moveUUID < UINT_MAX) {
+            moveUUID++;
+        } else {
+            moveUUID = 0;
+        }
+        return moveUUID;
+    }
+    
     void replayMoves();
 };
 

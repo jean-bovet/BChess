@@ -15,6 +15,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, readwrite) NSUInteger moveNumber;
 @property (nonatomic, readwrite) BOOL whiteMove;
+@property (nonatomic, readwrite) NSUInteger uuid;
 @property (nonatomic, strong, readwrite) NSString * _Nonnull name;
 @property (nonatomic, strong, readwrite) NSString * _Nonnull comment;
 @property (nonatomic, strong, readwrite) NSMutableArray<FEngineMoveNode*> * _Nonnull variations;

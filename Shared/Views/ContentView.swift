@@ -38,9 +38,7 @@ struct ContentView: View {
             
             if (showInfo) {
                 VStack(alignment: .leading) {
-                    if (document.mode.value != .play) {
-                        AnalyzeActionsView(document: $document)
-                    }
+                    AnalyzeActionsView(document: $document)
                     
                     InformationView(document: document)
                 }

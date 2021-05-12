@@ -43,6 +43,7 @@ typedef void(^FEngineDidUpdateCallback)();
 
 - (NSString* _Nonnull)PGNFormattedForDisplay;
 - (NSArray<FEngineMoveNode*>* _Nonnull)moveNodesTree;
+- (NSUInteger)currentMoveNodeUUID;
 
 - (NSArray<FEngineMove*>* _Nonnull)allMoves;
 - (NSArray<FEngineMove*>* _Nonnull)movesAt:(NSUInteger)rank file:(NSUInteger)file;

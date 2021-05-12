@@ -67,7 +67,7 @@ struct InformationView: View {
                     .padding(.bottom)
             }
             List(document.moveNodes.moveNodes, children: \FullMoveItem.children) { item in
-                FullMoveItemView(item: item)
+                FullMoveItemView(item: item, currentMoveUUID: document.engine.currentMoveNodeUUID())
                     .font(.system(.body, design: .monospaced))
             }
             Spacer()

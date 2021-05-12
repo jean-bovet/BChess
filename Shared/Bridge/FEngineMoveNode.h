@@ -13,6 +13,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface FEngineMoveNode: NSObject
 @property (nonatomic, readonly) NSUInteger moveNumber;
 @property (nonatomic, readonly) BOOL whiteMove;
+@property (nonatomic, readonly) NSUInteger uuid;
 @property (nonatomic, strong, readonly) NSString * _Nonnull name;
 @property (nonatomic, strong, readonly) NSString * _Nonnull comment;
 @property (nonatomic, strong, readonly) NSArray<FEngineMoveNode*> * _Nonnull variations;

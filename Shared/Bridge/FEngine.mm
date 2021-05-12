@@ -125,6 +125,10 @@
     return rootNode.variations;
 }
 
+- (NSUInteger)currentMoveNodeUUID {
+    return engine.game.getCurrentMoveUUID();
+}
+
 #pragma mark -
 
 - (NSString*)state {
