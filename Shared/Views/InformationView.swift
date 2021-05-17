@@ -74,8 +74,8 @@ struct InformationView: View {
                 }
             }
             
-            List(document.moveNodes.moveNodes, children: \FullMoveItem.children) { item in
-                FullMoveItemView(item: item, currentMoveUUID: document.engine.currentMoveNodeUUID())
+            List(document.game.moves, children: \FullMove.children) { item in
+                FullMoveView(item: item, currentMoveUUID: document.engine.currentMoveNodeUUID())
             }
             
             Spacer()

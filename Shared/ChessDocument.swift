@@ -48,6 +48,16 @@ struct GameMode {
     var value: Value = .play
 }
 
+// Structure used to hold information about the current variations
+// that the user can choose a move from. This is used when the user
+// move forward in a game and a choice must be made because more than
+// one move is available as the next move.
+struct Variations {
+    var show = false
+    var selectedVariationIndex = 0
+    var variations = [FEngineMoveNode]()
+}
+
 struct ChessDocument: FileDocument {
     
     static let startPosPGN = "*"
@@ -56,14 +66,14 @@ struct ChessDocument: FileDocument {
         
     var pgn: String {
         didSet {
-            moveNodes.rebuild(engine: engine)
+            game.rebuild(engine: engine)
         }
     }
     
     var currentGameIndex: UInt = 0 {
         didSet {
             engine.currentGameIndex = currentGameIndex
-            moveNodes.rebuild(engine: engine)
+            game.rebuild(engine: engine)
         }
     }
     
@@ -75,7 +85,8 @@ struct ChessDocument: FileDocument {
     var selection = Selection.empty()
     var lastMove: FEngineMove? = nil
     var info: FEngineInfo? = nil
-    var moveNodes = MoveNodes()
+    var game = Game()
+    var variations = Variations()
     
     var mode: GameMode
     
@@ -96,7 +107,7 @@ struct ChessDocument: FileDocument {
         self.rotated = rotated
         self.mode = mode
 
-        moveNodes.rebuild(engine: engine)
+        game.rebuild(engine: engine)
         
         loadOpenings()
     }

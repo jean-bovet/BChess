@@ -1,20 +1,20 @@
 //
-//  FullMoveItem.swift
+//  FullMove.swift
 //  BChess
 //
-//  Created by Jean Bovet on 5/10/21.
+//  Created by Jean Bovet on 5/16/21.
 //  Copyright © 2021 Jean Bovet. All rights reserved.
 //
 
 import SwiftUI
 
-final class FullMoveItem: Identifiable {
-    let id = UUID()
+final class FullMove: Identifiable {
+    let id: String
     
     var whiteMove: FEngineMoveNode?
     var blackMove: FEngineMoveNode?
     
-    var children: [FullMoveItem]?
+    var children: [FullMove]?
     var hasChildren: Bool {
         if let c = children {
             return !c.isEmpty
@@ -39,6 +39,10 @@ final class FullMoveItem: Identifiable {
         }
     }
 
+    init(id: String) {
+        self.id = id
+    }
+    
     func normalizeComment(comment: String) -> String {
         let nc = comment.components(separatedBy: .newlines)
             .joined(separator: " ")
@@ -50,7 +54,7 @@ final class FullMoveItem: Identifiable {
         }
     }
     
-    func canMergeWithNext(item: FullMoveItem) -> Bool {
+    func canMergeWithNext(item: FullMove) -> Bool {
         guard let wm = whiteMove else {
             return false
         }
@@ -76,9 +80,9 @@ final class FullMoveItem: Identifiable {
     }
 }
 
-extension Array where Element == FullMoveItem {
+extension Array where Element == FullMove {
     
-    mutating func add(element: FullMoveItem) {
+    mutating func add(element: FullMove) {
         if let lastElement = last {
             if lastElement.hasChildren {
                 append(element)
@@ -92,36 +96,4 @@ extension Array where Element == FullMoveItem {
             append(element)
         }
     }
-}
-
-class MoveNodes: ObservableObject {
-    
-    @Published var moveNodes = [FullMoveItem]()
-        
-    func rebuild(engine: FEngine) {
-        moveNodes.removeAll()
-        moveNodes = moveItems(engine: engine)
-    }
-    
-    func moveItems(engine: FEngine) -> [FullMoveItem] {
-        var items = [FullMoveItem]()
-        for node in engine.moveNodesTree() {
-            items.add(element: moveItems(from: node, engine: engine))
-        }
-        return items
-    }
-    
-    func moveItems(from: FEngineMoveNode, engine: FEngine) -> FullMoveItem {
-        var children = [FullMoveItem]()
-        for childNode in from.variations {
-            let child = moveItems(from: childNode, engine: engine)
-            children.add(element: child)
-        }
-        let item = FullMoveItem()
-        item.whiteMove = from.whiteMove ? from : nil
-        item.blackMove = from.whiteMove ? nil : from
-        item.children = children.isEmpty ? nil : children
-        return item
-    }
-    
 }

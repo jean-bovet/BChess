@@ -19,6 +19,10 @@
     if (self = [super init]) {
         self.moveNumber = node.moveNumber;
         self.whiteMove = MOVE_COLOR(node.move) == WHITE;
+        self.fromFile = FileFrom(MOVE_FROM(node.move));
+        self.fromRank = RankFrom(MOVE_FROM(node.move));
+        self.toFile = FileFrom(MOVE_TO(node.move));
+        self.toRank = RankFrom(MOVE_TO(node.move));
         self.uuid = node.uuid;
         self.name = NSStringFromString(FPGN::to_string(node.move, FPGN::SANType::tight));
         self.comment = NSStringFromString(node.comment);

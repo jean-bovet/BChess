@@ -223,11 +223,16 @@
     return engine.game().canMoveTo([self gameDirection:direction]);
 }
 
-- (void)moveTo:(Direction)direction {
+- (void)moveTo:(Direction)direction variation:(NSUInteger)variation {
     // TODO: handle the cancel with a callback when the cancel actually really happened
     [self cancel];
-    engine.game().moveTo([self gameDirection:direction]);
+    engine.game().moveTo([self gameDirection:direction], (unsigned int)variation);
     [self fireUpdate:self.stateIndex];
+}
+
+- (UInt)moveUUID:(Direction)direction {
+    auto nextIndexes = engine.game().moveIndexesTo([self gameDirection:direction]);
+    return engine.game().getMoveUUID(nextIndexes);
 }
 
 #pragma mark -

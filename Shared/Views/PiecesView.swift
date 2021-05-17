@@ -56,7 +56,7 @@ struct PiecesView: View {
         for rank in 0...7 {
             for file in 0...7 {
                 let piece = pieces.piece(atRank: rank, file: file)
-                let square = Square(rank: rank, file: file, piece: piece)
+                let square = Square(position: Position(rank: rank, file: file), piece: piece)
                 squares.append(square)
             }
         }
@@ -128,14 +128,14 @@ struct PiecesView: View {
             let yOffset: CGFloat = (geometry.size.height - minSize) / 2
             let b: [Square] = board(withPieces: document.pieces)
             ForEach(b) { square in
-                let x = CGFloat(square.file.actual(rotated: document.rotated)) * squareSize + xOffset
-                let y = CGFloat(7 - square.rank.actual(rotated: document.rotated)) * squareSize + yOffset
+                let x = CGFloat(square.position.file.actual(rotated: document.rotated)) * squareSize + xOffset
+                let y = CGFloat(7 - square.position.rank.actual(rotated: document.rotated)) * squareSize + yOffset
                 SquareView(piece: square.piece)
                     .frame(width: squareSize, height: squareSize)
                     .offset(x: x,
                             y: y)
                     .onTapGesture {
-                        processTap(square.rank, square.file)
+                        processTap(square.position.rank, square.position.file)
                     }
             }
         }

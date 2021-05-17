@@ -143,23 +143,46 @@ bool ChessGame::canMoveTo(Direction direction) {
     }
 }
 
-void ChessGame::moveTo(Direction direction) {
+void ChessGame::moveTo(Direction direction, unsigned variationIndex) {
     assert(canMoveTo(direction));
     switch (direction) {
         case Direction::start:
             moveIndexes.moveCursor = 0;
+            moveIndexes.resetToMainVariation();
             break;
         case Direction::end:
             moveIndexes.moveCursor = (int)moveIndexes.moves.size();
             break;
         case Direction::backward:
             moveIndexes.moveCursor--;
+            moveIndexes.resetToMainVariation();
             break;
         case Direction::forward:
+            moveIndexes.moves[moveIndexes.moveCursor] = variationIndex;
             moveIndexes.moveCursor++;
             break;
     }
     replayMoves();
+}
+
+ChessGame::MoveIndexes ChessGame::moveIndexesTo(Direction direction) {
+    assert(canMoveTo(direction));
+    MoveIndexes newIndexes = moveIndexes;
+    switch (direction) {
+        case Direction::start:
+            newIndexes.moveCursor = 0;
+            break;
+        case Direction::end:
+            newIndexes.moveCursor = (int)newIndexes.moves.size();
+            break;
+        case Direction::backward:
+            newIndexes.moveCursor--;
+            break;
+        case Direction::forward:
+            newIndexes.moveCursor++;
+            break;
+    }
+    return newIndexes;
 }
 
 void ChessGame::replayMoves() {

@@ -62,8 +62,12 @@ typedef NS_ENUM(NSInteger, Direction){
 - (NSArray<FEngineMove*>* _Nonnull)movesAt:(NSUInteger)rank file:(NSUInteger)file;
 - (void)move:(NSUInteger)move;
 
+// Returns YES if a move in the specified direction can be performed
 - (BOOL)canMoveTo:(Direction)direction;
-- (void)moveTo:(Direction)direction;
+// Perform the next move given the direction and variation index
+- (void)moveTo:(Direction)direction variation:(NSUInteger)variation;
+// Returns the next move UUID given the direction
+- (UInt)moveUUID:(Direction)direction;
 
 - (void)move:(NSString* _Nonnull)from to:(NSString* _Nonnull)to;
 

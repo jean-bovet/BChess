@@ -1,5 +1,5 @@
 //
-//  FullMoveItemView.swift
+//  FullMoveView.swift
 //  BChess
 //
 //  Created by Jean Bovet on 5/10/21.
@@ -8,9 +8,9 @@
 
 import SwiftUI
 
-struct FullMoveItemView: View {
+struct FullMoveView: View {
     
-    var item: FullMoveItem
+    var item: FullMove
     var currentMoveUUID: UInt
     
     func moveNameText(node: FEngineMoveNode) -> Text {
@@ -48,8 +48,8 @@ struct FullMoveItemView: View {
     }
 }
 
-struct FullMoveItemView_Previews: PreviewProvider {
+struct FullMoveView_Previews: PreviewProvider {
     static var previews: some View {
-        FullMoveItemView(item: FullMoveItem(), currentMoveUUID: 0)
+        FullMoveView(item: FullMove(id: "foo"), currentMoveUUID: 0)
     }
 }

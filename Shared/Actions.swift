@@ -73,8 +73,29 @@ struct Actions {
                 engine.cancel()
             }
             
-            engine.move(to: to)
-            document.pgn = document.engine.pgnAllGames()
+            if document.variations.show {
+                // If the variations are being show, then move using the selected variation index
+                engine.move(to: to, variation: UInt(document.variations.selectedVariationIndex))
+                document.pgn = document.engine.pgnAllGames()
+                
+                // Hide the variations
+                document.variations.show = false
+                document.variations.selectedVariationIndex = 0
+            } else {
+                // Get the next move UUID
+                let nextMoveUUID = UInt(engine.moveUUID(to))
+                if document.game.hasVariations(moveUUID: nextMoveUUID) {
+                    // If that move has variations - that is, more than one move possible,
+                    // the show these variations to the user who can select one of them.
+                    document.variations.show = true
+                    document.variations.variations = document.game.variations(moveUUID: nextMoveUUID)
+                } else {
+                    // That move has no variations
+                    document.variations.show = false
+                    engine.move(to: to, variation: 0)
+                    document.pgn = document.engine.pgnAllGames()
+                }
+            }
         }
     }
 

@@ -41,6 +41,14 @@ public:
             moveCursor++;
         }
         
+        // Reset the move path identifiers to only use the main variation
+        void resetToMainVariation() {
+            for (int index=0; index<moves.size(); index++) {
+                moves[index] = 0;
+            }
+        }
+        
+        // Clears all the moves
         void reset() {
             moveCursor = 0;
             moves.clear();
@@ -155,8 +163,12 @@ public:
     }
     
     unsigned int getCurrentMoveUUID() {
+        return getMoveUUID(moveIndexes);
+    }
+    
+    unsigned int getMoveUUID(MoveIndexes indexes) {
         unsigned int uuid = 0;
-        root.lookupNode(0, moveIndexes.moveCursor, moveIndexes, [&uuid](auto & node) {
+        root.lookupNode(0, indexes.moveCursor, indexes, [&uuid](auto & node) {
             uuid = node.uuid;
         });
         return uuid;
@@ -188,7 +200,8 @@ public:
     };
     
     bool canMoveTo(Direction direction);
-    void moveTo(Direction direction);
+    void moveTo(Direction direction, unsigned variationIndex);
+    MoveIndexes moveIndexesTo(Direction direction);
 
     std::string getState();
     

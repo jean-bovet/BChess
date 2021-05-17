@@ -12,7 +12,6 @@ struct Square: Identifiable {
     var id: String {
         return piece?.name ?? "\(UUID())"
     }
-    let rank: Int
-    let file: Int
+    let position: Position
     let piece: Piece?
 }

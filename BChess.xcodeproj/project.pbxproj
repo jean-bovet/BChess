@@ -19,9 +19,15 @@
 		A70A61DB1FD4D49500AFDF0E /* ChessEvaluater.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A70A61C81FD46E3C00AFDF0E /* ChessEvaluater.cpp */; };
 		A70A61DD1FD4D49500AFDF0E /* FFEN.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A70A61B91FD132D200AFDF0E /* FFEN.cpp */; };
 		A70A61DE1FD4D49F00AFDF0E /* magicmoves.c in Sources */ = {isa = PBXBuildFile; fileRef = A7712D411FCB97A900E7E802 /* magicmoves.c */; };
-		A70B41A3264A527900A56E29 /* FullMoveItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A70B41A2264A527900A56E29 /* FullMoveItemView.swift */; };
-		A70B41A4264A527900A56E29 /* FullMoveItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A70B41A2264A527900A56E29 /* FullMoveItemView.swift */; };
+		A70B41A3264A527900A56E29 /* FullMoveView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A70B41A2264A527900A56E29 /* FullMoveView.swift */; };
+		A70B41A4264A527900A56E29 /* FullMoveView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A70B41A2264A527900A56E29 /* FullMoveView.swift */; };
+		A712C25326522F6000E05408 /* FullMove.swift in Sources */ = {isa = PBXBuildFile; fileRef = A712C25226522F6000E05408 /* FullMove.swift */; };
+		A712C25426522F6000E05408 /* FullMove.swift in Sources */ = {isa = PBXBuildFile; fileRef = A712C25226522F6000E05408 /* FullMove.swift */; };
 		A716976D262BFF8C00156BD6 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A716976C262BFF8C00156BD6 /* SettingsView.swift */; };
+		A72C3E022650D78100CB9DB7 /* VariationSelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A72C3E012650D78100CB9DB7 /* VariationSelectionView.swift */; };
+		A72C3E032650D78100CB9DB7 /* VariationSelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A72C3E012650D78100CB9DB7 /* VariationSelectionView.swift */; };
+		A72C3E052650D82B00CB9DB7 /* Variation.swift in Sources */ = {isa = PBXBuildFile; fileRef = A72C3E042650D82B00CB9DB7 /* Variation.swift */; };
+		A72C3E062650D82C00CB9DB7 /* Variation.swift in Sources */ = {isa = PBXBuildFile; fileRef = A72C3E042650D82B00CB9DB7 /* Variation.swift */; };
 		A72E2B57200496CD006CBB1C /* BoardHashTests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A72E2B56200496CC006CBB1C /* BoardHashTests.cpp */; };
 		A731BD3720009856004C13EF /* Tournament.swift in Sources */ = {isa = PBXBuildFile; fileRef = A731BD3620009856004C13EF /* Tournament.swift */; };
 		A731BD392000A513004C13EF /* TournamentEngines.swift in Sources */ = {isa = PBXBuildFile; fileRef = A731BD382000A513004C13EF /* TournamentEngines.swift */; };
@@ -35,8 +41,8 @@
 		A75359851FDC994E008D1DEE /* FENgineInfo+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = A75359831FDC51B2008D1DEE /* FENgineInfo+Extension.swift */; };
 		A75683291FCD28A000CF1408 /* FEngine.mm in Sources */ = {isa = PBXBuildFile; fileRef = A75683281FCD28A000CF1408 /* FEngine.mm */; };
 		A756832D1FD0B3FE00CF1408 /* magicmoves.c in Sources */ = {isa = PBXBuildFile; fileRef = A7712D411FCB97A900E7E802 /* magicmoves.c */; };
-		A757614B264A504D006242F9 /* MoveNodes.swift in Sources */ = {isa = PBXBuildFile; fileRef = A757614A264A504D006242F9 /* MoveNodes.swift */; };
-		A757614C264A504D006242F9 /* MoveNodes.swift in Sources */ = {isa = PBXBuildFile; fileRef = A757614A264A504D006242F9 /* MoveNodes.swift */; };
+		A757614B264A504D006242F9 /* Game.swift in Sources */ = {isa = PBXBuildFile; fileRef = A757614A264A504D006242F9 /* Game.swift */; };
+		A757614C264A504D006242F9 /* Game.swift in Sources */ = {isa = PBXBuildFile; fileRef = A757614A264A504D006242F9 /* Game.swift */; };
 		A757614F264A50E8006242F9 /* FEngineMoveNode.mm in Sources */ = {isa = PBXBuildFile; fileRef = A757614E264A50E8006242F9 /* FEngineMoveNode.mm */; };
 		A7576150264A50E8006242F9 /* FEngineMoveNode.mm in Sources */ = {isa = PBXBuildFile; fileRef = A757614E264A50E8006242F9 /* FEngineMoveNode.mm */; };
 		A7576152264A51BC006242F9 /* FEngineMoveNode+Private.h in Sources */ = {isa = PBXBuildFile; fileRef = A7576151264A51BC006242F9 /* FEngineMoveNode+Private.h */; };
@@ -212,8 +218,11 @@
 		A70A61C91FD46E3C00AFDF0E /* ChessEvaluater.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = ChessEvaluater.hpp; sourceTree = "<group>"; };
 		A70A61CF1FD4AA9600AFDF0E /* FEngineInfo.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FEngineInfo.h; sourceTree = "<group>"; };
 		A70A61D01FD4AA9600AFDF0E /* FEngineInfo.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = FEngineInfo.mm; sourceTree = "<group>"; };
-		A70B41A2264A527900A56E29 /* FullMoveItemView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FullMoveItemView.swift; sourceTree = "<group>"; };
+		A70B41A2264A527900A56E29 /* FullMoveView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FullMoveView.swift; sourceTree = "<group>"; };
+		A712C25226522F6000E05408 /* FullMove.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FullMove.swift; sourceTree = "<group>"; };
 		A716976C262BFF8C00156BD6 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		A72C3E012650D78100CB9DB7 /* VariationSelectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VariationSelectionView.swift; sourceTree = "<group>"; };
+		A72C3E042650D82B00CB9DB7 /* Variation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Variation.swift; sourceTree = "<group>"; };
 		A72E2B56200496CC006CBB1C /* BoardHashTests.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BoardHashTests.cpp; sourceTree = "<group>"; };
 		A731BD3620009856004C13EF /* Tournament.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tournament.swift; sourceTree = "<group>"; };
 		A731BD382000A513004C13EF /* TournamentEngines.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TournamentEngines.swift; sourceTree = "<group>"; };
@@ -228,7 +237,7 @@
 		A753598A1FDCF95E008D1DEE /* Coordinate.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Coordinate.hpp; sourceTree = "<group>"; };
 		A75683271FCD28A000CF1408 /* FEngine.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FEngine.h; sourceTree = "<group>"; };
 		A75683281FCD28A000CF1408 /* FEngine.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = FEngine.mm; sourceTree = "<group>"; };
-		A757614A264A504D006242F9 /* MoveNodes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoveNodes.swift; sourceTree = "<group>"; };
+		A757614A264A504D006242F9 /* Game.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Game.swift; sourceTree = "<group>"; };
 		A757614D264A50E8006242F9 /* FEngineMoveNode.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FEngineMoveNode.h; sourceTree = "<group>"; };
 		A757614E264A50E8006242F9 /* FEngineMoveNode.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = FEngineMoveNode.mm; sourceTree = "<group>"; };
 		A7576151264A51BC006242F9 /* FEngineMoveNode+Private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "FEngineMoveNode+Private.h"; sourceTree = "<group>"; };
@@ -472,6 +481,7 @@
 				A79515EA25ABE41000AEA95F /* Position.swift */,
 				A795160B25ABE55E00AEA95F /* Square.swift */,
 				A795162125ABE59900AEA95F /* PlayAgainst.swift */,
+				A72C3E042650D82B00CB9DB7 /* Variation.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -482,7 +492,8 @@
 				A77F66AC25A832230030E61D /* BChessUIApp.swift */,
 				A716976C262BFF8C00156BD6 /* SettingsView.swift */,
 				A77F66AD25A832240030E61D /* ChessDocument.swift */,
-				A757614A264A504D006242F9 /* MoveNodes.swift */,
+				A757614A264A504D006242F9 /* Game.swift */,
+				A712C25226522F6000E05408 /* FullMove.swift */,
 				A795159D25ABE1D700AEA95F /* PiecesFactory.swift */,
 				A758BB0525AC119C0092714E /* Actions.swift */,
 				A7A30EC125AEB28D00729432 /* ActionsToolbar.swift */,
@@ -569,10 +580,11 @@
 				A79515A825ABE31100AEA95F /* SquareView.swift */,
 				A79515B325ABE34300AEA95F /* TopInformationView.swift */,
 				A79515BE25ABE36700AEA95F /* InformationView.swift */,
-				A70B41A2264A527900A56E29 /* FullMoveItemView.swift */,
+				A70B41A2264A527900A56E29 /* FullMoveView.swift */,
 				A795163C25ABE66600AEA95F /* BoardView.swift */,
 				A79515F525ABE44000AEA95F /* PiecesView.swift */,
 				A7A30EDC25AEBD7C00729432 /* LabelsView.swift */,
+				A72C3E012650D78100CB9DB7 /* VariationSelectionView.swift */,
 				A77F66AE25A832240030E61D /* ContentView.swift */,
 				A7A30F2E25B2BAFC00729432 /* PromotionView.swift */,
 				A746997B2637CCF7007E0058 /* NavigationView.swift */,
@@ -901,19 +913,20 @@
 				A7FE322A25AA96D100A75936 /* ChessBoardHash.cpp in Sources */,
 				A77F66D725A832270030E61D /* ChessDocument.swift in Sources */,
 				A791117C264B923600F97FA7 /* FEngineGame.mm in Sources */,
+				A712C25326522F6000E05408 /* FullMove.swift in Sources */,
 				A791117F264B92E500F97FA7 /* FEngineGame+Private.h in Sources */,
 				A795162225ABE59900AEA95F /* PlayAgainst.swift in Sources */,
 				A746997C2637CCF7007E0058 /* NavigationView.swift in Sources */,
 				A7FE324E25AAD61200A75936 /* FEngineUtility.mm in Sources */,
 				A79515F625ABE44000AEA95F /* PiecesView.swift in Sources */,
 				A7BC72E42636003F008FBBB4 /* NewGameView.swift in Sources */,
-				A757614B264A504D006242F9 /* MoveNodes.swift in Sources */,
+				A757614B264A504D006242F9 /* Game.swift in Sources */,
 				A758BB0625AC119C0092714E /* Actions.swift in Sources */,
 				A79515E025ABE3D300AEA95F /* Selection.swift in Sources */,
 				A7FE320A25AA96C500A75936 /* ChessGame.cpp in Sources */,
 				A7A30EDD25AEBD7C00729432 /* LabelsView.swift in Sources */,
 				A7FE324F25AAD61200A75936 /* FEngineInfo.mm in Sources */,
-				A70B41A3264A527900A56E29 /* FullMoveItemView.swift in Sources */,
+				A70B41A3264A527900A56E29 /* FullMoveView.swift in Sources */,
 				A7FE31EA25AA96B900A75936 /* ChessBoard.cpp in Sources */,
 				A795163D25ABE66600AEA95F /* BoardView.swift in Sources */,
 				A7FE322B25AA96D100A75936 /* FPGN.cpp in Sources */,
@@ -924,9 +937,11 @@
 				A79515BF25ABE36700AEA95F /* InformationView.swift in Sources */,
 				A7FE31EB25AA96B900A75936 /* MoveList.cpp in Sources */,
 				A7FE324D25AAD61200A75936 /* FEngineMove.mm in Sources */,
+				A72C3E052650D82B00CB9DB7 /* Variation.swift in Sources */,
 				A77F66D525A832270030E61D /* BChessUIApp.swift in Sources */,
 				A79515A925ABE31100AEA95F /* SquareView.swift in Sources */,
 				A7FE320C25AA96C500A75936 /* ChessState.cpp in Sources */,
+				A72C3E022650D78100CB9DB7 /* VariationSelectionView.swift in Sources */,
 				A7FE326925AAD64500A75936 /* FEngine.mm in Sources */,
 				A79515B425ABE34300AEA95F /* TopInformationView.swift in Sources */,
 				A7FE320B25AA96C500A75936 /* ChessOpenings.cpp in Sources */,
@@ -955,19 +970,20 @@
 				A7FE31DA25AA96B800A75936 /* MoveList.cpp in Sources */,
 				A795162325ABE59900AEA95F /* PlayAgainst.swift in Sources */,
 				A791117D264B923600F97FA7 /* FEngineGame.mm in Sources */,
+				A712C25426522F6000E05408 /* FullMove.swift in Sources */,
 				A7911180264B92E500F97FA7 /* FEngineGame+Private.h in Sources */,
 				A7FE31CB25AA96A800A75936 /* FEngineUtility.mm in Sources */,
 				A746997D2637CCF7007E0058 /* NavigationView.swift in Sources */,
 				A79515F725ABE44000AEA95F /* PiecesView.swift in Sources */,
 				A758BB0725AC119C0092714E /* Actions.swift in Sources */,
 				A716976D262BFF8C00156BD6 /* SettingsView.swift in Sources */,
-				A757614C264A504D006242F9 /* MoveNodes.swift in Sources */,
+				A757614C264A504D006242F9 /* Game.swift in Sources */,
 				A79515E125ABE3D300AEA95F /* Selection.swift in Sources */,
 				A7FE31DB25AA96B800A75936 /* GameHistory.cpp in Sources */,
 				A7A30EDE25AEBD7C00729432 /* LabelsView.swift in Sources */,
 				A7FE321C25AA96D000A75936 /* magicmoves.c in Sources */,
 				A77F66D825A832270030E61D /* ChessDocument.swift in Sources */,
-				A70B41A4264A527900A56E29 /* FullMoveItemView.swift in Sources */,
+				A70B41A4264A527900A56E29 /* FullMoveView.swift in Sources */,
 				A795163E25ABE66600AEA95F /* BoardView.swift in Sources */,
 				A7FE31DC25AA96B800A75936 /* ChessEvaluater.cpp in Sources */,
 				A79515CB25ABE38F00AEA95F /* LastMoveModifier.swift in Sources */,
@@ -978,9 +994,11 @@
 				A7FE31FD25AA96C500A75936 /* ChessState.cpp in Sources */,
 				A7FE321925AA96D000A75936 /* FFEN.cpp in Sources */,
 				A7BC72E52636003F008FBBB4 /* NewGameView.swift in Sources */,
+				A72C3E062650D82C00CB9DB7 /* Variation.swift in Sources */,
 				A77F66D625A832270030E61D /* BChessUIApp.swift in Sources */,
 				A79515AA25ABE31100AEA95F /* SquareView.swift in Sources */,
 				A7FE31D925AA96B800A75936 /* ChessBoard.cpp in Sources */,
+				A72C3E032650D78100CB9DB7 /* VariationSelectionView.swift in Sources */,
 				A7FE31A525AA963F00A75936 /* FEngine.mm in Sources */,
 				A79515B525ABE34300AEA95F /* TopInformationView.swift in Sources */,
 				A77F66DA25A832270030E61D /* ContentView.swift in Sources */,

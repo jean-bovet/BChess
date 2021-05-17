@@ -30,6 +30,7 @@ struct ContentView: View {
                         }
                     LabelsView(document: $document)
                     PiecesView(document: $document)
+                    VariationSelectionView(document: $document)
                 }
                 .padding()
                 .padding(.bottom, 20) // Because the labels are "leaking" a bit below the board space itself
