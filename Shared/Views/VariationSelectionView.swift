@@ -46,12 +46,12 @@ struct VariationSelectionView: View {
                             document.variations.selectedVariationIndex = v.index
                             Actions(document: $document).move(to: .forward)
                         }
-
-                    Path { path in
-                        path.move(to: CGPoint(x: x1, y: y1))
-                        path.addLine(to: CGPoint(x: x2, y: y2))
-                    }
-                    .stroke(Color.blue, lineWidth: 10)
+                    
+                    let p = Arrow(start: CGPoint(x: x1, y: y1),
+                                       end: CGPoint(x: x2, y: y2),
+                                       length: squareSize*0.4).path
+                    p.fill(Color.blue)
+                    p.stroke(Color.blue, lineWidth: 10)
                 }
             }
         }

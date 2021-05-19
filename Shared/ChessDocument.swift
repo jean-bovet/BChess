@@ -53,7 +53,11 @@ struct GameMode {
 // move forward in a game and a choice must be made because more than
 // one move is available as the next move.
 struct Variations {
-    var show = false
+    var show = false {
+        didSet {
+            selectedVariationIndex = 0
+        }
+    }
     var selectedVariationIndex = 0
     var variations = [FEngineMoveNode]()
 }

@@ -80,7 +80,6 @@ struct Actions {
                 
                 // Hide the variations
                 document.variations.show = false
-                document.variations.selectedVariationIndex = 0
             } else {
                 // Get the next move UUID
                 let nextMoveUUID = UInt(engine.moveUUID(to))

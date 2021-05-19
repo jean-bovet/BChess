@@ -23,6 +23,8 @@
 		A70B41A4264A527900A56E29 /* FullMoveView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A70B41A2264A527900A56E29 /* FullMoveView.swift */; };
 		A712C25326522F6000E05408 /* FullMove.swift in Sources */ = {isa = PBXBuildFile; fileRef = A712C25226522F6000E05408 /* FullMove.swift */; };
 		A712C25426522F6000E05408 /* FullMove.swift in Sources */ = {isa = PBXBuildFile; fileRef = A712C25226522F6000E05408 /* FullMove.swift */; };
+		A712C256265377C000E05408 /* Arrow.swift in Sources */ = {isa = PBXBuildFile; fileRef = A712C255265377C000E05408 /* Arrow.swift */; };
+		A712C257265377C000E05408 /* Arrow.swift in Sources */ = {isa = PBXBuildFile; fileRef = A712C255265377C000E05408 /* Arrow.swift */; };
 		A716976D262BFF8C00156BD6 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A716976C262BFF8C00156BD6 /* SettingsView.swift */; };
 		A72C3E022650D78100CB9DB7 /* VariationSelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A72C3E012650D78100CB9DB7 /* VariationSelectionView.swift */; };
 		A72C3E032650D78100CB9DB7 /* VariationSelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A72C3E012650D78100CB9DB7 /* VariationSelectionView.swift */; };
@@ -220,6 +222,7 @@
 		A70A61D01FD4AA9600AFDF0E /* FEngineInfo.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = FEngineInfo.mm; sourceTree = "<group>"; };
 		A70B41A2264A527900A56E29 /* FullMoveView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FullMoveView.swift; sourceTree = "<group>"; };
 		A712C25226522F6000E05408 /* FullMove.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FullMove.swift; sourceTree = "<group>"; };
+		A712C255265377C000E05408 /* Arrow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Arrow.swift; sourceTree = "<group>"; };
 		A716976C262BFF8C00156BD6 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		A72C3E012650D78100CB9DB7 /* VariationSelectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VariationSelectionView.swift; sourceTree = "<group>"; };
 		A72C3E042650D82B00CB9DB7 /* Variation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Variation.swift; sourceTree = "<group>"; };
@@ -588,6 +591,7 @@
 				A77F66AE25A832240030E61D /* ContentView.swift */,
 				A7A30F2E25B2BAFC00729432 /* PromotionView.swift */,
 				A746997B2637CCF7007E0058 /* NavigationView.swift */,
+				A712C255265377C000E05408 /* Arrow.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -949,6 +953,7 @@
 				A7FE322C25AA96D100A75936 /* magicmoves.c in Sources */,
 				A77F66D925A832270030E61D /* ContentView.swift in Sources */,
 				A757614F264A50E8006242F9 /* FEngineMoveNode.mm in Sources */,
+				A712C256265377C000E05408 /* Arrow.swift in Sources */,
 				A79515D525ABE3A400AEA95F /* SelectionModifier.swift in Sources */,
 				A775237625AD68FA009BFFD1 /* Animation.swift in Sources */,
 				A795161725ABE57C00AEA95F /* ConditionalView.swift in Sources */,
@@ -1006,6 +1011,7 @@
 				A7FE31FB25AA96C500A75936 /* ChessGame.cpp in Sources */,
 				A7FE31FC25AA96C500A75936 /* ChessOpenings.cpp in Sources */,
 				A7576150264A50E8006242F9 /* FEngineMoveNode.mm in Sources */,
+				A712C257265377C000E05408 /* Arrow.swift in Sources */,
 				A79515D625ABE3A400AEA95F /* SelectionModifier.swift in Sources */,
 				A775237725AD68FA009BFFD1 /* Animation.swift in Sources */,
 				A795161825ABE57C00AEA95F /* ConditionalView.swift in Sources */,
