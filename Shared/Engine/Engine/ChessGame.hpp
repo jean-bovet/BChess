@@ -212,7 +212,7 @@ private:
     // Unique ID for each generated move.
     // Simply incrementing this variable
     // is sufficient.
-    unsigned int moveUUID;
+    unsigned int moveUUID = 0;
 
     unsigned int nextMoveUUID() {
         if (moveUUID < UINT_MAX) {
