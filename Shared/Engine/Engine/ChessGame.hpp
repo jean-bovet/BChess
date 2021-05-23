@@ -82,8 +82,7 @@ public:
         typedef std::function<void(MoveNode &node)> NodeCallback;
         typedef std::function<void(MoveNode &node, int cursor)> NodeCallback2;
 
-        // Find the node that represents the move at `atIndex`. Note that `atIndex==0` represents
-        // the "root" node, which is not a move. The first move is actually at `atIndex==1`.
+        // Find the node that represents the move at `atIndex`.
         // cursor: the cursor used to keep track of the current index while recursively looking up
         void lookupNode(int cursor, int atIndex, MoveIndexes indexes, NodeCallback callback) {
             if (cursor == atIndex) {
@@ -99,9 +98,9 @@ public:
             if (cursor < untilCursorIndex) {
                 int varIndex = indexes.moves[cursor];
                 assert(varIndex < variations.size());
-                // TODO: revisit the cursor+1 which is needed because the root node is at cursor==0
-                callback(variations[varIndex], cursor+1);
-                variations[varIndex].visit(cursor+1, indexes, untilCursorIndex, callback);
+                auto & node = variations[varIndex];
+                callback(node, cursor);
+                node.visit(cursor+1, indexes, untilCursorIndex, callback);
             }
         }
         
@@ -180,7 +179,9 @@ public:
     void setCurrentMoveUUID(unsigned int uuid) {
         root.visit(0, moveIndexes, (int)moveIndexes.moves.size(), [this, &uuid](auto & node, auto cursor) {
             if (node.uuid == uuid) {
-                moveIndexes.moveCursor = cursor;
+                // Add one to the current cursor because cursor==0 represents the root node
+                // which is not a move. The first real move starts at cursor==1.
+                moveIndexes.moveCursor = cursor + 1;
             }
         });
     }
