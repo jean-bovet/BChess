@@ -81,6 +81,14 @@ struct ChessDocument: FileDocument {
         }
     }
     
+    var currentMoveIndex: UInt = 0 {
+        didSet {
+            engine.currentMoveNodeUUID = currentMoveIndex
+            selection = Selection.empty()
+            variations.show = false
+        }
+    }
+    
     var whitePlayer: GamePlayer
     var blackPlayer: GamePlayer
 

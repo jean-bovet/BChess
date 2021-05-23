@@ -40,6 +40,8 @@ typedef NS_ENUM(NSInteger, Direction){
 @property (nonatomic, strong, readonly) NSArray<FEngineGame*>* _Nonnull games;
 @property (nonatomic, assign) NSUInteger currentGameIndex;
 
+@property (nonatomic, assign) NSUInteger currentMoveNodeUUID;
+
 - (id _Nonnull)init;
 
 - (BOOL)loadOpening:(NSString* _Nonnull)pgn;
@@ -56,7 +58,6 @@ typedef NS_ENUM(NSInteger, Direction){
 
 - (NSString* _Nonnull)PGNFormattedForDisplay;
 - (NSArray<FEngineMoveNode*>* _Nonnull)moveNodesTree;
-- (NSUInteger)currentMoveNodeUUID;
 
 - (NSArray<FEngineMove*>* _Nonnull)allMoves;
 - (NSArray<FEngineMove*>* _Nonnull)movesAt:(NSUInteger)rank file:(NSUInteger)file;

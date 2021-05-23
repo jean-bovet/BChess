@@ -55,7 +55,7 @@ std::vector<Move> ChessGame::movesAt(File file, Rank rank) {
 std::vector<Move> ChessGame::allMoves() {
     std::vector<Move> all;
     MoveNode currentNode = root;
-    root.visit(0, moveIndexes, [&all](auto & node) {
+    root.visit(0, moveIndexes, moveIndexes.moveCursor, [&all](auto & node, int cursor) {
         all.push_back(node.move);
     });
     return all;

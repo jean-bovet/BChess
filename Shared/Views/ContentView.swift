@@ -40,7 +40,7 @@ struct ContentView: View {
             if (showInfo) {
                 VStack(alignment: .leading, spacing: 10) {
                     NavigationView(document: $document)                    
-                    InformationView(document: document)
+                    InformationView(document: $document)
                 }
                 .frame(minWidth: 350, idealWidth: 350, maxWidth: 350, alignment: .leading)
             }

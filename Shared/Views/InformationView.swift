@@ -10,13 +10,13 @@ import SwiftUI
 
 struct InformationView: View {
     
-    let document: ChessDocument
+    @Binding var document: ChessDocument
 
     let numberFormatter = NumberFormatter()
     let valueFormatter = NumberFormatter()
 
-    init(document: ChessDocument) {
-        self.document = document
+    init(document: Binding<ChessDocument>) {
+        self._document = document
         
         numberFormatter.numberStyle = .decimal
         numberFormatter.groupingSeparator = ","
@@ -75,7 +75,10 @@ struct InformationView: View {
             }
             
             List(document.game.moves, children: \FullMove.children) { item in
-                FullMoveView(item: item, currentMoveUUID: document.engine.currentMoveNodeUUID())
+                FullMoveView(item: item, currentMoveUUID: document.engine.currentMoveNodeUUID)
+                    .onTapGesture {
+                        document.currentMoveIndex = UInt(item.id)!
+                    }
             }
             
             Spacer()
@@ -98,11 +101,11 @@ struct BottomInformationView_Previews: PreviewProvider {
     static var previews: some View {
         Group {
             let doc = ChessDocument(pgn: "1. e4 e5 *")
-            InformationView(document: doc)
+            InformationView(document: .constant(doc))
         }
         Group {
             let doc = ChessDocument(pgn: "1. e4 e5 2. Nf3 Nf6 3. Nxe5 d6 4. Nc3 dxe5 *")
-            InformationView(document: doc)
+            InformationView(document: .constant(doc))
         }
     }
 }

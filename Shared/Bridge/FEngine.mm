@@ -37,6 +37,7 @@
 
 @synthesize games;
 @synthesize currentGameIndex;
+@synthesize currentMoveNodeUUID;
 
 + (void)initialize {
     if (self == [FEngine class]) {
@@ -158,6 +159,10 @@
     FEngineMoveNode *rootNode = [[FEngineMoveNode alloc] initWithNode:root];
     [self moveNodesFromNode:root mainLine:rootNode];
     return rootNode.variations;
+}
+
+- (void)setCurrentMoveNodeUUID:(NSUInteger)currentMoveNodeUUID {
+    engine.game().setCurrentMoveUUID((unsigned int)currentMoveNodeUUID);
 }
 
 - (NSUInteger)currentMoveNodeUUID {
