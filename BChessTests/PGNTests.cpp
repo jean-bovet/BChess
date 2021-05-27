@@ -355,5 +355,5 @@ TEST_F(PGN, MovesWithConsecutiveComments) {
     ASSERT_EQ(4, game.getNumberOfMoves());
 
     auto pgnAgain = FPGN::getGame(game, FPGN::Formatting::history);
-    ASSERT_EQ("1. e4 e5 2. Nf3 Nc6 *", pgnAgain);
+    ASSERT_EQ("1. e4 e5 2. Nf3 Nc6 { and  the  game  continues } *", pgnAgain);
 }

@@ -594,7 +594,7 @@ bool FPGN::parseMoveText() {
     }
 
     std::string comment;
-    parseComment(comment); // optional
+    while (parseComment(comment)) { } // optional
 
     game.move(whiteMove, comment, false);
 
@@ -642,7 +642,7 @@ bool FPGN::parseMoveText() {
     //    game.board.print();
 
     comment = "";
-    parseComment(comment); // optional
+    while (parseComment(comment)) { } // optional
 
     game.move(blackMove, comment, false);
 
@@ -658,7 +658,6 @@ bool FPGN::parseComment(std::string & comment) {
     
     if (character() == '{') {
         cursor++;
-        comment = "";
         if (!parseUntil(pgn, cursor, comment, '}')) {
             RETURN_FAILURE("Unable to parse until a specific character")
         }
