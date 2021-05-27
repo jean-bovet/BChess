@@ -373,6 +373,30 @@ bool FPGN::parseTerminationMarker() {
     }
 }
 
+bool FPGN::parseMoveAnnotation() {
+    if (pgn[cursor] == '?' && pgn[cursor+1] == '!') {
+        cursor += 2;
+        return true;
+    } else if (pgn[cursor] == '!' && pgn[cursor+1] == '?') {
+        cursor += 2;
+        return true;
+    } else if (pgn[cursor] == '!' && pgn[cursor+1] == '!') {
+        cursor += 2;
+        return true;
+    } else if (pgn[cursor] == '?' && pgn[cursor+1] == '?') {
+        cursor += 2;
+        return true;
+    } else if (pgn[cursor] == '!') {
+        cursor++;
+        return true;
+    } else if (pgn[cursor] == '?') {
+        cursor++;
+        return true;
+    } else {
+        return false;
+    }
+}
+
 bool FPGN::parseMove(Move &move) {
     PARSE_BEGIN
         
@@ -458,6 +482,8 @@ bool FPGN::parseMove(Move &move) {
     // 8.2.3.5: Check and checkmate indication characters
     if (isCheckOrMate(pgn[cursor])) {
         cursor++;
+    } else if (parseMoveAnnotation()) {
+        // Check for annotation style (ie g6?!)
     }
     
     // Handle promotion

@@ -47,7 +47,8 @@ public:
     bool parseMoveNumber(unsigned &moveNumber, bool &isMoveForBlack);
     bool parsePiece(Piece &p);
     bool parseMove(Move &move);
-    
+    bool parseMoveAnnotation();
+
     bool parseTerminationMarker();
     bool parseComment(std::string & comment);
     

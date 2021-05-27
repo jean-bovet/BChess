@@ -333,3 +333,27 @@ TEST_F(PGN, Game1) {
     auto pgnAgain = FPGN::getGame(game, FPGN::Formatting::history);
     ASSERT_EQ("1. e4 e5 2. Nf3 Nc6 3. Nc3 Nf6 4. Bc4 Nxe4 5. Nxe4 d5 6. Bxd5 Qxd5 7. Nc3 Qd6 8. O-O Bg4 9. h3 Bh5 10. Nb5 Qe7 11. c3 O-O-O 12. Qc2 Qf6 13. Nh2 Be2 14. Nxa7+ Nxa7 15. Re1 Bd3 16. Qa4 Bc5 17. Ng4 Qh4 18. b4 Bb6 19. Rxe5 h5 20. Ne3 Rh6 21. Bb2 Rf6 22. f3 Rxf3 23. Re8 Qf2+ 24. Kh1 Rg3 25. Rd1 Qxg2+ 26. Nxg2 Rxh3# 0-1", pgnAgain);
 }
+
+TEST_F(PGN, MovesWithAnnotationSymbols) {
+    std::string pgn = "1.e4 e5! 2.Nf3?? Nc6?! *";
+
+    ChessGame game;
+    ASSERT_TRUE(FPGN::setGame(pgn, game));
+    
+    ASSERT_EQ(4, game.getNumberOfMoves());
+
+    auto pgnAgain = FPGN::getGame(game, FPGN::Formatting::history);
+    ASSERT_EQ("1. e4 e5 2. Nf3 Nc6 *", pgnAgain);
+}
+
+TEST_F(PGN, MovesWithConsecutiveComments) {
+    std::string pgn = "1.e4 e5 2.Nf3 Nc6 { and } { the } { game } { continues } *";
+
+    ChessGame game;
+    ASSERT_TRUE(FPGN::setGame(pgn, game));
+    
+    ASSERT_EQ(4, game.getNumberOfMoves());
+
+    auto pgnAgain = FPGN::getGame(game, FPGN::Formatting::history);
+    ASSERT_EQ("1. e4 e5 2. Nf3 Nc6 *", pgnAgain);
+}
