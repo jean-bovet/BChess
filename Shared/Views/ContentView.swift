@@ -66,15 +66,15 @@ struct ContentView_Previews: PreviewProvider {
     
     static var previews: some View {
         Group {
-            let doc = ChessDocument(mode: GameMode(value: .analyze))
+            let doc = try! ChessDocument(mode: GameMode(value: .analyze))
             ContentView(document: .constant(doc))
         }
         Group {
-            let doc = ChessDocument(mode: GameMode(value: .train))
+            let doc = try! ChessDocument(mode: GameMode(value: .train))
             ContentView(document: .constant(doc))
         }
         Group {
-            let doc = ChessDocument(rotated: true)
+            let doc = try! ChessDocument(rotated: true)
             ContentView(document: .constant(doc))
         }
     }

@@ -51,7 +51,7 @@ struct NavigationView: View {
 
 struct NavigationView_Previews: PreviewProvider {
     static var previews: some View {
-        let doc = ChessDocument()
+        let doc = try! ChessDocument()
         NavigationView(document: .constant(doc))
     }
 }

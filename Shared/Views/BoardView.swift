@@ -43,7 +43,7 @@ struct BoardView: View {
 
 struct BoardView_Previews: PreviewProvider {
     static var previews: some View {
-        let doc = ChessDocument()
+        let doc = try! ChessDocument()
         BoardView(document: .constant(doc))
     }
 }

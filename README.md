@@ -20,6 +20,7 @@ Enjoy!
 
 ##  What remains to be done
 
+- Filter saving PGN to 80 characters per line
 - Finish Zobrist hashing unit test with all the scenarios: castling, attack, etc.
 - Ensure that when a Game is copied, the history is also copied, not just referenced because it will get messed up (see FEngineInfo)
 - Better handling of openings when a FEN is passed (and the board is not in the expected state for the opening)
@@ -31,3 +32,10 @@ Enjoy!
 - Add more openings
 - Transposition table [here](http://www.chessbin.com/post/Transposition-Table-and-Zobrist-Hashing) and [here](https://chessprogramming.wikispaces.com/Transposition+Table)
 - [Optimization](https://people.cs.clemson.edu/~dhouse/courses/405/papers/optimize.pdf)
+
+## Limitations
+
+- unable to have read-only document (it always want to write it back)
+- background of List is not transparent in Light Mode (it is white)
+- unable to create rich text with support of tapping in it (like to select precisely the white or black move)
+

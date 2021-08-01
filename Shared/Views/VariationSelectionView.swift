@@ -61,7 +61,7 @@ struct VariationSelectionView: View {
 struct VariationSelectionView_Previews: PreviewProvider {
     static var previews: some View {
         Group {
-            let doc = ChessDocument()
+            let doc = try! ChessDocument()
             ZStack {
                 BoardView(document: .constant(doc))
                 PiecesView(document: .constant(doc))

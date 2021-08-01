@@ -111,9 +111,11 @@ struct ChessDocument: FileDocument {
         return PiecesFactory().pieces(forState: engine.state)
     }
     
-    init(pgn: String = startPosPGN, white: GamePlayer? = nil, black: GamePlayer? = nil, rotated: Bool = false, mode: GameMode = GameMode(value: .play)) {
+    init(pgn: String = startPosPGN, white: GamePlayer? = nil, black: GamePlayer? = nil, rotated: Bool = false, mode: GameMode = GameMode(value: .play)) throws {
         self.pgn = pgn
-        self.engine.loadAllGames(pgn)
+        guard self.engine.loadAllGames(pgn) else {
+            throw CocoaError(.fileReadCorruptFile)
+        }
         self.whitePlayer = white ?? GamePlayer(name: "", computer: false, level: 0)
         self.blackPlayer = black ?? GamePlayer(name: "", computer: true, level: 0)
         self.rotated = rotated
@@ -146,9 +148,9 @@ struct ChessDocument: FileDocument {
             let decoder = JSONDecoder()
             let state = try decoder.decode(GameState.self, from: data)
 
-            self.init(pgn: state.pgn, white: state.white, black: state.black, rotated: state.rotated)
+            try self.init(pgn: state.pgn, white: state.white, black: state.black, rotated: state.rotated)
         } else if configuration.contentType == .pgn {
-            self.init(pgn: String(decoding: data, as: UTF8.self),
+            try self.init(pgn: String(decoding: data, as: UTF8.self),
                       white: GamePlayer(name: "", computer: false, level: 0),
                       black: GamePlayer(name: "", computer: false, level: 0))
         } else {

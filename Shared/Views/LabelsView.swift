@@ -51,14 +51,14 @@ struct LabelsView: View {
 struct LabelsView_Previews: PreviewProvider {
     static var previews: some View {
         Group {
-            let doc = ChessDocument()
+            let doc = try! ChessDocument()
             ZStack {
                 BoardView(document: .constant(doc))
                 LabelsView(document: .constant(doc))
             }
         }
         Group {
-            let doc = ChessDocument(rotated: true)
+            let doc = try! ChessDocument(rotated: true)
             ZStack {
                 BoardView(document: .constant(doc))
                 LabelsView(document: .constant(doc))

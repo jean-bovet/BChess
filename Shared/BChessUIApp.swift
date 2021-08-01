@@ -11,7 +11,7 @@ import SwiftUI
 @main
 struct BChessUIApp: App {
     var body: some Scene {
-        DocumentGroup(newDocument: ChessDocument()) { file in            
+        DocumentGroup(newDocument: try! ChessDocument()) { file in            
             ContentView(document: file.$document)
         }
         #if os(macOS)
