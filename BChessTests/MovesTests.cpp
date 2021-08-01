@@ -170,12 +170,22 @@ TEST_F(MovesTests, WhiteKingCastling) {
                 }, "e1"
                 );
     
-    // Black rook attacking b1 (so no queen side castling possible)
+    // Black rook attacking b1 (queen side castling possible)
     assertMoves("1r2k3/8/8/8/8/8/3PPP2/R3K2R w KQ - 0 1",
                 {
                  "1r2k3/8/8/8/8/8/3PPP2/R4RK1 b - - 1 1", // King side
-                 "1r2k3/8/8/8/8/8/3PPP2/R2K3R b - - 1 1",
-                 "1r2k3/8/8/8/8/8/3PPP2/R4K1R b - - 1 1"
+                 "1r2k3/8/8/8/8/8/3PPP2/R2K3R b - - 1 1", // Queen side
+                 "1r2k3/8/8/8/8/8/3PPP2/R4K1R b - - 1 1", // King side
+                 "1r2k3/8/8/8/8/8/3PPP2/2KR3R b - - 1 1", // Queen side
+                }, "e1"
+                );
+    
+    // Black rook attacking b2 (no queen side castling possible)
+    assertMoves("2r1k3/8/8/8/8/8/3PPP2/R3K2R w KQ - 0 1",
+                {
+                 "2r1k3/8/8/8/8/8/3PPP2/R2K3R b - - 1 1", // Queen side
+                 "2r1k3/8/8/8/8/8/3PPP2/R4K1R b - - 1 1", // King side
+                 "2r1k3/8/8/8/8/8/3PPP2/R4RK1 b - - 1 1", // King side
                 }, "e1"
                 );
 }
@@ -203,12 +213,22 @@ TEST_F(MovesTests, BlackKingCastling) {
                 }, "e8"
                 );
     
-    // White rook attacking b8 (so no queen side castling possible)
+    // White rook attacking b8 (queen side castling possible)
     assertMoves("r3k2r/3ppp2/8/8/8/8/8/1R2K3 b kq - 0 1",
                 {
                  "r4rk1/3ppp2/8/8/8/8/8/1R2K3 w - - 1 2", // King side
                  "r4k1r/3ppp2/8/8/8/8/8/1R2K3 w - - 1 2",
-                 "r2k3r/3ppp2/8/8/8/8/8/1R2K3 w - - 1 2"
+                 "r2k3r/3ppp2/8/8/8/8/8/1R2K3 w - - 1 2", // Queen side
+                 "2kr3r/3ppp2/8/8/8/8/8/1R2K3 w - - 1 2"
+                }, "e8"
+                );
+    
+    // White rook attacking c8 (so no queen side castling possible)
+    assertMoves("r3k2r/3ppp2/8/8/8/8/8/2R1K3 b kq - 0 1",
+                {
+                 "r2k3r/3ppp2/8/8/8/8/8/2R1K3 w - - 1 2", // Queen side
+                 "r4k1r/3ppp2/8/8/8/8/8/2R1K3 w - - 1 2", // King side
+                 "r4rk1/3ppp2/8/8/8/8/8/2R1K3 w - - 1 2"
                 }, "e8"
                 );
 }
