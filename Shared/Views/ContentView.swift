@@ -38,11 +38,13 @@ struct ContentView: View {
             }
             
             if (showInfo) {
+#if os(macOS)
                 VStack(alignment: .leading, spacing: 10) {
-                    NavigationView(document: $document)                    
+                    NavigationActionView(document: $document)
                     InformationView(document: $document)
                 }
                 .frame(minWidth: 350, idealWidth: 350, maxWidth: 350, alignment: .leading)
+#endif
             }
         }
         .padding()

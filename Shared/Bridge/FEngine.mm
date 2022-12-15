@@ -235,7 +235,7 @@
     [self fireUpdate:self.stateIndex];
 }
 
-- (UInt)moveUUID:(Direction)direction {
+- (NSUInteger)moveUUID:(Direction)direction {
     auto nextIndexes = engine.game().moveIndexesTo([self gameDirection:direction]);
     return engine.game().getMoveUUID(nextIndexes);
 }

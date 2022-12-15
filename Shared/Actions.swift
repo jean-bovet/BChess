@@ -56,6 +56,37 @@ struct Actions {
         document.lastMove = nil        
     }
 
+    func undoMove() {
+        guard document.engine.canMove(to: .backward) else {
+            return
+        }
+
+        withAnimation {
+            document.selection = Selection.empty()
+            document.lastMove = nil
+
+            if engine.isAnalyzing() {
+                engine.cancel()
+            }
+            document.engine.move(to: .backward, variation: 0)
+            document.pgn = document.engine.pgnAllGames()
+        }
+    }
+
+    func redoMove() {
+        guard document.engine.canMove(to: .forward) else {
+            return
+        }
+        
+        withAnimation {
+            document.selection = Selection.empty()
+            document.lastMove = nil
+
+            document.engine.move(to: .forward, variation: 0)
+            document.pgn = document.engine.pgnAllGames()
+        }
+    }
+    
     func canMove(to: Direction) -> Bool {
         return engine.canMove(to: to);
     }
@@ -124,7 +155,7 @@ struct Actions {
         pb.declareTypes([.string], owner: nil)
         pb.setString(engine.getPGNCurrentGame(), forType: .string)
         #else
-        UIPasteboard.general.string = engine.pgn()
+        UIPasteboard.general.string = engine.getPGNCurrentGame()
         #endif
     }
 

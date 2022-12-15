@@ -79,6 +79,24 @@ struct RotateBoard: View {
     }
 }
 
+struct UndoMoveButton: View {
+    @Binding var document: ChessDocument
+    var body: some View {
+        Button(action: { Actions(document: $document).undoMove() }) {
+            Label("Undo Move", systemImage: "arrow.uturn.backward.square")
+        }.disabled(!document.engine.canMove(to: .backward))
+    }
+}
+
+struct RedoMoveButton: View {
+    @Binding var document: ChessDocument
+    var body: some View {
+        Button(action: { Actions(document: $document).redoMove() }) {
+            Label("Redo Move", systemImage: "arrow.uturn.forward.square")
+        }.disabled(!document.engine.canMove(to: .forward))
+    }
+}
+
 struct CopyFENButton: View {
     @Binding var document: ChessDocument
     var body: some View {

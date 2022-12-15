@@ -10,8 +10,8 @@ import SwiftUI
 import UniformTypeIdentifiers
 
 extension UTType {
-    static var exampleText: UTType {
-        UTType(importedAs: "com.example.plain-text")
+    static var json: UTType {
+        UTType(importedAs: "ch.arizona-software.chess.json")
     }
     static var pgn: UTType {
         UTType(importedAs: "com.apple.chess.pgn")
@@ -137,14 +137,14 @@ struct ChessDocument: FileDocument {
         assert(result)
     }
     
-    static var readableContentTypes: [UTType] { [.exampleText, .pgn] }
+    static var readableContentTypes: [UTType] { [.json, .pgn] }
 
     init(configuration: ReadConfiguration) throws {
         guard let data = configuration.file.regularFileContents else {
             throw CocoaError(.fileReadCorruptFile)
         }
         
-        if configuration.contentType == .exampleText {
+        if configuration.contentType == .json {
             let decoder = JSONDecoder()
             let state = try decoder.decode(GameState.self, from: data)
 
@@ -161,7 +161,7 @@ struct ChessDocument: FileDocument {
     func fileWrapper(configuration: WriteConfiguration) throws -> FileWrapper {
         let pgnToWrite = mode.value != .play ? mode.pgnBeforeAnalyzing : pgn
         switch configuration.contentType {
-        case .exampleText:
+        case .json:
             let state = GameState(pgn: pgnToWrite, rotated: rotated, white: whitePlayer, black: blackPlayer)
             let encoder = JSONEncoder()
             let data = try encoder.encode(state)

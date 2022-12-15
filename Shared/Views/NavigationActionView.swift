@@ -8,7 +8,7 @@
 
 import SwiftUI
 
-struct NavigationView: View {
+struct NavigationActionView: View {
     
     @Binding var document: ChessDocument
     
@@ -49,9 +49,9 @@ struct NavigationView: View {
     }
 }
 
-struct NavigationView_Previews: PreviewProvider {
+struct NavigationActionView_Previews: PreviewProvider {
     static var previews: some View {
         let doc = try! ChessDocument()
-        NavigationView(document: .constant(doc))
+        NavigationActionView(document: .constant(doc))
     }
 }

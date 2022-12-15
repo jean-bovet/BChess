@@ -89,11 +89,11 @@ struct NewGameView_iOS: View {
 struct NewGameView_iOS_Previews: PreviewProvider {
     static var previews: some View {
         Group {
-            let doc = ChessDocument()
+            let doc = try! ChessDocument()
             NewGameView_iOS(document: .constant(doc), editMode: false)
         }
         Group {
-            let doc = ChessDocument()
+            let doc = try! ChessDocument()
             NewGameView_iOS(document: .constant(doc), editMode: true)
         }
     }

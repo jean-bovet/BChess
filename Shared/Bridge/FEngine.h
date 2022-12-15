@@ -68,7 +68,7 @@ typedef NS_ENUM(NSInteger, Direction){
 // Perform the next move given the direction and variation index
 - (void)moveTo:(Direction)direction variation:(NSUInteger)variation;
 // Returns the next move UUID given the direction
-- (UInt)moveUUID:(Direction)direction;
+- (NSUInteger)moveUUID:(Direction)direction;
 
 - (void)move:(NSString* _Nonnull)from to:(NSString* _Nonnull)to;
 
