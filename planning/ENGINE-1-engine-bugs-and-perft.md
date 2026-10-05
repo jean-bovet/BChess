@@ -1,6 +1,10 @@
 # ENGINE-1 — Engine bug fixes, proven by perft
 
-Revision 1 (2026-10-06): first draft, not yet reviewed.
+Revision 2 (2026-10-06): performance-review input folded into the test plan (every depth of each
+perft position, a second captured-rook case on h1, a move-ordering consistency test for B3); its
+deeper hash walk and a Release-only deep perft rejected with measurements; follow-ups renamed
+ENGINE-3 (ENGINE-2 is the UCI plan) and the performance findings added there. Not yet reviewed.
+Revision 1 (2026-10-06): first draft.
 
 Jean's request: "Fix all these engine bugs with perft tests." Six bugs from a code review, plus the
 risks it raised. Every bug below was re-checked against the code on `main` (6da9f7f) and reproduced
@@ -197,6 +201,16 @@ in the one test file that uses it.
 - **Defaulting a missing castling field to `-`** — would change what 2-field FENs did before (KQkq
   on a fresh board and through `ChessGame::setFEN`), so a stored game from such a FEN that castled
   would stop opening. New-board defaults plus the sanity drop keep old behaviour where it was legal.
+- **A deeper hash walk (position 3 d5, Kiwipete d4)** — measured at -O0 after the fix: 1.8 s and
+  18 s, far past the CI budget. The shallower walk already fails on `main` (the 153 / 97 mismatches
+  quoted in the review are the position 3 d4 / Kiwipete d3 figures; d5 / d4 find 3477 / 6160).
+- **Deep perft behind a Release or nightly switch** — the gates run the Debug test bundle only and
+  there is no nightly job, so the switch would never be on; the harness covers full depths.
+- **Score equality with the TT on and off** — not an invariant here: TT cut-offs from shallower or
+  bound entries legitimately change the result (`BestMoveTests.WithAndWithoutTT` expects different
+  lines). Move-order equality with the TT off is the sound version and is in step 4.
+- **Mate-in-N tests** — without distance-to-mate the engine may pick any mating move at equal score;
+  they belong with the mate-distance follow-up.
 - **Folding the other review risks in** (50-move rule, insufficient material, TT-before-draw,
   mate distance, quiescence in check, `MoveList::addMoves` colour) — each changes search results
   and needs its own tests and tuning; mixing them in would make the best-move changes here
@@ -210,15 +224,17 @@ changes, so no new Swift test. Each test is shown red on the unfixed code before
 
 | Step | Test (file) | Proves | Red on `main` |
 |---|---|---|---|
-| 1 | `Perft.StartPosition` d4 = 197281, `Perft.Position3` d5 = 674624, `Perft.Position4` d4 = 422333, `Perft.Position6` d3 = 89890 (`PerftTests.cpp`) | Move generation and `move()` match the reference counts | no (guards) |
-| 1 | `Perft.Kiwipete` d4 = 4085603 | Rook captured on h8/a8 loses the right | yes, 4085659 |
-| 1 | `Perft.Position5` d3 = 62379 | Rook captured on h1 loses the right | yes, 62416 |
-| 1 | `Perft.CapturedRookLosesCastling`: `4k2r/8/8/8/8/8/8/4K2R w Kk - 0 1`, Rxh8+ → `4k2R/8/8/8/8/8/8/4K3 b - - 0 1` | The fix in one readable case | yes, `b k` |
+| 1 | `Perft.StartPosition` d1–d4 = 20 / 400 / 8902 / 197281, `Perft.Position3` d1–d5 = 14 / 191 / 2812 / 43238 / 674624, `Perft.Position4` d1–d4 = 6 / 264 / 9467 / 422333, `Perft.Position6` d1–d3 = 46 / 2079 / 89890 (`PerftTests.cpp`; every depth asserted, so a failure names the shallowest wrong depth) | Move generation and `move()` match the reference counts | no (guards) |
+| 1 | `Perft.Kiwipete` d1–d4 = 48 / 2039 / 97862 / 4085603 | Rook captured on h8/a8 loses the right | yes, d4 4085659 |
+| 1 | `Perft.Position5` d1–d3 = 44 / 1486 / 62379 | Rook captured on h1 loses the right | yes, d3 62416 |
+| 1 | `Perft.CapturedRookLosesCastling`: `4k2r/8/8/8/8/8/8/4K2R w Kk - 0 1`, Rxh8+ → `4k2R/8/8/8/8/8/8/4K3 b - - 0 1` | The fix in one readable case (a8/h8 side) | yes, `b k` |
+| 1 | `Perft.CapturedRookOnH1LosesCastling`: position 5, play c4f7 (Bxf7) then f2h1 (Nxh1); White's `K` is gone and no e1g1 is generated | The a1/h1 side, on the exact failing perft path | yes |
 | 2 | `Perft.HashMatchesFromScratchAtEveryNode`: walk Kiwipete d3, position 3 d4, position 4 d3; at every node `board.getHash() == ChessBoardHash::hash(board)` (`PerftTests.cpp`, same walker with a hash flag) | Incremental hash is exact across ep, castling, promotion, captures | yes, 97 / 153 bad nodes |
 | 2 | `BoardHash.EnPassantKeepsHashExact`: the B2 repro (`BoardHashTests.cpp`) | B2 in one case | yes |
 | 3 | `BoardHash.CastlingAndEnPassantChangeTheHash`: `r3k2r/8/8/8/8/8/8/R3K2R w KQkq -` ≠ same with `Kkq`; `4k3/8/8/3pP3/8/8/8/4K3 w - d6` ≠ same with `-`; after 1. e4 (`…b KQkq e3`) == same with `-` (no black pawn can take) | Rights and capturable ep are in the hash; uncapturable ep is not | first two yes, third no (guard) |
 | 3 | `ChessEngineTests.CastlingRightsMakeAPositionDifferent`: `1. Nf3 Nf6 2. Rg1 Rg8 3. Rh1 Rh8 4. Ng1 Ng8 5. Nf3 Nf6 6. Ng1 Ng8 *` → `canPlay()` true; two more knight round trips → false | Repetition follows FIDE rights | yes (false) |
 | 3 | The step-2 walk now also checks the state keys | `stateKey` is maintained incrementally | — |
+| 4 | `MinMaxSearchTests.SortingDoesNotChangeTheScore`: TT off, score with `sortMoves` on == off for Kiwipete at `maxDepth` 0 and `r1bqkbnr/pppp1ppp/2n5/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 2 3` at 0–2 (≈0.35 s at -O0) | Alpha-beta and quiescence return the true minimax value whatever the move order | yes: Kiwipete d0 50 vs −640, the other d2 −15 vs 20 (with the B3 fix: equal at every depth, checked in a scratch copy) |
 | 4 | `MinMaxSearchTests.QuiescenceNeverBelowStandPat`: B3 repro, its colour mirror with Black to move, and a quiet position; `alphabeta` with `maxDepth = 0`, TT off; White to move: result ≥ `ChessEvaluater::evaluate`, Black to move: ≤ | B3 | yes, −220 < −200 |
 | 5 | `EvaluationTests.MirroredPositionsScoreOpposite`: a `mirrorFEN` helper in the test file (reverse ranks, swap case, swap side, swap castling case, ep rank 3↔6); start position, White-only pair, Black-only pair, Kiwipete, positions 4, 5, 6: `evaluate(p) == -evaluate(mirror(p))`, and the start position scores 0 | B4 and evaluation symmetry | yes (640 vs −590; start +50) |
 | 6 | `PGN.EngineOutputRoundTrips`: from `8/1P6/8/8/8/8/8/1k2K3 w - - 0 1` play b8=Q; `getGame` contains `b8=Q+`; `setGame` of that text succeeds and reaches the same FEN | B5 promotion + check | yes |
@@ -233,7 +249,8 @@ adds cases.
 
 **Time budget.** Measured with the harness at `-O0` (what the Debug test bundle uses): start d4
 35 ms, Kiwipete d4 880 ms, position 3 d5 160 ms, position 4 d4 110 ms, position 5 d3 15 ms,
-position 6 d3 25 ms (≈1.2 s); the hash walk ≈0.35 s once fixed. Target ≤ 2 s for `Perft.*` in the
+position 6 d3 25 ms (≈1.2 s; the shallower depths add little); the hash walk ≈0.35 s once fixed;
+the sorting test ≈0.35 s. Target ≤ 2 s for `Perft.*` in the
 Debug run; the implementer reports the measured time. If over budget, lower position 3 to d4 first;
 never lower the two red cases (Kiwipete d4, position 5 d3).
 
@@ -300,7 +317,13 @@ The 115 GoogleTest cases and 112 Swift tests must otherwise stay green; any othe
 - Nothing needs a real device: engine-only, covered by the macOS test gate; the iOS gate and the UCI
   build gate run as usual.
 
-## Follow-ups (proposed as ENGINE-2, not in this plan)
+## Follow-ups (ENGINE-3 candidates, not in this plan)
+
+ENGINE-2 is the UCI plan (`planning/ENGINE-2-uci-and-elo.md`); it owns the UCI promotion suffix in
+`FPGN::to_string(…, SANType::uci)` (`FPGN.cpp:152`) and the unchecked `ChessBoard::getMove`
+(`ChessBoard.cpp:364`). This plan touches neither (step 6 only adds `SANType::rank`).
+
+Correctness:
 
 - Draws: fifty-move rule (`halfMoveClock` is kept but unused) and insufficient material.
 - Search: probe the TT after `isDraw` and do not store repetition-dependent 0s; mate scores with
@@ -309,6 +332,15 @@ The 115 GoogleTest cases and 112 Swift tests must otherwise stay green; any othe
 - `MoveList::addMoves` tags moves with `board.color` (`MoveList.cpp:74`) instead of the generating
   side; affects only `positionalAnalysis` (off by default) and will change `EvaluationTests` values.
 - Exact en-passant legality in the hash (pinned capturing pawn).
+- Tests that come with those: mate-in-N (first move and ±`MAT_VALUE`), fifty-move rule, repetition
+  over a long history.
+
+Performance (from the performance review, not re-measured here):
+- TT best move first plus killer moves in move ordering (reported −29 % / −43 % nodes).
+- Bound the repetition scan by the half-move clock (`GameHistory.cpp:12-23` scans the whole history).
+- Quiescence cost (no delta pruning or SEE; it searches every capture).
+- The transposition table is allocated (≈549 MB, calloc in the constructor) for every `FEngine`,
+  including short-lived probe engines.
 
 ## Decision left open for Jean
 
@@ -321,5 +353,5 @@ The 115 GoogleTest cases and 112 Swift tests must otherwise stay green; any othe
    lenient re-parse that allows the castle — not recommended, it keeps the bug alive in one path.
 3. **Minimal SAN in the writer (`R1xe2`).** Default: yes, it is the standard form and round-trips
    once step 6 lands. Alternative: keep writing the full square for rank cases (parser fix only).
-4. **Scope.** Default: this plan (B1–B6, the hash state, nits); the other risks become ENGINE-2.
+4. **Scope.** Default: this plan (B1–B6, the hash state, nits); the other risks become ENGINE-3 candidates.
    Alternative: fold some follow-ups in here.
