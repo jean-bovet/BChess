@@ -1,5 +1,12 @@
 # ENGINE-1 — Engine bug fixes, proven by perft
 
+Revision 3 (2026-10-06): Codex plan round 1 folded in. I1 exposure (saved games with a castle B1
+allowed) is now an open decision with two specified options instead of a default; en passant enters
+the hash only when the capture is legal (pinned and rank-exposure cases tested against FIDE
+expectations); the promotion piece must be an explicit Q/R/B/N; NAGs, comments and variations are
+consumed in any order; the quiescence test now separates best from last and from stand-pat, PV
+included; step 7 uses `board.reset(); board.clear();`. Mate distance left the follow-ups (ENGINE-2
+owns it).
 Revision 2 (2026-10-06): performance-review input folded into the test plan (every depth of each
 perft position, a second captured-rook case on h1, a move-ordering consistency test for B3); its
 deeper hash walk and a Release-only deep perft rejected with measurements; follow-ups renamed
@@ -103,7 +110,10 @@ requires.
   rook leaving, a rook being captured, and anything else touching the corner. The king block stays.
 - Add `assert(bb_test(pieces[moveColor][ROOK], <corner>))` before each castling rook move
   (`ChessBoard.cpp:249-267`), so a regression that conjures a rook aborts the Debug perft instead of
-  silently miscounting.
+  silently miscounting. (With option (a) of decision 2 the assert is skipped while a legacy game is
+  loaded, since that path replays exactly such a castle.)
+- Plus whatever decision 2 picks: option (a) adds the legacy load path described there; option (b)
+  changes the I1 wording in `AGENTS.md` in this commit.
 
 ### Step 2 — En passant hash (B2)
 
@@ -116,15 +126,20 @@ quiescence rely on it.
 
 - `ChessBoardHash`: four castling keys and eight en-passant file keys, drawn from the same PRNG after
   `side` (`ChessBoardHash.cpp:55-63`), and one new function `static uint64_t stateKey(const ChessBoard
-  &board)` = XOR of the keys of the rights held, plus the ep file key **only when a pawn of the side
-  to move attacks the ep square** (`PawnAttacks[INVERSE(color)][epSquare] & pieces[color][PAWN]`, the
-  trick `isAttacked` already uses at `ChessBoard.cpp:494`). Its second caller is `ChessBoard::move`.
+  &board)` = XOR of the keys of the rights held, plus the ep file key **only when an en-passant
+  capture is legal**. Its second caller is `ChessBoard::move`. The legality check runs only when a
+  pawn of the side to move attacks the ep square (`PawnAttacks[INVERSE(color)][epSquare] &
+  pieces[color][PAWN]`, the trick `isAttacked` uses at `ChessBoard.cpp:494`), which is rare: for each
+  such pawn (at most two), on a copy of the board, clear the capturing pawn, set it on the ep square,
+  clear the captured pawn, mark the occupancy dirty and ask `isCheck(color)`. If any capture leaves
+  the king safe, the ep key is in. Done with direct bitboard edits, not `move()` or the generator,
+  so the check cannot recurse into `stateKey`. This covers a pinned capturing pawn, a file opened by
+  the captured pawn, and the rank-5/rank-4 exposure when both pawns leave the rank.
 - `hash()` XORs `stateKey(board)` in. `ChessBoard::move` XORs `stateKey(*this)` out right after the
   existing `getHash()` (`ChessBoard.cpp:229`) and back in after the side switch (`:346-347`), so
   every change to rights or ep in between is covered without touching each assignment.
-- Hashing ep only when capturable keeps repetition FIDE-correct: the position right after a double
-  push equals the same arrangement without the ep square unless a capture is possible. (A pinned
-  capturing pawn is the one case treated as "possible" though it is not legal; see follow-ups.)
+- Hashing ep only when the capture is legal is exactly FIDE 9.2.3: two positions are the same when
+  the same moves are possible, so an ep square no legal move can use does not count.
 - Prototyped in a scratch copy: the perft walk finds 0 bad nodes in Kiwipete d3, position 3 d4 and
   position 5 d3; the B2 repro hashes equal. Hashes are not persisted anywhere (only
   `ChessGame::history`, rebuilt on load, `ChessGame.cpp:197-209`; `FEngine.mm:335` copies it in
@@ -144,10 +159,16 @@ value may lie outside the window, never below the stand-pat). PV update and beta
 
 - `parseMove` (`FPGN.cpp:400-517`): new branch for rank + `x` + square (`R1xe2`) next to the `R6e4`
   branch; after the squares, parse in SAN order: optional `=Piece`, then optional `+`/`#`, then
-  optional annotation (`!`, `?`, `!!`, `??`, `!?`, `?!`). `parsePiece` failing after `=` is a failure,
-  not a silent pawn.
-- `parseMoveText`: skip NAGs (`$` followed by digits) wherever comments are skipped
-  (`FPGN.cpp:597`, `:645`), via a `parseNAG()` beside `parseComment`.
+  optional annotation (`!`, `?`, `!!`, `??`, `!?`, `?!`). After `=` the next character must be one of
+  `Q`, `R`, `B`, `N` and is consumed explicitly; anything else (nothing, `K`, `P`, another letter) is
+  a parse failure. `parsePiece` is not used there: it always returns true and maps any unknown
+  character to `PAWN` (`FPGN.cpp:306-346`).
+- `parseMoveText`: a `parseNAG()` (`$` followed by digits) beside `parseComment`. Before
+  `game.move`, consume comments and NAGs in any order (`FPGN.cpp:597`, `:645`, the comment text
+  still goes to the move). After `game.move`, consume variations, NAGs and comments in any order
+  (`FPGN.cpp:608`, `:649`), so `1. e4 (1. d4 d5) $1 e5 *` and `1. e4 (1. d4) {c} e5 *` parse.
+  A comment that follows a variation has no node to attach to without a new `ChessGame` API, so it
+  is consumed and not kept; such input failed to open before, so nothing that opened loses text.
 - Replace the reachable asserts with `RETURN_FAILURE`: `FPGN.cpp:629` and the two in `parseTag`
   (`:694`, `:698`).
 - Writer (`getPGN`, `FPGN.cpp:801-821`): standard SAN order — file if it disambiguates, else rank,
@@ -157,7 +178,7 @@ value may lie outside the window, never below the stand-pat). PV update and beta
 
 ### Step 7 — `setFEN` starts from a new board (B6)
 
-- `FFEN::setFEN`: replace `board.clear()` with `board = ChessBoard(); board.clear();`, so every field
+- `FFEN::setFEN`: replace `board.clear()` with `board.reset(); board.clear();`, so every field
   the FEN omits takes the value a new board has (KQkq, no ep, clocks 0 and 1) — exactly what both
   callers saw before on a fresh board and what `ChessGame::setFEN` sees after its `reset()`. The ep
   square is assigned, not ORed (`FFEN.cpp:203`).
@@ -189,8 +210,10 @@ in the one test file that uses it.
   and quiescence read the flag.
 - **Hashing ep whenever the square is set** — simpler, but the position after every double push
   would never repeat the same arrangement without it; FIDE treats them as equal unless a capture is
-  possible. **Full legality check for ep in the hash** — costs a make-move per double push for the
-  pinned-pawn corner case; left as a follow-up.
+  possible. **Pseudo-legal ep only (a pawn attacks the square)** — revision 1's design; Codex round 1
+  showed it miscounts repetition when the capture would expose the king
+  (`k3r3/8/8/3pP3/8/8/8/4K3 w - d6`), and the exact check costs only a board copy in the rare case a
+  pawn is adjacent.
 - **Fail-hard quiescence (return alpha)** — `alphabeta` is fail-soft and stores `bestValue` in the
   TT; mixing conventions corrupts bounds. The comment above `quiescence` already argues for
   returning the score.
@@ -210,7 +233,7 @@ in the one test file that uses it.
   bound entries legitimately change the result (`BestMoveTests.WithAndWithoutTT` expects different
   lines). Move-order equality with the TT off is the sound version and is in step 4.
 - **Mate-in-N tests** — without distance-to-mate the engine may pick any mating move at equal score;
-  they belong with the mate-distance follow-up.
+  they belong with mate distance, which ENGINE-2 owns.
 - **Folding the other review risks in** (50-move rule, insufficient material, TT-before-draw,
   mate distance, quiescence in check, `MoveList::addMoves` colour) — each changes search results
   and needs its own tests and tuning; mixing them in would make the best-move changes here
@@ -231,15 +254,18 @@ changes, so no new Swift test. Each test is shown red on the unfixed code before
 | 1 | `Perft.CapturedRookOnH1LosesCastling`: position 5, play c4f7 (Bxf7) then f2h1 (Nxh1); White's `K` is gone and no e1g1 is generated | The a1/h1 side, on the exact failing perft path | yes |
 | 2 | `Perft.HashMatchesFromScratchAtEveryNode`: walk Kiwipete d3, position 3 d4, position 4 d3; at every node `board.getHash() == ChessBoardHash::hash(board)` (`PerftTests.cpp`, same walker with a hash flag) | Incremental hash is exact across ep, castling, promotion, captures | yes, 97 / 153 bad nodes |
 | 2 | `BoardHash.EnPassantKeepsHashExact`: the B2 repro (`BoardHashTests.cpp`) | B2 in one case | yes |
-| 3 | `BoardHash.CastlingAndEnPassantChangeTheHash`: `r3k2r/8/8/8/8/8/8/R3K2R w KQkq -` ≠ same with `Kkq`; `4k3/8/8/3pP3/8/8/8/4K3 w - d6` ≠ same with `-`; after 1. e4 (`…b KQkq e3`) == same with `-` (no black pawn can take) | Rights and capturable ep are in the hash; uncapturable ep is not | first two yes, third no (guard) |
+| 3 | `BoardHash.CastlingAndEnPassantChangeTheHash`: `r3k2r/8/8/8/8/8/8/R3K2R w KQkq -` ≠ same with `Kkq`; `4k3/8/8/3pP3/8/8/8/4K3 w - d6` ≠ same with `-`; after 1. e4 (`…b KQkq e3`) == same with `-` (no black pawn can take) | Rights and legal ep are in the hash; an unusable ep square is not | first two yes, third no (guard) |
+| 3 | `BoardHash.IllegalEnPassantIsNotInTheHash`: `k3r3/8/8/3pP3/8/8/8/4K3 w - d6 0 1` == same with `-` (exd6 opens the e-file to the rook); `8/8/8/K2pP2r/8/8/8/4k3 w - d6 0 1` == same with `-` (both pawns leave rank 5, the rook sees the king); `4k3/6b1/8/3pP3/8/2K5/8/8 w - d6 0 1` (e5 pinned on the c3–g7 diagonal) == same with `-` | The expectation comes from the rules (python-chess `has_legal_en_passant()` is false for all three while `has_pseudo_legal_en_passant()` is true, checked), not from `hash()` | no on `main` (ep is not hashed at all); it is the guard that fails against a pseudo-legal step 3 (a pawn attacks d6 in each), and is shown red that way: run it once with the legality check stubbed out |
 | 3 | `ChessEngineTests.CastlingRightsMakeAPositionDifferent`: `1. Nf3 Nf6 2. Rg1 Rg8 3. Rh1 Rh8 4. Ng1 Ng8 5. Nf3 Nf6 6. Ng1 Ng8 *` → `canPlay()` true; two more knight round trips → false | Repetition follows FIDE rights | yes (false) |
 | 3 | The step-2 walk now also checks the state keys | `stateKey` is maintained incrementally | — |
 | 4 | `MinMaxSearchTests.SortingDoesNotChangeTheScore`: TT off, score with `sortMoves` on == off for Kiwipete at `maxDepth` 0 and `r1bqkbnr/pppp1ppp/2n5/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 2 3` at 0–2 (≈0.35 s at -O0) | Alpha-beta and quiescence return the true minimax value whatever the move order | yes: Kiwipete d0 50 vs −640, the other d2 −15 vs 20 (with the B3 fix: equal at every depth, checked in a scratch copy) |
+| 4 | `MinMaxSearchTests.QuiescenceReturnsTheBestCapture`: `k7/3r4/1p6/2p5/3Q4/8/8/K7 w - - 0 1` (captures sorted Qxd7 then Qxc5; Qxc5 loses the queen to bxc5); `alphabeta` with `maxDepth = 0`, TT off; score == `ChessEvaluater::evaluate` of the position after Qxd7 (Black has no capture there), PV == `Qd4xd7`, and the score is above the stand-pat | Best, not last and not stand-pat; PV matches the score | yes: `main` returns 310 (the Qxc5 line) with PV Qxd7; the fixed copy returns 705 with PV Qxd7; stand-pat 210 |
 | 4 | `MinMaxSearchTests.QuiescenceNeverBelowStandPat`: B3 repro, its colour mirror with Black to move, and a quiet position; `alphabeta` with `maxDepth = 0`, TT off; White to move: result ≥ `ChessEvaluater::evaluate`, Black to move: ≤ | B3 | yes, −220 < −200 |
 | 5 | `EvaluationTests.MirroredPositionsScoreOpposite`: a `mirrorFEN` helper in the test file (reverse ranks, swap case, swap side, swap castling case, ep rank 3↔6); start position, White-only pair, Black-only pair, Kiwipete, positions 4, 5, 6: `evaluate(p) == -evaluate(mirror(p))`, and the start position scores 0 | B4 and evaluation symmetry | yes (640 vs −590; start +50) |
 | 6 | `PGN.EngineOutputRoundTrips`: from `8/1P6/8/8/8/8/8/1k2K3 w - - 0 1` play b8=Q; `getGame` contains `b8=Q+`; `setGame` of that text succeeds and reaches the same FEN | B5 promotion + check | yes |
 | 6 | `PGN.RankAndSquareDisambiguation`: `4k3/8/8/8/8/4R3/4p3/4R1K1 w - - 0 1` Re1xe2 is written `R1xe2+` and read back; `4k3/8/8/8/8/Q7/8/Q1Q1K3 w - - 0 1` Qa1-b2 is written `Qa1b2`; a file case (`Rae1`-style) is unchanged | Writer uses minimal SAN; parser reads each form | yes (`Re1xe2+`, then parse) |
-| 6 | `PGN.NAGsAndAnnotationsAfterCheck`: `1. e4 $1 f5 $2 2. Qh5+! g6 $14 *` parses to 4 moves | NAGs and `+!` | yes |
+| 6 | `PGN.NAGsAndAnnotationsAfterCheck`: `1. e4 $1 f5 $2 2. Qh5+! g6 $14 *` parses to 4 moves; `1. e4 (1. d4 d5) $1 e5 *`, `1. e4 $1 {c} (1. d4) {d} $2 e5 *` and `1. e4 {c} $1 e5 *` each parse to 2 main-line moves with the variation kept | NAGs, comments and variations in any order; `+!` | yes |
+| 6 | `PGN.PromotionPieceMustBeExplicit`: from `8/1P6/8/8/8/8/8/1k2K3 w - - 0 1`, `1. b8=Q+`, `=R`, `=B`, `=N` parse to the matching promotion; `1. b8= *`, `1. b8=K *`, `1. b8=P *`, `1. b8=X *` fail | Only Q/R/B/N promote | `=K`/`=P`/`=X` red (mapped to a piece or pawn today); `b8=` red |
 | 6 | `PGN.MalformedInputFails`: `1. e4 2. d4` and `[Event] 1. e4 *` return false | No assert on bad input | yes (Debug assert aborts — the red run is a crash, recorded as such) |
 | 7 | `FEN.SetFENDoesNotInheritState` (new `FENTests.cpp`): reuse one board for `4k3/8/8/3pP3/8/8/8/4K3 w - d6 0 1` then `4k3/8/8/8/8/8/8/R3K2R w KQ e3 5 9` (ep is exactly e3) then `4k3/8/8/8/8/8/8/4K3 b` (→ `4k3/8/8/8/8/8/8/4K3 b - - 0 1`); FEN and hash equal to the same FEN on a fresh board | B6 | yes |
 | 7 | `FEN.ImpossibleCastlingRightsAreDropped`: `4k3/8/8/8/8/8/8/4K3 w KQkq - 0 1` → castling `-` and no castling move generated; `r3k2r/8/8/8/8/8/8/R3K2R w` keeps `KQkq` | No conjured rook from input; old 2-field behaviour kept | first yes, second no (guard) |
@@ -289,11 +315,12 @@ The 115 GoogleTest cases and 112 Swift tests must otherwise stay green; any othe
 
 ## Invariants
 
-- **I1 — Files keep opening.** *At risk, narrowly.* Games are stored as PGN (`GameState.pgn`,
-  `Shared/Model/GameState.swift:32`) and re-parsed against the legal moves. A stored game that
-  contains a castle made possible only by B1 (castling after the rook was captured on its corner), or
-  by a FEN claiming impossible rights, no longer parses after steps 1 and 7. Such a game is illegal
-  chess that no other program reads; see the open decision. Held otherwise: the parser only accepts
+- **I1 — Files keep opening.** *At risk; resolved by decision 2.* Games are stored as PGN
+  (`GameState.pgn`, `Shared/Model/GameState.swift:32`) and re-parsed against the legal moves. A
+  stored game that contains a castle made possible only by B1 (e.g. position 5 then
+  `8. Bxf7 Nxh1 9. O-O *`, which opens today), or by a FEN claiming impossible rights, no longer
+  parses after steps 1 and 7. As written, I1 has no exception for that; decision 2 either keeps
+  such files opening (option a) or narrows I1 (option b). Held otherwise: the parser only accepts
   more (every file that opened still opens, `OpeningsTests` and the PGN corpus tests stay green); the
   writer still writes standard PGN and becomes more standard (`R1xe2` instead of `Re1xe2`). Older
   BChess versions cannot read `R1xe2`, but they already cannot read their own `b8=Q+`. Missing FEN
@@ -326,14 +353,14 @@ ENGINE-2 is the UCI plan (`planning/ENGINE-2-uci-and-elo.md`); it owns the UCI p
 Correctness:
 
 - Draws: fifty-move rule (`halfMoveClock` is kept but unused) and insufficient material.
-- Search: probe the TT after `isDraw` and do not store repetition-dependent 0s; mate scores with
-  distance-to-mate so the engine prefers the shorter mate.
+- Search: probe the TT after `isDraw` and do not store repetition-dependent 0s. (Mate distance is
+  in ENGINE-2 r2, which also changes `IterativeDeepening` and `MinMaxSearch`; the step-4 tests here
+  assert relations, not node counts, so they survive it.)
 - Quiescence when in check (generate evasions instead of standing pat).
 - `MoveList::addMoves` tags moves with `board.color` (`MoveList.cpp:74`) instead of the generating
   side; affects only `positionalAnalysis` (off by default) and will change `EvaluationTests` values.
-- Exact en-passant legality in the hash (pinned capturing pawn).
-- Tests that come with those: mate-in-N (first move and ±`MAT_VALUE`), fifty-move rule, repetition
-  over a long history.
+- Tests that come with those: fifty-move rule, repetition over a long history. (Mate-in-N belongs
+  with ENGINE-2's mate distance.)
 
 Performance (from the performance review, not re-measured here):
 - TT best move first plus killer moves in move ordering (reported −29 % / −43 % nodes).
@@ -348,9 +375,46 @@ Performance (from the performance review, not re-measured here):
    never shipped) and accept a new line when its first move is within 30 centipawns of Stockfish's
    best at depth 20 and not worse than the old one. Alternative: no new tool — the fixed engine at
    depth + 2 and a written hand analysis in the commit message.
-2. **Stored games with an illegal castle (I1).** Default: accept that they stop opening (illegal
-   chess, unreadable by other programs, and only possible through B1 or a bad FEN). Alternative: a
-   lenient re-parse that allows the castle — not recommended, it keeps the bug alive in one path.
+2. **Saved games that contain a castle only the bug allowed (I1).** After steps 1 and 7, a game
+   where a side castled after its rook was captured on the corner (e.g. from position 5:
+   `8. Bxf7 Nxh1 9. O-O`), or castled with rights a FEN claimed without the king and rook in place,
+   no longer opens: the parser matches moves against the now-correct legal moves. Pick one:
+
+   **(a) Keep them opening with a legacy load path.** `FPGN::setGame` parses strictly first. Only if
+   that fails, it parses again in legacy mode: a `legacyCastlingRights` flag on `ChessGame`, copied
+   onto its board by `reset()`, `setFEN()` and `replayMoves()`, makes `ChessBoard::move` clear a right
+   only when the king or that rook *moves* (the pre-fix rule) and makes `FFEN::setFEN` skip the
+   step-7 drop of impossible rights; the step-1 castling assert is skipped in that mode. The game
+   keeps the flag for as long as it is open (navigation replays and new moves follow the old rule, as
+   before the fix); a new game, paste or FEN starts strict. Fixtures: the position-5 PGN above, a FEN
+   game with `KQkq` and no rooks that castles, and the same PGN inside a `GameState` `.json`
+   (`GameStateCodingTests` + `FEngine` `setPGN`): each opens, reaches the pre-fix final FEN, and
+   writes back unchanged; a strict-valid game never gets the flag. Cost: about 40 lines across
+   `ChessBoard`, `ChessGame`, `FFEN`, `FPGN`, 3 fixtures, and one flag the engine must carry
+   (and every future castling change must respect) to keep illegal positions loadable; risk: the
+   flag leaking into a normal game (a copy through `FEngine.mm:335` or a FEN game) would bring B1
+   back for that game.
+
+   **(b) Accept, and narrow I1 to the actual exposure.** BChess has never shipped (both App Store
+   versions are 1.0, "Prepare for Submission"), so such files can exist only on Jean's own devices,
+   and no other chess program reads them either. Step 1 changes `AGENTS.md` I1 from:
+
+   > **I1 — Files keep opening.** Every game file an earlier BChess wrote (`.json` with the
+   > `GameState` shape, `.pgn`) still opens, and PGN written by BChess stays standard PGN.
+
+   to:
+
+   > **I1 — Files keep opening.** Every game file an earlier BChess wrote (`.json` with the
+   > `GameState` shape, `.pgn`) still opens, and PGN written by BChess stays standard PGN. The one
+   > exception is a game whose moves are illegal chess that only an engine bug let BChess accept
+   > (ENGINE-1: castling after the rook was captured on its corner, or with castling rights a FEN
+   > claimed without king and rook in place); BChess had not shipped when that was fixed, so such
+   > files can exist only on the developer's own devices.
+
+   Cost: none in code; such a file reports the usual "could not open" error.
+
+   **Recommendation: (b).** The exposure is a handful of files at most, on Jean's devices only, and
+   (a) would keep an illegal-move path alive in the engine permanently for them.
 3. **Minimal SAN in the writer (`R1xe2`).** Default: yes, it is the standard form and round-trips
    once step 6 lands. Alternative: keep writing the full square for rank cases (parser fix only).
 4. **Scope.** Default: this plan (B1–B6, the hash state, nits); the other risks become ENGINE-3 candidates.
