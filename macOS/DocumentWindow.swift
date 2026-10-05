@@ -37,8 +37,8 @@ struct DocumentWindow: View {
     var body: some View {
         let session = box.session
         ContentView(session: session)
-            .navigationTitle(GameText.title(white: session.gameState.white, black: session.gameState.black))
-            .navigationSubtitle(session.openingName ?? "")
+            .background(WindowTitle(title: GameText.title(white: session.gameState.white, black: session.gameState.black),
+                                    subtitle: session.openingName ?? ""))
             .toolbar {
                 ToolbarItemGroup {
                     Button("New Game", systemImage: "plus.circle") {
@@ -80,6 +80,53 @@ struct DocumentWindow: View {
                     session.load(newState)
                 }
             }
+    }
+}
+
+/// Shows the players as the window title and the opening as its subtitle. A document window's controller
+/// writes the file name into the title when the document opens, saves or is renamed, which wins over
+/// `navigationTitle`, so this sets the window's title itself and puts it back whenever it is replaced.
+/// The file name stays in the title bar's document menu.
+private struct WindowTitle: NSViewRepresentable {
+    let title: String
+    let subtitle: String
+
+    func makeNSView(context: Context) -> TitleView {
+        TitleView()
+    }
+
+    func updateNSView(_ view: TitleView, context: Context) {
+        view.set(title: title, subtitle: subtitle)
+    }
+
+    final class TitleView: NSView {
+        private var title = ""
+        private var subtitle = ""
+        private var observation: NSKeyValueObservation?
+
+        func set(title: String, subtitle: String) {
+            self.title = title
+            self.subtitle = subtitle
+            apply()
+        }
+
+        override func viewDidMoveToWindow() {
+            super.viewDidMoveToWindow()
+            observation = window?.observe(\.title) { [weak self] _, _ in
+                Task { @MainActor in
+                    self?.apply()
+                }
+            }
+            apply()
+        }
+
+        private func apply() {
+            guard let window, window.title != title || window.subtitle != subtitle else {
+                return
+            }
+            window.title = title
+            window.subtitle = subtitle
+        }
     }
 }
 
