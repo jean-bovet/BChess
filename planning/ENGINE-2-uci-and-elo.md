@@ -1,15 +1,28 @@
 # ENGINE-2 — A match-ready UCI engine, and its Elo
 
-Revision 1 (2026-10-06). Planned on `main` (`--no-worktree`, Jean's call). Implemented **after
+Revision 2 (2026-10-06). Planned on `main` (`--no-worktree`, Jean's call). Implemented **after
 ENGINE-1** lands; this plan assumes its fixes (castling rights on rook capture, ep hash, quiescence
 return, bishop-pair sign, PGN round-trip, `setFEN` reset) and does not repeat them.
+
+- r1 — first draft.
+- r2 — Codex plan round 1 (substantive). Changes:
+  - The bridge migration now covers `FEngineConcurrencyTests` and keeps its invalidation check.
+  - A FEN that fails to parse restores the start position and drops its moves.
+  - New step 2: mate scores carry the distance (through the TT too), and statistics are cumulative,
+    one line per completed depth. This pulls "mate distance" out of ENGINE-1's follow-up list.
+  - Invalid `go` values are specified and tested.
+  - Malformed `position` input, `ucinewgame`, score sign and promotion in the `pv` get direct tests.
+  - The `movetime` lower bound is dropped from its test.
+  - UCI moves are matched by their UCI string.
+  - The script uses absolute paths and measures one level at a time. The combined estimate is
+    dropped, and degenerate results are refused.
 
 Jean's request: "I am curious to know the ELO of my engine — play it against a reference engine."
 
 To get a number, `BChessUCI` has to survive a few hundred games under a match runner. Today it
-can't: it crashes or plays an illegal move as soon as a game reaches a promotion. It also ignores the
-clock. Steps 1–3 make it a correct UCI engine. Step 4 adds the measuring tool, and step 5 runs it
-once and records the result.
+can't: it crashes or plays an illegal move as soon as a game reaches a promotion, and it ignores
+the clock. Steps 1–4 make it a correct UCI engine. Step 5 adds the measuring tool, and step 6 runs
+it once and records the result.
 
 ## Problem, with evidence
 
@@ -26,11 +39,17 @@ only at which piece sits on `from` and whether `to` is occupied, then makes a pl
 
 Castling given as a king move (`e1g1`) does work, because `ChessBoard::move` moves the rook
 whenever the king goes e1→g1/c1 (`ChessBoard.cpp:244-267`). It still does not carry the castling
-flag the generator sets (`createCastling`, `Move.hpp:106`). The only caller of `getMove` is
-`ChessGame::move(from, to)` (`ChessGame.cpp:133-138`), reached through `FEngine move:to:`
-(`FEngine.mm:225-229`). Its callers are `UCI.swift:87` and three test helpers
-(`GameSessionTests.swift:29`, `MoveRowsTests.swift:20`, `UCIProcessTests.swift:88`). The last of
-these, `isLegalMove`, therefore accepts some illegal moves, so the existing UCI test cannot catch an
+flag the generator sets (`createCastling`, `Move.hpp:106`).
+
+The only caller of `getMove` is `ChessGame::move(from, to)` (`ChessGame.cpp:133-138`), reached
+through `FEngine move:to:` (`FEngine.h:83`, `FEngine.mm:225-229`). Its Swift callers are:
+- `UCI.swift:87`;
+- the test helpers `GameSessionTests.swift:29`, `MoveRowsTests.swift:20` and
+  `UCIProcessTests.swift:88`;
+- `FEngineConcurrencyTests.swift:50` (the legality check in a concurrency test) and `:154`
+  (`expectInvalidates("move:to:")`).
+
+`isLegalMove` and the check at `:50` therefore accept some illegal moves, so neither can catch an
 illegal `bestmove`.
 
 **P2 — The engine's own promotions are written without the piece.** `FPGN::to_string` returns
@@ -38,90 +57,149 @@ illegal `bestmove`.
 So `bestmove` and the `pv` (`FEngineInfo.mm:86-101`) say `e7e8` where UCI requires `e7e8q`. A match
 runner rejects that as illegal, and BChess loses the game.
 
-**P3 — `go` ignores the clock.** `processCmdGo` (`UCI.swift:92-113`) looks only at the first
+**P3 — Every mate scores the same, so the engine can't tell a short mate from a long one.**
+`ChessEvaluater::evaluate` returns ±`MAT_VALUE` for any mate (`ChessEvaluater.cpp:146-150`).
+`MinMaxSearch` passes it up unchanged from three places: the horizon leaf (`MinMaxSearch.hpp:155-163`),
+the no-moves node (`:166-169`) and quiescence's stand-pat (`:268`). This has two effects:
+- **The search doesn't prefer the shorter mate.** A mating side can drift, and repetition detection
+  can turn a won game into a draw. That costs Elo in exactly the endgames a match will reach.
+- **`score mate N` has no true N to report.** PV length isn't the distance, because nothing makes
+  the defender pick the longest defence.
+
+`FEngineInfo.mat` tests for exact equality with ±`MAT_VALUE` (`FEngineInfo.mm:49`), and the app's
+`Verdict` uses it (`EngineView.swift:62`).
+
+**P4 — The search statistics don't add up.** `IterativeDeepening::search`
+(`IterativeDeepening.hpp:67-140`) has three problems:
+- `nodes` is reset every depth (`minMaxSearch.reset()`, `:88`).
+- `time` is whole seconds for the last depth only (`:119`), and `nps` covers that depth only (`:99-100`).
+- The callback also runs after an *interrupted* depth, repeating the previous evaluation (`:126-128`, the call at `:127`).
+
+UCI's `nodes`, `time` (ms) and `nps` are cumulative since `go`. The app shows `nodeEvaluated` and
+`movesPerSecond` (`EngineView.swift:68-69`) and never reads `time`.
+
+**P5 — `go` ignores the clock.** `processCmdGo` (`UCI.swift:92-113`) looks only at the first
 token. Anything other than `infinite` searches for a fixed 10 s (`// TODO time control`, `:104-106`).
 That ignores `wtime/btime/winc/binc/movestogo/movetime/depth`, and a 10+0.1 game is lost on time
 on move 1. A bare `go` crashes, because `tokens.removeFirst()` runs on an empty array (`:95`).
 
-**P4 — Protocol details a runner trips over.**
+**P6 — Protocol details a runner trips over.**
 - The first stdin line, whatever it is, triggers `id`/`uciok` (`UCI.swift:176-181`). A later `uci`
   falls to `default` (`:142-143`).
-- An empty line crashes (`process` → `tokens.removeFirst()`, `:116`).
+- An empty line crashes (`process` → `tokens.removeFirst()`, `:116`), and so does a bare `position`
+  (`:58`).
 - Unknown commands, including `setoption`, which every runner sends, print `Unknown command …` to
   **stdout** (`:143`).
-- `position fen` takes exactly six fields (`:63-65`). A FEN with fewer fields before `moves` crashes.
-- `ucinewgame` does nothing (`:129-131`). That is harmless today, because `position` always calls
-  `setFEN`, but the position is left from the previous game until then.
-- `info` (`BChess/UCI/FENgineInfo+Extension.swift:15-31`) reports `time` in whole seconds of the
-  last depth only (`IterativeDeepening.hpp:118`, `int(ms/1e3)`), but UCI's `time` is milliseconds
-  since `go`. It also reports `depth` as `max(depth, quiescenceDepth)`, and gives a mate as
-  `score cp 100000` (`ChessEvaluater.hpp:21`) instead of `score mate N`.
+- `position fen` takes exactly six fields (`:63-65`). Fewer fields crash.
+- When the FEN fails to parse, `FFEN::setFEN` has already cleared the board and filled it partly
+  before returning `false`. The game is left in a broken position, and the moves are then played
+  on it.
+- `ucinewgame` does nothing (`:129-131`).
+- `info` gives `depth` as `max(depth, quiescenceDepth)` (`FENgineInfo+Extension.swift:28`).
 
 **What already works and is reused.**
-- `FEngine evaluate:time:callback:` (`FEngine.mm:321-378`) arms a timer *when the search starts*
+- `FEngine evaluate:time:callback:` (`FEngine.mm:321-378`) arms its timer *when the search starts*
   (`:353-361`) and calls `stop`, so `time > 0` is the per-move budget.
-- `stop` always lets depth 1 finish (`IterativeDeepening.hpp:154-159`), so the result is always a
-  real move. `go` with no legal move answers `bestmove 0000` (`FENgineInfo+Extension.swift:33-40`).
+- `stop` always lets depth 1 finish (`IterativeDeepening.hpp:154-159`), so the result is always a real
+  move. `go` with no legal move answers `bestmove 0000` (`FENgineInfo+Extension.swift:33-40`).
 - stdin is read on the main thread while callbacks print from the search queue (I4). The subprocess
-  test `UCIProcessTests` (`BChessTests/UCIProcessTests.swift`) already drives the real binary.
-- `UCI.swift` is compiled into `BChessTests` (`project.yml:121-122`), so pure functions placed in it
-  can be unit-tested with no project change.
+  harness `UCIProcess` (`BChessTests/UCIProcessTests.swift`) already drives the real binary.
+- `UCI.swift` is compiled into `BChessTests` (`project.yml:121-122`). `GamesTests.swift:103-110`
+  already drives `UCI().process(&tokens)` in-process and reads `uci.engine.fen()`, so parsing can be
+  tested without a subprocess.
 - The opening book is never loaded in the tool. `useOpeningBook = true` (`UCI.swift:31`) finds
-  nothing, because only `GameSession` calls `loadOpening` (`Shared/Model/GameSession.swift:131`). So
-  BChess plays its own moves from the first one, and an `OwnBook` option has nothing to switch.
-- The transposition table is off (`FEngine.mm:64`, and the tool never sets `ttEnabled`). That stays
-  as it is (see Decision 5).
+  nothing, because only `GameSession` calls `loadOpening` (`Shared/Model/GameSession.swift:131`).
+  There is no own book to switch off.
+- The transposition table is off by default (`FEngine.mm:64`), and the tool never turns it on. The
+  app turns it on through the `useTranspositionTable` default (`GameSession.swift:478`).
 
 ## Design
 
 ### Step 1 — Legal moves from UCI text, and promotions written back (engine + bridge)
 
-- **`ChessGame::move(std::string uciMove) -> bool`** replaces `ChessGame::move(from, to)`. It reads
-  `from`, `to` and an optional promotion letter (`q r b n`), finds the one move in
-  `ChessMoveGenerator::generateMoves(board)` with the same from, to and promotion piece, plays it
-  with the existing `move(Move, "", false)`, and returns `true`. It returns `false` and changes
-  nothing for a malformed or illegal token, including a pawn reaching the last rank without a
-  letter. The legal move list already holds castling, en passant and every promotion. Matching
-  against it replaces `ChessBoard::getMove`, which is **deleted** (`ChessBoard.cpp:364-389`,
-  `ChessBoard.hpp:67`; no other caller). `ChessEngine::move(from, to)` (`ChessEngine.hpp:118`)
-  becomes `bool move(std::string uciMove)`.
-- **Bridge:** `- (BOOL)moveUCI:(NSString*)move NS_SWIFT_NAME(move(uci:))` replaces
-  `move:to:` (`FEngine.h:83`, `FEngine.mm:225`), keeping the `[self invalidate]`. All four callers
-  move to it; the three test helpers pass `from + to`. The result is one way to play a move from
-  text, not two.
 - **`FPGN::to_string(…, SANType::uci)`** appends the lowercase promotion letter
-  (`FPGN.cpp:152-154`). `bestmove` and `pv` then carry `e7e8q`, and the `ChessGameTests.cpp:41`
-  helper matches promotions too.
+  (`FPGN.cpp:152-154`). `bestmove` and `pv` then carry `e7e8q`, and the helper in
+  `ChessGameTests.cpp:41` matches promotions too.
+- **`bool ChessEngine::move(std::string uciMove)`** replaces `ChessEngine::move(from, to)`
+  (`ChessEngine.hpp:118`; the header already includes `FPGN.hpp`). It walks
+  `ChessMoveGenerator::generateMoves(game().board)` and plays the one candidate whose
+  `FPGN::to_string(candidate, SANType::uci)` equals the token, using the existing
+  `game().move(m, "", false)`. Otherwise it returns `false` and changes nothing.
+  - Exact string equality checks the squares, the promotion letter, castling and en passant at
+    once, with no second parser.
+  - Malformed tokens, illegal moves and a pawn reaching the last rank without a letter all fail.
+  - `ChessGame::move(from, to)` (`ChessGame.cpp:133-138`, `ChessGame.hpp`) and
+    `ChessBoard::getMove` (`ChessBoard.cpp:364-389`, `ChessBoard.hpp:67`) have no other caller and
+    are **deleted**.
+- **Bridge:** `- (BOOL)moveUCI:(NSString*)move NS_SWIFT_NAME(move(uci:))` replaces `move:to:`
+  (`FEngine.h:83`, `FEngine.mm:225-229`) and keeps the `[self invalidate]` first.
+  - All six call sites move to it.
+  - `FEngineConcurrencyTests.swift:154` becomes `expectInvalidates("move(uci:)") { $0.move(uci: "a2a3") }`,
+    so the invalidation regression stays covered.
+  - `:50` and `isLegalMove` use the returned `Bool`: legal means `true`. That is a real legality
+    check, where comparing FENs was not.
 
-### Step 2 — UCI protocol hygiene (`BChess/UCI/UCI.swift`, `FENgineInfo+Extension.swift`)
+### Step 2 — Mate distance and consistent statistics (engine)
 
-- `uci` becomes a command in `process`: it prints `id name BChess`, `id author Jean Bovet` and `uciok`.
-  `run()` stops treating the first line specially, so every line goes through `process`. No
-  `option` lines are advertised (Decision 5).
-- Empty and whitespace-only lines are ignored. `setoption`, `debug`, `register`, `ponderhit` and
-  unknown commands are ignored on stdout and logged with `os_log`. (The UCI spec says to ignore
-  unknown input.) After this, the only lines BChess prints are `id`, `uciok`, `readyok`, `info` and
-  `bestmove`.
-- `position`: the FEN is every token up to `moves` or the end of the line, so 4- or 6-field FENs
-  both work. A FEN that does not parse (`setFEN` returns `NO`) leaves the start position and logs
-  it. Each move goes through `engine.move(uci:)`; at the first `false`, the rest of the list is
-  dropped and the problem is logged. No assert, no crash.
+- **Mate scores carry the ply.** A helper in `MinMaxSearch`,
+  `static int mateAtPly(int score, int ply)`, turns ±`MAT_VALUE` into ±(`MAT_VALUE − ply`) and
+  leaves any other score alone. It is applied at the three places a node's own evaluation is
+  returned: the horizon leaf, the no-moves node and the quiescence stand-pat (`MinMaxSearch.hpp:155-169`,
+  `:268`). `depth` is already the ply from the root there. A shorter mate now scores higher for
+  the winner, and a longer one for the loser.
+  - `ChessEvaluater::evaluate` keeps returning ±`MAT_VALUE` (`EvaluationTests` unchanged).
+  - New `ChessEvaluater::isMateScore(v)` (`|v| > MAT_VALUE − MAX_MATE_PLY`, with
+    `MAX_MATE_PLY = 1000`) and `matePlies(v)` (`MAT_VALUE − |v|`).
+- **TT:** the table is optional but reachable from the app, so mate scores are stored relative to
+  the node and read back relative to the root. The standard adjustment is: on `store`, a mate score
+  moves `ply` further from zero; on probe, `ply` back (`MinMaxSearch.hpp:114-148` probe, `:243-248`
+  store). Without this, a mate found through a transposition would report the wrong distance.
+- **Bridge:** `FEngineInfo.mat` becomes `ChessEvaluater::isMateScore(value)` (`FEngineInfo.mm:49`),
+  so the app's `Verdict` keeps working. A new read-only `matePlies` (0 when not a mate) gives UCI
+  its distance: `mate N` with `N = (matePlies + 1) / 2`, signed from the engine's side.
+- **Statistics** (`IterativeDeepening::search`):
+  - One clock starts when `search()` starts. `ChessEvaluation.nodes` adds up over all depths.
+  - `ChessEvaluation.time` becomes **milliseconds since the search started** (only UCI reads it).
+  - `movesPerSecond` is cumulative nodes / cumulative time.
+  - The per-depth callback fires **only after a completed depth** (inside the
+    `curMaxDepth == 1 || running()` branch). The final `done` callback from `searchBestMove` is
+    unchanged.
+
+  The elapsed time lives in each search's own evaluation, so UCI keeps no mutable timestamp that
+  the search thread would read.
+- **Best-move tests that change** because the engine now prefers the shorter mate follow ENGINE-1's
+  rule for changed best-move tests ("Best-move tests that change"). That rule judges the new line
+  with Stockfish, or with the fixed engine at depth + 2.
+
+### Step 3 — UCI protocol hygiene (`BChess/UCI/UCI.swift`, `FENgineInfo+Extension.swift`)
+
+- `uci` becomes a command in `process`: it prints `id name BChess`, `id author Jean Bovet` and
+  `uciok`. `run()` stops treating the first line specially, so every line goes through `process`.
+  No `option` lines are advertised (Decision 5).
+- Blank lines are ignored. `setoption`, `debug`, `register`, `ponderhit` and unknown commands are
+  ignored on stdout and logged with `os_log`, as the UCI spec asks. After this, the only lines
+  BChess prints are `id`, `uciok`, `readyok`, `info` and `bestmove`.
+- `position` is all-or-nothing:
+  - Bare `position`, or an unknown sub-command: ignored and logged; the position is unchanged.
+  - `startpos`: `setFEN(StartPosFEN)`.
+  - `fen`: the FEN is every token up to `moves` or the end of the line, so 4- and 6-field FENs both
+    work. An empty FEN, or one `setFEN` rejects, means `setFEN(StartPosFEN)` again: the start
+    position, the moves **ignored**, logged.
+  - `moves`: played in order through `engine.move(uci:)`. At the first `false`, the moves before it
+    stay, the rest are dropped, and it is logged. No assert, no crash.
 - `ucinewgame` calls `engine.setFEN(StartPosFEN)`.
-- `info` keeps one line per completed depth, now in the standard form:
+- `info`, one line per completed depth (step 2):
   `info depth D seldepth S score cp X|mate N time T nodes K nps P pv …`.
   - `depth` is `info.depth`, and `seldepth` is `max(depth, quiescenceDepth)`.
-  - `time` is milliseconds since the `go` command. `UCI` keeps the `go` timestamp and passes it into
-    `uciInfoMessage(elapsedMilliseconds:)`.
-  - When `info.mat` is set, `score mate N` with `N = ±(pvPlies + 1) / 2` (engine POV), else
-    `score cp`.
+  - `time`, `nodes` and `nps` come straight from the step 2 values.
+  - `score` is from the engine's point of view, as now (`FENgineInfo+Extension.swift:18-26`).
   - `uciInfoMessage` is also compiled into the apps (`project.yml:47,78`), but they never call it.
     `GamesTests.swift:120` uses only `uciBestMove`, which is unchanged.
-- Dead code goes: `performance()` (`UCI.swift:147-153`), the commented tournament/performance blocks
-  (`main.swift:11-12,15`, `UCI.swift:157-165`) and `write` (folded into `engineOutput`). The `xcode`
-  command and the command-line-arguments mode stay. Neither writes extra lines to stdout, and a
-  match runner uses neither.
+- Dead code goes: `performance()` (`UCI.swift:147-153`), the commented blocks (`main.swift:11-12,15`,
+  `UCI.swift:157-165`) and `write` (folded into `engineOutput`). The `xcode` command and the
+  command-line mode stay. Neither prints extra lines, and no match runner uses them.
 
-### Step 3 — Time management (`go`)
+### Step 4 — Time management (`go`)
 
 A pure value type in `UCI.swift`, testable without a process:
 
@@ -129,72 +207,82 @@ A pure value type in `UCI.swift`, testable without a process:
 nonisolated struct SearchLimits: Equatable, Sendable {
     var wtime, btime, winc, binc, movestogo, movetime, depth: Int?   // ms / count / plies
     var infinite = false
-    init(goTokens: [String])          // key/value pairs; unknown keys (nodes, searchmoves, ponder, mate) skipped
+    init(goTokens: [String])
     /// What FEngine.evaluate(_:time:) takes: depth -1 = unlimited, time 0 = no timer.
     func search(whiteToMove: Bool) -> (depth: Int, time: TimeInterval)
 }
 ```
 
-Allocation, all in ms, with `overhead = 50` and `minimum = 10`:
-- `infinite`, or no clock and no movetime: no timer. `depth` if given, else unlimited. The search
-  answers on `stop`, as now.
-- `movetime m`: `max(m − overhead, minimum)`.
+**Parsing.** `go` takes key/value pairs.
+- A key with a missing or non-integer value (including one that overflows `Int`) is treated as
+  absent. Unknown keys and their arguments (`nodes`, `searchmoves …`, `ponder`, `mate`) are skipped.
+- Then: negative `wtime/btime/winc/binc` become 0; `movestogo` < 1 is absent; `movetime` < 0 is
+  absent; `depth` < 1 becomes 1, so a legal move is always found.
+
+**Allocation**, all in ms, with `overhead = 50`, `minimum = 10`, `maximum = 86_400_000` (one day, so
+`time * NSEC_PER_SEC` cannot overflow, `FEngine.mm:355`):
+- `infinite`, or no clock for the side to move and no `movetime`: no timer. `depth` is used if
+  given, else unlimited, and the search answers on `stop`, as now.
+- `movetime m`: `clamp(m − overhead)`.
 - Clock (`wtime`/`btime` for the side to move): `budget = remaining / (movestogo ?? 30) + inc`, then
-  `min(budget, remaining − overhead)`, then `max(…, minimum)`. At 10+0.1 that is ≈ 433 ms on move 1,
-  and it shrinks as the clock runs down.
-- `depth d` also caps the depth when a clock or movetime is given.
+  `min(budget, remaining − overhead)`, then clamped to `[minimum, maximum]`. At 10+0.1 that is
+  ≈ 433 ms on move 1, and it shrinks as the clock runs down.
+- `depth d` also caps the depth when there is a clock or a `movetime`.
 
-`processCmdGo` parses the limits, records the `go` time, and calls
-`engine.evaluate(depth, time:)`. The `stop`/`bestmove` path is unchanged.
+`processCmdGo` parses the limits and calls `engine.evaluate(depth, time:)`. The `stop`/`bestmove`
+path is unchanged.
 
-**Hard limit only.** A finished budget aborts the depth in progress (`IterativeDeepening.hpp:154-159`)
-and returns the last completed depth. There is no "don't start a new depth after half the budget"
-rule (see Alternatives).
+**Hard limit only.** When the budget runs out, the depth in progress is aborted and the last
+completed depth is returned. There is no rule to stop starting new depths (see Alternatives).
 
-### Step 4 — Elo tooling (no app code)
+### Step 5 — Elo tooling (no app code)
 
-- **`scripts/elo-match.sh`** (bash, `set -euo pipefail`). Its working directory is `.elo/` at the
-  repo root, added to `.gitignore`. Nothing binary is committed.
-  1. Checks its tools: `stockfish` (`brew install stockfish`, 19 today) and `fastchess`. If
-     fastchess is not on `PATH`, the script uses `.elo/fastchess/fastchess` and, when it is missing,
-     clones the **pinned release tag** of `github.com/Disservin/fastchess` and runs `make -j`. The tag
-     is recorded in the script. There is no Homebrew formula (`brew info fastchess`: none).
-  2. Fetches the opening book once: `8moves_v3.pgn` from `official-stockfish/books`, at a pinned
-     commit URL, verified against a sha256 written in the script. A mismatch stops the script.
-  3. Builds `BChessUCI` in Release with
-     `xcodebuild -scheme BChessUCI -configuration Release -derivedDataPath .elo/dd build`.
-  4. Plays one fastchess run per Stockfish level (`LEVELS`, default `1320 1600 1900`; 1320 is the
-     lowest `UCI_Elo` Stockfish accepts). Each run is equivalent to:
-     ```
-     fastchess -engine cmd=<BChessUCI> name=BChess \
-               -engine cmd=stockfish name=SF<L> option.UCI_LimitStrength=true option.UCI_Elo=<L> option.Threads=1 option.Hash=16 \
-               -each tc=$TC timemargin=100 -openings file=8moves_v3.pgn format=pgn order=random \
-               -repeat -games 2 -rounds $((GAMES_PER_LEVEL/2)) -concurrency $CONCURRENCY -recover \
-               -draw movenumber=40 movecount=8 score=10 -resign movecount=4 score=1000 twosided=true \
-               -pgnout file=.elo/runs/<stamp>/SF<L>.pgn
-     ```
-     The flag spellings are checked against the pinned version's `--help`. `-repeat` plays each
-     opening with both colours. Defaults: `TC=10+0.1`, `GAMES_PER_LEVEL=134`, `CONCURRENCY=4` (the
-     M2 has 4 performance cores; efficiency cores add noise). All are overridable through
-     environment variables, since Jean will want to change them.
-  5. Reports, for each level, W/D/L, score % and fastchess's Elo difference ± 95%. It also counts
-     BChess losses by illegal move, time forfeit or disconnect from the PGN `Termination`. Any
-     illegal move or disconnect marks the run **invalid**, because the number would measure a bug.
-     A level scored above 90% or below 10% is flagged as uninformative.
-  6. Gives an overall estimate: the inverse-variance weighted mean of `L + diff` over the levels,
-     with its ± (in `awk`, no Python). It also prints a ready-to-paste Markdown row for `docs/elo.md`.
-- **`docs/elo.md`** covers:
-  - Method, and setup (three commands).
-  - How to run, and how long it takes.
-  - **Caveats:**
-    - Stockfish's `UCI_Elo` is calibrated against CCRL 40/4 at a longer time control (60+0.6 in its
-      documentation; confirm against the installed version), so 10+0.1 numbers are indicative.
-    - The rating is relative to that anchor, not FIDE.
-    - Engine weaknesses the number will reflect: no mate distance, so mates can drift into
-      repetition; no TT; no fifty-move rule.
-  - The error-bar table below.
-  - A **Results** table: date, commit, TC, book, levels, games, W/D/L per level, estimate ± 95%,
-    and wall time.
+**`scripts/elo-match.sh`** (bash, `set -euo pipefail`). It runs from anywhere:
+`ROOT=$(git -C "$(dirname "$0")" rev-parse --show-toplevel)`, and every path is absolute under
+`$ROOT/.elo/`, which is added to `.gitignore`. Nothing binary is committed.
+
+1. **Tools.** `stockfish` comes from `brew install stockfish` (19 today). For `fastchess`, the
+   script uses `$ROOT/.elo/fastchess/fastchess` if it is not on `PATH`. When that is missing too, it
+   clones the **pinned release tag** of `github.com/Disservin/fastchess` and runs `make -j`. The tag
+   is recorded in the script. There is no Homebrew formula (`brew info fastchess`: none).
+2. **Book.** It fetches `8moves_v3.pgn` from `official-stockfish/books` once, from a pinned commit
+   URL, into `$ROOT/.elo/books/`. A sha256 written in the script must match, or the script stops.
+3. **Build.** `xcodebuild -project "$ROOT/BChess.xcodeproj" -scheme BChessUCI -configuration Release -derivedDataPath "$ROOT/.elo/dd" build`.
+4. **One level per run.** The inputs are `LEVEL` (Stockfish `UCI_Elo`; 1320 is the lowest it
+   accepts), `GAMES` (even), `TC` (default `10+0.1`) and `CONCURRENCY` (default 4: the M2 has 4
+   performance cores, and the efficiency cores add noise). The run is equivalent to:
+   ```
+   fastchess -engine cmd="$BCHESS" name=BChess \
+             -engine cmd=stockfish name=SF$LEVEL option.UCI_LimitStrength=true option.UCI_Elo=$LEVEL option.Threads=1 option.Hash=16 \
+             -each tc=$TC timemargin=100 -openings file="$BOOK" format=pgn order=random \
+             -repeat -games 2 -rounds $((GAMES/2)) -concurrency $CONCURRENCY -recover \
+             -draw movenumber=40 movecount=8 score=10 -resign movecount=4 score=1000 twosided=true \
+             -pgnout file="$ROOT/.elo/runs/$STAMP-SF$LEVEL.pgn"
+   ```
+   The flag spellings are checked against the pinned version's `--help`. `-repeat` plays each
+   opening with both colours.
+5. **Report.**
+   - W/D/L, score %, and fastchess's Elo difference ± 95%.
+   - BChess losses by illegal move, time forfeit or disconnect, counted from the PGN `Termination`.
+   - The performance `LEVEL + diff ± err`, and a ready-to-paste Markdown row for `docs/elo.md`.
+6. **Results that are not a number.**
+   - **Invalid**: any illegal move or disconnect. That is a bug to fix, not a rating.
+   - **Out of range**: a score outside 10–90%, an all-win or all-loss run, or no finite interval
+     from fastchess. The script prints "out of range — try `LEVEL=<L±300, at least 1320>`" and
+     records no rating.
+   - There is no combined multi-level estimate. One informative level, with its interval, is the
+     result.
+
+**`docs/elo.md`** covers:
+- Method and setup (three commands), how to run, and how long it takes.
+- **Caveats:**
+  - Stockfish's `UCI_Elo` is calibrated against CCRL 40/4 at a longer time control (60+0.6 in its
+    documentation; confirm against the installed version), so 10+0.1 numbers are indicative.
+  - The rating is relative to that anchor, not FIDE.
+  - Engine weaknesses the number will reflect: no TT in the tool, no fifty-move rule, no
+    quiescence in check.
+- The error-bar table below.
+- A **Results** table: date, commit, TC, book, level, games, W/D/L, performance ± 95%, wall time.
 
 **Error bars** (95%, near a 50% score, about 20% draws; the per-game score variance is about 0.2,
 and 1 score point ≈ 695 Elo at 50%):
@@ -203,58 +291,70 @@ and 1 score point ≈ 695 Elo at 50%):
 |------:|------:|
 | 100 | ±61 |
 | 200 | ±43 |
+| 300 | ±35 |
 | 400 | ±31 |
 | 1000 | ±19 |
 
-Levels far from the true rating add less information, so the three-level fit over 400 games is
-roughly ±35–45.
+They widen as the score moves away from 50%, which is why the level is chosen near the engine.
 
-**Time on this Mac (M2, concurrency 4)**: a 10+0.1 game takes ≤ 2 × (10 + 0.1 × moves) s. With
-adjudication, about 25 s of wall time is a reasonable estimate. 400 games × 25 s / 4 ≈ **40–45 min**.
-At 60+0.6 the same 400 games take about 4–5 h.
+**Time on this Mac (M2, concurrency 4)**: a 10+0.1 game is ≤ 2 × (10 + 0.1 × moves) s, about 25 s of
+wall time with adjudication. 300 games × 25 s / 4 ≈ **30 min**. At 60+0.6 the same run takes ≈ 3 h.
 
-### Step 5 — First measurement (default: run it)
+### Step 6 — First measurement (default: run it)
 
-Run `scripts/elo-match.sh` with the defaults (3 × 134 = 402 games, 10+0.1). Record the result in
-`docs/elo.md` → Results, with error bars, wall time and the commit. Put a one-line summary in the
-README row.
-- If BChess scores above 90% against 1900, rerun with higher `LEVELS`.
-- If it scores below 10% against 1320, use the fallback in Decision 2.
-- An **invalid** run (illegal move, disconnect) is a bug to fix in steps 1–3, not a number to record.
+1. Probe: `LEVEL=1600 GAMES=40` (≈ 4 min). Its performance (or the out-of-range hint) picks the
+   level: the performance rounded to 100, at least 1320.
+2. Measure: `GAMES=300` at that level (≈ 30 min, ±35). Record it in `docs/elo.md` → Results with the
+   interval, wall time and commit, and put a one-line summary in the README row.
+3. If the score is still out of range, move the level once more. Below 10% at 1320 means the
+   fallback in Decision 2.
+
+An invalid run is a bug to fix in steps 1–4, not a number to record.
 
 ### Reuse
 
-- `ChessMoveGenerator::generateMoves` (legal moves) and `ChessGame::move(Move, …)`.
+- `ChessMoveGenerator::generateMoves` and `FPGN::to_string(…, uci)` to match moves;
+  `ChessGame::move(Move, …)` to play them.
 - `FEngine evaluate:time:callback:`, `stop` and its generation guard.
 - `FEngineInfo` `mat`/`depth`/`quiescenceDepth`/`bestLine(true)`/`uciBestMove`.
-- `UCIProcess` (the subprocess harness in `UCIProcessTests.swift`) and its `isLegalMove`, which
-  becomes a real legality check through `move(uci:)`.
+- The in-process `UCI().process` pattern (`GamesTests.swift:103-110`) for parsing tests, and the
+  `UCIProcess` harness for stdout and timing.
 - `os_log` for diagnostics.
-- No new files in the app targets, and no `project.yml` change.
+- No new files in the app targets, and no `project.yml` change. The new test file sits in the
+  `BChessTests` folder source.
 
 ## Alternatives rejected
 
 - **Parse UCI moves in Swift against `engine.allMoves()`.** That fixes the tool but leaves
   `ChessBoard::getMove` building illegal or flagless moves for anything else. Fixing it in the engine
   is the same amount of code, and it is testable as plain C++ (I3).
+- **Parse squares and promotion separately (r1).** It is a second parser; comparing UCI strings is
+  exact and shorter (Codex r1).
 - **Keep `move:to:` and add `moveUCI:` beside it.** That is two ways to play a move from text, one
-  of them wrong for promotion and en passant. Replace it instead.
-- **Soft time limit / "don't start a depth past 50% of the budget".** It saves clock but changes
-  no move. It is a strength tweak for later, not needed for a correct engine.
-- **Node limits (`go nodes`).** The search has no node counter check. The token is skipped, so a
-  runner that uses node limits isn't supported (fastchess and cutechess default to clocks).
-- **cutechess-cli as the runner.** It is also not in Homebrew, it needs Qt to build, and it is
-  slower at high concurrency. fastchess builds with `make` alone and reports Elo±, illegal moves and
-  timeouts directly. (Decision 1.)
-- **The repo's `BChess/Openings.pgn` as the match book.** It holds variations and named lines of
-  uneven length; fastchess plays mainlines only. `8moves_v3` is balanced, standard, and pinned by
-  hash.
+  of them wrong for promotion and en passant.
+- **Mate distance from the PV length (r1).** It is wrong: the PV need not hold the longest defence
+  (Codex r1).
+- **Report mates without a distance** (Codex's fallback). Rejected because it leaves the strength
+  bug: without a distance, the engine still doesn't prefer the faster mate. The fix is about a dozen
+  lines in one function, plus the TT adjustment.
+- **A UCI-side `go` timestamp (r1).** It is mutable state read from the search thread; the
+  evaluation's own elapsed time does the job (Codex r1).
+- **Soft time limit** (don't start a depth past half the budget). It saves clock but changes no move.
+  It is a strength tweak for later.
+- **Node limits (`go nodes`).** The search has no node check. The token is skipped, and clocks are
+  the runners' default.
+- **cutechess-cli** as the runner. It is not in Homebrew and needs Qt to build. fastchess builds with
+  `make` and reports Elo±, illegal moves and timeouts. (Decision 1.)
+- **The repo's `BChess/Openings.pgn` as the match book.** It holds variations and uneven lines.
+  `8moves_v3` is balanced, standard, and pinned by hash.
 - **UHO books.** They are built to be unbalanced, to separate strong engines. At this level they
   mostly add noise.
-- **Exposing `Hash`/`Threads`/`OwnBook`.** There is no book to own. The search is single-threaded.
-  The TT stays off (Decision 5). An option nobody would change is a knob the simplicity bar rules out.
-- **Running Elo in CI.** It takes tens of minutes and needs network tools. It is a manual measurement
-  recorded in `docs/elo.md`.
+- **Several levels and an inverse-variance estimate (r1).** The weighting is undefined at 0%/100%
+  and assumes the levels are calibrated alike. One informative level is simpler and honest about its
+  interval (Codex r1).
+- **Exposing `Hash`/`Threads`/`OwnBook`.** There is no book, the search is single-threaded, and the
+  TT stays off (Decision 5). Nobody would set these options.
+- **Running Elo in CI.** It takes tens of minutes and needs network tools. It is a manual measurement.
 
 ## Test plan
 
@@ -262,69 +362,82 @@ Each test is written first and seen red on `main` + ENGINE-1.
 
 | Step | Test | Proves | Red today |
 |------|------|--------|-----------|
-| 1 | `FEngineTests.moveUCIPlaysPromotionEnPassantCastling` (Swift): `b7b8n` from `8/1P6/8/8/8/8/8/k3K3 w - - 0 1` → FEN with a knight on b8; `e5d6` ep → captured pawn gone; `e1g1` → rook on f1; each returns `true` | legal-move matching, all three special moves | yes (no `move(uci:)`; ep leaves the pawn) |
-| 1 | `FEngineTests.moveUCIRejectsIllegal`: `e2e5`, `b7b8` (no letter), `zz99`, `e7e8q` for a non-pawn → `false`, FEN unchanged | no silent illegal moves | yes |
-| 1 | `MoveTests.UCIStringHasPromotion` (GoogleTest): `to_string(createPromotion(b7,b8,WHITE,PAWN,QUEEN), uci) == "b7b8q"`, knight → `"b7b8n"` | P2 | yes |
-| 2 | `UCIProcessTests.promotionInPositionMoves`: `position fen 8/1P6/8/8/8/8/8/k3K3 w - - 0 1 moves b7b8q`, `go depth 1` → `bestmove` legal in `1Q6/8/8/8/8/8/8/k3K3 b - - 0 1` | P1 end to end, no crash | yes (assert) |
-| 2 | `UCIProcessTests.bestMoveCarriesPromotion`: `8/1P6/8/8/8/8/8/k3K3 w` `go depth 3` → `bestmove b7b8q` | P2 end to end | yes (`b7b8`) |
-| 2 | `UCIProcessTests.onlyUCILinesOnStdout`: `uci`, blank line, `setoption name Hash value 16`, `foo`, `isready`, `ucinewgame`, `position startpos moves e2e4`, `go depth 2`, then every line matches `^(id |uciok$|readyok$|info |bestmove )`, and the `bestmove` is legal for Black after e4 | P4, ucinewgame, no crash on blank | yes |
-| 2 | `UCIProcessTests.mateIsReportedAsMate`: `6k1/5ppp/8/8/8/8/8/R5K1 w - - 0 1` `go depth 2` → an `info` with `score mate 1`, `bestmove a1a8` | `score mate` | yes |
-| 3 | `SearchLimitsTests` (pure Swift Testing, new file in `BChessTests/`, picked up by the folder source): parse of `wtime 10000 btime 9000 winc 100 binc 100`, `movetime 500`, `depth 4`, `infinite`, `` (bare), unknown tokens skipped; allocation: 10+0.1 white → 433 ms, black uses `btime`, `movestogo 1` with 1000 ms → 950, 30 ms left → 10 (floor), movetime 500 → 450, depth-only → (4, 0) | the formula and its edges | yes (type missing) |
-| 3 | `UCIProcessTests.clockIsHonoured`: `go wtime 3000 btime 3000` → `bestmove` within 1.0 s, legal | P3 | yes (10 s) |
-| 3 | `UCIProcessTests.movetimeIsHonoured`: `go movetime 300` → `bestmove` after ≥ 200 ms and within 1.5 s | movetime | yes |
-| 3 | `UCIProcessTests.depthEndsTheSearch`: `go depth 2`, no `stop` → `bestmove` within 5 s, and the last `info` has `depth 2` | depth honoured | yes |
-| 3 | existing `goInfiniteThenStopPrintsBestMove`, `positionWithoutMovesPrintsTheNullMove` | `infinite`/`stop`/`0000` unchanged | — |
+| 1 | `MoveTests.UCIStringHasPromotion` (GoogleTest): `to_string(createPromotion(b7,b8,WHITE,PAWN,QUEEN), uci) == "b7b8q"`; knight → `"b7b8n"` | P2 | yes |
+| 1 | `FEngineTests.moveUCIPlaysSpecialMoves` (Swift): from `8/1P6/8/8/8/8/8/k3K3 w - - 0 1`, `b7b8n` → knight on b8; en passant `e5d6` → the captured pawn is gone; `e1g1` → rook on f1; each returns `true` and the FEN is exact | legal matching of every special move | yes (no `move(uci:)`; ep leaves the pawn) |
+| 1 | `FEngineTests.moveUCIRejectsIllegal`: `e2e5`, `b7b8` (no letter), `zz99`, `e2e4q`, `""` → `false`, FEN unchanged | no silent illegal moves | yes |
+| 1 | `FEngineConcurrencyTests.positionChangeInvalidatesSearch` with `move(uci:)` | invalidation still covered | — (migrated) |
+| 2 | `MinMaxSearch.MateCarriesDistance` (GoogleTest, TT off **and** on): `6k1/5ppp/8/8/8/8/8/R5K1 w - - 0 1` at depth 3 → `MAT_VALUE − 1`; a mate-in-2 FEN (chosen by the implementer and confirmed by `stockfish` reporting `mate 2`) at depth 4 → `MAT_VALUE − 3`, and Black to move in a mirrored mate → `−(MAT_VALUE − 1)` | P3 distance, sign, TT adjustment | yes (`MAT_VALUE`) |
+| 2 | `MinMaxSearch.PrefersShorterMate`: a position with a mate in 1 and a longer mate available, depth 4 → the best move is the mate in 1 | P3 strength effect | yes, if the longer mate's move is generated first (the implementer picks such a position) |
+| 2 | `IterativeDeepening.StatisticsAreCumulative` (GoogleTest): depth-3 search; the callback fires 3 times, with depths 1, 2, 3; nodes strictly increase; the last `nodes` = sum of the per-depth visits; `time` (ms) does not decrease | P4 | yes (per-depth nodes) |
+| 2 | `IterativeDeepening.NoCallbackForInterruptedDepth`: stop during depth 2 through the `MinMaxSearch::checkpoint` test hook (`MinMaxSearch.hpp:72`, `:213`) → no second per-depth callback | P4 | yes |
+| 3 | `UCICommandTests` (in-process, `UCI().process`, `FEngine.fen()`, new file): bare `position` → unchanged; `position fen` with no FEN → start; `position fen 4k3/8/8/8/8/8/8/4K2X w - - 0 1 moves e1e2` → start position, moves ignored; 4-field `position fen 4k3/8/8/8/8/8/8/4K3 w -` → that position; `position startpos moves e2e4 e7e9 d2d4` → after e4 only; `position fen X` then `ucinewgame` → start | P6 all-or-nothing `position`, `ucinewgame` | yes (crashes, partial board, no reset) |
+| 3 | `UCIProcessTests.promotionInPositionMoves`: `position fen 8/1P6/8/8/8/8/8/k3K3 w - - 0 1 moves b7b8q`, `go depth 1` → `bestmove` legal (`move(uci:)` returns `true`) in `1Q6/8/8/8/8/8/8/k3K3 b - - 0 1` | P1 end to end, no crash | yes (assert) |
+| 3 | `UCIProcessTests.promotionInBestMoveAndPV`: same start, `go depth 3` → some `info … pv b7b8q …` and `bestmove b7b8q` | P2 end to end | yes (`b7b8`) |
+| 3 | `UCIProcessTests.onlyUCILinesOnStdout`: `uci`, a blank line, `setoption name Hash value 16`, `foo`, bare `position`, `isready`, `position fen <middlegame>`, `ucinewgame`, `go depth 2` (no `position` after `ucinewgame`) → every line matches `^(id |uciok$|readyok$|info |bestmove )`; the `bestmove` is legal from the **start** position | stdout clean, and the reset is seen end to end | yes |
+| 3 | `UCIProcessTests.scoreIsFromTheEngineSide`: White to move, White a queen up → `score cp` > 0; the same position mirrored with Black to move → `score cp` > 0; Black to move with a mate in 1 → `score mate 1` | sign on both sides, `mate N` | yes (`mate`) |
+| 3 | `UCIProcessTests.mateIsReportedAsMate`: `6k1/5ppp/8/8/8/8/8/R5K1 w - - 0 1` `go depth 3` → `info … score mate 1 …`, `bestmove a1a8` | `score mate` | yes |
+| 4 | `SearchLimitsTests` (pure Swift Testing, new file): parse of `wtime 10000 btime 9000 winc 100 binc 100`, `movetime 500`, `depth 4`, `infinite`, bare, unknown keys (`nodes 5 searchmoves e2e4 d2d4 depth 3` → depth 3); invalid values: `movestogo 0`, `depth 0` → 1, `wtime -5`, `wtime abc`, `wtime 99999999999999999999` (overflow), `wtime` with no value. Allocation: 10+0.1 White → 433 ms; Black uses `btime`; `movestogo 1` with 1000 ms → 950; 30 ms left → 10; movetime 500 → 450; depth only → (4, 0); a huge clock → the one-day cap | the formula and every edge, with no divide by zero | yes (type missing) |
+| 4 | `UCIProcessTests.clockIsHonoured`: `go wtime 3000 btime 3000` → `bestmove` within 1.0 s, legal | P5 | yes (10 s) |
+| 4 | `UCIProcessTests.movetimeIsHonoured`: `go movetime 300` from a middlegame → `bestmove` within 1.5 s, legal (no lower bound: a search may legitimately finish early) | `movetime` | yes (10 s) |
+| 4 | `UCIProcessTests.depthEndsTheSearch`: `go depth 2`, no `stop` → `bestmove` within 5 s, and the last `info` has `depth 2` | depth honoured | yes |
+| 4 | the existing `goInfiniteThenStopPrintsBestMove` and `positionWithoutMovesPrintsTheNullMove` | `infinite`/`stop`/`0000` unchanged | — |
 
-The process tests run in Debug, from positions outside any book, each in a few hundred ms, so the
-suite stays well under 10 s. Step 4 has no unit test. Its check is a smoke run
-(`LEVELS=1320 GAMES_PER_LEVEL=4 TC=2+0.05`) that must finish with no invalid game, reported in the
-step's commit message.
+The process tests run in Debug, each in under a second, so the added suite stays well under 10 s.
+Step 5 has no unit test. Its check is a smoke run (`LEVEL=1320 GAMES=4 TC=2+0.05`) that must finish
+with no invalid game, reported in the step's commit message.
 
 ## Invariants
 
-- **I1 — Files keep opening.** Holds. PGN writing uses the SAN types, and only `SANType::uci` gains
-  the letter. No stored format uses UCI text (`FEngineMoveNode.mm:27` uses `tight`).
-- **I2 — Search results land on their position.** Holds. `move(uci:)` keeps `[self invalidate]`,
-  and the app never calls it.
-- **I3 — Portable engine.** Holds. Step 1 is plain C++ in `ChessGame.cpp`; one function is deleted
-  from `ChessBoard.cpp`.
+- **I1 — Files keep opening.** Holds.
+  - PGN writing uses the SAN types, and only `SANType::uci` gains the letter.
+  - No stored format holds UCI text (`FEngineMoveNode.mm:27` uses `tight`).
+  - Scores are never stored.
+- **I2 — Search results land on their position.** Holds. `move(uci:)` keeps `[self invalidate]`, and
+  the migrated `expectInvalidates` proves it. The other step 2 changes (mate scores, statistics, one
+  callback per completed depth) change what a callback says, not when or whether it can land.
+  `FEngine.mm`'s generation guard is untouched.
+- **I3 — Portable engine.** Holds. Steps 1–2 are plain C++ in `ChessEngine.hpp`, `FPGN.cpp`,
+  `MinMaxSearch.hpp`, `IterativeDeepening.hpp` and `ChessEvaluater`. Code is deleted from
+  `ChessBoard.cpp` and `ChessGame.cpp`.
 - **I4 — The UCI tool keeps working.** This is the invariant most at risk, and it is held:
   - stdin stays on the main thread, and callbacks print from the search queue.
-  - `stop` and timers go through the existing generation guard.
-  - Every new path (`go` parsing, illegal moves, blank lines) ends in "ignore and log", never an
-    assert or an empty `removeFirst`.
-  - The existing stop/0000 tests stay. The new process tests cover promotion, clocks, `movetime`,
-    `depth`, `ucinewgame` and stdout cleanliness.
-- **I5 — Private and offline.** Holds for the apps, which are unchanged. The Elo script downloads
-  developer tools (fastchess source, the opening book) into the git-ignored `.elo/` only when run by
-  hand. Nothing reaches the app or CI.
+  - UCI keeps no state the search thread reads (time comes from the evaluation).
+  - `stop` and the timers go through the existing generation guard.
+  - Every new input path ends in "ignore and log", never an assert or an empty `removeFirst`.
+  - The existing stop/0000 tests stay. The new tests cover promotion, malformed `position`,
+    `ucinewgame`, clocks, `movetime`, `depth`, score signs and stdout.
+- **I5 — Private and offline.** Holds for the apps. The Elo script downloads developer tools
+  (fastchess source, the book) into the git-ignored `.elo/`, only when run by hand. Nothing reaches
+  the app or CI.
 
 ## Risks and rollout
 
+- **The app's analysis changes a little**: shorter mates win, and the readout is cumulative.
+  `Verdict` still says "forced mate" through `mat`. `nodeEvaluated` now counts the whole search,
+  which is what a reader expects.
 - **Stockfish's calibration** at 10+0.1 is approximate. The number is reported with the TC, and
   Decision 3 offers the calibrated TC.
 - **The engine may sit below 1320**, Stockfish's lowest level. Decision 2 has the fallback.
 - **Root repetition.** In a position that already occurred three times, the search returns no move
   (`MinMaxSearch.hpp:152`), and BChess would answer `0000`. fastchess ends the game at threefold
-  before asking, so this only matters if the two disagree on repetition. The match report counts
-  disconnects and illegal moves, so a disagreement would show.
+  before asking, so this only matters if the two disagree on repetition. The report counts illegal
+  moves and disconnects, so a disagreement would show.
 - **C++ `assert`s stay on in Release** (no `NDEBUG` in `project.yml`). That is slower, but correct.
   Turning them off is an app-wide build change, out of scope.
-- **Machine load** during the match makes time forfeits more likely. `timemargin=100` and a
-  concurrency of 4 keep them rare, and the report counts them.
-- No device needed. The gates in `/develop` cover it, and step 5 runs on Jean's Mac.
+- **Machine load** makes time forfeits more likely. `timemargin=100` and a concurrency of 4 keep
+  them rare, and the report counts them.
+- No device needed. The gates in `/develop` cover the code, and step 6 runs on Jean's Mac.
 
 ## Decision left open for Jean
 
-1. **Match runner.** Default: **fastchess** (builds with `make`, reports Elo± and forfeits).
-   Alternative: cutechess-cli (needs a Qt build).
-2. **Reference opponents.** Default: **Stockfish 19 with `UCI_LimitStrength`** at 1320/1600/1900,
-   one `brew install`. Alternative (also the fallback if BChess is below 1320): add 1–2 small engines
-   with published CCRL ratings, built from source into `.elo/`, e.g. ones rated about 1000–1400.
-3. **Time control.** Default: **10+0.1** (≈ 40–45 min for 400 games, indicative). Alternative:
-   60+0.6, Stockfish's calibration TC (≈ 4–5 h for 400 games).
-4. **Games in the first run.** Default: **≈ 400** (±35–45 Elo overall), run as step 5 and recorded.
-   Alternative: leave the run to Jean, or 1000 games (≈ ±20–25, ≈ 2 h).
-5. **Transposition table.** Default: **off, as today** (the TT never clears, has no aging, and
-   ENGINE-1 lists repetition/TT interactions as follow-ups). Alternative: a second run with `ttEnabled`
-   on to see what it is worth, behind a `Hash` option. That only makes sense after the TT follow-ups.
+1. **Match runner.** Default: **fastchess**. Alternative: cutechess-cli (needs a Qt build).
+2. **Reference opponent.** Default: **Stockfish 19 with `UCI_LimitStrength`**, one `brew install`.
+   Alternative (also the fallback if BChess is below 1320): a small engine with a published CCRL
+   rating near BChess, built from source into `.elo/`.
+3. **Time control.** Default: **10+0.1** (≈ 30 min for 300 games; indicative). Alternative: 60+0.6,
+   Stockfish's calibration TC (≈ 3 h).
+4. **First run.** Default: **probe + 300 games at one level (±35)**, run as step 6 and recorded.
+   Alternatives: leave the run to Jean, or 1000 games (±19, ≈ 1¾ h).
+5. **Transposition table in the tool.** Default: **off, as today** (it never clears and has no
+   aging, and ENGINE-1 lists TT/repetition follow-ups). Alternative: a later run with it on, behind
+   a `Hash` option, once those follow-ups land.
