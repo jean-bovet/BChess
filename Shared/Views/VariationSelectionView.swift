@@ -10,7 +10,7 @@ import SwiftUI
 
 struct VariationSelectionView: View {
     
-    @Binding var document: ChessDocument
+    let session: GameSession
 
     func variations(from: [FEngineMoveNode]) -> [Variation] {
         var variations = [Variation]()
@@ -24,18 +24,18 @@ struct VariationSelectionView: View {
     }
         
     var body: some View {
-        if document.variations.show {
+        if session.variations.show {
             GeometryReader { geometry in
                 let minSize: CGFloat = min(geometry.size.width, geometry.size.height)
                 let squareSize: CGFloat = minSize / CGFloat(numberOfSquares)
                 let xOffset: CGFloat = (geometry.size.width - minSize) / 2 + squareSize / 2
                 let yOffset: CGFloat = (geometry.size.height - minSize) / 2 + squareSize / 2
                 
-                ForEach(variations(from: document.variations.variations)) { v in
-                    let x1 = CGFloat(v.from.file.actual(rotated: document.rotated)) * squareSize + xOffset
-                    let y1 = CGFloat(7 - v.from.rank.actual(rotated: document.rotated)) * squareSize + yOffset
-                    let x2 = CGFloat(v.to.file.actual(rotated: document.rotated)) * squareSize + xOffset
-                    let y2 = CGFloat(7 - v.to.rank.actual(rotated: document.rotated)) * squareSize + yOffset
+                ForEach(variations(from: session.variations.variations)) { v in
+                    let x1 = CGFloat(v.from.file.actual(rotated: session.gameState.rotated)) * squareSize + xOffset
+                    let y1 = CGFloat(7 - v.from.rank.actual(rotated: session.gameState.rotated)) * squareSize + yOffset
+                    let x2 = CGFloat(v.to.file.actual(rotated: session.gameState.rotated)) * squareSize + xOffset
+                    let y2 = CGFloat(7 - v.to.rank.actual(rotated: session.gameState.rotated)) * squareSize + yOffset
 
                     Rectangle()
                         .background(Color.blue)
@@ -43,8 +43,7 @@ struct VariationSelectionView: View {
                         .frame(width: squareSize, height: squareSize, alignment: .center)
                         .offset(x: x2 - squareSize/2, y: y2 - squareSize/2)
                         .onTapGesture {
-                            document.variations.selectedVariationIndex = v.index
-                            Actions(document: $document).move(to: .forward)
+                            session.chooseVariation(v.index)
                         }
                     
                     let p = Arrow(start: CGPoint(x: x1, y: y1),
@@ -58,15 +57,11 @@ struct VariationSelectionView: View {
     }
 }
 
-struct VariationSelectionView_Previews: PreviewProvider {
-    static var previews: some View {
-        Group {
-            let doc = try! ChessDocument()
-            ZStack {
-                BoardView(document: .constant(doc))
-                PiecesView(document: .constant(doc))
-                VariationSelectionView(document: .constant(doc))
-            }
-        }
+#Preview {
+    let session = GameSession()
+    ZStack {
+        BoardView(session: session)
+        PiecesView(session: session)
+        VariationSelectionView(session: session)
     }
 }

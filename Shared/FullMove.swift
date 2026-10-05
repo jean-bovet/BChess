@@ -6,7 +6,7 @@
 //  Copyright © 2021 Jean Bovet. All rights reserved.
 //
 
-import SwiftUI
+import Foundation
 
 final class FullMove: Identifiable {
     let id: String

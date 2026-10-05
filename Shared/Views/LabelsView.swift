@@ -9,10 +9,10 @@
 import SwiftUI
 
 struct LabelsView: View {
-    @Binding var document: ChessDocument
+    let session: GameSession
 
     func actualIndex(_ index: Int) -> Int {
-        if document.rotated {
+        if session.gameState.rotated {
             return 7 - index
         } else {
             return index
@@ -48,21 +48,18 @@ struct LabelsView: View {
     }
 }
 
-struct LabelsView_Previews: PreviewProvider {
-    static var previews: some View {
-        Group {
-            let doc = try! ChessDocument()
-            ZStack {
-                BoardView(document: .constant(doc))
-                LabelsView(document: .constant(doc))
-            }
-        }
-        Group {
-            let doc = try! ChessDocument(rotated: true)
-            ZStack {
-                BoardView(document: .constant(doc))
-                LabelsView(document: .constant(doc))
-            }
-        }
+#Preview("White at the bottom") {
+    let session = GameSession()
+    ZStack {
+        BoardView(session: session)
+        LabelsView(session: session)
+    }
+}
+
+#Preview("Rotated") {
+    let session = GameSession(state: GameState(pgn: "*", rotated: true))
+    ZStack {
+        BoardView(session: session)
+        LabelsView(session: session)
     }
 }

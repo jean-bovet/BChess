@@ -9,7 +9,7 @@
 import SwiftUI
 
 struct PromotionView: View {
-    @Environment(\.presentationMode) var presentation
+    @Environment(\.dismiss) private var dismiss
     @Binding var promotion: Promotion
     let callback: ((String) -> Void)?
     
@@ -42,19 +42,17 @@ struct PromotionView: View {
                         .padding()
                         .onTapGesture() {
                             callback?(name)
-                            presentation.wrappedValue.dismiss()
+                            dismiss()
                         }
                 }
             }
             Button("Cancel") {
-                presentation.wrappedValue.dismiss()
+                dismiss()
             }.padding()
         }
     }
 }
 
-struct PromotionView_Previews: PreviewProvider {
-    static var previews: some View {
-        PromotionView(promotion: .constant(Promotion(move: FEngineMove(), isWhite: true)), callback: nil)
-    }
+#Preview {
+    PromotionView(promotion: .constant(Promotion(move: FEngineMove(), isWhite: true)), callback: nil)
 }

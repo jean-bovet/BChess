@@ -24,6 +24,8 @@ void ChessGame::reset() {
     moveIndexes.reset();
     history->clear();
     board.reset();
+    // The history holds the initial position too: it counts as the first occurrence of a position
+    history->push_back(board.getHash());
     outcome = Outcome::in_progress;
     initialFEN = StartFEN;
 }
@@ -32,6 +34,8 @@ bool ChessGame::setFEN(std::string fen) {
     reset();
     if (FFEN::setFEN(fen, board)) {
         initialFEN = fen;
+        history->clear();
+        history->push_back(board.getHash());
         return true;
     } else {
         return false;
@@ -102,6 +106,9 @@ void ChessGame::move(Move move, std::string comment, bool replace) {
         }
     });
 
+    // The node at the cursor is either new (no children) or an existing one: continue along its main line.
+    extendPathToLeaf(moveIndexes.moveCursor);
+
     board.move(move);
     
     history->push_back(board.getHash());
@@ -148,17 +155,19 @@ void ChessGame::moveTo(Direction direction, unsigned variationIndex) {
     switch (direction) {
         case Direction::start:
             moveIndexes.moveCursor = 0;
-            moveIndexes.resetToMainVariation();
             break;
         case Direction::end:
             moveIndexes.moveCursor = (int)moveIndexes.moves.size();
             break;
         case Direction::backward:
             moveIndexes.moveCursor--;
-            moveIndexes.resetToMainVariation();
             break;
         case Direction::forward:
-            moveIndexes.moves[moveIndexes.moveCursor] = variationIndex;
+            if (moveIndexes.moves[moveIndexes.moveCursor] != (int)variationIndex) {
+                // Another variation replaces the rest of the path with its own main line.
+                moveIndexes.moves[moveIndexes.moveCursor] = variationIndex;
+                extendPathToLeaf(moveIndexes.moveCursor + 1);
+            }
             moveIndexes.moveCursor++;
             break;
     }
@@ -189,9 +198,26 @@ void ChessGame::replayMoves() {
     board.reset();
     auto result = FFEN::setFEN(initialFEN, board);
     assert(result);
+    // The history must hold the positions up to the cursor only, as move() builds it,
+    // otherwise the repetition detection counts positions that lie ahead.
+    history->clear();
+    history->push_back(board.getHash());
     auto moves = allMoves();
     for (int index=0; index<moves.size(); index++) {
         board.move(moves[index]);
+        history->push_back(board.getHash());
+    }
+}
+
+void ChessGame::extendPathToLeaf(int keep) {
+    moveIndexes.moves.resize(keep);
+    MoveNode *node = &root;
+    for (int index=0; index<keep; index++) {
+        node = &node->variations[moveIndexes.moves[index]];
+    }
+    while (!node->variations.empty()) {
+        moveIndexes.moves.push_back(0);
+        node = &node->variations[0];
     }
 }
 

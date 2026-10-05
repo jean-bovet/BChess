@@ -11,9 +11,10 @@ Enjoy!
 - Supports all chess rules (including "en passant" and pawn promotion)
 - C++ chess engine supporting multiple level of difficulty (timed)
 - User interface written in SwiftUI, supporting macOS and iOS
+- Games are saved as `.bchess` files (JSON). Older `.json` games and PGN files still open
+- On macOS each game is a document. On iOS the app opens onto a Games list that lives in the app's Documents folder (visible in Files), with Import, Share (standard PGN) and delete
 
 ## Attributions
-- [SwiftUI animation completion](https://www.avanderlee.com/swiftui/withanimation-completion-callback/)
 - [Magic Move-Bitboard Generation in Computer Chess, Pradyumna Kannan](http://pradu.us/old/Nov27_2008/Buzz/research/magic/Bitboards.pdf)
 - [Magic Move-Bitboard Generation Source Code](https://essays.jwatzman.org/essays/chess-move-generation-with-magic-bitboards.html)
 - [Chess Evaluation](https://chessprogramming.wikispaces.com/Evaluation)
@@ -35,7 +36,6 @@ Enjoy!
 
 ## Limitations
 
-- unable to have read-only document (it always want to write it back)
 - background of List is not transparent in Light Mode (it is white)
 - unable to create rich text with support of tapping in it (like to select precisely the white or black move)
 

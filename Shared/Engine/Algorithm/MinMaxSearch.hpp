@@ -9,8 +9,10 @@
 #pragma once
 
 #include <stdio.h>
+#include <atomic>
 #include <climits>
 #include <algorithm>
+#include <functional>
 #include <iostream>
 
 #include "MoveList.hpp"
@@ -55,19 +57,36 @@ struct MinMaxVariation {
 };
 
 class MinMaxSearch {
-    bool analyzing = false;
+    // Set from any thread to end the running search. It is cleared only by resume(), never by a search
+    // itself, so a cancel can never be lost between two depths.
+    std::atomic<bool> stopRequested{false};
     
 public:
     Configuration config;
     
     int visitedNodes = 0;
     
+#ifdef BCHESS_TEST_HOOKS
+    // Called in the move loop right after the move has been pushed on the history. Tests use it to
+    // stop the search at an exact node, or to park the search thread inside alpha-beta.
+    std::function<void()> checkpoint;
+#endif
+    
     void reset() {
         visitedNodes = 0;
     }
 
     void cancel() {
-        analyzing = false;
+        stopRequested.store(true, std::memory_order_relaxed);
+    }
+    
+    // Allows a new search to run after cancel().
+    void resume() {
+        stopRequested.store(false, std::memory_order_relaxed);
+    }
+    
+    bool stopped() const {
+        return stopRequested.load(std::memory_order_relaxed);
     }
     
     typedef MinMaxVariation Variation;
@@ -75,7 +94,6 @@ public:
     // pv: Principal Variation that will be available when this method returns.
     // bv: Best Variation that is provided from an earlier search (typically by the iterative deepening algorithm).
     int alphabeta(ChessBoard node, HistoryPtr history, TranspositionTable &table, int depth, bool maximizingPlayer, Variation &pv, Variation &bv) {
-        analyzing = true;
         Variation currentLine;
         int color = maximizingPlayer ? 1 : -1;
         int score = alphabeta(node, history, table, depth, -INT_MAX, INT_MAX, color, pv, currentLine, bv);
@@ -162,7 +180,7 @@ private:
         TranspositionEntryType entryType = TranspositionEntryType::ALPHA;
         
         Move bestMove = INVALID_MOVE;
-        for (int index=-1; index<moves.count && analyzing; index++) {
+        for (int index=-1; index<moves.count && !stopped(); index++) {
             Move move = Move();
             if (index == -1) {
                 // At index -1 we try to evaluate the previously detected
@@ -191,6 +209,9 @@ private:
             
             cv.moves.push(move);
             history->push_back(newNode.getHash());
+#ifdef BCHESS_TEST_HOOKS
+            if (checkpoint) checkpoint();
+#endif
             
             Variation line;
             Variation bestLine = (move == bestMovePV) ? bv : Variation();
@@ -217,7 +238,9 @@ private:
             }
         }
 
-        if (ChessMoveGenerator::isValid(bestMove)) {
+        // A loop that was cut short holds a partial value, which must not be trusted by a later search
+        // of the same position. Its parents are cut short too, so they store nothing either.
+        if (ChessMoveGenerator::isValid(bestMove) && !stopped()) {
             table.store(evalDepth, node.getHash(), bestValue, bestMove, entryType
 #ifdef ASSERT_TT_KEY_COLLISION
                         , FFEN::getFEN(node, true)
@@ -261,7 +284,7 @@ private:
         }
         
         int score = stand_pat;
-        for (int index=0; index<moves.count && analyzing; index++) {
+        for (int index=0; index<moves.count && !stopped(); index++) {
             auto move = moves.moves[index];
             
             visitedNodes++;

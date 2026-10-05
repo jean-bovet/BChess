@@ -9,189 +9,27 @@
 import SwiftUI
 import UniformTypeIdentifiers
 
-extension UTType {
-    static var json: UTType {
-        UTType(importedAs: "ch.arizona-software.chess.json")
-    }
-    static var pgn: UTType {
-        UTType(importedAs: "com.apple.chess.pgn")
-    }
-}
-
-// The state of the game that is saved to the file
-struct GameState: Codable {
-    let pgn: String
-    let rotated: Bool
-    let white: GamePlayer? // Optional for backwards compability
-    let black: GamePlayer? // Optional for backwards compability
-}
-
-// The model of a player
-struct GamePlayer: Codable {
-    var name: String
-    var computer: Bool
-    var level: Int
-}
-
-// The mode of game
-struct GameMode {
-    enum Value {
-        case play
-        case analyze
-        case train
-    }
-    
-    // Contains the PGN before the analyze started, so we can restore it
-    var pgnBeforeAnalyzing = ""
-    
-    // The state of the board (see enum above)
-    var value: Value = .play
-}
-
-// Structure used to hold information about the current variations
-// that the user can choose a move from. This is used when the user
-// move forward in a game and a choice must be made because more than
-// one move is available as the next move.
-struct Variations {
-    var show = false {
-        didSet {
-            selectedVariationIndex = 0
-        }
-    }
-    var selectedVariationIndex = 0
-    var variations = [FEngineMoveNode]()
-}
-
+/// The macOS document: a pure value. The runtime state lives in `GameSession`, which `DocumentWindow`
+/// keeps in sync with this value.
 struct ChessDocument: FileDocument {
-    
-    static let startPosPGN = "*"
-    
-    let engine = FEngine()
-        
-    var pgn: String {
-        didSet {
-            game.rebuild(engine: engine)
-        }
-    }
-    
-    var currentGameIndex: UInt = 0 {
-        didSet {
-            engine.currentGameIndex = currentGameIndex
-            game.rebuild(engine: engine)
-        }
-    }
-    
-    var currentMoveIndex: UInt = 0 {
-        didSet {
-            engine.currentMoveNodeUUID = currentMoveIndex
-            selection = Selection.empty()
-            variations.show = false
-        }
-    }
-    
-    var whitePlayer: GamePlayer
-    var blackPlayer: GamePlayer
 
-    var rotated = false
+    var state: GameState
 
-    var selection = Selection.empty()
-    var lastMove: FEngineMove? = nil
-    var info: FEngineInfo? = nil
-    var game = Game()
-    var variations = Variations()
-    
-    var mode: GameMode
-    
-    // This variable is used by any action that needs the engine to move
-    // if suitable. For example, after New Game or Edit Game.
-    // It is observed in the PiecesView view.
-    var engineShouldMove = false
-    
-    var pieces: [Piece] {
-        return PiecesFactory().pieces(forState: engine.state)
-    }
-    
-    init(pgn: String = startPosPGN, white: GamePlayer? = nil, black: GamePlayer? = nil, rotated: Bool = false, mode: GameMode = GameMode(value: .play)) throws {
-        self.pgn = pgn
-        guard self.engine.loadAllGames(pgn) else {
-            throw CocoaError(.fileReadCorruptFile)
-        }
-        self.whitePlayer = white ?? GamePlayer(name: "", computer: false, level: 0)
-        self.blackPlayer = black ?? GamePlayer(name: "", computer: true, level: 0)
-        self.rotated = rotated
-        self.mode = mode
-
-        game.rebuild(engine: engine)
-        
-        loadOpenings()
+    init(state: GameState = .newGame) {
+        self.state = state
     }
 
-    func loadOpenings() {
-        engine.useOpeningBook = true
-        
-        let path = Bundle.main.path(forResource: "Openings", ofType: "pgn")
-        assert(path != nil)
-        
-        let pgn = try! String(contentsOfFile: path!)
-        let result = engine.loadOpening(pgn);
-        assert(result)
-    }
-    
-    static var readableContentTypes: [UTType] { [.json, .pgn] }
+    static var readableContentTypes: [UTType] { [.bchessGame, .json, .pgn] }
 
     init(configuration: ReadConfiguration) throws {
         guard let data = configuration.file.regularFileContents else {
             throw CocoaError(.fileReadCorruptFile)
         }
-        
-        if configuration.contentType == .json {
-            let decoder = JSONDecoder()
-            let state = try decoder.decode(GameState.self, from: data)
-
-            try self.init(pgn: state.pgn, white: state.white, black: state.black, rotated: state.rotated)
-        } else if configuration.contentType == .pgn {
-            try self.init(pgn: String(decoding: data, as: UTF8.self),
-                      white: GamePlayer(name: "", computer: false, level: 0),
-                      black: GamePlayer(name: "", computer: false, level: 0))
-        } else {
-            throw CocoaError(.fileReadUnknown)
-        }
+        state = try GameState(data: data, contentType: configuration.contentType)
     }
-    
+
+    // Writes the format the document was opened as
     func fileWrapper(configuration: WriteConfiguration) throws -> FileWrapper {
-        let pgnToWrite = mode.value != .play ? mode.pgnBeforeAnalyzing : pgn
-        switch configuration.contentType {
-        case .json:
-            let state = GameState(pgn: pgnToWrite, rotated: rotated, white: whitePlayer, black: blackPlayer)
-            let encoder = JSONEncoder()
-            let data = try encoder.encode(state)
-            return .init(regularFileWithContents: data)
-        case .pgn:
-            if let data = pgnToWrite.data(using: .utf8) {
-                return .init(regularFileWithContents: data)
-            } else {
-                throw CocoaError(.fileWriteInapplicableStringEncoding)
-            }
-        default:
-            throw CocoaError(.fileWriteUnsupportedScheme)
-        }
+        .init(regularFileWithContents: try state.data(for: configuration.contentType))
     }
-    
-    func applyEngineSettings() {
-        switch engine.isWhite() ? whitePlayer.level : blackPlayer.level {
-        case 0:
-            engine.thinkingTime = 2
-        case 1:
-            engine.thinkingTime = 5
-        case 2:
-            engine.thinkingTime = 10
-        case 3:
-            engine.thinkingTime = 15
-        default:
-            engine.thinkingTime = 2
-        }
-
-        engine.ttEnabled = UserDefaults.standard.bool(forKey: "useTranspositionTable")
-    }
-    
 }

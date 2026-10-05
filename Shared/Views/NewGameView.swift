@@ -32,9 +32,9 @@ struct NewPlayerConfigurationView: View {
 
 struct NewGameView: View {
     
-    @Environment(\.presentationMode) var presentationMode
+    @Environment(\.dismiss) private var dismiss
 
-    @Binding var document: ChessDocument
+    let session: GameSession
 
     @State private var temporaryWhitePlayer = GamePlayer(name: "", computer: true, level: 0)
     @State private var temporaryBlackPlayer = GamePlayer(name: "", computer: true, level: 0)
@@ -54,42 +54,34 @@ struct NewGameView: View {
                 Spacer()
                 if editMode {
                     Button("OK") {
-                        document.whitePlayer = temporaryWhitePlayer
-                        document.blackPlayer = temporaryBlackPlayer
-                        document.engineShouldMove.toggle()
-                        presentationMode.wrappedValue.dismiss()
+                        session.setPlayers(white: temporaryWhitePlayer, black: temporaryBlackPlayer)
+                        session.requestEngineMoveIfNeeded()
+                        dismiss()
                     }
                 } else {
                     Button("Cancel") {
-                        presentationMode.wrappedValue.dismiss()
+                        dismiss()
                     }
                     Button("New Game") {
-                        document.whitePlayer = temporaryWhitePlayer
-                        document.blackPlayer = temporaryBlackPlayer
-                        Actions(document: $document).newGame()
-                        document.engineShouldMove.toggle()
-                        presentationMode.wrappedValue.dismiss()
+                        session.newGame(white: temporaryWhitePlayer, black: temporaryBlackPlayer)
+                        session.requestEngineMoveIfNeeded()
+                        dismiss()
                     }
                 }
             }
         }
         .padding()
         .onAppear() {
-            temporaryWhitePlayer = document.whitePlayer
-            temporaryBlackPlayer = document.blackPlayer
+            temporaryWhitePlayer = session.gameState.white
+            temporaryBlackPlayer = session.gameState.black
         }
     }
 }
 
-struct NewGameView_Previews: PreviewProvider {
-    static var previews: some View {
-        Group {
-            let doc = try! ChessDocument()
-            NewGameView(document: .constant(doc), editMode: false)
-        }
-        Group {
-            let doc = try! ChessDocument()
-            NewGameView(document: .constant(doc), editMode: true)
-        }
-    }
+#Preview("New game") {
+    NewGameView(session: GameSession(), editMode: false)
+}
+
+#Preview("Edit game") {
+    NewGameView(session: GameSession(), editMode: true)
 }

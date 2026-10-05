@@ -10,13 +10,32 @@ import SwiftUI
 
 @main
 struct BChessUIApp: App {
-    var body: some Scene {
-        DocumentGroup(newDocument: try! ChessDocument()) { file in            
-            ContentView(document: file.$document)
+    #if os(iOS)
+    private let library: GameLibrary
+
+    init() {
+        // UI tests start from an empty library of their own
+        if ProcessInfo.processInfo.arguments.contains("-uiTestingFreshLibrary") {
+            let directory = FileManager.default.temporaryDirectory.appendingPathComponent("UITests-\(UUID().uuidString)", isDirectory: true)
+            try? FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+            library = GameLibrary(directory: directory)
+        } else {
+            library = .documents
         }
+    }
+    #endif
+
+    var body: some Scene {
         #if os(macOS)
+        DocumentGroup(newDocument: ChessDocument()) { file in
+            DocumentWindow(document: file.$document)
+        }
         Settings {
             SettingsView()
+        }
+        #else
+        WindowGroup {
+            GameRootView(library: library)
         }
         #endif
     }

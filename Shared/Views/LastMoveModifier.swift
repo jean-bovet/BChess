@@ -11,11 +11,11 @@ import SwiftUI
 struct LastMoveModifier: ViewModifier {
     let rank: Int
     let file: Int
-    let document: ChessDocument
+    let session: GameSession
     
     func moveColor() -> Color {
-        if document.mode.value == .train {
-            if document.engine.isValidOpeningMoves() {
+        if session.mode.value == .train {
+            if session.isValidOpeningMoves {
                 return Color.green.opacity(0.8)
             } else {
                 return Color.red.opacity(0.8)
@@ -26,7 +26,7 @@ struct LastMoveModifier: ViewModifier {
     }
     
     func isLastMoveStart(_ rank: Int, _ file: Int) -> Bool {
-        if let move = document.lastMove {
+        if let move = session.lastMove {
             return move.fromRank == rank && move.fromFile == file
         } else {
             return false
@@ -34,7 +34,7 @@ struct LastMoveModifier: ViewModifier {
     }
 
     func isLastMoveEnd(_ rank: Int, _ file: Int) -> Bool {
-        if let move = document.lastMove {
+        if let move = session.lastMove {
             return move.toRank == rank && move.toFile == file
         } else {
             return false

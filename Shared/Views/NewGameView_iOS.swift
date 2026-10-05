@@ -8,76 +8,57 @@
 
 import SwiftUI
 
-struct NewPlayerConfigurationView_iOS: View {
-    
-    @Binding var player: GamePlayer
-
-    var body: some View {
-        VStack(alignment: .leading) {
-            TextField("Name", text: $player.name)
-            Toggle(isOn: $player.computer) {
-                Text("Computer")
-                    .fixedSize()
-            }
-            Picker(selection: $player.level, label: Text("Level")) {
-                Text("2 seconds").tag(0)
-                Text("5 seconds").tag(1)
-                Text("10 seconds").tag(2)
-                Text("15 seconds").tag(3)
-            }
-            .hide(!player.computer, remove: true)
-        }.padding()
-    }
-}
-
 struct NewGameView_iOS: View {
     
-    @Environment(\.presentationMode) var presentationMode
+    @Environment(\.dismiss) private var dismiss
 
-    @Binding var document: ChessDocument
+    let session: GameSession
 
     @State private var temporaryWhitePlayer = GamePlayer(name: "", computer: true, level: 0)
     @State private var temporaryBlackPlayer = GamePlayer(name: "", computer: true, level: 0)
 
     var editMode: Bool
+    /// Starts the game elsewhere than in place; nil resets the session.
+    var onNewGame: ((GamePlayer, GamePlayer) -> Void)? = nil
     
     var body: some View {
-        NavigationView {
+        NavigationStack {
             Form {
                 Section(header: Text("White Player").bold()) {
-                    NewPlayerConfigurationView_iOS(player: $temporaryWhitePlayer)
+                    NewPlayerConfigurationView(player: $temporaryWhitePlayer)
                 }
                 Section(header: Text("Black Player").bold()) {
-                    NewPlayerConfigurationView_iOS(player: $temporaryBlackPlayer)
+                    NewPlayerConfigurationView(player: $temporaryBlackPlayer)
                 }
             }
             .onAppear() {
-                temporaryWhitePlayer = document.whitePlayer
-                temporaryBlackPlayer = document.blackPlayer
+                temporaryWhitePlayer = session.gameState.white
+                temporaryBlackPlayer = session.gameState.black
             }
-            .navigationBarTitle(editMode ? "Settings" : "New Game")
+            .navigationTitle(editMode ? "Settings" : "New Game")
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
                     Button("Cancel") {
-                        presentationMode.wrappedValue.dismiss()
+                        dismiss()
                     }
                 }
 
                 ToolbarItem(placement: .navigationBarTrailing) {
                     if editMode {
                         Button("OK") {
-                            document.whitePlayer = temporaryWhitePlayer
-                            document.blackPlayer = temporaryBlackPlayer
-                            document.engineShouldMove.toggle()
-                            presentationMode.wrappedValue.dismiss()
+                            session.setPlayers(white: temporaryWhitePlayer, black: temporaryBlackPlayer)
+                            session.requestEngineMoveIfNeeded()
+                            dismiss()
                         }
                     } else {
                         Button("New Game") {
-                            document.whitePlayer = temporaryWhitePlayer
-                            document.blackPlayer = temporaryBlackPlayer
-                            Actions(document: $document).newGame()
-                            document.engineShouldMove.toggle()
-                            presentationMode.wrappedValue.dismiss()
+                            if let onNewGame {
+                                onNewGame(temporaryWhitePlayer, temporaryBlackPlayer)
+                            } else {
+                                session.newGame(white: temporaryWhitePlayer, black: temporaryBlackPlayer)
+                                session.requestEngineMoveIfNeeded()
+                            }
+                            dismiss()
                         }
                     }
                 }
@@ -86,15 +67,10 @@ struct NewGameView_iOS: View {
     }
 }
 
-struct NewGameView_iOS_Previews: PreviewProvider {
-    static var previews: some View {
-        Group {
-            let doc = try! ChessDocument()
-            NewGameView_iOS(document: .constant(doc), editMode: false)
-        }
-        Group {
-            let doc = try! ChessDocument()
-            NewGameView_iOS(document: .constant(doc), editMode: true)
-        }
-    }
+#Preview("New game") {
+    NewGameView_iOS(session: GameSession(), editMode: false)
+}
+
+#Preview("Edit game") {
+    NewGameView_iOS(session: GameSession(), editMode: true)
 }

@@ -24,9 +24,11 @@ public:
     // This structure identifies the current moves of the game,
     // taking into account the exact variation taken when appropriate.
     struct MoveIndexes {
-        // Current move path identifier
+        // Current move path identifier: a root-to-leaf path through the tree of moves.
         // [0, 0, 1] means there are 3 moves, the first 2 in the main line
         // and the third one using the first variation.
+        // The cursor only moves along this path, so stepping back and forward stays on the
+        // current line. Every method that changes it keeps it a path that ends at a leaf.
         std::vector<int> moves;
         
         // The current index in the index of moves above
@@ -39,13 +41,6 @@ public:
                 moves.push_back(move);
             }
             moveCursor++;
-        }
-        
-        // Reset the move path identifiers to only use the main variation
-        void resetToMainVariation() {
-            for (int index=0; index<moves.size(); index++) {
-                moves[index] = 0;
-            }
         }
         
         // Clears all the moves
@@ -120,6 +115,19 @@ public:
             }
         }
 
+        // Appends to `path` the variation indexes leading from this node to the node with this uuid.
+        // Returns false, leaving `path` as it was, when no node below this one has that uuid.
+        bool findPath(unsigned int target, std::vector<int> &path) {
+            for (int index=0; index<variations.size(); index++) {
+                path.push_back(index);
+                if (variations[index].uuid == target || variations[index].findPath(target, path)) {
+                    return true;
+                }
+                path.pop_back();
+            }
+            return false;
+        }
+
         void clear() {
             variations.clear();
         }
@@ -176,14 +184,35 @@ public:
         return uuid;
     }
     
+    // Selects the move with this uuid, on any variation, and replays the game up to it.
+    // An unknown uuid does nothing.
     void setCurrentMoveUUID(unsigned int uuid) {
-        root.visit(0, moveIndexes, (int)moveIndexes.moves.size(), [this, &uuid](auto & node, auto cursor) {
-            if (node.uuid == uuid) {
-                // Add one to the current cursor because cursor==0 represents the root node
-                // which is not a move. The first real move starts at cursor==1.
-                moveIndexes.moveCursor = cursor + 1;
-            }
+        std::vector<int> path;
+        if (root.findPath(uuid, path)) {
+            moveIndexes.moves = path;
+            extendPathToLeaf((int)path.size());
+            moveIndexes.moveCursor = (int)path.size();
+            replayMoves();
+        }
+    }
+    
+    // The moves that can follow the current position, the main line first.
+    std::vector<MoveNode> getNextMoveNodes() {
+        std::vector<MoveNode> nodes;
+        root.lookupNode(0, moveIndexes.moveCursor, moveIndexes, [&nodes](auto & node) {
+            nodes = node.variations;
         });
+        return nodes;
+    }
+    
+    // The variation index that the current path takes at the cursor, 0 when the cursor is at the end.
+    int getNextVariationIndex() {
+        return moveIndexes.moveCursor < moveIndexes.moves.size() ? moveIndexes.moves[moveIndexes.moveCursor] : 0;
+    }
+    
+    // The number of moves on the current line, which is the cursor position of the last move.
+    int getLineLength() {
+        return (int)moveIndexes.moves.size();
     }
     
     MoveNode getRoot() {
@@ -236,5 +265,8 @@ private:
     }
     
     void replayMoves();
+    
+    // Keeps the first `keep` entries of the move path and follows the main line from there to a leaf.
+    void extendPathToLeaf(int keep);
 };
 

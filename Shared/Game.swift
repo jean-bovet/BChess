@@ -6,14 +6,14 @@
 //  Copyright © 2021 Jean Bovet. All rights reserved.
 //
 
-import SwiftUI
+import Foundation
 
-final class Game: ObservableObject {
+/// The moves of the current game as a tree of full moves, in the shape that the move list displays.
+struct Game {
     
-    @Published var moves = [FullMove]()
+    var moves = [FullMove]()
         
-    func rebuild(engine: FEngine) {
-        moves.removeAll()
+    mutating func rebuild(engine: FEngine) {
         moves = moveItems(engine: engine)
     }
     
@@ -36,28 +36,6 @@ final class Game: ObservableObject {
         item.blackMove = from.whiteMove ? nil : from
         item.children = children.isEmpty ? nil : children
         return item
-    }
-    
-    func hasVariations(moveUUID: UInt) -> Bool {
-        return variations(moveUUID: moveUUID).count > 1
-    }
-    
-    func variations(moveUUID: UInt) -> [FEngineMoveNode] {
-        let nodes = moves.compactMap { node -> FEngineMoveNode? in
-            if let wm = node.whiteMove, wm.uuid == moveUUID {
-                return wm
-            }
-            if let bm = node.blackMove, bm.uuid == moveUUID {
-                return bm
-            }
-            return nil
-        }
-
-        if let node = nodes.first {
-            return [node] + node.variations
-        } else {
-            return []
-        }
     }
 
 }

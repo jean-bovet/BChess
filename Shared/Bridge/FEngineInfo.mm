@@ -65,6 +65,10 @@
     return FileFrom(MOVE_TO((Move)self.bestMove));
 }
 
+- (BOOL)hasBestMove {
+    return self.info.line.count > 0;
+}
+
 - (NSUInteger)bestMove {
     return self.info.line.bestMove();
 }

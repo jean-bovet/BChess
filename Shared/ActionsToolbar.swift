@@ -9,7 +9,6 @@
 import SwiftUI
 
 struct NewGameButton: View {
-    @Binding var document: ChessDocument
     @Binding var showNewGameSheet: Bool
     @Binding var newGameSheetEditMode: Bool
 
@@ -24,25 +23,24 @@ struct NewGameButton: View {
 }
 
 struct AnalyzeBoard: View {
-    @Binding var document: ChessDocument
+    let session: GameSession
     var body: some View {
-        Button(action: { withAnimation { Actions(document: $document).analyze() } }) {
+        Button(action: { withAnimation { session.toggleAnalyze() } }) {
             Label("Analyze Game", systemImage: "magnifyingglass.circle")
         }
     }
 }
 
 struct TrainButton: View {
-    @Binding var document: ChessDocument
+    let session: GameSession
     var body: some View {
-        Button(action: { withAnimation { Actions(document: $document).train() } }) {
+        Button(action: { withAnimation { session.toggleTrain() } }) {
             Label("Practice Openings", systemImage: "book")
         }
     }
 }
 
 struct EditGameButton: View {
-    @Binding var document: ChessDocument
     @Binding var showNewGameSheet: Bool
     @Binding var newGameSheetEditMode: Bool
 
@@ -57,7 +55,6 @@ struct EditGameButton: View {
 }
 
 struct ShowHideInfoButton: View {
-    @Binding var document: ChessDocument
     @Binding var showInfo: Bool
     var body: some View {
         Button(action: { withAnimation { showInfo.toggle() } }) {
@@ -71,78 +68,82 @@ struct ShowHideInfoButton: View {
 }
 
 struct RotateBoard: View {
-    @Binding var document: ChessDocument
+    let session: GameSession
     var body: some View {
-        Button(action: { Actions(document: $document).rotateBoard() }) {
+        Button(action: { session.rotate() }) {
             Label("Flip Board", systemImage: "arrow.triangle.2.circlepath.circle")
         }
     }
 }
 
 struct UndoMoveButton: View {
-    @Binding var document: ChessDocument
+    let session: GameSession
     var body: some View {
-        Button(action: { Actions(document: $document).undoMove() }) {
+        Button(action: { withAnimation { session.undo() } }) {
             Label("Undo Move", systemImage: "arrow.uturn.backward.square")
-        }.disabled(!document.engine.canMove(to: .backward))
+        }.disabled(!session.canMove(to: .backward))
     }
 }
 
 struct RedoMoveButton: View {
-    @Binding var document: ChessDocument
+    let session: GameSession
     var body: some View {
-        Button(action: { Actions(document: $document).redoMove() }) {
+        Button(action: { withAnimation { session.redo() } }) {
             Label("Redo Move", systemImage: "arrow.uturn.forward.square")
-        }.disabled(!document.engine.canMove(to: .forward))
+        }.disabled(!session.canMove(to: .forward))
     }
 }
 
 struct CopyFENButton: View {
-    @Binding var document: ChessDocument
+    let session: GameSession
     var body: some View {
-        Button(action: { Actions(document: $document).copyFEN() }) {
+        Button(action: { Pasteboard.set(session.fen) }) {
             Label("Copy Position", systemImage: "doc.on.doc")
         }
     }
 }
 
 struct CopyPGNButton: View {
-    @Binding var document: ChessDocument
+    let session: GameSession
     var body: some View {
-        Button(action: { Actions(document: $document).copyPGN() }) {
+        Button(action: { Pasteboard.set(session.pgnCurrentGame) }) {
             Label("Copy Game", systemImage: "doc.on.doc")
         }
     }
 }
 
 struct PasteButton: View {
-    @Binding var document: ChessDocument
+    let session: GameSession
     var body: some View {
-        Button(action: { Actions(document: $document).pasteGame() }) {
+        Button(action: {
+            if let text = Pasteboard.string {
+                _ = session.paste(text)
+            }
+        }) {
             Label("Paste", systemImage: "arrow.down.circle")
         }
     }
 }
 
 struct CopyPasteMenu: View {
-    @Binding var document: ChessDocument
+    let session: GameSession
     
     var body: some View {
         Section {
-            CopyFENButton(document: $document)
-            CopyPGNButton(document: $document)
-            PasteButton(document: $document)
+            CopyFENButton(session: session)
+            CopyPGNButton(session: session)
+            PasteButton(session: session)
         }
     }
 }
 
 struct GameSelectionMenu: View {
-    @Binding var document: ChessDocument
+    let session: GameSession
         
     var body: some View {
-        Picker(selection: $document.currentGameIndex, label: Text("Games")) {
-            ForEach(document.engine.games, id:\.self) { game in
-                Text(game.name).tag(game.index)
+        Picker(selection: Binding(get: { session.currentGameIndex }, set: { session.selectGame($0) }), label: Text("Games")) {
+            ForEach(session.games, id:\.self) { game in
+                Text(game.name).tag(Int(game.index))
             }
         }
     }
@@ -150,7 +151,7 @@ struct GameSelectionMenu: View {
 
 struct ActionsToolbar: ToolbarContent {
 
-    @Binding var document: ChessDocument
+    let session: GameSession
     @Binding var showInfo: Bool
     @Binding var showNewGameSheet: Bool
     @Binding var newGameSheetEditMode: Bool
@@ -159,30 +160,30 @@ struct ActionsToolbar: ToolbarContent {
         #if os(macOS)
         ToolbarItemGroup(placement: .automatic) {
             Menu {
-                NewGameButton(document: $document, showNewGameSheet: $showNewGameSheet, newGameSheetEditMode: $newGameSheetEditMode)
-                EditGameButton(document: $document, showNewGameSheet: $showNewGameSheet, newGameSheetEditMode: $newGameSheetEditMode)
+                NewGameButton(showNewGameSheet: $showNewGameSheet, newGameSheetEditMode: $newGameSheetEditMode)
+                EditGameButton(showNewGameSheet: $showNewGameSheet, newGameSheetEditMode: $newGameSheetEditMode)
 
-                GameSelectionMenu(document: $document)
+                GameSelectionMenu(session: session)
                 
                 Divider()
                 
-                AnalyzeBoard(document: $document)
-                TrainButton(document: $document)
+                AnalyzeBoard(session: session)
+                TrainButton(session: session)
 
                 Divider()
 
-                RotateBoard(document: $document)
+                RotateBoard(session: session)
 
                 Divider()
 
-                ShowHideInfoButton(document: $document, showInfo: $showInfo)
+                ShowHideInfoButton(showInfo: $showInfo)
             }
             label: {
                 Label("Board", systemImage: "checkerboard.rectangle")
             }
             
             Menu {
-                CopyPasteMenu(document: $document)
+                CopyPasteMenu(session: session)
             }
             label: {
                 Label("Copy & Paste", systemImage: "doc.on.doc")
@@ -191,26 +192,26 @@ struct ActionsToolbar: ToolbarContent {
         #else
         ToolbarItemGroup(placement: .automatic) {
             Menu {
-                NewGameButton(document: $document, showNewGameSheet: $showNewGameSheet, newGameSheetEditMode: $newGameSheetEditMode)
-                EditGameButton(document: $document, showNewGameSheet: $showNewGameSheet, newGameSheetEditMode: $newGameSheetEditMode)
-                RotateBoard(document: $document)
+                NewGameButton(showNewGameSheet: $showNewGameSheet, newGameSheetEditMode: $newGameSheetEditMode)
+                EditGameButton(showNewGameSheet: $showNewGameSheet, newGameSheetEditMode: $newGameSheetEditMode)
+                RotateBoard(session: session)
             }
             label: {
                 Label("Actions", systemImage: "ellipsis.circle")
             }
         }
         ToolbarItemGroup(placement: .bottomBar) {
-            ShowHideInfoButton(document: $document, showInfo: $showInfo)
+            ShowHideInfoButton(showInfo: $showInfo)
             Spacer()
             
-            UndoMoveButton(document: $document)
+            UndoMoveButton(session: session)
             Spacer()
             
-            RedoMoveButton(document: $document)
+            RedoMoveButton(session: session)
             Spacer()
 
             Menu {
-                CopyPasteMenu(document: $document)
+                CopyPasteMenu(session: session)
             }
             label: {
                 Label("Copy & Paste", systemImage: "doc.on.doc")

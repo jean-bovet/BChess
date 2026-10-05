@@ -8,17 +8,15 @@
 	<array>
 		<dict>
 			<key>CFBundleTypeName</key>
-			<string>BChess</string>
+			<string>BChess Game</string>
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
 			<key>LSHandlerRank</key>
-			<string>Default</string>
+			<string>Owner</string>
 			<key>LSItemContentTypes</key>
 			<array>
-				<string>ch.arizona-software.chess.json</string>
+				<string>ch.arizona-software.bchess.game</string>
 			</array>
-			<key>NSUbiquitousDocumentUserActivityType</key>
-			<string>$(PRODUCT_BUNDLE_IDENTIFIER).json</string>
 		</dict>
 		<dict>
 			<key>CFBundleTypeName</key>
@@ -26,7 +24,7 @@
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
 			<key>LSHandlerRank</key>
-			<string>Default</string>
+			<string>Alternate</string>
 			<key>LSItemContentTypes</key>
 			<array>
 				<string>com.apple.chess.pgn</string>
@@ -54,16 +52,12 @@
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>
-		<true/>
+		<false/>
 	</dict>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 	<key>UILaunchScreen</key>
 	<dict/>
-	<key>UIRequiredDeviceCapabilities</key>
-	<array>
-		<string>armv7</string>
-	</array>
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>
@@ -77,9 +71,9 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
-	<key>UISupportsDocumentBrowser</key>
+	<key>UIFileSharingEnabled</key>
 	<true/>
-	<key>UTImportedTypeDeclarations</key>
+	<key>UTExportedTypeDeclarations</key>
 	<array>
 		<dict>
 			<key>UTTypeConformsTo</key>
@@ -87,21 +81,20 @@
 				<string>public.json</string>
 			</array>
 			<key>UTTypeDescription</key>
-			<string>Chess Format</string>
-			<key>UTTypeIconFiles</key>
-			<array/>
-			<key>UTTypeIcons</key>
-			<dict/>
+			<string>BChess Game</string>
 			<key>UTTypeIdentifier</key>
-			<string>ch.arizona-software.chess.json</string>
+			<string>ch.arizona-software.bchess.game</string>
 			<key>UTTypeTagSpecification</key>
 			<dict>
 				<key>public.filename-extension</key>
 				<array>
-					<string>json</string>
+					<string>bchess</string>
 				</array>
 			</dict>
 		</dict>
+	</array>
+	<key>UTImportedTypeDeclarations</key>
+	<array>
 		<dict>
 			<key>UTTypeConformsTo</key>
 			<array>

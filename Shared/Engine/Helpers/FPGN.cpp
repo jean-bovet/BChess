@@ -782,10 +782,10 @@ static void getPGN(ChessBoard board, // The chess board representation which is 
                    int moveIndex, // The current move index
                    int fromMoveIndex, // The move index at which we starts to build up the PGN
                    int toMoveIndex, // The move index at which to stop building up the PGN
-                   int fullMoveIndex, // The number of full move that have been done so far
                    bool mainLine, // True if this node/move represents the main line, false if it represents a variation
                    bool recursive, // True if this method should continue to traverse the next move and all its variation, false to just output this move and return
-                   bool skip // True if the PGN output should be skipped for this method executed
+                   bool skip, // True if the PGN output should be skipped for this method executed
+                   bool forceNumber // True if the move that is output next, even Black's, must carry its move number (after a variation)
 ) {
     auto move = node.move;
     auto piece = MOVE_PIECE(move);
@@ -820,19 +820,28 @@ static void getPGN(ChessBoard board, // The chess board representation which is 
         }
     }
     
-    if (moveIndex % 2 == 0) {
-        fullMoveIndex++;
-    }
+    // The side to move and the move number come from the board, so that a game that starts from a FEN
+    // is numbered from that position: "3... a6" when Black is to move at move 3.
+    bool whiteToMove = board.color == WHITE;
+    int fullMoveIndex = board.fullMoveCount;
 
     // Output the move number
     if (!skip) {
         if (mainLine) {
             // In the main line, only display the move number for white
-            if (moveIndex % 2 == 0 && formatting != FPGN::Formatting::line) {
-                if (pgn.size() > 0) {
-                    pgn += " ";
+            if (formatting != FPGN::Formatting::line) {
+                if (whiteToMove) {
+                    if (pgn.size() > 0) {
+                        pgn += " ";
+                    }
+                    pgn += std::to_string(fullMoveIndex) + ".";
+                } else if (moveIndex == 0 || forceNumber) {
+                    // The game starts with Black's move, or Black's move follows a variation
+                    if (pgn.size() > 0) {
+                        pgn += " ";
+                    }
+                    pgn += std::to_string(fullMoveIndex) + "...";
                 }
-                pgn += std::to_string(fullMoveIndex) + ".";
             }
         } else {
             // We are in a variation, which means we need to display
@@ -843,7 +852,7 @@ static void getPGN(ChessBoard board, // The chess board representation which is 
             if (formatting != FPGN::Formatting::line) {
                 pgn += std::to_string(fullMoveIndex);
             }
-            if (moveIndex % 2 == 0) {
+            if (whiteToMove) {
                 pgn += ".";
             } else {
                 pgn += "...";
@@ -893,26 +902,26 @@ static void getPGN(ChessBoard board, // The chess board representation which is 
             // If there is only one variation, it is easy: it is the main line
             // so continue recursively to traverse it.
             auto & main = node.variations[0];
-            getPGN(board, formatting, main, pgn, moveIndex+1, fromMoveIndex, toMoveIndex, fullMoveIndex, /*mainline*/true, /*recursive*/true, /*skip*/false);
+            getPGN(board, formatting, main, pgn, moveIndex+1, fromMoveIndex, toMoveIndex, /*mainline*/true, /*recursive*/true, /*skip*/false, /*forceNumber*/skip && forceNumber);
         } else {
             // If there are more than one variation, we need to print first the main variation but for only one move
             // For example: 1. e4 e5
             auto & main = node.variations[0];
-            getPGN(board, formatting, main, pgn, moveIndex+1, fromMoveIndex, toMoveIndex, fullMoveIndex, /*mainline*/true, /*recursive*/false, /*skip*/false);
+            getPGN(board, formatting, main, pgn, moveIndex+1, fromMoveIndex, toMoveIndex, /*mainline*/true, /*recursive*/false, /*skip*/false, /*forceNumber*/skip && forceNumber);
             
             // And then print all the other variations in full (recursively)
             // For example: 1. e4 e5 (1... d5)
             for (int vindex=1; vindex<node.variations.size(); vindex++) {
                 auto & vnode = node.variations[vindex];
                 pgn += " (";
-                getPGN(board, formatting, vnode, pgn, moveIndex+1, fromMoveIndex, toMoveIndex, fullMoveIndex, /*mainline*/false, /*recursive*/true, /*skip*/false);
+                getPGN(board, formatting, vnode, pgn, moveIndex+1, fromMoveIndex, toMoveIndex, /*mainline*/false, /*recursive*/true, /*skip*/false, /*forceNumber*/false);
                 pgn += ")";
             }
             
             // And finally resume the main line output, recursively, but skipping this time the next move
             // because it was already output above
             // For example: 1. e4 e5 (1... d5) 2. Nf3 *
-            getPGN(board, formatting, main, pgn, moveIndex+1, fromMoveIndex, toMoveIndex, fullMoveIndex, /*mainline*/true, /*recursive*/true, /*skip*/true);
+            getPGN(board, formatting, main, pgn, moveIndex+1, fromMoveIndex, toMoveIndex, /*mainline*/true, /*recursive*/true, /*skip*/true, /*forceNumber*/true);
         }
     }
 }
@@ -929,6 +938,21 @@ std::string FPGN::getGames(std::vector<ChessGame> & games) {
     return allGamesPGN;
 }
 
+// The PGN result of an outcome: "1-0", "0-1", "1/2-1/2" or "*" while the game is in progress
+static std::string resultString(ChessGame::Outcome outcome) {
+    switch (outcome) {
+        case ChessGame::Outcome::black_wins:
+            return "0-1";
+        case ChessGame::Outcome::white_wins:
+            return "1-0";
+        case ChessGame::Outcome::draw:
+            return "1/2-1/2";
+        case ChessGame::Outcome::in_progress:
+            return "*";
+    }
+    return "*";
+}
+
 std::string FPGN::getGame(ChessGame game, Formatting formatting, int fromIndex, int toIndex) {
     std::string pgn;
     
@@ -938,13 +962,16 @@ std::string FPGN::getGame(ChessGame game, Formatting formatting, int fromIndex, 
         std::vector<std::string> tagRoster = { "Event", "Site", "Date", "Round", "White", "Black", "Result" };
         for (int index=0; index<tagRoster.size(); index++) {
             auto tagName = tagRoster[index];
-            auto value = game.tags[tagName];
+            // The Result tag is the outcome of the game, the same as the termination marker
+            auto value = tagName == "Result" ? resultString(game.outcome) : game.tags[tagName];
             pgn += "["+tagName+" \""+value+"\"]\n";
         }
         
         auto it = game.tags.begin();
         while (it != game.tags.end()) {
-            if (std::find(tagRoster.begin(), tagRoster.end(), it->first) == tagRoster.end()) {
+            // FEN and SetUp are written below, from the initial position
+            bool positionTag = it->first == "FEN" || it->first == "SetUp" || it->first == "Setup";
+            if (!positionTag && std::find(tagRoster.begin(), tagRoster.end(), it->first) == tagRoster.end()) {
                 // Write only non-roster tags
                 pgn += "["+it->first+" \""+it->second+"\"]\n";
             }
@@ -955,7 +982,7 @@ std::string FPGN::getGame(ChessGame game, Formatting formatting, int fromIndex, 
             // [FEN "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq - 0 1"]
             // [SetUp "1"]
             std::string tags = "[FEN \"" + game.initialFEN + "\"]\n";
-            tags += "[Setup \"1\"]\n";
+            tags += "[SetUp \"1\"]\n";
             
             pgn += tags;
         }
@@ -971,18 +998,20 @@ std::string FPGN::getGame(ChessGame game, Formatting formatting, int fromIndex, 
     ChessBoard outputBoard;
     FFEN::setFEN(game.initialFEN, outputBoard);
     
-    unsigned fullMoveIndex = 0;
-    
+    // The first moves are handled like the moves of any node: the main one, then its alternatives in
+    // parentheses right after it, then the rest of the main line. For example: 1. e4 (1. d4) 1... e5
     auto rootNode = game.getRoot();
-    for (int vindex=0; vindex<rootNode.variations.size(); vindex++) {
-        auto & node = rootNode.variations[vindex];
-        if (vindex > 0) {
+    if (rootNode.variations.size() == 1) {
+        getPGN(outputBoard, formatting, rootNode.variations[0], pgn, 0, fromIndex, toIndex, /*mainline*/true, /*recursive*/true, /*skip*/false, /*forceNumber*/false);
+    } else if (rootNode.variations.size() > 1) {
+        auto & main = rootNode.variations[0];
+        getPGN(outputBoard, formatting, main, pgn, 0, fromIndex, toIndex, /*mainline*/true, /*recursive*/false, /*skip*/false, /*forceNumber*/false);
+        for (int vindex=1; vindex<rootNode.variations.size(); vindex++) {
             pgn += " (";
-        }
-        getPGN(outputBoard, formatting, node, pgn, 0, fromIndex, toIndex, fullMoveIndex, /*mainline*/vindex == 0, /*recursive*/true, /*skip*/false);
-        if (vindex > 0) {
+            getPGN(outputBoard, formatting, rootNode.variations[vindex], pgn, 0, fromIndex, toIndex, /*mainline*/false, /*recursive*/true, /*skip*/false, /*forceNumber*/false);
             pgn += ")";
         }
+        getPGN(outputBoard, formatting, main, pgn, 0, fromIndex, toIndex, /*mainline*/true, /*recursive*/true, /*skip*/true, /*forceNumber*/true);
     }
     
     if (formatting == Formatting::line) {
@@ -993,23 +1022,7 @@ std::string FPGN::getGame(ChessGame game, Formatting formatting, int fromIndex, 
         pgn += " ";
     }
 
-    switch (game.outcome) {
-        case ChessGame::Outcome::black_wins:
-            pgn += "0-1";
-            break;
-            
-        case ChessGame::Outcome::white_wins:
-            pgn += "1-0";
-            break;
-            
-        case ChessGame::Outcome::draw:
-            pgn += "1/2-1/2";
-            break;
-            
-        case ChessGame::Outcome::in_progress:
-            pgn += "*";
-            break;
-    }
+    pgn += resultString(game.outcome);
     
     return pgn;
 }

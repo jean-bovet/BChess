@@ -32,9 +32,14 @@ class UCI {
     }
     
     func engineOutput(_ message: String) {
+        Self.output(message, log: log, xcodeMode: xcodeMode)
+    }
+
+    // Static so that the search callback, which runs on another thread, does not capture the UCI object
+    nonisolated static func output(_ message: String, log: OSLog, xcodeMode: Bool) {
         print(message)
         if !xcodeMode {
-            os_log("%{public}@", log: self.log, message)
+            os_log("%{public}@", log: log, message)
         }
     }
     
@@ -100,12 +105,10 @@ class UCI {
             depth = -1
             time = 10 // 10 seconds for now
         }
+        let log = self.log
+        let xcodeMode = self.xcodeMode
         engine.evaluate(depth, time: time) { (info, completed) in
-            if completed {
-                self.engineOutput(info.uciBestMove)
-            } else {
-                self.engineOutput(info.uciInfoMessage)
-            }
+            UCI.output(completed ? info.uciBestMove : info.uciInfoMessage, log: log, xcodeMode: xcodeMode)
         }
     }
     

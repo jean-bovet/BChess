@@ -10,10 +10,14 @@
 
 @class FEngineMove;
 
+/** Immutable once the engine has handed it out. */
+NS_SWIFT_SENDABLE
 @interface FEngineInfo : NSObject
 
 @property (nonatomic, assign, readonly) NSUInteger fromRank, fromFile, toRank, toFile;
 
+// NO when the search found no move (a mate, a stalemate or a drawn position)
+@property (nonatomic, assign, readonly) BOOL hasBestMove;
 @property (nonatomic, assign, readonly) NSUInteger bestMove;
 @property (nonatomic, strong, readonly) FEngineMove * _Nullable bestEngineMove;
 

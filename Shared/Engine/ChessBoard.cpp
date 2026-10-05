@@ -224,6 +224,10 @@ void ChessBoard::reset() {
 }
 
 void ChessBoard::move(Move move) {
+    // The hash is updated incrementally below: it must be exact before the first update, and it is
+    // zero ("to be computed") after a FEN was set
+    getHash();
+    
     if (color == BLACK) {
         fullMoveCount++;
     }

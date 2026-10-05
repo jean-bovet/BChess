@@ -48,8 +48,6 @@ struct FullMoveView: View {
     }
 }
 
-struct FullMoveView_Previews: PreviewProvider {
-    static var previews: some View {
-        FullMoveView(item: FullMove(id: "foo"), currentMoveUUID: 0)
-    }
+#Preview {
+    FullMoveView(item: FullMove(id: "foo"), currentMoveUUID: 0)
 }

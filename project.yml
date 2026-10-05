@@ -1,0 +1,177 @@
+name: BChess
+options:
+  bundleIdPrefix: ch.arizona-software
+  deploymentTarget:
+    iOS: "18.0"
+    macOS: "15.0"
+  createIntermediateGroups: true
+  xcodeVersion: "26.0"
+
+settings:
+  base:
+    SWIFT_VERSION: "6.0"
+    CLANG_CXX_LANGUAGE_STANDARD: c++20
+    CLANG_CXX_LIBRARY: libc++
+    DEVELOPMENT_TEAM: 28XRU7S6GA
+    CODE_SIGN_STYLE: Automatic
+    HEADER_SEARCH_PATHS:
+      - $(SRCROOT)/Shared/Engine/**
+      - $(SRCROOT)/Shared/Bridge
+    GENERATE_INFOPLIST_FILE: NO
+    MARKETING_VERSION: "0.2"
+    CURRENT_PROJECT_VERSION: "110"
+
+# The C++ engine and its Objective-C++ bridge, compiled by every target that needs the engine.
+targetTemplates:
+  Engine:
+    sources:
+      - path: Shared/Engine
+      - path: Shared/Bridge
+
+targets:
+  "BChess (iOS)":
+    type: application
+    platform: iOS
+    templates: [Engine]
+    sources:
+      - path: Shared
+        excludes:
+          - Engine
+          - Bridge
+      - path: iOS
+        excludes:
+          - Info.plist
+      - path: BChess/UCI/FENgineInfo+Extension.swift
+      - path: BChess/Openings.pgn
+        buildPhase: resources
+    settings:
+      base:
+        PRODUCT_NAME: BChess
+        PRODUCT_BUNDLE_IDENTIFIER: ch.arizona-software.BChess
+        INFOPLIST_FILE: iOS/Info.plist
+        SWIFT_OBJC_BRIDGING_HEADER: BChess/BChess-Bridging-Header.h
+        TARGETED_DEVICE_FAMILY: "1,2"
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
+        ENABLE_PREVIEWS: YES
+
+  "BChess (macOS)":
+    type: application
+    platform: macOS
+    templates: [Engine]
+    sources:
+      - path: Shared
+        excludes:
+          - Engine
+          - Bridge
+          - Views/NewGameView_iOS.swift
+      - path: macOS
+        excludes:
+          - Info.plist
+          - macOS.entitlements
+      - path: BChess/UCI/FENgineInfo+Extension.swift
+      - path: BChess/Openings.pgn
+        buildPhase: resources
+    settings:
+      base:
+        PRODUCT_NAME: BChess
+        PRODUCT_BUNDLE_IDENTIFIER: ch.arizona-software.BChess
+        INFOPLIST_FILE: macOS/Info.plist
+        CODE_SIGN_ENTITLEMENTS: macOS/macOS.entitlements
+        CODE_SIGN_IDENTITY: Apple Development
+        ENABLE_HARDENED_RUNTIME: YES
+        SWIFT_OBJC_BRIDGING_HEADER: BChess/BChess-Bridging-Header.h
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
+        COMBINE_HIDPI_IMAGES: YES
+        ENABLE_PREVIEWS: YES
+
+  BChessUCI:
+    type: tool
+    platform: macOS
+    templates: [Engine]
+    sources:
+      - path: BChess/main.swift
+      - path: BChess/UCI
+    settings:
+      base:
+        PRODUCT_NAME: BChessUCI
+        CODE_SIGN_IDENTITY: "-"
+        SWIFT_OBJC_BRIDGING_HEADER: BChess/BChess-Bridging-Header.h
+
+  BChessTests:
+    type: bundle.unit-test
+    platform: macOS
+    templates: [Engine]
+    sources:
+      - path: BChessTests
+        excludes:
+          - Info.plist
+      # The app logic, which uses only Foundation, Observation and the bridge
+      - path: Shared/Model
+      - path: Shared/Game.swift
+      - path: Shared/FullMove.swift
+      - path: Shared/PiecesFactory.swift
+      - path: BChess/UCI/UCI.swift
+      - path: BChess/UCI/FENgineInfo+Extension.swift
+      - path: BChess/Openings.pgn
+        buildPhase: resources
+    dependencies:
+      # Built next to the test bundle, for the UCI subprocess test only
+      - target: BChessUCI
+        link: false
+    settings:
+      base:
+        # The search checkpoint of the engine tests, set on no other target
+        GCC_PREPROCESSOR_DEFINITIONS:
+          - $(inherited)
+          - BCHESS_TEST_HOOKS=1
+        PRODUCT_BUNDLE_IDENTIFIER: ch.arizona-software.BChessTests
+        INFOPLIST_FILE: BChessTests/Info.plist
+        SWIFT_OBJC_BRIDGING_HEADER: BChessTests/BChessTests-Bridging-Header.h
+        HEADER_SEARCH_PATHS:
+          - $(inherited)
+          - $(SRCROOT)/Dependencies/gtest/include
+          - $(SRCROOT)/Dependencies/gtest
+        CODE_SIGN_IDENTITY: "-"
+
+  BChessUITests:
+    type: bundle.ui-testing
+    platform: iOS
+    sources:
+      - path: BChessUITests
+    dependencies:
+      - target: "BChess (iOS)"
+    settings:
+      base:
+        GENERATE_INFOPLIST_FILE: YES
+        PRODUCT_BUNDLE_IDENTIFIER: ch.arizona-software.BChessUITests
+        TARGETED_DEVICE_FAMILY: "1,2"
+
+schemes:
+  "BChess (macOS)":
+    build:
+      targets:
+        "BChess (macOS)": all
+    run:
+      config: Debug
+    test:
+      config: Debug
+      targets:
+        - BChessTests
+  "BChess (iOS)":
+    build:
+      targets:
+        "BChess (iOS)": all
+    run:
+      config: Debug
+    test:
+      config: Debug
+      targets:
+        - BChessUITests
+  BChessUCI:
+    build:
+      targets:
+        BChessUCI: all
+    run:
+      config: Debug

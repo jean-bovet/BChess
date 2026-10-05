@@ -31,10 +31,11 @@ extension FEngineInfo {
     }
     
     var uciBestMove: String {
-        if let move = bestMove(true) {
+        if hasBestMove, let move = bestMove(true) {
             return "bestmove \(move)"
         } else {
-            return "bestmove ??"
+            // The UCI null move: the position has no legal move
+            return "bestmove 0000"
         }
     }
 }

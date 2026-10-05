@@ -8,8 +8,11 @@
 
 #pragma once
 
+#include <mutex>
+
 #include "Types.hpp"
 
+#include "FFEN.hpp"
 #include "FPGN.hpp"
 
 #include "MinMaxSearch.hpp"
@@ -38,8 +41,6 @@ public:
     
     IterativeDeepening iterativeSearch;
     
-    bool transpositionTable = true;
-    
     typedef std::function<void(ChessEvaluation, bool)> SearchCallback;
     
 public:
@@ -48,18 +49,28 @@ public:
         games.push_back(ChessGame());
     }
     
+    // Rewrites global tables, so it runs once even when several engines or tests call it concurrently.
     static void initialize() {
-        ChessMoveGenerator::initialize();
-        ChessBoardHash::initialize();
+        static std::once_flag once;
+        std::call_once(once, [] {
+            ChessMoveGenerator::initialize();
+            ChessBoardHash::initialize();
+        });
     }
     
     bool loadOpening(std::string pgn) {
         return openings.load(pgn);
     }
     
+    // Replaces all the games, or leaves them untouched when the PGN does not parse or holds no game.
     bool loadAllGames(std::string pgn) {
-        games.clear();
-        return FPGN::setGames(pgn, games);
+        std::vector<ChessGame> parsed;
+        if (!FPGN::setGames(pgn, parsed) || parsed.empty()) {
+            return false;
+        }
+        games.swap(parsed);
+        gameIndex = 0;
+        return true;
     }
     
     bool setFEN(std::string fen) {
@@ -128,8 +139,19 @@ public:
         return game().board.color == WHITE;
     }
     
+    // Whether a move can be played from the current position. Earlier positions of a finished game can
+    // be played from, which starts a variation; the final position of a game with a result cannot, and
+    // neither can a position that is drawn by repetition.
     bool canPlay() {
-        return game().outcome == ChessGame::Outcome::in_progress;
+        auto & g = game();
+        if (ChessMoveGenerator::generateMoves(g.board).count == 0) {
+            return false;
+        }
+        // A position that already occurred three times is drawn: a search finds no move in it
+        if (ChessEvaluater::isDraw(g.board, g.history)) {
+            return false;
+        }
+        return g.getNumberOfMoves() < g.getLineLength() || g.outcome == ChessGame::Outcome::in_progress;
     }
     
     // Returns true if the current moves are following a valid opening line as defined
@@ -147,11 +169,9 @@ public:
     }
     
     bool lookupOpeningMove(ChessEvaluation & evaluation) {
-        if (game().getNumberOfMoves() == 0 && game().board.fullMoveCount > 1) {
-            // If the game is not at the starting position, that is,
-            // there are no moves recorded yet but the fullMoveCount is greater
-            // than one (meaning the game has one or more move already), don't use
-            // any openings.
+        if (game().initialFEN != StartFEN) {
+            // The openings are lines from the standard start position: a game that started from
+            // another position would be offered moves that are not legal in it.
             return false;
         }
         bool result = openings.best(game().allMoves(), [&evaluation](auto opening) {
@@ -160,9 +180,11 @@ public:
         return result;
     }
 
-    void searchBestMove(int maxDepth, SearchCallback callback) {
+    // Searches the given position, not game(): the caller passes a snapshot, because the history is
+    // modified during the search. Call iterativeSearch.start() first.
+    void searchBestMove(ChessBoard board, HistoryPtr history, int maxDepth, bool transpositionTable, SearchCallback callback) {
         iterativeSearch.minMaxSearch.config.transpositionTable = transpositionTable;
-        ChessEvaluation info = iterativeSearch.search(game().board, game().history, maxDepth, [&](ChessEvaluation info) {
+        ChessEvaluation info = iterativeSearch.search(board, history, maxDepth, [&](ChessEvaluation info) {
             if (!iterativeSearch.cancelled()) {
                 callback(info, false);
             }

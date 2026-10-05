@@ -9,7 +9,9 @@
 import SwiftUI
 
 struct ContentView: View {
-    @Binding var document: ChessDocument
+    let session: GameSession
+    /// Starts a new game somewhere else than in place (the iOS library). Nil resets the session.
+    var onNewGame: ((GamePlayer, GamePlayer) -> Void)? = nil
             
     @State private var showInfo = true
     
@@ -19,29 +21,32 @@ struct ContentView: View {
     var body: some View {
         HStack(alignment: .top) {
             VStack(alignment: .leading) {
-                ColorInformationView(document: $document, isWhite: document.rotated ? true: false)
+                ColorInformationView(session: session, isWhite: session.gameState.rotated ? true: false)
                 ZStack {
-                    BoardView(document: $document)
-                        .if(document.mode.value == .analyze) {
+                    BoardView(session: session)
+                        .if(session.mode.value == .analyze) {
                             $0.border(Color.yellow, width: 4)
                         }
-                        .if(document.mode.value == .train) {
+                        .if(session.mode.value == .train) {
                             $0.border(Color.green, width: 4)
                         }
-                    LabelsView(document: $document)
-                    PiecesView(document: $document)
-                    VariationSelectionView(document: $document)
+                    LabelsView(session: session)
+                    PiecesView(session: session)
+                    VariationSelectionView(session: session)
                 }
+                .accessibilityElement(children: .contain)
+                .accessibilityIdentifier("board")
+                .accessibilityValue(session.fen)
                 .padding()
                 .padding(.bottom, 20) // Because the labels are "leaking" a bit below the board space itself
-                ColorInformationView(document: $document, isWhite: document.rotated ? false: true)
+                ColorInformationView(session: session, isWhite: session.gameState.rotated ? false: true)
             }
             
             if (showInfo) {
 #if os(macOS)
                 VStack(alignment: .leading, spacing: 10) {
-                    NavigationActionView(document: $document)
-                    InformationView(document: $document)
+                    NavigationActionView(session: session)
+                    InformationView(session: session)
                 }
                 .frame(minWidth: 350, idealWidth: 350, maxWidth: 350, alignment: .leading)
 #endif
@@ -49,35 +54,35 @@ struct ContentView: View {
         }
         .padding()
         .toolbar {
-            ActionsToolbar(document: $document,
+            ActionsToolbar(session: session,
                            showInfo: $showInfo,
                            showNewGameSheet: $showNewGameSheet,
                            newGameSheetEditMode: $newGameSheetEditMode)
         }
+        .onAppear {
+            // The engine waits for the move animation before it replies
+            session.animate = { change, completion in
+                withAnimation(.default, completionCriteria: .logicallyComplete, change, completion: completion)
+            }
+        }
         .sheet(isPresented: $showNewGameSheet) {
             #if os(macOS)
-            NewGameView(document: $document, editMode: newGameSheetEditMode)
+            NewGameView(session: session, editMode: newGameSheetEditMode)
             #else
-            NewGameView_iOS(document: $document, editMode: newGameSheetEditMode)
+            NewGameView_iOS(session: session, editMode: newGameSheetEditMode, onNewGame: onNewGame)
             #endif
         }
     }
 }
 
-struct ContentView_Previews: PreviewProvider {
-    
-    static var previews: some View {
-        Group {
-            let doc = try! ChessDocument(mode: GameMode(value: .analyze))
-            ContentView(document: .constant(doc))
-        }
-        Group {
-            let doc = try! ChessDocument(mode: GameMode(value: .train))
-            ContentView(document: .constant(doc))
-        }
-        Group {
-            let doc = try! ChessDocument(rotated: true)
-            ContentView(document: .constant(doc))
-        }
-    }
+#Preview("Analyze") {
+    ContentView(session: GameSession(mode: GameMode(value: .analyze)))
+}
+
+#Preview("Train") {
+    ContentView(session: GameSession(mode: GameMode(value: .train)))
+}
+
+#Preview("Rotated") {
+    ContentView(session: GameSession(state: GameState(pgn: "*", rotated: true)))
 }

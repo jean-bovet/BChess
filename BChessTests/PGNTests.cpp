@@ -190,7 +190,7 @@ TEST_F(PGN, GameWithBlackFromFEN) {
     game.move("c1", "d1");
     
     auto pgn = FPGN::getGame(game);
-    ASSERT_EQ("[Event \"\"]\n[Site \"\"]\n[Date \"\"]\n[Round \"\"]\n[White \"\"]\n[Black \"\"]\n[Result \"\"]\n[FEN \"1K1k4/1P6/8/8/8/8/r7/2R5 w - - 0 1\"]\n[Setup \"1\"]\n\n 1. Rd1+ *", pgn);
+    ASSERT_EQ("[Event \"\"]\n[Site \"\"]\n[Date \"\"]\n[Round \"\"]\n[White \"\"]\n[Black \"\"]\n[Result \"*\"]\n[FEN \"1K1k4/1P6/8/8/8/8/r7/2R5 w - - 0 1\"]\n[SetUp \"1\"]\n\n 1. Rd1+ *", pgn);
 }
 
 TEST_F(PGN, GameWithBlackPromotion) {
@@ -233,7 +233,7 @@ TEST_F(PGN, OutputFromPosition) {
     ASSERT_EQ(fen.c_str(), game.initialFEN);
     
     auto pgn = FPGN::getGame(game);
-    ASSERT_EQ("[Event \"\"]\n[Site \"\"]\n[Date \"\"]\n[Round \"\"]\n[White \"\"]\n[Black \"\"]\n[Result \"\"]\n[FEN \"r1bqkbnr/ppp1pppp/2n5/3p4/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 2 3\"]\n[Setup \"1\"]\n\n *", pgn);
+    ASSERT_EQ("[Event \"\"]\n[Site \"\"]\n[Date \"\"]\n[Round \"\"]\n[White \"\"]\n[Black \"\"]\n[Result \"*\"]\n[FEN \"r1bqkbnr/ppp1pppp/2n5/3p4/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 2 3\"]\n[SetUp \"1\"]\n\n *", pgn);
 }
 
 TEST_F(PGN, InputFromPosition) {
@@ -356,4 +356,73 @@ TEST_F(PGN, MovesWithConsecutiveComments) {
 
     auto pgnAgain = FPGN::getGame(game, FPGN::Formatting::history);
     ASSERT_EQ("1. e4 e5 2. Nf3 Nc6 { and  the  game  continues } *", pgnAgain);
+}
+
+// A game that starts from a FEN is standard PGN: one FEN and one SetUp tag, and the numbering starts
+// from the position's move number and side to move. Asserted on the literal text, not on our parser.
+TEST_F(PGN, FENGameBlackToMoveNumbering) {
+    ChessEngine::initialize();
+    std::string fen = "r1bqkb1r/pppp1ppp/2n2n2/4p3/2B1P3/5N2/PPPP1PPP/RNBQK2R b KQkq - 4 4";
+    std::string pgn = "[FEN \"" + fen + "\"]\n[SetUp \"1\"]\n\n4... a6 5. Nc3 (5. d3) 5... d6 *";
+    std::string expectedMoves = "\n\n 4... a6 5. Nc3 (5. d3) 5... d6 *";
+    
+    ChessGame game;
+    ASSERT_TRUE(FPGN::setGame(pgn, game));
+    
+    // Saved twice: the tags do not pile up, and the text does not change
+    auto once = FPGN::getGame(game);
+    ChessGame again;
+    ASSERT_TRUE(FPGN::setGame(once, again));
+    auto twice = FPGN::getGame(again);
+    
+    for (auto & text : { once, twice }) {
+        ASSERT_EQ(text.size() - expectedMoves.size(), text.rfind(expectedMoves));
+        ASSERT_NE(std::string::npos, text.find("[FEN \"" + fen + "\"]\n[SetUp \"1\"]\n"));
+        ASSERT_EQ(std::string::npos, text.find("[FEN", text.find("[FEN") + 1));
+        ASSERT_EQ(std::string::npos, text.find("[SetUp", text.find("[SetUp") + 1));
+    }
+    ASSERT_EQ(once, twice);
+}
+
+// The Result tag and the termination marker are the same outcome, and never empty.
+TEST_F(PGN, ResultTagFollowsTheOutcome) {
+    ChessEngine::initialize();
+    std::string tags = "[Event \"\"]\n[Site \"\"]\n[Date \"\"]\n[Round \"\"]\n[White \"\"]\n[Black \"\"]\n";
+    
+    // A new game
+    ChessGame fresh;
+    ASSERT_EQ(tags + "[Result \"*\"]\n\n *", FPGN::getGame(fresh));
+    
+    // A finished game
+    ChessGame mate;
+    ASSERT_TRUE(FPGN::setGame("1. f3 e5 2. g4 Qh4# 0-1", mate));
+    ASSERT_EQ(tags + "[Result \"0-1\"]\n\n 1. f3 e5 2. g4 Qh4# 0-1", FPGN::getGame(mate));
+    
+    // An imported finished game that is then continued: no stale Result
+    ChessGame resigned;
+    ASSERT_TRUE(FPGN::setGame("[Result \"1-0\"]\n\n1. e4 e5 1-0", resigned));
+    ASSERT_NE(std::string::npos, FPGN::getGame(resigned).find("[Result \"1-0\"]"));
+    resigned.move("g1", "f3");
+    auto continued = FPGN::getGame(resigned);
+    ASSERT_NE(std::string::npos, continued.find("[Result \"*\"]\n"));
+    ASSERT_EQ(std::string::npos, continued.find("1-0"));
+    ASSERT_EQ(std::string::npos, continued.find("[Result", continued.find("[Result") + 1));
+    ASSERT_EQ(" 1. e4 e5 2. Nf3 *", continued.substr(continued.rfind("\n\n") + 2));
+}
+
+// Alternatives to the first move are written right after it, so that they parse back as the same tree.
+TEST_F(PGN, RootVariationsFollowTheirMove) {
+    ChessEngine::initialize();
+    std::string text = "1. e4 (1. d4) 1... e5 2. Nf3 *";
+    ChessGame game;
+    ASSERT_TRUE(FPGN::setGame(text, game));
+    ASSERT_EQ(2, game.getRoot().variations.size());
+    ASSERT_EQ(text, FPGN::getGame(game, FPGN::Formatting::history));
+    
+    ChessGame again;
+    ASSERT_TRUE(FPGN::setGame(FPGN::getGame(game, FPGN::Formatting::history), again));
+    ASSERT_EQ(2, again.getRoot().variations.size());
+    ASSERT_EQ(3, again.getNumberOfMoves());
+    ASSERT_EQ(FFEN::getFEN(game.board), FFEN::getFEN(again.board));
+    ASSERT_EQ(text, FPGN::getGame(again, FPGN::Formatting::history));
 }

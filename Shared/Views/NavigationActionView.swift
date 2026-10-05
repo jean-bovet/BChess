@@ -10,48 +10,45 @@ import SwiftUI
 
 struct NavigationActionView: View {
     
-    @Binding var document: ChessDocument
+    let session: GameSession
     
     var body: some View {
         HStack() {
-            if document.mode.value != .play {
+            if session.mode.value != .play {
                 Button(action: {
-                    Actions(document: $document).analyzeReset()
+                    session.analyzeReset()
                 }) {
                     Image(systemName: "arrow.counterclockwise.circle.fill")
                 }
             }
             
             Button(action: {
-                Actions(document: $document).move(to: .start)
+                session.move(to: .start)
             }) {
                 Image(systemName: "backward.end.fill")
-            }.disabled(!document.engine.canMove(to: .start))
+            }.disabled(!session.canMove(to: .start))
 
             Button(action: {
-                Actions(document: $document).move(to: .backward)
+                session.move(to: .backward)
             }) {
                 Image(systemName: "arrowtriangle.backward.fill")
-            }.disabled(!document.engine.canMove(to: .backward))
+            }.disabled(!session.canMove(to: .backward))
 
             Button(action: {
-                Actions(document: $document).move(to: .forward)
+                session.move(to: .forward)
             }) {
                 Image(systemName: "arrowtriangle.forward.fill")
-            }.disabled(!document.engine.canMove(to: .forward))
+            }.disabled(!session.canMove(to: .forward))
 
             Button(action: {
-                Actions(document: $document).move(to: .end)
+                session.move(to: .end)
             }) {
                 Image(systemName: "forward.end.fill")
-            }.disabled(!document.engine.canMove(to: .end))
+            }.disabled(!session.canMove(to: .end))
         }
     }
 }
 
-struct NavigationActionView_Previews: PreviewProvider {
-    static var previews: some View {
-        let doc = try! ChessDocument()
-        NavigationActionView(document: .constant(doc))
-    }
+#Preview {
+    NavigationActionView(session: GameSession())
 }

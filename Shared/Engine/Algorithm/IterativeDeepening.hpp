@@ -12,6 +12,7 @@
 #include "ChessEvaluater.hpp"
 #include "TranspositionTable.hpp"
 
+#include <atomic>
 #include <chrono>
 using namespace std::chrono;
 
@@ -51,8 +52,22 @@ public:
         cancelled
     };
     
-    Status status = Status::stopped;
+    // Written by stop() and cancel() from other threads while search() runs.
+    std::atomic<Status> status{Status::stopped};
     
+    // The last depth that search() completed, 0 before depth 1 is done.
+    std::atomic<int> completedDepth{0};
+    
+    // Arms the next search(). It is separate from search() so that a stop() or cancel() that arrives
+    // before search() begins is honored instead of being overwritten.
+    void start() {
+        completedDepth = 0;
+        minMaxSearch.resume();
+        status = Status::running;
+    }
+    
+    // A cancel ends the search at once. A stop always lets depth 1 finish, so the result is a real move,
+    // and then ends the search. Only fully completed depths are recorded.
     ChessEvaluation search(ChessBoard board, HistoryPtr history, int maxDepth, SearchCallback callback) {
         if (maxDepth == -1) {
             maxDepth = INT_MAX; // infinite depth
@@ -61,9 +76,11 @@ public:
         ChessEvaluation evaluation;
         MinMaxSearch::Variation bestVariation;
 
-        status = Status::running;
-        
-        for (int curMaxDepth=1; curMaxDepth<=maxDepth && running(); curMaxDepth++) {
+        for (int curMaxDepth=1; curMaxDepth<=maxDepth; curMaxDepth++) {
+            if (cancelled() || (curMaxDepth > 1 && !running())) {
+                break;
+            }
+            
             TimeManagement moveClock;
             moveClock.start();
             
@@ -82,11 +99,11 @@ public:
             double movesPerSingleMs = minMaxSearch.visitedNodes / moveClock.elapsedMilli();
             int movesPerSecond = int(movesPerSingleMs * 1e3);
             
-            if (status == Status::cancelled) {
+            if (cancelled()) {
                 break;
             }
             
-            if (running()) {
+            if (curMaxDepth == 1 || running()) {
                 bestVariation = pv;
                 
                 evaluation.clear();
@@ -102,6 +119,8 @@ public:
                 evaluation.time = int(moveClock.elapsedMilli()/1e3);
                 evaluation.engineColor = board.color;
                 evaluation.movesPerSecond = movesPerSecond;
+                
+                completedDepth = curMaxDepth;
             }
             
             if (callback) {
@@ -115,9 +134,8 @@ public:
             }
         }
         
-        if (running()) {
-            status = Status::stopped;
-        }
+        Status expected = Status::running;
+        status.compare_exchange_strong(expected, Status::stopped);
         
         return evaluation;
     }
@@ -132,7 +150,9 @@ public:
 
     void stop() {
         status = Status::stopped;
-        minMaxSearch.cancel();
+        if (completedDepth > 0) {
+            minMaxSearch.cancel();
+        }
     }
     
     void cancel() {

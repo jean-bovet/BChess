@@ -7,6 +7,7 @@
 //
 
 #import "FEngine.h"
+#import "FEngine+Testing.h"
 #import "FEngineInfo+Private.h"
 #import "FEngineMove.h"
 #import "FEngineGame+Private.h"
@@ -22,14 +23,26 @@
 #import "ChessEngine.hpp"
 #import "ChessOpenings.hpp"
 
+#include <memory>
+#include <mutex>
+
+// Threading model.
+// - Every search runs on `_searchQueue`, a serial queue, on its own snapshot of the game. Searches on
+//   one engine never overlap, so `engine.iterativeSearch` is only touched there.
+// - `_generation` identifies the current search request. Every position change, cancel and new
+//   request bumps it under `_control`. The search thread re-checks it, and invokes the callback,
+//   while holding `_control`. So once cancel, evaluate or a position change has returned, no
+//   callback of an earlier search is running or will start. The caller waits at most for one
+//   in-flight callback, never for a search.
+// - Callbacks never touch the main queue: the UCI tool's main thread sits in readLine.
 @interface FEngine () {
     ChessEngine engine;
+    dispatch_queue_t _searchQueue;
+    std::recursive_mutex _control;
+    uint64_t _generation;
+    // The generation for which stop was requested, 0 for none. It survives until the search is armed.
+    uint64_t _stopRequestedGeneration;
 }
-
-// This index is used to keep track of which engine session is currently analyzing.
-// It is incremented each time the user cancels the current session and is used to
-// avoid firing an update if the engine has been cancelled.
-@property (nonatomic, assign) NSUInteger stateIndex;
 
 @end
 
@@ -51,19 +64,21 @@
         _ttEnabled = NO;
         _searchDepth = INT_MAX;
         _thinkingTime = 5;
-        _stateIndex = 0;
+        _generation = 0;
+        _stopRequestedGeneration = 0;
+        _searchQueue = dispatch_queue_create("ch.arizona-software.BChess.search",
+                                             dispatch_queue_attr_make_with_qos_class(DISPATCH_QUEUE_SERIAL, QOS_CLASS_USER_INITIATED, 0));
     }
     return self;
 }
 
-- (void)fireUpdate:(NSUInteger)localStateIndex {
-    dispatch_async(dispatch_get_main_queue(), ^{
-        // Do not fire an update if the localStateIndex (which is the one used when
-        // the engine started analyzing) is different from the current state index.
-        if (self.updateCallback && self.stateIndex == localStateIndex) {
-            self.updateCallback();
-        }
-    });
+// Cancels the running search and makes any pending or running search of an earlier generation
+// ineffective. Returns the new generation.
+- (uint64_t)invalidate {
+    std::lock_guard<std::recursive_mutex> lock(_control);
+    _generation++;
+    engine.cancel();
+    return _generation;
 }
 
 - (BOOL)loadOpening:(NSString* _Nonnull)pgn {
@@ -87,6 +102,7 @@
 #pragma mark -
 
 - (BOOL)setFEN:(NSString *)FEN {
+    [self invalidate];
     return engine.setFEN(StringFromNSString(FEN));
 }
 
@@ -106,6 +122,7 @@
 }
 
 - (void)setCurrentGameIndex:(NSUInteger)index {
+    [self invalidate];
     engine.gameIndex = (unsigned int)index;
 }
 
@@ -114,10 +131,12 @@
 }
 
 - (BOOL)loadAllGames:(NSString* _Nonnull)PGN {
+    [self invalidate];
     return engine.loadAllGames(StringFromNSString(PGN));
 }
 
 - (BOOL)setPGN:(NSString *)PGN {
+    [self invalidate];
     return engine.setPGN(StringFromNSString(PGN));
 }
 
@@ -162,6 +181,7 @@
 }
 
 - (void)setCurrentMoveNodeUUID:(NSUInteger)currentMoveNodeUUID {
+    [self invalidate];
     engine.game().setCurrentMoveUUID((unsigned int)currentMoveNodeUUID);
 }
 
@@ -202,14 +222,14 @@
 }
 
 - (void)move:(NSUInteger)move {
+    [self invalidate];
     engine.move((Move)move, "", true);
-    [self fireUpdate:self.stateIndex];
 }
 
 - (void)move:(NSString*)from to:(NSString*)to {
+    [self invalidate];
     engine.move(std::string([from cStringUsingEncoding:NSUTF8StringEncoding]),
                 std::string([to cStringUsingEncoding:NSUTF8StringEncoding]));
-    [self fireUpdate:self.stateIndex];
 }
 
 - (ChessGame::Direction)gameDirection:(Direction)direction {
@@ -229,10 +249,20 @@
 }
 
 - (void)moveTo:(Direction)direction variation:(NSUInteger)variation {
-    // TODO: handle the cancel with a callback when the cancel actually really happened
-    [self cancel];
+    [self invalidate];
     engine.game().moveTo([self gameDirection:direction], (unsigned int)variation);
-    [self fireUpdate:self.stateIndex];
+}
+
+- (NSArray<FEngineMoveNode*>*)nextMoveChoices {
+    NSMutableArray *choices = [NSMutableArray array];
+    for (auto & node : engine.game().getNextMoveNodes()) {
+        [choices addObject:[[FEngineMoveNode alloc] initWithNode:node]];
+    }
+    return choices;
+}
+
+- (NSUInteger)nextVariation {
+    return (NSUInteger)engine.game().getNextVariationIndex();
 }
 
 - (NSUInteger)moveUUID:(Direction)direction {
@@ -243,12 +273,14 @@
 #pragma mark -
 
 - (void)stop {
+    std::lock_guard<std::recursive_mutex> lock(_control);
+    // Remember the intent for this generation: the search may not be armed yet.
+    _stopRequestedGeneration = _generation;
     engine.stop();
 }
 
 - (void)cancel {
-    self.stateIndex += 1;
-    engine.cancel();
+    [self invalidate];
 }
 
 - (BOOL)isAnalyzing {
@@ -263,10 +295,13 @@
     return engine.canPlay();
 }
 
-- (FEngineInfo*)infoFor:(ChessEvaluation)info {
+- (FEngineInfo*)infoFor:(ChessEvaluation)info game:(const ChessGame &)game {
     FEngineInfo *ei = [[FEngineInfo alloc] init];
     ei.info = info;
-    ei.game = engine.game();
+    // Never share the history vector that the search mutates
+    ChessGame copy = game;
+    copy.history = NEW_HISTORY;
+    ei.game = copy;
     return ei;
 }
 
@@ -283,57 +318,88 @@
 }
 
 - (void)evaluate:(NSInteger)depth time:(NSTimeInterval)time callback:(FEngineSearchCallback)callback {
-    [self cancel];
-    
-    NSUInteger localStateIndex = self.stateIndex;
+    uint64_t gen = [self invalidate];
     
     if (self.useOpeningBook) {
         FEngineInfo *info = [self lookupOpeningMove];
         if (info) {
             callback(info, YES);
-            [self fireUpdate:localStateIndex];
             return;
         }
     }
     
-    if (time > 0) {
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(time * NSEC_PER_SEC)), dispatch_get_global_queue(QOS_CLASS_UTILITY, 0), ^{
-            [self stop];
+    // The search works on its own copy of the position: the history is modified during the search
+    // while the caller keeps moving, undoing or pasting on the real game.
+    ChessGame copy = engine.game();
+    copy.history = std::make_shared<std::vector<BoardHash>>(*engine.game().history);
+    auto snapshot = std::make_shared<const ChessGame>(copy);
+    BOOL tt = self.ttEnabled;
+    
+    dispatch_block_t search = ^{
+        {
+            std::lock_guard<std::recursive_mutex> lock(self->_control);
+            if (gen != self->_generation) {
+                // Cancelled or superseded before it started
+                return;
+            }
+            self->engine.iterativeSearch.start();
+            if (self->_stopRequestedGeneration == gen) {
+                // Honored here: depth 1 still finishes, so the result is a real move
+                self->engine.stop();
+            }
+        }
+        
+        if (time > 0) {
+            // Armed here, so it measures the search time, not the time spent in the queue
+            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(time * NSEC_PER_SEC)), dispatch_get_global_queue(QOS_CLASS_UTILITY, 0), ^{
+                std::lock_guard<std::recursive_mutex> lock(self->_control);
+                if (gen == self->_generation) {
+                    self->engine.stop();
+                }
+            });
+        }
+        
+        self->engine.searchBestMove(snapshot->board, snapshot->history, (int)depth, tt, [self, snapshot, gen, callback](ChessEvaluation evaluation, bool done) {
+            FEngineInfo *info = [self infoFor:evaluation game:*snapshot];
+            std::lock_guard<std::recursive_mutex> lock(self->_control);
+            if (gen == self->_generation) {
+                callback(info, done);
+            }
         });
-    }
-
+    };
+    
     if (self.async) {
-        dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0), ^{
-            [self searchBestMove:depth callback:^(FEngineInfo * _Nonnull info, BOOL completed) {
-                callback(info, completed);
-                [self fireUpdate:localStateIndex];
-            }];
-        });
+        dispatch_async(_searchQueue, search);
     } else {
-        [self searchBestMove:depth callback:^(FEngineInfo * _Nonnull info, BOOL completed) {
-            callback(info, completed);
-            [self fireUpdate:localStateIndex];
-        }];
+        // The inline path is serialized with any search that is still unwinding
+        dispatch_sync(_searchQueue, search);
     }
 }
 
 - (FEngineInfo*)lookupOpeningMove {
     ChessEvaluation evaluation;
     if (engine.lookupOpeningMove(evaluation)) {
-        return [self infoFor:evaluation];
+        return [self infoFor:evaluation game:engine.game()];
     } else {
         return nil;
     }
 }
 
-- (void)searchBestMove:(NSInteger)maxDepth callback:(FEngineSearchCallback)callback {
-    // TODO ??
-    ChessEvaluater::positionalAnalysis = self.positionalAnalysis;
-    engine.transpositionTable = self.ttEnabled;
-    
-    engine.searchBestMove((int)maxDepth, [self, callback](ChessEvaluation evaluation, bool done) {
-        callback([self infoFor:evaluation], done);
-    });
+
+// Test hooks, declared in FEngine+Testing.h
+
+- (void)performOnSearchQueue:(dispatch_block_t)block {
+    dispatch_async(_searchQueue, block);
+}
+
+- (void)setSearchCheckpoint:(nullable dispatch_block_t)block {
+#ifdef BCHESS_TEST_HOOKS
+    if (block) {
+        engine.iterativeSearch.minMaxSearch.checkpoint = [block]() { block(); };
+    } else {
+        engine.iterativeSearch.minMaxSearch.checkpoint = nullptr;
+    }
+#endif
 }
 
 @end

@@ -13,8 +13,10 @@
 @class FEngineMoveNode;
 @class FEngineGame;
 
-typedef void(^FEngineSearchCallback)(FEngineInfo * _Nonnull info, BOOL completed);
-typedef void(^FEngineDidUpdateCallback)();
+NS_ASSUME_NONNULL_BEGIN
+
+/** Called on the engine's search queue (or inline on the calling thread for an opening book move), never on the main queue. */
+typedef void (NS_SWIFT_SENDABLE ^FEngineSearchCallback)(FEngineInfo * _Nonnull info, BOOL completed);
 
 typedef NS_ENUM(NSInteger, Direction){
     start = 0,
@@ -28,12 +30,9 @@ typedef NS_ENUM(NSInteger, Direction){
 
 @property (nonatomic, assign) BOOL async;
 @property (nonatomic, assign) BOOL useOpeningBook;
-@property (nonatomic, assign) BOOL positionalAnalysis;
 @property (nonatomic, assign) BOOL ttEnabled;
 @property (nonatomic, assign) NSUInteger searchDepth;
 @property (nonatomic, assign) NSTimeInterval thinkingTime;
-
-@property (nonatomic, strong) FEngineDidUpdateCallback _Nullable updateCallback;
 
 @property (nonatomic, strong, readonly) NSString * _Nonnull state;
 
@@ -67,6 +66,10 @@ typedef NS_ENUM(NSInteger, Direction){
 - (BOOL)canMoveTo:(Direction)direction;
 // Perform the next move given the direction and variation index
 - (void)moveTo:(Direction)direction variation:(NSUInteger)variation;
+// The variation that the current line takes for its next move: moving forward with it stays on the line
+- (NSUInteger)nextVariation;
+// The moves that can follow the current position, the main one first. Their order is the variation index.
+- (NSArray<FEngineMoveNode*>* _Nonnull)nextMoveChoices;
 // Returns the next move UUID given the direction
 - (NSUInteger)moveUUID:(Direction)direction;
 
@@ -93,3 +96,5 @@ typedef NS_ENUM(NSInteger, Direction){
 - (void)evaluate:(NSInteger)depth time:(NSTimeInterval)time callback:(FEngineSearchCallback _Nonnull)callback;
 
 @end
+
+NS_ASSUME_NONNULL_END

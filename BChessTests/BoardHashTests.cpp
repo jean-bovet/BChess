@@ -16,7 +16,7 @@
 #include "FPGN.hpp"
 
 TEST(BoardHash, MakeAndUndoMove) {
-    ChessBoardHash::initialize();
+    ChessEngine::initialize();
     
     ChessBoard board;
     
@@ -38,7 +38,7 @@ TEST(BoardHash, MakeAndUndoMove) {
 }
 
 TEST(BoardHash, EnsureNoCollision) {
-    ChessBoardHash::initialize();
+    ChessEngine::initialize();
 
     ChessBoard boardA, boardB;
     

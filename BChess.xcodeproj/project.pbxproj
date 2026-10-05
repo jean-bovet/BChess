@@ -3,645 +3,623 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 48;
+	objectVersion = 77;
 	objects = {
 
 /* Begin PBXBuildFile section */
-		A70A61BB1FD132D200AFDF0E /* FFEN.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A70A61B91FD132D200AFDF0E /* FFEN.cpp */; };
-		A70A61C41FD458DE00AFDF0E /* ChessMoveGenerator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A70A61C21FD458DE00AFDF0E /* ChessMoveGenerator.cpp */; };
-		A70A61C61FD4592700AFDF0E /* MoveList.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A70A61C51FD4592700AFDF0E /* MoveList.cpp */; };
-		A70A61CA1FD46E3C00AFDF0E /* ChessEvaluater.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A70A61C81FD46E3C00AFDF0E /* ChessEvaluater.cpp */; };
-		A70A61D11FD4AA9600AFDF0E /* FEngineInfo.mm in Sources */ = {isa = PBXBuildFile; fileRef = A70A61D01FD4AA9600AFDF0E /* FEngineInfo.mm */; };
-		A70A61D51FD4D42100AFDF0E /* FEngineInfo.mm in Sources */ = {isa = PBXBuildFile; fileRef = A70A61D01FD4AA9600AFDF0E /* FEngineInfo.mm */; };
-		A70A61D81FD4D49500AFDF0E /* MoveList.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A70A61C51FD4592700AFDF0E /* MoveList.cpp */; };
-		A70A61D91FD4D49500AFDF0E /* ChessMoveGenerator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A70A61C21FD458DE00AFDF0E /* ChessMoveGenerator.cpp */; };
-		A70A61DA1FD4D49500AFDF0E /* ChessBoard.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A7712D451FCBC13100E7E802 /* ChessBoard.cpp */; };
-		A70A61DB1FD4D49500AFDF0E /* ChessEvaluater.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A70A61C81FD46E3C00AFDF0E /* ChessEvaluater.cpp */; };
-		A70A61DD1FD4D49500AFDF0E /* FFEN.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A70A61B91FD132D200AFDF0E /* FFEN.cpp */; };
-		A70A61DE1FD4D49F00AFDF0E /* magicmoves.c in Sources */ = {isa = PBXBuildFile; fileRef = A7712D411FCB97A900E7E802 /* magicmoves.c */; };
-		A70B41A3264A527900A56E29 /* FullMoveView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A70B41A2264A527900A56E29 /* FullMoveView.swift */; };
-		A70B41A4264A527900A56E29 /* FullMoveView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A70B41A2264A527900A56E29 /* FullMoveView.swift */; };
-		A712C25326522F6000E05408 /* FullMove.swift in Sources */ = {isa = PBXBuildFile; fileRef = A712C25226522F6000E05408 /* FullMove.swift */; };
-		A712C25426522F6000E05408 /* FullMove.swift in Sources */ = {isa = PBXBuildFile; fileRef = A712C25226522F6000E05408 /* FullMove.swift */; };
-		A712C256265377C000E05408 /* Arrow.swift in Sources */ = {isa = PBXBuildFile; fileRef = A712C255265377C000E05408 /* Arrow.swift */; };
-		A712C257265377C000E05408 /* Arrow.swift in Sources */ = {isa = PBXBuildFile; fileRef = A712C255265377C000E05408 /* Arrow.swift */; };
-		A716976D262BFF8C00156BD6 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A716976C262BFF8C00156BD6 /* SettingsView.swift */; };
-		A72C3E022650D78100CB9DB7 /* VariationSelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A72C3E012650D78100CB9DB7 /* VariationSelectionView.swift */; };
-		A72C3E032650D78100CB9DB7 /* VariationSelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A72C3E012650D78100CB9DB7 /* VariationSelectionView.swift */; };
-		A72C3E052650D82B00CB9DB7 /* Variation.swift in Sources */ = {isa = PBXBuildFile; fileRef = A72C3E042650D82B00CB9DB7 /* Variation.swift */; };
-		A72C3E062650D82C00CB9DB7 /* Variation.swift in Sources */ = {isa = PBXBuildFile; fileRef = A72C3E042650D82B00CB9DB7 /* Variation.swift */; };
-		A72E2B57200496CD006CBB1C /* BoardHashTests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A72E2B56200496CC006CBB1C /* BoardHashTests.cpp */; };
-		A731BD3720009856004C13EF /* Tournament.swift in Sources */ = {isa = PBXBuildFile; fileRef = A731BD3620009856004C13EF /* Tournament.swift */; };
-		A731BD392000A513004C13EF /* TournamentEngines.swift in Sources */ = {isa = PBXBuildFile; fileRef = A731BD382000A513004C13EF /* TournamentEngines.swift */; };
-		A746997C2637CCF7007E0058 /* NavigationActionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A746997B2637CCF7007E0058 /* NavigationActionView.swift */; };
-		A746997D2637CCF7007E0058 /* NavigationActionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A746997B2637CCF7007E0058 /* NavigationActionView.swift */; };
-		A746C244200148E9001F4437 /* ChessBoardHash.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A746C242200148E9001F4437 /* ChessBoardHash.cpp */; };
-		A746C245200148ED001F4437 /* ChessBoardHash.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A746C242200148E9001F4437 /* ChessBoardHash.cpp */; };
-		A746C2492001707F001F4437 /* GameHistory.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A746C2472001707F001F4437 /* GameHistory.cpp */; };
-		A746C24D2001A2FD001F4437 /* GameHistory.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A746C2472001707F001F4437 /* GameHistory.cpp */; };
-		A75359841FDC51B2008D1DEE /* FENgineInfo+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = A75359831FDC51B2008D1DEE /* FENgineInfo+Extension.swift */; };
-		A75359851FDC994E008D1DEE /* FENgineInfo+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = A75359831FDC51B2008D1DEE /* FENgineInfo+Extension.swift */; };
-		A75683291FCD28A000CF1408 /* FEngine.mm in Sources */ = {isa = PBXBuildFile; fileRef = A75683281FCD28A000CF1408 /* FEngine.mm */; };
-		A756832D1FD0B3FE00CF1408 /* magicmoves.c in Sources */ = {isa = PBXBuildFile; fileRef = A7712D411FCB97A900E7E802 /* magicmoves.c */; };
-		A757614B264A504D006242F9 /* Game.swift in Sources */ = {isa = PBXBuildFile; fileRef = A757614A264A504D006242F9 /* Game.swift */; };
-		A757614C264A504D006242F9 /* Game.swift in Sources */ = {isa = PBXBuildFile; fileRef = A757614A264A504D006242F9 /* Game.swift */; };
-		A757614F264A50E8006242F9 /* FEngineMoveNode.mm in Sources */ = {isa = PBXBuildFile; fileRef = A757614E264A50E8006242F9 /* FEngineMoveNode.mm */; };
-		A7576150264A50E8006242F9 /* FEngineMoveNode.mm in Sources */ = {isa = PBXBuildFile; fileRef = A757614E264A50E8006242F9 /* FEngineMoveNode.mm */; };
-		A7576152264A51BC006242F9 /* FEngineMoveNode+Private.h in Sources */ = {isa = PBXBuildFile; fileRef = A7576151264A51BC006242F9 /* FEngineMoveNode+Private.h */; };
-		A7576153264A51BC006242F9 /* FEngineMoveNode+Private.h in Sources */ = {isa = PBXBuildFile; fileRef = A7576151264A51BC006242F9 /* FEngineMoveNode+Private.h */; };
-		A758BB0625AC119C0092714E /* Actions.swift in Sources */ = {isa = PBXBuildFile; fileRef = A758BB0525AC119C0092714E /* Actions.swift */; };
-		A758BB0725AC119C0092714E /* Actions.swift in Sources */ = {isa = PBXBuildFile; fileRef = A758BB0525AC119C0092714E /* Actions.swift */; };
-		A75A283F1FECD7DD003AC5EF /* FEngine.mm in Sources */ = {isa = PBXBuildFile; fileRef = A75683281FCD28A000CF1408 /* FEngine.mm */; };
-		A75CB25B1FED8F2C005487BD /* MoveTests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A75CB25A1FED8F2B005487BD /* MoveTests.cpp */; };
-		A75CB25D1FED8F82005487BD /* EvaluationTests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A75CB25C1FED8F82005487BD /* EvaluationTests.cpp */; };
-		A75CB25F1FED8F9E005487BD /* CheckTests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A75CB25E1FED8F9E005487BD /* CheckTests.cpp */; };
-		A765D8611FF6C1950045BB36 /* ChessOpenings.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A765D85F1FF6C1950045BB36 /* ChessOpenings.cpp */; };
-		A7688F60204B6E91004B1E9E /* ChessState.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A7688F5E204B6E91004B1E9E /* ChessState.cpp */; };
-		A7688F62204B739E004B1E9E /* ChessState.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A7688F5E204B6E91004B1E9E /* ChessState.cpp */; };
-		A7688F64204B73BF004B1E9E /* StateTests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A7688F63204B73BF004B1E9E /* StateTests.cpp */; };
-		A76CACC1264A1E92009EAA8B /* FEngineTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A76CACC0264A1E92009EAA8B /* FEngineTests.swift */; };
-		A7712D2F1FC7C4CD00E7E802 /* UCI.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7712D2E1FC7C4CD00E7E802 /* UCI.swift */; };
-		A7712D341FC895D100E7E802 /* UCI.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7712D2E1FC7C4CD00E7E802 /* UCI.swift */; };
-		A7712D471FCBC13100E7E802 /* ChessBoard.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A7712D451FCBC13100E7E802 /* ChessBoard.cpp */; };
-		A77371FE1FE31FEF0001A90F /* ChessGame.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A77371FC1FE31FEF0001A90F /* ChessGame.cpp */; };
-		A77372011FE320010001A90F /* FPGN.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A77371FF1FE320010001A90F /* FPGN.cpp */; };
-		A77372021FE334BB0001A90F /* ChessGame.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A77371FC1FE31FEF0001A90F /* ChessGame.cpp */; };
-		A77372031FE334BB0001A90F /* FPGN.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A77371FF1FE320010001A90F /* FPGN.cpp */; };
-		A775236325AD6532009BFFD1 /* Openings.pgn in Resources */ = {isa = PBXBuildFile; fileRef = A7C92AA91FF6EE5500160D2E /* Openings.pgn */; };
-		A775236C25AD6533009BFFD1 /* Openings.pgn in Resources */ = {isa = PBXBuildFile; fileRef = A7C92AA91FF6EE5500160D2E /* Openings.pgn */; };
-		A775237625AD68FA009BFFD1 /* Animation.swift in Sources */ = {isa = PBXBuildFile; fileRef = A775237525AD68FA009BFFD1 /* Animation.swift */; };
-		A775237725AD68FA009BFFD1 /* Animation.swift in Sources */ = {isa = PBXBuildFile; fileRef = A775237525AD68FA009BFFD1 /* Animation.swift */; };
-		A77F66C825A832270030E61D /* Tests_iOS.swift in Sources */ = {isa = PBXBuildFile; fileRef = A77F66C725A832270030E61D /* Tests_iOS.swift */; };
-		A77F66D325A832270030E61D /* Tests_macOS.swift in Sources */ = {isa = PBXBuildFile; fileRef = A77F66D225A832270030E61D /* Tests_macOS.swift */; };
-		A77F66D525A832270030E61D /* BChessUIApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A77F66AC25A832230030E61D /* BChessUIApp.swift */; };
-		A77F66D625A832270030E61D /* BChessUIApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A77F66AC25A832230030E61D /* BChessUIApp.swift */; };
-		A77F66D725A832270030E61D /* ChessDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = A77F66AD25A832240030E61D /* ChessDocument.swift */; };
-		A77F66D825A832270030E61D /* ChessDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = A77F66AD25A832240030E61D /* ChessDocument.swift */; };
-		A77F66D925A832270030E61D /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A77F66AE25A832240030E61D /* ContentView.swift */; };
-		A77F66DA25A832270030E61D /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A77F66AE25A832240030E61D /* ContentView.swift */; };
-		A77F66DB25A832270030E61D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A77F66AF25A832270030E61D /* Assets.xcassets */; };
-		A77F66DC25A832270030E61D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A77F66AF25A832270030E61D /* Assets.xcassets */; };
-		A78E754C202C080E00445360 /* MovesTests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A78E754B202C080E00445360 /* MovesTests.cpp */; };
-		A78E7551202C110200445360 /* UnitTestHelper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A78E754F202C110200445360 /* UnitTestHelper.cpp */; };
-		A791117C264B923600F97FA7 /* FEngineGame.mm in Sources */ = {isa = PBXBuildFile; fileRef = A791117B264B923600F97FA7 /* FEngineGame.mm */; };
-		A791117D264B923600F97FA7 /* FEngineGame.mm in Sources */ = {isa = PBXBuildFile; fileRef = A791117B264B923600F97FA7 /* FEngineGame.mm */; };
-		A791117F264B92E500F97FA7 /* FEngineGame+Private.h in Sources */ = {isa = PBXBuildFile; fileRef = A791117E264B92E500F97FA7 /* FEngineGame+Private.h */; };
-		A7911180264B92E500F97FA7 /* FEngineGame+Private.h in Sources */ = {isa = PBXBuildFile; fileRef = A791117E264B92E500F97FA7 /* FEngineGame+Private.h */; };
-		A7911181264B98DC00F97FA7 /* FEngineGame.mm in Sources */ = {isa = PBXBuildFile; fileRef = A791117B264B923600F97FA7 /* FEngineGame.mm */; };
-		A7911183264B98E600F97FA7 /* FEngineMoveNode.mm in Sources */ = {isa = PBXBuildFile; fileRef = A757614E264A50E8006242F9 /* FEngineMoveNode.mm */; };
-		A7911184264B998900F97FA7 /* FEngineMoveNode.mm in Sources */ = {isa = PBXBuildFile; fileRef = A757614E264A50E8006242F9 /* FEngineMoveNode.mm */; };
-		A7911185264B998900F97FA7 /* FEngineGame.mm in Sources */ = {isa = PBXBuildFile; fileRef = A791117B264B923600F97FA7 /* FEngineGame.mm */; };
-		A7911186264B998900F97FA7 /* FEngineMove.mm in Sources */ = {isa = PBXBuildFile; fileRef = A7C92AB31FF86BF200160D2E /* FEngineMove.mm */; };
-		A79514EC25AAE2C400AEA95F /* FENgineInfo+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = A75359831FDC51B2008D1DEE /* FENgineInfo+Extension.swift */; };
-		A79514F925AAE2C500AEA95F /* FENgineInfo+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = A75359831FDC51B2008D1DEE /* FENgineInfo+Extension.swift */; };
-		A795159E25ABE1D700AEA95F /* PiecesFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = A795159D25ABE1D700AEA95F /* PiecesFactory.swift */; };
-		A795159F25ABE1D700AEA95F /* PiecesFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = A795159D25ABE1D700AEA95F /* PiecesFactory.swift */; };
-		A79515A925ABE31100AEA95F /* SquareView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A79515A825ABE31100AEA95F /* SquareView.swift */; };
-		A79515AA25ABE31100AEA95F /* SquareView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A79515A825ABE31100AEA95F /* SquareView.swift */; };
-		A79515B425ABE34300AEA95F /* TopInformationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A79515B325ABE34300AEA95F /* TopInformationView.swift */; };
-		A79515B525ABE34300AEA95F /* TopInformationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A79515B325ABE34300AEA95F /* TopInformationView.swift */; };
-		A79515BF25ABE36700AEA95F /* InformationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A79515BE25ABE36700AEA95F /* InformationView.swift */; };
-		A79515C025ABE36700AEA95F /* InformationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A79515BE25ABE36700AEA95F /* InformationView.swift */; };
-		A79515CA25ABE38F00AEA95F /* LastMoveModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = A79515C925ABE38F00AEA95F /* LastMoveModifier.swift */; };
-		A79515CB25ABE38F00AEA95F /* LastMoveModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = A79515C925ABE38F00AEA95F /* LastMoveModifier.swift */; };
-		A79515D525ABE3A400AEA95F /* SelectionModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = A79515D425ABE3A400AEA95F /* SelectionModifier.swift */; };
-		A79515D625ABE3A400AEA95F /* SelectionModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = A79515D425ABE3A400AEA95F /* SelectionModifier.swift */; };
-		A79515E025ABE3D300AEA95F /* Selection.swift in Sources */ = {isa = PBXBuildFile; fileRef = A79515DF25ABE3D300AEA95F /* Selection.swift */; };
-		A79515E125ABE3D300AEA95F /* Selection.swift in Sources */ = {isa = PBXBuildFile; fileRef = A79515DF25ABE3D300AEA95F /* Selection.swift */; };
-		A79515EB25ABE41000AEA95F /* Position.swift in Sources */ = {isa = PBXBuildFile; fileRef = A79515EA25ABE41000AEA95F /* Position.swift */; };
-		A79515EC25ABE41000AEA95F /* Position.swift in Sources */ = {isa = PBXBuildFile; fileRef = A79515EA25ABE41000AEA95F /* Position.swift */; };
-		A79515F625ABE44000AEA95F /* PiecesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A79515F525ABE44000AEA95F /* PiecesView.swift */; };
-		A79515F725ABE44000AEA95F /* PiecesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A79515F525ABE44000AEA95F /* PiecesView.swift */; };
-		A795160C25ABE55E00AEA95F /* Square.swift in Sources */ = {isa = PBXBuildFile; fileRef = A795160B25ABE55E00AEA95F /* Square.swift */; };
-		A795160D25ABE55E00AEA95F /* Square.swift in Sources */ = {isa = PBXBuildFile; fileRef = A795160B25ABE55E00AEA95F /* Square.swift */; };
-		A795161725ABE57C00AEA95F /* ConditionalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A795161625ABE57C00AEA95F /* ConditionalView.swift */; };
-		A795161825ABE57C00AEA95F /* ConditionalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A795161625ABE57C00AEA95F /* ConditionalView.swift */; };
-		A795162225ABE59900AEA95F /* PlayAgainst.swift in Sources */ = {isa = PBXBuildFile; fileRef = A795162125ABE59900AEA95F /* PlayAgainst.swift */; };
-		A795162325ABE59900AEA95F /* PlayAgainst.swift in Sources */ = {isa = PBXBuildFile; fileRef = A795162125ABE59900AEA95F /* PlayAgainst.swift */; };
-		A795163D25ABE66600AEA95F /* BoardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A795163C25ABE66600AEA95F /* BoardView.swift */; };
-		A795163E25ABE66600AEA95F /* BoardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A795163C25ABE66600AEA95F /* BoardView.swift */; };
-		A7A30EC225AEB28D00729432 /* ActionsToolbar.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7A30EC125AEB28D00729432 /* ActionsToolbar.swift */; };
-		A7A30EC325AEB28D00729432 /* ActionsToolbar.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7A30EC125AEB28D00729432 /* ActionsToolbar.swift */; };
-		A7A30EDD25AEBD7C00729432 /* LabelsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7A30EDC25AEBD7C00729432 /* LabelsView.swift */; };
-		A7A30EDE25AEBD7C00729432 /* LabelsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7A30EDC25AEBD7C00729432 /* LabelsView.swift */; };
-		A7A30F2F25B2BAFC00729432 /* PromotionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7A30F2E25B2BAFC00729432 /* PromotionView.swift */; };
-		A7A30F3025B2BAFC00729432 /* PromotionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7A30F2E25B2BAFC00729432 /* PromotionView.swift */; };
-		A7AFCCAA1FB4E40D00AE3D85 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7AFCCA91FB4E40D00AE3D85 /* main.swift */; };
-		A7BC72E42636003F008FBBB4 /* NewGameView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7BC72E32636003F008FBBB4 /* NewGameView.swift */; };
-		A7BC72E52636003F008FBBB4 /* NewGameView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7BC72E32636003F008FBBB4 /* NewGameView.swift */; };
-		A7C92AAB1FF6F19100160D2E /* Openings.pgn in Resources */ = {isa = PBXBuildFile; fileRef = A7C92AA91FF6EE5500160D2E /* Openings.pgn */; };
-		A7C92AB51FF86C4300160D2E /* FEngineMove.mm in Sources */ = {isa = PBXBuildFile; fileRef = A7C92AB31FF86BF200160D2E /* FEngineMove.mm */; };
-		A7C92AB91FF86F6800160D2E /* FEngineUtility.mm in Sources */ = {isa = PBXBuildFile; fileRef = A7C92AB81FF86F6800160D2E /* FEngineUtility.mm */; };
-		A7C92ABB1FF8712800160D2E /* FEngineUtility.mm in Sources */ = {isa = PBXBuildFile; fileRef = A7C92AB81FF86F6800160D2E /* FEngineUtility.mm */; };
-		A7E3B6891FF6C85500DBB66B /* OpeningsTests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A7E3B6881FF6C85500DBB66B /* OpeningsTests.cpp */; };
-		A7E490EB1FEA207100970EAD /* gtest-all.cc in Sources */ = {isa = PBXBuildFile; fileRef = A7E490EA1FEA207100970EAD /* gtest-all.cc */; };
-		A7E490EC1FEA23DD00970EAD /* PGNTests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A77372041FE340780001A90F /* PGNTests.cpp */; };
-		A7E490ED1FEA29B900970EAD /* GamesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7712D321FC8957500E7E802 /* GamesTests.swift */; };
-		A7E490F21FEA2E7E00970EAD /* GoogleTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = A7E490F11FEA2E7E00970EAD /* GoogleTests.mm */; };
-		A7E4C6B72636849C00BE4955 /* NewGameView_iOS.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7E4C6B62636849C00BE4955 /* NewGameView_iOS.swift */; };
-		A7EBE7CF1FF6C93600ACDF85 /* ChessOpenings.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A765D85F1FF6C1950045BB36 /* ChessOpenings.cpp */; };
-		A7EF55C81FF191B1004CF2DA /* SearchChessTests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A7E490E41FEA1C0600970EAD /* SearchChessTests.cpp */; };
-		A7EF55C91FF1CF77004CF2DA /* BestMoveTests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A70A61BD1FD3196400AFDF0E /* BestMoveTests.cpp */; };
-		A7FE31A525AA963F00A75936 /* FEngine.mm in Sources */ = {isa = PBXBuildFile; fileRef = A75683281FCD28A000CF1408 /* FEngine.mm */; };
-		A7FE31CA25AA96A800A75936 /* FEngineInfo.mm in Sources */ = {isa = PBXBuildFile; fileRef = A70A61D01FD4AA9600AFDF0E /* FEngineInfo.mm */; };
-		A7FE31CB25AA96A800A75936 /* FEngineUtility.mm in Sources */ = {isa = PBXBuildFile; fileRef = A7C92AB81FF86F6800160D2E /* FEngineUtility.mm */; };
-		A7FE31CC25AA96A800A75936 /* FEngineMove.mm in Sources */ = {isa = PBXBuildFile; fileRef = A7C92AB31FF86BF200160D2E /* FEngineMove.mm */; };
-		A7FE31D925AA96B800A75936 /* ChessBoard.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A7712D451FCBC13100E7E802 /* ChessBoard.cpp */; };
-		A7FE31DA25AA96B800A75936 /* MoveList.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A70A61C51FD4592700AFDF0E /* MoveList.cpp */; };
-		A7FE31DB25AA96B800A75936 /* GameHistory.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A746C2472001707F001F4437 /* GameHistory.cpp */; };
-		A7FE31DC25AA96B800A75936 /* ChessEvaluater.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A70A61C81FD46E3C00AFDF0E /* ChessEvaluater.cpp */; };
-		A7FE31DD25AA96B800A75936 /* ChessMoveGenerator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A70A61C21FD458DE00AFDF0E /* ChessMoveGenerator.cpp */; };
-		A7FE31EA25AA96B900A75936 /* ChessBoard.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A7712D451FCBC13100E7E802 /* ChessBoard.cpp */; };
-		A7FE31EB25AA96B900A75936 /* MoveList.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A70A61C51FD4592700AFDF0E /* MoveList.cpp */; };
-		A7FE31EC25AA96B900A75936 /* GameHistory.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A746C2472001707F001F4437 /* GameHistory.cpp */; };
-		A7FE31ED25AA96B900A75936 /* ChessEvaluater.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A70A61C81FD46E3C00AFDF0E /* ChessEvaluater.cpp */; };
-		A7FE31EE25AA96B900A75936 /* ChessMoveGenerator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A70A61C21FD458DE00AFDF0E /* ChessMoveGenerator.cpp */; };
-		A7FE31FB25AA96C500A75936 /* ChessGame.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A77371FC1FE31FEF0001A90F /* ChessGame.cpp */; };
-		A7FE31FC25AA96C500A75936 /* ChessOpenings.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A765D85F1FF6C1950045BB36 /* ChessOpenings.cpp */; };
-		A7FE31FD25AA96C500A75936 /* ChessState.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A7688F5E204B6E91004B1E9E /* ChessState.cpp */; };
-		A7FE320A25AA96C500A75936 /* ChessGame.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A77371FC1FE31FEF0001A90F /* ChessGame.cpp */; };
-		A7FE320B25AA96C500A75936 /* ChessOpenings.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A765D85F1FF6C1950045BB36 /* ChessOpenings.cpp */; };
-		A7FE320C25AA96C500A75936 /* ChessState.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A7688F5E204B6E91004B1E9E /* ChessState.cpp */; };
-		A7FE321925AA96D000A75936 /* FFEN.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A70A61B91FD132D200AFDF0E /* FFEN.cpp */; };
-		A7FE321A25AA96D000A75936 /* ChessBoardHash.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A746C242200148E9001F4437 /* ChessBoardHash.cpp */; };
-		A7FE321B25AA96D000A75936 /* FPGN.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A77371FF1FE320010001A90F /* FPGN.cpp */; };
-		A7FE321C25AA96D000A75936 /* magicmoves.c in Sources */ = {isa = PBXBuildFile; fileRef = A7712D411FCB97A900E7E802 /* magicmoves.c */; };
-		A7FE322925AA96D100A75936 /* FFEN.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A70A61B91FD132D200AFDF0E /* FFEN.cpp */; };
-		A7FE322A25AA96D100A75936 /* ChessBoardHash.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A746C242200148E9001F4437 /* ChessBoardHash.cpp */; };
-		A7FE322B25AA96D100A75936 /* FPGN.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A77371FF1FE320010001A90F /* FPGN.cpp */; };
-		A7FE322C25AA96D100A75936 /* magicmoves.c in Sources */ = {isa = PBXBuildFile; fileRef = A7712D411FCB97A900E7E802 /* magicmoves.c */; };
-		A7FE324D25AAD61200A75936 /* FEngineMove.mm in Sources */ = {isa = PBXBuildFile; fileRef = A7C92AB31FF86BF200160D2E /* FEngineMove.mm */; };
-		A7FE324E25AAD61200A75936 /* FEngineUtility.mm in Sources */ = {isa = PBXBuildFile; fileRef = A7C92AB81FF86F6800160D2E /* FEngineUtility.mm */; };
-		A7FE324F25AAD61200A75936 /* FEngineInfo.mm in Sources */ = {isa = PBXBuildFile; fileRef = A70A61D01FD4AA9600AFDF0E /* FEngineInfo.mm */; };
-		A7FE326925AAD64500A75936 /* FEngine.mm in Sources */ = {isa = PBXBuildFile; fileRef = A75683281FCD28A000CF1408 /* FEngine.mm */; };
+		0401A8739A8AE962C5B83EDF /* GameState.swift in Sources */ = {isa = PBXBuildFile; fileRef = E918E82CA52FD5A787214464 /* GameState.swift */; };
+		04AA9D1F6F5B25621FBDDAC2 /* BChessUIApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D0B880575533E500966B9FF /* BChessUIApp.swift */; };
+		0668B67A2EB828B68ED6CDF4 /* FullMoveView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 292E61AA9D148297F19F9713 /* FullMoveView.swift */; };
+		0765B5599107D096C64103B5 /* MinMaxSearchTests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 53E1CB7DFCB5C3399E0AFAE5 /* MinMaxSearchTests.cpp */; };
+		07DF6D4FB0FB1DA0235D77C4 /* OpeningsTests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 19F55617E5E81201E906F8EA /* OpeningsTests.cpp */; };
+		09B208471B25168203A8199A /* MoveTests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 679F482FF7CFC630243800C2 /* MoveTests.cpp */; };
+		0C7C7633D1B241266010C6C4 /* GameShellTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE010CC0D7A64B49DAAC7DF7 /* GameShellTests.swift */; };
+		0CAA5AC886897017523B2FAE /* FEngineMoveNode.mm in Sources */ = {isa = PBXBuildFile; fileRef = 67B30EF56BB2ADE44B075F8F /* FEngineMoveNode.mm */; };
+		0FABA35E043D77D32C93CF4E /* ChessGame.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1798BECBBBED258BED2E2CA1 /* ChessGame.cpp */; };
+		10F2B28DF63EAEFF238B4485 /* FEngineMove.mm in Sources */ = {isa = PBXBuildFile; fileRef = 2E720E71C38BC9C943E23A2A /* FEngineMove.mm */; };
+		13493B99175ADD17841971A3 /* FullMove.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB066BF62484862642882974 /* FullMove.swift */; };
+		1426B85E993D7B40855AC4F7 /* BChessUIApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D0B880575533E500966B9FF /* BChessUIApp.swift */; };
+		14E16E9E72529BF731B49DAB /* Position.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CF08685F1E9CDB6EE194D4B /* Position.swift */; };
+		159DA4F09658860EDB41DFB2 /* ChessMoveGenerator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ED44E31F4BB157BDE34CAADF /* ChessMoveGenerator.cpp */; };
+		15ABF3FE1AAC6A92D4CFCA61 /* DocumentWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFFCE8A3BEC69C017E353E3A /* DocumentWindow.swift */; };
+		15D3FD0CCF3383C42DF3EC8F /* ChessBoard.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AE369A268D78EE76D0D84F80 /* ChessBoard.cpp */; };
+		15F912F2E8E9A34E429F574F /* FEngineMove.mm in Sources */ = {isa = PBXBuildFile; fileRef = 2E720E71C38BC9C943E23A2A /* FEngineMove.mm */; };
+		1765DD92373F05F3557F0359 /* UCI.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9C49214C700B590509D6A2C /* UCI.swift */; };
+		176FA56E22CEA206AD493097 /* GameHistory.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FECF3456A6E4C0D9547AC353 /* GameHistory.cpp */; };
+		1814025A5197978BAEE7F6D6 /* FENgineInfo+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4127DC8F0333054AE16B921 /* FENgineInfo+Extension.swift */; };
+		185D96A20E05349A2931C0E3 /* EvaluationTests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F37D108593DEDA1EAC945852 /* EvaluationTests.cpp */; };
+		19352E0CBD75C14FAB9EE2AD /* FEngineConcurrencyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34E712ACCD1156718C34F831 /* FEngineConcurrencyTests.swift */; };
+		198A1E051F9AEE52239366D9 /* FEngineInfo.mm in Sources */ = {isa = PBXBuildFile; fileRef = AB15A1998BD8F52B3436A738 /* FEngineInfo.mm */; };
+		1A301637DD3721FF826D82C9 /* SquareView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FDBE14AD20196EBDEB22043A /* SquareView.swift */; };
+		1B5121713877DF451F9BC427 /* PlayAgainst.swift in Sources */ = {isa = PBXBuildFile; fileRef = 117C3F2306D0FD7602AA2488 /* PlayAgainst.swift */; };
+		1BDE624ED61A0203F3089B28 /* GameRootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44F34E9EA5805AF04B66FEC7 /* GameRootView.swift */; };
+		1C800008BF8752C88086FF00 /* ChessBoardHash.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A4315B0E7D14507709F7ADAF /* ChessBoardHash.cpp */; };
+		201DE6DF9038C87648A050E9 /* SearchChessTests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CBA33EA4ACC347FB0DF9ABA4 /* SearchChessTests.cpp */; };
+		204F1E5EE32623BAD1D5B90E /* FEngineTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4D6AC18DAF20B619B734F5B /* FEngineTests.swift */; };
+		2132010981BE81C9556D5CAC /* ChessMoveGenerator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ED44E31F4BB157BDE34CAADF /* ChessMoveGenerator.cpp */; };
+		2181B8B9D24093453CC60B94 /* PromotionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81D206FD51B7D4574C66BE3B /* PromotionView.swift */; };
+		21AD9F37AA2CA31FCC6540D4 /* BestMoveTests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 02349FE00E1E4BF129C077AB /* BestMoveTests.cpp */; };
+		2312118FD83EEA4785E54A0E /* FEngineUtility.mm in Sources */ = {isa = PBXBuildFile; fileRef = CE782615578B3D7B3C451A64 /* FEngineUtility.mm */; };
+		23FD802F2F9C69009BCA0DC2 /* FEngineMove.mm in Sources */ = {isa = PBXBuildFile; fileRef = 2E720E71C38BC9C943E23A2A /* FEngineMove.mm */; };
+		26EBEEFC5E0B10F7901879C8 /* FEngine.mm in Sources */ = {isa = PBXBuildFile; fileRef = 107058D83675D2AF04C3E091 /* FEngine.mm */; };
+		275C5182800600AB054701FE /* Position.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CF08685F1E9CDB6EE194D4B /* Position.swift */; };
+		2781988D9F67EC5D97B52E5C /* FullMoveView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 292E61AA9D148297F19F9713 /* FullMoveView.swift */; };
+		27F45075258D05C48A8CF4F1 /* FEngineMove.mm in Sources */ = {isa = PBXBuildFile; fileRef = 2E720E71C38BC9C943E23A2A /* FEngineMove.mm */; };
+		2A9AAC9BA6C1693CBBEBAC2F /* InformationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D654539FF9079CD21242A84 /* InformationView.swift */; };
+		2BB1B9AEADF0979C105D77BC /* Variation.swift in Sources */ = {isa = PBXBuildFile; fileRef = F14DD2B61B0DFA99631A8621 /* Variation.swift */; };
+		2BC576F891278012F0C6EB1A /* ChessMoveGenerator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ED44E31F4BB157BDE34CAADF /* ChessMoveGenerator.cpp */; };
+		2C446D502A1BB5DC6BB9A7B3 /* ChessBoard.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AE369A268D78EE76D0D84F80 /* ChessBoard.cpp */; };
+		3090063C08ABB80A2165A50A /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B7C82FBD58A56EEA69F8536 /* ContentView.swift */; };
+		32BB425A448B3B372DCA707D /* VariationSelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71EBF0402256A6790224AAB8 /* VariationSelectionView.swift */; };
+		33A990A09B6560EB68723772 /* FEngineInfo.mm in Sources */ = {isa = PBXBuildFile; fileRef = AB15A1998BD8F52B3436A738 /* FEngineInfo.mm */; };
+		3509940CA0C682612996AD29 /* FEngineInfo.mm in Sources */ = {isa = PBXBuildFile; fileRef = AB15A1998BD8F52B3436A738 /* FEngineInfo.mm */; };
+		3614046B451B7E6538D11DAE /* Selection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 712C86DA78A185AE24966EF1 /* Selection.swift */; };
+		3641DE08ADF3ABCD68113A4B /* ChessBoard.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AE369A268D78EE76D0D84F80 /* ChessBoard.cpp */; };
+		36BCD1C73BBD031A3410960E /* ChessEvaluater.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 947CCE0E46399FFD55FC32BC /* ChessEvaluater.cpp */; };
+		370FBDFF72D8224767EF7AB6 /* LabelsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2F90389CE311A6A7172FBE4 /* LabelsView.swift */; };
+		3821659B2605770F3480B087 /* ActionsToolbar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 956075511431C656DF93A731 /* ActionsToolbar.swift */; };
+		39DECB5A1F2AE1D1666C0C81 /* GTestRunner.mm in Sources */ = {isa = PBXBuildFile; fileRef = 6CFD5BA027224C45ACF97E37 /* GTestRunner.mm */; };
+		39EBC7172DB4D5772BB41681 /* FEngineGame.mm in Sources */ = {isa = PBXBuildFile; fileRef = D05BA0CF62011F29A83BC02B /* FEngineGame.mm */; };
+		3A9574F98C571558D09A671F /* Openings.pgn in Resources */ = {isa = PBXBuildFile; fileRef = C570D7A63E563DBD04ACAF7F /* Openings.pgn */; };
+		3B9168E9B93E37FB97255B3E /* DocumentWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFFCE8A3BEC69C017E353E3A /* DocumentWindow.swift */; };
+		3C81E8B219E11075BEDDDBBB /* GameLibrary.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71E5EEE6D0B10E5AD9440A65 /* GameLibrary.swift */; };
+		4262BBD0AA25555400496224 /* ConditionalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6436166D3A4BF3D36CDCE690 /* ConditionalView.swift */; };
+		42E612D54317BCAFC6EF13D6 /* GameSessionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 368A041E11904F2B624D0C96 /* GameSessionTests.swift */; };
+		4406B4C05FB4EC9B01CC1C90 /* Arrow.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEC6B2A69F9EAD135A9433ED /* Arrow.swift */; };
+		442FF3DD428D7AA67F14CEC4 /* IterativeDeepeningTests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D15ACC05CB5B63796D43739F /* IterativeDeepeningTests.cpp */; };
+		450FF83A5DCA3959E33F8FB4 /* PlayAgainst.swift in Sources */ = {isa = PBXBuildFile; fileRef = 117C3F2306D0FD7602AA2488 /* PlayAgainst.swift */; };
+		465254AFEEF7A4F592EDE8B8 /* GameHistory.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FECF3456A6E4C0D9547AC353 /* GameHistory.cpp */; };
+		472D5FF088052271DF546D2E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7AE6FC034D3D248278A55641 /* Assets.xcassets */; };
+		4970DCEF72BD80A9CA8156B9 /* Square.swift in Sources */ = {isa = PBXBuildFile; fileRef = E62F53FB8737C917EACA573D /* Square.swift */; };
+		4AF0DF735024EDD20F5D4126 /* ConditionalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6436166D3A4BF3D36CDCE690 /* ConditionalView.swift */; };
+		4B6AC3F473FF41AC148797D8 /* LabelsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2F90389CE311A6A7172FBE4 /* LabelsView.swift */; };
+		4B990CD24C52E42ADCB349EB /* magicmoves.c in Sources */ = {isa = PBXBuildFile; fileRef = D11C33D8BBE6428E42241039 /* magicmoves.c */; };
+		4FBB7929B62BE30EFEC21C80 /* FFEN.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F7BCF98F9720337F7D257AFA /* FFEN.cpp */; };
+		5038DE0599BCA82690BF7849 /* BoardHashTests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 90A78D47B8D6EA3AFA4FF658 /* BoardHashTests.cpp */; };
+		50F769517A70B9DCFD18284B /* PlayAgainst.swift in Sources */ = {isa = PBXBuildFile; fileRef = 117C3F2306D0FD7602AA2488 /* PlayAgainst.swift */; };
+		511708FE8F72BD9DBC5E1742 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7AE6FC034D3D248278A55641 /* Assets.xcassets */; };
+		51597C0234CFC27A93176646 /* StateTests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2AD84B737192936DAA406CD7 /* StateTests.cpp */; };
+		536CCC49CF72BD8D80281500 /* GameStateCodingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB9B23C24F0D870DB254ECD6 /* GameStateCodingTests.swift */; };
+		54AD5F191D6C9A7151D02B9D /* ChessGame.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1798BECBBBED258BED2E2CA1 /* ChessGame.cpp */; };
+		54BAE9B206E2B941C596C763 /* ChessGame.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1798BECBBBED258BED2E2CA1 /* ChessGame.cpp */; };
+		55520A2B44E600A09A749E1B /* FENgineInfo+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4127DC8F0333054AE16B921 /* FENgineInfo+Extension.swift */; };
+		580FFD27B1F8E2EC4AD8D143 /* GameSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 449B35D4D73E3A74D24EEC1D /* GameSession.swift */; };
+		58225EBA11A0DBD6C47AE30D /* UCIProcessTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CE26D46FB2EB6963C3B70EE /* UCIProcessTests.swift */; };
+		58DCA4660C044FF537754AB7 /* Selection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 712C86DA78A185AE24966EF1 /* Selection.swift */; };
+		59377159D3138D6FC7F6BD47 /* ChessState.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 431412F9A9BFFBA835CA9E74 /* ChessState.cpp */; };
+		5A6CF278BC154F8A1E27A2B2 /* FullMove.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB066BF62484862642882974 /* FullMove.swift */; };
+		5D565D127C2378C90B54FB84 /* GameState.swift in Sources */ = {isa = PBXBuildFile; fileRef = E918E82CA52FD5A787214464 /* GameState.swift */; };
+		5EDC8B79DD21EB0B4931007B /* FEngineUtility.mm in Sources */ = {isa = PBXBuildFile; fileRef = CE782615578B3D7B3C451A64 /* FEngineUtility.mm */; };
+		652C1D9CC19A455514C7589F /* ChessGameTests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 62BE341484A569C1B3F4DC3B /* ChessGameTests.cpp */; };
+		670721415A71F2EA7C283D3C /* UnitTestHelper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 20FCADEB3C5F59400CF1FB32 /* UnitTestHelper.cpp */; };
+		687625833AC8552DF1728B21 /* MovesTests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9BA0B234E3F267394AD43C1F /* MovesTests.cpp */; };
+		6A5E612D961C12FD349DC387 /* ChessState.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 431412F9A9BFFBA835CA9E74 /* ChessState.cpp */; };
+		6B674CF5A48A3FEBD21CF92D /* ChessBoardHash.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A4315B0E7D14507709F7ADAF /* ChessBoardHash.cpp */; };
+		6CEF4B70836176683A9EC90B /* FPGN.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5F871687B9D9A0D848DEFFFE /* FPGN.cpp */; };
+		71E4AD54E9B9C238936E2B39 /* Openings.pgn in Resources */ = {isa = PBXBuildFile; fileRef = C570D7A63E563DBD04ACAF7F /* Openings.pgn */; };
+		73A49D1EE51DE8367CA99323 /* SelectionModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2D17161DA74B911FD109203 /* SelectionModifier.swift */; };
+		766704256B00BAE218AF2C79 /* PGNTests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 19CA422D6799EFFF17A2BDAE /* PGNTests.cpp */; };
+		77953060A98DD1ADBAB69B2B /* ChessOpenings.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 94916DB48E273E8C193F571F /* ChessOpenings.cpp */; };
+		77A4E5FC418C593DB8C6D634 /* ChessBoardHash.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A4315B0E7D14507709F7ADAF /* ChessBoardHash.cpp */; };
+		78765A87EBC10ED3441A0A61 /* PiecesFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = B06D783FF88F314CC998FEC5 /* PiecesFactory.swift */; };
+		78EFE39F6F4B9F66FAB992F2 /* BoardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C80EAED5A93B886115810B84 /* BoardView.swift */; };
+		79234A2D05908EE2A080C99E /* PiecesFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = B06D783FF88F314CC998FEC5 /* PiecesFactory.swift */; };
+		7B445929EE7F0B52FCDAF886 /* Selection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 712C86DA78A185AE24966EF1 /* Selection.swift */; };
+		7EE11886FE2963FD8302B23F /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B7C82FBD58A56EEA69F8536 /* ContentView.swift */; };
+		830AF3ECE9A3E9A8BDC1AFCB /* magicmoves.c in Sources */ = {isa = PBXBuildFile; fileRef = D11C33D8BBE6428E42241039 /* magicmoves.c */; };
+		84D5CE43F1FA31A4DBFED7CF /* gtest-all.cc in Sources */ = {isa = PBXBuildFile; fileRef = 45C32D5DABF1A7564A170028 /* gtest-all.cc */; };
+		84D9FEE4B48FD84A2A86C946 /* Openings.pgn in Resources */ = {isa = PBXBuildFile; fileRef = C570D7A63E563DBD04ACAF7F /* Openings.pgn */; };
+		862BB23888D1E7B79CFE4351 /* NavigationActionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF704EB6D594569C8C1C0283 /* NavigationActionView.swift */; };
+		869984D8E6A87C1A78CA51A8 /* GameHistory.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FECF3456A6E4C0D9547AC353 /* GameHistory.cpp */; };
+		878940D221C9C6AAAD6D7D34 /* ChessEvaluater.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 947CCE0E46399FFD55FC32BC /* ChessEvaluater.cpp */; };
+		87E363FD341DAB6E7724C21E /* FEngine.mm in Sources */ = {isa = PBXBuildFile; fileRef = 107058D83675D2AF04C3E091 /* FEngine.mm */; };
+		894F4AF87419939C628038FC /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C986E8C85A8DD1C80E51BAB7 /* SettingsView.swift */; };
+		8A39952C2F27B18FEDBBCE2A /* FEngineMoveNode.mm in Sources */ = {isa = PBXBuildFile; fileRef = 67B30EF56BB2ADE44B075F8F /* FEngineMoveNode.mm */; };
+		8A77F9705BB9B600B005EE97 /* FEngineGame.mm in Sources */ = {isa = PBXBuildFile; fileRef = D05BA0CF62011F29A83BC02B /* FEngineGame.mm */; };
+		8CFD2DC7D5930C0738CD3794 /* SquareView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FDBE14AD20196EBDEB22043A /* SquareView.swift */; };
+		8E85EF2B2D8E4A802F14F47D /* Position.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CF08685F1E9CDB6EE194D4B /* Position.swift */; };
+		8E93751260FDF488AA388F2F /* PromotionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81D206FD51B7D4574C66BE3B /* PromotionView.swift */; };
+		8F2D0ED297669A8113C270DF /* FFEN.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F7BCF98F9720337F7D257AFA /* FFEN.cpp */; };
+		8F4DA3B4DC0205083230935A /* Pasteboard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A18B566B43232E369485F4D /* Pasteboard.swift */; };
+		910455537F55F4412768FC24 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE9B55D22F2C1D0A3ED7D1BD /* main.swift */; };
+		91AA170EE9AC7E889118BF35 /* MoveList.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5706678E59692AD6397F2D59 /* MoveList.cpp */; };
+		9518620E43D9B847CED8488E /* FEngineUtility.mm in Sources */ = {isa = PBXBuildFile; fileRef = CE782615578B3D7B3C451A64 /* FEngineUtility.mm */; };
+		964A24461F1D8C58BED4431A /* magicmoves.c in Sources */ = {isa = PBXBuildFile; fileRef = D11C33D8BBE6428E42241039 /* magicmoves.c */; };
+		964E68698D0402C887D6283B /* FFEN.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F7BCF98F9720337F7D257AFA /* FFEN.cpp */; };
+		993EDA19151F3900365CC340 /* CheckTests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 30FFD068B173D4656B5A8E33 /* CheckTests.cpp */; };
+		9AC10D64359B02B9DE926458 /* TestSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 558E41B761768D6665905A72 /* TestSupport.swift */; };
+		9C64B7FFF6BEB786AA7946F7 /* FEngineGame.mm in Sources */ = {isa = PBXBuildFile; fileRef = D05BA0CF62011F29A83BC02B /* FEngineGame.mm */; };
+		9F47CDB1A6B0BC4FFD6F3377 /* GameLibrary.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71E5EEE6D0B10E5AD9440A65 /* GameLibrary.swift */; };
+		A1039674D01A68EBFA2D16DE /* ChessOpenings.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 94916DB48E273E8C193F571F /* ChessOpenings.cpp */; };
+		A1D17872DA6E50A57002D655 /* NewGameView_iOS.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0324AFBE64AEA9CAF1E5ED66 /* NewGameView_iOS.swift */; };
+		A2EDC44DAD4A1B1190684848 /* ChessDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0318AE9A862AD390FF9642EF /* ChessDocument.swift */; };
+		A4C90C9D1B4E2831C3FB3245 /* FFEN.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F7BCF98F9720337F7D257AFA /* FFEN.cpp */; };
+		A7AB1E23A4C9B895CF215660 /* Variation.swift in Sources */ = {isa = PBXBuildFile; fileRef = F14DD2B61B0DFA99631A8621 /* Variation.swift */; };
+		AA9CEB41DA74BF76D9747044 /* SelectionModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2D17161DA74B911FD109203 /* SelectionModifier.swift */; };
+		AB53F831335DF4041610656E /* FPGN.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5F871687B9D9A0D848DEFFFE /* FPGN.cpp */; };
+		ABBD0D65D9E0F0225839AB02 /* FENgineInfo+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4127DC8F0333054AE16B921 /* FENgineInfo+Extension.swift */; };
+		AC33F1353A1A345806CFBBEE /* FullMove.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB066BF62484862642882974 /* FullMove.swift */; };
+		AC4254D2D4694A597205850D /* BChessUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFBE02E6B7A75B593B086B33 /* BChessUITests.swift */; };
+		ACA37B48A9D01A6F6CEF1618 /* ChessState.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 431412F9A9BFFBA835CA9E74 /* ChessState.cpp */; };
+		AD69676FCA9D9E7CD553DBCA /* InformationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D654539FF9079CD21242A84 /* InformationView.swift */; };
+		ADBD16343AF39DF6A793E289 /* GameSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 449B35D4D73E3A74D24EEC1D /* GameSession.swift */; };
+		ADEBD8A009DD4420ACDCE850 /* MoveList.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5706678E59692AD6397F2D59 /* MoveList.cpp */; };
+		AECEBD69DD9C697283B32C09 /* GameHistory.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FECF3456A6E4C0D9547AC353 /* GameHistory.cpp */; };
+		AF94D65987FCCDE94933F813 /* Game.swift in Sources */ = {isa = PBXBuildFile; fileRef = BAC64B5B0C55E00286BBAD36 /* Game.swift */; };
+		B0146C12C9A064FFFC00A821 /* GameLibraryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93D05661AEFDD830ACE4D2C5 /* GameLibraryTests.swift */; };
+		B0E4E012D654827521A7A06E /* GameLibrary.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71E5EEE6D0B10E5AD9440A65 /* GameLibrary.swift */; };
+		B41FE1EDC76F30A0313E8D66 /* VariationSelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71EBF0402256A6790224AAB8 /* VariationSelectionView.swift */; };
+		B5EB367839D3D8AF030C548F /* ChessEngineTests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 280A9084A6C57B4D90C7FD95 /* ChessEngineTests.cpp */; };
+		B6BC1B0175E5B0CC48FA01FD /* Game.swift in Sources */ = {isa = PBXBuildFile; fileRef = BAC64B5B0C55E00286BBAD36 /* Game.swift */; };
+		B7AB7FC4A683505ADFB314CF /* MoveList.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5706678E59692AD6397F2D59 /* MoveList.cpp */; };
+		B7F67B65AD67362E48C53620 /* GameShell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4664882CCC95A474A5F6075D /* GameShell.swift */; };
+		BC3252F10593360ED02A17E6 /* PiecesFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = B06D783FF88F314CC998FEC5 /* PiecesFactory.swift */; };
+		BCD8BA67A61553ADA49D738A /* TopInformationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A85619A52BB238582F403F9F /* TopInformationView.swift */; };
+		BE677D8292959DBF4EFD1935 /* ChessOpenings.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 94916DB48E273E8C193F571F /* ChessOpenings.cpp */; };
+		C1A1CE815B0234952BBD3C71 /* FEngineUtility.mm in Sources */ = {isa = PBXBuildFile; fileRef = CE782615578B3D7B3C451A64 /* FEngineUtility.mm */; };
+		C59A2AA362E0BCAF379CA111 /* ChessGame.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1798BECBBBED258BED2E2CA1 /* ChessGame.cpp */; };
+		C6AB2504F416C6620DD490E0 /* LastMoveModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8893A6A3EDE392ADA62194CC /* LastMoveModifier.swift */; };
+		C77F47BEF2A3B59916E914C0 /* PiecesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7041B69703399B00EABB120 /* PiecesView.swift */; };
+		C9EBE9F0D6ADF207629626E7 /* ActionsToolbar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 956075511431C656DF93A731 /* ActionsToolbar.swift */; };
+		CA7950C7A1E8D98F00DE9E82 /* FEngineMoveNode.mm in Sources */ = {isa = PBXBuildFile; fileRef = 67B30EF56BB2ADE44B075F8F /* FEngineMoveNode.mm */; };
+		CB6A99B05281BBABEC5EBE6A /* FPGN.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5F871687B9D9A0D848DEFFFE /* FPGN.cpp */; };
+		CC197AF6A5A175F902CC5F85 /* EngineGoogleTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A78AB8B57782EC7CB61D27F1 /* EngineGoogleTests.swift */; };
+		CC480D3CD900751324E8B8B7 /* NewGameView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10F73A52A3430FA524DA26BE /* NewGameView.swift */; };
+		CC4F4D1AB7BE8020AFD7C1A5 /* MoveList.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5706678E59692AD6397F2D59 /* MoveList.cpp */; };
+		CD23542CDA8BE41D577FB493 /* ChessState.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 431412F9A9BFFBA835CA9E74 /* ChessState.cpp */; };
+		CDBD0832323B94EF11A42BF2 /* ChessOpenings.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 94916DB48E273E8C193F571F /* ChessOpenings.cpp */; };
+		D0DC2694675277188D493261 /* Pasteboard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A18B566B43232E369485F4D /* Pasteboard.swift */; };
+		D1BA917F5C4104B5A8BBC3E6 /* GameState.swift in Sources */ = {isa = PBXBuildFile; fileRef = E918E82CA52FD5A787214464 /* GameState.swift */; };
+		D23BBF0091D67647832949B2 /* GameShell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4664882CCC95A474A5F6075D /* GameShell.swift */; };
+		D2FA408F51B18E96D62CAC1B /* Game.swift in Sources */ = {isa = PBXBuildFile; fileRef = BAC64B5B0C55E00286BBAD36 /* Game.swift */; };
+		D4299D14FE94AE75F3F9F0CD /* magicmoves.c in Sources */ = {isa = PBXBuildFile; fileRef = D11C33D8BBE6428E42241039 /* magicmoves.c */; };
+		D5465461B1242AE87333473B /* ChessDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0318AE9A862AD390FF9642EF /* ChessDocument.swift */; };
+		D569F2B9CA8B580B6BBB22EC /* GameShell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4664882CCC95A474A5F6075D /* GameShell.swift */; };
+		D696C7D97E1575179483D0AB /* ChessMoveGenerator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ED44E31F4BB157BDE34CAADF /* ChessMoveGenerator.cpp */; };
+		D838BEFA0B6842F5AC1FEC52 /* NavigationActionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF704EB6D594569C8C1C0283 /* NavigationActionView.swift */; };
+		D8C4D733FB9A2E8E70B02D88 /* FENgineInfo+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4127DC8F0333054AE16B921 /* FENgineInfo+Extension.swift */; };
+		DB78776DF8D62DDAA5DF6203 /* FEngineInfo.mm in Sources */ = {isa = PBXBuildFile; fileRef = AB15A1998BD8F52B3436A738 /* FEngineInfo.mm */; };
+		DCD4B97AB91741A82C30825A /* ChessBoardHash.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A4315B0E7D14507709F7ADAF /* ChessBoardHash.cpp */; };
+		DCDECDF4563125B4DF500148 /* BoardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C80EAED5A93B886115810B84 /* BoardView.swift */; };
+		DEDE9BADCE58E2E7B101D4C0 /* ChessBoard.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AE369A268D78EE76D0D84F80 /* ChessBoard.cpp */; };
+		DF2CCAD477BD63192BE669E2 /* FEngineMoveNode.mm in Sources */ = {isa = PBXBuildFile; fileRef = 67B30EF56BB2ADE44B075F8F /* FEngineMoveNode.mm */; };
+		E2375AA2D60123A58309DFB6 /* FEngineGame.mm in Sources */ = {isa = PBXBuildFile; fileRef = D05BA0CF62011F29A83BC02B /* FEngineGame.mm */; };
+		E82472307660320279C501A7 /* Arrow.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEC6B2A69F9EAD135A9433ED /* Arrow.swift */; };
+		EA570E8F0D08DF0F3154968C /* Variation.swift in Sources */ = {isa = PBXBuildFile; fileRef = F14DD2B61B0DFA99631A8621 /* Variation.swift */; };
+		EAB4A88DCE96E3F283CAD532 /* GameSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 449B35D4D73E3A74D24EEC1D /* GameSession.swift */; };
+		EACA4E6233CF4D5C7B703014 /* FEngine.mm in Sources */ = {isa = PBXBuildFile; fileRef = 107058D83675D2AF04C3E091 /* FEngine.mm */; };
+		EAE60EC6702EC16FDFF0D9AD /* FPGN.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5F871687B9D9A0D848DEFFFE /* FPGN.cpp */; };
+		F0015AE7C1448AD40B679077 /* Square.swift in Sources */ = {isa = PBXBuildFile; fileRef = E62F53FB8737C917EACA573D /* Square.swift */; };
+		F2570D3170BCF77279A5704F /* ChessEvaluater.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 947CCE0E46399FFD55FC32BC /* ChessEvaluater.cpp */; };
+		F2FD92D587AF8AE2F3D948B8 /* FEngine.mm in Sources */ = {isa = PBXBuildFile; fileRef = 107058D83675D2AF04C3E091 /* FEngine.mm */; };
+		F75AA0F187EFE2B9D33C7794 /* ChessEvaluater.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 947CCE0E46399FFD55FC32BC /* ChessEvaluater.cpp */; };
+		F78D3581A2A6D289435E6A3E /* TopInformationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A85619A52BB238582F403F9F /* TopInformationView.swift */; };
+		F896E8030CD4C8943A93B4BE /* Square.swift in Sources */ = {isa = PBXBuildFile; fileRef = E62F53FB8737C917EACA573D /* Square.swift */; };
+		F9302FEE88A3B7E2153993AA /* NewGameView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10F73A52A3430FA524DA26BE /* NewGameView.swift */; };
+		FA0BA37FDA969E28D8265469 /* LastMoveModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8893A6A3EDE392ADA62194CC /* LastMoveModifier.swift */; };
+		FA1FB12A80F60CB81B9E451D /* UCI.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9C49214C700B590509D6A2C /* UCI.swift */; };
+		FB580352923161E7E5B92EBB /* PiecesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7041B69703399B00EABB120 /* PiecesView.swift */; };
+		FC95C56DDCA1C7588D9B911B /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C986E8C85A8DD1C80E51BAB7 /* SettingsView.swift */; };
+		FD98CB38F3FC265A65B03CCA /* GamesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A9958FDE6580C36E49FEE3D /* GamesTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		A77F66C425A832270030E61D /* PBXContainerItemProxy */ = {
+		43FE7F635630094ACBAAECC3 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = A7AFCC9E1FB4E40D00AE3D85 /* Project object */;
+			containerPortal = 8D3403F4DA379573365B4586 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = A77F66B325A832270030E61D;
-			remoteInfo = "BChessUI (iOS)";
+			remoteGlobalIDString = 178ACF2B5B59047059B2ABB2;
+			remoteInfo = BChessUCI;
 		};
-		A77F66CF25A832270030E61D /* PBXContainerItemProxy */ = {
+		68702A086B97EA1E4E1010E3 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = A7AFCC9E1FB4E40D00AE3D85 /* Project object */;
+			containerPortal = 8D3403F4DA379573365B4586 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = A77F66BA25A832270030E61D;
-			remoteInfo = "BChessUI (macOS)";
+			remoteGlobalIDString = 91D0B727552821ADC37F6F1F;
+			remoteInfo = "BChess (iOS)";
 		};
 /* End PBXContainerItemProxy section */
 
-/* Begin PBXCopyFilesBuildPhase section */
-		A7AFCCA41FB4E40D00AE3D85 /* CopyFiles */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = /usr/share/man/man1/;
-			dstSubfolderSpec = 0;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 1;
-		};
-/* End PBXCopyFilesBuildPhase section */
-
 /* Begin PBXFileReference section */
-		A70A61B91FD132D200AFDF0E /* FFEN.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = FFEN.cpp; sourceTree = "<group>"; };
-		A70A61BA1FD132D200AFDF0E /* FFEN.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = FFEN.hpp; sourceTree = "<group>"; };
-		A70A61BC1FD1333300AFDF0E /* FUtility.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = FUtility.hpp; sourceTree = "<group>"; };
-		A70A61BD1FD3196400AFDF0E /* BestMoveTests.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = BestMoveTests.cpp; sourceTree = "<group>"; };
-		A70A61BE1FD38C7500AFDF0E /* Color.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Color.hpp; sourceTree = "<group>"; };
-		A70A61BF1FD38D4100AFDF0E /* Piece.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Piece.hpp; sourceTree = "<group>"; };
-		A70A61C01FD4587B00AFDF0E /* Move.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Move.hpp; sourceTree = "<group>"; };
-		A70A61C21FD458DE00AFDF0E /* ChessMoveGenerator.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ChessMoveGenerator.cpp; sourceTree = "<group>"; };
-		A70A61C31FD458DE00AFDF0E /* ChessMoveGenerator.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = ChessMoveGenerator.hpp; sourceTree = "<group>"; };
-		A70A61C51FD4592700AFDF0E /* MoveList.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = MoveList.cpp; sourceTree = "<group>"; };
-		A70A61C81FD46E3C00AFDF0E /* ChessEvaluater.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ChessEvaluater.cpp; sourceTree = "<group>"; };
-		A70A61C91FD46E3C00AFDF0E /* ChessEvaluater.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = ChessEvaluater.hpp; sourceTree = "<group>"; };
-		A70A61CF1FD4AA9600AFDF0E /* FEngineInfo.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FEngineInfo.h; sourceTree = "<group>"; };
-		A70A61D01FD4AA9600AFDF0E /* FEngineInfo.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = FEngineInfo.mm; sourceTree = "<group>"; };
-		A70B41A2264A527900A56E29 /* FullMoveView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FullMoveView.swift; sourceTree = "<group>"; };
-		A712C25226522F6000E05408 /* FullMove.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FullMove.swift; sourceTree = "<group>"; };
-		A712C255265377C000E05408 /* Arrow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Arrow.swift; sourceTree = "<group>"; };
-		A716976C262BFF8C00156BD6 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
-		A72C3E012650D78100CB9DB7 /* VariationSelectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VariationSelectionView.swift; sourceTree = "<group>"; };
-		A72C3E042650D82B00CB9DB7 /* Variation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Variation.swift; sourceTree = "<group>"; };
-		A72E2B56200496CC006CBB1C /* BoardHashTests.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BoardHashTests.cpp; sourceTree = "<group>"; };
-		A731BD3620009856004C13EF /* Tournament.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tournament.swift; sourceTree = "<group>"; };
-		A731BD382000A513004C13EF /* TournamentEngines.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TournamentEngines.swift; sourceTree = "<group>"; };
-		A746997B2637CCF7007E0058 /* NavigationActionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationActionView.swift; sourceTree = "<group>"; };
-		A746C242200148E9001F4437 /* ChessBoardHash.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ChessBoardHash.cpp; sourceTree = "<group>"; };
-		A746C243200148E9001F4437 /* ChessBoardHash.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = ChessBoardHash.hpp; sourceTree = "<group>"; };
-		A746C2472001707F001F4437 /* GameHistory.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = GameHistory.cpp; sourceTree = "<group>"; };
-		A746C2482001707F001F4437 /* GameHistory.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = GameHistory.hpp; sourceTree = "<group>"; };
-		A746C24B20017351001F4437 /* Types.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Types.hpp; sourceTree = "<group>"; };
-		A75359831FDC51B2008D1DEE /* FENgineInfo+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FENgineInfo+Extension.swift"; sourceTree = "<group>"; };
-		A75359871FDCF8D6008D1DEE /* Bitboard.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Bitboard.hpp; sourceTree = "<group>"; };
-		A753598A1FDCF95E008D1DEE /* Coordinate.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Coordinate.hpp; sourceTree = "<group>"; };
-		A75683271FCD28A000CF1408 /* FEngine.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FEngine.h; sourceTree = "<group>"; };
-		A75683281FCD28A000CF1408 /* FEngine.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = FEngine.mm; sourceTree = "<group>"; };
-		A757614A264A504D006242F9 /* Game.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Game.swift; sourceTree = "<group>"; };
-		A757614D264A50E8006242F9 /* FEngineMoveNode.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FEngineMoveNode.h; sourceTree = "<group>"; };
-		A757614E264A50E8006242F9 /* FEngineMoveNode.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = FEngineMoveNode.mm; sourceTree = "<group>"; };
-		A7576151264A51BC006242F9 /* FEngineMoveNode+Private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "FEngineMoveNode+Private.h"; sourceTree = "<group>"; };
-		A758BB0525AC119C0092714E /* Actions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Actions.swift; sourceTree = "<group>"; };
-		A75A283D1FEC8506003AC5EF /* ChessEvaluation.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = ChessEvaluation.hpp; sourceTree = "<group>"; };
-		A75BFAC61FE8C05E001EE942 /* MinMaxSearch.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = MinMaxSearch.hpp; sourceTree = "<group>"; };
-		A75CB25A1FED8F2B005487BD /* MoveTests.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MoveTests.cpp; sourceTree = "<group>"; };
-		A75CB25C1FED8F82005487BD /* EvaluationTests.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = EvaluationTests.cpp; sourceTree = "<group>"; };
-		A75CB25E1FED8F9E005487BD /* CheckTests.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CheckTests.cpp; sourceTree = "<group>"; };
-		A75CB2611FED9693005487BD /* IterativeDeepening.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = IterativeDeepening.hpp; sourceTree = "<group>"; };
-		A765D85F1FF6C1950045BB36 /* ChessOpenings.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ChessOpenings.cpp; sourceTree = "<group>"; };
-		A765D8601FF6C1950045BB36 /* ChessOpenings.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = ChessOpenings.hpp; sourceTree = "<group>"; };
-		A7688F5E204B6E91004B1E9E /* ChessState.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ChessState.cpp; sourceTree = "<group>"; };
-		A7688F5F204B6E91004B1E9E /* ChessState.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = ChessState.hpp; sourceTree = "<group>"; };
-		A7688F63204B73BF004B1E9E /* StateTests.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = StateTests.cpp; sourceTree = "<group>"; };
-		A76CACC0264A1E92009EAA8B /* FEngineTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FEngineTests.swift; sourceTree = "<group>"; };
-		A7712D141FB916E900E7E802 /* BChessTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BChessTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		A7712D181FB916E900E7E802 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		A7712D2E1FC7C4CD00E7E802 /* UCI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UCI.swift; sourceTree = "<group>"; };
-		A7712D321FC8957500E7E802 /* GamesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GamesTests.swift; sourceTree = "<group>"; };
-		A7712D3F1FCB97A800E7E802 /* BChess-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "BChess-Bridging-Header.h"; sourceTree = "<group>"; };
-		A7712D401FCB97A900E7E802 /* magicmoves.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = magicmoves.h; sourceTree = "<group>"; };
-		A7712D411FCB97A900E7E802 /* magicmoves.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = magicmoves.c; sourceTree = "<group>"; };
-		A7712D451FCBC13100E7E802 /* ChessBoard.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ChessBoard.cpp; sourceTree = "<group>"; };
-		A7712D461FCBC13100E7E802 /* ChessBoard.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = ChessBoard.hpp; sourceTree = "<group>"; };
-		A77371FC1FE31FEF0001A90F /* ChessGame.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ChessGame.cpp; sourceTree = "<group>"; };
-		A77371FD1FE31FEF0001A90F /* ChessGame.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = ChessGame.hpp; sourceTree = "<group>"; };
-		A77371FF1FE320010001A90F /* FPGN.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = FPGN.cpp; sourceTree = "<group>"; };
-		A77372001FE320010001A90F /* FPGN.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = FPGN.hpp; sourceTree = "<group>"; };
-		A77372041FE340780001A90F /* PGNTests.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PGNTests.cpp; sourceTree = "<group>"; };
-		A775237525AD68FA009BFFD1 /* Animation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Animation.swift; sourceTree = "<group>"; };
-		A77F66AC25A832230030E61D /* BChessUIApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BChessUIApp.swift; sourceTree = "<group>"; };
-		A77F66AD25A832240030E61D /* ChessDocument.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChessDocument.swift; sourceTree = "<group>"; };
-		A77F66AE25A832240030E61D /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
-		A77F66AF25A832270030E61D /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		A77F66B425A832270030E61D /* BChess.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BChess.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		A77F66B625A832270030E61D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		A77F66BB25A832270030E61D /* BChess.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BChess.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		A77F66BD25A832270030E61D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		A77F66BE25A832270030E61D /* macOS.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = macOS.entitlements; sourceTree = "<group>"; };
-		A77F66C325A832270030E61D /* Tests iOS.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Tests iOS.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
-		A77F66C725A832270030E61D /* Tests_iOS.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tests_iOS.swift; sourceTree = "<group>"; };
-		A77F66C925A832270030E61D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		A77F66CE25A832270030E61D /* Tests macOS.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Tests macOS.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
-		A77F66D225A832270030E61D /* Tests_macOS.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tests_macOS.swift; sourceTree = "<group>"; };
-		A77F66D425A832270030E61D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		A78E754B202C080E00445360 /* MovesTests.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MovesTests.cpp; sourceTree = "<group>"; };
-		A78E754F202C110200445360 /* UnitTestHelper.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = UnitTestHelper.cpp; sourceTree = "<group>"; };
-		A78E7550202C110200445360 /* UnitTestHelper.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = UnitTestHelper.hpp; sourceTree = "<group>"; };
-		A791117A264B923600F97FA7 /* FEngineGame.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FEngineGame.h; sourceTree = "<group>"; };
-		A791117B264B923600F97FA7 /* FEngineGame.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = FEngineGame.mm; sourceTree = "<group>"; };
-		A791117E264B92E500F97FA7 /* FEngineGame+Private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "FEngineGame+Private.h"; sourceTree = "<group>"; };
-		A795159D25ABE1D700AEA95F /* PiecesFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PiecesFactory.swift; sourceTree = "<group>"; };
-		A79515A825ABE31100AEA95F /* SquareView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SquareView.swift; sourceTree = "<group>"; };
-		A79515B325ABE34300AEA95F /* TopInformationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TopInformationView.swift; sourceTree = "<group>"; };
-		A79515BE25ABE36700AEA95F /* InformationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InformationView.swift; sourceTree = "<group>"; };
-		A79515C925ABE38F00AEA95F /* LastMoveModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LastMoveModifier.swift; sourceTree = "<group>"; };
-		A79515D425ABE3A400AEA95F /* SelectionModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectionModifier.swift; sourceTree = "<group>"; };
-		A79515DF25ABE3D300AEA95F /* Selection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Selection.swift; sourceTree = "<group>"; };
-		A79515EA25ABE41000AEA95F /* Position.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Position.swift; sourceTree = "<group>"; };
-		A79515F525ABE44000AEA95F /* PiecesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PiecesView.swift; sourceTree = "<group>"; };
-		A795160B25ABE55E00AEA95F /* Square.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Square.swift; sourceTree = "<group>"; };
-		A795161625ABE57C00AEA95F /* ConditionalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConditionalView.swift; sourceTree = "<group>"; };
-		A795162125ABE59900AEA95F /* PlayAgainst.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayAgainst.swift; sourceTree = "<group>"; };
-		A795163C25ABE66600AEA95F /* BoardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoardView.swift; sourceTree = "<group>"; };
-		A7A30EC125AEB28D00729432 /* ActionsToolbar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActionsToolbar.swift; sourceTree = "<group>"; };
-		A7A30EDC25AEBD7C00729432 /* LabelsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LabelsView.swift; sourceTree = "<group>"; };
-		A7A30F2E25B2BAFC00729432 /* PromotionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromotionView.swift; sourceTree = "<group>"; };
-		A7A30F4725B4151A00729432 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
-		A7AFCCA61FB4E40D00AE3D85 /* BChessUCI */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = BChessUCI; sourceTree = BUILT_PRODUCTS_DIR; };
-		A7AFCCA91FB4E40D00AE3D85 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
-		A7B1B0F41FF2D97300EAF157 /* FEngineInfo+Private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "FEngineInfo+Private.h"; sourceTree = "<group>"; };
-		A7BC72E32636003F008FBBB4 /* NewGameView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewGameView.swift; sourceTree = "<group>"; };
-		A7C92AA91FF6EE5500160D2E /* Openings.pgn */ = {isa = PBXFileReference; lastKnownFileType = text; path = Openings.pgn; sourceTree = "<group>"; };
-		A7C92AB21FF86BF200160D2E /* FEngineMove.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FEngineMove.h; sourceTree = "<group>"; };
-		A7C92AB31FF86BF200160D2E /* FEngineMove.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = FEngineMove.mm; sourceTree = "<group>"; };
-		A7C92AB71FF86F6800160D2E /* FEngineUtility.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FEngineUtility.h; sourceTree = "<group>"; };
-		A7C92AB81FF86F6800160D2E /* FEngineUtility.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = FEngineUtility.mm; sourceTree = "<group>"; };
-		A7CEB0F320154597002AFDF7 /* TranspositionTable.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = TranspositionTable.hpp; sourceTree = "<group>"; };
-		A7E3B6881FF6C85500DBB66B /* OpeningsTests.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = OpeningsTests.cpp; sourceTree = "<group>"; };
-		A7E490E41FEA1C0600970EAD /* SearchChessTests.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SearchChessTests.cpp; sourceTree = "<group>"; };
-		A7E490EA1FEA207100970EAD /* gtest-all.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "gtest-all.cc"; path = "BChessTests/Helper/gtest-all.cc"; sourceTree = SOURCE_ROOT; };
-		A7E490F11FEA2E7E00970EAD /* GoogleTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = GoogleTests.mm; sourceTree = "<group>"; };
-		A7E4C6B62636849C00BE4955 /* NewGameView_iOS.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewGameView_iOS.swift; sourceTree = "<group>"; };
-		A7EF55C71FEF17A1004CF2DA /* ChessEngine.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = ChessEngine.hpp; sourceTree = "<group>"; };
-		A7EF55CB1FF22FE7004CF2DA /* MoveList.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = MoveList.hpp; sourceTree = "<group>"; };
+		016499BE603639D3C1FA76E0 /* ChessEvaluater.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = ChessEvaluater.hpp; sourceTree = "<group>"; };
+		01DFD43A6217F24F3C75D432 /* FEngineInfo+Private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "FEngineInfo+Private.h"; sourceTree = "<group>"; };
+		02349FE00E1E4BF129C077AB /* BestMoveTests.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = BestMoveTests.cpp; sourceTree = "<group>"; };
+		0318AE9A862AD390FF9642EF /* ChessDocument.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChessDocument.swift; sourceTree = "<group>"; };
+		0324AFBE64AEA9CAF1E5ED66 /* NewGameView_iOS.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewGameView_iOS.swift; sourceTree = "<group>"; };
+		0C3AF2DF91FF284FE10C1A44 /* BChessUCI */ = {isa = PBXFileReference; includeInIndex = 0; path = BChessUCI; sourceTree = BUILT_PRODUCTS_DIR; };
+		0CF72A21B24ED326F0B371AE /* Color.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Color.hpp; sourceTree = "<group>"; };
+		0D0B880575533E500966B9FF /* BChessUIApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BChessUIApp.swift; sourceTree = "<group>"; };
+		0FDA68D0526CDAC0B06103A4 /* FEngineGame+Private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "FEngineGame+Private.h"; sourceTree = "<group>"; };
+		107058D83675D2AF04C3E091 /* FEngine.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = FEngine.mm; sourceTree = "<group>"; };
+		10F73A52A3430FA524DA26BE /* NewGameView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewGameView.swift; sourceTree = "<group>"; };
+		117C3F2306D0FD7602AA2488 /* PlayAgainst.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayAgainst.swift; sourceTree = "<group>"; };
+		16194F1626E7FC78881DC886 /* BChessTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BChessTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		16CEEED7978C48CDE20D26A4 /* Coordinate.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Coordinate.hpp; sourceTree = "<group>"; };
+		1798BECBBBED258BED2E2CA1 /* ChessGame.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ChessGame.cpp; sourceTree = "<group>"; };
+		19CA422D6799EFFF17A2BDAE /* PGNTests.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = PGNTests.cpp; sourceTree = "<group>"; };
+		19F55617E5E81201E906F8EA /* OpeningsTests.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = OpeningsTests.cpp; sourceTree = "<group>"; };
+		1D654539FF9079CD21242A84 /* InformationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InformationView.swift; sourceTree = "<group>"; };
+		20FCADEB3C5F59400CF1FB32 /* UnitTestHelper.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = UnitTestHelper.cpp; sourceTree = "<group>"; };
+		280A9084A6C57B4D90C7FD95 /* ChessEngineTests.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ChessEngineTests.cpp; sourceTree = "<group>"; };
+		292E61AA9D148297F19F9713 /* FullMoveView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FullMoveView.swift; sourceTree = "<group>"; };
+		2AD84B737192936DAA406CD7 /* StateTests.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = StateTests.cpp; sourceTree = "<group>"; };
+		2B7C82FBD58A56EEA69F8536 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		2E720E71C38BC9C943E23A2A /* FEngineMove.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = FEngineMove.mm; sourceTree = "<group>"; };
+		30FFD068B173D4656B5A8E33 /* CheckTests.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = CheckTests.cpp; sourceTree = "<group>"; };
+		3407557ECA0071262CA4733D /* FEngineMove.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FEngineMove.h; sourceTree = "<group>"; };
+		34E712ACCD1156718C34F831 /* FEngineConcurrencyTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FEngineConcurrencyTests.swift; sourceTree = "<group>"; };
+		368A041E11904F2B624D0C96 /* GameSessionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameSessionTests.swift; sourceTree = "<group>"; };
+		36CC0D446777BA3CF1815BED /* FPGN.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = FPGN.hpp; sourceTree = "<group>"; };
+		3A18B566B43232E369485F4D /* Pasteboard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Pasteboard.swift; sourceTree = "<group>"; };
+		3E689B1557F57FDACA81FAE8 /* FUtility.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = FUtility.hpp; sourceTree = "<group>"; };
+		431412F9A9BFFBA835CA9E74 /* ChessState.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ChessState.cpp; sourceTree = "<group>"; };
+		449B35D4D73E3A74D24EEC1D /* GameSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameSession.swift; sourceTree = "<group>"; };
+		44F34E9EA5805AF04B66FEC7 /* GameRootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameRootView.swift; sourceTree = "<group>"; };
+		45C32D5DABF1A7564A170028 /* gtest-all.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "gtest-all.cc"; sourceTree = "<group>"; };
+		4664882CCC95A474A5F6075D /* GameShell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameShell.swift; sourceTree = "<group>"; };
+		4A9958FDE6580C36E49FEE3D /* GamesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GamesTests.swift; sourceTree = "<group>"; };
+		4C55C2ABA848E57FC09A4259 /* Bitboard.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Bitboard.hpp; sourceTree = "<group>"; };
+		5251F732403CBCD809AEFD86 /* ChessBoard.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = ChessBoard.hpp; sourceTree = "<group>"; };
+		53E1CB7DFCB5C3399E0AFAE5 /* MinMaxSearchTests.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = MinMaxSearchTests.cpp; sourceTree = "<group>"; };
+		558E41B761768D6665905A72 /* TestSupport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestSupport.swift; sourceTree = "<group>"; };
+		5706678E59692AD6397F2D59 /* MoveList.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = MoveList.cpp; sourceTree = "<group>"; };
+		5CF08685F1E9CDB6EE194D4B /* Position.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Position.swift; sourceTree = "<group>"; };
+		5F871687B9D9A0D848DEFFFE /* FPGN.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = FPGN.cpp; sourceTree = "<group>"; };
+		62BE341484A569C1B3F4DC3B /* ChessGameTests.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ChessGameTests.cpp; sourceTree = "<group>"; };
+		6436166D3A4BF3D36CDCE690 /* ConditionalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConditionalView.swift; sourceTree = "<group>"; };
+		65F748AE99BB8505E7917CD3 /* FEngine+Testing.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "FEngine+Testing.h"; sourceTree = "<group>"; };
+		679F482FF7CFC630243800C2 /* MoveTests.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = MoveTests.cpp; sourceTree = "<group>"; };
+		67B30EF56BB2ADE44B075F8F /* FEngineMoveNode.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = FEngineMoveNode.mm; sourceTree = "<group>"; };
+		69ACE86C185AA2B0424A25DC /* MoveList.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = MoveList.hpp; sourceTree = "<group>"; };
+		6B8EEAE40D5B734AE976A31E /* Move.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Move.hpp; sourceTree = "<group>"; };
+		6CFD5BA027224C45ACF97E37 /* GTestRunner.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = GTestRunner.mm; sourceTree = "<group>"; };
+		6D70913F596256BB04031E72 /* ChessOpenings.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = ChessOpenings.hpp; sourceTree = "<group>"; };
+		712C86DA78A185AE24966EF1 /* Selection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Selection.swift; sourceTree = "<group>"; };
+		71E5EEE6D0B10E5AD9440A65 /* GameLibrary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameLibrary.swift; sourceTree = "<group>"; };
+		71EBF0402256A6790224AAB8 /* VariationSelectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VariationSelectionView.swift; sourceTree = "<group>"; };
+		7AE6FC034D3D248278A55641 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		81D206FD51B7D4574C66BE3B /* PromotionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromotionView.swift; sourceTree = "<group>"; };
+		8239FD746C93352706B1C6FE /* FEngineMoveNode+Private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "FEngineMoveNode+Private.h"; sourceTree = "<group>"; };
+		84BFF85A25C57146CAF30E10 /* FEngineUtility.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FEngineUtility.h; sourceTree = "<group>"; };
+		8893A6A3EDE392ADA62194CC /* LastMoveModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LastMoveModifier.swift; sourceTree = "<group>"; };
+		8ADF2094CD31705EF2946A03 /* FEngineGame.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FEngineGame.h; sourceTree = "<group>"; };
+		8CF09EA88A74DC29E1AAB9BD /* TranspositionTable.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = TranspositionTable.hpp; sourceTree = "<group>"; };
+		90A78D47B8D6EA3AFA4FF658 /* BoardHashTests.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = BoardHashTests.cpp; sourceTree = "<group>"; };
+		93D05661AEFDD830ACE4D2C5 /* GameLibraryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameLibraryTests.swift; sourceTree = "<group>"; };
+		947CCE0E46399FFD55FC32BC /* ChessEvaluater.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ChessEvaluater.cpp; sourceTree = "<group>"; };
+		94916DB48E273E8C193F571F /* ChessOpenings.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ChessOpenings.cpp; sourceTree = "<group>"; };
+		956075511431C656DF93A731 /* ActionsToolbar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActionsToolbar.swift; sourceTree = "<group>"; };
+		9885254EA5CE0CC7ECA0A9D3 /* ChessEvaluation.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = ChessEvaluation.hpp; sourceTree = "<group>"; };
+		9B26F7CF7097BD3EF64ACF81 /* magicmoves.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = magicmoves.h; sourceTree = "<group>"; };
+		9BA0B234E3F267394AD43C1F /* MovesTests.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = MovesTests.cpp; sourceTree = "<group>"; };
+		9CE26D46FB2EB6963C3B70EE /* UCIProcessTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UCIProcessTests.swift; sourceTree = "<group>"; };
+		9CE45E5F1D175374FC199B7F /* ChessEngine.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = ChessEngine.hpp; sourceTree = "<group>"; };
+		9F36671FEEC94EAF64BE69D9 /* ChessBoardHash.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = ChessBoardHash.hpp; sourceTree = "<group>"; };
+		A1477E0FA670ACFCC4B0A27A /* BChess (iOS).app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = "BChess (iOS).app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		A4315B0E7D14507709F7ADAF /* ChessBoardHash.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ChessBoardHash.cpp; sourceTree = "<group>"; };
+		A7041B69703399B00EABB120 /* PiecesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PiecesView.swift; sourceTree = "<group>"; };
+		A78AB8B57782EC7CB61D27F1 /* EngineGoogleTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EngineGoogleTests.swift; sourceTree = "<group>"; };
+		A7AB0415D932620ED470CEAB /* FFEN.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = FFEN.hpp; sourceTree = "<group>"; };
+		A85619A52BB238582F403F9F /* TopInformationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TopInformationView.swift; sourceTree = "<group>"; };
+		A9C49214C700B590509D6A2C /* UCI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UCI.swift; sourceTree = "<group>"; };
+		A9D7CC6DC2D85B2F268A43FF /* Piece.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Piece.hpp; sourceTree = "<group>"; };
+		AB15A1998BD8F52B3436A738 /* FEngineInfo.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = FEngineInfo.mm; sourceTree = "<group>"; };
+		ABF91800B596390870A37C38 /* FEngineInfo.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FEngineInfo.h; sourceTree = "<group>"; };
+		AC5CBF6D315E939E7FD3C07D /* GTestRunner.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GTestRunner.h; sourceTree = "<group>"; };
+		AD9143658FEE30892CC47903 /* FEngine.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FEngine.h; sourceTree = "<group>"; };
+		AE369A268D78EE76D0D84F80 /* ChessBoard.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ChessBoard.cpp; sourceTree = "<group>"; };
+		AEC6B2A69F9EAD135A9433ED /* Arrow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Arrow.swift; sourceTree = "<group>"; };
+		B06D783FF88F314CC998FEC5 /* PiecesFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PiecesFactory.swift; sourceTree = "<group>"; };
+		B2F90389CE311A6A7172FBE4 /* LabelsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LabelsView.swift; sourceTree = "<group>"; };
+		B33D8737F4BC31AFA0BD8E97 /* BChessTests-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "BChessTests-Bridging-Header.h"; sourceTree = "<group>"; };
+		B4127DC8F0333054AE16B921 /* FENgineInfo+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FENgineInfo+Extension.swift"; sourceTree = "<group>"; };
+		B62D3039628BC097D49AA710 /* BChessUITests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = BChessUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		BAC64B5B0C55E00286BBAD36 /* Game.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Game.swift; sourceTree = "<group>"; };
+		BE9B55D22F2C1D0A3ED7D1BD /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
+		BF704EB6D594569C8C1C0283 /* NavigationActionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationActionView.swift; sourceTree = "<group>"; };
+		C2D17161DA74B911FD109203 /* SelectionModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectionModifier.swift; sourceTree = "<group>"; };
+		C4D6AC18DAF20B619B734F5B /* FEngineTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FEngineTests.swift; sourceTree = "<group>"; };
+		C570D7A63E563DBD04ACAF7F /* Openings.pgn */ = {isa = PBXFileReference; path = Openings.pgn; sourceTree = "<group>"; };
+		C80EAED5A93B886115810B84 /* BoardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoardView.swift; sourceTree = "<group>"; };
+		C8845AC83986914A0B1BFDD8 /* MinMaxSearch.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = MinMaxSearch.hpp; sourceTree = "<group>"; };
+		C986E8C85A8DD1C80E51BAB7 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		CBA33EA4ACC347FB0DF9ABA4 /* SearchChessTests.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = SearchChessTests.cpp; sourceTree = "<group>"; };
+		CBEDC388A15D182465E02883 /* GameHistory.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = GameHistory.hpp; sourceTree = "<group>"; };
+		CE782615578B3D7B3C451A64 /* FEngineUtility.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = FEngineUtility.mm; sourceTree = "<group>"; };
+		CFFCE8A3BEC69C017E353E3A /* DocumentWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentWindow.swift; sourceTree = "<group>"; };
+		D05BA0CF62011F29A83BC02B /* FEngineGame.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = FEngineGame.mm; sourceTree = "<group>"; };
+		D11C33D8BBE6428E42241039 /* magicmoves.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = magicmoves.c; sourceTree = "<group>"; };
+		D15ACC05CB5B63796D43739F /* IterativeDeepeningTests.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = IterativeDeepeningTests.cpp; sourceTree = "<group>"; };
+		DA30F10ED6B1020513D36929 /* BChess (macOS).app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "BChess (macOS).app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		DE010CC0D7A64B49DAAC7DF7 /* GameShellTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameShellTests.swift; sourceTree = "<group>"; };
+		E62F53FB8737C917EACA573D /* Square.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Square.swift; sourceTree = "<group>"; };
+		E660BA0577075A90B39F5F8D /* FEngineMoveNode.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FEngineMoveNode.h; sourceTree = "<group>"; };
+		E918E82CA52FD5A787214464 /* GameState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameState.swift; sourceTree = "<group>"; };
+		EADDC013EB57D3BBC65AAAF4 /* IterativeDeepening.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = IterativeDeepening.hpp; sourceTree = "<group>"; };
+		EB04257DD3615AB196B819EC /* ChessGame.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = ChessGame.hpp; sourceTree = "<group>"; };
+		EB9B23C24F0D870DB254ECD6 /* GameStateCodingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameStateCodingTests.swift; sourceTree = "<group>"; };
+		ED44E31F4BB157BDE34CAADF /* ChessMoveGenerator.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ChessMoveGenerator.cpp; sourceTree = "<group>"; };
+		EDF542B4F0103A6B866175C1 /* UnitTestHelper.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = UnitTestHelper.hpp; sourceTree = "<group>"; };
+		F14DD2B61B0DFA99631A8621 /* Variation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Variation.swift; sourceTree = "<group>"; };
+		F2AE887434F7DF974A8405C8 /* ChessMoveGenerator.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = ChessMoveGenerator.hpp; sourceTree = "<group>"; };
+		F37D108593DEDA1EAC945852 /* EvaluationTests.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = EvaluationTests.cpp; sourceTree = "<group>"; };
+		F7BCF98F9720337F7D257AFA /* FFEN.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = FFEN.cpp; sourceTree = "<group>"; };
+		FB066BF62484862642882974 /* FullMove.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FullMove.swift; sourceTree = "<group>"; };
+		FCBDDC5ABB4DF6DF28515737 /* Types.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Types.hpp; sourceTree = "<group>"; };
+		FDBE14AD20196EBDEB22043A /* SquareView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SquareView.swift; sourceTree = "<group>"; };
+		FECF3456A6E4C0D9547AC353 /* GameHistory.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = GameHistory.cpp; sourceTree = "<group>"; };
+		FEEA804C177D0F7528A254ED /* ChessState.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = ChessState.hpp; sourceTree = "<group>"; };
+		FFBE02E6B7A75B593B086B33 /* BChessUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BChessUITests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
-/* Begin PBXFrameworksBuildPhase section */
-		A7712D111FB916E900E7E802 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		A77F66B125A832270030E61D /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		A77F66B825A832270030E61D /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		A77F66C025A832270030E61D /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		A77F66CB25A832270030E61D /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		A7AFCCA31FB4E40D00AE3D85 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-/* End PBXFrameworksBuildPhase section */
-
 /* Begin PBXGroup section */
-		A70A61CE1FD4AA8500AFDF0E /* Bridge */ = {
+		0D60B308CCEA4947E8E2596C /* Engine */ = {
 			isa = PBXGroup;
 			children = (
-				A70A61CF1FD4AA9600AFDF0E /* FEngineInfo.h */,
-				A7B1B0F41FF2D97300EAF157 /* FEngineInfo+Private.h */,
-				A70A61D01FD4AA9600AFDF0E /* FEngineInfo.mm */,
-				A7C92AB21FF86BF200160D2E /* FEngineMove.h */,
-				A7C92AB31FF86BF200160D2E /* FEngineMove.mm */,
-				A75683271FCD28A000CF1408 /* FEngine.h */,
-				A75683281FCD28A000CF1408 /* FEngine.mm */,
-				A791117A264B923600F97FA7 /* FEngineGame.h */,
-				A791117E264B92E500F97FA7 /* FEngineGame+Private.h */,
-				A791117B264B923600F97FA7 /* FEngineGame.mm */,
-				A757614D264A50E8006242F9 /* FEngineMoveNode.h */,
-				A7576151264A51BC006242F9 /* FEngineMoveNode+Private.h */,
-				A757614E264A50E8006242F9 /* FEngineMoveNode.mm */,
-				A7C92AB71FF86F6800160D2E /* FEngineUtility.h */,
-				A7C92AB81FF86F6800160D2E /* FEngineUtility.mm */,
-			);
-			path = Bridge;
-			sourceTree = "<group>";
-		};
-		A70A61D31FD4D37600AFDF0E /* Helpers */ = {
-			isa = PBXGroup;
-			children = (
-				A7712D401FCB97A900E7E802 /* magicmoves.h */,
-				A7712D411FCB97A900E7E802 /* magicmoves.c */,
-				A746C243200148E9001F4437 /* ChessBoardHash.hpp */,
-				A746C242200148E9001F4437 /* ChessBoardHash.cpp */,
-				A70A61BA1FD132D200AFDF0E /* FFEN.hpp */,
-				A70A61B91FD132D200AFDF0E /* FFEN.cpp */,
-				A77372001FE320010001A90F /* FPGN.hpp */,
-				A77371FF1FE320010001A90F /* FPGN.cpp */,
-				A70A61BC1FD1333300AFDF0E /* FUtility.hpp */,
-			);
-			path = Helpers;
-			sourceTree = "<group>";
-		};
-		A70A61D41FD4D37E00AFDF0E /* Engine */ = {
-			isa = PBXGroup;
-			children = (
-				A7EF55CB1FF22FE7004CF2DA /* MoveList.hpp */,
-				A70A61C51FD4592700AFDF0E /* MoveList.cpp */,
-				A75A283D1FEC8506003AC5EF /* ChessEvaluation.hpp */,
-				A70A61C31FD458DE00AFDF0E /* ChessMoveGenerator.hpp */,
-				A70A61C21FD458DE00AFDF0E /* ChessMoveGenerator.cpp */,
-				A70A61C91FD46E3C00AFDF0E /* ChessEvaluater.hpp */,
-				A70A61C81FD46E3C00AFDF0E /* ChessEvaluater.cpp */,
-				A7712D461FCBC13100E7E802 /* ChessBoard.hpp */,
-				A7712D451FCBC13100E7E802 /* ChessBoard.cpp */,
-				A746C2482001707F001F4437 /* GameHistory.hpp */,
-				A746C2472001707F001F4437 /* GameHistory.cpp */,
-				A78E7553203126B500445360 /* Types */,
-				A78E7552203122ED00445360 /* Engine */,
-				A765D8621FF6C1B30045BB36 /* Algorithm */,
-				A70A61D31FD4D37600AFDF0E /* Helpers */,
+				9CE45E5F1D175374FC199B7F /* ChessEngine.hpp */,
+				1798BECBBBED258BED2E2CA1 /* ChessGame.cpp */,
+				EB04257DD3615AB196B819EC /* ChessGame.hpp */,
+				94916DB48E273E8C193F571F /* ChessOpenings.cpp */,
+				6D70913F596256BB04031E72 /* ChessOpenings.hpp */,
+				431412F9A9BFFBA835CA9E74 /* ChessState.cpp */,
+				FEEA804C177D0F7528A254ED /* ChessState.hpp */,
 			);
 			path = Engine;
 			sourceTree = "<group>";
 		};
-		A765D8621FF6C1B30045BB36 /* Algorithm */ = {
+		0F5CE133D3F207246A816226 /* BChessUITests */ = {
 			isa = PBXGroup;
 			children = (
-				A7CEB0F320154597002AFDF7 /* TranspositionTable.hpp */,
-				A75CB2611FED9693005487BD /* IterativeDeepening.hpp */,
-				A75BFAC61FE8C05E001EE942 /* MinMaxSearch.hpp */,
+				FFBE02E6B7A75B593B086B33 /* BChessUITests.swift */,
 			);
-			path = Algorithm;
+			path = BChessUITests;
 			sourceTree = "<group>";
 		};
-		A7712D151FB916E900E7E802 /* BChessTests */ = {
+		1C104E777345C9DD5C8E484A /* iOS */ = {
 			isa = PBXGroup;
 			children = (
-				A7712D321FC8957500E7E802 /* GamesTests.swift */,
-				A76CACC0264A1E92009EAA8B /* FEngineTests.swift */,
-				A72E2B56200496CC006CBB1C /* BoardHashTests.cpp */,
-				A78E754B202C080E00445360 /* MovesTests.cpp */,
-				A75CB25A1FED8F2B005487BD /* MoveTests.cpp */,
-				A75CB25C1FED8F82005487BD /* EvaluationTests.cpp */,
-				A75CB25E1FED8F9E005487BD /* CheckTests.cpp */,
-				A70A61BD1FD3196400AFDF0E /* BestMoveTests.cpp */,
-				A7E3B6881FF6C85500DBB66B /* OpeningsTests.cpp */,
-				A77372041FE340780001A90F /* PGNTests.cpp */,
-				A7E490E41FEA1C0600970EAD /* SearchChessTests.cpp */,
-				A7688F63204B73BF004B1E9E /* StateTests.cpp */,
-				A7E490F01FEA2E6F00970EAD /* Helper */,
-				A7712D181FB916E900E7E802 /* Info.plist */,
-			);
-			path = BChessTests;
-			sourceTree = "<group>";
-		};
-		A7712D301FC7C4D300E7E802 /* UCI */ = {
-			isa = PBXGroup;
-			children = (
-				A7712D2E1FC7C4CD00E7E802 /* UCI.swift */,
-				A75359831FDC51B2008D1DEE /* FENgineInfo+Extension.swift */,
-				A731BD3620009856004C13EF /* Tournament.swift */,
-				A731BD382000A513004C13EF /* TournamentEngines.swift */,
-			);
-			path = UCI;
-			sourceTree = "<group>";
-		};
-		A775234225AC2947009BFFD1 /* Model */ = {
-			isa = PBXGroup;
-			children = (
-				A79515DF25ABE3D300AEA95F /* Selection.swift */,
-				A79515EA25ABE41000AEA95F /* Position.swift */,
-				A795160B25ABE55E00AEA95F /* Square.swift */,
-				A795162125ABE59900AEA95F /* PlayAgainst.swift */,
-				A72C3E042650D82B00CB9DB7 /* Variation.swift */,
-			);
-			path = Model;
-			sourceTree = "<group>";
-		};
-		A77F66AB25A832230030E61D /* Shared */ = {
-			isa = PBXGroup;
-			children = (
-				A77F66AC25A832230030E61D /* BChessUIApp.swift */,
-				A716976C262BFF8C00156BD6 /* SettingsView.swift */,
-				A77F66AD25A832240030E61D /* ChessDocument.swift */,
-				A757614A264A504D006242F9 /* Game.swift */,
-				A712C25226522F6000E05408 /* FullMove.swift */,
-				A795159D25ABE1D700AEA95F /* PiecesFactory.swift */,
-				A758BB0525AC119C0092714E /* Actions.swift */,
-				A7A30EC125AEB28D00729432 /* ActionsToolbar.swift */,
-				A775237525AD68FA009BFFD1 /* Animation.swift */,
-				A775234225AC2947009BFFD1 /* Model */,
-				A795164725ABE6C700AEA95F /* Views */,
-				A70A61CE1FD4AA8500AFDF0E /* Bridge */,
-				A70A61D41FD4D37E00AFDF0E /* Engine */,
-				A77F66AF25A832270030E61D /* Assets.xcassets */,
-			);
-			path = Shared;
-			sourceTree = "<group>";
-		};
-		A77F66B525A832270030E61D /* iOS */ = {
-			isa = PBXGroup;
-			children = (
-				A77F66B625A832270030E61D /* Info.plist */,
+				44F34E9EA5805AF04B66FEC7 /* GameRootView.swift */,
 			);
 			path = iOS;
 			sourceTree = "<group>";
 		};
-		A77F66BC25A832270030E61D /* macOS */ = {
+		200599CAEF058B6181E944F2 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				A77F66BD25A832270030E61D /* Info.plist */,
-				A77F66BE25A832270030E61D /* macOS.entitlements */,
-			);
-			path = macOS;
-			sourceTree = "<group>";
-		};
-		A77F66C625A832270030E61D /* Tests iOS */ = {
-			isa = PBXGroup;
-			children = (
-				A77F66C725A832270030E61D /* Tests_iOS.swift */,
-				A77F66C925A832270030E61D /* Info.plist */,
-			);
-			path = "Tests iOS";
-			sourceTree = "<group>";
-		};
-		A77F66D125A832270030E61D /* Tests macOS */ = {
-			isa = PBXGroup;
-			children = (
-				A77F66D225A832270030E61D /* Tests_macOS.swift */,
-				A77F66D425A832270030E61D /* Info.plist */,
-			);
-			path = "Tests macOS";
-			sourceTree = "<group>";
-		};
-		A78E7552203122ED00445360 /* Engine */ = {
-			isa = PBXGroup;
-			children = (
-				A7EF55C71FEF17A1004CF2DA /* ChessEngine.hpp */,
-				A77371FD1FE31FEF0001A90F /* ChessGame.hpp */,
-				A77371FC1FE31FEF0001A90F /* ChessGame.cpp */,
-				A765D8601FF6C1950045BB36 /* ChessOpenings.hpp */,
-				A765D85F1FF6C1950045BB36 /* ChessOpenings.cpp */,
-				A7688F5F204B6E91004B1E9E /* ChessState.hpp */,
-				A7688F5E204B6E91004B1E9E /* ChessState.cpp */,
-			);
-			path = Engine;
-			sourceTree = "<group>";
-		};
-		A78E7553203126B500445360 /* Types */ = {
-			isa = PBXGroup;
-			children = (
-				A746C24B20017351001F4437 /* Types.hpp */,
-				A753598A1FDCF95E008D1DEE /* Coordinate.hpp */,
-				A75359871FDCF8D6008D1DEE /* Bitboard.hpp */,
-				A70A61BE1FD38C7500AFDF0E /* Color.hpp */,
-				A70A61BF1FD38D4100AFDF0E /* Piece.hpp */,
-				A70A61C01FD4587B00AFDF0E /* Move.hpp */,
-			);
-			path = Types;
-			sourceTree = "<group>";
-		};
-		A795164725ABE6C700AEA95F /* Views */ = {
-			isa = PBXGroup;
-			children = (
-				A795161625ABE57C00AEA95F /* ConditionalView.swift */,
-				A7BC72E32636003F008FBBB4 /* NewGameView.swift */,
-				A7E4C6B62636849C00BE4955 /* NewGameView_iOS.swift */,
-				A79515C925ABE38F00AEA95F /* LastMoveModifier.swift */,
-				A79515D425ABE3A400AEA95F /* SelectionModifier.swift */,
-				A79515A825ABE31100AEA95F /* SquareView.swift */,
-				A79515B325ABE34300AEA95F /* TopInformationView.swift */,
-				A79515BE25ABE36700AEA95F /* InformationView.swift */,
-				A70B41A2264A527900A56E29 /* FullMoveView.swift */,
-				A795163C25ABE66600AEA95F /* BoardView.swift */,
-				A79515F525ABE44000AEA95F /* PiecesView.swift */,
-				A7A30EDC25AEBD7C00729432 /* LabelsView.swift */,
-				A72C3E012650D78100CB9DB7 /* VariationSelectionView.swift */,
-				A77F66AE25A832240030E61D /* ContentView.swift */,
-				A7A30F2E25B2BAFC00729432 /* PromotionView.swift */,
-				A746997B2637CCF7007E0058 /* NavigationActionView.swift */,
-				A712C255265377C000E05408 /* Arrow.swift */,
-			);
-			path = Views;
-			sourceTree = "<group>";
-		};
-		A7AFCC9D1FB4E40D00AE3D85 = {
-			isa = PBXGroup;
-			children = (
-				A7A30F4725B4151A00729432 /* README.md */,
-				A7AFCCA81FB4E40D00AE3D85 /* BChess */,
-				A7712D151FB916E900E7E802 /* BChessTests */,
-				A77F66AB25A832230030E61D /* Shared */,
-				A77F66B525A832270030E61D /* iOS */,
-				A77F66BC25A832270030E61D /* macOS */,
-				A77F66C625A832270030E61D /* Tests iOS */,
-				A77F66D125A832270030E61D /* Tests macOS */,
-				A7AFCCA71FB4E40D00AE3D85 /* Products */,
-			);
-			sourceTree = "<group>";
-		};
-		A7AFCCA71FB4E40D00AE3D85 /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				A7AFCCA61FB4E40D00AE3D85 /* BChessUCI */,
-				A7712D141FB916E900E7E802 /* BChessTests.xctest */,
-				A77F66B425A832270030E61D /* BChess.app */,
-				A77F66BB25A832270030E61D /* BChess.app */,
-				A77F66C325A832270030E61D /* Tests iOS.xctest */,
-				A77F66CE25A832270030E61D /* Tests macOS.xctest */,
+				A1477E0FA670ACFCC4B0A27A /* BChess (iOS).app */,
+				DA30F10ED6B1020513D36929 /* BChess (macOS).app */,
+				16194F1626E7FC78881DC886 /* BChessTests.xctest */,
+				0C3AF2DF91FF284FE10C1A44 /* BChessUCI */,
+				B62D3039628BC097D49AA710 /* BChessUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
-		A7AFCCA81FB4E40D00AE3D85 /* BChess */ = {
+		2A8D555C9D076B7F128FF688 /* Shared */ = {
 			isa = PBXGroup;
 			children = (
-				A7AFCCA91FB4E40D00AE3D85 /* main.swift */,
-				A7712D3F1FCB97A800E7E802 /* BChess-Bridging-Header.h */,
-				A7C92AA91FF6EE5500160D2E /* Openings.pgn */,
-				A7712D301FC7C4D300E7E802 /* UCI */,
+				956075511431C656DF93A731 /* ActionsToolbar.swift */,
+				7AE6FC034D3D248278A55641 /* Assets.xcassets */,
+				0D0B880575533E500966B9FF /* BChessUIApp.swift */,
+				0318AE9A862AD390FF9642EF /* ChessDocument.swift */,
+				FB066BF62484862642882974 /* FullMove.swift */,
+				BAC64B5B0C55E00286BBAD36 /* Game.swift */,
+				B06D783FF88F314CC998FEC5 /* PiecesFactory.swift */,
+				C986E8C85A8DD1C80E51BAB7 /* SettingsView.swift */,
+				83A9530C8ED85F1B497D126E /* Bridge */,
+				35AFF10F2132CA3979C057A3 /* Engine */,
+				8EF1061AD1EE8ABFA0EAD8DC /* Model */,
+				D64522CC7869D435823EF2DC /* Views */,
+			);
+			path = Shared;
+			sourceTree = "<group>";
+		};
+		35AFF10F2132CA3979C057A3 /* Engine */ = {
+			isa = PBXGroup;
+			children = (
+				AE369A268D78EE76D0D84F80 /* ChessBoard.cpp */,
+				5251F732403CBCD809AEFD86 /* ChessBoard.hpp */,
+				947CCE0E46399FFD55FC32BC /* ChessEvaluater.cpp */,
+				016499BE603639D3C1FA76E0 /* ChessEvaluater.hpp */,
+				9885254EA5CE0CC7ECA0A9D3 /* ChessEvaluation.hpp */,
+				ED44E31F4BB157BDE34CAADF /* ChessMoveGenerator.cpp */,
+				F2AE887434F7DF974A8405C8 /* ChessMoveGenerator.hpp */,
+				FECF3456A6E4C0D9547AC353 /* GameHistory.cpp */,
+				CBEDC388A15D182465E02883 /* GameHistory.hpp */,
+				5706678E59692AD6397F2D59 /* MoveList.cpp */,
+				69ACE86C185AA2B0424A25DC /* MoveList.hpp */,
+				47B69CC9D1F2123DACB306F5 /* Algorithm */,
+				0D60B308CCEA4947E8E2596C /* Engine */,
+				D519D9C07CA7678B074E8C93 /* Helpers */,
+				CAA3690860C1765F7D7D3BB8 /* Types */,
+			);
+			path = Engine;
+			sourceTree = "<group>";
+		};
+		438246EEA921270982C884DF /* BChessTests */ = {
+			isa = PBXGroup;
+			children = (
+				B33D8737F4BC31AFA0BD8E97 /* BChessTests-Bridging-Header.h */,
+				02349FE00E1E4BF129C077AB /* BestMoveTests.cpp */,
+				90A78D47B8D6EA3AFA4FF658 /* BoardHashTests.cpp */,
+				30FFD068B173D4656B5A8E33 /* CheckTests.cpp */,
+				280A9084A6C57B4D90C7FD95 /* ChessEngineTests.cpp */,
+				62BE341484A569C1B3F4DC3B /* ChessGameTests.cpp */,
+				A78AB8B57782EC7CB61D27F1 /* EngineGoogleTests.swift */,
+				F37D108593DEDA1EAC945852 /* EvaluationTests.cpp */,
+				34E712ACCD1156718C34F831 /* FEngineConcurrencyTests.swift */,
+				C4D6AC18DAF20B619B734F5B /* FEngineTests.swift */,
+				93D05661AEFDD830ACE4D2C5 /* GameLibraryTests.swift */,
+				368A041E11904F2B624D0C96 /* GameSessionTests.swift */,
+				DE010CC0D7A64B49DAAC7DF7 /* GameShellTests.swift */,
+				EB9B23C24F0D870DB254ECD6 /* GameStateCodingTests.swift */,
+				4A9958FDE6580C36E49FEE3D /* GamesTests.swift */,
+				D15ACC05CB5B63796D43739F /* IterativeDeepeningTests.cpp */,
+				53E1CB7DFCB5C3399E0AFAE5 /* MinMaxSearchTests.cpp */,
+				9BA0B234E3F267394AD43C1F /* MovesTests.cpp */,
+				679F482FF7CFC630243800C2 /* MoveTests.cpp */,
+				19F55617E5E81201E906F8EA /* OpeningsTests.cpp */,
+				19CA422D6799EFFF17A2BDAE /* PGNTests.cpp */,
+				CBA33EA4ACC347FB0DF9ABA4 /* SearchChessTests.cpp */,
+				2AD84B737192936DAA406CD7 /* StateTests.cpp */,
+				9CE26D46FB2EB6963C3B70EE /* UCIProcessTests.swift */,
+				EE7BB1F240C4F49C31C96878 /* Helper */,
+			);
+			path = BChessTests;
+			sourceTree = "<group>";
+		};
+		47B69CC9D1F2123DACB306F5 /* Algorithm */ = {
+			isa = PBXGroup;
+			children = (
+				EADDC013EB57D3BBC65AAAF4 /* IterativeDeepening.hpp */,
+				C8845AC83986914A0B1BFDD8 /* MinMaxSearch.hpp */,
+				8CF09EA88A74DC29E1AAB9BD /* TranspositionTable.hpp */,
+			);
+			path = Algorithm;
+			sourceTree = "<group>";
+		};
+		8154253DF1D3E3B7CEB83C67 /* UCI */ = {
+			isa = PBXGroup;
+			children = (
+				B4127DC8F0333054AE16B921 /* FENgineInfo+Extension.swift */,
+				A9C49214C700B590509D6A2C /* UCI.swift */,
+			);
+			path = UCI;
+			sourceTree = "<group>";
+		};
+		83A9530C8ED85F1B497D126E /* Bridge */ = {
+			isa = PBXGroup;
+			children = (
+				AD9143658FEE30892CC47903 /* FEngine.h */,
+				107058D83675D2AF04C3E091 /* FEngine.mm */,
+				65F748AE99BB8505E7917CD3 /* FEngine+Testing.h */,
+				8ADF2094CD31705EF2946A03 /* FEngineGame.h */,
+				D05BA0CF62011F29A83BC02B /* FEngineGame.mm */,
+				0FDA68D0526CDAC0B06103A4 /* FEngineGame+Private.h */,
+				ABF91800B596390870A37C38 /* FEngineInfo.h */,
+				AB15A1998BD8F52B3436A738 /* FEngineInfo.mm */,
+				01DFD43A6217F24F3C75D432 /* FEngineInfo+Private.h */,
+				3407557ECA0071262CA4733D /* FEngineMove.h */,
+				2E720E71C38BC9C943E23A2A /* FEngineMove.mm */,
+				E660BA0577075A90B39F5F8D /* FEngineMoveNode.h */,
+				67B30EF56BB2ADE44B075F8F /* FEngineMoveNode.mm */,
+				8239FD746C93352706B1C6FE /* FEngineMoveNode+Private.h */,
+				84BFF85A25C57146CAF30E10 /* FEngineUtility.h */,
+				CE782615578B3D7B3C451A64 /* FEngineUtility.mm */,
+			);
+			path = Bridge;
+			sourceTree = "<group>";
+		};
+		8EF1061AD1EE8ABFA0EAD8DC /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				71E5EEE6D0B10E5AD9440A65 /* GameLibrary.swift */,
+				449B35D4D73E3A74D24EEC1D /* GameSession.swift */,
+				4664882CCC95A474A5F6075D /* GameShell.swift */,
+				E918E82CA52FD5A787214464 /* GameState.swift */,
+				117C3F2306D0FD7602AA2488 /* PlayAgainst.swift */,
+				5CF08685F1E9CDB6EE194D4B /* Position.swift */,
+				712C86DA78A185AE24966EF1 /* Selection.swift */,
+				E62F53FB8737C917EACA573D /* Square.swift */,
+				F14DD2B61B0DFA99631A8621 /* Variation.swift */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		91C7F37181777896B71FAB3A /* macOS */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = macOS;
+			sourceTree = "<group>";
+		};
+		9EEE927A9B2635A2E9157C8E = {
+			isa = PBXGroup;
+			children = (
+				EBF2831EB8A9DE51AA56C0A9 /* BChess */,
+				438246EEA921270982C884DF /* BChessTests */,
+				0F5CE133D3F207246A816226 /* BChessUITests */,
+				1C104E777345C9DD5C8E484A /* iOS */,
+				91C7F37181777896B71FAB3A /* macOS */,
+				2A8D555C9D076B7F128FF688 /* Shared */,
+				200599CAEF058B6181E944F2 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		CAA3690860C1765F7D7D3BB8 /* Types */ = {
+			isa = PBXGroup;
+			children = (
+				4C55C2ABA848E57FC09A4259 /* Bitboard.hpp */,
+				0CF72A21B24ED326F0B371AE /* Color.hpp */,
+				16CEEED7978C48CDE20D26A4 /* Coordinate.hpp */,
+				6B8EEAE40D5B734AE976A31E /* Move.hpp */,
+				A9D7CC6DC2D85B2F268A43FF /* Piece.hpp */,
+				FCBDDC5ABB4DF6DF28515737 /* Types.hpp */,
+			);
+			path = Types;
+			sourceTree = "<group>";
+		};
+		D519D9C07CA7678B074E8C93 /* Helpers */ = {
+			isa = PBXGroup;
+			children = (
+				A4315B0E7D14507709F7ADAF /* ChessBoardHash.cpp */,
+				9F36671FEEC94EAF64BE69D9 /* ChessBoardHash.hpp */,
+				F7BCF98F9720337F7D257AFA /* FFEN.cpp */,
+				A7AB0415D932620ED470CEAB /* FFEN.hpp */,
+				5F871687B9D9A0D848DEFFFE /* FPGN.cpp */,
+				36CC0D446777BA3CF1815BED /* FPGN.hpp */,
+				3E689B1557F57FDACA81FAE8 /* FUtility.hpp */,
+				D11C33D8BBE6428E42241039 /* magicmoves.c */,
+				9B26F7CF7097BD3EF64ACF81 /* magicmoves.h */,
+			);
+			path = Helpers;
+			sourceTree = "<group>";
+		};
+		D64522CC7869D435823EF2DC /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				AEC6B2A69F9EAD135A9433ED /* Arrow.swift */,
+				C80EAED5A93B886115810B84 /* BoardView.swift */,
+				6436166D3A4BF3D36CDCE690 /* ConditionalView.swift */,
+				2B7C82FBD58A56EEA69F8536 /* ContentView.swift */,
+				CFFCE8A3BEC69C017E353E3A /* DocumentWindow.swift */,
+				292E61AA9D148297F19F9713 /* FullMoveView.swift */,
+				1D654539FF9079CD21242A84 /* InformationView.swift */,
+				B2F90389CE311A6A7172FBE4 /* LabelsView.swift */,
+				8893A6A3EDE392ADA62194CC /* LastMoveModifier.swift */,
+				BF704EB6D594569C8C1C0283 /* NavigationActionView.swift */,
+				0324AFBE64AEA9CAF1E5ED66 /* NewGameView_iOS.swift */,
+				10F73A52A3430FA524DA26BE /* NewGameView.swift */,
+				3A18B566B43232E369485F4D /* Pasteboard.swift */,
+				A7041B69703399B00EABB120 /* PiecesView.swift */,
+				81D206FD51B7D4574C66BE3B /* PromotionView.swift */,
+				C2D17161DA74B911FD109203 /* SelectionModifier.swift */,
+				FDBE14AD20196EBDEB22043A /* SquareView.swift */,
+				A85619A52BB238582F403F9F /* TopInformationView.swift */,
+				71EBF0402256A6790224AAB8 /* VariationSelectionView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		EBF2831EB8A9DE51AA56C0A9 /* BChess */ = {
+			isa = PBXGroup;
+			children = (
+				BE9B55D22F2C1D0A3ED7D1BD /* main.swift */,
+				C570D7A63E563DBD04ACAF7F /* Openings.pgn */,
+				8154253DF1D3E3B7CEB83C67 /* UCI */,
 			);
 			path = BChess;
 			sourceTree = "<group>";
 		};
-		A7E490F01FEA2E6F00970EAD /* Helper */ = {
+		EE7BB1F240C4F49C31C96878 /* Helper */ = {
 			isa = PBXGroup;
 			children = (
-				A78E7550202C110200445360 /* UnitTestHelper.hpp */,
-				A78E754F202C110200445360 /* UnitTestHelper.cpp */,
-				A7E490F11FEA2E7E00970EAD /* GoogleTests.mm */,
-				A7E490EA1FEA207100970EAD /* gtest-all.cc */,
+				45C32D5DABF1A7564A170028 /* gtest-all.cc */,
+				AC5CBF6D315E939E7FD3C07D /* GTestRunner.h */,
+				6CFD5BA027224C45ACF97E37 /* GTestRunner.mm */,
+				558E41B761768D6665905A72 /* TestSupport.swift */,
+				20FCADEB3C5F59400CF1FB32 /* UnitTestHelper.cpp */,
+				EDF542B4F0103A6B866175C1 /* UnitTestHelper.hpp */,
 			);
 			path = Helper;
 			sourceTree = "<group>";
@@ -649,691 +627,636 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		A7712D131FB916E900E7E802 /* BChessTests */ = {
+		08FB82B9B37F67BA11C4EB8A /* BChess (macOS) */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = A7712D191FB916E900E7E802 /* Build configuration list for PBXNativeTarget "BChessTests" */;
+			buildConfigurationList = FFCEE15748E5936903B05738 /* Build configuration list for PBXNativeTarget "BChess (macOS)" */;
 			buildPhases = (
-				A7712D101FB916E900E7E802 /* Sources */,
-				A7712D111FB916E900E7E802 /* Frameworks */,
-				A7712D121FB916E900E7E802 /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			name = BChessTests;
-			productName = BChessTests;
-			productReference = A7712D141FB916E900E7E802 /* BChessTests.xctest */;
-			productType = "com.apple.product-type.bundle.unit-test";
-		};
-		A77F66B325A832270030E61D /* BChess (iOS) */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = A77F66DD25A832270030E61D /* Build configuration list for PBXNativeTarget "BChess (iOS)" */;
-			buildPhases = (
-				A77F66B025A832270030E61D /* Sources */,
-				A77F66B125A832270030E61D /* Frameworks */,
-				A77F66B225A832270030E61D /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			name = "BChess (iOS)";
-			productName = "BChessUI (iOS)";
-			productReference = A77F66B425A832270030E61D /* BChess.app */;
-			productType = "com.apple.product-type.application";
-		};
-		A77F66BA25A832270030E61D /* BChess (macOS) */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = A77F66E025A832270030E61D /* Build configuration list for PBXNativeTarget "BChess (macOS)" */;
-			buildPhases = (
-				A77F66B725A832270030E61D /* Sources */,
-				A77F66B825A832270030E61D /* Frameworks */,
-				A77F66B925A832270030E61D /* Resources */,
+				0657EC45FEAAEF41F50B3D39 /* Sources */,
+				A27CD961BEFCB8E2398EBCD6 /* Resources */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 			);
 			name = "BChess (macOS)";
-			productName = "BChessUI (macOS)";
-			productReference = A77F66BB25A832270030E61D /* BChess.app */;
+			packageProductDependencies = (
+			);
+			productName = "BChess (macOS)";
+			productReference = DA30F10ED6B1020513D36929 /* BChess (macOS).app */;
 			productType = "com.apple.product-type.application";
 		};
-		A77F66C225A832270030E61D /* Tests iOS */ = {
+		0D34FC7106C6F49747B8416E /* BChessTests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = A77F66E325A832270030E61D /* Build configuration list for PBXNativeTarget "Tests iOS" */;
+			buildConfigurationList = EA9DF4A848325893F9C6F56C /* Build configuration list for PBXNativeTarget "BChessTests" */;
 			buildPhases = (
-				A77F66BF25A832270030E61D /* Sources */,
-				A77F66C025A832270030E61D /* Frameworks */,
-				A77F66C125A832270030E61D /* Resources */,
+				3158958F69B4F79067DCFCC6 /* Sources */,
+				471DF1CF7603917F069CAC69 /* Resources */,
 			);
 			buildRules = (
 			);
 			dependencies = (
-				A77F66C525A832270030E61D /* PBXTargetDependency */,
+				DC6179E30CCEF6975FC2A163 /* PBXTargetDependency */,
 			);
-			name = "Tests iOS";
-			productName = "Tests iOS";
-			productReference = A77F66C325A832270030E61D /* Tests iOS.xctest */;
-			productType = "com.apple.product-type.bundle.ui-testing";
+			name = BChessTests;
+			packageProductDependencies = (
+			);
+			productName = BChessTests;
+			productReference = 16194F1626E7FC78881DC886 /* BChessTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
 		};
-		A77F66CD25A832270030E61D /* Tests macOS */ = {
+		178ACF2B5B59047059B2ABB2 /* BChessUCI */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = A77F66E625A832270030E61D /* Build configuration list for PBXNativeTarget "Tests macOS" */;
+			buildConfigurationList = C3DFDC42EC8D9B74361C294F /* Build configuration list for PBXNativeTarget "BChessUCI" */;
 			buildPhases = (
-				A77F66CA25A832270030E61D /* Sources */,
-				A77F66CB25A832270030E61D /* Frameworks */,
-				A77F66CC25A832270030E61D /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				A77F66D025A832270030E61D /* PBXTargetDependency */,
-			);
-			name = "Tests macOS";
-			productName = "Tests macOS";
-			productReference = A77F66CE25A832270030E61D /* Tests macOS.xctest */;
-			productType = "com.apple.product-type.bundle.ui-testing";
-		};
-		A7AFCCA51FB4E40D00AE3D85 /* BChessUCI */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = A7AFCCAD1FB4E40D00AE3D85 /* Build configuration list for PBXNativeTarget "BChessUCI" */;
-			buildPhases = (
-				A7AFCCA21FB4E40D00AE3D85 /* Sources */,
-				A7AFCCA31FB4E40D00AE3D85 /* Frameworks */,
-				A7AFCCA41FB4E40D00AE3D85 /* CopyFiles */,
+				FF82F162C4F1E4E2CE40E766 /* Sources */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 			);
 			name = BChessUCI;
-			productName = BChess;
-			productReference = A7AFCCA61FB4E40D00AE3D85 /* BChessUCI */;
+			packageProductDependencies = (
+			);
+			productName = BChessUCI;
+			productReference = 0C3AF2DF91FF284FE10C1A44 /* BChessUCI */;
 			productType = "com.apple.product-type.tool";
+		};
+		91D0B727552821ADC37F6F1F /* BChess (iOS) */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 27B83ADBE206691CD329FFC6 /* Build configuration list for PBXNativeTarget "BChess (iOS)" */;
+			buildPhases = (
+				346B00E88D0F5B8D8D67199C /* Sources */,
+				E951D0223BB5396092A09C95 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "BChess (iOS)";
+			packageProductDependencies = (
+			);
+			productName = "BChess (iOS)";
+			productReference = A1477E0FA670ACFCC4B0A27A /* BChess (iOS).app */;
+			productType = "com.apple.product-type.application";
+		};
+		A3F74A0EAA013625F9523E1E /* BChessUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 32FFE681D3C963839BDDA1D2 /* Build configuration list for PBXNativeTarget "BChessUITests" */;
+			buildPhases = (
+				5AFB8DF1B884B496A099BE90 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				ABB173ECA26684FBB9B725E2 /* PBXTargetDependency */,
+			);
+			name = BChessUITests;
+			packageProductDependencies = (
+			);
+			productName = BChessUITests;
+			productReference = B62D3039628BC097D49AA710 /* BChessUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
 		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
-		A7AFCC9E1FB4E40D00AE3D85 /* Project object */ = {
+		8D3403F4DA379573365B4586 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastSwiftUpdateCheck = 1230;
-				LastUpgradeCheck = 1410;
-				ORGANIZATIONNAME = "Jean Bovet";
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 2600;
 				TargetAttributes = {
-					A7712D131FB916E900E7E802 = {
-						CreatedOnToolsVersion = 9.1;
-						LastSwiftMigration = 1000;
+					08FB82B9B37F67BA11C4EB8A = {
+						DevelopmentTeam = 28XRU7S6GA;
 						ProvisioningStyle = Automatic;
 					};
-					A77F66B325A832270030E61D = {
-						CreatedOnToolsVersion = 12.3;
+					0D34FC7106C6F49747B8416E = {
+						DevelopmentTeam = 28XRU7S6GA;
 						ProvisioningStyle = Automatic;
 					};
-					A77F66BA25A832270030E61D = {
-						CreatedOnToolsVersion = 12.3;
+					178ACF2B5B59047059B2ABB2 = {
+						DevelopmentTeam = 28XRU7S6GA;
 						ProvisioningStyle = Automatic;
 					};
-					A77F66C225A832270030E61D = {
-						CreatedOnToolsVersion = 12.3;
+					91D0B727552821ADC37F6F1F = {
+						DevelopmentTeam = 28XRU7S6GA;
 						ProvisioningStyle = Automatic;
-						TestTargetID = A77F66B325A832270030E61D;
 					};
-					A77F66CD25A832270030E61D = {
-						CreatedOnToolsVersion = 12.3;
+					A3F74A0EAA013625F9523E1E = {
+						DevelopmentTeam = 28XRU7S6GA;
 						ProvisioningStyle = Automatic;
-						TestTargetID = A77F66BA25A832270030E61D;
-					};
-					A7AFCCA51FB4E40D00AE3D85 = {
-						CreatedOnToolsVersion = 9.1;
-						LastSwiftMigration = 1000;
-						ProvisioningStyle = Automatic;
+						TestTargetID = 91D0B727552821ADC37F6F1F;
 					};
 				};
 			};
-			buildConfigurationList = A7AFCCA11FB4E40D00AE3D85 /* Build configuration list for PBXProject "BChess" */;
-			compatibilityVersion = "Xcode 8.0";
+			buildConfigurationList = 283355205AA8E9FA5C2A8F54 /* Build configuration list for PBXProject "BChess" */;
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
-				en,
 				Base,
+				en,
 			);
-			mainGroup = A7AFCC9D1FB4E40D00AE3D85;
-			productRefGroup = A7AFCCA71FB4E40D00AE3D85 /* Products */;
+			mainGroup = 9EEE927A9B2635A2E9157C8E;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 200599CAEF058B6181E944F2 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				A7AFCCA51FB4E40D00AE3D85 /* BChessUCI */,
-				A7712D131FB916E900E7E802 /* BChessTests */,
-				A77F66B325A832270030E61D /* BChess (iOS) */,
-				A77F66BA25A832270030E61D /* BChess (macOS) */,
-				A77F66C225A832270030E61D /* Tests iOS */,
-				A77F66CD25A832270030E61D /* Tests macOS */,
+				91D0B727552821ADC37F6F1F /* BChess (iOS) */,
+				08FB82B9B37F67BA11C4EB8A /* BChess (macOS) */,
+				178ACF2B5B59047059B2ABB2 /* BChessUCI */,
+				0D34FC7106C6F49747B8416E /* BChessTests */,
+				A3F74A0EAA013625F9523E1E /* BChessUITests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		A7712D121FB916E900E7E802 /* Resources */ = {
+		471DF1CF7603917F069CAC69 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A7C92AAB1FF6F19100160D2E /* Openings.pgn in Resources */,
+				71E4AD54E9B9C238936E2B39 /* Openings.pgn in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		A77F66B225A832270030E61D /* Resources */ = {
+		A27CD961BEFCB8E2398EBCD6 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A775236C25AD6533009BFFD1 /* Openings.pgn in Resources */,
-				A77F66DB25A832270030E61D /* Assets.xcassets in Resources */,
+				472D5FF088052271DF546D2E /* Assets.xcassets in Resources */,
+				84D9FEE4B48FD84A2A86C946 /* Openings.pgn in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		A77F66B925A832270030E61D /* Resources */ = {
+		E951D0223BB5396092A09C95 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A775236325AD6532009BFFD1 /* Openings.pgn in Resources */,
-				A77F66DC25A832270030E61D /* Assets.xcassets in Resources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		A77F66C125A832270030E61D /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		A77F66CC25A832270030E61D /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
+				511708FE8F72BD9DBC5E1742 /* Assets.xcassets in Resources */,
+				3A9574F98C571558D09A671F /* Openings.pgn in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		A7712D101FB916E900E7E802 /* Sources */ = {
+		0657EC45FEAAEF41F50B3D39 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A746C245200148ED001F4437 /* ChessBoardHash.cpp in Sources */,
-				A75CB25B1FED8F2C005487BD /* MoveTests.cpp in Sources */,
-				A78E7551202C110200445360 /* UnitTestHelper.cpp in Sources */,
-				A70A61DD1FD4D49500AFDF0E /* FFEN.cpp in Sources */,
-				A7EBE7CF1FF6C93600ACDF85 /* ChessOpenings.cpp in Sources */,
-				A746C24D2001A2FD001F4437 /* GameHistory.cpp in Sources */,
-				A78E754C202C080E00445360 /* MovesTests.cpp in Sources */,
-				A7712D341FC895D100E7E802 /* UCI.swift in Sources */,
-				A70A61DA1FD4D49500AFDF0E /* ChessBoard.cpp in Sources */,
-				A7911183264B98E600F97FA7 /* FEngineMoveNode.mm in Sources */,
-				A75CB25D1FED8F82005487BD /* EvaluationTests.cpp in Sources */,
-				A7E490EC1FEA23DD00970EAD /* PGNTests.cpp in Sources */,
-				A7E490ED1FEA29B900970EAD /* GamesTests.swift in Sources */,
-				A77372031FE334BB0001A90F /* FPGN.cpp in Sources */,
-				A7E3B6891FF6C85500DBB66B /* OpeningsTests.cpp in Sources */,
-				A7688F62204B739E004B1E9E /* ChessState.cpp in Sources */,
-				A76CACC1264A1E92009EAA8B /* FEngineTests.swift in Sources */,
-				A70A61DE1FD4D49F00AFDF0E /* magicmoves.c in Sources */,
-				A75359851FDC994E008D1DEE /* FENgineInfo+Extension.swift in Sources */,
-				A7C92AB51FF86C4300160D2E /* FEngineMove.mm in Sources */,
-				A70A61D51FD4D42100AFDF0E /* FEngineInfo.mm in Sources */,
-				A7911181264B98DC00F97FA7 /* FEngineGame.mm in Sources */,
-				A7688F64204B73BF004B1E9E /* StateTests.cpp in Sources */,
-				A7E490F21FEA2E7E00970EAD /* GoogleTests.mm in Sources */,
-				A7EF55C91FF1CF77004CF2DA /* BestMoveTests.cpp in Sources */,
-				A70A61DB1FD4D49500AFDF0E /* ChessEvaluater.cpp in Sources */,
-				A75CB25F1FED8F9E005487BD /* CheckTests.cpp in Sources */,
-				A7E490EB1FEA207100970EAD /* gtest-all.cc in Sources */,
-				A7C92ABB1FF8712800160D2E /* FEngineUtility.mm in Sources */,
-				A7EF55C81FF191B1004CF2DA /* SearchChessTests.cpp in Sources */,
-				A77372021FE334BB0001A90F /* ChessGame.cpp in Sources */,
-				A70A61D81FD4D49500AFDF0E /* MoveList.cpp in Sources */,
-				A72E2B57200496CD006CBB1C /* BoardHashTests.cpp in Sources */,
-				A70A61D91FD4D49500AFDF0E /* ChessMoveGenerator.cpp in Sources */,
-				A75A283F1FECD7DD003AC5EF /* FEngine.mm in Sources */,
+				C9EBE9F0D6ADF207629626E7 /* ActionsToolbar.swift in Sources */,
+				E82472307660320279C501A7 /* Arrow.swift in Sources */,
+				04AA9D1F6F5B25621FBDDAC2 /* BChessUIApp.swift in Sources */,
+				DCDECDF4563125B4DF500148 /* BoardView.swift in Sources */,
+				15D3FD0CCF3383C42DF3EC8F /* ChessBoard.cpp in Sources */,
+				6B674CF5A48A3FEBD21CF92D /* ChessBoardHash.cpp in Sources */,
+				D5465461B1242AE87333473B /* ChessDocument.swift in Sources */,
+				F2570D3170BCF77279A5704F /* ChessEvaluater.cpp in Sources */,
+				C59A2AA362E0BCAF379CA111 /* ChessGame.cpp in Sources */,
+				159DA4F09658860EDB41DFB2 /* ChessMoveGenerator.cpp in Sources */,
+				77953060A98DD1ADBAB69B2B /* ChessOpenings.cpp in Sources */,
+				59377159D3138D6FC7F6BD47 /* ChessState.cpp in Sources */,
+				4262BBD0AA25555400496224 /* ConditionalView.swift in Sources */,
+				3090063C08ABB80A2165A50A /* ContentView.swift in Sources */,
+				15ABF3FE1AAC6A92D4CFCA61 /* DocumentWindow.swift in Sources */,
+				ABBD0D65D9E0F0225839AB02 /* FENgineInfo+Extension.swift in Sources */,
+				F2FD92D587AF8AE2F3D948B8 /* FEngine.mm in Sources */,
+				39EBC7172DB4D5772BB41681 /* FEngineGame.mm in Sources */,
+				DB78776DF8D62DDAA5DF6203 /* FEngineInfo.mm in Sources */,
+				23FD802F2F9C69009BCA0DC2 /* FEngineMove.mm in Sources */,
+				CA7950C7A1E8D98F00DE9E82 /* FEngineMoveNode.mm in Sources */,
+				9518620E43D9B847CED8488E /* FEngineUtility.mm in Sources */,
+				A4C90C9D1B4E2831C3FB3245 /* FFEN.cpp in Sources */,
+				CB6A99B05281BBABEC5EBE6A /* FPGN.cpp in Sources */,
+				13493B99175ADD17841971A3 /* FullMove.swift in Sources */,
+				2781988D9F67EC5D97B52E5C /* FullMoveView.swift in Sources */,
+				B6BC1B0175E5B0CC48FA01FD /* Game.swift in Sources */,
+				869984D8E6A87C1A78CA51A8 /* GameHistory.cpp in Sources */,
+				B0E4E012D654827521A7A06E /* GameLibrary.swift in Sources */,
+				580FFD27B1F8E2EC4AD8D143 /* GameSession.swift in Sources */,
+				D569F2B9CA8B580B6BBB22EC /* GameShell.swift in Sources */,
+				0401A8739A8AE962C5B83EDF /* GameState.swift in Sources */,
+				2A9AAC9BA6C1693CBBEBAC2F /* InformationView.swift in Sources */,
+				370FBDFF72D8224767EF7AB6 /* LabelsView.swift in Sources */,
+				C6AB2504F416C6620DD490E0 /* LastMoveModifier.swift in Sources */,
+				CC4F4D1AB7BE8020AFD7C1A5 /* MoveList.cpp in Sources */,
+				862BB23888D1E7B79CFE4351 /* NavigationActionView.swift in Sources */,
+				CC480D3CD900751324E8B8B7 /* NewGameView.swift in Sources */,
+				8F4DA3B4DC0205083230935A /* Pasteboard.swift in Sources */,
+				78765A87EBC10ED3441A0A61 /* PiecesFactory.swift in Sources */,
+				FB580352923161E7E5B92EBB /* PiecesView.swift in Sources */,
+				450FF83A5DCA3959E33F8FB4 /* PlayAgainst.swift in Sources */,
+				275C5182800600AB054701FE /* Position.swift in Sources */,
+				2181B8B9D24093453CC60B94 /* PromotionView.swift in Sources */,
+				58DCA4660C044FF537754AB7 /* Selection.swift in Sources */,
+				73A49D1EE51DE8367CA99323 /* SelectionModifier.swift in Sources */,
+				FC95C56DDCA1C7588D9B911B /* SettingsView.swift in Sources */,
+				4970DCEF72BD80A9CA8156B9 /* Square.swift in Sources */,
+				8CFD2DC7D5930C0738CD3794 /* SquareView.swift in Sources */,
+				F78D3581A2A6D289435E6A3E /* TopInformationView.swift in Sources */,
+				2BB1B9AEADF0979C105D77BC /* Variation.swift in Sources */,
+				B41FE1EDC76F30A0313E8D66 /* VariationSelectionView.swift in Sources */,
+				4B990CD24C52E42ADCB349EB /* magicmoves.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		A77F66B025A832270030E61D /* Sources */ = {
+		3158958F69B4F79067DCFCC6 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A7A30F2F25B2BAFC00729432 /* PromotionView.swift in Sources */,
-				A7E4C6B72636849C00BE4955 /* NewGameView_iOS.swift in Sources */,
-				A7FE322925AA96D100A75936 /* FFEN.cpp in Sources */,
-				A7FE31ED25AA96B900A75936 /* ChessEvaluater.cpp in Sources */,
-				A795159E25ABE1D700AEA95F /* PiecesFactory.swift in Sources */,
-				A7576152264A51BC006242F9 /* FEngineMoveNode+Private.h in Sources */,
-				A7A30EC225AEB28D00729432 /* ActionsToolbar.swift in Sources */,
-				A795160C25ABE55E00AEA95F /* Square.swift in Sources */,
-				A7FE322A25AA96D100A75936 /* ChessBoardHash.cpp in Sources */,
-				A77F66D725A832270030E61D /* ChessDocument.swift in Sources */,
-				A791117C264B923600F97FA7 /* FEngineGame.mm in Sources */,
-				A712C25326522F6000E05408 /* FullMove.swift in Sources */,
-				A791117F264B92E500F97FA7 /* FEngineGame+Private.h in Sources */,
-				A795162225ABE59900AEA95F /* PlayAgainst.swift in Sources */,
-				A746997C2637CCF7007E0058 /* NavigationActionView.swift in Sources */,
-				A7FE324E25AAD61200A75936 /* FEngineUtility.mm in Sources */,
-				A79515F625ABE44000AEA95F /* PiecesView.swift in Sources */,
-				A7BC72E42636003F008FBBB4 /* NewGameView.swift in Sources */,
-				A757614B264A504D006242F9 /* Game.swift in Sources */,
-				A758BB0625AC119C0092714E /* Actions.swift in Sources */,
-				A79515E025ABE3D300AEA95F /* Selection.swift in Sources */,
-				A7FE320A25AA96C500A75936 /* ChessGame.cpp in Sources */,
-				A7A30EDD25AEBD7C00729432 /* LabelsView.swift in Sources */,
-				A7FE324F25AAD61200A75936 /* FEngineInfo.mm in Sources */,
-				A70B41A3264A527900A56E29 /* FullMoveView.swift in Sources */,
-				A7FE31EA25AA96B900A75936 /* ChessBoard.cpp in Sources */,
-				A795163D25ABE66600AEA95F /* BoardView.swift in Sources */,
-				A7FE322B25AA96D100A75936 /* FPGN.cpp in Sources */,
-				A79515CA25ABE38F00AEA95F /* LastMoveModifier.swift in Sources */,
-				A7FE31EE25AA96B900A75936 /* ChessMoveGenerator.cpp in Sources */,
-				A79514EC25AAE2C400AEA95F /* FENgineInfo+Extension.swift in Sources */,
-				A79515EB25ABE41000AEA95F /* Position.swift in Sources */,
-				A79515BF25ABE36700AEA95F /* InformationView.swift in Sources */,
-				A7FE31EB25AA96B900A75936 /* MoveList.cpp in Sources */,
-				A7FE324D25AAD61200A75936 /* FEngineMove.mm in Sources */,
-				A72C3E052650D82B00CB9DB7 /* Variation.swift in Sources */,
-				A77F66D525A832270030E61D /* BChessUIApp.swift in Sources */,
-				A79515A925ABE31100AEA95F /* SquareView.swift in Sources */,
-				A7FE320C25AA96C500A75936 /* ChessState.cpp in Sources */,
-				A72C3E022650D78100CB9DB7 /* VariationSelectionView.swift in Sources */,
-				A7FE326925AAD64500A75936 /* FEngine.mm in Sources */,
-				A79515B425ABE34300AEA95F /* TopInformationView.swift in Sources */,
-				A7FE320B25AA96C500A75936 /* ChessOpenings.cpp in Sources */,
-				A7FE31EC25AA96B900A75936 /* GameHistory.cpp in Sources */,
-				A7FE322C25AA96D100A75936 /* magicmoves.c in Sources */,
-				A77F66D925A832270030E61D /* ContentView.swift in Sources */,
-				A757614F264A50E8006242F9 /* FEngineMoveNode.mm in Sources */,
-				A712C256265377C000E05408 /* Arrow.swift in Sources */,
-				A79515D525ABE3A400AEA95F /* SelectionModifier.swift in Sources */,
-				A775237625AD68FA009BFFD1 /* Animation.swift in Sources */,
-				A795161725ABE57C00AEA95F /* ConditionalView.swift in Sources */,
+				21AD9F37AA2CA31FCC6540D4 /* BestMoveTests.cpp in Sources */,
+				5038DE0599BCA82690BF7849 /* BoardHashTests.cpp in Sources */,
+				993EDA19151F3900365CC340 /* CheckTests.cpp in Sources */,
+				DEDE9BADCE58E2E7B101D4C0 /* ChessBoard.cpp in Sources */,
+				1C800008BF8752C88086FF00 /* ChessBoardHash.cpp in Sources */,
+				B5EB367839D3D8AF030C548F /* ChessEngineTests.cpp in Sources */,
+				878940D221C9C6AAAD6D7D34 /* ChessEvaluater.cpp in Sources */,
+				0FABA35E043D77D32C93CF4E /* ChessGame.cpp in Sources */,
+				652C1D9CC19A455514C7589F /* ChessGameTests.cpp in Sources */,
+				D696C7D97E1575179483D0AB /* ChessMoveGenerator.cpp in Sources */,
+				CDBD0832323B94EF11A42BF2 /* ChessOpenings.cpp in Sources */,
+				ACA37B48A9D01A6F6CEF1618 /* ChessState.cpp in Sources */,
+				CC197AF6A5A175F902CC5F85 /* EngineGoogleTests.swift in Sources */,
+				185D96A20E05349A2931C0E3 /* EvaluationTests.cpp in Sources */,
+				1814025A5197978BAEE7F6D6 /* FENgineInfo+Extension.swift in Sources */,
+				EACA4E6233CF4D5C7B703014 /* FEngine.mm in Sources */,
+				19352E0CBD75C14FAB9EE2AD /* FEngineConcurrencyTests.swift in Sources */,
+				9C64B7FFF6BEB786AA7946F7 /* FEngineGame.mm in Sources */,
+				3509940CA0C682612996AD29 /* FEngineInfo.mm in Sources */,
+				10F2B28DF63EAEFF238B4485 /* FEngineMove.mm in Sources */,
+				0CAA5AC886897017523B2FAE /* FEngineMoveNode.mm in Sources */,
+				204F1E5EE32623BAD1D5B90E /* FEngineTests.swift in Sources */,
+				C1A1CE815B0234952BBD3C71 /* FEngineUtility.mm in Sources */,
+				4FBB7929B62BE30EFEC21C80 /* FFEN.cpp in Sources */,
+				AB53F831335DF4041610656E /* FPGN.cpp in Sources */,
+				AC33F1353A1A345806CFBBEE /* FullMove.swift in Sources */,
+				39DECB5A1F2AE1D1666C0C81 /* GTestRunner.mm in Sources */,
+				D2FA408F51B18E96D62CAC1B /* Game.swift in Sources */,
+				176FA56E22CEA206AD493097 /* GameHistory.cpp in Sources */,
+				3C81E8B219E11075BEDDDBBB /* GameLibrary.swift in Sources */,
+				B0146C12C9A064FFFC00A821 /* GameLibraryTests.swift in Sources */,
+				ADBD16343AF39DF6A793E289 /* GameSession.swift in Sources */,
+				42E612D54317BCAFC6EF13D6 /* GameSessionTests.swift in Sources */,
+				B7F67B65AD67362E48C53620 /* GameShell.swift in Sources */,
+				0C7C7633D1B241266010C6C4 /* GameShellTests.swift in Sources */,
+				D1BA917F5C4104B5A8BBC3E6 /* GameState.swift in Sources */,
+				536CCC49CF72BD8D80281500 /* GameStateCodingTests.swift in Sources */,
+				FD98CB38F3FC265A65B03CCA /* GamesTests.swift in Sources */,
+				442FF3DD428D7AA67F14CEC4 /* IterativeDeepeningTests.cpp in Sources */,
+				0765B5599107D096C64103B5 /* MinMaxSearchTests.cpp in Sources */,
+				ADEBD8A009DD4420ACDCE850 /* MoveList.cpp in Sources */,
+				09B208471B25168203A8199A /* MoveTests.cpp in Sources */,
+				687625833AC8552DF1728B21 /* MovesTests.cpp in Sources */,
+				07DF6D4FB0FB1DA0235D77C4 /* OpeningsTests.cpp in Sources */,
+				766704256B00BAE218AF2C79 /* PGNTests.cpp in Sources */,
+				79234A2D05908EE2A080C99E /* PiecesFactory.swift in Sources */,
+				50F769517A70B9DCFD18284B /* PlayAgainst.swift in Sources */,
+				8E85EF2B2D8E4A802F14F47D /* Position.swift in Sources */,
+				201DE6DF9038C87648A050E9 /* SearchChessTests.cpp in Sources */,
+				3614046B451B7E6538D11DAE /* Selection.swift in Sources */,
+				F0015AE7C1448AD40B679077 /* Square.swift in Sources */,
+				51597C0234CFC27A93176646 /* StateTests.cpp in Sources */,
+				9AC10D64359B02B9DE926458 /* TestSupport.swift in Sources */,
+				FA1FB12A80F60CB81B9E451D /* UCI.swift in Sources */,
+				58225EBA11A0DBD6C47AE30D /* UCIProcessTests.swift in Sources */,
+				670721415A71F2EA7C283D3C /* UnitTestHelper.cpp in Sources */,
+				EA570E8F0D08DF0F3154968C /* Variation.swift in Sources */,
+				84D5CE43F1FA31A4DBFED7CF /* gtest-all.cc in Sources */,
+				D4299D14FE94AE75F3F9F0CD /* magicmoves.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		A77F66B725A832270030E61D /* Sources */ = {
+		346B00E88D0F5B8D8D67199C /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A7A30F3025B2BAFC00729432 /* PromotionView.swift in Sources */,
-				A7FE321B25AA96D000A75936 /* FPGN.cpp in Sources */,
-				A7FE31CC25AA96A800A75936 /* FEngineMove.mm in Sources */,
-				A795159F25ABE1D700AEA95F /* PiecesFactory.swift in Sources */,
-				A7A30EC325AEB28D00729432 /* ActionsToolbar.swift in Sources */,
-				A7576153264A51BC006242F9 /* FEngineMoveNode+Private.h in Sources */,
-				A795160D25ABE55E00AEA95F /* Square.swift in Sources */,
-				A7FE31CA25AA96A800A75936 /* FEngineInfo.mm in Sources */,
-				A7FE31DA25AA96B800A75936 /* MoveList.cpp in Sources */,
-				A795162325ABE59900AEA95F /* PlayAgainst.swift in Sources */,
-				A791117D264B923600F97FA7 /* FEngineGame.mm in Sources */,
-				A712C25426522F6000E05408 /* FullMove.swift in Sources */,
-				A7911180264B92E500F97FA7 /* FEngineGame+Private.h in Sources */,
-				A7FE31CB25AA96A800A75936 /* FEngineUtility.mm in Sources */,
-				A746997D2637CCF7007E0058 /* NavigationActionView.swift in Sources */,
-				A79515F725ABE44000AEA95F /* PiecesView.swift in Sources */,
-				A758BB0725AC119C0092714E /* Actions.swift in Sources */,
-				A716976D262BFF8C00156BD6 /* SettingsView.swift in Sources */,
-				A757614C264A504D006242F9 /* Game.swift in Sources */,
-				A79515E125ABE3D300AEA95F /* Selection.swift in Sources */,
-				A7FE31DB25AA96B800A75936 /* GameHistory.cpp in Sources */,
-				A7A30EDE25AEBD7C00729432 /* LabelsView.swift in Sources */,
-				A7FE321C25AA96D000A75936 /* magicmoves.c in Sources */,
-				A77F66D825A832270030E61D /* ChessDocument.swift in Sources */,
-				A70B41A4264A527900A56E29 /* FullMoveView.swift in Sources */,
-				A795163E25ABE66600AEA95F /* BoardView.swift in Sources */,
-				A7FE31DC25AA96B800A75936 /* ChessEvaluater.cpp in Sources */,
-				A79515CB25ABE38F00AEA95F /* LastMoveModifier.swift in Sources */,
-				A7FE321A25AA96D000A75936 /* ChessBoardHash.cpp in Sources */,
-				A79514F925AAE2C500AEA95F /* FENgineInfo+Extension.swift in Sources */,
-				A79515EC25ABE41000AEA95F /* Position.swift in Sources */,
-				A79515C025ABE36700AEA95F /* InformationView.swift in Sources */,
-				A7FE31FD25AA96C500A75936 /* ChessState.cpp in Sources */,
-				A7FE321925AA96D000A75936 /* FFEN.cpp in Sources */,
-				A7BC72E52636003F008FBBB4 /* NewGameView.swift in Sources */,
-				A72C3E062650D82C00CB9DB7 /* Variation.swift in Sources */,
-				A77F66D625A832270030E61D /* BChessUIApp.swift in Sources */,
-				A79515AA25ABE31100AEA95F /* SquareView.swift in Sources */,
-				A7FE31D925AA96B800A75936 /* ChessBoard.cpp in Sources */,
-				A72C3E032650D78100CB9DB7 /* VariationSelectionView.swift in Sources */,
-				A7FE31A525AA963F00A75936 /* FEngine.mm in Sources */,
-				A79515B525ABE34300AEA95F /* TopInformationView.swift in Sources */,
-				A77F66DA25A832270030E61D /* ContentView.swift in Sources */,
-				A7FE31DD25AA96B800A75936 /* ChessMoveGenerator.cpp in Sources */,
-				A7FE31FB25AA96C500A75936 /* ChessGame.cpp in Sources */,
-				A7FE31FC25AA96C500A75936 /* ChessOpenings.cpp in Sources */,
-				A7576150264A50E8006242F9 /* FEngineMoveNode.mm in Sources */,
-				A712C257265377C000E05408 /* Arrow.swift in Sources */,
-				A79515D625ABE3A400AEA95F /* SelectionModifier.swift in Sources */,
-				A775237725AD68FA009BFFD1 /* Animation.swift in Sources */,
-				A795161825ABE57C00AEA95F /* ConditionalView.swift in Sources */,
+				3821659B2605770F3480B087 /* ActionsToolbar.swift in Sources */,
+				4406B4C05FB4EC9B01CC1C90 /* Arrow.swift in Sources */,
+				1426B85E993D7B40855AC4F7 /* BChessUIApp.swift in Sources */,
+				78EFE39F6F4B9F66FAB992F2 /* BoardView.swift in Sources */,
+				3641DE08ADF3ABCD68113A4B /* ChessBoard.cpp in Sources */,
+				DCD4B97AB91741A82C30825A /* ChessBoardHash.cpp in Sources */,
+				A2EDC44DAD4A1B1190684848 /* ChessDocument.swift in Sources */,
+				F75AA0F187EFE2B9D33C7794 /* ChessEvaluater.cpp in Sources */,
+				54AD5F191D6C9A7151D02B9D /* ChessGame.cpp in Sources */,
+				2BC576F891278012F0C6EB1A /* ChessMoveGenerator.cpp in Sources */,
+				BE677D8292959DBF4EFD1935 /* ChessOpenings.cpp in Sources */,
+				CD23542CDA8BE41D577FB493 /* ChessState.cpp in Sources */,
+				4AF0DF735024EDD20F5D4126 /* ConditionalView.swift in Sources */,
+				7EE11886FE2963FD8302B23F /* ContentView.swift in Sources */,
+				3B9168E9B93E37FB97255B3E /* DocumentWindow.swift in Sources */,
+				D8C4D733FB9A2E8E70B02D88 /* FENgineInfo+Extension.swift in Sources */,
+				87E363FD341DAB6E7724C21E /* FEngine.mm in Sources */,
+				E2375AA2D60123A58309DFB6 /* FEngineGame.mm in Sources */,
+				33A990A09B6560EB68723772 /* FEngineInfo.mm in Sources */,
+				27F45075258D05C48A8CF4F1 /* FEngineMove.mm in Sources */,
+				DF2CCAD477BD63192BE669E2 /* FEngineMoveNode.mm in Sources */,
+				2312118FD83EEA4785E54A0E /* FEngineUtility.mm in Sources */,
+				964E68698D0402C887D6283B /* FFEN.cpp in Sources */,
+				EAE60EC6702EC16FDFF0D9AD /* FPGN.cpp in Sources */,
+				5A6CF278BC154F8A1E27A2B2 /* FullMove.swift in Sources */,
+				0668B67A2EB828B68ED6CDF4 /* FullMoveView.swift in Sources */,
+				AF94D65987FCCDE94933F813 /* Game.swift in Sources */,
+				465254AFEEF7A4F592EDE8B8 /* GameHistory.cpp in Sources */,
+				9F47CDB1A6B0BC4FFD6F3377 /* GameLibrary.swift in Sources */,
+				1BDE624ED61A0203F3089B28 /* GameRootView.swift in Sources */,
+				EAB4A88DCE96E3F283CAD532 /* GameSession.swift in Sources */,
+				D23BBF0091D67647832949B2 /* GameShell.swift in Sources */,
+				5D565D127C2378C90B54FB84 /* GameState.swift in Sources */,
+				AD69676FCA9D9E7CD553DBCA /* InformationView.swift in Sources */,
+				4B6AC3F473FF41AC148797D8 /* LabelsView.swift in Sources */,
+				FA0BA37FDA969E28D8265469 /* LastMoveModifier.swift in Sources */,
+				91AA170EE9AC7E889118BF35 /* MoveList.cpp in Sources */,
+				D838BEFA0B6842F5AC1FEC52 /* NavigationActionView.swift in Sources */,
+				F9302FEE88A3B7E2153993AA /* NewGameView.swift in Sources */,
+				A1D17872DA6E50A57002D655 /* NewGameView_iOS.swift in Sources */,
+				D0DC2694675277188D493261 /* Pasteboard.swift in Sources */,
+				BC3252F10593360ED02A17E6 /* PiecesFactory.swift in Sources */,
+				C77F47BEF2A3B59916E914C0 /* PiecesView.swift in Sources */,
+				1B5121713877DF451F9BC427 /* PlayAgainst.swift in Sources */,
+				14E16E9E72529BF731B49DAB /* Position.swift in Sources */,
+				8E93751260FDF488AA388F2F /* PromotionView.swift in Sources */,
+				7B445929EE7F0B52FCDAF886 /* Selection.swift in Sources */,
+				AA9CEB41DA74BF76D9747044 /* SelectionModifier.swift in Sources */,
+				894F4AF87419939C628038FC /* SettingsView.swift in Sources */,
+				F896E8030CD4C8943A93B4BE /* Square.swift in Sources */,
+				1A301637DD3721FF826D82C9 /* SquareView.swift in Sources */,
+				BCD8BA67A61553ADA49D738A /* TopInformationView.swift in Sources */,
+				A7AB1E23A4C9B895CF215660 /* Variation.swift in Sources */,
+				32BB425A448B3B372DCA707D /* VariationSelectionView.swift in Sources */,
+				830AF3ECE9A3E9A8BDC1AFCB /* magicmoves.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		A77F66BF25A832270030E61D /* Sources */ = {
+		5AFB8DF1B884B496A099BE90 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A77F66C825A832270030E61D /* Tests_iOS.swift in Sources */,
+				AC4254D2D4694A597205850D /* BChessUITests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		A77F66CA25A832270030E61D /* Sources */ = {
+		FF82F162C4F1E4E2CE40E766 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A77F66D325A832270030E61D /* Tests_macOS.swift in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		A7AFCCA21FB4E40D00AE3D85 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				A7AFCCAA1FB4E40D00AE3D85 /* main.swift in Sources */,
-				A75683291FCD28A000CF1408 /* FEngine.mm in Sources */,
-				A7712D2F1FC7C4CD00E7E802 /* UCI.swift in Sources */,
-				A77372011FE320010001A90F /* FPGN.cpp in Sources */,
-				A746C2492001707F001F4437 /* GameHistory.cpp in Sources */,
-				A7911186264B998900F97FA7 /* FEngineMove.mm in Sources */,
-				A70A61BB1FD132D200AFDF0E /* FFEN.cpp in Sources */,
-				A75359841FDC51B2008D1DEE /* FENgineInfo+Extension.swift in Sources */,
-				A756832D1FD0B3FE00CF1408 /* magicmoves.c in Sources */,
-				A7712D471FCBC13100E7E802 /* ChessBoard.cpp in Sources */,
-				A7911184264B998900F97FA7 /* FEngineMoveNode.mm in Sources */,
-				A77371FE1FE31FEF0001A90F /* ChessGame.cpp in Sources */,
-				A7688F60204B6E91004B1E9E /* ChessState.cpp in Sources */,
-				A70A61CA1FD46E3C00AFDF0E /* ChessEvaluater.cpp in Sources */,
-				A70A61C41FD458DE00AFDF0E /* ChessMoveGenerator.cpp in Sources */,
-				A70A61D11FD4AA9600AFDF0E /* FEngineInfo.mm in Sources */,
-				A70A61C61FD4592700AFDF0E /* MoveList.cpp in Sources */,
-				A765D8611FF6C1950045BB36 /* ChessOpenings.cpp in Sources */,
-				A7C92AB91FF86F6800160D2E /* FEngineUtility.mm in Sources */,
-				A731BD392000A513004C13EF /* TournamentEngines.swift in Sources */,
-				A731BD3720009856004C13EF /* Tournament.swift in Sources */,
-				A7911185264B998900F97FA7 /* FEngineGame.mm in Sources */,
-				A746C244200148E9001F4437 /* ChessBoardHash.cpp in Sources */,
+				2C446D502A1BB5DC6BB9A7B3 /* ChessBoard.cpp in Sources */,
+				77A4E5FC418C593DB8C6D634 /* ChessBoardHash.cpp in Sources */,
+				36BCD1C73BBD031A3410960E /* ChessEvaluater.cpp in Sources */,
+				54BAE9B206E2B941C596C763 /* ChessGame.cpp in Sources */,
+				2132010981BE81C9556D5CAC /* ChessMoveGenerator.cpp in Sources */,
+				A1039674D01A68EBFA2D16DE /* ChessOpenings.cpp in Sources */,
+				6A5E612D961C12FD349DC387 /* ChessState.cpp in Sources */,
+				55520A2B44E600A09A749E1B /* FENgineInfo+Extension.swift in Sources */,
+				26EBEEFC5E0B10F7901879C8 /* FEngine.mm in Sources */,
+				8A77F9705BB9B600B005EE97 /* FEngineGame.mm in Sources */,
+				198A1E051F9AEE52239366D9 /* FEngineInfo.mm in Sources */,
+				15F912F2E8E9A34E429F574F /* FEngineMove.mm in Sources */,
+				8A39952C2F27B18FEDBBCE2A /* FEngineMoveNode.mm in Sources */,
+				5EDC8B79DD21EB0B4931007B /* FEngineUtility.mm in Sources */,
+				8F2D0ED297669A8113C270DF /* FFEN.cpp in Sources */,
+				6CEF4B70836176683A9EC90B /* FPGN.cpp in Sources */,
+				AECEBD69DD9C697283B32C09 /* GameHistory.cpp in Sources */,
+				B7AB7FC4A683505ADFB314CF /* MoveList.cpp in Sources */,
+				1765DD92373F05F3557F0359 /* UCI.swift in Sources */,
+				964A24461F1D8C58BED4431A /* magicmoves.c in Sources */,
+				910455537F55F4412768FC24 /* main.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		A77F66C525A832270030E61D /* PBXTargetDependency */ = {
+		ABB173ECA26684FBB9B725E2 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = A77F66B325A832270030E61D /* BChess (iOS) */;
-			targetProxy = A77F66C425A832270030E61D /* PBXContainerItemProxy */;
+			target = 91D0B727552821ADC37F6F1F /* BChess (iOS) */;
+			targetProxy = 68702A086B97EA1E4E1010E3 /* PBXContainerItemProxy */;
 		};
-		A77F66D025A832270030E61D /* PBXTargetDependency */ = {
+		DC6179E30CCEF6975FC2A163 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = A77F66BA25A832270030E61D /* BChess (macOS) */;
-			targetProxy = A77F66CF25A832270030E61D /* PBXContainerItemProxy */;
+			target = 178ACF2B5B59047059B2ABB2 /* BChessUCI */;
+			targetProxy = 43FE7F635630094ACBAAECC3 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
-		A7712D1A1FB916E900E7E802 /* Debug */ = {
+		06A586B11017FD8C2C672D35 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CLANG_WARN_ASSIGN_ENUM = YES;
-				CODE_SIGN_STYLE = Automatic;
-				COMBINE_HIDPI_IMAGES = YES;
-				DEAD_CODE_STRIPPING = YES;
-				DEVELOPMENT_TEAM = 28XRU7S6GA;
-				FRAMEWORK_SEARCH_PATHS = (
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(PROJECT_DIR)/BChessTests",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
 				);
-				HEADER_SEARCH_PATHS = (
-					Dependencies/gtest/include,
-					Dependencies/gtest,
-				);
-				INFOPLIST_FILE = BChessTests/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
-				MACOSX_DEPLOYMENT_TARGET = "$(RECOMMENDED_MACOSX_DEPLOYMENT_TARGET)";
-				PRODUCT_BUNDLE_IDENTIFIER = "ch.arizona-software.BChessTests";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_OBJC_BRIDGING_HEADER = "BChess/BChess-Bridging-Header.h";
-			};
-			name = Debug;
-		};
-		A7712D1B1FB916E900E7E802 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CLANG_WARN_ASSIGN_ENUM = YES;
-				CODE_SIGN_STYLE = Automatic;
-				COMBINE_HIDPI_IMAGES = YES;
-				DEAD_CODE_STRIPPING = YES;
-				DEVELOPMENT_TEAM = 28XRU7S6GA;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PROJECT_DIR)/BChessTests",
-				);
-				HEADER_SEARCH_PATHS = (
-					Dependencies/gtest/include,
-					Dependencies/gtest,
-				);
-				INFOPLIST_FILE = BChessTests/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
-				MACOSX_DEPLOYMENT_TARGET = "$(RECOMMENDED_MACOSX_DEPLOYMENT_TARGET)";
-				PRODUCT_BUNDLE_IDENTIFIER = "ch.arizona-software.BChessTests";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_OBJC_BRIDGING_HEADER = "BChess/BChess-Bridging-Header.h";
+				PRODUCT_BUNDLE_IDENTIFIER = "ch.arizona-software.BChessUITests";
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = "BChess (iOS)";
 			};
 			name = Release;
 		};
-		A77F66DE25A832270030E61D /* Debug */ = {
+		0AC8F19F9788C13D09D2C01C /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CLANG_ENABLE_OBJC_WEAK = YES;
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 110;
-				DEVELOPMENT_TEAM = 28XRU7S6GA;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = iOS/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				MACOSX_DEPLOYMENT_TARGET = "$(RECOMMENDED_MACOSX_DEPLOYMENT_TARGET)";
-				MARKETING_VERSION = 0.2;
-				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
-				MTL_FAST_MATH = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = "ch.arizona-software.BChess";
 				PRODUCT_NAME = BChess;
 				SDKROOT = iphoneos;
 				SWIFT_OBJC_BRIDGING_HEADER = "BChess/BChess-Bridging-Header.h";
-				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
 		};
-		A77F66DF25A832270030E61D /* Release */ = {
+		3E7C429DC4E06D7C601A9A1E /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CLANG_ENABLE_OBJC_WEAK = YES;
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 110;
-				DEVELOPMENT_TEAM = 28XRU7S6GA;
-				ENABLE_PREVIEWS = YES;
-				INFOPLIST_FILE = iOS/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				MACOSX_DEPLOYMENT_TARGET = "$(RECOMMENDED_MACOSX_DEPLOYMENT_TARGET)";
-				MARKETING_VERSION = 0.2;
-				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = "ch.arizona-software.BChess";
-				PRODUCT_NAME = BChess;
-				SDKROOT = iphoneos;
-				SWIFT_OBJC_BRIDGING_HEADER = "BChess/BChess-Bridging-Header.h";
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				VALIDATE_PRODUCT = YES;
-			};
-			name = Release;
-		};
-		A77F66E125A832270030E61D /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CLANG_ENABLE_OBJC_WEAK = YES;
 				CODE_SIGN_ENTITLEMENTS = macOS/macOS.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
-				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 110;
-				DEAD_CODE_STRIPPING = YES;
-				DEVELOPMENT_TEAM = 28XRU7S6GA;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = macOS/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
-				MACOSX_DEPLOYMENT_TARGET = 11.0;
-				MARKETING_VERSION = 0.2;
-				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
-				MTL_FAST_MATH = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = "ch.arizona-software.BChess";
 				PRODUCT_NAME = BChess;
 				SDKROOT = macosx;
 				SWIFT_OBJC_BRIDGING_HEADER = "BChess/BChess-Bridging-Header.h";
-				SWIFT_VERSION = 5.0;
 			};
-			name = Debug;
+			name = Release;
 		};
-		A77F66E225A832270030E61D /* Release */ = {
+		5524024D3B5382273FC7D093 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CLANG_ENABLE_OBJC_WEAK = YES;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				ENABLE_PREVIEWS = YES;
+				INFOPLIST_FILE = iOS/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "ch.arizona-software.BChess";
+				PRODUCT_NAME = BChess;
+				SDKROOT = iphoneos;
+				SWIFT_OBJC_BRIDGING_HEADER = "BChess/BChess-Bridging-Header.h";
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		69E9E310EFDFC9CE6A4B478E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_IDENTITY = "-";
+				COMBINE_HIDPI_IMAGES = YES;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"BCHESS_TEST_HOOKS=1",
+				);
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SRCROOT)/Dependencies/gtest/include",
+					"$(SRCROOT)/Dependencies/gtest",
+				);
+				INFOPLIST_FILE = BChessTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "ch.arizona-software.BChessTests";
+				SDKROOT = macosx;
+				SWIFT_OBJC_BRIDGING_HEADER = "BChessTests/BChessTests-Bridging-Header.h";
+			};
+			name = Debug;
+		};
+		8B1A5CD552CF087F29B76403 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_IDENTITY = "-";
+				COMBINE_HIDPI_IMAGES = YES;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"BCHESS_TEST_HOOKS=1",
+				);
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SRCROOT)/Dependencies/gtest/include",
+					"$(SRCROOT)/Dependencies/gtest",
+				);
+				INFOPLIST_FILE = BChessTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "ch.arizona-software.BChessTests";
+				SDKROOT = macosx;
+				SWIFT_OBJC_BRIDGING_HEADER = "BChessTests/BChessTests-Bridging-Header.h";
+			};
+			name = Release;
+		};
+		95D76FD8E459935FC6872983 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = macOS/macOS.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
-				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 110;
-				DEAD_CODE_STRIPPING = YES;
-				DEVELOPMENT_TEAM = 28XRU7S6GA;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = macOS/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
-				MACOSX_DEPLOYMENT_TARGET = 11.0;
-				MARKETING_VERSION = 0.2;
-				MTL_FAST_MATH = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = "ch.arizona-software.BChess";
 				PRODUCT_NAME = BChess;
 				SDKROOT = macosx;
 				SWIFT_OBJC_BRIDGING_HEADER = "BChess/BChess-Bridging-Header.h";
-				SWIFT_VERSION = 5.0;
-			};
-			name = Release;
-		};
-		A77F66E425A832270030E61D /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
-				CLANG_ENABLE_OBJC_WEAK = YES;
-				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = 28XRU7S6GA;
-				INFOPLIST_FILE = "Tests iOS/Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 14.3;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				MACOSX_DEPLOYMENT_TARGET = "$(RECOMMENDED_MACOSX_DEPLOYMENT_TARGET)";
-				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
-				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = "ch.arizona-software.Tests-iOS";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = iphoneos;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_TARGET_NAME = "BChessUI (iOS)";
 			};
 			name = Debug;
 		};
-		A77F66E525A832270030E61D /* Release */ = {
+		A6505E0FA7F743080FD83478 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
-				CLANG_ENABLE_OBJC_WEAK = YES;
-				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = 28XRU7S6GA;
-				INFOPLIST_FILE = "Tests iOS/Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 14.3;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				MACOSX_DEPLOYMENT_TARGET = "$(RECOMMENDED_MACOSX_DEPLOYMENT_TARGET)";
-				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = "ch.arizona-software.Tests-iOS";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = iphoneos;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_TARGET_NAME = "BChessUI (iOS)";
-				VALIDATE_PRODUCT = YES;
-			};
-			name = Release;
-		};
-		A77F66E725A832270030E61D /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
-				CLANG_ENABLE_OBJC_WEAK = YES;
-				CODE_SIGN_STYLE = Automatic;
+				CODE_SIGN_IDENTITY = "-";
 				COMBINE_HIDPI_IMAGES = YES;
-				DEAD_CODE_STRIPPING = YES;
-				DEVELOPMENT_TEAM = 28XRU7S6GA;
-				INFOPLIST_FILE = "Tests macOS/Info.plist";
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
-				MACOSX_DEPLOYMENT_TARGET = 11.1;
-				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
-				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = "ch.arizona-software.Tests-macOS";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 5.0;
-				TEST_TARGET_NAME = "BChessUI (macOS)";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "ch.arizona-software.BChessUCI";
+				PRODUCT_NAME = BChessUCI;
+				SDKROOT = macosx;
+				SWIFT_OBJC_BRIDGING_HEADER = "BChess/BChess-Bridging-Header.h";
 			};
 			name = Debug;
 		};
-		A77F66E825A832270030E61D /* Release */ = {
+		B5F560A72853B1D0AA510176 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
-				CLANG_ENABLE_OBJC_WEAK = YES;
-				CODE_SIGN_STYLE = Automatic;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "ch.arizona-software.BChessUITests";
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = "BChess (iOS)";
+			};
+			name = Debug;
+		};
+		C141881DF666B1485E04ACA2 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "-";
 				COMBINE_HIDPI_IMAGES = YES;
-				DEAD_CODE_STRIPPING = YES;
-				DEVELOPMENT_TEAM = 28XRU7S6GA;
-				INFOPLIST_FILE = "Tests macOS/Info.plist";
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
-				MACOSX_DEPLOYMENT_TARGET = 11.1;
-				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = "ch.arizona-software.Tests-macOS";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 5.0;
-				TEST_TARGET_NAME = "BChessUI (macOS)";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "ch.arizona-software.BChessUCI";
+				PRODUCT_NAME = BChessUCI;
+				SDKROOT = macosx;
+				SWIFT_OBJC_BRIDGING_HEADER = "BChess/BChess-Bridging-Header.h";
 			};
 			name = Release;
 		};
-		A7AFCCAB1FB4E40D00AE3D85 /* Debug */ = {
+		E7C507022C63CE4AB3B5B467 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LANGUAGE_STANDARD = "c++20";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
 				CLANG_WARN_COMMA = YES;
@@ -1356,10 +1279,11 @@
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				CODE_SIGN_IDENTITY = "Mac Developer";
+				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
-				DEAD_CODE_STRIPPING = YES;
+				CURRENT_PROJECT_VERSION = 110;
 				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = 28XRU7S6GA;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -1367,8 +1291,8 @@
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PREPROCESSOR_DEFINITIONS = (
-					"DEBUG=1",
 					"$(inherited)",
+					"DEBUG=1",
 				);
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
@@ -1376,26 +1300,35 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.13;
-				MTL_ENABLE_DEBUG_INFO = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				HEADER_SEARCH_PATHS = (
+					"$(SRCROOT)/Shared/Engine/**",
+					"$(SRCROOT)/Shared/Bridge",
+				);
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
+				MARKETING_VERSION = 0.2;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
-				SDKROOT = macosx;
+				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 			};
 			name = Debug;
 		};
-		A7AFCCAC1FB4E40D00AE3D85 /* Release */ = {
+		ECE2B603E0677805EDE48B09 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LANGUAGE_STANDARD = "c++20";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
 				CLANG_WARN_COMMA = YES;
@@ -1418,10 +1351,11 @@
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				CODE_SIGN_IDENTITY = "Mac Developer";
+				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
-				DEAD_CODE_STRIPPING = YES;
+				CURRENT_PROJECT_VERSION = 110;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = 28XRU7S6GA;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -1432,112 +1366,81 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.13;
+				GENERATE_INFOPLIST_FILE = NO;
+				HEADER_SEARCH_PATHS = (
+					"$(SRCROOT)/Shared/Engine/**",
+					"$(SRCROOT)/Shared/Bridge",
+				);
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
+				MARKETING_VERSION = 0.2;
 				MTL_ENABLE_DEBUG_INFO = NO;
-				SDKROOT = macosx;
-				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
-				SWIFT_VERSION = 5.0;
-			};
-			name = Release;
-		};
-		A7AFCCAE1FB4E40D00AE3D85 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CLANG_ENABLE_MODULES = YES;
-				CODE_SIGN_IDENTITY = "-";
-				CODE_SIGN_STYLE = Automatic;
-				DEAD_CODE_STRIPPING = YES;
-				DEVELOPMENT_TEAM = 28XRU7S6GA;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
-				MACOSX_DEPLOYMENT_TARGET = "$(RECOMMENDED_MACOSX_DEPLOYMENT_TARGET)";
+				MTL_FAST_MATH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_OBJC_BRIDGING_HEADER = "BChess/BChess-Bridging-Header.h";
-				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-			};
-			name = Debug;
-		};
-		A7AFCCAF1FB4E40D00AE3D85 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CLANG_ENABLE_MODULES = YES;
-				CODE_SIGN_IDENTITY = "-";
-				CODE_SIGN_STYLE = Automatic;
-				DEAD_CODE_STRIPPING = YES;
-				DEVELOPMENT_TEAM = 28XRU7S6GA;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
-				MACOSX_DEPLOYMENT_TARGET = "$(RECOMMENDED_MACOSX_DEPLOYMENT_TARGET)";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_OBJC_BRIDGING_HEADER = "BChess/BChess-Bridging-Header.h";
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 6.0;
 			};
 			name = Release;
 		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		A7712D191FB916E900E7E802 /* Build configuration list for PBXNativeTarget "BChessTests" */ = {
+		27B83ADBE206691CD329FFC6 /* Build configuration list for PBXNativeTarget "BChess (iOS)" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				A7712D1A1FB916E900E7E802 /* Debug */,
-				A7712D1B1FB916E900E7E802 /* Release */,
+				0AC8F19F9788C13D09D2C01C /* Debug */,
+				5524024D3B5382273FC7D093 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
+			defaultConfigurationName = Debug;
 		};
-		A77F66DD25A832270030E61D /* Build configuration list for PBXNativeTarget "BChess (iOS)" */ = {
+		283355205AA8E9FA5C2A8F54 /* Build configuration list for PBXProject "BChess" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				A77F66DE25A832270030E61D /* Debug */,
-				A77F66DF25A832270030E61D /* Release */,
+				E7C507022C63CE4AB3B5B467 /* Debug */,
+				ECE2B603E0677805EDE48B09 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
+			defaultConfigurationName = Debug;
 		};
-		A77F66E025A832270030E61D /* Build configuration list for PBXNativeTarget "BChess (macOS)" */ = {
+		32FFE681D3C963839BDDA1D2 /* Build configuration list for PBXNativeTarget "BChessUITests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				A77F66E125A832270030E61D /* Debug */,
-				A77F66E225A832270030E61D /* Release */,
+				B5F560A72853B1D0AA510176 /* Debug */,
+				06A586B11017FD8C2C672D35 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
+			defaultConfigurationName = Debug;
 		};
-		A77F66E325A832270030E61D /* Build configuration list for PBXNativeTarget "Tests iOS" */ = {
+		C3DFDC42EC8D9B74361C294F /* Build configuration list for PBXNativeTarget "BChessUCI" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				A77F66E425A832270030E61D /* Debug */,
-				A77F66E525A832270030E61D /* Release */,
+				A6505E0FA7F743080FD83478 /* Debug */,
+				C141881DF666B1485E04ACA2 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
+			defaultConfigurationName = Debug;
 		};
-		A77F66E625A832270030E61D /* Build configuration list for PBXNativeTarget "Tests macOS" */ = {
+		EA9DF4A848325893F9C6F56C /* Build configuration list for PBXNativeTarget "BChessTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				A77F66E725A832270030E61D /* Debug */,
-				A77F66E825A832270030E61D /* Release */,
+				69E9E310EFDFC9CE6A4B478E /* Debug */,
+				8B1A5CD552CF087F29B76403 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
+			defaultConfigurationName = Debug;
 		};
-		A7AFCCA11FB4E40D00AE3D85 /* Build configuration list for PBXProject "BChess" */ = {
+		FFCEE15748E5936903B05738 /* Build configuration list for PBXNativeTarget "BChess (macOS)" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				A7AFCCAB1FB4E40D00AE3D85 /* Debug */,
-				A7AFCCAC1FB4E40D00AE3D85 /* Release */,
+				95D76FD8E459935FC6872983 /* Debug */,
+				3E7C429DC4E06D7C601A9A1E /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		A7AFCCAD1FB4E40D00AE3D85 /* Build configuration list for PBXNativeTarget "BChessUCI" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				A7AFCCAE1FB4E40D00AE3D85 /* Debug */,
-				A7AFCCAF1FB4E40D00AE3D85 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
+			defaultConfigurationName = Debug;
 		};
 /* End XCConfigurationList section */
 	};
-	rootObject = A7AFCC9E1FB4E40D00AE3D85 /* Project object */;
+	rootObject = 8D3403F4DA379573365B4586 /* Project object */;
 }

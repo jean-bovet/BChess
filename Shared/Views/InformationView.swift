@@ -10,13 +10,13 @@ import SwiftUI
 
 struct InformationView: View {
     
-    @Binding var document: ChessDocument
+    let session: GameSession
 
     let numberFormatter = NumberFormatter()
     let valueFormatter = NumberFormatter()
 
-    init(document: Binding<ChessDocument>) {
-        self._document = document
+    init(session: GameSession) {
+        self.session = session
         
         numberFormatter.numberStyle = .decimal
         numberFormatter.groupingSeparator = ","
@@ -30,7 +30,7 @@ struct InformationView: View {
     }
 
     func value() -> String {
-        guard let info = document.info else {
+        guard let info = session.info else {
             return " "
         }
         
@@ -45,7 +45,7 @@ struct InformationView: View {
     }
     
     func speed() -> String {
-        guard let info = document.info else {
+        guard let info = session.info else {
             return " "
         }
 
@@ -64,26 +64,26 @@ struct InformationView: View {
         VStack(alignment: .leading, spacing: 10) {
             HStack {
                 Image(systemName: "checkerboard.rectangle")
-                Text(document.engine.games[Int(document.currentGameIndex)].name)
+                Text(session.games[session.currentGameIndex].name)
             }
             
-            if let opening = document.engine.openingName() {
+            if let opening = session.openingName {
                 HStack {
                     Image(systemName: "book")
                     Text(opening)
                 }
             }
             
-            List(document.game.moves, children: \FullMove.children) { item in
-                FullMoveView(item: item, currentMoveUUID: document.engine.currentMoveNodeUUID)
+            List(session.game.moves, children: \FullMove.children) { item in
+                FullMoveView(item: item, currentMoveUUID: session.currentMoveUUID)
                     .onTapGesture {
-                        document.currentMoveIndex = UInt(item.id)!
+                        session.selectMove(uuid: UInt(item.id)!)
                     }
             }
             
             Spacer()
             
-            if document.mode.value == .play {
+            if session.mode.value == .play {
                 HStack() {
                     Image(systemName: "cpu")
                     Text(value())
@@ -97,15 +97,10 @@ struct InformationView: View {
     }
 }
 
-struct BottomInformationView_Previews: PreviewProvider {
-    static var previews: some View {
-        Group {
-            let doc = try! ChessDocument(pgn: "1. e4 e5 *")
-            InformationView(document: .constant(doc))
-        }
-        Group {
-            let doc = try! ChessDocument(pgn: "1. e4 e5 2. Nf3 Nf6 3. Nxe5 d6 4. Nc3 dxe5 *")
-            InformationView(document: .constant(doc))
-        }
-    }
+#Preview("Short game") {
+    InformationView(session: GameSession(state: GameState(pgn: "1. e4 e5 *")))
+}
+
+#Preview("Longer game") {
+    InformationView(session: GameSession(state: GameState(pgn: "1. e4 e5 2. Nf3 Nf6 3. Nxe5 d6 4. Nc3 dxe5 *")))
 }

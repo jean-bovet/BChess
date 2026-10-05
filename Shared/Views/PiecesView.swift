@@ -15,42 +15,24 @@ struct Promotion {
 
 struct PiecesView: View {
     
-    @Binding var document: ChessDocument
+    let session: GameSession
     
     @State private var isPromotionViewShown = false
     @State private var promotion = Promotion(move: FEngineMove(), isWhite: true)
-    
-    // This state is used as a workaround to
-    // detect when the animation of the piece after
-    // a move is completed so the computer can start thinking.
-    // This is to avoid the computer replying at the same time as the animation is
-    // ongoing after the human (or computer) has played.
-    @State private var pieceAnimationValue = 0.0
 
     func processTap(_ rank: Int, _ file: Int) {
-        if let move = document.selection.possibleMove(rank, file) {
+        if let move = session.selection.possibleMove(rank, file) {
             if move.isPromotion {
-                promotion = Promotion(move: move, isWhite: document.engine.isWhite())
+                promotion = Promotion(move: move, isWhite: session.isWhiteToMove)
                 isPromotionViewShown.toggle()
             } else {
-                doMove(move)
+                session.playHuman(move)
             }
         } else {
-            document.selection = Selection(position: Position(rank: rank, file: file),
-                                           possibleMoves: document.engine.moves(at: UInt(rank), file: UInt(file)))
+            session.select(rank: rank, file: file)
         }
     }
 
-    func doMove(_ move: FEngineMove) {
-        withAnimation {
-            playMove(move: move)
-            
-            // Set the final value to detect when the animation ends
-            // (see below in onAnimationCompleted)
-            pieceAnimationValue = 1.0
-        }
-    }
-    
     func board(withPieces pieces: [Piece]) -> [Square] {
         var squares = [Square]()
         for rank in 0...7 {
@@ -63,61 +45,13 @@ struct PiecesView: View {
         return squares
     }
     
+    func squareIdentifier(_ position: Position) -> String {
+        "square-\(["a", "b", "c", "d", "e", "f", "g", "h"][position.file])\(position.rank + 1)"
+    }
+    
     func applyPromotion(pieceName: String) {
         promotion.move.setPromotionPiece(pieceName)
-        doMove(promotion.move)
-    }
-    
-    func triggerEngineEvaluationIfSuitable() {
-        // Don't play the engine while the user is analyzing the board
-        guard document.mode.value == .play else {
-            return
-        }
-        
-        // Only play the computer if the current color matches
-        // a player who is a computer.
-        guard document.engine.isWhite() && document.whitePlayer.computer || !document.engine.isWhite() && document.blackPlayer.computer else {
-            return
-        }
-
-        // Ensure the engine internal state allows it to play
-        guard document.engine.canPlay() else {
-            return
-        }
-                
-        // Trigger the engine evaluation
-        document.engine.evaluate { (info, completed) in
-            DispatchQueue.main.async {
-                if completed {
-                    withAnimation {
-                        playMove(info: info)
-                        
-                        // Set the final value to detect when the animation ends
-                        // (see below in onAnimationCompleted)
-                        pieceAnimationValue = 1.0
-                    }
-                } else {
-                    self.document.info = info
-                }
-            }
-        }
-    }
-
-    func playMove(move: FEngineMove) {
-        document.selection = Selection.empty()
-        document.lastMove = move
-        document.applyEngineSettings()
-        document.engine.move(move.rawMoveValue)
-        document.pgn = document.engine.pgnAllGames()
-    }
-    
-    func playMove(info: FEngineInfo) {
-        document.selection = Selection.empty()
-        document.lastMove = info.bestEngineMove
-        document.info = info
-        document.applyEngineSettings()
-        document.engine.move(info.bestMove)
-        document.pgn = document.engine.pgnAllGames()
+        session.playHuman(promotion.move)
     }
         
     var body: some View {
@@ -126,10 +60,11 @@ struct PiecesView: View {
             let squareSize: CGFloat = minSize / CGFloat(numberOfSquares)
             let xOffset: CGFloat = (geometry.size.width - minSize) / 2
             let yOffset: CGFloat = (geometry.size.height - minSize) / 2
-            let b: [Square] = board(withPieces: document.pieces)
+            let rotated = session.gameState.rotated
+            let b: [Square] = board(withPieces: session.pieces)
             ForEach(b) { square in
-                let x = CGFloat(square.position.file.actual(rotated: document.rotated)) * squareSize + xOffset
-                let y = CGFloat(7 - square.position.rank.actual(rotated: document.rotated)) * squareSize + yOffset
+                let x = CGFloat(square.position.file.actual(rotated: rotated)) * squareSize + xOffset
+                let y = CGFloat(7 - square.position.rank.actual(rotated: rotated)) * squareSize + yOffset
                 SquareView(piece: square.piece)
                     .frame(width: squareSize, height: squareSize)
                     .offset(x: x,
@@ -137,24 +72,18 @@ struct PiecesView: View {
                     .onTapGesture {
                         processTap(square.position.rank, square.position.file)
                     }
+                    .accessibilityElement()
+                    .accessibilityIdentifier(squareIdentifier(square.position))
+                    .accessibilityValue(square.piece.map { String($0.name.prefix(1)) } ?? "empty")
+                    .accessibilityAddTraits(.isButton)
             }
         }
         .onAppear() {
             // Start to play after this view appear which takes care of starting
-            // the engine when the document is first opened
-            triggerEngineEvaluationIfSuitable()
+            // the engine when the game is first shown
+            session.requestEngineMoveIfNeeded()
         }
-        .onChange(of: document.engineShouldMove, perform: { value in
-            // Start to play after a change in this state, which is usually
-            // triggered after a new game is selected
-            triggerEngineEvaluationIfSuitable()
-        })
-        .onAnimationCompleted(for: pieceAnimationValue) {
-            // Animation has completed, reset the value
-            pieceAnimationValue = 0
-            // And trigger the engine evaluation if suitable
-            triggerEngineEvaluationIfSuitable()
-        }.sheet(isPresented: $isPromotionViewShown) {
+        .sheet(isPresented: $isPromotionViewShown) {
             PromotionView(promotion: $promotion, callback: { name in
                 self.applyPromotion(pieceName: name)
             })
@@ -162,21 +91,18 @@ struct PiecesView: View {
     }
 }
 
-struct PiecesView_Previews: PreviewProvider {
-    static var previews: some View {
-        Group {
-            let doc = try! ChessDocument()
-            ZStack {
-                BoardView(document: .constant(doc))
-                PiecesView(document: .constant(doc))
-            }
-        }
-        Group {
-            let doc = try! ChessDocument(rotated: true)
-            ZStack {
-                BoardView(document: .constant(doc))
-                PiecesView(document: .constant(doc))
-            }
-        }
+#Preview("White at the bottom") {
+    let session = GameSession()
+    ZStack {
+        BoardView(session: session)
+        PiecesView(session: session)
+    }
+}
+
+#Preview("Rotated") {
+    let session = GameSession(state: GameState(pgn: "*", rotated: true))
+    ZStack {
+        BoardView(session: session)
+        PiecesView(session: session)
     }
 }

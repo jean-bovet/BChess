@@ -6,35 +6,27 @@
 //  Copyright © 2021 Jean Bovet. All rights reserved.
 //
 
-import XCTest
+import Testing
 
-class FEngineTests: XCTestCase {
+struct FEngineTests {
 
-    override func setUpWithError() throws {
-        // Put setup code here. This method is called before the invocation of each test method in the class.
-    }
-
-    override func tearDownWithError() throws {
-        // Put teardown code here. This method is called after the invocation of each test method in the class.
-    }
-
-    func testTreeNode() throws {
+    @Test func treeNode() {
         let engine = FEngine()
         engine.setPGN("1. e4 e5 (1... c5)")
         
         let nodes = engine.moveNodesTree()
-        XCTAssertEqual(2, nodes.count)
-        XCTAssertEqual("e4", nodes[0].name)
-        XCTAssertEqual("e5", nodes[1].name)
-        XCTAssertEqual("c5", nodes[1].variations[0].name)
+        #expect(nodes.count == 2)
+        #expect(nodes[0].name == "e4")
+        #expect(nodes[1].name == "e5")
+        #expect(nodes[1].variations[0].name == "c5")
     }
 
-    func testTreeNode2() throws {
+    @Test func treeNode2() {
         let engine = FEngine()
         engine.setPGN("1.e4 e5 ( 1...Nf6 ) ( 1...Nc6 2.d4 Nf6 ) 2.Nf3 Nc6 3.Nc3 Nf6 *")
         
         let nodes = engine.moveNodesTree()
-        XCTAssertEqual(6, nodes.count)
+        #expect(nodes.count == 6)
     }
 
 }

@@ -10,7 +10,7 @@ import Foundation
 
 struct Square: Identifiable {
     var id: String {
-        return piece?.name ?? "\(UUID())"
+        return piece?.name ?? "empty-\(position.rank)-\(position.file)"
     }
     let position: Position
     let piece: Piece?

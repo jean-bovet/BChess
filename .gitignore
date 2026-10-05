@@ -1,2 +1,5 @@
 xcuserdata
 BChess.xcodeproj/project.xcworkspace/xcshareddata
+
+# Claude worktrees
+.claude/worktrees/
