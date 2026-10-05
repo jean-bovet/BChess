@@ -155,9 +155,7 @@ on move 1. A bare `go` crashes, because `tokens.removeFirst()` runs on an empty 
     so the invalidation regression stays covered.
   - `:50` and `isLegalMove` use the returned `Bool`: legal means `true`. That is a real legality
     check, where comparing FENs was not.
-- **`FFEN::setFEN` validates and is all-or-nothing.** This builds on ENGINE-1 step 7, which already
-  starts from `ChessBoard()`. Parsing now fills a local `ChessBoard parsed` and assigns
-  `board = parsed` only when every check passes, so on `false` the caller's board is untouched. It
+- **`FFEN::setFEN` validates and is all-or-nothing.** This builds on ENGINE-1 step 7 (`board.reset(); board.clear();` at the start). That reset now runs on a local `ChessBoard parsed`, which is filled and assigned `board = parsed` only when every check passes, so on `false` the caller's board is untouched. It
   rejects:
   - a placement that isn't exactly 8 ranks of exactly 8 files each (digits 1–8 and the 12 piece
     letters);
