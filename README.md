@@ -37,7 +37,7 @@ xcodebuild test -scheme "BChess (macOS)" -destination 'platform=macOS'
 xcodebuild test -scheme "BChess (iOS)" -destination 'platform=iOS Simulator,name=iPhone 17 Pro'
 ```
 
-GitHub Actions (`.github/workflows/ci.yml`) checks that the project matches `project.yml`, runs both test schemes, builds `BChessUCI`, and fails on compiler warnings in the app's own sources or if any engine test case did not run.
+Continuous integration and TestFlight builds run on Xcode Cloud, whose workflows are configured in App Store Connect.
 
 How changes are planned and reviewed is described in `AGENTS.md` and `planning/`.
 
