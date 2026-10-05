@@ -56,17 +56,35 @@ private func play(_ session: GameSession, _ from: String, _ to: String) {
 
 /// Counts the moves that the engine's search pushes, through the test hook: proof that a search runs.
 private final class SearchProbe: @unchecked Sendable {
-    private let lock = NSLock()
+    private let condition = NSCondition()
     private var moves = 0
+    private var holding = false
 
     var count: Int {
-        lock.withLock { moves }
+        condition.withLock { moves }
     }
 
     init(_ engine: FEngine) {
         engine.setSearchCheckpoint { [self] in
-            lock.withLock { moves += 1 }
+            condition.lock()
+            moves += 1
+            while holding {
+                condition.wait()
+            }
+            condition.unlock()
         }
+    }
+
+    /// Parks every search at its next checkpoint, so none can report until `release()`.
+    func hold() {
+        condition.withLock { holding = true }
+    }
+
+    func release() {
+        condition.lock()
+        holding = false
+        condition.broadcast()
+        condition.unlock()
     }
 }
 
@@ -642,6 +660,7 @@ struct GameSessionTests {
         let session = blackToMoveAfterAMove()
         defer { session.cancelSearch() }
         let probe = SearchProbe(session.engine)
+        defer { probe.release() }
         session.showsEngine = true
 
         // Without yielding to the main queue, so that the callbacks of the search pile up behind us:
@@ -649,13 +668,17 @@ struct GameSessionTests {
         while probe.count < 5_000 {
             usleep(1_000)
         }
+        // From here no search can report: the old one stops at its next checkpoint while unwinding,
+        // and the new one waits behind it on the search queue. Only the callbacks already queued
+        // can reach the main queue.
+        probe.hold()
         let id = session.analysisID
         session.move(to: .backward)
         #expect(session.analysisID > id)
         #expect(session.isWhiteToMove)
 
         // The main queue now runs the queued callbacks of the old analysis (Black to move) and then
-        // this continuation, which was queued before the new search could produce anything
+        // this continuation
         await Task.yield()
         #expect(session.info == nil, "a result for the old position landed")
     }
