@@ -32,6 +32,9 @@ targets:
   "BChess (iOS)":
     type: application
     platform: iOS
+    # The product is BChess.app (PRODUCT_NAME below). Without this, XcodeGen writes the
+    # target name into the schemes, and Xcode rewrites both schemes whenever the project is open.
+    productName: BChess
     templates: [Engine]
     sources:
       - path: Shared
@@ -58,6 +61,9 @@ targets:
   "BChess (macOS)":
     type: application
     platform: macOS
+    # The product is BChess.app (PRODUCT_NAME below). Without this, XcodeGen writes the
+    # target name into the schemes, and Xcode rewrites both schemes whenever the project is open.
+    productName: BChess
     templates: [Engine]
     sources:
       - path: Shared

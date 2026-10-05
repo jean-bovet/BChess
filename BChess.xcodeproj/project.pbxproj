@@ -305,11 +305,12 @@
 		9885254EA5CE0CC7ECA0A9D3 /* ChessEvaluation.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = ChessEvaluation.hpp; sourceTree = "<group>"; };
 		9B26F7CF7097BD3EF64ACF81 /* magicmoves.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = magicmoves.h; sourceTree = "<group>"; };
 		9BA0B234E3F267394AD43C1F /* MovesTests.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = MovesTests.cpp; sourceTree = "<group>"; };
+		9CC0AFB8437EE6BEB286B9A4 /* BChess.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BChess.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		9CE26D46FB2EB6963C3B70EE /* UCIProcessTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UCIProcessTests.swift; sourceTree = "<group>"; };
 		9CE45E5F1D175374FC199B7F /* ChessEngine.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = ChessEngine.hpp; sourceTree = "<group>"; };
 		9D97E9AA4F42DF8EB4998533 /* Verdict.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Verdict.swift; sourceTree = "<group>"; };
+		9DC5A344F0A528B0BA355655 /* BChess.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = BChess.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		9F36671FEEC94EAF64BE69D9 /* ChessBoardHash.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = ChessBoardHash.hpp; sourceTree = "<group>"; };
-		A1477E0FA670ACFCC4B0A27A /* BChess (iOS).app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = "BChess (iOS).app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		A2A0BBD22E8999C106D3DDBD /* MoveListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoveListView.swift; sourceTree = "<group>"; };
 		A4315B0E7D14507709F7ADAF /* ChessBoardHash.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ChessBoardHash.cpp; sourceTree = "<group>"; };
 		A7041B69703399B00EABB120 /* PiecesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PiecesView.swift; sourceTree = "<group>"; };
@@ -345,7 +346,6 @@
 		D05BA0CF62011F29A83BC02B /* FEngineGame.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = FEngineGame.mm; sourceTree = "<group>"; };
 		D11C33D8BBE6428E42241039 /* magicmoves.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = magicmoves.c; sourceTree = "<group>"; };
 		D15ACC05CB5B63796D43739F /* IterativeDeepeningTests.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = IterativeDeepeningTests.cpp; sourceTree = "<group>"; };
-		DA30F10ED6B1020513D36929 /* BChess (macOS).app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "BChess (macOS).app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		DE010CC0D7A64B49DAAC7DF7 /* GameShellTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameShellTests.swift; sourceTree = "<group>"; };
 		E62F53FB8737C917EACA573D /* Square.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Square.swift; sourceTree = "<group>"; };
 		E660BA0577075A90B39F5F8D /* FEngineMoveNode.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FEngineMoveNode.h; sourceTree = "<group>"; };
@@ -404,8 +404,8 @@
 		200599CAEF058B6181E944F2 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				A1477E0FA670ACFCC4B0A27A /* BChess (iOS).app */,
-				DA30F10ED6B1020513D36929 /* BChess (macOS).app */,
+				9DC5A344F0A528B0BA355655 /* BChess.app */,
+				9CC0AFB8437EE6BEB286B9A4 /* BChess.app */,
 				16194F1626E7FC78881DC886 /* BChessTests.xctest */,
 				0C3AF2DF91FF284FE10C1A44 /* BChessUCI */,
 				B62D3039628BC097D49AA710 /* BChessUITests.xctest */,
@@ -667,7 +667,7 @@
 			packageProductDependencies = (
 			);
 			productName = "BChess (macOS)";
-			productReference = DA30F10ED6B1020513D36929 /* BChess (macOS).app */;
+			productReference = 9CC0AFB8437EE6BEB286B9A4 /* BChess.app */;
 			productType = "com.apple.product-type.application";
 		};
 		0D34FC7106C6F49747B8416E /* BChessTests */ = {
@@ -721,7 +721,7 @@
 			packageProductDependencies = (
 			);
 			productName = "BChess (iOS)";
-			productReference = A1477E0FA670ACFCC4B0A27A /* BChess (iOS).app */;
+			productReference = 9DC5A344F0A528B0BA355655 /* BChess.app */;
 			productType = "com.apple.product-type.application";
 		};
 		A3F74A0EAA013625F9523E1E /* BChessUITests */ = {

@@ -16,7 +16,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "08FB82B9B37F67BA11C4EB8A"
-               BuildableName = "BChess (macOS).app"
+               BuildableName = "BChess.app"
                BlueprintName = "BChess (macOS)"
                ReferencedContainer = "container:BChess.xcodeproj">
             </BuildableReference>
@@ -33,7 +33,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "08FB82B9B37F67BA11C4EB8A"
-            BuildableName = "BChess (macOS).app"
+            BuildableName = "BChess.app"
             BlueprintName = "BChess (macOS)"
             ReferencedContainer = "container:BChess.xcodeproj">
          </BuildableReference>
@@ -69,7 +69,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "08FB82B9B37F67BA11C4EB8A"
-            BuildableName = "BChess (macOS).app"
+            BuildableName = "BChess.app"
             BlueprintName = "BChess (macOS)"
             ReferencedContainer = "container:BChess.xcodeproj">
          </BuildableReference>
@@ -88,7 +88,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "08FB82B9B37F67BA11C4EB8A"
-            BuildableName = "BChess (macOS).app"
+            BuildableName = "BChess.app"
             BlueprintName = "BChess (macOS)"
             ReferencedContainer = "container:BChess.xcodeproj">
          </BuildableReference>
