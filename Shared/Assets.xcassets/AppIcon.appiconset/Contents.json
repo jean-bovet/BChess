@@ -153,7 +153,8 @@
     {
       "idiom" : "mac",
       "scale" : "1x",
-      "size" : "16x16"
+      "size" : "16x16",
+      "filename" : "mac-16.png"
     },
     {
       "filename" : "noun_108491_cc-8.png",
@@ -206,7 +207,8 @@
     {
       "idiom" : "mac",
       "scale" : "2x",
-      "size" : "512x512"
+      "size" : "512x512",
+      "filename" : "mac-512@2x.png"
     }
   ],
   "info" : {
