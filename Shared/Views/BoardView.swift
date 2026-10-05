@@ -12,11 +12,15 @@ struct BoardView: View {
     
     let session: GameSession
 
+    /// The squares keep these colors in light and dark mode
+    static let lightSquare = Color.white
+    static let darkSquare = Color.gray
+
     func backgroundColor(rank: Int, file: Int) -> Color {
         if rank % 2 == 0 {
-            return file % 2 == 0 ? .gray : .white
+            return file % 2 == 0 ? Self.darkSquare : Self.lightSquare
         } else {
-            return file % 2 == 0 ? .white : .gray
+            return file % 2 == 0 ? Self.lightSquare : Self.darkSquare
         }
     }
     

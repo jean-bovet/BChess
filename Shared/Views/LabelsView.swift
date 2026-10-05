@@ -9,6 +9,9 @@
 import SwiftUI
 
 struct LabelsView: View {
+    /// Space between the bottom of the board and the a–h labels
+    static let fileLabelGap: CGFloat = 4
+
     let session: GameSession
 
     func actualIndex(_ index: Int) -> Int {
@@ -38,7 +41,7 @@ struct LabelsView: View {
             
             ForEach(Array(["a", "b", "c", "d", "e", "f", "g", "h"].enumerated()), id:\.offset) { index, value in
                 let x = xOffset + CGFloat(actualIndex(index)) * squareSize
-                let y = yOffset + CGFloat(numberOfSquares) * squareSize + 0.1 * squareSize
+                let y = yOffset + CGFloat(numberOfSquares) * squareSize + LabelsView.fileLabelGap
                 Text("\(value)")
                     .font(.title2)
                     .frame(width: squareSize, height: squareSize, alignment: .top)

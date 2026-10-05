@@ -40,11 +40,18 @@ struct PlayerRow: View {
             Image(systemName: player.computer ? "cpu" : "person.fill")
             Text(label)
 
-            HStack(spacing: 0) {
-                ForEach(session.capturedPieces(white: isWhite), id: \.self) { piece in
-                    SquareView(piece: Piece(name: piece, file: 0, rank: 0))
-                        .frame(width: 24, height: 24)
+            let captured = session.capturedPieces(white: isWhite)
+            if !captured.isEmpty {
+                HStack(spacing: 0) {
+                    ForEach(captured, id: \.self) { piece in
+                        SquareView(piece: Piece(name: piece, file: 0, rank: 0))
+                            .frame(width: 24, height: 24)
+                    }
                 }
+                .padding(.horizontal, 4)
+                // The board's light square, so black pieces stay visible on a dark background
+                .background(BoardView.lightSquare, in: Capsule())
+                .overlay(Capsule().strokeBorder(.separator))
             }
 
             if let points = session.materialPoints(white: isWhite) {

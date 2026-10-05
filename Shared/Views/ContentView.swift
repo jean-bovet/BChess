@@ -19,6 +19,9 @@ struct ContentView: View {
 
     @State private var showAllMoves = false
 
+    /// The a–h labels (title 2) and the space under them, growing with Dynamic Type
+    @ScaledMetric(relativeTo: .title2) private var fileLabelBand: CGFloat = 46
+
     /// The sidebar sits beside the board when there is more width than height, and the status below it
     /// otherwise (iPhone in portrait). The Mac is always wide.
     @State private var isWide = true
@@ -46,7 +49,9 @@ struct ContentView: View {
         .accessibilityIdentifier("board")
         .accessibilityValue(session.fen)
         .padding(.horizontal)
-        .padding(.bottom, 20) // Because the labels are "leaking" a bit below the board space itself
+        // The a–h labels are drawn below the board's square: reserve their band plus a clear gap
+        // before the player row
+        .padding(.bottom, fileLabelBand)
     }
 
     private var boardColumn: some View {
@@ -91,8 +96,9 @@ struct ContentView: View {
                 VStack(alignment: .leading, spacing: 10) {
                     boardColumn
                     StatusLine(session: session)
-                    engine
+                    // The engine goes below the moves so that showing it doesn't move them
                     MoveStrip(session: session) { showAllMoves = true }
+                    engine
                     Spacer(minLength: 0)
                 }
             }
