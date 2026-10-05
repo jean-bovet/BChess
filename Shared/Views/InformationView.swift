@@ -80,10 +80,9 @@ struct InformationView: View {
                         session.selectMove(uuid: UInt(item.id)!)
                     }
             }
-            
-            Spacer()
-            
-            if session.mode.value == .play {
+            .listStyle(.plain)
+
+            if session.mode.value == .play && session.info != nil {
                 HStack() {
                     Image(systemName: "cpu")
                     Text(value())

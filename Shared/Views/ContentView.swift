@@ -13,13 +13,21 @@ struct ContentView: View {
     /// Starts a new game somewhere else than in place (the iOS library). Nil resets the session.
     var onNewGame: ((GamePlayer, GamePlayer) -> Void)? = nil
             
-    @State private var showInfo = true
-    
+    @AppStorage("showInformationPanel") private var showInfo = true
+
     @State private var showNewGameSheet = false
     @State private var newGameSheetEditMode = false
 
+    /// The information panel sits beside the board when there is more width than height,
+    /// and below it otherwise (iPhone in portrait). The Mac is always wide.
+    @State private var isWide = true
+
+    private var layout: AnyLayout {
+        isWide ? AnyLayout(HStackLayout(alignment: .top)) : AnyLayout(VStackLayout(alignment: .leading))
+    }
+
     var body: some View {
-        HStack(alignment: .top) {
+        layout {
             VStack(alignment: .leading) {
                 ColorInformationView(session: session, isWhite: session.gameState.rotated ? true: false)
                 ZStack {
@@ -34,6 +42,8 @@ struct ContentView: View {
                     PiecesView(session: session)
                     VariationSelectionView(session: session)
                 }
+                // Keeps the greedy GeometryReader layers from taking more than the board's square
+                .aspectRatio(1, contentMode: .fit)
                 .accessibilityElement(children: .contain)
                 .accessibilityIdentifier("board")
                 .accessibilityValue(session.fen)
@@ -41,18 +51,27 @@ struct ContentView: View {
                 .padding(.bottom, 20) // Because the labels are "leaking" a bit below the board space itself
                 ColorInformationView(session: session, isWhite: session.gameState.rotated ? false: true)
             }
-            
-            if (showInfo) {
-#if os(macOS)
+            // The board gets its full size first; the panel takes what is left
+            .layoutPriority(1)
+
+            if showInfo {
                 VStack(alignment: .leading, spacing: 10) {
                     NavigationActionView(session: session)
                     InformationView(session: session)
                 }
-                .frame(minWidth: 350, idealWidth: 350, maxWidth: 350, alignment: .leading)
-#endif
+                .frame(minWidth: isWide ? 350 : nil, idealWidth: isWide ? 350 : nil, maxWidth: isWide ? 350 : .infinity,
+                       maxHeight: .infinity, alignment: .topLeading)
+                .transition(.opacity)
             }
         }
         .padding()
+        #if os(iOS)
+        .onGeometryChange(for: Bool.self) { proxy in
+            proxy.size.width > proxy.size.height
+        } action: { wide in
+            isWide = wide
+        }
+        #endif
         .toolbar {
             ActionsToolbar(session: session,
                            showInfo: $showInfo,
