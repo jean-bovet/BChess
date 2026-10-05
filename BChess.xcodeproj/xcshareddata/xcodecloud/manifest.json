@@ -1,0 +1,9 @@
+{
+  "id" : "1d644d04-2ead-41eb-a288-13cb936bb20d",
+  "targets" : [
+    {
+      "id" : "a0bc2201-4fbf-4a82-98d4-52f6f7e3350d",
+      "name" : "BChess (iOS)"
+    }
+  ]
+}
