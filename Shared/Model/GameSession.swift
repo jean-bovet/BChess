@@ -62,7 +62,8 @@ final class GameSession {
         return url.flatMap { try? String(contentsOf: $0, encoding: .utf8) } ?? ""
     }()
 
-    private let engine = FEngine()
+    /// Internal for the tests, which watch the search through its hooks.
+    let engine = FEngine()
 
     /// The persisted value. It changes only with the content of the game: moves, new game, paste,
     /// players and rotation. Selection, navigation and analysis never change it.
@@ -70,6 +71,8 @@ final class GameSession {
 
     var selection = Selection.empty()
     var lastMove: FEngineMove?
+    /// The engine's readout for the position on screen: the search of the computer's move while it thinks,
+    /// else the analysis of the position when `showsEngine`. Cleared on every position change.
     var info: FEngineInfo?
     var variations = Variations()
     var mode = GameMode()
@@ -77,6 +80,38 @@ final class GameSession {
 
     /// Bumped on every change to the engine, so that views reading engine-derived values refresh.
     private(set) var revision = 0
+
+    /// The engine readout is on: positions that the computer is not about to play are analyzed.
+    var showsEngine = false {
+        didSet {
+            guard showsEngine != oldValue else {
+                return
+            }
+            if showsEngine {
+                analyzeIfNeeded()
+            } else if isAnalyzing {
+                // Only an analysis: hiding the readout never drops the computer's move
+                isAnalyzing = false
+                engine.cancel()
+            }
+        }
+    }
+
+    /// The computer's move is pending: its move animation runs or its search does (the status line says
+    /// "thinking"). Set only on the path that ends in `requestEngineMoveIfNeeded()`.
+    private(set) var isThinking = false
+
+    /// An analysis search runs; `analysisID` identifies it.
+    private(set) var isAnalyzing = false
+    private(set) var analysisID = 0
+
+    /// How long a position is analyzed. The last result stays on screen afterwards.
+    static let analysisTime: TimeInterval = 10
+
+    /// The budget the next analysis gets; a seam for tests.
+    var analysisBudget = GameSession.analysisTime
+
+    private var hasStarted = false
 
     /// Identifies the position that a search result may be played on. Bumped on every change to the
     /// position, the players or the mode: a result computed for an earlier value is dropped.
@@ -93,7 +128,6 @@ final class GameSession {
     init(state: GameState = .newGame, mode: GameMode = GameMode()) {
         gameState = state
         self.mode = mode
-        engine.useOpeningBook = true
         _ = engine.loadOpening(Self.openingsPGN)
         if !engine.loadAllGames(state.pgn) {
             _ = engine.loadAllGames("*")
@@ -136,6 +170,12 @@ final class GameSession {
     var currentGameIndex: Int {
         _ = revision
         return Int(engine.currentGameIndex)
+    }
+
+    /// Why nothing can be played from the position on screen, or `.none`.
+    var gameEnd: GameEnd {
+        _ = revision
+        return engine.gameEnd
     }
 
     var currentMoveUUID: UInt {
@@ -207,16 +247,29 @@ final class GameSession {
 
     // MARK: Funnels
 
-    /// Any change to the position, the players or the mode: the pending search is dropped.
-    private func invalidate() {
+    /// Drops every pending search, the computer's and the analysis.
+    private func stopSearches() {
         positionID += 1
+        isThinking = false
+        isAnalyzing = false
         engine.cancel()
         revision += 1
     }
 
+    /// Any change to the position, the players or the mode: the pending searches are dropped and the
+    /// readout is cleared. `awaitingReply` is set only by a move that the computer is about to answer.
+    /// The new position is then analyzed when the readout is on.
+    private func invalidate(awaitingReply: Bool = false) {
+        stopSearches()
+        info = nil
+        let player = engine.isWhite() ? gameState.white : gameState.black
+        isThinking = awaitingReply && mode.value == .play && player.computer && engine.canPlay()
+        analyzeIfNeeded()
+    }
+
     /// A change to the content of the game: persist it and rebuild the move list.
-    private func contentDidChange() {
-        invalidate()
+    private func contentDidChange(awaitingReply: Bool = false) {
+        invalidate(awaitingReply: awaitingReply)
         gameState.pgn = mode.value == .play ? engine.pgnAllGames() : mode.pgnBeforeAnalyzing
         game.rebuild(engine: engine)
     }
@@ -225,7 +278,7 @@ final class GameSession {
 
     /// Drops any pending search; used when the session is replaced.
     func cancelSearch() {
-        invalidate()
+        stopSearches()
     }
 
     func rotate() {
@@ -250,25 +303,6 @@ final class GameSession {
     func select(rank: Int, file: Int) {
         selection = Selection(position: Position(rank: rank, file: file),
                               possibleMoves: engine.moves(at: UInt(rank), file: UInt(file)))
-    }
-
-    func undo() {
-        guard engine.canMove(to: .backward) else {
-            return
-        }
-        clearSelection()
-        engine.move(to: .backward, variation: 0)
-        invalidate()
-    }
-
-    func redo() {
-        guard engine.canMove(to: .forward) else {
-            return
-        }
-        clearSelection()
-        // Along the current line, which may be a variation
-        engine.move(to: .forward, variation: engine.nextVariation())
-        invalidate()
     }
 
     func move(to direction: Direction) {
@@ -320,17 +354,6 @@ final class GameSession {
         gameState.white = white
         gameState.black = black
         invalidate()
-    }
-
-    func newGame(white: GamePlayer, black: GamePlayer) {
-        gameState.white = white
-        gameState.black = black
-        mode = GameMode()
-        engine.setFEN(StartPosFEN)
-        info = nil
-        clearSelection()
-        variations = Variations()
-        contentDidChange()
     }
 
     /// Replaces the current game with a FEN or PGN text. A text that does not parse leaves the game
@@ -401,20 +424,17 @@ final class GameSession {
     /// the side to move, once the move animation has completed.
     func playHuman(_ move: FEngineMove) {
         perform(animated: {
-            self.play(rawMove: move.rawMoveValue, lastMove: move, info: nil)
+            self.play(rawMove: move.rawMoveValue, lastMove: move)
         }, then: {
             self.requestEngineMoveIfNeeded()
         })
     }
 
-    private func play(rawMove: UInt, lastMove: FEngineMove?, info: FEngineInfo?) {
+    private func play(rawMove: UInt, lastMove: FEngineMove?) {
         selection = Selection.empty()
         self.lastMove = lastMove
-        if let info {
-            self.info = info
-        }
         engine.move(rawMove)
-        contentDidChange()
+        contentDidChange(awaitingReply: true)
     }
 
     /// Runs `change` animated, then `next` when the animation has completed, unless the position has
@@ -435,21 +455,25 @@ final class GameSession {
     func requestEngineMoveIfNeeded() {
         // Don't play the engine while the user is analyzing the board
         guard mode.value == .play else {
-            return
+            return noReplyPending()
         }
 
         // Only play the computer if the current color matches a player who is a computer
         let white = engine.isWhite()
         let player = white ? gameState.white : gameState.black
         guard player.computer else {
-            return
+            return noReplyPending()
         }
 
         // Ensure the engine internal state allows it to play
         guard engine.canPlay() else {
-            return
+            return noReplyPending()
         }
 
+        // The search that starts here supersedes an analysis in the bridge
+        isThinking = true
+        isAnalyzing = false
+        engine.useOpeningBook = true
         engine.thinkingTime = player.thinkingTime
         engine.ttEnabled = UserDefaults.standard.bool(forKey: "useTranspositionTable")
 
@@ -464,6 +488,57 @@ final class GameSession {
         }
     }
 
+    /// The computer does not play this position: the readout may analyze it.
+    private func noReplyPending() {
+        isThinking = false
+        if !isAnalyzing {
+            analyzeIfNeeded()
+        }
+    }
+
+    /// Lets the computer play the position that the game is opened on, once per session: the board
+    /// appears again whenever the layout changes, which must not start a computer move on a position
+    /// the user navigated to.
+    func startIfNeeded() {
+        guard !hasStarted else {
+            return
+        }
+        hasStarted = true
+        requestEngineMoveIfNeeded()
+    }
+
+    /// Analyzes the position on screen when the readout is on, the computer is not about to play it
+    /// and the game is not over.
+    private func analyzeIfNeeded() {
+        guard showsEngine, !isThinking, engine.canPlay() else {
+            return
+        }
+        isAnalyzing = true
+        analysisID += 1
+        let id = analysisID
+        // A book move carries no evaluation
+        engine.useOpeningBook = false
+        engine.ttEnabled = UserDefaults.standard.bool(forKey: "useTranspositionTable")
+        engine.evaluate(Int.max, time: analysisBudget) { [weak self] info, completed in
+            DispatchQueue.main.async {
+                MainActor.assumeIsolated {
+                    self?.analysisDidUpdate(info, completed: completed, token: id)
+                }
+            }
+        }
+    }
+
+    /// Applies an analysis result to the readout. It has no path to `play`: an analysis never moves a piece.
+    func analysisDidUpdate(_ info: FEngineInfo, completed: Bool, token: Int) {
+        guard isAnalyzing, token == analysisID else {
+            return
+        }
+        self.info = info
+        if completed {
+            isAnalyzing = false
+        }
+    }
+
     /// The authority for I2 in the app: a result applies only to the position it was computed for.
     func searchDidUpdate(_ info: FEngineInfo, completed: Bool, token: Int) {
         guard token == positionID else {
@@ -472,10 +547,10 @@ final class GameSession {
         if completed {
             // A search that found no move (the position is over) plays nothing
             guard info.hasBestMove else {
-                return
+                return noReplyPending()
             }
             perform(animated: {
-                self.play(rawMove: info.bestMove, lastMove: info.bestEngineMove, info: info)
+                self.play(rawMove: info.bestMove, lastMove: info.bestEngineMove)
             }, then: {
                 self.requestEngineMoveIfNeeded()
             })

@@ -18,8 +18,8 @@ struct NewGameView_iOS: View {
     @State private var temporaryBlackPlayer = GamePlayer(name: "", computer: true, level: 0)
 
     var editMode: Bool
-    /// Starts the game elsewhere than in place; nil resets the session.
-    var onNewGame: ((GamePlayer, GamePlayer) -> Void)? = nil
+    /// Starts a new game in the library.
+    let onNewGame: (GamePlayer, GamePlayer) -> Void
     
     var body: some View {
         NavigationStack {
@@ -35,7 +35,7 @@ struct NewGameView_iOS: View {
                 temporaryWhitePlayer = session.gameState.white
                 temporaryBlackPlayer = session.gameState.black
             }
-            .navigationTitle(editMode ? "Settings" : "New Game")
+            .navigationTitle(editMode ? "Players & Level" : "New Game")
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
                     Button("Cancel") {
@@ -52,12 +52,7 @@ struct NewGameView_iOS: View {
                         }
                     } else {
                         Button("New Game") {
-                            if let onNewGame {
-                                onNewGame(temporaryWhitePlayer, temporaryBlackPlayer)
-                            } else {
-                                session.newGame(white: temporaryWhitePlayer, black: temporaryBlackPlayer)
-                                session.requestEngineMoveIfNeeded()
-                            }
+                            onNewGame(temporaryWhitePlayer, temporaryBlackPlayer)
                             dismiss()
                         }
                     }
@@ -68,9 +63,9 @@ struct NewGameView_iOS: View {
 }
 
 #Preview("New game") {
-    NewGameView_iOS(session: GameSession(), editMode: false)
+    NewGameView_iOS(session: GameSession(), editMode: false, onNewGame: { _, _ in })
 }
 
 #Preview("Edit game") {
-    NewGameView_iOS(session: GameSession(), editMode: true)
+    NewGameView_iOS(session: GameSession(), editMode: true, onNewGame: { _, _ in })
 }

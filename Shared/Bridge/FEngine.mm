@@ -152,10 +152,6 @@
     return [self getPGN:true];
 }
 
-- (NSString*)PGNFormattedForDisplay {
-    return NSStringFromString(engine.getPGNForDisplay());
-}
-
 - (void)moveNodesFromNode:(ChessGame::MoveNode)node
                  mainLine:(FEngineMoveNode*)mainLine {
     FEngineMoveNode *mainLineNodeWithVariants = nil;
@@ -265,11 +261,6 @@
     return (NSUInteger)engine.game().getNextVariationIndex();
 }
 
-- (NSUInteger)moveUUID:(Direction)direction {
-    auto nextIndexes = engine.game().moveIndexesTo([self gameDirection:direction]);
-    return engine.game().getMoveUUID(nextIndexes);
-}
-
 #pragma mark -
 
 - (void)stop {
@@ -293,6 +284,16 @@
 
 - (BOOL)canPlay {
     return engine.canPlay();
+}
+
+- (GameEnd)gameEnd {
+    switch (engine.gameEnd()) {
+        case ChessEngine::GameEnd::none: return GameEndNone;
+        case ChessEngine::GameEnd::checkmate: return GameEndCheckmate;
+        case ChessEngine::GameEnd::stalemate: return GameEndStalemate;
+        case ChessEngine::GameEnd::repetition: return GameEndRepetition;
+        case ChessEngine::GameEnd::finished: return GameEndFinished;
+    }
 }
 
 - (FEngineInfo*)infoFor:(ChessEvaluation)info game:(const ChessGame &)game {

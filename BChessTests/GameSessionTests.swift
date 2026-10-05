@@ -54,6 +54,22 @@ private func play(_ session: GameSession, _ from: String, _ to: String) {
     session.playHuman(move)
 }
 
+/// Counts the moves that the engine's search pushes, through the test hook: proof that a search runs.
+private final class SearchProbe: @unchecked Sendable {
+    private let lock = NSLock()
+    private var moves = 0
+
+    var count: Int {
+        lock.withLock { moves }
+    }
+
+    init(_ engine: FEngine) {
+        engine.setSearchCheckpoint { [self] in
+            lock.withLock { moves += 1 }
+        }
+    }
+}
+
 /// Waits, letting the main queue run, until the condition holds or the time is up.
 @MainActor
 private func waitUntil(_ seconds: TimeInterval = 5, _ condition: () -> Bool) async -> Bool {
@@ -74,8 +90,8 @@ struct GameSessionTests {
         let before = session.gameState
 
         session.select(rank: 1, file: 3)
-        session.undo()
-        session.redo()
+        session.move(to: .backward)
+        session.move(to: .forward)
         session.move(to: .start)
         session.move(to: .end)
         session.toggleAnalyze()
@@ -87,16 +103,16 @@ struct GameSessionTests {
         let state = try GameState(data: legacy, contentType: .json)
         let session = GameSession(state: state)
 
-        session.undo()
+        session.move(to: .backward)
         session.move(to: .start)
-        let uuid = try #require(session.game.moves.first?.whiteMove?.uuid)
+        let uuid = try #require(session.game.rows.first?.white?.uuid)
         session.selectMove(uuid: uuid)
         #expect(session.gameState == state)
     }
 
     @Test func selectMoveRebuildsPosition() throws {
         let session = GameSession(state: GameState(pgn: "1. e4 e5 2. Nf3 *", white: .human, black: .human))
-        let uuid = try #require(session.game.moves.first?.whiteMove?.uuid)
+        let uuid = try #require(session.game.rows.first?.white?.uuid)
         session.selectMove(uuid: uuid)
 
         #expect(session.fen == fen(after: [("e2", "e4")]))
@@ -105,44 +121,20 @@ struct GameSessionTests {
         #expect(session.canMove(to: .backward))
     }
 
-    @Test func undoRedo() {
+    @Test func backAndForward() {
         let session = GameSession(state: twoHumans)
         play(session, "e2", "e4")
         play(session, "e7", "e5")
         let pgn = session.gameState.pgn
 
-        session.undo()
+        session.move(to: .backward)
         #expect(session.fen == fen(after: [("e2", "e4")]))
         #expect(session.canMove(to: .forward))
         #expect(session.gameState.pgn == pgn)
 
-        session.redo()
+        session.move(to: .forward)
         #expect(session.fen == fen(after: [("e2", "e4"), ("e7", "e5")]))
         #expect(session.gameState.pgn == pgn)
-    }
-
-    @Test func redoFollowsTheSelectedBranch() throws {
-        let state = GameState(pgn: "1. e4 e5 (1... c5 2. Nf3) *", white: .human, black: .human)
-        let session = GameSession(state: state)
-
-        // The uuid of c5, the variation of e5
-        let reference = FEngine()
-        reference.loadAllGames(state.pgn)
-        let c5 = try #require(reference.moveNodesTree()[1].variations.first)
-        #expect(c5.name == "c5")
-
-        session.selectMove(uuid: c5.uuid)
-        let onBranch = fen(after: [("e2", "e4"), ("c7", "c5")])
-        #expect(session.fen == onBranch)
-
-        session.undo()
-        session.redo()
-        #expect(session.fen == onBranch)
-
-        // The forward button at a branch point asks instead (forwardAtABranchPointOffersTheChoices)
-        session.undo()
-        session.move(to: .forward)
-        #expect(session.variations.show)
     }
 
     @Test func backwardAtABranchPointJustGoesBack() throws {
@@ -239,12 +231,12 @@ struct GameSessionTests {
         play(session, "e2", "e4")
         let state = session.gameState
         let position = session.fen
-        let moves = session.game.moves.count
+        let moves = session.game.rows.count
 
         #expect(!session.paste("this is neither a FEN nor a PGN"))
         #expect(session.fen == position)
         #expect(session.gameState == state)
-        #expect(session.game.moves.count == moves)
+        #expect(session.game.rows.count == moves)
     }
 
     @Test func analyzeThenResetRestoresGame() {
@@ -290,37 +282,29 @@ struct GameSessionTests {
         #expect(session.gameState == state)
     }
 
-    @Test func newGameResets() {
-        let session = GameSession(state: twoHumans)
-        play(session, "e2", "e4")
-        session.select(rank: 6, file: 4)
-        #expect(session.lastMove != nil)
-
-        session.newGame(white: computerBlack, black: .human)
-        #expect(session.gameState.white == computerBlack)
-        #expect(session.gameState.black == .human)
-        #expect(session.fen == startFEN)
-        #expect(halfMoves(session) == 0)
-        #expect(session.selection.possibleMoves.isEmpty)
-        #expect(session.lastMove == nil)
-        #expect(session.info == nil)
-    }
-
     @Test func everyPositionChangeBumpsPositionID() throws {
         let session = GameSession(state: twoHumans)
+        session.showsEngine = true
+        defer { session.cancelSearch() }
         var last = session.positionID
+        var lastAnalysis = session.analysisID
         func expectBump(_ what: String, sourceLocation: SourceLocation = #_sourceLocation, _ change: () -> Void) {
             change()
             #expect(session.positionID > last, "\(what) did not bump the position", sourceLocation: sourceLocation)
             last = session.positionID
+            // The readout belongs to the new position: cleared, and a new analysis runs
+            #expect(session.info == nil, "\(what) kept the readout of the old position", sourceLocation: sourceLocation)
+            #expect(session.isAnalyzing, "\(what) did not analyze the new position", sourceLocation: sourceLocation)
+            #expect(session.analysisID > lastAnalysis, "\(what) reused an analysis", sourceLocation: sourceLocation)
+            lastAnalysis = session.analysisID
         }
 
         expectBump("play") { play(session, "e2", "e4") }
         expectBump("play") { play(session, "e7", "e5") }
-        expectBump("undo") { session.undo() }
-        expectBump("redo") { session.redo() }
+        expectBump("back") { session.move(to: .backward) }
+        expectBump("forward") { session.move(to: .forward) }
         expectBump("move(to:)") { session.move(to: .start) }
-        let uuid = try #require(session.game.moves.first?.whiteMove?.uuid)
+        let uuid = try #require(session.game.rows.first?.white?.uuid)
         expectBump("selectMove") { session.selectMove(uuid: uuid) }
         expectBump("selectGame") { session.selectGame(0) }
         expectBump("setPlayers") { session.setPlayers(white: .human, black: .human) }
@@ -329,7 +313,6 @@ struct GameSessionTests {
         expectBump("toggleAnalyze back") { session.toggleAnalyze() }
         expectBump("toggleTrain") { session.toggleTrain() }
         expectBump("toggleTrain back") { session.toggleTrain() }
-        expectBump("newGame") { session.newGame(white: .human, black: .human) }
         expectBump("load") { session.load(GameState(pgn: "1. c4 *")) }
     }
 
@@ -382,8 +365,8 @@ struct GameSessionTests {
 
         play(session, "e2", "e4")
         let afterE4 = session.fen
-        session.undo()
-        session.redo()
+        session.move(to: .backward)
+        session.move(to: .forward)
         completion?()
 
         // A book reply would come at once
@@ -399,9 +382,11 @@ struct GameSessionTests {
         // The opening book answers, one move after the other, without any further call
         #expect(await waitUntil { halfMoves(session) >= 3 })
 
-        session.newGame(white: .human, black: .human)
+        // Making both players human stops the game
+        session.setPlayers(white: .human, black: .human)
+        let stopped = halfMoves(session)
         try? await Task.sleep(for: .milliseconds(500))
-        #expect(halfMoves(session) == 0)
+        #expect(halfMoves(session) == stopped)
     }
 
     @Test func staleSearchResultIsIgnored() throws {
@@ -434,6 +419,275 @@ struct GameSessionTests {
         return result.value
     }
 
+    // MARK: Analysis of the position on screen
+
+    /// A White-to-move middlegame as a game with one move, so that Black is to move and one step back exists.
+    private func blackToMoveAfterAMove(white: GamePlayer = .human, black: GamePlayer = .human) -> GameSession {
+        let state = GameState(pgn: pgn(fen: middlegame.replacingOccurrences(of: " b ", with: " w ")), white: white, black: black)
+        let session = GameSession(state: state)
+        play(session, "h2", "h3")
+        return session
+    }
+
+    @Test func analysisRunsOnAHumanTurnWhenShown() async {
+        let session = GameSession(state: twoHumans)
+        defer { session.cancelSearch() }
+        #expect(!session.isAnalyzing)
+
+        session.showsEngine = true
+        #expect(session.isAnalyzing)
+        #expect(await waitUntil { session.info != nil })
+        // Not a book move: a real search with a depth
+        #expect((session.info?.depth ?? 0) > 0)
+        #expect(session.fen == startFEN)
+        #expect(halfMoves(session) == 0)
+    }
+
+    @Test func analysisNeverPlaysAMove() throws {
+        let session = GameSession(state: twoHumans)
+        session.showsEngine = true
+        let info = try #require(searchResult())
+        #expect(info.hasBestMove)
+
+        session.analysisDidUpdate(info, completed: true, token: session.analysisID)
+        #expect(halfMoves(session) == 0)
+        #expect(session.fen == startFEN)
+        #expect(!session.isAnalyzing)
+        #expect(session.info === info)
+    }
+
+    @Test func staleAnalysisIsIgnored() throws {
+        let session = GameSession(state: twoHumans)
+        defer { session.cancelSearch() }
+        session.showsEngine = true
+        let info = try #require(searchResult())
+
+        // The position changes: the old token no longer applies
+        let old = session.analysisID
+        play(session, "e2", "e4")
+        session.analysisDidUpdate(info, completed: false, token: old)
+        #expect(session.info !== info)
+        session.analysisDidUpdate(info, completed: true, token: old)
+        #expect(session.info !== info)
+        #expect(session.isAnalyzing)
+
+        // The same position analyzed a second time gets a new token
+        let first = session.analysisID
+        session.showsEngine = false
+        session.showsEngine = true
+        #expect(session.analysisID > first)
+        session.analysisDidUpdate(info, completed: true, token: first)
+        #expect(session.info !== info)
+        #expect(session.isAnalyzing)
+    }
+
+    @Test func staleAnalysisIsIgnoredAcrossAModeChange() throws {
+        let session = GameSession(state: twoHumans)
+        defer { session.cancelSearch() }
+        session.showsEngine = true
+        let oldID = session.analysisID
+        let info = try #require(searchResult())
+
+        // Same position, same side to move, new analysis
+        session.toggleAnalyze()
+        #expect(session.analysisID > oldID)
+        #expect(session.isAnalyzing)
+
+        session.analysisDidUpdate(info, completed: false, token: oldID)
+        #expect(session.info !== info)
+        session.analysisDidUpdate(info, completed: true, token: oldID)
+        #expect(session.info !== info)
+        #expect(session.isAnalyzing)
+    }
+
+    @Test func hidingTheEngineKeepsTheComputersMove() async {
+        let session = GameSession(state: GameState(pgn: pgn(fen: middlegame), white: .human, black: computerBlack))
+        session.showsEngine = true
+        #expect(session.isAnalyzing)
+
+        session.requestEngineMoveIfNeeded()
+        #expect(session.isThinking)
+        #expect(!session.isAnalyzing)
+        session.showsEngine = false
+
+        #expect(await waitUntil(4) { halfMoves(session) >= 1 })
+    }
+
+    @Test func hidingTheEngineStopsAnAnalysis() async {
+        let session = GameSession(state: twoHumans)
+        defer { session.cancelSearch() }
+        let probe = SearchProbe(session.engine)
+        session.showsEngine = true
+        #expect(session.isAnalyzing)
+        #expect(await waitUntil { probe.count > 0 })
+
+        session.showsEngine = false
+        #expect(!session.isAnalyzing)
+        // The search itself stops: it pushes no more moves
+        try? await Task.sleep(for: .milliseconds(200))
+        let settled = probe.count
+        try? await Task.sleep(for: .milliseconds(300))
+        #expect(probe.count == settled, "the search kept running after the engine was hidden")
+    }
+
+    @Test func backToAComputerTurnIsAnalyzed() async {
+        for shownFromTheStart in [false, true] {
+            let session = GameSession(state: GameState(pgn: "*", white: .human, black: computerBlack))
+            defer { session.cancelSearch() }
+            session.showsEngine = shownFromTheStart
+            play(session, "e2", "e4")
+            #expect(await waitUntil { halfMoves(session) >= 2 })
+
+            // Black, a computer, is to move again, but nobody is about to play it
+            session.move(to: .backward)
+            #expect(!session.isWhiteToMove)
+            session.showsEngine = true
+            #expect(!session.isThinking)
+            #expect(session.isAnalyzing)
+            #expect(await waitUntil { session.info != nil })
+        }
+    }
+
+    /// After `change`, the readout must never show a result computed for the position before it.
+    private func expectNoStaleReadout(_ session: GameSession, change: () -> Void,
+                                      sourceLocation: SourceLocation = #_sourceLocation) async {
+        #expect(await waitUntil { session.info != nil }, sourceLocation: sourceLocation)
+        #expect(session.info?.isWhite == false, sourceLocation: sourceLocation)
+        let id = session.analysisID
+
+        change()
+        #expect(session.analysisID > id, sourceLocation: sourceLocation)
+        #expect(session.isWhiteToMove, sourceLocation: sourceLocation)
+        let deadline = Date().addingTimeInterval(1.5)
+        while Date() < deadline {
+            if let info = session.info {
+                #expect(info.isWhite == session.isWhiteToMove, "a result for the other side landed", sourceLocation: sourceLocation)
+            }
+            try? await Task.sleep(for: .milliseconds(20))
+        }
+    }
+
+    @Test func realAnalysisIsDroppedOnPositionChange() async {
+        let back = blackToMoveAfterAMove()
+        defer { back.cancelSearch() }
+        back.showsEngine = true
+        await expectNoStaleReadout(back) { back.move(to: .backward) }
+
+        let pasted = blackToMoveAfterAMove()
+        defer { pasted.cancelSearch() }
+        pasted.showsEngine = true
+        let whiteToMove = middlegame.replacingOccurrences(of: " b ", with: " w ")
+        await expectNoStaleReadout(pasted) { _ = pasted.paste(whiteToMove) }
+    }
+
+    @Test func noAnalysisWhileTheComputerIsToPlay() async {
+        let session = GameSession(state: GameState(pgn: "*", white: .human, black: computerBlack))
+        defer { session.cancelSearch() }
+        var completion: (@MainActor () -> Void)?
+        session.animate = { change, done in
+            change()
+            completion = done
+        }
+        session.showsEngine = true
+        #expect(session.isAnalyzing)
+
+        // The move animation runs and the computer is about to reply
+        play(session, "e2", "e4")
+        #expect(session.isThinking)
+        #expect(!session.isAnalyzing)
+
+        completion?()
+        #expect(await waitUntil { halfMoves(session) >= 2 })
+        #expect(!session.isThinking)
+        #expect(session.isAnalyzing)
+    }
+
+    @Test func noAnalysisWhenTheGameIsOver() async throws {
+        let session = GameSession(state: GameState(pgn: "1. Nf3 Nf6 2. Ng1 Ng8 3. Nf3 Nf6 4. Ng1 Ng8 *", white: .human, black: .human))
+        #expect(session.gameEnd == .repetition)
+        session.showsEngine = true
+        #expect(!session.isAnalyzing)
+        try await Task.sleep(for: .milliseconds(300))
+        #expect(session.info == nil)
+    }
+
+    @Test func cancelSearchStartsNothing() async throws {
+        let session = GameSession(state: twoHumans)
+        session.showsEngine = true
+        #expect(session.isAnalyzing)
+
+        session.cancelSearch()
+        #expect(!session.isAnalyzing)
+        try await Task.sleep(for: .milliseconds(500))
+        #expect(!session.isAnalyzing)
+    }
+
+    @Test(.timeLimit(.minutes(1)))
+    func analysisStopsAtItsTimeLimit() async {
+        #expect(GameSession.analysisTime == 10)
+        #expect(GameSession().analysisBudget == GameSession.analysisTime)
+
+        // The budget that the session holds is the one that reaches the search
+        let session = GameSession(state: twoHumans)
+        session.analysisBudget = 3
+        session.showsEngine = true
+        try? await Task.sleep(for: .milliseconds(1500))
+        #expect(session.isAnalyzing, "the search stopped long before its budget")
+        #expect(await waitUntil(8) { !session.isAnalyzing })
+        // The last result stays on screen
+        #expect(session.info != nil)
+    }
+
+    @Test func aStaleCallbackQueuedBeforeAChangeIsRejected() async {
+        let session = blackToMoveAfterAMove()
+        defer { session.cancelSearch() }
+        let probe = SearchProbe(session.engine)
+        session.showsEngine = true
+
+        // Without yielding to the main queue, so that the callbacks of the search pile up behind us:
+        // the search has gone well past its first depth, whose callback is then queued
+        while probe.count < 5_000 {
+            usleep(1_000)
+        }
+        let id = session.analysisID
+        session.move(to: .backward)
+        #expect(session.analysisID > id)
+        #expect(session.isWhiteToMove)
+
+        // The main queue now runs the queued callbacks of the old analysis (Black to move) and then
+        // this continuation, which was queued before the new search could produce anything
+        await Task.yield()
+        #expect(session.info == nil, "a result for the old position landed")
+    }
+
+    @Test func theBoardAppearingAgainDoesNotStartTheComputer() async throws {
+        let session = GameSession(state: GameState(pgn: "*", white: .human, black: computerBlack))
+        defer { session.cancelSearch() }
+        session.startIfNeeded()
+        play(session, "e2", "e4")
+        #expect(await waitUntil { halfMoves(session) >= 2 })
+        // Back to Black's turn, which the computer plays but not from here
+        session.move(to: .backward)
+        #expect(!session.isWhiteToMove)
+        let count = halfMoves(session)
+
+        // A layout change recreates the board, which asks to start the game again
+        session.startIfNeeded()
+        #expect(!session.isThinking)
+        try await Task.sleep(for: .milliseconds(300))
+        #expect(!session.isThinking)
+        #expect(halfMoves(session) == count)
+    }
+
+    @Test func theComputerPlaysTheGameItOpensOn() async {
+        let state = GameState(pgn: pgn(fen: middlegame), white: .human, black: computerBlack)
+        let session = GameSession(state: state)
+        defer { session.cancelSearch() }
+        session.startIfNeeded()
+        #expect(session.isThinking)
+        #expect(await waitUntil { halfMoves(session) >= 1 })
+    }
+
     @Test func cancelledSearchNeverPlaysItsMove() async throws {
         let state = GameState(pgn: pgn(fen: middlegame.replacingOccurrences(of: " b ", with: " w ")), white: .human, black: computerBlack)
         let session = GameSession(state: state)
@@ -441,7 +695,7 @@ struct GameSessionTests {
 
         // White plays, which starts Black's search; then White takes the move back
         play(session, "h2", "h3")
-        session.undo()
+        session.move(to: .backward)
         try await Task.sleep(for: .milliseconds(2500))
         #expect(session.fen == before)
         #expect(session.lastMove == nil)

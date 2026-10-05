@@ -81,7 +81,7 @@ struct PiecesView: View {
         .onAppear() {
             // Start to play after this view appear which takes care of starting
             // the engine when the game is first shown
-            session.requestEngineMoveIfNeeded()
+            session.startIfNeeded()
         }
         .sheet(isPresented: $isPromotionViewShown) {
             PromotionView(promotion: $promotion, callback: { name in

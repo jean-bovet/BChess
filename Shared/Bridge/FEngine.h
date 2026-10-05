@@ -25,6 +25,15 @@ typedef NS_ENUM(NSInteger, Direction){
     forward
 };
 
+/** Why nothing can be played from the current position. */
+typedef NS_CLOSED_ENUM(NSInteger, GameEnd){
+    GameEndNone = 0,
+    GameEndCheckmate,
+    GameEndStalemate,
+    GameEndRepetition,
+    GameEndFinished
+};
+
 /** This class is the interface between the C++ engine and the Objective-C/Swift world*/
 @interface FEngine : NSObject
 
@@ -55,7 +64,6 @@ typedef NS_ENUM(NSInteger, Direction){
 - (NSString* _Nonnull)pgnAllGames;
 - (NSString* _Nonnull)getPGNCurrentGame;
 
-- (NSString* _Nonnull)PGNFormattedForDisplay;
 - (NSArray<FEngineMoveNode*>* _Nonnull)moveNodesTree;
 
 - (NSArray<FEngineMove*>* _Nonnull)allMoves;
@@ -71,7 +79,6 @@ typedef NS_ENUM(NSInteger, Direction){
 // The moves that can follow the current position, the main one first. Their order is the variation index.
 - (NSArray<FEngineMoveNode*>* _Nonnull)nextMoveChoices;
 // Returns the next move UUID given the direction
-- (NSUInteger)moveUUID:(Direction)direction;
 
 - (void)move:(NSString* _Nonnull)from to:(NSString* _Nonnull)to;
 
@@ -88,6 +95,8 @@ typedef NS_ENUM(NSInteger, Direction){
 - (BOOL)isWhite;
 
 - (BOOL)canPlay;
+
+@property (nonatomic, readonly) GameEnd gameEnd;
 
 - (void)analyze:(FEngineSearchCallback _Nonnull)callback;
 

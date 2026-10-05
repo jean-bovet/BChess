@@ -64,21 +64,28 @@ struct GameRootView: View {
     }
 }
 
+/// The sheets of the game screen that edit the players.
+private enum PlayersSheet: String, Identifiable {
+    case newGame
+    case players
+
+    var id: String { rawValue }
+}
+
 private struct GameView: View {
     let shell: GameShell
 
     @Environment(\.scenePhase) private var scenePhase
+    @AppStorage("showEngine") private var showEngine = false
     @State private var showGames = false
+    @State private var playersSheet: PlayersSheet?
     @State private var pending: PendingSwitch?
     @State private var actionError: String?
 
     var body: some View {
         NavigationStack {
-            ContentView(session: shell.session, onNewGame: { white, black in
-                attempt(.create(white, black))
-            })
+            ContentView(session: shell.session)
             .id(shell.current.url)
-            .navigationTitle(shell.current.title)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
@@ -86,11 +93,27 @@ private struct GameView: View {
                         Label("Games", systemImage: "list.bullet")
                     }
                 }
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    ShareLink(item: PGNExport(text: shell.session.gameState.pgn, name: shell.current.title),
-                              preview: SharePreview(shell.current.title)) {
-                        Label("Share", systemImage: "square.and.arrow.up")
+                ToolbarItem(placement: .principal) {
+                    VStack(spacing: 0) {
+                        Text(GameText.title(white: shell.session.gameState.white, black: shell.session.gameState.black))
+                            .font(.headline)
+                        if let opening = shell.session.openingName {
+                            Text(opening)
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
                     }
+                }
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    moreMenu
+                }
+                ToolbarItemGroup(placement: .bottomBar) {
+                    NavigationButtons(session: shell.session)
+                    Spacer()
+                    Toggle(isOn: $showEngine) {
+                        Label("Engine", systemImage: "gauge")
+                    }
+                    .toggleStyle(.button)
                 }
             }
         }
@@ -105,6 +128,11 @@ private struct GameView: View {
             if phase == .background {
                 shell.save()
             }
+        }
+        .sheet(item: $playersSheet) { sheet in
+            NewGameView_iOS(session: shell.session, editMode: sheet == .players, onNewGame: { white, black in
+                attempt(.create(white, black))
+            })
         }
         .sheet(isPresented: $showGames) {
             GamesList(shell: shell, attempt: attempt, actionError: $actionError)
@@ -130,6 +158,28 @@ private struct GameView: View {
             Button("OK", role: .cancel) { actionError = nil }
         } message: {
             Text(actionError ?? "")
+        }
+    }
+
+    private var moreMenu: some View {
+        Menu {
+            Button("New Game", systemImage: "plus.circle") { playersSheet = .newGame }
+            Button("Players & Level", systemImage: "person.2") { playersSheet = .players }
+            Button("Flip Board", systemImage: "arrow.triangle.2.circlepath.circle") { shell.session.rotate() }
+            ShareLink(item: PGNExport(text: shell.session.gameState.pgn, name: shell.current.title),
+                      preview: SharePreview(shell.current.title)) {
+                Label("Share Game", systemImage: "square.and.arrow.up")
+            }
+            Divider()
+            Button("Copy Position", systemImage: "doc.on.doc") { Pasteboard.set(shell.session.fen) }
+            Button("Copy Game", systemImage: "doc.on.doc") { Pasteboard.set(shell.session.pgnCurrentGame) }
+            Button("Paste Game or Position", systemImage: "arrow.down.circle") {
+                if let text = Pasteboard.string {
+                    _ = shell.session.paste(text)
+                }
+            }
+        } label: {
+            Label("More", systemImage: "ellipsis.circle")
         }
     }
 

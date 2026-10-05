@@ -30,6 +30,7 @@ struct NewPlayerConfigurationView: View {
     }
 }
 
+/// The players and their level, as a sheet of the game window.
 struct NewGameView: View {
     
     @Environment(\.dismiss) private var dismiss
@@ -39,10 +40,9 @@ struct NewGameView: View {
     @State private var temporaryWhitePlayer = GamePlayer(name: "", computer: true, level: 0)
     @State private var temporaryBlackPlayer = GamePlayer(name: "", computer: true, level: 0)
 
-    var editMode: Bool
-    
     var body: some View {
         VStack {
+            Text("Players & Level").font(.headline)
             GroupBox(label: Text("White Player").bold()) {
                 NewPlayerConfigurationView(player: $temporaryWhitePlayer)
             }
@@ -52,22 +52,16 @@ struct NewGameView: View {
             
             HStack {
                 Spacer()
-                if editMode {
-                    Button("OK") {
-                        session.setPlayers(white: temporaryWhitePlayer, black: temporaryBlackPlayer)
-                        session.requestEngineMoveIfNeeded()
-                        dismiss()
-                    }
-                } else {
-                    Button("Cancel") {
-                        dismiss()
-                    }
-                    Button("New Game") {
-                        session.newGame(white: temporaryWhitePlayer, black: temporaryBlackPlayer)
-                        session.requestEngineMoveIfNeeded()
-                        dismiss()
-                    }
+                Button("Cancel") {
+                    dismiss()
                 }
+                .keyboardShortcut(.cancelAction)
+                Button("OK") {
+                    session.setPlayers(white: temporaryWhitePlayer, black: temporaryBlackPlayer)
+                    session.requestEngineMoveIfNeeded()
+                    dismiss()
+                }
+                .keyboardShortcut(.defaultAction)
             }
         }
         .padding()
@@ -78,10 +72,6 @@ struct NewGameView: View {
     }
 }
 
-#Preview("New game") {
-    NewGameView(session: GameSession(), editMode: false)
-}
-
-#Preview("Edit game") {
-    NewGameView(session: GameSession(), editMode: true)
+#Preview("Players & Level") {
+    NewGameView(session: GameSession())
 }

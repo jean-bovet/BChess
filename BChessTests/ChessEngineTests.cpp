@@ -105,3 +105,50 @@ TEST_F(ChessEngineTests, CannotPlayFromTheRepeatedStartPosition) {
     ASSERT_TRUE(engine.setPGN("1. Nf3 Nf6 2. Ng1 Ng8 3. Nf3 Nf6 4. Ng1 *"));
     ASSERT_TRUE(engine.canPlay());
 }
+
+// The reason nothing can be played, for the status line.
+TEST_F(ChessEngineTests, GameEndCheckmate) {
+    ChessEngine engine;
+    ASSERT_TRUE(engine.setPGN("1. f3 e5 2. g4 Qh4#"));
+    ASSERT_EQ(ChessEngine::GameEnd::checkmate, engine.gameEnd());
+    
+    engine.game().moveTo(ChessGame::Direction::backward, 0);
+    ASSERT_EQ(ChessEngine::GameEnd::none, engine.gameEnd());
+}
+
+TEST_F(ChessEngineTests, GameEndStalemate) {
+    ChessEngine engine;
+    ASSERT_TRUE(engine.setFEN("7k/5Q2/6K1/8/8/8/8/8 b - - 0 1"));
+    ASSERT_EQ(ChessEngine::GameEnd::stalemate, engine.gameEnd());
+}
+
+TEST_F(ChessEngineTests, GameEndRepetition) {
+    ChessEngine engine;
+    ASSERT_TRUE(engine.setPGN("1. Nf3 Nf6 2. Ng1 Ng8 3. Nf3 Nf6 4. Ng1 Ng8 5. Nf3 Nf6 1/2-1/2"));
+    engine.game().moveTo(ChessGame::Direction::backward, 0);
+    ASSERT_EQ(ChessEngine::GameEnd::repetition, engine.gameEnd());
+}
+
+TEST_F(ChessEngineTests, GameEndDeclaredResult) {
+    ChessEngine engine;
+    ASSERT_TRUE(engine.setPGN("1. e4 1-0"));
+    ASSERT_EQ(ChessEngine::GameEnd::finished, engine.gameEnd());
+    
+    engine.game().moveTo(ChessGame::Direction::backward, 0);
+    ASSERT_EQ(ChessEngine::GameEnd::none, engine.gameEnd());
+}
+
+TEST_F(ChessEngineTests, CanPlayMatchesGameEnd) {
+    ChessEngine engine;
+    for (auto pgn : {"1. f3 e5 2. g4 Qh4#", "1. e4 1-0", "1. e4 e5 *",
+                     "1. Nf3 Nf6 2. Ng1 Ng8 3. Nf3 Nf6 4. Ng1 Ng8 5. Nf3 Nf6 1/2-1/2"}) {
+        ASSERT_TRUE(engine.setPGN(pgn));
+        // Every position of the line, from the end back to the start
+        do {
+            ASSERT_EQ(engine.canPlay(), engine.gameEnd() == ChessEngine::GameEnd::none) << pgn;
+        } while (engine.game().canMoveTo(ChessGame::Direction::backward) &&
+                 (engine.game().moveTo(ChessGame::Direction::backward, 0), true));
+    }
+    ASSERT_TRUE(engine.setFEN("7k/5Q2/6K1/8/8/8/8/8 b - - 0 1"));
+    ASSERT_EQ(engine.canPlay(), engine.gameEnd() == ChessEngine::GameEnd::none);
+}

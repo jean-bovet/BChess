@@ -19,6 +19,8 @@ struct BChessUIApp: App {
             let directory = FileManager.default.temporaryDirectory.appendingPathComponent("UITests-\(UUID().uuidString)", isDirectory: true)
             try? FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
             library = GameLibrary(directory: directory)
+            // ... and from the engine readout off, whatever an earlier run left behind
+            UserDefaults.standard.removeObject(forKey: "showEngine")
         } else {
             library = .documents
         }
@@ -28,7 +30,10 @@ struct BChessUIApp: App {
     var body: some Scene {
         #if os(macOS)
         DocumentGroup(newDocument: ChessDocument()) { file in
-            DocumentWindow(document: file.$document)
+            DocumentWindow(document: file.$document, isNew: file.fileURL == nil)
+        }
+        .commands {
+            GameCommands()
         }
         Settings {
             SettingsView()

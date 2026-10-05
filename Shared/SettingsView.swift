@@ -11,12 +11,15 @@ import SwiftUI
 struct SettingsView: View {
     @AppStorage("useTranspositionTable") private var ttTable = false
 
+    @AppStorage("showEngineStatistics") private var showStatistics = false
+
     var body: some View {
         Form {
             Toggle("Use Transposition Table (Beta)", isOn: $ttTable)
+            Toggle("Show engine statistics", isOn: $showStatistics)
         }
         .padding(20)
-        .frame(width: 350, height: 100)
+        .frame(width: 350, height: 120)
     }
 }
 

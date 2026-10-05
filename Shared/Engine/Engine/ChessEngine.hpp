@@ -93,10 +93,6 @@ public:
         }
     }
     
-    std::string getPGNForDisplay() {
-        return FPGN::getGame(game(), FPGN::Formatting::history, 0, game().getNumberOfMoves());
-    }
-    
     ChessGame::MoveNode getRootMoveNode() {
         return game().getRoot();
     }
@@ -139,19 +135,35 @@ public:
         return game().board.color == WHITE;
     }
     
-    // Whether a move can be played from the current position. Earlier positions of a finished game can
+    // Why nothing can be played from the current position, or none. Earlier positions of a finished game can
     // be played from, which starts a variation; the final position of a game with a result cannot, and
     // neither can a position that is drawn by repetition.
-    bool canPlay() {
+    enum class GameEnd {
+        none,
+        checkmate,
+        stalemate,
+        repetition,
+        finished // a declared result at the end of the line
+    };
+    
+    GameEnd gameEnd() {
         auto & g = game();
         if (ChessMoveGenerator::generateMoves(g.board).count == 0) {
-            return false;
+            return g.board.isCheck(g.board.color) ? GameEnd::checkmate : GameEnd::stalemate;
         }
         // A position that already occurred three times is drawn: a search finds no move in it
         if (ChessEvaluater::isDraw(g.board, g.history)) {
-            return false;
+            return GameEnd::repetition;
         }
-        return g.getNumberOfMoves() < g.getLineLength() || g.outcome == ChessGame::Outcome::in_progress;
+        if (g.getNumberOfMoves() < g.getLineLength() || g.outcome == ChessGame::Outcome::in_progress) {
+            return GameEnd::none;
+        }
+        return GameEnd::finished;
+    }
+    
+    // Whether a move can be played from the current position.
+    bool canPlay() {
+        return gameEnd() == GameEnd::none;
     }
     
     // Returns true if the current moves are following a valid opening line as defined

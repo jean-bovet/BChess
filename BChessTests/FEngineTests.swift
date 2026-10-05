@@ -29,4 +29,13 @@ struct FEngineTests {
         #expect(nodes.count == 6)
     }
 
+    @Test func gameEndCrossesTheBridge() {
+        let engine = FEngine()
+        #expect(engine.gameEnd == .none)
+
+        engine.setPGN("1. f3 e5 2. g4 Qh4#")
+        #expect(engine.gameEnd == .checkmate)
+        #expect(!engine.canPlay())
+    }
+
 }

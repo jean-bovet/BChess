@@ -1,0 +1,509 @@
+<title>BChess Screen Redesign</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Literata:opsz,wght@7..72,500;7..72,650&family=Atkinson+Hyperlegible:wght@400;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a design review — a short argument, then "today" and "proposed" phones side by side, then the change list and the open decisions. */
+:root {
+  --bg: #f3f4f2;
+  --surface: #ffffff;
+  --fg: #1d2220;
+  --muted: #5d6662;
+  --line: #d9ddd9;
+  --accent: #2c6e4f;
+  --accent-soft: #e2efe8;
+  --remove: #a3402f;
+  --remove-soft: #f6e4e0;
+  --move: #8a6418;
+  --move-soft: #f5ecd8;
+  /* The depicted phone keeps the app's own light look in both themes */
+  --phone-bg: #ffffff;
+  --phone-fg: #111111;
+  --phone-muted: #6b6b6b;
+  --phone-chip: #f0f0f0;
+  --phone-frame: #1b1b1b;
+  --sq-light: #ffffff;
+  --sq-dark: #8e8e93;
+  --phone-accent: #0a84ff;
+  --display: "Literata", Georgia, "Times New Roman", serif;
+  --body: "Atkinson Hyperlegible", -apple-system, "Segoe UI", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #141816; --surface: #1c211f; --fg: #e6eae7; --muted: #9aa49f; --line: #2f3633;
+    --accent: #6fc39a; --accent-soft: #1f3a2d; --remove: #e8846f; --remove-soft: #3d2420;
+    --move: #e0b45c; --move-soft: #3a2f18; --phone-frame: #000000;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #141816; --surface: #1c211f; --fg: #e6eae7; --muted: #9aa49f; --line: #2f3633;
+  --accent: #6fc39a; --accent-soft: #1f3a2d; --remove: #e8846f; --remove-soft: #3d2420;
+  --move: #e0b45c; --move-soft: #3a2f18; --phone-frame: #000000;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--fg); font-family: var(--body); font-size: 16px; line-height: 1.55; }
+.page { max-width: 1080px; margin: 0 auto; padding-inline: 20px; padding-block: 40px 72px; display: grid; gap: 56px; }
+h1, h2, h3 { font-family: var(--display); font-weight: 650; text-wrap: balance; margin: 0; letter-spacing: -0.01em; }
+h1 { font-size: clamp(2rem, 4.5vw, 2.9rem); line-height: 1.1; }
+h2 { font-size: 1.6rem; line-height: 1.2; }
+h3 { font-size: 1.1rem; }
+p { margin: 0; max-width: 65ch; }
+.eyebrow { font-size: 0.78rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); font-weight: 700; }
+header { display: grid; gap: 14px; }
+.lede { font-size: 1.15rem; color: var(--fg); }
+.rule { display: grid; gap: 10px; }
+.rule ol { margin: 0; padding-left: 1.3em; display: grid; gap: 6px; max-width: 65ch; }
+.rule li::marker { color: var(--accent); font-weight: 700; }
+section { display: grid; gap: 20px; }
+
+/* Comparison */
+.compare { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 32px; align-items: start; }
+.column { display: grid; gap: 14px; justify-items: center; min-width: 0; }
+.column-head { width: 100%; max-width: 340px; display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+.count { font-family: var(--mono); font-size: 0.85rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+.count b { color: var(--fg); font-weight: 500; }
+.shot { width: 100%; max-width: 300px; border-radius: 36px; border: 8px solid var(--phone-frame); display: block; background: var(--phone-bg); }
+.tabs { display: inline-flex; background: var(--surface); border: 1px solid var(--line); border-radius: 999px; padding: 3px; gap: 2px; flex-wrap: wrap; justify-content: center; }
+.tabs button { font: inherit; font-size: 0.85rem; border: 0; background: transparent; color: var(--muted); padding: 6px 12px; border-radius: 999px; cursor: pointer; }
+.tabs button[aria-pressed="true"] { background: var(--accent); color: var(--surface); font-weight: 700; }
+.tabs button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.caption { font-size: 0.9rem; color: var(--muted); max-width: 300px; text-align: center; min-height: 3em; }
+
+/* Mockup phone */
+.phone { width: 100%; max-width: 300px; aspect-ratio: 300 / 652; border: 8px solid var(--phone-frame); border-radius: 36px; background: var(--phone-bg); color: var(--phone-fg); overflow: hidden; position: relative; display: flex; flex-direction: column; font-family: -apple-system, "SF Pro Text", var(--body); font-size: 11px; }
+.status-bar { display: flex; justify-content: space-between; padding: 8px 18px 0; font-weight: 600; font-size: 10px; }
+.nav { display: flex; align-items: center; gap: 6px; padding: 8px 10px 4px; }
+.glass { width: 28px; height: 28px; border-radius: 50%; background: var(--phone-chip); display: grid; place-items: center; flex: none; }
+.glass svg { width: 14px; height: 14px; stroke: var(--phone-fg); fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.nav-title { flex: 1; text-align: center; font-weight: 700; font-size: 12px; line-height: 1.15; }
+.nav-title small { display: block; font-weight: 400; color: var(--phone-muted); font-size: 9.5px; }
+.player { display: flex; align-items: center; gap: 6px; padding: 4px 12px; font-size: 11px; }
+.turn-dot { width: 7px; height: 7px; border-radius: 50%; border: 1.5px solid var(--phone-fg); flex: none; }
+.turn-dot.on { background: var(--phone-fg); }
+.player .name { font-weight: 600; }
+.player .meta { color: var(--phone-muted); }
+.player .caps { margin-left: auto; letter-spacing: -1px; font-size: 12px; }
+.board { margin: 2px 10px; display: grid; grid-template-columns: repeat(8, 1fr); aspect-ratio: 1; border: 1px solid var(--sq-dark); max-width: 100%; }
+.sq { display: grid; place-items: center; font-size: 21px; line-height: 1; position: relative; }
+.sq.l { background: var(--sq-light); }
+.sq.d { background: var(--sq-dark); }
+.sq.last { box-shadow: inset 0 0 0 2px #f2a33a; }
+.sq .f, .sq .r { position: absolute; font-size: 7px; color: var(--phone-muted); font-family: var(--mono); }
+.sq .f { right: 2px; bottom: 1px; }
+.sq .r { left: 2px; top: 1px; }
+.sq.d .f, .sq.d .r { color: #ffffff; }
+.pc-w { color: #ffffff; -webkit-text-stroke: 0.9px #111111; }
+.pc-b { color: #111111; }
+.statusline { padding: 6px 12px 0; font-size: 11px; color: var(--phone-muted); display: flex; gap: 6px; align-items: baseline; min-height: 22px; }
+.statusline b { color: var(--phone-fg); }
+.engine { margin: 4px 12px 0; padding: 7px 9px; border-radius: 10px; background: var(--phone-chip); display: grid; gap: 3px; }
+.engine .row { display: flex; justify-content: space-between; gap: 8px; }
+.engine .eval { font-family: var(--mono); font-weight: 500; }
+.evalbar { height: 4px; border-radius: 2px; background: #111111; overflow: hidden; }
+.evalbar span { display: block; height: 100%; width: 54%; background: #ffffff; border-right: 1px solid #999999; box-shadow: inset 0 0 0 1px #cccccc; }
+.strip { margin: 6px 0 0; padding: 0 12px; display: flex; gap: 4px; overflow: hidden; white-space: nowrap; font-family: var(--mono); font-size: 10.5px; align-items: center; }
+.strip .mv { padding: 3px 5px; border-radius: 6px; }
+.strip .num { color: var(--phone-muted); }
+.strip .cur { background: var(--phone-fg); color: var(--phone-bg); }
+.strip .branch { color: var(--phone-accent); }
+.spacer { flex: 1; }
+.toolbar { display: flex; justify-content: space-between; align-items: center; padding: 6px 18px 14px; }
+.toolbar .pill { display: flex; gap: 2px; background: var(--phone-chip); border-radius: 999px; padding: 3px; }
+.toolbar .pill .glass { background: transparent; }
+.toolbar .glass.active { background: var(--phone-fg); }
+.toolbar .glass.active svg { stroke: var(--phone-bg); }
+.sheet { position: absolute; left: 0; right: 0; bottom: 0; top: 46%; background: var(--phone-bg); border-radius: 18px 18px 0 0; box-shadow: 0 -6px 24px rgba(0,0,0,0.18); padding: 8px 14px; display: grid; grid-template-rows: auto auto 1fr; gap: 8px; }
+.grabber { width: 34px; height: 4px; border-radius: 2px; background: #c7c7cc; justify-self: center; }
+.sheet-head { display: flex; justify-content: space-between; align-items: baseline; font-weight: 700; font-size: 12px; }
+.sheet-head span { color: var(--phone-accent); font-weight: 400; }
+.movelist { font-family: var(--mono); font-size: 10.5px; display: grid; gap: 0; align-content: start; }
+.movelist div { padding: 4px 0; border-bottom: 1px solid #ececec; display: grid; grid-template-columns: 22px 1fr 1fr; }
+.movelist .num { color: var(--phone-muted); }
+.movelist .var { grid-column: 2 / 4; color: var(--phone-accent); padding-left: 8px; }
+.movelist .cur { font-weight: 500; text-decoration: underline; }
+.menu { position: absolute; top: 44px; right: 10px; width: 62%; background: var(--phone-bg); border-radius: 14px; box-shadow: 0 8px 28px rgba(0,0,0,0.22); padding: 4px 0; font-size: 11px; display: grid; }
+.menu div { padding: 6px 12px; display: flex; justify-content: space-between; }
+.menu hr { border: 0; border-top: 1px solid #e5e5ea; margin: 3px 0; }
+.menu .icon { color: var(--phone-muted); }
+
+/* Change list */
+.changes { display: grid; gap: 10px; }
+.change { display: grid; grid-template-columns: 8.5rem 1fr; gap: 6px 18px; padding: 14px 16px; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; }
+.change .what { font-weight: 700; }
+.change .detail { color: var(--muted); grid-column: 2; min-width: 0; }
+.change .head { grid-column: 2; display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap; min-width: 0; }
+.tag { grid-row: span 2; align-self: start; justify-self: start; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; padding: 3px 8px; border-radius: 999px; }
+.tag.keep { background: var(--accent-soft); color: var(--accent); }
+.tag.move { background: var(--move-soft); color: var(--move); }
+.tag.remove { background: var(--remove-soft); color: var(--remove); }
+.tag.merge { background: var(--accent-soft); color: var(--accent); }
+code, .mono { font-family: var(--mono); font-size: 0.9em; }
+@media (max-width: 560px) {
+  .change { grid-template-columns: 1fr; }
+  .tag { grid-row: auto; }
+  .change .head, .change .detail { grid-column: 1; }
+}
+
+/* Decisions */
+.decisions { display: grid; gap: 14px; counter-reset: d; }
+.decision { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 16px 18px; display: grid; gap: 8px; }
+.decision h3 { display: flex; gap: 10px; align-items: baseline; }
+.decision h3::before { counter-increment: d; content: "D" counter(d); font-family: var(--mono); font-size: 0.85rem; color: var(--accent); font-weight: 500; }
+.rec { font-size: 0.95rem; }
+.rec b { color: var(--accent); }
+.mac { display: grid; gap: 10px; }
+.mac ul { margin: 0; padding-left: 1.2em; display: grid; gap: 6px; max-width: 70ch; }
+footer { color: var(--muted); font-size: 0.9rem; }
+/* Mac mockup */
+.mac-block { display: grid; gap: 14px; justify-items: center; }
+.column-head.wide, .caption.wide { max-width: 820px; }
+.caption.wide { min-height: 0; }
+.mac-shot { width: 100%; max-width: 820px; border-radius: 12px; border: 1px solid var(--line); box-shadow: 0 12px 32px rgba(0,0,0,0.12); display: block; }
+.mac-scroll { width: 100%; max-width: 820px; overflow-x: auto; padding-bottom: 6px; }
+.mac-window { width: 760px; margin: 0 auto; background: var(--phone-bg); color: var(--phone-fg); border-radius: 12px; border: 1px solid #c9c9c9; box-shadow: 0 12px 32px rgba(0,0,0,0.14); overflow: hidden; font-family: -apple-system, "SF Pro Text", var(--body); font-size: 12px; position: relative; }
+.menubar { display: flex; gap: 16px; align-items: center; padding: 4px 12px; background: #ececec; border-bottom: 1px solid #d4d4d4; font-size: 12px; position: relative; }
+.menubar .apple { width: 11px; height: 13px; border-radius: 5px 5px 6px 6px; background: #1d1d1f; display: inline-block; }
+.menubar span.open { background: var(--phone-accent); color: #ffffff; border-radius: 4px; padding: 0 6px; margin: 0 -6px; }
+.dropdown { position: absolute; top: 22px; z-index: 3; min-width: 220px; background: #f7f7f7; border: 1px solid #cfcfcf; border-radius: 8px; box-shadow: 0 10px 28px rgba(0,0,0,0.2); padding: 4px; display: grid; }
+.dropdown div { display: flex; justify-content: space-between; gap: 20px; padding: 3px 10px; border-radius: 4px; }
+.dropdown div:first-child { background: var(--phone-accent); color: #ffffff; }
+.dropdown div:first-child kbd { color: #ffffff; }
+.dropdown .dim, .dropdown div.dim:first-child { color: #a0a0a0; background: transparent; }
+.dropdown hr { border: 0; border-top: 1px solid #dcdcdc; margin: 3px 6px; }
+kbd { font-family: -apple-system, var(--body); color: #8a8a8a; }
+.titlebar { display: flex; align-items: center; gap: 14px; padding: 10px 14px; border-bottom: 1px solid #e3e3e3; }
+.lights { display: flex; gap: 7px; }
+.lights i { width: 12px; height: 12px; border-radius: 50%; background: #ff5f57; display: block; }
+.lights i:nth-child(2) { background: #febc2e; }
+.lights i:nth-child(3) { background: #28c840; }
+.wtitle { font-weight: 700; font-size: 13px; line-height: 1.15; }
+.wtitle small { display: block; font-weight: 400; color: var(--phone-muted); font-size: 11px; }
+.tbuttons { margin-left: auto; display: flex; gap: 8px; }
+.tb { height: 28px; min-width: 32px; padding: 0 8px; border-radius: 999px; background: var(--phone-chip); display: flex; align-items: center; justify-content: center; gap: 10px; }
+.tb svg { width: 14px; height: 14px; stroke: var(--phone-fg); fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.tb.active { background: var(--phone-fg); }
+.tb.active svg { stroke: var(--phone-bg); }
+.wbody { display: grid; grid-template-columns: 1fr 250px; gap: 18px; padding: 14px 16px 16px; }
+.wboard { display: grid; gap: 4px; align-content: start; }
+.mac-board { margin: 0; }
+.mac-board .sq { font-size: 34px; }
+.mac-board .sq .f, .mac-board .sq .r { font-size: 9px; }
+.wside { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.side-head { font-weight: 700; font-size: 13px; }
+.mac-moves { font-size: 12px; }
+.mac-moves div { grid-template-columns: 26px 1fr 1fr; }
+.side-status { margin-top: auto; color: var(--phone-muted); }
+.side-status b { color: var(--phone-fg); }
+.mac-engine { margin: auto 0 0; }
+.decision.done { opacity: 0.85; }
+.pill-done { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; padding: 2px 8px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); margin-right: 6px; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .phone .sheet, .phone .menu, .phone .engine, .dropdown, .mac-engine { animation: rise 220ms ease-out; }
+  @keyframes rise { from { transform: translateY(6px); opacity: 0.6; } to { transform: none; opacity: 1; } }
+}
+</style>
+
+<main class="page">
+  <header>
+    <span class="eyebrow">BChess · iPhone and Mac · design review</span>
+    <h1>The board is the app. Everything else earns its place.</h1>
+    <p class="lede">Today the game screen shows 19 controls and readouts, several of them twice. The proposal keeps 11 on screen, puts the rest one tap away, and turns the engine’s statistics into one sentence a player can use.</p>
+  </header>
+
+  <section class="rule">
+    <h2>Three rules for the screen</h2>
+    <ol>
+      <li><b>Board first.</b> The board gets the full width and nothing competes with it for attention.</li>
+      <li><b>One way to do each thing.</b> Undo/Redo and the ◀ ▶ buttons do the same thing today; keep one.</li>
+      <li><b>Show what a player reads, hide what an engine author reads.</b> “White is slightly better, best is h3” beats “Depth 12/18 with 1,204,331 nodes at 2,113,904 n/s”.</li>
+    </ol>
+  </section>
+
+  <section>
+    <h2>On iPhone</h2>
+    <div class="compare">
+      <div class="column">
+        <div class="column-head"><h3>Today</h3><span class="count"><b>19</b> on screen</span></div>
+        <img class="shot" alt="BChess on iPhone today: board, player rows, navigation buttons, game name, move list, engine rows, and a bottom bar with info, undo, redo and copy and paste" src="data:image/jpeg;base64,__TODAY__">
+        <p class="caption">Ruy Lopez after 8…O-O, with (i) on. Game name reads “-”; the title is the file’s timestamp.</p>
+      </div>
+      <div class="column">
+        <div class="column-head"><h3>Proposed</h3><span class="count"><b>11</b> on screen</span></div>
+        <div class="tabs" role="group" aria-label="Proposed screen state">
+          <button type="button" id="st-play" aria-pressed="true" data-state="play">Playing</button>
+          <button type="button" id="st-engine" aria-pressed="false" data-state="engine">Engine on</button>
+          <button type="button" id="st-moves" aria-pressed="false" data-state="moves">All moves</button>
+          <button type="button" id="st-menu" aria-pressed="false" data-state="menu">⋯ menu</button>
+        </div>
+        <div class="phone" id="phone" aria-label="Proposed BChess screen mockup">
+          <div class="status-bar"><span>9:41</span><span>●●● ▮</span></div>
+          <div class="nav">
+            <span class="glass" title="Games"><svg viewBox="0 0 16 16"><path d="M3 4h10M3 8h10M3 12h10"/></svg></span>
+            <div class="nav-title">You vs Computer<small>Ruy Lopez, Closed</small></div>
+            <span class="glass" title="More"><svg viewBox="0 0 16 16"><circle cx="3.5" cy="8" r="0.6"/><circle cx="8" cy="8" r="0.6"/><circle cx="12.5" cy="8" r="0.6"/></svg></span>
+          </div>
+          <div class="player"><span class="turn-dot"></span><span class="name">Computer</span><span class="meta">5 s</span><span class="caps pc-w">♙︎</span></div>
+          <div class="board" id="board"></div>
+          <div class="player"><span class="turn-dot on"></span><span class="name">You</span><span class="meta">to move</span><span class="caps pc-b">♟︎</span></div>
+          <div class="statusline" id="statusline"><b>Your move.</b> Last: 8…O-O</div>
+          <div class="engine" id="engine" hidden>
+            <div class="row"><span><b>White is slightly better</b></span><span class="eval">+0.4</span></div>
+            <div class="evalbar" aria-hidden="true"><span></span></div>
+            <div class="row"><span>Best: <span class="mono">9. h3</span> d5 10. exd5</span></div>
+          </div>
+          <div class="strip" aria-label="Move strip">
+            <span class="num">6.</span><span class="mv">Re1</span><span class="mv">b5</span>
+            <span class="num">7.</span><span class="mv">Bb3</span><span class="mv">d6</span>
+            <span class="num">8.</span><span class="mv">c3</span><span class="mv cur">O-O</span>
+            <span class="branch">⑂1</span>
+          </div>
+          <div class="spacer"></div>
+          <div class="toolbar">
+            <span class="pill">
+              <span class="glass" title="Back"><svg viewBox="0 0 16 16"><path d="M10 3 5 8l5 5"/></svg></span>
+              <span class="glass" title="Forward"><svg viewBox="0 0 16 16"><path d="m6 3 5 5-5 5"/></svg></span>
+            </span>
+            <span class="glass" id="engine-btn" title="Engine"><svg viewBox="0 0 16 16"><rect x="4" y="4" width="8" height="8" rx="1.5"/><path d="M6 2v2M10 2v2M6 12v2M10 12v2M2 6h2M2 10h2M12 6h2M12 10h2"/></svg></span>
+          </div>
+          <div class="sheet" id="sheet" hidden>
+            <div class="grabber"></div>
+            <div class="sheet-head">All moves<span>Done</span></div>
+            <div class="movelist">
+              <div><span class="num">1.</span><span>e4</span><span>e5</span></div>
+              <div><span class="num">2.</span><span>Nf3</span><span>Nc6</span></div>
+              <div><span class="num">3.</span><span>Bb5</span><span>a6</span><span class="var">(3…Nf6 4. O-O)</span></div>
+              <div><span class="num">4.</span><span>Ba4</span><span>Nf6</span></div>
+              <div><span class="num">5.</span><span>O-O</span><span>Be7</span></div>
+              <div><span class="num">6.</span><span>Re1</span><span>b5</span></div>
+              <div><span class="num">7.</span><span>Bb3</span><span>d6</span></div>
+              <div><span class="num">8.</span><span>c3</span><span class="cur">O-O</span></div>
+            </div>
+          </div>
+          <div class="menu" id="menu" hidden>
+            <div>New Game <span class="icon">＋</span></div>
+            <div>Players &amp; Level <span class="icon">◐</span></div>
+            <div>Flip Board <span class="icon">⇅</span></div>
+            <hr>
+            <div>Share Game <span class="icon">↑</span></div>
+            <div>Copy Position (FEN) <span class="icon">⧉</span></div>
+            <div>Paste Game or Position <span class="icon">⧉</span></div>
+          </div>
+        </div>
+        <p class="caption" id="caption">The board, two player rows, one status line and the last few moves. Back and forward are the only buttons below.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>What changes</h2>
+    <div class="changes">
+      <div class="change"><span class="tag merge">Merge</span><div class="head"><span class="what">Undo / Redo and ◀ ▶</span></div><p class="detail">Both step back and forward through the moves (<code>GameSession.undo()</code> is a move backward). Keep one pair, in the bottom bar. Touch and hold for the start or the end of the game.</p></div>
+      <div class="change"><span class="tag move">Move</span><div class="head"><span class="what">Copy &amp; Paste</span></div><p class="detail">Used rarely, yet it holds a bottom-bar slot today. It moves into the ⋯ menu with Share, which leaves the top bar with two buttons.</p></div>
+      <div class="change"><span class="tag merge">Merge</span><div class="head"><span class="what">Share</span></div><p class="detail">Today a separate top-bar button. In the proposal it is “Share Game” in the ⋯ menu.</p></div>
+      <div class="change"><span class="tag keep">Replace</span><div class="head"><span class="what">The (i) panel</span></div><p class="detail">The panel splits by what a player needs. The last few moves are always visible as a one-line strip: tap a move to jump to it, tap the strip for every move with comments and variations. The engine gets its own button.</p></div>
+      <div class="change"><span class="tag keep">Simplify</span><div class="head"><span class="what">Engine readout</span></div><p class="detail">One sentence, the evaluation, a thin bar, and the best line, shown only while the engine button is on. Depth, nodes and nodes per second go away on iPhone (on the Mac they could stay behind a setting, see D3).</p></div>
+      <div class="change"><span class="tag remove">Remove</span><div class="head"><span class="what">Game name row (“-”)</span></div><p class="detail">The PGN event name is almost always empty. The title already names the game.</p></div>
+      <div class="change"><span class="tag keep">Rename</span><div class="head"><span class="what">Title “Game 2026-10-05 14.28.29”</span></div><p class="detail">The title shows the players (“You vs Computer”) and the opening underneath when it is known. The date stays in the Games list.</p></div>
+      <div class="change"><span class="tag keep">Simplify</span><div class="head"><span class="what">Player rows</span></div><p class="detail">“Computer · 5 s” and “You · to move” read better than a cpu icon, a person icon, “White”, “Black” and a hollow or filled triangle. A dot shows whose turn it is. Captured pieces stay, they are small and useful.</p></div>
+      <div class="change"><span class="tag move">Move</span><div class="head"><span class="what">New Game, “Settings”, Flip Board</span></div><p class="detail">They stay in the ⋯ menu. The sheet titled “Settings” becomes “Players &amp; Level”, which is what it edits.</p></div>
+      <div class="change"><span class="tag keep">Keep</span><div class="head"><span class="what">Variation arrows on the board</span></div><p class="detail">When the next move has alternatives, the arrows on the board stay the way to pick one. The ⑂ mark in the strip says a variation exists.</p></div>
+    </div>
+  </section>
+
+  <section class="mac">
+    <h2>On the Mac</h2>
+    <p>The same rules, with room to spare. The window keeps the full move list beside the board, so the iPhone’s move strip isn’t needed. The toolbar holds the few actions used during a game, and everything else goes to the menu bar, where Mac users look for it.</p>
+
+    <div class="mac-block">
+      <div class="column-head wide"><h3>Today</h3><span class="count"><b>14</b> on screen</span></div>
+      <img class="mac-shot" alt="BChess on the Mac today: the board on the left with Black and White rows, two toolbar menus at top right, and a sidebar with four navigation buttons, a game name row reading a dash, and the move list" src="data:image/jpeg;base64,__MACTODAY__">
+      <p class="caption wide">Same game. The title is the file name, the toolbar has two drop-down menus (Board, Copy &amp; Paste), and the sidebar starts with ◀ ▶ buttons and a “-” game name row.</p>
+    </div>
+
+    <div class="mac-block">
+      <div class="column-head wide"><h3>Proposed</h3><span class="count"><b>12</b> on screen</span></div>
+      <div class="tabs" role="group" aria-label="Proposed Mac window state">
+        <button type="button" id="mst-play" aria-pressed="true" data-mstate="play">Playing</button>
+        <button type="button" id="mst-engine" aria-pressed="false" data-mstate="engine">Engine on</button>
+        <button type="button" id="mst-game" aria-pressed="false" data-mstate="game">Game menu</button>
+        <button type="button" id="mst-edit" aria-pressed="false" data-mstate="edit">Edit menu</button>
+      </div>
+      <div class="mac-scroll">
+        <div class="mac-window" aria-label="Proposed BChess Mac window mockup">
+          <div class="menubar">
+            <span class="apple"></span><b>BChess</b><span>File</span><span id="mb-edit">Edit</span><span id="mb-game">Game</span><span>View</span><span>Window</span><span>Help</span>
+            <div class="dropdown" id="dd-game" hidden style="left: 168px">
+              <div>New Game <kbd>⌘N</kbd></div>
+              <div>Players &amp; Level… <kbd>⌘,</kbd></div>
+              <div>Flip Board <kbd>⌘R</kbd></div>
+              <hr>
+              <div>Back <kbd>←</kbd></div>
+              <div>Forward <kbd>→</kbd></div>
+              <div>Start of Game <kbd>⌘←</kbd></div>
+              <div>End of Game <kbd>⌘→</kbd></div>
+              <hr>
+              <div>Show Engine <kbd>⌘E</kbd></div>
+              <div>Analyze Game</div>
+              <div>Practice Openings</div>
+            </div>
+            <div class="dropdown" id="dd-edit" hidden style="left: 126px">
+              <div class="dim">Undo <kbd>⌘Z</kbd></div>
+              <hr>
+              <div>Copy Game <kbd>⌘C</kbd></div>
+              <div>Copy Position <kbd>⌥⌘C</kbd></div>
+              <div>Paste Game or Position <kbd>⌘V</kbd></div>
+            </div>
+          </div>
+          <div class="titlebar">
+            <span class="lights"><i></i><i></i><i></i></span>
+            <div class="wtitle">You vs Computer<small>Ruy Lopez, Closed</small></div>
+            <div class="tbuttons">
+              <span class="tb" title="New Game"><svg viewBox="0 0 16 16"><path d="M8 3v10M3 8h10"/></svg></span>
+              <span class="tb" title="Flip Board"><svg viewBox="0 0 16 16"><path d="M5 2v11M2.5 10.5 5 13l2.5-2.5M11 14V3M8.5 5.5 11 3l2.5 2.5"/></svg></span>
+              <span class="tb pair"><svg viewBox="0 0 16 16"><path d="M10 3 5 8l5 5"/></svg><svg viewBox="0 0 16 16"><path d="m6 3 5 5-5 5"/></svg></span>
+              <span class="tb" id="mac-engine-btn" title="Show Engine"><svg viewBox="0 0 16 16"><rect x="4" y="4" width="8" height="8" rx="1.5"/><path d="M6 2v2M10 2v2M6 12v2M10 12v2M2 6h2M2 10h2M12 6h2M12 10h2"/></svg></span>
+            </div>
+          </div>
+          <div class="wbody">
+            <div class="wboard">
+              <div class="player"><span class="turn-dot"></span><span class="name">Computer</span><span class="meta">5 s</span><span class="caps pc-w">♙︎</span></div>
+              <div class="board mac-board" id="mac-board"></div>
+              <div class="player"><span class="turn-dot on"></span><span class="name">You</span><span class="meta">to move</span><span class="caps pc-b">♟︎</span></div>
+            </div>
+            <div class="wside">
+              <div class="side-head">Ruy Lopez, Closed</div>
+              <div class="movelist mac-moves">
+                <div><span class="num">1.</span><span>e4</span><span>e5</span></div>
+                <div><span class="num">2.</span><span>Nf3</span><span>Nc6</span></div>
+                <div><span class="num">3.</span><span>Bb5</span><span>a6</span><span class="var">(3…Nf6 4. O-O)</span></div>
+                <div><span class="num">4.</span><span>Ba4</span><span>Nf6</span></div>
+                <div><span class="num">5.</span><span>O-O</span><span>Be7</span></div>
+                <div><span class="num">6.</span><span>Re1</span><span>b5</span></div>
+                <div><span class="num">7.</span><span>Bb3</span><span>d6</span></div>
+                <div><span class="num">8.</span><span>c3</span><span class="cur">O-O</span></div>
+              </div>
+              <div class="side-status" id="mac-status"><b>Your move.</b></div>
+              <div class="engine mac-engine" id="mac-engine" hidden>
+                <div class="row"><span><b>White is slightly better</b></span><span class="eval">+0.4</span></div>
+                <div class="evalbar" aria-hidden="true"><span></span></div>
+                <div class="row"><span>Best: <span class="mono">9. h3</span> d5 10. exd5 Nxd5</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <p class="caption wide" id="mac-caption"></p>
+    </div>
+
+    <div class="changes">
+      <div class="change"><span class="tag keep">Rename</span><div class="head"><span class="what">Window title “Ruy Lopez.bchess”</span></div><p class="detail">The title shows the players and the subtitle the opening, as on iPhone. The file name stays in the title’s menu and the proxy icon, as in every document app.</p></div>
+      <div class="change"><span class="tag move">Move</span><div class="head"><span class="what">◀ ▶ buttons in the sidebar</span></div><p class="detail">They join the toolbar as one back/forward pair, with ← and → on the keyboard and ⌘← / ⌘→ for the start and end.</p></div>
+      <div class="change"><span class="tag move">Move</span><div class="head"><span class="what">Board ▾ toolbar menu</span></div><p class="detail">Becomes a Game menu in the menu bar with shortcuts. New Game and Flip Board also get toolbar buttons because they are used during play.</p></div>
+      <div class="change"><span class="tag move">Move</span><div class="head"><span class="what">Copy &amp; Paste ▾ toolbar menu</span></div><p class="detail">Goes to the standard Edit menu: ⌘C copies the game, ⌥⌘C the position, ⌘V pastes either. The toolbar menu goes away.</p></div>
+      <div class="change"><span class="tag remove">Remove</span><div class="head"><span class="what">Game name row (“-”)</span></div><p class="detail">Same as iPhone. The opening becomes the sidebar’s heading.</p></div>
+      <div class="change"><span class="tag keep">Simplify</span><div class="head"><span class="what">Engine readout</span></div><p class="detail">The same sentence, evaluation, bar and best line as iPhone, at the bottom of the sidebar while Show Engine is on. Depth, nodes and speed only appear with “Show engine statistics” in Settings (decided, D3).</p></div>
+      <div class="change"><span class="tag keep">Keep</span><div class="head"><span class="what">The full move list</span></div><p class="detail">The Mac has the room, so the sidebar keeps every move with variations in place, as a two-column list a chess player reads like a score sheet.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Decisions</h2>
+    <div class="decisions">
+      <div class="decision done"><h3>Engine on iPhone: button or always on?</h3><p class="rec"><span class="pill-done">Decided</span> A button, off by default. It keeps the screen calm and stops the engine from coaching during a game.</p></div>
+      <div class="decision done"><h3>Analyze Game and Practice Openings on iPhone</h3><p class="rec"><span class="pill-done">Decided</span> Left out for now. They stay in the Mac’s Game menu; the iPhone app gets simpler first.</p></div>
+      <div class="decision done"><h3>Engine statistics on the Mac</h3><p class="rec"><span class="pill-done">Decided</span> Behind “Show engine statistics” in Settings, off by default.</p></div>
+      <div class="decision done"><h3>Board colors</h3><p class="rec"><span class="pill-done">Decided</span> Unchanged in this pass.</p></div>
+      <div class="decision"><h3>New Game on the Mac</h3><p class="rec">Today New Game restarts the open document in place, while File › New opens another window. On iPhone, New Game now adds a game and keeps the old one. <b>Recommend: on the Mac, New Game (⌘N) opens a new window with the players sheet, so the finished game is kept, as on iPhone.</b> Restarting in place goes away.</p></div>
+    </div>
+  </section>
+
+  <footer>Mockup drawn from the real position (Ruy Lopez, Closed, after 8…O-O). Screenshots from the iOS 26.5 simulator and macOS, on main at 3c0611a.</footer>
+</main>
+
+<script>
+(function () {
+  var fen = "r1bq1rk1/2p1bppp/p1np1n2/1p2p3/4P3/1BP2N2/PP1P1PPP/RNBQR1K1";
+  var glyph = { k: "♚", q: "♛", r: "♜", b: "♝", n: "♞", p: "♟" };
+  var board = document.getElementById("board");
+  var rows = fen.split("/");
+  for (var r = 0; r < 8; r++) {
+    var file = 0;
+    for (var i = 0; i < rows[r].length; i++) {
+      var ch = rows[r][i];
+      if (/[1-8]/.test(ch)) {
+        for (var e = 0; e < Number(ch); e++) { addSquare(r, file++, null); }
+      } else {
+        addSquare(r, file++, ch);
+      }
+    }
+  }
+  function addSquare(r, f, piece) {
+    var sq = document.createElement("div");
+    var dark = (r + f) % 2 === 1;
+    sq.className = "sq " + (dark ? "d" : "l");
+    // Last move 8...O-O: king e8 to g8, rook h8 to f8
+    if (r === 0 && (f === 4 || f === 6)) { sq.className += " last"; }
+    if (piece) {
+      var s = document.createElement("span");
+      var white = piece === piece.toUpperCase();
+      s.className = white ? "pc-w" : "pc-b";
+      s.textContent = glyph[piece.toLowerCase()] + "︎";
+      sq.appendChild(s);
+    }
+    if (f === 0) { var rk = document.createElement("span"); rk.className = "r"; rk.textContent = String(8 - r); sq.appendChild(rk); }
+    if (r === 7) { var fl = document.createElement("span"); fl.className = "f"; fl.textContent = "abcdefgh"[f]; sq.appendChild(fl); }
+    board.appendChild(sq);
+  }
+
+  var captions = {
+    play: "The board, two player rows, one status line and the last few moves. Back and forward are the only buttons below.",
+    engine: "The engine button on: one sentence, the evaluation with a thin bar, and the best line. No depth, nodes or speed.",
+    moves: "Tap the move strip: every move with comments and variations, the list that sits in the (i) panel today. Tap a move to jump to it.",
+    menu: "⋯ holds everything used now and then: New Game, Players & Level, Flip Board, Share, Copy and Paste."
+  };
+  var buttons = document.querySelectorAll(".tabs button");
+  function show(state) {
+    buttons.forEach(function (b) { b.setAttribute("aria-pressed", String(b.dataset.state === state)); });
+    document.getElementById("engine").hidden = state !== "engine";
+    document.getElementById("statusline").hidden = state === "engine";
+    document.getElementById("engine-btn").classList.toggle("active", state === "engine");
+    document.getElementById("sheet").hidden = state !== "moves";
+    document.getElementById("menu").hidden = state !== "menu";
+    document.getElementById("caption").textContent = captions[state];
+    try { localStorage.setItem("bchess-review-state", state); } catch (err) {}
+  }
+  buttons.forEach(function (b) { b.addEventListener("click", function () { show(b.dataset.state); }); });
+  var saved = null;
+  try { saved = localStorage.getItem("bchess-review-state"); } catch (err) {}
+  show(captions[saved] ? saved : "play");
+  var macBoard = document.getElementById("mac-board");
+  macBoard.innerHTML = board.innerHTML;
+  var macCaptions = {
+    play: "The board, two player rows, the opening as the sidebar heading and every move. The toolbar has New Game, Flip Board, back and forward, and the engine.",
+    engine: "Show Engine on: the same sentence, evaluation, bar and best line as on iPhone, at the bottom of the sidebar.",
+    game: "The Game menu takes over the Board drop-down: New Game, Players & Level, Flip Board, navigation with arrow keys, and the analysis modes.",
+    edit: "Copy and Paste live where Mac users expect them: ⌘C copies the game, ⌥⌘C the position, ⌘V pastes either."
+  };
+  var mbuttons = document.querySelectorAll("[data-mstate]");
+  function showMac(state) {
+    mbuttons.forEach(function (b) { b.setAttribute("aria-pressed", String(b.dataset.mstate === state)); });
+    document.getElementById("mac-engine").hidden = state !== "engine";
+    document.getElementById("mac-status").hidden = state === "engine";
+    document.getElementById("mac-engine-btn").classList.toggle("active", state === "engine");
+    document.getElementById("dd-game").hidden = state !== "game";
+    document.getElementById("dd-edit").hidden = state !== "edit";
+    document.getElementById("mb-game").classList.toggle("open", state === "game");
+    document.getElementById("mb-edit").classList.toggle("open", state === "edit");
+    document.getElementById("mac-caption").textContent = macCaptions[state];
+    try { localStorage.setItem("bchess-review-mac-state", state); } catch (err) {}
+  }
+  mbuttons.forEach(function (b) { b.addEventListener("click", function () { showMac(b.dataset.mstate); }); });
+  var msaved = null;
+  try { msaved = localStorage.getItem("bchess-review-mac-state"); } catch (err) {}
+  showMac(macCaptions[msaved] ? msaved : "play");
+})();
+</script>
