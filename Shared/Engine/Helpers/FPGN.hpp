@@ -51,6 +51,8 @@ public:
 
     bool parseTerminationMarker();
     bool parseComment(std::string & comment);
+    bool parseNAG();
+    void consumeAfterMove();
     
     void eatWhiteSpaces();
 
@@ -59,6 +61,7 @@ public:
     enum class SANType {
         tight, // Ne6
         medium, // Nde6
+        rank, // N1e6
         full, // Nd4e6
         uci // d4e6
     };

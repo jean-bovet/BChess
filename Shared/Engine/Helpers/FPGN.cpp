@@ -205,6 +205,16 @@ std::string FPGN::to_string(Move move, SANType sanType) {
                 break;
             }
                 
+            case SANType::rank: {
+                pgn += pgnPiece(piece);
+                pgn += fromSquare.substr(1, 1);
+                if (isCapture) {
+                    pgn += "x";
+                }
+                pgn += toSquare;
+                break;
+            }
+                
             case SANType::uci:
                 // Handled above
                 break;
@@ -416,6 +426,12 @@ bool FPGN::parseMove(Move &move) {
         fromRank = getRank(pgn[cursor++]);
         toFile = getFile(pgn[cursor++]);
         toRank = getRank(pgn[cursor++]);
+    } else if (isRank(pgn[cursor]) && pgn[cursor+1] == 'x' && isFile(pgn[cursor+2]) && isRank(pgn[cursor+3])) {
+        // R1xe2
+        fromRank = getRank(pgn[cursor++]);
+        cursor++;
+        toFile = getFile(pgn[cursor++]);
+        toRank = getRank(pgn[cursor++]);
     } else if (isFile(pgn[cursor]) && isFile(pgn[cursor+1]) && isRank(pgn[cursor+2])) {
         // Nbd7
         // Rae8
@@ -479,19 +495,32 @@ bool FPGN::parseMove(Move &move) {
         RETURN_FAILURE("Invalid SAN representation of the move")
     }
 
-    // 8.2.3.5: Check and checkmate indication characters
+    // A check mark before the promotion is not SAN but older BChess output accepted it
     if (isCheckOrMate(pgn[cursor])) {
         cursor++;
-    } else if (parseMoveAnnotation()) {
-        // Check for annotation style (ie g6?!)
     }
     
-    // Handle promotion
+    // Handle promotion: the piece must be spelled out
     Piece promotedPiece = (Piece)0;
     if (isPromotion(pgn[cursor])) {
         cursor++;
-        parsePiece(promotedPiece);
+        switch (pgn[cursor]) {
+            case 'Q': promotedPiece = QUEEN; break;
+            case 'R': promotedPiece = ROOK; break;
+            case 'B': promotedPiece = BISHOP; break;
+            case 'N': promotedPiece = KNIGHT; break;
+            default:
+                move = 0;
+                RETURN_FAILURE("Invalid promotion piece")
+        }
+        cursor++;
     }
+    
+    // 8.2.3.5: Check and checkmate indication characters, then the annotation (ie g6?! or Qh5+!)
+    if (isCheckOrMate(pgn[cursor])) {
+        cursor++;
+    }
+    parseMoveAnnotation();
     
     // The target square must be fully defined at this point
     assert(toFile != FileUndefined);
@@ -594,7 +623,7 @@ bool FPGN::parseMoveText() {
     }
 
     std::string comment;
-    while (parseComment(comment)) { } // optional
+    while (parseComment(comment) || parseNAG()) { } // optional
 
     game.move(whiteMove, comment, false);
 
@@ -605,7 +634,7 @@ bool FPGN::parseMoveText() {
 //    }
 //    game.board.print();
 
-    while (parseVariation()) { } // Parse zero or more variations
+    consumeAfterMove();
         
     // Return now if the moveText was actually only for black
     if (isMoveForBlack) {
@@ -626,7 +655,9 @@ bool FPGN::parseMoveText() {
     // Sometimes the move number is repeated for the black move
     if (isDigit(character())) {
         if (parseMoveNumber(moveNumber, isMoveForBlack)) {
-            assert(isMoveForBlack); // it should always be for black
+            if (!isMoveForBlack) {
+                RETURN_FAILURE("Black move number expected")
+            }
         } else {
             RETURN_FAILURE("Invalid black move number")
         }
@@ -642,11 +673,11 @@ bool FPGN::parseMoveText() {
     //    game.board.print();
 
     comment = "";
-    while (parseComment(comment)) { } // optional
+    while (parseComment(comment) || parseNAG()) { } // optional
 
     game.move(blackMove, comment, false);
 
-    while (parseVariation()) { } // Parse zero or more variations
+    consumeAfterMove();
 
     return true;
 }
@@ -666,6 +697,27 @@ bool FPGN::parseComment(std::string & comment) {
     } else {
         RETURN_FAILURE_SILENT("Unexpected comment starting character", true)
     }
+}
+
+// Parse a numeric annotation glyph in the form: $14. Ignored.
+bool FPGN::parseNAG() {
+    PARSE_BEGIN
+    
+    if (character() != '$' || !isDigit(character(1))) {
+        RETURN_FAILURE_SILENT("Unexpected NAG starting character", true)
+    }
+    cursor++;
+    while (isDigit(character())) {
+        cursor++;
+    }
+    return true;
+}
+
+// After a move: variations, NAGs and comments in any order. A comment here follows a variation and
+// has no move to attach to, so it is consumed and dropped.
+void FPGN::consumeAfterMove() {
+    std::string ignored;
+    while (parseVariation() || parseNAG() || parseComment(ignored)) { }
 }
 
 bool FPGN::setGame(std::string pgn, ChessGame &game) {
@@ -690,12 +742,14 @@ bool FPGN::parseTag(bool lookahead) {
 
     std::string tagName;
     std::string tagValue;
-    auto result = parseString(pgn, cursor, tagName);
-    assert(result);
+    if (!parseString(pgn, cursor, tagName)) {
+        RETURN_FAILURE("Unable to parse the TAG name")
+    }
     
     eatWhiteSpaces();
-    result = parseQuotedString(pgn, cursor, tagValue);
-    assert(result);
+    if (!parseQuotedString(pgn, cursor, tagValue)) {
+        RETURN_FAILURE("Unable to parse the TAG value")
+    }
     
     eatWhiteSpaces();
     if (character() != ']') {
@@ -810,12 +864,18 @@ static void getPGN(ChessBoard board, // The chess board representation which is 
             // Use the File to specify the move. For example: Nge3
             sanType = FPGN::SANType::medium;
         } else {
-            matchingMoves = getMatchingMoves(board, MOVE_TO(move), piece, MOVE_PROMOTION_PIECE(move), FileFrom(MOVE_FROM(move)), RankFrom(MOVE_FROM(move)));
+            matchingMoves = getMatchingMoves(board, MOVE_TO(move), piece, MOVE_PROMOTION_PIECE(move), FileUndefined, RankFrom(MOVE_FROM(move)));
             if (matchingMoves.size() == 1) {
-                sanType = FPGN::SANType::full;
+                // Use the Rank to specify the move. For example: N1e3
+                sanType = FPGN::SANType::rank;
             } else {
-                // Should not happen
-                printf("Unable to find matching moves\n");
+                matchingMoves = getMatchingMoves(board, MOVE_TO(move), piece, MOVE_PROMOTION_PIECE(move), FileFrom(MOVE_FROM(move)), RankFrom(MOVE_FROM(move)));
+                if (matchingMoves.size() == 1) {
+                    sanType = FPGN::SANType::full;
+                } else {
+                    // Should not happen
+                    printf("Unable to find matching moves\n");
+                }
             }
         }
     }

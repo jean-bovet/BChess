@@ -201,7 +201,7 @@ TEST_F(PGN, GameWithBlackPromotion) {
     game.move(move, "", false);
     
     auto pgn = FPGN::getGame(game, FPGN::Formatting::history);
-    ASSERT_EQ(pgn, "1. e4 Nf6 2. Nc3 Nxe4 3. Nxe4 d5 4. Nc3 Qd6 5. Nf3 h5 6. d4 Qd8 7. Bb5+ c6 8. Ba4 b5 9. Bb3 a5 10. a4 b4 11. Na2 Bg4 12. Qd3 Bxf3 13. Qxf3 h4 14. h3 Qd6 15. Bf4 Qe6+ 16. Be3 Qd6 17. O-O g6 18. c4 bxc3 19. bxc3 Nd7 20. c4 dxc4 21. Bxc4 Qf6 22. Qg4 e5 23. Rfe1 Qg7 24. dxe5 Nc5 25. Bxc5 Bxc5 26. e6 Bd4 27. exf7+ Kf8 28. Qe6 Qf6 29. Rad1 Qxe6 30. Bxe6 c5 31. Bd5 Rb8 32. Nc1 Rh5 33. Bc4 Rf5 34. Re2 Rf4 35. Rde1 Bxf2+ 36. Rxf2 Rxc4 37. Nd3 Kg7 38. Re7 Kf8 39. Re6 Rxa4 40. Nxc5 Ra1+ 41. Kh2 Rd1 42. Ne4 Kg7 43. Ng5 Rf8 44. Rfe2 Rxf7 45. Nxf7 Kxf7 46. Re6e4 Ra1 47. Rxh4 Kg8 48. Rf2 Kg7 49. Rhf4 a4 50. Rf7+ Kh6 51. Rf2f4 a3 52. Rg4 a2 53. Rf6 Rh1+ 54. Kxh1 a1=Q+ *");
+    ASSERT_EQ(pgn, "1. e4 Nf6 2. Nc3 Nxe4 3. Nxe4 d5 4. Nc3 Qd6 5. Nf3 h5 6. d4 Qd8 7. Bb5+ c6 8. Ba4 b5 9. Bb3 a5 10. a4 b4 11. Na2 Bg4 12. Qd3 Bxf3 13. Qxf3 h4 14. h3 Qd6 15. Bf4 Qe6+ 16. Be3 Qd6 17. O-O g6 18. c4 bxc3 19. bxc3 Nd7 20. c4 dxc4 21. Bxc4 Qf6 22. Qg4 e5 23. Rfe1 Qg7 24. dxe5 Nc5 25. Bxc5 Bxc5 26. e6 Bd4 27. exf7+ Kf8 28. Qe6 Qf6 29. Rad1 Qxe6 30. Bxe6 c5 31. Bd5 Rb8 32. Nc1 Rh5 33. Bc4 Rf5 34. Re2 Rf4 35. Rde1 Bxf2+ 36. Rxf2 Rxc4 37. Nd3 Kg7 38. Re7 Kf8 39. Re6 Rxa4 40. Nxc5 Ra1+ 41. Kh2 Rd1 42. Ne4 Kg7 43. Ng5 Rf8 44. Rfe2 Rxf7 45. Nxf7 Kxf7 46. R6e4 Ra1 47. Rxh4 Kg8 48. Rf2 Kg7 49. Rhf4 a4 50. Rf7+ Kh6 51. R2f4 a3 52. Rg4 a2 53. Rf6 Rh1+ 54. Kxh1 a1=Q+ *");
 }
 
 TEST_F(PGN, OutputFromInitialPosition) {
@@ -425,4 +425,96 @@ TEST_F(PGN, RootVariationsFollowTheirMove) {
     ASSERT_EQ(3, again.getNumberOfMoves());
     ASSERT_EQ(FFEN::getFEN(game.board), FFEN::getFEN(again.board));
     ASSERT_EQ(text, FPGN::getGame(again, FPGN::Formatting::history));
+}
+
+// Plays the SAN moves from a FEN, as a PGN with a FEN tag
+static bool gameFrom(const char *fen, const std::string &moves, ChessGame &game) {
+    return FPGN::setGame(std::string("[SetUp \"1\"]\n[FEN \"") + fen + "\"]\n\n" + moves, game);
+}
+
+// BChess must read what it writes: the check mark comes after the promotion
+TEST_F(PGN, EngineOutputRoundTrips) {
+    ChessGame game;
+    ASSERT_TRUE(gameFrom("8/1P6/8/8/8/8/8/1k2K3 w - - 0 1", "1. b8=Q *", game));
+    
+    auto written = FPGN::getGame(game, FPGN::Formatting::history);
+    ASSERT_NE(std::string::npos, written.find("b8=Q+")) << written;
+    
+    ChessGame again;
+    ASSERT_TRUE(gameFrom("8/1P6/8/8/8/8/8/1k2K3 w - - 0 1", written, again)) << written;
+    ASSERT_EQ(FFEN::getFEN(game.board), FFEN::getFEN(again.board));
+}
+
+TEST_F(PGN, RankAndSquareDisambiguation) {
+    // Both rooks reach e2 along the file, so the rank tells them apart
+    ChessGame game;
+    ASSERT_TRUE(gameFrom("k7/8/8/8/8/4R3/4p3/4R1K1 w - - 0 1", "1. R1xe2 *", game));
+    ASSERT_EQ("k7/8/8/8/8/4R3/4R3/6K1 b - - 0 1", FFEN::getFEN(game.board));
+    auto written = FPGN::getGame(game, FPGN::Formatting::history);
+    ASSERT_NE(std::string::npos, written.find("R1xe2")) << written;
+    ASSERT_EQ(std::string::npos, written.find("Re1xe2")) << written;
+    
+    ChessGame again;
+    ASSERT_TRUE(gameFrom("k7/8/8/8/8/4R3/4p3/4R1K1 w - - 0 1", written, again)) << written;
+    ASSERT_EQ(FFEN::getFEN(game.board), FFEN::getFEN(again.board));
+    
+    // The old full-square spelling still reads
+    ChessGame legacy;
+    ASSERT_TRUE(gameFrom("k7/8/8/8/8/4R3/4p3/4R1K1 w - - 0 1", "1. Re1xe2 *", legacy));
+    ASSERT_EQ(FFEN::getFEN(game.board), FFEN::getFEN(legacy.board));
+    
+    // Neither the file nor the rank is enough: the full square
+    ChessGame queens;
+    ASSERT_TRUE(gameFrom("4k3/8/8/8/8/Q7/8/Q1Q1K3 w - - 0 1", "1. Qa1b2 *", queens));
+    ASSERT_NE(std::string::npos, FPGN::getGame(queens, FPGN::Formatting::history).find("Qa1b2"));
+    
+    // A file is enough
+    ChessGame rooks;
+    ASSERT_TRUE(gameFrom("4k3/8/8/8/8/8/8/R4RK1 w - - 0 1", "1. Rad1 *", rooks));
+    ASSERT_NE(std::string::npos, FPGN::getGame(rooks, FPGN::Formatting::history).find("Rad1"));
+}
+
+TEST_F(PGN, NAGsAndAnnotationsAfterCheck) {
+    ChessGame game;
+    ASSERT_TRUE(FPGN::setGame("1. e4 $1 f5 $2 2. Qh5+! g6 $14 *", game));
+    ASSERT_EQ(4, game.getNumberOfMoves());
+    
+    const char *texts[] = {
+        "1. e4 (1. d4 d5) $1 e5 *",
+        "1. e4 $1 {c} (1. d4) {d} $2 e5 *",
+        "1. e4 {c} $1 e5 *",
+    };
+    for (auto text : texts) {
+        ChessGame variations;
+        ASSERT_TRUE(FPGN::setGame(text, variations)) << text;
+        ASSERT_EQ(2, variations.getNumberOfMoves()) << text;
+        ASSERT_EQ(std::string(text).find("(") != std::string::npos ? 2 : 1, variations.getRoot().variations.size()) << text;
+    }
+}
+
+TEST_F(PGN, PromotionPieceMustBeExplicit) {
+    const char *fen = "8/1P6/8/8/8/8/8/1k2K3 w - - 0 1";
+    const struct { const char *move; const char *fen; } good[] = {
+        {"1. b8=Q+ *", "1Q6/8/8/8/8/8/8/1k2K3 b - - 0 1"},
+        {"1. b8=R+ *", "1R6/8/8/8/8/8/8/1k2K3 b - - 0 1"},
+        {"1. b8=B *", "1B6/8/8/8/8/8/8/1k2K3 b - - 0 1"},
+        {"1. b8=N *", "1N6/8/8/8/8/8/8/1k2K3 b - - 0 1"},
+    };
+    for (auto &c : good) {
+        ChessGame game;
+        ASSERT_TRUE(gameFrom(fen, c.move, game)) << c.move;
+        ASSERT_EQ(c.fen, FFEN::getFEN(game.board)) << c.move;
+    }
+    
+    for (auto bad : {"1. b8= *", "1. b8=K *", "1. b8=P *", "1. b8=X *"}) {
+        ChessGame game;
+        ASSERT_FALSE(gameFrom(fen, bad, game)) << bad;
+    }
+}
+
+// Bad input fails instead of hitting an assert
+TEST_F(PGN, MalformedInputFails) {
+    ChessGame game;
+    ASSERT_FALSE(FPGN::setGame("1. e4 2. d4", game));
+    ASSERT_FALSE(FPGN::setGame("[Event] 1. e4 *", game));
 }
