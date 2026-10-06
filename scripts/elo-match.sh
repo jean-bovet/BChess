@@ -86,12 +86,16 @@ sprt_llr() {
 }
 
 # The SPRT's outcome: H1, H0 or none. fastchess says "completed - H1 was accepted" also when it merely ran out of
-# rounds with the LLR inside its bounds, so the decision line only counts when the LLR agrees with it.
+# rounds with the LLR inside its bounds, so the decision line only counts when the LLR agrees with it. fastchess
+# prints the LLR and its bounds with 2 decimals (the true bounds are +-2.944), so a run that ended at the round
+# cap (second argument 1) needs an LLR 0.01 beyond the printed bound: a printed 2.94 may be 2.9400 and no
+# decision. A run that stopped early stopped because fastchess's own unrounded test said so.
 sprt_decision() {
-    local said llr lower upper
+    local said llr lower upper atcap=${2:-0}
     said=$(sed -nE 's/.*completed - (H[01]) was accepted.*/\1/p' "$1" | tail -1)
     read -r llr lower upper < <(sprt_llr "$1")
     if [[ -z $said || -z ${llr:-} ]]; then echo none; return; fi
+    if (( atcap )); then upper=$(awk -v u="$upper" 'BEGIN { printf "%.2f", u + 0.01 }'); lower=$(awk -v b="$lower" 'BEGIN { printf "%.2f", b - 0.01 }'); fi
     if awk -v l="$llr" -v u="$upper" 'BEGIN { exit !(l >= u) }'; then [[ $said == H1 ]] && echo H1 || echo none
     elif awk -v l="$llr" -v b="$lower" 'BEGIN { exit !(l <= b) }'; then [[ $said == H0 ]] && echo H0 || echo none
     else echo none; fi
@@ -113,7 +117,7 @@ judge_run() {
     PLAYED=$((WINS + LOSSES + DRAWS))
     read -r PGNGAMES PGNWINS PGNDRAWS PGNLOSSES ILLEGAL TIMEOUTS ANYILLEGAL ABANDONED UNTERMINATED MALFORMED < <(pgn_summary "$pgn")
     DECISION=none
-    [[ $mode == ab ]] && DECISION=$(sprt_decision "$log")
+    [[ $mode == ab ]] && DECISION=$(sprt_decision "$log" $(( PLAYED >= expected ? 1 : 0 )))
     local bad=0
     (( ANYILLEGAL > 0 || ABANDONED > 0 || UNTERMINATED > 0 || MALFORMED > 0 || TIMEOUTS > 0 || PLAYED == 0 || PGNGAMES != PLAYED \
        || PGNWINS != WINS || PGNLOSSES != LOSSES || PGNDRAWS != DRAWS )) && bad=1
@@ -214,7 +218,15 @@ if [[ ${1:-} == --self-test ]]; then
     judge "fewer games than the cap and no decision line" 2 ab 100 "$TMP/nodec.log" "$TMP/h1.pgn"
     log 6 2 2 "$LLR_MID" "$DEC_H1" > "$TMP/quirk.log"
     judge "a decision line whose LLR is inside the bounds is no decision" 2 ab 100 "$TMP/quirk.log" "$TMP/h1.pgn"
-    log 40 20 40 "$LLR_MID" "$DEC_H1" > "$TMP/cap.log"; pgn 40 20 40 > "$TMP/cap.pgn"
+    LLR_EDGE='LLR: 2.94 (99.9%) (-2.94, 2.94) [0.00, 10.00]'
+    LLR_EDGE_H1='LLR: 2.95 (100.2%) (-2.94, 2.94) [0.00, 10.00]'
+    log 40 20 40 "$LLR_EDGE" "$DEC_H1" > "$TMP/capedge.log"; pgn 40 20 40 > "$TMP/cap.pgn"
+    judge "at the cap, a printed LLR of 2.94 is inconclusive" 5 ab 100 "$TMP/capedge.log" "$TMP/cap.pgn"
+    log 40 20 40 "$LLR_EDGE_H1" "$DEC_H1" > "$TMP/capok.log"
+    judge "at the cap, a printed LLR of 2.95 is H1" 0 ab 100 "$TMP/capok.log" "$TMP/cap.pgn"
+    log 6 2 2 "$LLR_EDGE" "$DEC_H1" > "$TMP/earlyedge.log"
+    judge "an early stop with a printed LLR of 2.94 is H1 as before" 0 ab 100 "$TMP/earlyedge.log" "$TMP/h1.pgn"
+    log 40 20 40 "$LLR_MID" "$DEC_H1" > "$TMP/cap.log"
     judge "inconclusive at the cap" 5 ab 100 "$TMP/cap.log" "$TMP/cap.pgn"
     log 6 2 2 "$LLR_H1" "$DEC_H1" > "$TMP/differs.log"; pgn 5 2 3 > "$TMP/differs.pgn"
     judge "PGN totals that differ from the summary" 2 ab 100 "$TMP/differs.log" "$TMP/differs.pgn"
