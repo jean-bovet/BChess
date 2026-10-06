@@ -1,11 +1,23 @@
 # ENGINE-3 (speed) — A faster search at the same strength of play, measured
 
-Revision 1 (2026-10-06). Planned on `main` (`--no-worktree`, Jean's call). This is the first of three
+Revision 2 (2026-10-06). Planned on `main` (`--no-worktree`, Jean's call). This is the first of three
 ENGINE-3 plans: **speed** (this one), then **search** (pruning, check extension, TT cut-offs and draws),
 then **evaluation**. It assumes ENGINE-1 (bug fixes, perft) and ENGINE-2 (match-ready `BChessUCI`, mate
 distance, `scripts/elo-match.sh`, 1736 ± 40 in `docs/elo.md`) and repeats neither.
 
 - r1 — first draft.
+- r2 — Codex plan round 1 (substantive). All findings accepted:
+  - **Blocker.** The A/B mode validates against the number of games actually played. It accepts
+    fewer than `MAX_GAMES` only when fastchess reports an SPRT decision.
+  - Time forfeits by **either** engine make a run invalid, in both modes.
+  - A failed TT allocation: checked size arithmetic, a test seam that forces the failure, and no
+    retry on every store.
+  - Delta pruning never skips a capture that gives check, so a mating capture is still searched.
+  - SEE: pins are ignored (documented and tested), a king recapture into an attacked square is
+    refused, and the PxN fixtures are corrected.
+  - The GoogleTest registration floor is raised with every step that adds cases.
+  - The board is passed as `ChessBoard &`, not `const`, because `getHash`, `isCheck` and
+    `generateMoves` update caches.
 
 Jean's request: "Start with the speed plan." The goal is a higher Elo through a faster search: more
 depth in the same time. Out of scope here: new pruning of the main search (null move, LMR, futility),
@@ -116,13 +128,37 @@ without a match.
     `-sprt elo0=0 elo1=10 alpha=0.05 beta=0.05 model=logistic` and
     `-rounds $((MAX_GAMES / 2))` (default `MAX_GAMES=8000`). The default `TC=5+0.05`
     (Decision D3).
-  - **Checks.** The existing PGN validator is reused unchanged: the checkout's engine is still named
-    `BChess`, so every check, and the W/D/L from BChess's side, carry over.
-  - **Result.** It reports fastchess's `LLR` line, then "H1 accepted" (exit 0), "H0 accepted"
-    (exit 4) or "inconclusive at MAX_GAMES" (exit 5). An invalid run is exit 2, as today.
+  - **Checks.** The per-game checks of the PGN validator (`pgn_summary`) are reused: the checkout's
+    engine is still named `BChess`, so the W/D/L stay from BChess's side. Two things change, and the
+    second applies to both modes:
+    - **The expected game count.** An SPRT run can stop before `MAX_GAMES`. Today the run is invalid
+      unless `PLAYED == GAMES` and `PGNGAMES == GAMES` (`elo-match.sh`, report section). In A/B
+      mode the expected count becomes `PLAYED`, the games fastchess's summary reports. A run with
+      `PLAYED < MAX_GAMES` is valid only when the log holds fastchess's SPRT decision line
+      ("H0 was accepted" / "H1 was accepted"). `PGNGAMES` and the PGN's W/D/L must equal the
+      summary's in every case. An even count is not required, because an SPRT can stop between the
+      two games of an opening pair.
+    - **Time forfeits by either engine.** Today `pgn_summary` counts only BChess's time-forfeit
+      losses, and that count is not part of the invalid-run condition. It now counts `time forfeit`
+      terminations whichever side lost, and any count above zero makes the run invalid (exit 2).
+      This applies to the Stockfish mode too. A Base or Stockfish forfeit would otherwise inflate
+      BChess's score. ENGINE-2's runs had none, so its recorded results stand. `docs/elo.md` says so.
+  - **Result.** It reports fastchess's `LLR` line, then one of:
+    - "H1 accepted" (exit 0);
+    - "H0 accepted" (exit 4);
+    - "inconclusive at MAX_GAMES" (exit 5), when all games were played with no decision;
+    - an invalid run, exit 2, as today.
 
-  `--self-test` gains cases for parsing those three outcomes. `docs/elo.md` gains a short "A/B
-  (SPRT)" section: how to run it, and how to read the result.
+  `--self-test` gains these cases:
+  - an early H1 stop: fewer games than `MAX_GAMES` and a decision line → valid;
+  - an early H0 stop → valid, exit 4;
+  - fewer games and **no** decision line → invalid;
+  - PGN totals that differ from the summary → invalid;
+  - a time forfeit lost by BChess, and one lost by the other engine → both invalid.
+
+  The decision and summary parsing are shell functions, fed by small sample logs, like the existing
+  PGN samples. `docs/elo.md` gains a short "A/B (SPRT)" section: how to run it, and how to read the
+  result.
 
 ### Step 2 — Transposition-table memory: lazy, sized, and safe (exact)
 
@@ -130,8 +166,16 @@ without a match.
   - The first `store` allocates a power-of-two number of entries that fits in `megabytes`, and the
     index becomes `hash & mask` instead of `hash % TRANSPO_SIZE`, so no division.
   - `exists`/`get` on an unallocated table return "absent".
-  - If `calloc` fails, the table stays empty and every store is ignored. The search still works,
-    without a table.
+  - **The size is checked before allocation.** The entry count is the largest power of two with
+    `count * sizeof(TranspositionEntry) <= megabytes * 2^20`, computed so it cannot overflow:
+    `megabytes` is clamped to `SIZE_MAX / 2^20` first, and the count is at least 1.
+  - **A failed `calloc` disables the table for its lifetime.** A `bool allocationFailed` is set,
+    every later store and probe returns at once without retrying the allocation, and the search
+    works without a table.
+  - **Test seam.** The allocator is called through a function pointer, `calloc` by default, that a
+    test can replace with one returning `nullptr`. This makes the failure deterministic for a valid
+    size. The seam is a static member behind `BCHESS_TEST_HOOKS`, the existing test-hook macro
+    (`MinMaxSearch.hpp:72`). Release builds call `calloc` directly.
   - `TRANSPO_SIZE` goes away.
   - A `size_t allocatedBytes() const` is added for the tests.
 - **Store replacement.** The entry gains a `uint8_t generation`. `IterativeDeepening::search` bumps
@@ -193,7 +237,10 @@ without a match.
 ### Step 4 — No large copies in the search (exact)
 
 - `MinMaxVariation::push(int, Move, const MinMaxVariation &line)` and `MoveList::push(const MoveList &)`.
-- `ChessEvaluater::evaluate(const ChessBoard &, …, const MoveList &)`, and the same for
+- `ChessEvaluater::evaluate(ChessBoard &, …, const MoveList &)`. The board is a non-const reference
+  because `getHash`, `isCheck` and `generateMoves` update its caches (`ChessBoard.hpp:78-84`,
+  `ChessMoveGenerator.hpp:40-44`); making them const is a wider refactor this plan does not need.
+  The `MoveList` is passed by const reference, and the same goes for
   `evaluateAction` and `evaluateMobility`, which take a `MoveList` by value
   (`ChessEvaluater.hpp:45-52`).
 - `MinMaxSearch.hpp:243`: pass the child either `bv` or a reference to one empty `Variation` (a
@@ -228,7 +275,7 @@ without a match.
     only an upper limit.
   - A FEN can claim a clock larger than the history; the `min` handles it.
 
-  `ChessEvaluater::isDraw(const ChessBoard &, const HistoryPtr &)` passes `board.halfMoveClock`.
+  `ChessEvaluater::isDraw(ChessBoard &, const HistoryPtr &)` passes `board.halfMoveClock`.
   `ChessEngine::gameEnd` (`ChessEngine.hpp:157`) goes through the same function, so the game's draw
   detection gets the same bound. Today's semantics are kept: three occurrences, counted on the same
   side to move.
@@ -288,15 +335,26 @@ without a match.
 - **The rule.** In `quiescence`, skip a capture when all of these hold:
   - `stand_pat + pieceValue(captured) + 200 <= alpha`;
   - the move is not a promotion;
-  - `alpha` is not a mate score (`ChessEvaluater::isMateScore`).
+  - `alpha` is not a mate score (`ChessEvaluater::isMateScore`);
+  - **the move does not give check.**
 
   `pieceValue` is a public accessor over the existing `PieceValue` table (`ChessEvaluater.cpp:88`);
   no second table.
+- **Why the check exemption.** A capture can mate even when it wins little material. Without the
+  exemption, delta pruning would skip it, and the `firstMoveOnly` mate check would never see the
+  position after it. Keeping mates is worth more than a few saved nodes.
+
+  The test is cheap and exact. The capture is made on the copy `quiescence` already builds
+  (`MinMaxSearch.hpp:320-321`), then `newNode.isCheck(newNode.color)`. Only when that is false and
+  the delta condition holds is the recursive `quiescence` call skipped. The recursive call
+  (evaluation, generation, legality tests) is the cost delta pruning saves, so skipping it after
+  the move keeps nearly all the saving.
 - **What does not change.**
   - `bestValue` still starts at `stand_pat` and is still the maximum over the moves searched. The
     ENGINE-1 fixes keep holding: never below stand-pat, and the best capture rather than the last
     one.
-  - Mates are still found by the `firstMoveOnly` check at each quiescence node.
+  - Mates are still found by the `firstMoveOnly` check at each quiescence node that is searched,
+    and every checking capture is searched.
   - The margin, 200 cp, is not tuned here.
 - **Gate.** SPRT against step 7's commit passes (D3). The step adds nodes-per-depth and instruction
   figures to the results table.
@@ -308,6 +366,14 @@ without a match.
   - attackers found with the same lookups `isAttacked` uses (`ChessBoard.cpp:484-520`);
   - x-rays uncovered through the magic lookups with an updated occupancy;
   - least valuable attacker first.
+  - **Pins are ignored.** A pinned piece counts as an attacker or defender. This is the usual SEE
+    approximation, and SEE only decides whether quiescence skips a capture, so a misjudged exchange
+    costs a pruning decision, never legality: the moves searched still come from the legal
+    generator. A test pins this behaviour down so that it cannot change silently.
+  - **The king recaptures only into safety.** A king is the last attacker taken for its side. It
+    may capture only when the opponent has no attacker left on the square after the exchange so
+    far. Otherwise the exchange stops before the king's capture, because that capture would be
+    illegal.
 - **Pruning.** In `quiescence`, captures with `see < 0` are skipped, except promotions. They can
   also be sorted below winning captures; sorting them is part of the same commit.
 - **The step is attempted only if step 8 landed**, and lands only on an SPRT pass against step 8's
@@ -372,10 +438,11 @@ proves and whether it is red before its step.
 
 | Step | Test | Proves | Red before? |
 |---|---|---|---|
-| 1 | `scripts/bench.sh` runs and prints a signature. `scripts/elo-match.sh --self-test` covers the H1, H0 and inconclusive outcomes. | Tooling | n/a (developer tools, not in CI) |
+| 1 | `scripts/bench.sh` runs and prints a signature. `scripts/elo-match.sh --self-test` covers: an early H1 stop (valid); an early H0 stop (valid, exit 4); fewer games than `MAX_GAMES` with no decision line (invalid); PGN totals that differ from the summary (invalid); a time forfeit lost by BChess and one lost by the other engine (both invalid); inconclusive at `MAX_GAMES` (exit 5). | Tooling: an early SPRT stop is accepted only with a decision, and forfeits are never counted as results | the forfeit and early-stop cases are red against today's script |
 | 2 | `TranspositionTableTests.LazyAllocation`: a new table has `allocatedBytes() == 0` and `exists()` is false. After one `store`, `allocatedBytes()` is a power of two ≤ the requested MB. | Probe engines cost no memory | yes (allocates 549 MiB in the constructor) |
 | 2 | `TranspositionTableTests.NewSearchReplacesDeeperStaleEntry`: store a depth-8 entry, bump the generation, store depth 2 at the same index → replaced. Same generation → kept. | Stale entries do not block ordering | yes |
-| 2 | `TranspositionTableTests.FailedAllocationIsHarmless`: a table asked for an impossible size (e.g. `SIZE_MAX` MB). Stores are ignored, probes are absent, and a search returns a legal move. | Reliability | yes (null dereference) |
+| 2 | `TranspositionTableTests.FailedAllocationIsHarmless`: a valid 1 MB table, with the `BCHESS_TEST_HOOKS` allocator seam returning `nullptr` and counting its calls. 1,000 stores are ignored, probes are absent, the allocator is called exactly once, and a depth-3 search with that table returns a legal move. | Reliability, no retry per node | yes (null dereference) |
+| 2 | `TranspositionTableTests.SizeIsCheckedAndPowerOfTwo`: 1 MB → 32,768 entries (32-byte entries) or the equivalent for the final entry size. `SIZE_MAX` MB is clamped without overflow: the computed count is a power of two and its byte size does not wrap. The allocation is not attempted, because the seam records the request size and returns `nullptr`. | Checked arithmetic | yes |
 | 2 | Swift `FEngineTests.ProbeEngineAllocatesNoTable`, through an `FEngine+Testing.h` accessor: a fresh `FEngine` reports 0 bytes. After a depth-2 search it reports the platform size (16 MB on the iOS test run, 64 MB on macOS). | Per-platform size, lazy in the app | yes |
 | 3 | Existing `Perft.*` (6 positions + 2 castling cases), `Perft.HashMatchesFromScratchAtEveryNode`, all `BoardHash.*` | Move generation and hash unchanged | guards |
 | 3 | `BoardHash.LegalityMoveLeavesRulesIntact`: for every pseudo-legal move of Kiwipete and position 4, the legality-only path and `move()` leave identical `pieces`, `enPassant`, castling flags and counters. | The two paths share one rule set | yes (no such path) |
@@ -387,8 +454,9 @@ proves and whether it is red before its step.
 | 6 | `MinMaxSearchTests.BogusHashMoveIsIgnored`: store, under the root hash, an entry whose `bestMove` is illegal in the root position. Search depth 3 with TT cut-offs off. The PV's first move is legal, and the score equals a fresh-table search. | Validation against the list | not before step 6, where nothing reads the move. Proven red by deleting the validation in a scratch copy, then restored. |
 | 6, 7 | `SearchChessTests.OrderedMove` / `ChessTree`: the sorted node counts are updated (the score, 50 / 0, unchanged). The unsorted counts (341,658 / 142,400) are **unchanged**. | `sortMoves=false` is still the plain baseline | n/a (recorded) |
 | 7 | `MinMaxSearchTests.KillerIsAQuietMove`: after a search, killers hold only non-captures and non-promotions, at most 2 per ply, distinct. | Killer bookkeeping | yes |
-| 8 | `MinMaxSearchTests.QuiescenceReturnsTheBestCapture`, `QuiescenceNeverBelowStandPat`, `MateCarriesDistance`, `PrefersShorterMate` unchanged. New `DeltaPruningKeepsAWinningCapture`: a position where a queen capture lifts the score above alpha keeps it. `DeltaPruningSkipsHopelessCapture`: a pawn capture far below alpha visits fewer quiescence nodes, same result. | No regression of the ENGINE-1/2 fixes | the last is red |
-| 9 | `SEETests`: PxN = +220 (`PieceValue` difference), QxP defended by a pawn = −800, an x-ray rook battery on a file, an en-passant capture, a capture by the king of an undefended piece. | SEE values | yes |
+| 8 | `MinMaxSearchTests.QuiescenceReturnsTheBestCapture`, `QuiescenceNeverBelowStandPat`, `MateCarriesDistance`, `PrefersShorterMate` unchanged. New `DeltaPruningKeepsAWinningCapture`: a position where a queen capture lifts the score above alpha keeps it. `DeltaPruningSkipsHopelessCapture`: a pawn capture far below alpha visits fewer quiescence nodes, same result. `DeltaPruningKeepsAMatingCapture`: the side to move is far behind (alpha well above stand-pat + pawn + 200), and a pawn capture mates (the implementer builds the FEN and confirms the mate with Stockfish). Quiescence at `maxDepth = 0` returns the mate score `MAT_VALUE − 1`, with that capture as the PV. | No regression of the ENGINE-1/2 fixes; a mating capture is never pruned | the last two are red (the last with the check exemption deleted in a scratch copy) |
+| 9 | `SEETests`: PxN, knight undefended = **+320**; PxN, knight defended by a pawn = **+220** (320 − 100); QxP defended by a pawn = −800; an x-ray rook battery on a file; an en-passant capture = +100; a king capturing an undefended piece = its value. **King recapture refused:** a piece captured on a square the capturer's side still attacks after the exchange, where the only defender is the king → the king does not recapture, and the value is the full piece. **Pins ignored:** a capture defended only by a pinned piece is scored as defended, the documented approximation. | SEE values and the two exchange rules | yes |
+| every step that adds GoogleTests | `EngineGoogleTests.registersAllCases` (`EngineGoogleTests.swift:30`, today `>= 166`) is raised to the new total in the same commit. | New cases cannot silently fail to register | n/a (floor) |
 | all | Changed best-move tests: the ENGINE-1 rule (Stockfish depth 20, within 30 cp and not worse than the old line), documented in the commit. Stop only if a test's purpose fails. | | |
 
 CI time: the new tests search at depth ≤ 4 (ms at `-O0`). The bench and matches are developer tools
