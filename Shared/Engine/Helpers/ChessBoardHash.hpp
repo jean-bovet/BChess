@@ -20,4 +20,9 @@ public:
     static uint64_t getPseudoNumber(Square square, Color color, Piece piece);
     
     static uint64_t getWhiteTurn();
+    
+    /// The part of the hash that is not piece placement or side to move: the castling rights held,
+    /// and the en-passant file when an en-passant capture is legal (FIDE 9.2.3: positions are the
+    /// same when the same moves are possible, so an en-passant square nothing can use does not count).
+    static uint64_t stateKey(const ChessBoard &board);
 };

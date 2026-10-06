@@ -152,3 +152,14 @@ TEST_F(ChessEngineTests, CanPlayMatchesGameEnd) {
     ASSERT_TRUE(engine.setFEN("7k/5Q2/6K1/8/8/8/8/8 b - - 0 1"));
     ASSERT_EQ(engine.canPlay(), engine.gameEnd() == ChessEngine::GameEnd::none);
 }
+
+// Castling rights are part of a position (FIDE 9.2): the start arrangement occurs three times here but only
+// twice with the same rights, since the rook walk gave up the king-side rights.
+TEST_F(ChessEngineTests, CastlingRightsMakeAPositionDifferent) {
+    ChessEngine engine;
+    ASSERT_TRUE(engine.setPGN("1. Nf3 Nf6 2. Rg1 Rg8 3. Rh1 Rh8 4. Ng1 Ng8 5. Nf3 Nf6 6. Ng1 Ng8 *"));
+    ASSERT_TRUE(engine.canPlay());
+    
+    ASSERT_TRUE(engine.setPGN("1. Nf3 Nf6 2. Rg1 Rg8 3. Rh1 Rh8 4. Ng1 Ng8 5. Nf3 Nf6 6. Ng1 Ng8 7. Nf3 Nf6 8. Ng1 Ng8 *"));
+    ASSERT_FALSE(engine.canPlay());
+}

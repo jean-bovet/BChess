@@ -52,6 +52,11 @@ static uint64_t zobrist[64][12];
 
 static uint64_t side;
 
+// Index: white king side, white queen side, black king side, black queen side
+static uint64_t castling[4];
+
+static uint64_t enPassantFile[8];
+
 void ChessBoardHash::initialize() {
     PRNG rng(1070372);
     for (Square square=0; square<64; square++) {
@@ -60,6 +65,12 @@ void ChessBoardHash::initialize() {
         }
     }
     side = rng.rand<BoardHash>();
+    for (auto &key : castling) {
+        key = rng.rand<BoardHash>();
+    }
+    for (auto &key : enPassantFile) {
+        key = rng.rand<BoardHash>();
+    }
 }
 
 BoardHash ChessBoardHash::hash(ChessBoard board) {
@@ -77,6 +88,8 @@ BoardHash ChessBoardHash::hash(ChessBoard board) {
         h ^= side;
     }
     
+    h ^= stateKey(board);
+    
     return h;
 }
 
@@ -89,3 +102,47 @@ uint64_t ChessBoardHash::getWhiteTurn() {
     return side;
 }
 
+
+// True when a pawn of the side to move can capture en passant without leaving its king in check.
+// Done with direct bitboard edits on a copy, never with move() or the generator, because move()
+// calls stateKey().
+static bool canCaptureEnPassant(const ChessBoard &board) {
+    auto color = board.color;
+    Square target = lsb(board.enPassant);
+    
+    // The target square is on the sixth rank for White and on the third for Black. Anything else
+    // (a hand-written FEN) cannot be captured.
+    if (color == WHITE ? (target < a6 || target > h6) : (target < a3 || target > h3)) {
+        return false;
+    }
+    
+    // Same trick as isAttacked(): a pawn of the other color placed on the target square sees the
+    // squares our pawns capture from
+    Bitboard candidates = PawnAttacks[INVERSE(color)][target] & board.pieces[color][PAWN];
+    while (candidates) {
+        Square from = lsb(candidates);
+        bb_clear(candidates, from);
+        
+        ChessBoard copy = board;
+        bb_clear(copy.pieces[color][PAWN], from);
+        bb_set(copy.pieces[color][PAWN], target);
+        bb_clear(copy.pieces[INVERSE(color)][PAWN], color == WHITE ? target - 8 : target + 8);
+        copy.occupancyDirty = true;
+        if (!copy.isCheck(color)) {
+            return true;
+        }
+    }
+    return false;
+}
+
+uint64_t ChessBoardHash::stateKey(const ChessBoard &board) {
+    uint64_t key = 0;
+    if (board.whiteCanCastleKingSide) key ^= castling[0];
+    if (board.whiteCanCastleQueenSide) key ^= castling[1];
+    if (board.blackCanCastleKingSide) key ^= castling[2];
+    if (board.blackCanCastleQueenSide) key ^= castling[3];
+    if (board.enPassant && canCaptureEnPassant(board)) {
+        key ^= enPassantFile[FileFrom(lsb(board.enPassant))];
+    }
+    return key;
+}

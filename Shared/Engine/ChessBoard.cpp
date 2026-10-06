@@ -228,6 +228,9 @@ void ChessBoard::move(Move move) {
     // zero ("to be computed") after a FEN was set
     getHash();
     
+    // Take the castling rights and en-passant square out of the hash, they are put back at the end
+    hash ^= ChessBoardHash::stateKey(*this);
+    
     if (color == BLACK) {
         fullMoveCount++;
     }
@@ -345,6 +348,7 @@ void ChessBoard::move(Move move) {
     // Switch the side that is moving
     color = INVERSE(color);
     hash = hash ^ ChessBoardHash::getWhiteTurn();
+    hash ^= ChessBoardHash::stateKey(*this);
 }
 
 void ChessBoard::undo_move(Move move) {
