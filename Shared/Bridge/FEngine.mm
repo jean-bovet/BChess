@@ -26,6 +26,21 @@
 #include <memory>
 #include <mutex>
 
+#include <TargetConditionals.h>
+
+// The transposition table's size. It is allocated by the first search, so an engine that never searches
+// (the probes that validate a pasted text or a file) costs nothing. A phone has far less memory to give.
+#if TARGET_OS_IPHONE
+static const size_t FEngineHashMegabytes = 16;
+#else
+static const size_t FEngineHashMegabytes = 64;
+#endif
+
+// An Objective-C++ instance variable is default-constructed, so the size goes in through a subclass
+struct FEngineCore: ChessEngine {
+    FEngineCore() : ChessEngine(FEngineHashMegabytes) {}
+};
+
 // Threading model.
 // - Every search runs on `_searchQueue`, a serial queue, on its own snapshot of the game. Searches on
 //   one engine never overlap, so `engine.iterativeSearch` is only touched there.
@@ -36,7 +51,7 @@
 //   in-flight callback, never for a search.
 // - Callbacks never touch the main queue: the UCI tool's main thread sits in readLine.
 @interface FEngine () {
-    ChessEngine engine;
+    FEngineCore engine;
     dispatch_queue_t _searchQueue;
     std::recursive_mutex _control;
     uint64_t _generation;
@@ -390,6 +405,14 @@
 
 - (void)performOnSearchQueue:(dispatch_block_t)block {
     dispatch_async(_searchQueue, block);
+}
+
+- (NSUInteger)transpositionTableBytes {
+    __block NSUInteger bytes = 0;
+    dispatch_sync(_searchQueue, ^{
+        bytes = self->engine.iterativeSearch.table.allocatedBytes();
+    });
+    return bytes;
 }
 
 - (void)setSearchCheckpoint:(nullable dispatch_block_t)block {

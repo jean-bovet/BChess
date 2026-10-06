@@ -47,7 +47,8 @@ public:
     
 public:
     
-    ChessEngine() {
+    // hashMegabytes: the size of the transposition table, which is allocated by the first search
+    explicit ChessEngine(size_t hashMegabytes = 16) : iterativeSearch(hashMegabytes) {
         games.push_back(ChessGame());
     }
     

@@ -264,6 +264,8 @@ private:
             }
         }
 
+        // The store does not look at config.transpositionTable, which gates only the cut-offs above: the table
+        // also orders the moves of a later search, whatever the setting.
         // A loop that was cut short holds a partial value, which must not be trusted by a later search
         // of the same position. Its parents are cut short too, so they store nothing either.
         if (ChessMoveGenerator::isValid(bestMove) && !stopped()) {

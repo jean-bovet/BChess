@@ -156,6 +156,7 @@
 		ACA37B48A9D01A6F6CEF1618 /* ChessState.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 431412F9A9BFFBA835CA9E74 /* ChessState.cpp */; };
 		ADBD16343AF39DF6A793E289 /* GameSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 449B35D4D73E3A74D24EEC1D /* GameSession.swift */; };
 		ADEBD8A009DD4420ACDCE850 /* MoveList.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5706678E59692AD6397F2D59 /* MoveList.cpp */; };
+		AE4F33FC19A22D77CB2D3117 /* TranspositionTableTests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 97EF7CE821EEB5AA4C3A36BF /* TranspositionTableTests.cpp */; };
 		AECEBD69DD9C697283B32C09 /* GameHistory.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FECF3456A6E4C0D9547AC353 /* GameHistory.cpp */; };
 		AF94D65987FCCDE94933F813 /* Game.swift in Sources */ = {isa = PBXBuildFile; fileRef = BAC64B5B0C55E00286BBAD36 /* Game.swift */; };
 		B0146C12C9A064FFFC00A821 /* GameLibraryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93D05661AEFDD830ACE4D2C5 /* GameLibraryTests.swift */; };
@@ -308,6 +309,7 @@
 		947CCE0E46399FFD55FC32BC /* ChessEvaluater.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ChessEvaluater.cpp; sourceTree = "<group>"; };
 		94916DB48E273E8C193F571F /* ChessOpenings.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ChessOpenings.cpp; sourceTree = "<group>"; };
 		95D8446DFFA5BCD9EC7FFBA5 /* MoveRowsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoveRowsTests.swift; sourceTree = "<group>"; };
+		97EF7CE821EEB5AA4C3A36BF /* TranspositionTableTests.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = TranspositionTableTests.cpp; sourceTree = "<group>"; };
 		9885254EA5CE0CC7ECA0A9D3 /* ChessEvaluation.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = ChessEvaluation.hpp; sourceTree = "<group>"; };
 		9B26F7CF7097BD3EF64ACF81 /* magicmoves.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = magicmoves.h; sourceTree = "<group>"; };
 		9BA0B234E3F267394AD43C1F /* MovesTests.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = MovesTests.cpp; sourceTree = "<group>"; };
@@ -492,6 +494,7 @@
 				CBA33EA4ACC347FB0DF9ABA4 /* SearchChessTests.cpp */,
 				78235E48247B716B7C0058B1 /* SearchLimitsTests.swift */,
 				2AD84B737192936DAA406CD7 /* StateTests.cpp */,
+				97EF7CE821EEB5AA4C3A36BF /* TranspositionTableTests.cpp */,
 				04A09D1A221F0D289C106E21 /* UCICommandTests.swift */,
 				9CE26D46FB2EB6963C3B70EE /* UCIProcessTests.swift */,
 				C5006601DFB324FFE15ECF30 /* VerdictTests.swift */,
@@ -966,6 +969,7 @@
 				F0015AE7C1448AD40B679077 /* Square.swift in Sources */,
 				51597C0234CFC27A93176646 /* StateTests.cpp in Sources */,
 				9AC10D64359B02B9DE926458 /* TestSupport.swift in Sources */,
+				AE4F33FC19A22D77CB2D3117 /* TranspositionTableTests.cpp in Sources */,
 				FA1FB12A80F60CB81B9E451D /* UCI.swift in Sources */,
 				89B0AEECAAE198D5521D5480 /* UCICommandTests.swift in Sources */,
 				58225EBA11A0DBD6C47AE30D /* UCIProcessTests.swift in Sources */,

@@ -10,6 +10,25 @@ import Testing
 
 struct FEngineTests {
 
+    /// The probes that validate a pasted text or a file cost no table, and a search allocates the size of
+    /// the platform: 16 MB on a phone, 64 MB on a Mac.
+    @Test func probeEngineAllocatesNoTable() {
+        let engine = FEngine()
+        engine.useOpeningBook = false
+        #expect(engine.transpositionTableBytes() == 0)
+        #expect(engine.setFEN("r1bqkbnr/pppp1ppp/2n5/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 2 3"))
+        #expect(engine.setPGN("1. e4 e5 2. Nf3 *"))
+        #expect(engine.transpositionTableBytes() == 0)
+
+        engine.async = false
+        engine.evaluate(2) { _, _ in }
+        #if os(iOS)
+        #expect(engine.transpositionTableBytes() == 16 * 1024 * 1024)
+        #else
+        #expect(engine.transpositionTableBytes() == 64 * 1024 * 1024)
+        #endif
+    }
+
     @Test func treeNode() {
         let engine = FEngine()
         engine.setPGN("1. e4 e5 (1... c5)")

@@ -50,6 +50,10 @@ public:
 
     TranspositionTable table;
 
+    // The table's size in megabytes: it is allocated by the first store of a search, never before
+    explicit IterativeDeepening(size_t hashMegabytes = 16) : table(hashMegabytes) {
+    }
+
     enum class Status {
         running,
         stopped,
@@ -84,6 +88,8 @@ public:
         
         ChessEvaluation evaluation;
         MinMaxSearch::Variation bestVariation;
+        
+        table.newSearch();
         
         // One clock and one node count for the whole search, so that the figures add up over the depths
         TimeManagement searchClock;

@@ -33,7 +33,8 @@ static void assertChessSearch(int expectedVisitedNodes, int expectedValue, Confi
     ASSERT_EQ(0, alphaBeta.visitedNodes);
     
     HistoryPtr history = NEW_HISTORY;
-    TranspositionTable table;
+    // The counts depend on the table's collisions (the table is on in these searches), so its size is pinned
+    TranspositionTable table(16);
     int score = alphaBeta.alphabeta(rootBoard, history, table, 0, rootBoard.color == WHITE, pv, bv);
 //    std::cout << alphaBeta.visitedNodes << " => " << score << " " << pv.moves.description() << std::endl;
     ASSERT_EQ(expectedVisitedNodes, alphaBeta.visitedNodes); // n initial moves + 1 for the root node
@@ -48,7 +49,7 @@ TEST_F(SearchChessTests, ChessTree) {
     assertChessSearch(23364, 0, config); // with alpha-beta prunning
     
     config.alphaBetaPrunning = false;
-    assertChessSearch(142400, 0, config); // without alpha-beta
+    assertChessSearch(142706, 0, config); // without alpha-beta
 }
 
 TEST_F(SearchChessTests, OrderedMove) {
@@ -62,5 +63,5 @@ TEST_F(SearchChessTests, OrderedMove) {
     assertChessSearch(43391, 50, config, board);
     
     config.sortMoves = false;
-    assertChessSearch(341658, 50, config, board);
+    assertChessSearch(341919, 50, config, board);
 }

@@ -14,6 +14,10 @@ NS_ASSUME_NONNULL_BEGIN
 /** Runs the block on the engine's serial search queue, behind any search that is queued or running. */
 - (void)performOnSearchQueue:(dispatch_block_t)block;
 
+/** The memory the transposition table holds now: 0 before the first search stores anything. Waits for the
+ search queue. */
+- (NSUInteger)transpositionTableBytes;
+
 /** Called inside the search, right after a move has been pushed on the search's history. Takes effect
  only in builds that define BCHESS_TEST_HOOKS. Pass nil to remove it. */
 - (void)setSearchCheckpoint:(nullable dispatch_block_t)block;

@@ -604,3 +604,4 @@ Bench: `scripts/bench.sh`, depth 6, TT cut-offs off, best of 3, Apple M2 under l
 | Step | Commit | Signature (nodes / scores hash) | Instructions | Δ instr. | Perft Mnps (start d5) | Max RSS | SPRT | Landed? |
 |---|---|---|---:|---:|---:|---:|---|---|
 | baseline | 2eb86d5 | 15,069,745 / 5cbdcd84043b9398 | 84,427,765,172 | — | 22.1 | 552 MB | — | — |
+| 2 TT lazy, sized, safe | (step 2 commit) | 15,069,745 / 5cbdcd84043b9398 (identical) | 84,253,210,195 | −0.21 % | — | 18.7 MB | — | yes (memory and safety, signature identical; the 2 % rule does not apply to a memory step) |
