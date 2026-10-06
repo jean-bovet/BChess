@@ -139,4 +139,19 @@ struct GameStateCodingTests {
             #expect(engine.pgnAllGames().contains(legacyFENTag))
         }
     }
+
+    // A rank that runs past the 8th file with empty squares was accepted before and was saved as it was typed
+    @Test func overlongEmptyRankFilesOpen() throws {
+        let tag = #"[FEN "4k4/8/8/8/8/8/8/4K3 w - - 0 1"]"#
+        let pgn = "[Event \"Test\"]\n\(tag)\n[SetUp \"1\"]\n\n1. Ke2 *"
+        let json = #"{"pgn":"[Event \"Test\"]\n[FEN \"4k4/8/8/8/8/8/8/4K3 w - - 0 1\"]\n[SetUp \"1\"]\n\n1. Ke2 *","rotated":false}"#
+
+        for (data, type) in [(Data(pgn.utf8), UTType.pgn), (Data(json.utf8), UTType.json)] {
+            let state = try GameState(data: data, contentType: type)
+            let engine = FEngine()
+            #expect(engine.loadAllGames(state.pgn))
+            #expect(engine.fen() == "4k3/8/8/8/8/8/4K3/8 b - - 1 1")
+            #expect(engine.pgnAllGames().contains(tag))
+        }
+    }
 }

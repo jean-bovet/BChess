@@ -41,6 +41,8 @@ sha256() { shasum -a 256 "$1" | awk '{print $1}'; }
 # 1. Tools
 command -v stockfish > /dev/null || fail "stockfish is missing: brew install stockfish"
 STOCKFISH=$(command -v stockfish)
+STOCKFISH_ID=$({ echo uci; sleep 0.5; echo quit; } | "$STOCKFISH" | sed -n 's/^id name //p; /^Stockfish/p' | head -1 | sed -E 's/ by .*//')
+[[ $STOCKFISH_ID == "Stockfish 19" ]] || fail "Stockfish 19 is required, found '${STOCKFISH_ID:-unknown}' at $STOCKFISH"
 
 if [[ -x "$ELO/fastchess/fastchess" ]]; then
     FASTCHESS="$ELO/fastchess/fastchess"
@@ -54,6 +56,9 @@ else
     make -C "$ELO/fastchess" -j"$(sysctl -n hw.ncpu)" > "$ELO/fastchess-build.log" 2>&1 || { tail -20 "$ELO/fastchess-build.log"; fail "fastchess did not build"; }
     FASTCHESS="$ELO/fastchess/fastchess"
 fi
+
+FASTCHESS_ID=$("$FASTCHESS" -version 2>&1 | head -1)
+[[ $FASTCHESS_ID == *"-${FASTCHESS_COMMIT:0:7}" ]] || fail "fastchess at the pinned commit ${FASTCHESS_COMMIT:0:7} is required, found '$FASTCHESS_ID' at $FASTCHESS"
 
 # 2. Opening book
 BOOK="$ELO/books/8moves_v3.pgn"
@@ -78,7 +83,18 @@ STAMP=$(date +%Y%m%d-%H%M%S)
 mkdir -p "$ELO/runs"
 PGN="$ELO/runs/$STAMP-SF$LEVEL.pgn"
 LOG="$ELO/runs/$STAMP-SF$LEVEL.log"
-echo "BChess $(git -C "$ROOT" rev-parse --short HEAD) against Stockfish $LEVEL: $GAMES games, $TC, $CONCURRENCY at a time"
+INFO="$ELO/runs/$STAMP-SF$LEVEL.info"
+SEED=${SEED:-$(( (RANDOM << 15) | RANDOM ))}
+COMMIT=$(git -C "$ROOT" rev-parse --short HEAD)
+[[ -z $(git -C "$ROOT" status --porcelain) ]] && TREE=clean || TREE=dirty
+{
+    echo "BChess:      $COMMIT ($TREE tree), BChessUCI sha256 $(sha256 "$BCHESS")"
+    echo "Stockfish:   $STOCKFISH_ID, $STOCKFISH, sha256 $(sha256 "$STOCKFISH")"
+    echo "fastchess:   $FASTCHESS_ID, $FASTCHESS, sha256 $(sha256 "$FASTCHESS")"
+    echo "Book:        8moves_v3.pgn sha256 $BOOK_PGN_SHA256, opening seed $SEED"
+    echo "Settings:    LEVEL=$LEVEL GAMES=$GAMES TC=$TC CONCURRENCY=$CONCURRENCY"
+} | tee "$INFO"
+echo "Playing $GAMES games against Stockfish $LEVEL, $TC, $CONCURRENCY at a time"
 START=$(date +%s)
 # fastchess saves its state (config.json) in the folder it runs in
 cd "$ELO/runs"
@@ -86,7 +102,7 @@ cd "$ELO/runs"
     -engine cmd="$BCHESS" name=BChess \
     -engine cmd="$STOCKFISH" name=SF$LEVEL option.UCI_LimitStrength=true option.UCI_Elo=$LEVEL option.Threads=1 option.Hash=16 \
     -each tc=$TC timemargin=100 \
-    -openings file="$BOOK" format=pgn order=random \
+    -openings file="$BOOK" format=pgn order=random -srand "$SEED" \
     -repeat -games 2 -rounds $((GAMES / 2)) -concurrency "$CONCURRENCY" -recover \
     -draw movenumber=40 movecount=8 score=10 \
     -resign movecount=4 score=1000 twosided=true \
@@ -101,6 +117,19 @@ LOSSES=$(sed -E 's/.*Losses: ([0-9]+).*/\1/' <<< "$GAMELINE")
 DRAWS=$(sed -E 's/.*Draws: ([0-9]+).*/\1/' <<< "$GAMELINE")
 SCORE=$(sed -E 's/.*\(([0-9.]+) %\).*/\1/' <<< "$GAMELINE")
 PLAYED=$((WINS + LOSSES + DRAWS))
+
+# The games themselves are the authority: exactly GAMES results, each with a termination, agreeing with the summary
+read -r PGNRESULTS PGNTERMINATIONS PGNWINS PGNLOSSES PGNDRAWS < <(awk '
+    /^\[White "/ { white = ($2 == "\"BChess\"]") }
+    /^\[Result "/ {
+        r = $2; gsub(/[\]"]/, "", r)
+        if (r == "1-0" || r == "0-1" || r == "1/2-1/2") results++
+        if (r == "1/2-1/2") draws++
+        else if ((white && r == "1-0") || (!white && r == "0-1")) wins++
+        else if (r == "1-0" || r == "0-1") losses++
+    }
+    /^\[Termination "/ { terminations++ }
+    END { print results + 0, terminations + 0, wins + 0, losses + 0, draws + 0 }' "$PGN")
 
 # BChess's losses by how they ended, and the games that must not happen, from the PGN's Termination tag
 read -r ILLEGAL TIMEOUTS ABANDONED UNTERMINATED < <(awk '
@@ -123,7 +152,9 @@ echo "Result: BChess $WINS wins, $LOSSES losses, $DRAWS draws out of $PLAYED gam
 echo "BChess losses by illegal move: $ILLEGAL, by time forfeit: $TIMEOUTS. Games abandoned (disconnect or stall): $ABANDONED, unterminated: $UNTERMINATED"
 echo "Wall time: $((WALL / 60)) min $((WALL % 60)) s. Games: $PGN"
 
-if (( ANYILLEGAL > 0 || ABANDONED > 0 || UNTERMINATED > 0 || PLAYED < GAMES )); then
+if (( ANYILLEGAL > 0 || ABANDONED > 0 || UNTERMINATED > 0 || PLAYED != GAMES || PGNRESULTS != GAMES || PGNTERMINATIONS != GAMES \
+      || PGNWINS != WINS || PGNLOSSES != LOSSES || PGNDRAWS != DRAWS )); then
+    echo "PGN: $PGNRESULTS results, $PGNTERMINATIONS terminations, $PGNWINS/$PGNDRAWS/$PGNLOSSES (W/D/L); summary: $PLAYED games, $WINS/$DRAWS/$LOSSES; expected $GAMES games" >&2
     echo "INVALID RUN: an illegal move, a disconnect or an unfinished game is a bug to fix, not a rating. No Elo is reported." >&2
     echo "Look at the games whose Termination is not normal or adjudication in $PGN, and at $LOG" >&2
     exit 2
@@ -142,6 +173,7 @@ ERROR=$(awk -v e="$ELOERR" 'BEGIN { printf "%.0f", e }')
 echo "Elo difference to Stockfish $LEVEL: $ELODIFF +/- $ELOERR (95 %)"
 echo "Performance: $PERFORMANCE +/- $ERROR (Stockfish UCI_Elo scale, $TC)"
 echo
-echo "| Date | Commit | TC | Book | Stockfish level | Games | W/D/L | Performance (95 %) | Wall time |"
+echo "| Date | Commit | TC | Book (seed) | Stockfish level | Games | W/D/L | Performance (95 %) | Wall time |"
 echo "|---|---|---|---|---|---:|---|---|---:|"
-echo "| $(date +%F) | $(git -C "$ROOT" rev-parse --short HEAD) | $TC | 8moves_v3 | $LEVEL | $PLAYED | $WINS/$DRAWS/$LOSSES | $PERFORMANCE ± $ERROR | $(( (WALL + 30) / 60 )) min |"
+echo "| $(date +%F) | $COMMIT$([[ $TREE == dirty ]] && echo "+dirty") | $TC | 8moves_v3 ($SEED) | $LEVEL | $PLAYED | $WINS/$DRAWS/$LOSSES | $PERFORMANCE ± $ERROR | $(( (WALL + 30) / 60 )) min |"
+echo "Tools and hashes: $INFO"

@@ -111,6 +111,9 @@ struct UCIProcessTests {
         let secondMark = uci.lineCount
         uci.send("position fen \(Self.second)")
         uci.send("go infinite")
+        // stdin is answered while the search runs, not only after it
+        uci.send("isready")
+        #expect(uci.waitForLine(after: secondMark) { $0 == "readyok" } != nil)
         uci.send("stop")
         let secondBest = try #require(uci.waitForLine(after: secondMark) { $0.hasPrefix("bestmove") })
         #expect(isLegalMove(String(secondBest.dropFirst("bestmove ".count)), in: Self.second))
@@ -165,12 +168,12 @@ struct UCIProcessTests {
         let uci = try UCIProcess()
         defer { uci.terminate() }
 
-        // A rank with 9 files: refused, the process stays alive and plays from the start position
-        uci.send("position fen 4k4/8/8/8/8/8/8/4K3 w - - 0 1 moves e1e2")
+        // A piece on a 9th file: refused, the process stays alive and plays from the start position
+        uci.send("position fen 4k3k/8/8/8/8/8/8/4K3 w - - 0 1 moves e1e2")
         let mark = uci.lineCount
         uci.send("isready")
         #expect(uci.waitForLine(after: mark) { $0 == "readyok" } != nil)
-        var lines = try search(uci, position: "fen 4k4/8/8/8/8/8/8/4K3 w - - 0 1 moves e1e2")
+        var lines = try search(uci, position: "fen 4k3k/8/8/8/8/8/8/4K3 w - - 0 1 moves e1e2")
         #expect(isLegalMove(bestMove(in: lines), in: Self.start))
 
         // An en passant square that cannot exist: sanitized, so the move is played
@@ -191,25 +194,34 @@ struct UCIProcessTests {
         let uci = try UCIProcess()
         defer { uci.terminate() }
 
+        // The budget runs out inside a depth: no timing of ours is involved
         uci.send("position fen \(Self.first)")
         let mark = uci.lineCount
-        uci.send("go infinite")
-        #expect(uci.waitForLine(after: mark, timeout: 20) { $0.hasPrefix("info depth 4 ") } != nil)
-        // Into the next depth, so that it is interrupted
-        Thread.sleep(forTimeInterval: 0.05)
-        uci.send("stop")
+        uci.send("go movetime 400")
         #expect(uci.waitForLine(after: mark) { $0.hasPrefix("bestmove") } != nil)
 
         let lines = Array(uci.allLines.dropFirst(mark))
         let infos = lines.filter { $0.hasPrefix("info ") }
         #expect(infos.count >= 2)
         #expect(lines.last?.hasPrefix("bestmove") == true)
-        // The last line before bestmove is the final one: its totals cover the interrupted depth
+        // The last line before bestmove is the final one
         #expect(lines[lines.count - 2] == infos.last)
         let final = infos[infos.count - 1]
         let before = infos[infos.count - 2]
+        // Same completed depth, score and line, with the work of the interrupted depth added
+        #expect(field("depth", in: final) == field("depth", in: before))
+        #expect(text(after: "score", until: "time", in: final) == text(after: "score", until: "time", in: before))
+        #expect(text(after: "pv", until: nil, in: final) == text(after: "pv", until: nil, in: before))
         #expect(field("nodes", in: final) > field("nodes", in: before))
         #expect(field("time", in: final) >= field("time", in: before))
+    }
+
+    /// The tokens between two keywords of an info line, as one string.
+    private func text(after start: String, until end: String?, in line: String) -> String {
+        let tokens = line.split(separator: " ").map(String.init)
+        guard let from = tokens.firstIndex(of: start) else { return "" }
+        let to = end.flatMap { tokens.firstIndex(of: $0) } ?? tokens.count
+        return tokens[(from + 1)..<to].joined(separator: " ")
     }
 
     private func field(_ name: String, in line: String) -> Int {

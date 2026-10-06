@@ -9,6 +9,7 @@
 #include "FFEN.hpp"
 #include "FUtility.hpp"
 
+#include <algorithm>
 #include <vector>
 #include <cassert>
 #include <iostream>
@@ -181,29 +182,25 @@ bool FFEN::setFEN(std::string fen, ChessBoard &board) {
     parsed.reset();
     parsed.clear();
     
-    // More than 8 ranks, or more than 8 files in a rank, would write outside the board
-    if (ranks.size() > 8) {
-        std::cerr << "Invalid FEN string, too many ranks: " << fen << std::endl;
-        return false;
-    }
-    
     Coordinate coord = { 7, 0 };
     for (std::string rank : ranks) {
         for (char p : rank) {
             auto emptySquares = p - '0';
             if (emptySquares >= 1 && emptySquares <= 8) {
-                coord.file += emptySquares;
+                // Empty squares past the end of the rank are harmless (earlier versions accepted them)
+                coord.file = std::min(int(coord.file) + emptySquares, 8);
             } else {
                 BoardSquare square;
-                if (!charToSquare(p, square) || coord.file > 7) {
+                if (!charToSquare(p, square)) {
+                    return false;
+                }
+                // A piece that does not fit on the board is not a position
+                if (coord.file > 7 || coord.rank < 0 || coord.rank > 7) {
+                    std::cerr << "Invalid FEN string, a piece is off the board: " << fen << std::endl;
                     return false;
                 }
                 parsed.set(square, coord.file, coord.rank);
                 coord.file += 1;
-            }
-            if (coord.file > 8) {
-                std::cerr << "Invalid FEN string, too many files: " << fen << std::endl;
-                return false;
             }
         }
         coord.rank -= 1;
@@ -218,12 +215,12 @@ bool FFEN::setFEN(std::string fen, ChessBoard &board) {
         parsed.setCastling(fields[2]);
     }
     
-    // En passant: a name that is not a square on the third or sixth rank is ignored
+    // En passant: a name that is not a square is ignored (the validation below does the rest)
     if (fields.size() > 3) {
         auto enPassant = fields[3];
         parsed.enPassant = 0;
         auto square = squareForName(enPassant);
-        if (square != SquareUndefined && (RankFrom(square) == 2 || RankFrom(square) == 5)) {
+        if (square != SquareUndefined) {
             bb_set(parsed.enPassant, square);
         }
     }
