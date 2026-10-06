@@ -178,7 +178,7 @@ int ChessEvaluater::evaluate(ChessBoard board, HistoryPtr history, MoveList move
             // Advantage when a pair of bishop is detected, which is worth 1/2 pawn
             // https://www.chess.com/article/view/the-evaluation-of-material-imbalances-by-im-larry-kaufman
             if (piece == BISHOP && count >= 2) {
-                value += color * (PieceValue[PAWN]/2);
+                value += colorSign * (PieceValue[PAWN]/2);
             }
             
             // Now let's add some bonus depending on the piece location

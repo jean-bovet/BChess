@@ -45,10 +45,10 @@ TEST_F(SearchChessTests, ChessTree) {
     config.quiescenceSearch = false;
 
     config.alphaBetaPrunning = true;
-    assertChessSearch(23201, 50, config); // with alpha-beta prunning
+    assertChessSearch(23364, 0, config); // with alpha-beta prunning
     
     config.alphaBetaPrunning = false;
-    assertChessSearch(142400, 50, config); // without alpha-beta
+    assertChessSearch(142400, 0, config); // without alpha-beta
 }
 
 TEST_F(SearchChessTests, OrderedMove) {
@@ -59,8 +59,8 @@ TEST_F(SearchChessTests, OrderedMove) {
     Configuration config;
 
     config.sortMoves = true;
-    assertChessSearch(39168, 50, config, board);
+    assertChessSearch(43391, 50, config, board);
     
     config.sortMoves = false;
-    assertChessSearch(311437, 50, config, board);
+    assertChessSearch(341658, 50, config, board);
 }
