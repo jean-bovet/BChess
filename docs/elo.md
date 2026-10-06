@@ -100,7 +100,7 @@ diffs two outputs, and `scripts/bench.sh --perft` runs ENGINE-1's perft check.
 - The rating is relative to that anchor. It is not a FIDE or a CCRL rating.
 - A limited-strength Stockfish plays its weaker moves differently from a human of that rating, and
   from other engines.
-- What the number reflects in BChess: no transposition table in the tool, no fifty-move rule, and
+- What the number reflects in BChess: the transposition table orders moves but never cuts off (it is off for cut-offs in the tool), no fifty-move rule, and
   no quiescence search while in check.
 - The error bars widen as the score moves away from 50 %, which is why the level is chosen near the
   engine's own.
@@ -124,9 +124,13 @@ score point is about 695 Elo at 50 %):
 |---|---|---|---|---|---:|---|---|---:|
 | 2026-10-06 | c527652 | 10+0.1 | 8moves_v3 (not recorded) | 1600 | 40 | 28/2/10 | 1768 ± 125 | 4 min |
 | 2026-10-06 | c527652 | 10+0.1 | 8moves_v3 (not recorded) | 1800 | 300 | 115/15/170 | **1736 ± 40** | 34 min |
+| 2026-10-06 | e0c7f01 | 10+0.1, margin 200 | 8moves_v3 (498536314) | 2000 | 40 | 18/3/19 | 1991 ± 116 | 5 min |
+| 2026-10-06 | e0c7f01 | 10+0.1, margin 200 | 8moves_v3 (124222418) | 2000 | 300 | 116/21/163 | **1945 ± 39** | 35 min |
 
 The first row is the probe that picked the level for the second. The second is the measurement:
 `LEVEL=1800 GAMES=300 scripts/elo-match.sh` (10+0.1, concurrency 4, Apple M2, Stockfish 19,
 fastchess v1.8.2-alpha). Score 40.8 %, Elo difference to Stockfish 1800 of −64 ± 40 (95 %). No
 illegal move, time forfeit, disconnect or stall in either run. BChess at this commit therefore
 plays at about 1740 ± 40 on Stockfish's `UCI_Elo` scale at 10+0.1.
+
+ENGINE-3 (speed: a faster search at the same evaluation, delta pruning in quiescence; the transposition table orders moves but does not cut off) is in the next two rows, with a 200 ms time margin for both engines (`TIMEMARGIN=200`, in the run info) after forfeits of 100 to 150 ms on a loaded machine. The first is the 40-game probe that picked the level. The second is the measurement: 300 games, no forfeit, score 42.2 %, Elo difference to Stockfish 2000 of -54.9 ± 39.4. Against ENGINE-2 itself (`BASE=2eb86d5 TIMEMARGIN=200 scripts/elo-match.sh`, SPRT [0, 10], 5+0.05) H1 was accepted after 208 games, 142/49/17, +241 ± 51 Elo, LLR 2.95.
