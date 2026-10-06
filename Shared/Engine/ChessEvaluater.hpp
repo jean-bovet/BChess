@@ -21,6 +21,19 @@ public:
     // the line of moves to the mat).
     static const int MAT_VALUE = 100000;
     
+    // The search scores a mate MAT_VALUE minus the number of plies to it, so that the shorter mate wins.
+    // No other score comes anywhere near.
+    static const int MAX_MATE_PLY = 1000;
+    
+    static bool isMateScore(int value) {
+        return value > MAT_VALUE - MAX_MATE_PLY || value < -(MAT_VALUE - MAX_MATE_PLY);
+    }
+    
+    // The number of plies to the mate that a mate score stands for, 0 for any other score
+    static int matePlies(int value) {
+        return isMateScore(value) ? MAT_VALUE - (value < 0 ? -value : value) : 0;
+    }
+    
     static bool positionalAnalysis;
     
     static bool isQuiet(Move move);    

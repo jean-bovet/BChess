@@ -87,6 +87,112 @@ TEST_F(MinMaxSearchTests, QuiescenceNeverBelowStandPat) {
     }
 }
 
+// The search with an explicit table, so that a test can share one between searches.
+static int searchWithTable(const char *fen, int maxDepth, bool useTable, TranspositionTable &table, MinMaxSearch::Variation &pv, MinMaxSearch *used = nullptr) {
+    ChessBoard board;
+    EXPECT_TRUE(FFEN::setFEN(fen, board));
+    
+    MinMaxSearch search;
+    search.config.maxDepth = maxDepth;
+    search.config.transpositionTable = useTable;
+    
+    MinMaxSearch::Variation bv;
+    int score = search.alphabeta(board, NEW_HISTORY, table, 0, board.color == WHITE, pv, bv);
+    if (used) {
+        used->visitedNodes = search.visitedNodes;
+        used->maxPly = search.maxPly;
+    }
+    return score;
+}
+
+static const int mate = ChessEvaluater::MAT_VALUE;
+
+// White mates in 1 and in 2; the same positions with the colours swapped give the negative scores
+static const char *mateIn1White = "6k1/5ppp/8/8/8/8/8/R5K1 w - - 0 1";
+static const char *mateIn1Black = "r5k1/8/8/8/8/8/5PPP/6K1 b - - 0 1";
+static const char *mateIn2White = "7k/8/5K2/8/8/8/8/R7 w - - 0 1"; // Kg6 (or Ra7) and Ra8#
+static const char *mateIn2Black = "1r6/K1k5/8/8/8/8/8/8 b - - 1 2";
+
+// A mate is worth less the further it is from the root: the search then prefers the shorter one
+TEST_F(MinMaxSearchTests, MateCarriesDistance) {
+    for (bool useTable : {false, true}) {
+        TranspositionTable table;
+        MinMaxSearch::Variation pv;
+        ASSERT_EQ(mate - 1, searchWithTable(mateIn1White, 3, useTable, table, pv)) << useTable;
+        
+        TranspositionTable table2;
+        MinMaxSearch::Variation pv2;
+        ASSERT_EQ(-(mate - 1), searchWithTable(mateIn1Black, 3, useTable, table2, pv2)) << useTable;
+        
+        TranspositionTable table3;
+        MinMaxSearch::Variation pv3;
+        ASSERT_EQ(mate - 3, searchWithTable(mateIn2White, 4, useTable, table3, pv3)) << useTable;
+        
+        TranspositionTable table4;
+        MinMaxSearch::Variation pv4;
+        ASSERT_EQ(-(mate - 3), searchWithTable(mateIn2Black, 4, useTable, table4, pv4)) << useTable;
+    }
+}
+
+TEST_F(MinMaxSearchTests, MateScoreHelpers) {
+    ASSERT_TRUE(ChessEvaluater::isMateScore(mate));
+    ASSERT_TRUE(ChessEvaluater::isMateScore(-(mate - 7)));
+    ASSERT_FALSE(ChessEvaluater::isMateScore(0));
+    ASSERT_FALSE(ChessEvaluater::isMateScore(5000));
+    ASSERT_FALSE(ChessEvaluater::isMateScore(-(mate - ChessEvaluater::MAX_MATE_PLY)));
+    ASSERT_EQ(3, ChessEvaluater::matePlies(mate - 3));
+    ASSERT_EQ(3, ChessEvaluater::matePlies(-(mate - 3)));
+    ASSERT_EQ(0, ChessEvaluater::matePlies(120));
+}
+
+// Qg7# mates at once, Qf3 (or Qf8+) mates later: with equal scores the first one found won
+TEST_F(MinMaxSearchTests, PrefersShorterMate) {
+    TranspositionTable table;
+    MinMaxSearch::Variation pv;
+    int score = searchWithTable("7k/5Q2/6K1/8/8/8/8/8 w - - 0 1", 4, false, table, pv);
+    ASSERT_EQ(mate - 1, score);
+    ASSERT_GT(pv.moves.count, 0);
+    ASSERT_EQ(f7, MOVE_FROM(pv.moves.moves[0]));
+    ASSERT_EQ(g7, MOVE_TO(pv.moves.moves[0]));
+}
+
+// P: White to move, mate in 2. Q: Black to move, its only move leads to P (the rook checks, only Ka2 escapes).
+// All scores are White's, as alphabeta returns them.
+TEST_F(MinMaxSearchTests, TTMateIsPlyRelative) {
+    const char *P = "8/8/8/8/8/8/k1K5/1R6 w - - 1 2";
+    const char *Q = "8/8/8/8/8/8/2K5/kR6 b - - 0 1";
+    const char *Pm = "1r6/K1k5/8/8/8/8/8/8 b - - 1 2";
+    const char *Qm = "Kr6/2k5/8/8/8/8/8/8 w - - 0 1";
+    struct Case { const char *p; const char *q; int sign; };
+    for (auto c : {Case{P, Q, 1}, Case{Pm, Qm, -1}}) {
+        // (a) the table holds P (stored at ply 0), Q probes it at ply 1
+        {
+            TranspositionTable table;
+            MinMaxSearch::Variation pv1, pv2;
+            ASSERT_EQ(c.sign * (mate - 3), searchWithTable(c.p, 4, true, table, pv1));
+            ASSERT_EQ(c.sign * (mate - 4), searchWithTable(c.q, 5, true, table, pv2)) << c.q;
+        }
+        // (b) Q stores P at ply 1, the root probe of P at ply 0 reads it back
+        {
+            TranspositionTable table;
+            MinMaxSearch::Variation pv1, pv2;
+            ASSERT_EQ(c.sign * (mate - 4), searchWithTable(c.q, 5, true, table, pv1)) << c.q;
+            ASSERT_EQ(c.sign * (mate - 3), searchWithTable(c.p, 4, true, table, pv2));
+        }
+    }
+}
+
+// The deepest ply visited, in the search or in the quiescence search, not the depth of the principal variation
+TEST_F(MinMaxSearchTests, SelDepthIsDeepestVisited) {
+    TranspositionTable table;
+    MinMaxSearch::Variation pv;
+    MinMaxSearch used;
+    searchWithTable("r1bqkb1r/pppp1ppp/2n2n2/4p3/2B1P3/3P1N2/PPP2PPP/RNBQK2R w KQkq - 0 1", 2, false, table, pv, &used);
+    // The line that was chosen ends at ply 2 (qsDepth), and a capture sequence elsewhere runs much deeper
+    ASSERT_EQ(2, pv.qsDepth);
+    ASSERT_GT(used.maxPly, pv.qsDepth);
+}
+
 #ifdef BCHESS_TEST_HOOKS
 
 // A search that is cancelled in the middle of the root's move loop must not leave an entry for the

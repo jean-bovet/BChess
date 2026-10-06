@@ -25,6 +25,10 @@
     return self.info.time;
 }
 
+- (NSInteger)selDepth {
+    return self.info.selDepth;
+}
+
 - (NSInteger)quiescenceDepth {
     return self.info.quiescenceDepth;
 }
@@ -46,7 +50,11 @@
 }
 
 - (BOOL)mat {
-    return self.value == ChessEvaluater::MAT_VALUE || self.value == -ChessEvaluater::MAT_VALUE;
+    return ChessEvaluater::isMateScore((int)self.value);
+}
+
+- (NSInteger)matePlies {
+    return ChessEvaluater::matePlies((int)self.value);
 }
 
 - (NSUInteger)fromRank {

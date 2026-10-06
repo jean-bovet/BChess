@@ -61,6 +61,11 @@ public:
     // The last depth that search() completed, 0 before depth 1 is done.
     std::atomic<int> completedDepth{0};
     
+    // Nodes per second, 0 when no time has elapsed
+    static int64_t nodesPerSecond(int64_t nodes, int64_t milliseconds) {
+        return milliseconds > 0 ? nodes * 1000 / milliseconds : 0;
+    }
+    
     // Arms the next search(). It is separate from search() so that a stop() or cancel() that arrives
     // before search() begins is honored instead of being overwritten.
     void start() {
@@ -78,14 +83,20 @@ public:
         
         ChessEvaluation evaluation;
         MinMaxSearch::Variation bestVariation;
+        
+        // One clock and one node count for the whole search, so that the figures add up over the depths
+        TimeManagement searchClock;
+        searchClock.start();
+        int64_t totalNodes = 0;
+        auto elapsedMilli = [&searchClock] {
+            searchClock.stop();
+            return int64_t(searchClock.elapsedMilli());
+        };
 
         for (int curMaxDepth=1; curMaxDepth<=maxDepth; curMaxDepth++) {
             if (cancelled() || (curMaxDepth > 1 && !running())) {
                 break;
             }
-            
-            TimeManagement moveClock;
-            moveClock.start();
             
             minMaxSearch.config.maxDepth = curMaxDepth;
             minMaxSearch.reset();
@@ -94,18 +105,16 @@ public:
             
             int score = minMaxSearch.alphabeta(board, history, table, 0, board.color == WHITE, pv, bestVariation);
             
-            moveClock.stop();
+            totalNodes += minMaxSearch.visitedNodes;
             
 //            int percentCollision = (float)table.collisionCount / table.storeCount * 100;
 //            std::cout << "Entry count = " << table.storeCount << ", collision = " << table.collisionCount << " (" << percentCollision << "%)" << ", new = " << table.newStoreCount << std::endl;
 
-            double movesPerSingleMs = minMaxSearch.visitedNodes / moveClock.elapsedMilli();
-            int movesPerSecond = int(movesPerSingleMs * 1e3);
-            
             if (cancelled()) {
                 break;
             }
             
+            // A depth that was interrupted holds a partial result: nothing is recorded or reported for it
             if (curMaxDepth == 1 || running()) {
                 bestVariation = pv;
                 
@@ -115,19 +124,20 @@ public:
 
                 evaluation.depth = pv.depth;
                 evaluation.quiescenceDepth = pv.qsDepth;
+                evaluation.selDepth = int(minMaxSearch.maxPly);
 
                 evaluation.line.push(pv.moves);
                 
-                evaluation.nodes = minMaxSearch.visitedNodes;
-                evaluation.time = int(moveClock.elapsedMilli()/1e3);
+                evaluation.nodes = totalNodes;
+                evaluation.time = elapsedMilli();
                 evaluation.engineColor = board.color;
-                evaluation.movesPerSecond = movesPerSecond;
+                evaluation.movesPerSecond = nodesPerSecond(evaluation.nodes, evaluation.time);
                 
                 completedDepth = curMaxDepth;
-            }
-            
-            if (callback) {
-                callback(evaluation);
+                
+                if (callback) {
+                    callback(evaluation);
+                }
             }
             
             // If the principal variation has no valid move, it means
@@ -136,6 +146,12 @@ public:
                 break;
             }
         }
+        
+        // The returned evaluation keeps the score and the line of the last completed depth, but its
+        // totals cover all the work, including a depth that was interrupted
+        evaluation.nodes = totalNodes;
+        evaluation.time = elapsedMilli();
+        evaluation.movesPerSecond = nodesPerSecond(evaluation.nodes, evaluation.time);
         
         Status expected = Status::running;
         status.compare_exchange_strong(expected, Status::stopped);

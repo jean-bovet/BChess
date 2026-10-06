@@ -22,10 +22,15 @@ NS_SWIFT_SENDABLE
 @property (nonatomic, strong, readonly) FEngineMove * _Nullable bestEngineMove;
 
 @property (nonatomic, assign, readonly) BOOL mat;
+// The number of plies to the mate when `mat`, 0 otherwise
+@property (nonatomic, assign, readonly) NSInteger matePlies;
 @property (nonatomic, assign, readonly) BOOL isWhite;
 
 @property (nonatomic, assign, readonly) NSInteger depth;
 @property (nonatomic, assign, readonly) NSInteger quiescenceDepth;
+// The deepest ply the search visited
+@property (nonatomic, assign, readonly) NSInteger selDepth;
+// Milliseconds since the search started, and the nodes and nodes per second of the whole search
 @property (nonatomic, assign, readonly) NSInteger time;
 @property (nonatomic, assign, readonly) NSInteger nodeEvaluated;
 @property (nonatomic, assign, readonly) NSInteger movesPerSecond;

@@ -64,7 +64,10 @@ class MinMaxSearch {
 public:
     Configuration config;
     
-    int visitedNodes = 0;
+    int64_t visitedNodes = 0;
+    
+    // The deepest ply visited by alphabeta or quiescence since reset()
+    int64_t maxPly = 0;
     
 #ifdef BCHESS_TEST_HOOKS
     // Called in the move loop right after the move has been pushed on the history. Tests use it to
@@ -74,6 +77,7 @@ public:
     
     void reset() {
         visitedNodes = 0;
+        maxPly = 0;
     }
 
     void cancel() {
@@ -102,6 +106,31 @@ public:
     
 private:
     
+    // A mate found at this ply from the root is worth less than a mate found closer to it
+    static int mateAtPly(int score, int ply) {
+        if (score == ChessEvaluater::MAT_VALUE) {
+            return score - ply;
+        } else if (score == -ChessEvaluater::MAT_VALUE) {
+            return score + ply;
+        }
+        return score;
+    }
+    
+    // The table holds a mate relative to its own node, so that another path to the node reads it right
+    static int ttValueToStore(int value, int ply) {
+        if (!ChessEvaluater::isMateScore(value)) {
+            return value;
+        }
+        return value > 0 ? value + ply : value - ply;
+    }
+    
+    static int ttValueFromProbe(int value, int ply) {
+        if (!ChessEvaluater::isMateScore(value)) {
+            return value;
+        }
+        return value > 0 ? value - ply : value + ply;
+    }
+    
     // pv: Principal Variation - the best line found so far.
     // cv: Current Variation - the current line being examined.
     // bv: Best Variation - if available
@@ -109,6 +138,7 @@ private:
     // https://chessprogramming.wikispaces.com/Principal+variation
     int alphabeta(ChessBoard node, HistoryPtr history, TranspositionTable &table, int depth, int alpha, int beta, int color, Variation &pv, Variation &cv, Variation &bv) {
         pv.depth = depth;
+        maxPly = std::max<int64_t>(maxPly, depth);
 
         int evalDepth = config.maxDepth - depth;
         
@@ -123,26 +153,28 @@ private:
             
             // Make sure the entry exists and that its depth is at least what we are at right now
             if (entry.depth >= evalDepth) {
+                // Relative to the root, like alpha and beta
+                int value = ttValueFromProbe(entry.value, depth);
                 switch (entry.type) {
                     case TranspositionEntryType::EXACT:
                         // Exact value: use it right away
                         assert(ChessMoveGenerator::isValid(entry.bestMove));
-                        pv.push(entry.value, entry.bestMove, Variation());
-                        return entry.value;
+                        pv.push(value, entry.bestMove, Variation());
+                        return value;
                         
                     case TranspositionEntryType::ALPHA:
-                        if (entry.value <= alpha) {
+                        if (value <= alpha) {
                             assert(ChessMoveGenerator::isValid(entry.bestMove));
-                            pv.push(entry.value, entry.bestMove, Variation());
-                            return entry.value;
+                            pv.push(value, entry.bestMove, Variation());
+                            return value;
                         }
                         break;
                         
                     case TranspositionEntryType::BETA:
-                        if (entry.value >= beta) {
+                        if (value >= beta) {
                             assert(ChessMoveGenerator::isValid(entry.bestMove));
-                            pv.push(entry.value, entry.bestMove, Variation());
-                            return entry.value;
+                            pv.push(value, entry.bestMove, Variation());
+                            return value;
                         }
                         break;
                 }
@@ -158,14 +190,14 @@ private:
                 int score = quiescence(node, history, depth, alpha, beta, color, pv, cv);
                 return score;
             } else {
-                int score = ChessEvaluater::evaluate(node, history) * color;
+                int score = mateAtPly(ChessEvaluater::evaluate(node, history) * color, depth);
                 return score;
             }
         }
         
         auto moves = ChessMoveGenerator::generateMoves(node);
         if (moves.count == 0) {
-            int score = ChessEvaluater::evaluate(node, history, moves) * color;
+            int score = mateAtPly(ChessEvaluater::evaluate(node, history, moves) * color, depth);
             return score;
         }
         
@@ -241,7 +273,7 @@ private:
         // A loop that was cut short holds a partial value, which must not be trusted by a later search
         // of the same position. Its parents are cut short too, so they store nothing either.
         if (ChessMoveGenerator::isValid(bestMove) && !stopped()) {
-            table.store(evalDepth, node.getHash(), bestValue, bestMove, entryType
+            table.store(evalDepth, node.getHash(), ttValueToStore(bestValue, depth), bestMove, entryType
 #ifdef ASSERT_TT_KEY_COLLISION
                         , FFEN::getFEN(node, true)
 #endif
@@ -260,12 +292,13 @@ private:
     // https://www.ics.uci.edu/~eppstein/180a/990204.html
     int quiescence(ChessBoard node, HistoryPtr history, int depth, int alpha, int beta, int color, Variation &pv, Variation &cv) {
         pv.qsDepth = depth;
+        maxPly = std::max<int64_t>(maxPly, depth);
         
         if (ChessEvaluater::isDraw(node, history)) {
             return 0;
         }
 
-        auto stand_pat = ChessEvaluater::evaluate(node, history) * color;
+        auto stand_pat = mateAtPly(ChessEvaluater::evaluate(node, history) * color, depth);
         if (stand_pat >= beta) {
             return stand_pat;
         }

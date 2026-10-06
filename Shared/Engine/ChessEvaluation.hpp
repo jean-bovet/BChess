@@ -8,6 +8,8 @@
 
 #pragma once
 
+#include <cstdint>
+
 #include "MoveList.hpp"
 
 struct ChessEvaluation {
@@ -17,10 +19,13 @@ struct ChessEvaluation {
     
     int quiescenceDepth = 0;
     int depth = 0;
+    // The deepest ply visited in the depth that produced this evaluation
+    int selDepth = 0;
     
-    int time = 0;
-    int nodes = 0;
-    int movesPerSecond = 0;
+    // Totals since the search started: milliseconds, and nodes
+    int64_t time = 0;
+    int64_t nodes = 0;
+    int64_t movesPerSecond = 0;
     
     Color engineColor = WHITE;
     
