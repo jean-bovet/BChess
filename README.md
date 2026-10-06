@@ -50,6 +50,45 @@ How changes are planned and reviewed is described in `AGENTS.md` and `planning/`
 - `BChess/`: the `BChessUCI` command-line tool
 - `BChessTests/`, `BChessUITests/`: tests
 
+## How BChess was built
+
+BChess was written by hand from 2017 to 2022, then modernized with
+[Claude Code](https://claude.com/claude-code) in October 2026. The git history shows which is which:
+every commit made with Claude Code carries a `Co-Authored-By: Claude` trailer.
+
+### By hand (2017–2022, 331 commits)
+
+- **The chess engine**, in C++: bitboards with magic move generation, legal move generation with
+  castling, en passant and promotion, alpha-beta search with iterative deepening, quiescence search,
+  a transposition table, an evaluation with piece-square tables, and an opening book.
+- **FEN and PGN** reading and writing, including comments and variations, and PGN files with several games.
+- **The UCI command-line engine**, `BChessUCI`.
+- **The apps**: the first macOS UI (2017) and an iOS UI (2018), then the 2021 SwiftUI rewrite for iPhone,
+  iPad and Mac, with document-based games, the move list with variations, and the Analyze Game and
+  Practice Openings modes.
+- **The engine tests**: GoogleTest cases for move generation, check detection, PGN, openings, hashing and search.
+
+### With Claude Code (October 2026)
+
+Each change was planned, reviewed by Codex and implemented following the `/develop` process
+(`AGENTS.md`, `planning/`).
+
+- **Modernization (APP-1):** builds with current Xcode for iOS 26 / macOS 26 (the project had stopped
+  building); XcodeGen; Swift 6; the engine tests, which had silently stopped running, run again as
+  Swift Testing cases; a thread-safe engine bridge; an iOS app that opens straight onto the board with
+  a Games library; the `.bchess` file type.
+- **A simpler game screen (APP-2):** one status line, a move strip, an engine readout with analysis on
+  the player's turn, a Game menu and Edit-menu copy and paste on the Mac, New Game in a new window.
+- **Engine fixes (ENGINE-1):** six bugs found by a perft suite and a code review, among them castling
+  rights kept after a rook capture, en passant corrupting the hash, quiescence returning the wrong score,
+  and an inverted bishop-pair bonus. Perft now matches all six reference positions.
+- **A match-ready UCI engine and a rating (ENGINE-2):** legal move parsing, mate distance, time control,
+  hardening against malformed FEN, and `scripts/elo-match.sh`; first measurement 1736 ± 40 on
+  Stockfish's UCI_Elo scale (see `docs/elo.md`).
+- **Shipping:** Xcode Cloud builds and TestFlight for iOS and macOS, App Store icons and metadata.
+- **Tests:** from 9 Swift tests (the 88 GoogleTest cases weren't running) to 166 engine test cases and
+  145 app and UCI tests.
+
 ## Attributions
 - [Magic Move-Bitboard Generation in Computer Chess, Pradyumna Kannan](http://pradu.us/old/Nov27_2008/Buzz/research/magic/Bitboards.pdf)
 - [Magic Move-Bitboard Generation Source Code](https://essays.jwatzman.org/essays/chess-move-generation-with-magic-bitboards.html)
@@ -58,10 +97,7 @@ How changes are planned and reviewed is described in `AGENTS.md` and `planning/`
 ## What remains to be done
 
 - Wrap saved PGN at 80 characters per line
-- Finish the Zobrist hashing unit test with all the scenarios: castling, attack, etc.
 - Copy the move history, not just a reference to it, when a game is copied (see the workaround in `FEngineInfo.mm`)
-- Handle UCI moves with promotion (for example `e7e8q`)
-- Time management in UCI
 - Add the 50-move rule
 - Add a heuristic that gives a bonus when the king is safely behind its row of pawns after castling
 - Add more openings: the opening book names only a few lines, so most games show no opening name
