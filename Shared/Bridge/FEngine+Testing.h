@@ -18,6 +18,10 @@ NS_ASSUME_NONNULL_BEGIN
  search queue. */
 - (NSUInteger)transpositionTableBytes;
 
+/** The table size in megabytes that the engine takes on a phone or on a Mac. The platform is chosen at compile
+ time, and the iOS scheme runs UI tests only, so both values are checked from here. */
++ (NSUInteger)hashMegabytesForPhone:(BOOL)phone;
+
 /** Called inside the search, right after a move has been pushed on the search's history. Takes effect
  only in builds that define BCHESS_TEST_HOOKS. Pass nil to remove it. */
 - (void)setSearchCheckpoint:(nullable dispatch_block_t)block;

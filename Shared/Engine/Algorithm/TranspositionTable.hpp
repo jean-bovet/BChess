@@ -56,7 +56,7 @@ class TranspositionTable {
     bool allocationFailed = false;
     uint8_t generation = 0;
     
-    static void *allocate(size_t count, size_t size) {
+    void *allocate(size_t count, size_t size) {
 #ifdef BCHESS_TEST_HOOKS
         return allocator(count, size);
 #else
@@ -79,8 +79,9 @@ class TranspositionTable {
 public:
     
 #ifdef BCHESS_TEST_HOOKS
-    // The allocation, replaceable by a test that wants it to fail or to see the size requested
-    inline static void *(*allocator)(size_t count, size_t size) = calloc;
+    // The allocation of this table, replaceable by a test that wants it to fail or to see the size requested.
+    // Per table, so that other tables in the process (other tests' searches) are not affected.
+    void *(*allocator)(size_t count, size_t size) = calloc;
 #endif
     
     bool enabled = true;

@@ -76,22 +76,16 @@ static void *failingAllocator(size_t count, size_t size) {
     return nullptr;
 }
 
-class ScopedAllocator {
-    void *(*saved)(size_t, size_t);
-public:
-    ScopedAllocator(void *(*replacement)(size_t, size_t)) : saved(TranspositionTable::allocator) {
-        allocatorCalls = 0;
-        TranspositionTable::allocator = replacement;
-    }
-    ~ScopedAllocator() {
-        TranspositionTable::allocator = saved;
-    }
-};
+// The allocator belongs to the table, so the other searches of the process keep using calloc
+static void useFailingAllocator(TranspositionTable &table) {
+    allocatorCalls = 0;
+    table.allocator = failingAllocator;
+}
 
 // No retry on every store, no null dereference, and the search goes on without a table
 TEST_F(TranspositionTableTests, FailedAllocationIsHarmless) {
-    ScopedAllocator scope(failingAllocator);
     TranspositionTable table(1);
+    useFailingAllocator(table);
     for (int i = 1; i <= 1000; i++) {
         put(table, 3, i);
     }
@@ -129,8 +123,8 @@ TEST_F(TranspositionTableTests, SizeIsCheckedAndPowerOfTwo) {
     EXPECT_GT(TranspositionTable::entryCountFor((SIZE_MAX >> 20) + 1), size_t(1) << 30);
     
     // The largest size is clamped, and the byte size of the request does not wrap
-    ScopedAllocator scope(failingAllocator);
     TranspositionTable table(SIZE_MAX);
+    useFailingAllocator(table);
     put(table, 1, 1);
     EXPECT_EQ(1, allocatorCalls);
     EXPECT_EQ(entry, allocatorSize);

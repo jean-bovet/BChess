@@ -300,7 +300,10 @@ static void iterate(const char *fen, int depth, bool sortMoves, std::vector<int>
 }
 
 // Ordering moves only changes how soon alpha-beta cuts off, never the minimax value: with the table never
-// read for cut-offs, iterative deepening gives the same score at every depth whatever the order
+// read for cut-offs, iterative deepening gives the same score at every depth whatever the order. The depths
+// are 2, 2 and 3 rather than the plan's 4: the unsorted full-width search with quiescence at depth 4 takes
+// minutes in the Debug test bundle. The bench (depth 6, scripts/bench.sh) checks the same property on nine
+// positions, and the plan's gate for the ordering steps is that comparison.
 TEST_F(MinMaxSearchTests, OrderingDoesNotChangeTheScore) {
     struct Case { const char *fen; int depth; };
     const Case cases[] = {
@@ -394,14 +397,15 @@ TEST_F(MinMaxSearchTests, KillerIsAQuietMove) {
 #ifdef BCHESS_TEST_HOOKS
 // Quiescence alone from the position, with a window of the test's choosing and delta pruning on or off.
 // Fills the result, its line and the nodes it visited.
-static int quiescenceAt(const char *fen, bool deltaPruning, int alphaOverStandPat, MinMaxSearch::Variation &pv, int64_t &nodes, int &standPatValue) {
+static int quiescenceAt(const char *fen, bool deltaPruning, int alphaOverStandPat, MinMaxSearch::Variation &pv, int64_t &nodes, int &standPatValue, int absoluteAlpha = 0) {
     ChessBoard board;
     EXPECT_TRUE(FFEN::setFEN(fen, board));
     standPatValue = ChessEvaluater::evaluate(board) * (board.color == WHITE ? 1 : -1);
     
     MinMaxSearch search;
     search.config.deltaPruning = deltaPruning;
-    int score = search.quiescenceForTest(board, standPatValue + alphaOverStandPat, INT_MAX, board.color == WHITE ? 1 : -1, pv);
+    int alpha = absoluteAlpha != 0 ? absoluteAlpha : standPatValue + alphaOverStandPat;
+    int score = search.quiescenceForTest(board, alpha, INT_MAX, board.color == WHITE ? 1 : -1, pv);
     nodes = search.visitedNodes;
     return score;
 }
@@ -432,6 +436,30 @@ TEST_F(MinMaxSearchTests, DeltaPruningSkipsHopelessCapture) {
     ASSERT_LE(withDelta, standPat + 1000);
     ASSERT_LE(without, standPat + 1000);
     ASSERT_EQ(standPat, withDelta);
+}
+
+// A capture that promotes can lift the score by a queen, whatever the piece it takes: it is never pruned. Here
+// gxh8 takes a rook (500 + 200 below alpha, so a plain capture would go) and does not give check.
+TEST_F(MinMaxSearchTests, DeltaPruningKeepsAPromotion) {
+    auto fen = "7r/6P1/8/8/8/8/2k5/7K w - - 0 1";
+    MinMaxSearch::Variation pruned, plain;
+    int64_t prunedNodes, plainNodes;
+    int standPat, standPat2;
+    int withDelta = quiescenceAt(fen, true, 1000, pruned, prunedNodes, standPat);
+    int without = quiescenceAt(fen, false, 1000, plain, plainNodes, standPat2);
+    ASSERT_GT(prunedNodes, 0);
+    ASSERT_EQ(plainNodes, prunedNodes);
+    ASSERT_EQ(without, withDelta);
+}
+
+// While alpha is a mate score the margin means nothing: the node is not pruned, whatever the capture
+TEST_F(MinMaxSearchTests, DeltaPruningStopsAtAMateScoreAlpha) {
+    auto fen = "k7/8/8/3p4/4P3/8/8/K7 w - - 0 1"; // exd5 wins a pawn
+    MinMaxSearch::Variation pv;
+    int64_t nodes;
+    int standPat;
+    quiescenceAt(fen, true, 0, pv, nodes, standPat, ChessEvaluater::MAT_VALUE - 5);
+    ASSERT_GT(nodes, 0);
 }
 
 // 1. fxg7 is mate with a pawn that takes a knight: it wins little, but it ends the game, so a node that is far

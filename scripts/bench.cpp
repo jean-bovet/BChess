@@ -23,6 +23,7 @@
 #include "ChessEngine.hpp"
 #include "FFEN.hpp"
 #include "FPGN.hpp"
+#include "FUtility.hpp"
 
 namespace {
 
@@ -77,18 +78,6 @@ Cost now() {
     return cost;
 }
 
-std::vector<std::string> split(const std::string &text) {
-    std::vector<std::string> words;
-    size_t start = 0;
-    while (start < text.size()) {
-        size_t end = text.find(' ', start);
-        if (end == std::string::npos) end = text.size();
-        if (end > start) words.push_back(text.substr(start, end - start));
-        start = end + 1;
-    }
-    return words;
-}
-
 }
 
 int main() {
@@ -119,7 +108,9 @@ int main() {
                 return 1;
             }
         } else {
-            for (auto &uci : split(position.game)) {
+            std::vector<std::string> moves;
+            split4(position.game, moves);
+            for (auto &uci : moves) {
                 if (!engine.move(uci)) {
                     printf("%s: move %s rejected\n", position.name, uci.c_str());
                     return 1;

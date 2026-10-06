@@ -57,15 +57,6 @@ struct MinMaxVariation {
         moves.push(line.moves);
     }
 
-    // A line of one move: the same as pushing an empty line, without building one
-    void push(int score, Move move) {
-        value = score;
-        qsDepth = 0;
-        
-        moves.count = 0;
-        moves.push(move);
-    }
-
 };
 
 class MinMaxSearch {
@@ -245,7 +236,7 @@ private:
             int value = 0;
             if (entry.depth >= evalDepth && ttCutoff(entry, depth, alpha, beta, value)) {
                 assert(ChessMoveGenerator::isValid(entry.bestMove));
-                pv.push(value, entry.bestMove);
+                pv.push(value, entry.bestMove, emptyLine);
                 return value;
             }
         }

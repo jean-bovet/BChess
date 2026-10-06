@@ -22,11 +22,13 @@ struct FEngineTests {
 
         engine.async = false
         engine.evaluate(2) { _, _ in }
-        #if os(iOS)
-        #expect(engine.transpositionTableBytes() == 16 * 1024 * 1024)
-        #else
         #expect(engine.transpositionTableBytes() == 64 * 1024 * 1024)
-        #endif
+    }
+
+    /// The iOS scheme runs UI tests only, so the phone size is checked through the function that chooses it
+    @Test func hashSizePerPlatform() {
+        #expect(FEngine.hashMegabytes(forPhone: true) == 16)
+        #expect(FEngine.hashMegabytes(forPhone: false) == 64)
     }
 
     @Test func treeNode() {

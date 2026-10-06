@@ -30,11 +30,10 @@
 
 // The transposition table's size. It is allocated by the first search, so an engine that never searches
 // (the probes that validate a pasted text or a file) costs nothing. A phone has far less memory to give.
-#if TARGET_OS_IPHONE
-static const size_t FEngineHashMegabytes = 16;
-#else
-static const size_t FEngineHashMegabytes = 64;
-#endif
+static size_t HashMegabytes(bool phone) {
+    return phone ? 16 : 64;
+}
+static const size_t FEngineHashMegabytes = HashMegabytes(TARGET_OS_IPHONE);
 
 // An Objective-C++ instance variable is default-constructed, so the size goes in through a subclass
 struct FEngineCore: ChessEngine {
@@ -405,6 +404,10 @@ struct FEngineCore: ChessEngine {
 
 - (void)performOnSearchQueue:(dispatch_block_t)block {
     dispatch_async(_searchQueue, block);
+}
+
++ (NSUInteger)hashMegabytesForPhone:(BOOL)phone {
+    return HashMegabytes(phone);
 }
 
 - (NSUInteger)transpositionTableBytes {
