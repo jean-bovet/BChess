@@ -14,6 +14,8 @@
 
 #include <vector>
 #include <map>
+#include <climits>
+#include <functional>
 
 class ChessGame {
 public:

@@ -10,6 +10,7 @@
 
 #include "ChessBoard.hpp"
 #include "Types.hpp"
+#include <cstdint>
 
 class ChessBoardHash {    
 public:

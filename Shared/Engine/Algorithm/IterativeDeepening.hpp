@@ -14,6 +14,9 @@
 
 #include <atomic>
 #include <chrono>
+#include <climits>
+#include <functional>
+#include <iostream>
 using namespace std::chrono;
 
 class TimeManagement {

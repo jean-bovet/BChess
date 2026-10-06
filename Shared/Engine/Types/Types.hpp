@@ -9,6 +9,8 @@
 #pragma once
 
 #include <vector>
+#include <memory>
+#include <cstdint>
 
 typedef uint64_t BoardHash;
 

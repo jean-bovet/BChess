@@ -524,3 +524,15 @@ TEST_F(PGN, MalformedInputFails) {
     ASSERT_FALSE(FPGN::setGame("1. e4 2. d4", game));
     ASSERT_FALSE(FPGN::setGame("[Event] 1. e4 *", game));
 }
+
+// The saved-file boundary: what the storage formatting writes opens again as it is, FEN tags included
+TEST_F(PGN, StorageFormattingReopensAFENGameWithAPromotion) {
+    ChessGame game;
+    ASSERT_TRUE(gameFrom("8/1P6/8/8/8/8/8/1k2K3 w - - 0 1", "1. b8=Q *", game));
+    
+    auto stored = FPGN::getGame(game);
+    ChessGame again;
+    ASSERT_TRUE(FPGN::setGame(stored, again)) << stored;
+    ASSERT_EQ(FFEN::getFEN(game.board), FFEN::getFEN(again.board)) << stored;
+    ASSERT_EQ(stored, FPGN::getGame(again));
+}

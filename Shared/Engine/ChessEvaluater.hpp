@@ -10,6 +10,7 @@
 
 #include "ChessBoard.hpp"
 #include "MoveList.hpp"
+#include <climits>
 
 // https://chessprogramming.wikispaces.com/Evaluation
 class ChessEvaluater {

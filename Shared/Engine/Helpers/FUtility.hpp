@@ -11,6 +11,7 @@
 #include <string>
 #include <algorithm>
 #include <iterator>
+#include <iostream>
 
 template <class Container>
 void split4(const std::string& str, Container& cont,

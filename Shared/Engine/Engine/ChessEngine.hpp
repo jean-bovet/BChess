@@ -25,6 +25,8 @@
 #include "ChessMoveGenerator.hpp"
 #include "ChessEvaluater.hpp"
 #include "ChessEvaluation.hpp"
+#include <functional>
+#include <vector>
 
 typedef MinMaxSearch ChessMinMaxSearch;
 

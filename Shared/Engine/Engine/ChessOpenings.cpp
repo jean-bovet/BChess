@@ -9,6 +9,8 @@
 #include "ChessOpenings.hpp"
 #include "FPGN.hpp"
 #include "FUtility.hpp"
+#include <algorithm>
+#include <vector>
 
 ChessOpenings::ChessOpenings() {
 }

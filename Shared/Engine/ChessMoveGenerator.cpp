@@ -190,7 +190,7 @@ void ChessMoveGenerator::generatePawnsMoves(ChessBoard &board, Color color, Move
         if (mode == Mode::firstMoveOnly && moveList.count > 0) return;
 
         // Also check if it's possible to do the en-passant
-        if (board.enPassant > 0) {
+        if (board.isEnPassantTargetValid(color)) {
             auto enPassantMove = PawnAttacks[color][square] & board.enPassant;
             if (enPassantMove > 0) {
                 auto enPassantToSquare = lsb(enPassantMove);

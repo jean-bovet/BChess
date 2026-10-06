@@ -108,25 +108,10 @@ uint64_t ChessBoardHash::getWhiteTurn() {
 // calls stateKey().
 static bool canCaptureEnPassant(const ChessBoard &board) {
     auto color = board.color;
+    if (!board.isEnPassantTargetValid(color)) {
+        return false;
+    }
     Square target = lsb(board.enPassant);
-    
-    // The target square is on the sixth rank for White and on the third for Black. Anything else
-    // (a hand-written FEN) cannot be captured.
-    if (color == WHITE ? (target < a6 || target > h6) : (target < a3 || target > h3)) {
-        return false;
-    }
-    
-    // The pawn to capture sits behind the target square, which must be empty
-    Square victim = color == WHITE ? target - 8 : target + 8;
-    Bitboard occupied = 0;
-    for (auto &byColor : board.pieces) {
-        for (auto pieces : byColor) {
-            occupied |= pieces;
-        }
-    }
-    if (!bb_test(board.pieces[INVERSE(color)][PAWN], victim) || bb_test(occupied, target)) {
-        return false;
-    }
     
     // Same trick as isAttacked(): a pawn of the other color placed on the target square sees the
     // squares our pawns capture from
@@ -153,7 +138,7 @@ uint64_t ChessBoardHash::stateKey(const ChessBoard &board) {
     if (board.whiteCanCastleQueenSide) key ^= castling[1];
     if (board.blackCanCastleKingSide) key ^= castling[2];
     if (board.blackCanCastleQueenSide) key ^= castling[3];
-    if (board.enPassant && canCaptureEnPassant(board)) {
+    if (canCaptureEnPassant(board)) {
         key ^= enPassantFile[FileFrom(lsb(board.enPassant))];
     }
     return key;

@@ -7,6 +7,7 @@
 //
 
 #include "ChessState.hpp"
+#include <map>
 
 void ChessState::set(ChessBoard board) {
     for (Rank r=0; r<8; r++) {

@@ -13,6 +13,8 @@
 
 #include "ChessGame.hpp"
 #include "ChessBoard.hpp"
+#include <climits>
+#include <vector>
 
 // This class knows how to parse PGN
 // https://en.wikipedia.org/wiki/Portable_Game_Notation

@@ -183,3 +183,49 @@ TEST(BoardHash, SetCastlingInvalidatesTheHash) {
     board.move(createMove(e2, e4, WHITE, PAWN));
     ASSERT_EQ(board.getHash(), ChessBoardHash::hash(board));
 }
+
+static int enPassantMoves(ChessBoard &board) {
+    int count = 0;
+    MoveList moves = ChessMoveGenerator::generateMoves(board);
+    for (int i = 0; i < moves.count; i++) {
+        count += MOVE_IS_ENPASSANT(moves.moves[i]) ? 1 : 0;
+    }
+    return count;
+}
+
+static void expectEveryMoveKeepsTheHashExact(ChessBoard &board) {
+    MoveList moves = ChessMoveGenerator::generateMoves(board);
+    for (int i = 0; i < moves.count; i++) {
+        ChessBoard next = board;
+        next.move(moves.moves[i]);
+        ASSERT_EQ(next.getHash(), ChessBoardHash::hash(next)) << FFEN::getFEN(board);
+    }
+}
+
+// An en-passant square nothing can capture (no pawn behind it, occupied target) must never generate a
+// capture, in the move generator as well as in the hash, whichever way the square got there.
+TEST(BoardHash, ImpossibleEnPassantGeneratesNoCapture) {
+    ChessEngine::initialize();
+
+    const char *fens[] = {
+        "4k3/8/8/4P3/8/8/8/4K3 w - d6 0 1",
+        "4k3/8/3n4/3pP3/8/8/8/4K3 w - d6 0 1",
+    };
+    for (auto fen : fens) {
+        // From a FEN: the square is dropped
+        ChessBoard board;
+        ASSERT_TRUE(FFEN::setFEN(fen, board));
+        ASSERT_EQ(0, enPassantMoves(board)) << fen;
+        ASSERT_EQ(0u, board.enPassant) << fen;
+        expectEveryMoveKeepsTheHashExact(board);
+        
+        // Set directly on the board: the generator and the hash agree that there is no capture
+        ChessBoard without;
+        ASSERT_TRUE(FFEN::setFEN(fen, without));
+        ChessBoard direct = without;
+        bb_set(direct.enPassant, d6);
+        ASSERT_EQ(0, enPassantMoves(direct)) << fen;
+        ASSERT_EQ(ChessBoardHash::hash(without), ChessBoardHash::hash(direct)) << fen;
+        expectEveryMoveKeepsTheHashExact(direct);
+    }
+}

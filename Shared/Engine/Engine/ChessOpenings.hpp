@@ -13,6 +13,7 @@
 #include <vector>
 
 #include "ChessGame.hpp"
+#include <functional>
 
 class ChessOpenings {
 private:

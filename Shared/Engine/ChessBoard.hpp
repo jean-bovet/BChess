@@ -70,7 +70,11 @@ public:
     
     void move(Color color, Piece piece, Square from, Square to);
     
-    Bitboard allPieces(Color color);
+    Bitboard allPieces(Color color) const;
+    
+    // True when the en-passant square can be a capture target for `color`: it is on the right rank, the
+    // target is empty and an opposing pawn stands behind it. Move generation and the hash both use this.
+    bool isEnPassantTargetValid(Color color) const;
     Bitboard emptySquares();
     
     Bitboard getOccupancy();

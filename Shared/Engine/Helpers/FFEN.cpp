@@ -11,6 +11,7 @@
 
 #include <vector>
 #include <cassert>
+#include <iostream>
 
 inline static bool charToSquare(char p, BoardSquare &square) {
     square.empty = false;
@@ -227,6 +228,11 @@ bool FFEN::setFEN(std::string fen, ChessBoard &board) {
     }
     
     dropImpossibleCastlingRights(board);
+    
+    // Nothing can capture on this square: drop it so no move or hash ever depends on it
+    if (!board.isEnPassantTargetValid(board.color)) {
+        board.enPassant = 0;
+    }
     
     return true;
 }

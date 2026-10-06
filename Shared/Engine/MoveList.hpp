@@ -11,6 +11,8 @@
 #include <cassert>
 #include "Move.hpp"
 #include "ChessBoard.hpp"
+#include <cstring>
+#include <vector>
 
 const int MAX_MOVES = 256;
 

@@ -12,6 +12,7 @@
 #include <iostream>
 #include <cassert>
 #include "magicmoves.h"
+#include <cstring>
 
 Bitboard PawnAttacks[2][64];
 
@@ -185,7 +186,7 @@ ChessBoard::ChessBoard() {
 }
 
 void ChessBoard::clear() {
-    memset(pieces, 0, sizeof(pieces));
+    std::memset(pieces, 0, sizeof(pieces));
     occupancyDirty = true;
     hash = 0; // need to recompute it
 }
@@ -474,7 +475,23 @@ void ChessBoard::set(BoardSquare square, File file, Rank rank) {
     occupancyDirty = true;
 }
 
-Bitboard ChessBoard::allPieces(Color color) {
+bool ChessBoard::isEnPassantTargetValid(Color color) const {
+    if (enPassant == 0) {
+        return false;
+    }
+    Square target = lsb(enPassant);
+    
+    // The target square is on the sixth rank for White and on the third for Black
+    if (color == WHITE ? (target < a6 || target > h6) : (target < a3 || target > h3)) {
+        return false;
+    }
+    
+    // The pawn to capture sits behind the target square, which must be empty
+    Square victim = color == WHITE ? target - 8 : target + 8;
+    return bb_test(pieces[INVERSE(color)][PAWN], victim) && !bb_test(allPieces(WHITE) | allPieces(BLACK), target);
+}
+
+Bitboard ChessBoard::allPieces(Color color) const {
     return pieces[color][PAWN]|
     pieces[color][ROOK]|
     pieces[color][KNIGHT]|

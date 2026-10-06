@@ -16,6 +16,7 @@
 #include <cassert>
 #include <iostream>
 #include <vector>
+#include <cstdio>
 
 #define PARSE_BEGIN unsigned savedCursor = cursor; eatWhiteSpaces();
 
@@ -852,32 +853,21 @@ static void getPGN(ChessBoard board, // The chess board representation which is 
         return;
     }
     
-    FPGN::SANType sanType = FPGN::SANType::full;
-    auto matchingMoves = getMatchingMoves(board, MOVE_TO(move), piece, MOVE_PROMOTION_PIECE(move), FileUndefined, RankUndefined);
-    if (matchingMoves.size() == 1) {
-        // Only one matching move, we can use the shortest form for PGN
-        // For example: Ne3
-        sanType = FPGN::SANType::tight;
-    } else {
-        matchingMoves = getMatchingMoves(board, MOVE_TO(move), piece, MOVE_PROMOTION_PIECE(move), FileFrom(MOVE_FROM(move)), RankUndefined);
-        if (matchingMoves.size() == 1) {
-            // Use the File to specify the move. For example: Nge3
-            sanType = FPGN::SANType::medium;
-        } else {
-            matchingMoves = getMatchingMoves(board, MOVE_TO(move), piece, MOVE_PROMOTION_PIECE(move), FileUndefined, RankFrom(MOVE_FROM(move)));
-            if (matchingMoves.size() == 1) {
-                // Use the Rank to specify the move. For example: N1e3
-                sanType = FPGN::SANType::rank;
-            } else {
-                matchingMoves = getMatchingMoves(board, MOVE_TO(move), piece, MOVE_PROMOTION_PIECE(move), FileFrom(MOVE_FROM(move)), RankFrom(MOVE_FROM(move)));
-                if (matchingMoves.size() == 1) {
-                    sanType = FPGN::SANType::full;
-                } else {
-                    // Should not happen
-                    printf("Unable to find matching moves\n");
-                }
-            }
+    // The shortest SAN that no other legal move of the same piece to the same square shares: the piece
+    // and square (Ne3), else the file (Nge3), else the rank (N1e3), else the full origin (Ng1e3).
+    FPGN::SANType sanType = FPGN::SANType::tight;
+    auto from = MOVE_FROM(move);
+    bool sharesFile = false, sharesRank = false, hasOthers = false;
+    for (auto other : getMatchingMoves(board, MOVE_TO(move), piece, MOVE_PROMOTION_PIECE(move), FileUndefined, RankUndefined)) {
+        if (MOVE_FROM(other) == from) {
+            continue;
         }
+        hasOthers = true;
+        sharesFile = sharesFile || FileFrom(MOVE_FROM(other)) == FileFrom(from);
+        sharesRank = sharesRank || RankFrom(MOVE_FROM(other)) == RankFrom(from);
+    }
+    if (hasOthers) {
+        sanType = !sharesFile ? FPGN::SANType::medium : (!sharesRank ? FPGN::SANType::rank : FPGN::SANType::full);
     }
     
     // The side to move and the move number come from the board, so that a game that starts from a FEN

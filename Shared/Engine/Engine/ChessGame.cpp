@@ -13,6 +13,7 @@
 #include "ChessBoardHash.hpp"
 #include "ChessState.hpp"
 #include <math.h>
+#include <vector>
 
 ChessGame::ChessGame() {
     history = NEW_HISTORY;
