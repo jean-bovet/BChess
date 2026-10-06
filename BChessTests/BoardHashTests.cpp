@@ -16,7 +16,7 @@
 #include "FPGN.hpp"
 #include "ChessMoveGenerator.hpp"
 
-TEST(BoardHash, MakeAndUndoMove) {
+TEST(BoardHash, MoveChangesTheHash) {
     ChessEngine::initialize();
     
     ChessBoard board;
@@ -34,8 +34,6 @@ TEST(BoardHash, MakeAndUndoMove) {
     ASSERT_TRUE(h2 > 0);
 
     ASSERT_NE(h1, h2);
-    
-    board.undo_move(m);
 }
 
 TEST(BoardHash, EnsureNoCollision) {

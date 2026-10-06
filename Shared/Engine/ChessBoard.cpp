@@ -351,10 +351,6 @@ void ChessBoard::move(Move move) {
     hash ^= ChessBoardHash::stateKey(*this);
 }
 
-void ChessBoard::undo_move(Move move) {
-    ChessBoard::move(MOVE_COLOR(move), MOVE_PIECE(move), MOVE_TO(move), MOVE_FROM(move));
-}
-
 Bitboard ChessBoard::getOccupancy() {
     if (occupancyDirty) {
         auto whitePieces = allPieces(Color::WHITE);

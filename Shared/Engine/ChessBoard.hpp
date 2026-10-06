@@ -67,7 +67,6 @@ public:
     Move getMove(std::string from, std::string to);
 
     void move(Move move);
-    void undo_move(Move move);
     
     void move(Color color, Piece piece, Square from, Square to);
     
