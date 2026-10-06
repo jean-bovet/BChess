@@ -158,6 +158,19 @@ private:
         return value > 0 ? value - ply : value + ply;
     }
     
+    // The best move that the table holds for the position, or an invalid move
+    static Move tableMove(TranspositionTable &table, ChessBoard &node) {
+        BoardHash hash = node.getHash();
+        if (table.exists(hash
+#ifdef ASSERT_TT_KEY_COLLISION
+                         , FFEN::getFEN(node, true)
+#endif
+                         )) {
+            return table.get(hash).bestMove;
+        }
+        return INVALID_MOVE;
+    }
+    
     // pv: Principal Variation - the best line found so far.
     // cv: Current Variation - the current line being examined.
     // bv: Best Variation - if available
@@ -213,34 +226,30 @@ private:
             ChessMoveGenerator::sortMoves(moves);
         }
         
-        // Lookup the best move if available in the best variation
+        // The move to try first. The previous iteration's best variation comes first, whatever sortMoves says.
+        // Without one, the table's best move for this position, which every search stores whether or not the
+        // table cuts off. sortMoves = false leaves the table out. A move the position does not have (a collision
+        // or an old entry) is not in the list and so is never played.
         auto bestMovePV = bv.moves.lookup(depth);
+        Move firstMove = bestMovePV;
+        if (!ChessMoveGenerator::isValid(firstMove) && config.sortMoves) {
+            firstMove = tableMove(table, node);
+        }
+        if (ChessMoveGenerator::isValid(firstMove)) {
+            for (int index=0; index<moves.count; index++) {
+                if (moves.moves[index] == firstMove) {
+                    std::rotate(moves.moves, moves.moves + index, moves.moves + index + 1);
+                    break;
+                }
+            }
+        }
 
         int bestValue = -INT_MAX;
         TranspositionEntryType entryType = TranspositionEntryType::ALPHA;
         
         Move bestMove = INVALID_MOVE;
-        for (int index=-1; index<moves.count && !stopped(); index++) {
-            Move move = Move();
-            if (index == -1) {
-                // At index -1 we try to evaluate the previously detected
-                // best move, if available.
-                if (ChessMoveGenerator::isValid(bestMovePV)) {
-                    // Analyze the best move first
-                    move = bestMovePV;
-                } else {
-                    // Let's skip this best move and start with the generated moves
-                    continue;
-                }
-            } else {
-                // Above index -1, we analyze the generated moves
-                move = moves.moves[index];
-                
-                // Skip this move if it is the best move (which has been analyzed first)
-                if (move == bestMovePV) {
-                    continue;
-                }
-            }
+        for (int index=0; index<moves.count && !stopped(); index++) {
+            Move move = moves.moves[index];
             
             visitedNodes++;
 

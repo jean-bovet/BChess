@@ -280,3 +280,77 @@ TEST_F(MinMaxSearchTests, CancelledLoopStoresNoEntry) {
 }
 
 #endif
+
+// Iterative deepening to `depth` with the transposition table never read. Fills the score and the cumulative
+// node count of every depth.
+static void iterate(const char *fen, int depth, bool sortMoves, std::vector<int> &scores, std::vector<int64_t> &nodes) {
+    ChessBoard board;
+    EXPECT_TRUE(FFEN::setFEN(fen, board));
+    
+    IterativeDeepening search;
+    search.minMaxSearch.config.transpositionTable = false;
+    search.minMaxSearch.config.sortMoves = sortMoves;
+    search.start();
+    search.search(board, NEW_HISTORY, depth, [&](ChessEvaluation e) {
+        scores.push_back(e.value);
+        nodes.push_back(e.nodes);
+    });
+}
+
+// Ordering moves only changes how soon alpha-beta cuts off, never the minimax value: with the table never
+// read for cut-offs, iterative deepening gives the same score at every depth whatever the order
+TEST_F(MinMaxSearchTests, OrderingDoesNotChangeTheScore) {
+    struct Case { const char *fen; int depth; };
+    const Case cases[] = {
+        {"r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1", 2},
+        {"r1bqkb1r/pppp1ppp/2n2n2/4p3/2B1P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 4 4", 2},
+        {"r1bqkbnr/pppp1ppp/2n5/3P4/8/8/PPP2PPP/RNBQKBNR b KQkq - 0 5", 3},
+    };
+    for (auto &c : cases) {
+        std::vector<int> sortedScores, unsortedScores;
+        std::vector<int64_t> sortedNodes, unsortedNodes;
+        iterate(c.fen, c.depth, true, sortedScores, sortedNodes);
+        iterate(c.fen, c.depth, false, unsortedScores, unsortedNodes);
+        ASSERT_EQ(size_t(c.depth), sortedScores.size()) << c.fen;
+        ASSERT_EQ(sortedScores, unsortedScores) << c.fen;
+    }
+}
+
+// sortMoves = false turns the MVV/LVA sort and the table's hash move off, and nothing else: the previous
+// iteration's best variation is still tried first, so the unsorted node counts are the plain baseline
+TEST_F(MinMaxSearchTests, UnsortedSearchKeepsBestVariationFirst) {
+    std::vector<int> scores;
+    std::vector<int64_t> nodes;
+    iterate("r1bqkbnr/pppp1ppp/2n5/3P4/8/8/PPP2PPP/RNBQKBNR b KQkq - 0 5", 3, false, scores, nodes);
+    // Recorded before the hash move existed (ENGINE-3 step 6): the cumulative nodes of depths 1 to 3
+    ASSERT_EQ((std::vector<int64_t>{95, 1065, 40717}), nodes);
+}
+
+// An entry that a collision or an old game left under this position's hash can name any move: the move
+// is searched first only when the position has it
+TEST_F(MinMaxSearchTests, BogusHashMoveIsIgnored) {
+    const char *fen = "r1bqkbnr/pppp1ppp/2n5/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 2 3";
+    ChessBoard board;
+    ASSERT_TRUE(FFEN::setFEN(fen, board));
+    
+    TranspositionTable fresh;
+    MinMaxSearch::Variation freshPV;
+    int freshScore = searchWithTable(fen, 3, false, fresh, freshPV);
+    
+    // A rook that jumps over its own pieces to take the queen (a win of material, if it were played), and a
+    // king capture that is not legal either
+    for (Move bogus : {createCapture(a1, d8, WHITE, ROOK, BLACK, QUEEN), createCapture(e1, e8, WHITE, KING, BLACK, KING)}) {
+        TranspositionTable poisoned;
+        poisoned.store(7, board.getHash(), 0, bogus, TranspositionEntryType::EXACT);
+        MinMaxSearch::Variation pv;
+        int score = searchWithTable(fen, 3, false, poisoned, pv);
+        ASSERT_EQ(freshScore, score);
+        
+        auto legal = ChessMoveGenerator::generateMoves(board);
+        bool found = false;
+        for (int i = 0; i < legal.count; i++) {
+            found = found || legal.moves[i] == pv.moves.bestMove();
+        }
+        ASSERT_TRUE(found) << "the first move of the line is legal";
+    }
+}
