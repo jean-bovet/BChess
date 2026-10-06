@@ -14,6 +14,7 @@
 # CONCURRENCY  games played at once
 # BASE         a git ref: A/B mode against that commit instead of Stockfish
 # MAX_GAMES    A/B mode: the most games played, an even number (default 8000)
+# ELO0, ELO1   A/B mode: the SPRT hypotheses (default 0 and 10: a gain test; -5 and 0 tests for no regression)
 
 set -euo pipefail
 
@@ -33,6 +34,8 @@ BASE=${BASE:-}
 LEVEL=${LEVEL:-1600}
 GAMES=${GAMES:-300}
 MAX_GAMES=${MAX_GAMES:-8000}
+ELO0=${ELO0:-0}
+ELO1=${ELO1:-10}
 if [[ -n $BASE ]]; then TC=${TC:-5+0.05}; else TC=${TC:-10+0.1}; fi
 CONCURRENCY=${CONCURRENCY:-4}
 
@@ -318,15 +321,15 @@ COMMIT=$(git -C "$ROOT" rev-parse --short HEAD)
     echo "fastchess:   $FASTCHESS_ID, $FASTCHESS, sha256 $(sha256 "$FASTCHESS")"
     echo "Book:        8moves_v3.pgn sha256 $BOOK_PGN_SHA256, opening seed $SEED"
     if [[ -n $BASE ]]; then
-        echo "Settings:    BASE=$BASE MAX_GAMES=$MAX_GAMES TC=$TC CONCURRENCY=$CONCURRENCY, SPRT elo0=0 elo1=10 alpha=0.05 beta=0.05 model=logistic"
+        echo "Settings:    BASE=$BASE MAX_GAMES=$MAX_GAMES TC=$TC CONCURRENCY=$CONCURRENCY, SPRT elo0=$ELO0 elo1=$ELO1 alpha=0.05 beta=0.05 model=logistic"
     else
         echo "Settings:    LEVEL=$LEVEL GAMES=$GAMES TC=$TC CONCURRENCY=$CONCURRENCY"
     fi
 } | tee "$INFO"
 if [[ -n $BASE ]]; then
-    echo "Playing up to $MAX_GAMES games against $BASE_SHORT (SPRT [0, 10]), $TC, $CONCURRENCY at a time"
+    echo "Playing up to $MAX_GAMES games against $BASE_SHORT (SPRT [$ELO0, $ELO1]), $TC, $CONCURRENCY at a time"
     OPPONENT=(-engine cmd="$BASEBIN" name=Base)
-    SPRT=(-sprt elo0=0 elo1=10 alpha=0.05 beta=0.05 model=logistic)
+    SPRT=(-sprt elo0=$ELO0 elo1=$ELO1 alpha=0.05 beta=0.05 model=logistic)
 else
     echo "Playing $GAMES games against Stockfish $LEVEL, $TC, $CONCURRENCY at a time"
     OPPONENT=(-engine cmd="$STOCKFISH" name=SF$LEVEL option.UCI_LimitStrength=true option.UCI_Elo=$LEVEL option.Threads=1 option.Hash=16)
@@ -366,8 +369,8 @@ fi
 if [[ -n $BASE ]]; then
     echo "Elo difference to $BASE_SHORT: $ELODIFF +/- $ELOERR (95 %), $(grep -E '^LLR: ' "$LOG" | tail -1)"
     case $JUDGED in
-        0) echo "H1 accepted: BChess is at least 0 to 10 Elo better than $BASE_SHORT (SPRT [0, 10], alpha = beta = 0.05, $PLAYED games)" ;;
-        4) echo "H0 accepted: no gain over $BASE_SHORT was shown (SPRT [0, 10], alpha = beta = 0.05, $PLAYED games)" ;;
+        0) echo "H1 accepted: the SPRT [$ELO0, $ELO1] ended on the upper hypothesis against $BASE_SHORT (alpha = beta = 0.05, $PLAYED games)" ;;
+        4) echo "H0 accepted: the SPRT [$ELO0, $ELO1] ended on the lower hypothesis against $BASE_SHORT (alpha = beta = 0.05, $PLAYED games)" ;;
         5) echo "inconclusive at MAX_GAMES ($PLAYED games): no decision, so the change is not shown to help" ;;
     esac
     echo "| $(date +%F) | $COMMIT$([[ $TREE == dirty ]] && echo "+dirty") vs $BASE_SHORT | $TC | $PLAYED | $WINS/$DRAWS/$LOSSES | $ELODIFF ± $ELOERR | $(grep -E '^LLR: ' "$LOG" | tail -1 | sed -E 's/^LLR: (-?[0-9.]+).*/\1/') | $([[ $JUDGED == 0 ]] && echo H1 || ([[ $JUDGED == 4 ]] && echo H0 || echo none)) |"

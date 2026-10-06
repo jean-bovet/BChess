@@ -61,6 +61,7 @@ Stockfish, to decide whether a change makes BChess stronger:
 ```
 BASE=2eb86d5 scripts/elo-match.sh                        # SPRT [0, 10], 5+0.05, at most 8000 games
 BASE=HEAD~1 MAX_GAMES=4000 TC=5+0.05 CONCURRENCY=4 scripts/elo-match.sh
+BASE=HEAD~1 ELO0=-5 ELO1=0 scripts/elo-match.sh          # non-regression: H1 means no loss beyond -5 Elo
 ```
 
 - **Base build:** `git archive <ref>` is extracted into `.elo/base/<sha>` and built there in
