@@ -266,4 +266,59 @@ struct UCIProcessTests {
         #expect(lines.contains { $0.hasPrefix("info ") && $0.contains(" score mate 1 ") })
         #expect(bestMove(in: lines) == "a1a8")
     }
+
+    // MARK: Time management
+
+    @Test func clockIsHonoured() throws {
+        let uci = try UCIProcess()
+        defer { uci.terminate() }
+
+        uci.send("position fen \(Self.first)")
+        let mark = uci.lineCount
+        let started = Date()
+        uci.send("go wtime 3000 btime 3000")
+        let best = try #require(uci.waitForLine(after: mark, timeout: 5) { $0.hasPrefix("bestmove") })
+        #expect(Date().timeIntervalSince(started) < 1.0)
+        #expect(isLegalMove(String(best.dropFirst("bestmove ".count)), in: Self.first))
+    }
+
+    @Test func movetimeIsHonoured() throws {
+        let uci = try UCIProcess()
+        defer { uci.terminate() }
+
+        uci.send("position fen \(Self.first)")
+        let mark = uci.lineCount
+        let started = Date()
+        uci.send("go movetime 300")
+        let best = try #require(uci.waitForLine(after: mark, timeout: 5) { $0.hasPrefix("bestmove") })
+        #expect(Date().timeIntervalSince(started) < 1.5)
+        #expect(isLegalMove(String(best.dropFirst("bestmove ".count)), in: Self.first))
+    }
+
+    @Test func depthEndsTheSearch() throws {
+        let uci = try UCIProcess()
+        defer { uci.terminate() }
+
+        uci.send("position fen \(Self.first)")
+        let mark = uci.lineCount
+        uci.send("go depth 2")
+        let best = try #require(uci.waitForLine(after: mark, timeout: 5) { $0.hasPrefix("bestmove") })
+        #expect(isLegalMove(String(best.dropFirst("bestmove ".count)), in: Self.first))
+        let lines = Array(uci.allLines.dropFirst(mark))
+        let lastInfo = try #require(lines.last { $0.hasPrefix("info ") })
+        #expect(lastInfo.hasPrefix("info depth 2 "))
+        #expect(!lines.contains { $0.hasPrefix("info depth 3 ") })
+    }
+
+    @Test func bareGoDoesNotCrash() throws {
+        let uci = try UCIProcess()
+        defer { uci.terminate() }
+
+        uci.send("position fen \(Self.first)")
+        let mark = uci.lineCount
+        uci.send("go")
+        #expect(uci.waitForLine(after: mark, timeout: 20) { $0.hasPrefix("info ") } != nil)
+        uci.send("stop")
+        #expect(uci.waitForLine(after: mark) { $0.hasPrefix("bestmove") } != nil)
+    }
 }

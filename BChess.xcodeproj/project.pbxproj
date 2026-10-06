@@ -125,6 +125,7 @@
 		89B0AEECAAE198D5521D5480 /* UCICommandTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04A09D1A221F0D289C106E21 /* UCICommandTests.swift */; };
 		8A39952C2F27B18FEDBBCE2A /* FEngineMoveNode.mm in Sources */ = {isa = PBXBuildFile; fileRef = 67B30EF56BB2ADE44B075F8F /* FEngineMoveNode.mm */; };
 		8A77F9705BB9B600B005EE97 /* FEngineGame.mm in Sources */ = {isa = PBXBuildFile; fileRef = D05BA0CF62011F29A83BC02B /* FEngineGame.mm */; };
+		8BE45745D3D432074396B2DA /* SearchLimitsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78235E48247B716B7C0058B1 /* SearchLimitsTests.swift */; };
 		8CFD2DC7D5930C0738CD3794 /* SquareView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FDBE14AD20196EBDEB22043A /* SquareView.swift */; };
 		8E85EF2B2D8E4A802F14F47D /* Position.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CF08685F1E9CDB6EE194D4B /* Position.swift */; };
 		8E93751260FDF488AA388F2F /* PromotionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81D206FD51B7D4574C66BE3B /* PromotionView.swift */; };
@@ -293,6 +294,7 @@
 		712C86DA78A185AE24966EF1 /* Selection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Selection.swift; sourceTree = "<group>"; };
 		71E5EEE6D0B10E5AD9440A65 /* GameLibrary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameLibrary.swift; sourceTree = "<group>"; };
 		71EBF0402256A6790224AAB8 /* VariationSelectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VariationSelectionView.swift; sourceTree = "<group>"; };
+		78235E48247B716B7C0058B1 /* SearchLimitsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchLimitsTests.swift; sourceTree = "<group>"; };
 		7AE6FC034D3D248278A55641 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		81D206FD51B7D4574C66BE3B /* PromotionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromotionView.swift; sourceTree = "<group>"; };
 		8239FD746C93352706B1C6FE /* FEngineMoveNode+Private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "FEngineMoveNode+Private.h"; sourceTree = "<group>"; };
@@ -488,6 +490,7 @@
 				B1C4B3C222B45C0C99C5CED0 /* PerftTests.cpp */,
 				19CA422D6799EFFF17A2BDAE /* PGNTests.cpp */,
 				CBA33EA4ACC347FB0DF9ABA4 /* SearchChessTests.cpp */,
+				78235E48247B716B7C0058B1 /* SearchLimitsTests.swift */,
 				2AD84B737192936DAA406CD7 /* StateTests.cpp */,
 				04A09D1A221F0D289C106E21 /* UCICommandTests.swift */,
 				9CE26D46FB2EB6963C3B70EE /* UCIProcessTests.swift */,
@@ -958,6 +961,7 @@
 				50F769517A70B9DCFD18284B /* PlayAgainst.swift in Sources */,
 				8E85EF2B2D8E4A802F14F47D /* Position.swift in Sources */,
 				201DE6DF9038C87648A050E9 /* SearchChessTests.cpp in Sources */,
+				8BE45745D3D432074396B2DA /* SearchLimitsTests.swift in Sources */,
 				3614046B451B7E6538D11DAE /* Selection.swift in Sources */,
 				F0015AE7C1448AD40B679077 /* Square.swift in Sources */,
 				51597C0234CFC27A93176646 /* StateTests.cpp in Sources */,

@@ -9,6 +9,77 @@
 import Foundation
 import os.log
 
+/// What a `go` command asks for, and the time and depth the engine gets from it.
+nonisolated struct SearchLimits: Equatable, Sendable {
+    /// The longest any time value can be, in milliseconds: a day. Every value is clamped to it when parsed, so
+    /// the arithmetic below cannot overflow, and the timer's nanoseconds cannot either.
+    static let maximum = 86_400_000
+    /// What the engine keeps for itself on every move, in milliseconds
+    static let overhead = 50
+    /// The shortest search time that is ever allotted, in milliseconds
+    static let minimum = 10
+    /// The moves left in the period when `go` does not say
+    static let defaultMovesToGo = 30
+
+    var wtime, btime, winc, binc, movestogo, movetime, depth: Int?   // ms / count / plies
+    var infinite = false
+
+    /// The tokens that follow `go`.
+    init(goTokens tokens: [String]) {
+        var index = 0
+        func value(clamped range: ClosedRange<Int>) -> Int? {
+            // The value is absent, and the next token left alone, when it is not an integer
+            guard index + 1 < tokens.count, let number = Int(tokens[index + 1]) else {
+                return nil
+            }
+            index += 1
+            return min(max(number, range.lowerBound), range.upperBound)
+        }
+        let times = 0...Self.maximum
+        while index < tokens.count {
+            switch tokens[index] {
+            case "wtime": wtime = value(clamped: times)
+            case "btime": btime = value(clamped: times)
+            case "winc": winc = value(clamped: times)
+            case "binc": binc = value(clamped: times)
+            case "movetime": movetime = value(clamped: times)
+            case "movestogo":
+                // Fewer than one move to go means nothing
+                if let number = value(clamped: Int.min...1000), number >= 1 {
+                    movestogo = number
+                }
+            case "depth":
+                // At least 1, so that a move is always found; at most 64, which every conversion to the engine's int holds
+                depth = value(clamped: 1...64)
+            case "infinite": infinite = true
+            default: break // nodes, searchmoves, ponder, mate and their arguments
+            }
+            index += 1
+        }
+    }
+
+    /// What `FEngine.evaluate(_:time:)` takes: depth -1 is unlimited, and time 0 means no timer (seconds).
+    func search(whiteToMove: Bool) -> (depth: Int, time: TimeInterval) {
+        let searchDepth = depth ?? -1
+        if infinite {
+            return (searchDepth, 0)
+        }
+        if let movetime {
+            return (searchDepth, Self.seconds(movetime - Self.overhead))
+        }
+        guard let remaining = whiteToMove ? wtime : btime else {
+            return (searchDepth, 0)
+        }
+        let increment = (whiteToMove ? winc : binc) ?? 0
+        let budget = remaining / (movestogo ?? Self.defaultMovesToGo) + increment
+        return (searchDepth, Self.seconds(min(budget, remaining - Self.overhead)))
+    }
+
+    private static func seconds(_ milliseconds: Int) -> TimeInterval {
+        TimeInterval(min(max(milliseconds, minimum), maximum)) / 1000
+    }
+}
+
 class UCI {
     
     static let defaultDepth = 6
@@ -98,20 +169,12 @@ class UCI {
 
     func processCmdGo(_ tokens: inout [String]) {
         // go infinite
-        // go wtime 300000 btime 300000
-        let cmd = tokens.first
+        // go wtime 300000 btime 300000 winc 1000 binc 1000
+        // go movetime 500
+        // go depth 6
+        let limits = SearchLimits(goTokens: tokens)
+        let (depth, time) = limits.search(whiteToMove: engine.isWhite())
         
-        // UCI only plays with time control
-        let depth: Int
-        let time: TimeInterval
-        if cmd == "infinite" {
-            depth = -1
-            time = -1
-        } else {
-            // TODO time control
-            depth = -1
-            time = 10 // 10 seconds for now
-        }
         let log = self.log
         let xcodeMode = self.xcodeMode
         engine.evaluate(depth, time: time) { (info, completed) in
