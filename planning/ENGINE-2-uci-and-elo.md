@@ -564,3 +564,12 @@ with no invalid game, reported in the step's commit message.
 3. **Time control:** 10+0.1.
 4. **First run:** a probe, then 300 games at one level, recorded as step 6.
 5. **Transposition table in the tool:** off.
+
+## Follow-ups (ENGINE-3)
+
+- Rewrite `FFEN::setFEN` as a cursor parser over the first six fields (review r3, SIMPLER): no input-sized
+  vectors, the same acceptance and the same unsigned-byte wrap. Deferred because it is a behaviour-preserving
+  refactor and the last review round had passed.
+- Review r3 on placement: the wrapped file counter can put several pieces on one square. The first piece on a
+  square stays and the later ones are ignored. Such a position was never playable (move generation overflowed
+  `MoveList`), so I1 needs no more than loading it. `MoveList::push` also drops moves past `MAX_MOVES`.

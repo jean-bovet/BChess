@@ -104,6 +104,21 @@ public:
         return score * color;
     }
     
+    // Whether a table entry settles the node at `ply`, and then its value. The entry holds mates relative to its
+    // own node, so the value is turned relative to the root before it is compared with alpha and beta.
+    static bool ttCutoff(const TranspositionEntry &entry, int ply, int alpha, int beta, int &value) {
+        value = ttValueFromProbe(entry.value, ply);
+        switch (entry.type) {
+            case TranspositionEntryType::EXACT:
+                return true;
+            case TranspositionEntryType::ALPHA:
+                return value <= alpha;
+            case TranspositionEntryType::BETA:
+                return value >= beta;
+        }
+        return false;
+    }
+    
 private:
     
     // A mate found at this ply from the root is worth less than a mate found closer to it
@@ -152,32 +167,11 @@ private:
             auto entry = table.get(node.getHash());
             
             // Make sure the entry exists and that its depth is at least what we are at right now
-            if (entry.depth >= evalDepth) {
-                // Relative to the root, like alpha and beta
-                int value = ttValueFromProbe(entry.value, depth);
-                switch (entry.type) {
-                    case TranspositionEntryType::EXACT:
-                        // Exact value: use it right away
-                        assert(ChessMoveGenerator::isValid(entry.bestMove));
-                        pv.push(value, entry.bestMove, Variation());
-                        return value;
-                        
-                    case TranspositionEntryType::ALPHA:
-                        if (value <= alpha) {
-                            assert(ChessMoveGenerator::isValid(entry.bestMove));
-                            pv.push(value, entry.bestMove, Variation());
-                            return value;
-                        }
-                        break;
-                        
-                    case TranspositionEntryType::BETA:
-                        if (value >= beta) {
-                            assert(ChessMoveGenerator::isValid(entry.bestMove));
-                            pv.push(value, entry.bestMove, Variation());
-                            return value;
-                        }
-                        break;
-                }
+            int value = 0;
+            if (entry.depth >= evalDepth && ttCutoff(entry, depth, alpha, beta, value)) {
+                assert(ChessMoveGenerator::isValid(entry.bestMove));
+                pv.push(value, entry.bestMove, Variation());
+                return value;
             }
         }
 

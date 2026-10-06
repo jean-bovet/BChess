@@ -182,3 +182,46 @@ TEST_F(FEN, HugeCountersSaturate) {
         ASSERT_EQ(INT_MAX, next.fullMoveCount);
     }
 }
+
+// The wrapped file counter puts several pieces on one square: the first one stays
+static std::string stackedPiecesFEN() {
+    std::string rank = "Q1Q1Q1Q1" + std::string(31, '8') + "R1R1R1R1" + std::string(31, '8')
+                     + "B1B1B1B1" + std::string(31, '8') + "N1N1N1N1";
+    return rank + "/8/" + rank + "/8/" + rank + "/8/" + rank + "/8 w - - 0 1";
+}
+
+TEST_F(FEN, PiecesNeverShareASquare) {
+    ChessBoard board;
+    ASSERT_TRUE(FFEN::setFEN("Q" + std::string(31, '8') + "7Rk6/8/8/8/8/8/8/4K3 w - - 0 1", board));
+    ASSERT_EQ("Qk6/8/8/8/8/8/8/4K3 w - - 0 1", FFEN::getFEN(board));
+}
+
+TEST_F(FEN, StackedPiecesStayWithinTheMoveList) {
+    ChessBoard board;
+    ASSERT_TRUE(FFEN::setFEN(stackedPiecesFEN(), board));
+    MoveList moves = ChessMoveGenerator::generateMoves(board);
+    ASSERT_LE(moves.count, MAX_MOVES);
+}
+
+TEST(MoveListTests, NeverWritesPastItsCapacity) {
+    MoveList list;
+    for (int i = 0; i < MAX_MOVES + 10; i++) {
+        list.push(createMove(e2, e4, WHITE, PAWN));
+    }
+    ASSERT_EQ(MAX_MOVES, list.count);
+    MoveList other;
+    other.push(createMove(e2, e4, WHITE, PAWN));
+    list.push(other);
+    ASSERT_EQ(MAX_MOVES, list.count);
+    
+    MoveList half;
+    for (int i = 0; i < MAX_MOVES - 3; i++) {
+        half.push(createMove(e2, e4, WHITE, PAWN));
+    }
+    MoveList five;
+    for (int i = 0; i < 5; i++) {
+        five.push(createMove(e2, e4, WHITE, PAWN));
+    }
+    half.push(five);
+    ASSERT_EQ(MAX_MOVES, half.count);
+}

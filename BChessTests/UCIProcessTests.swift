@@ -333,4 +333,21 @@ struct UCIProcessTests {
         uci.send("stop")
         #expect(uci.waitForLine(after: mark) { $0.hasPrefix("bestmove") } != nil)
     }
+
+    // Pieces that pile up on one square (the file counter wraps) must not take the tool down
+    @Test func stackedPiecesFENDoesNotCrash() throws {
+        let uci = try UCIProcess()
+        defer { uci.terminate() }
+
+        let rank = "Q1Q1Q1Q1" + String(repeating: "8", count: 31) + "R1R1R1R1" + String(repeating: "8", count: 31)
+            + "B1B1B1B1" + String(repeating: "8", count: 31) + "N1N1N1N1"
+        let fen = [rank, "8", rank, "8", rank, "8", rank, "8"].joined(separator: "/") + " w - - 0 1"
+        uci.send("position fen \(fen)")
+        let mark = uci.lineCount
+        uci.send("go depth 2")
+        #expect(uci.waitForLine(after: mark, timeout: 10) { $0.hasPrefix("bestmove") } != nil)
+        let ready = uci.lineCount
+        uci.send("isready")
+        #expect(uci.waitForLine(after: ready) { $0 == "readyok" } != nil)
+    }
 }

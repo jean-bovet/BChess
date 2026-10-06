@@ -182,6 +182,47 @@ TEST_F(MinMaxSearchTests, TTMateIsPlyRelative) {
     }
 }
 
+// ALPHA and BETA entries are compared with the window in root-relative values. The stored value is relative to its
+// node: at ply 3 a stored mate of MAT-1 is a mate of MAT-4 from the root. Windows sit between the two values, so
+// comparing the stored value as it is gives the opposite answer.
+TEST_F(MinMaxSearchTests, TTBoundsUseRootRelativeMates) {
+    const int ply = 3;
+    auto entry = [](int value, TranspositionEntryType type) {
+        TranspositionEntry e = {};
+        e.value = value;
+        e.type = type;
+        return e;
+    };
+    int value = 0;
+    
+    // A winning mate stored as MAT-1 reads MAT-4 at ply 3
+    int stored = mate - 1;
+    int fromRoot = mate - 4;
+    // BETA: a cutoff only when the root-relative value reaches beta
+    ASSERT_FALSE(MinMaxSearch::ttCutoff(entry(stored, BETA), ply, 0, fromRoot + 1, value));
+    ASSERT_EQ(fromRoot, value);
+    ASSERT_TRUE(MinMaxSearch::ttCutoff(entry(stored, BETA), ply, 0, fromRoot, value));
+    // ALPHA: a cutoff only when the root-relative value is at most alpha
+    ASSERT_FALSE(MinMaxSearch::ttCutoff(entry(stored, ALPHA), ply, fromRoot - 1, mate, value));
+    ASSERT_TRUE(MinMaxSearch::ttCutoff(entry(stored, ALPHA), ply, fromRoot, mate, value));
+    
+    // A losing mate: -(MAT-1) reads -(MAT-4)
+    int lost = -(mate - 1);
+    int lostFromRoot = -(mate - 4);
+    ASSERT_FALSE(MinMaxSearch::ttCutoff(entry(lost, BETA), ply, -mate, lostFromRoot + 1, value));
+    ASSERT_EQ(lostFromRoot, value);
+    ASSERT_TRUE(MinMaxSearch::ttCutoff(entry(lost, BETA), ply, -mate, lostFromRoot, value));
+    ASSERT_FALSE(MinMaxSearch::ttCutoff(entry(lost, ALPHA), ply, lostFromRoot - 1, mate, value));
+    ASSERT_TRUE(MinMaxSearch::ttCutoff(entry(lost, ALPHA), ply, lostFromRoot, mate, value));
+    
+    // Scores that are not mates are never adjusted, and an exact entry always settles the node
+    ASSERT_TRUE(MinMaxSearch::ttCutoff(entry(250, BETA), ply, 0, 250, value));
+    ASSERT_EQ(250, value);
+    ASSERT_FALSE(MinMaxSearch::ttCutoff(entry(250, BETA), ply, 0, 251, value));
+    ASSERT_TRUE(MinMaxSearch::ttCutoff(entry(stored, EXACT), ply, 0, mate, value));
+    ASSERT_EQ(fromRoot, value);
+}
+
 // The deepest ply visited, in the search or in the quiescence search, not the depth of the principal variation
 TEST_F(MinMaxSearchTests, SelDepthIsDeepestVisited) {
     TranspositionTable table;

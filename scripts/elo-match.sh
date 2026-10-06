@@ -33,7 +33,7 @@ CONCURRENCY=${CONCURRENCY:-4}
 fail() { echo "error: $*" >&2; exit 1; }
 
 # One pass over a fastchess PGN. Every game (it starts at its [Event] tag) must have a BChess side, exactly one
-# Result and exactly one Termination, both from the allowed values. Prints, in this order:
+# Result and exactly one Termination, both from the allowed values, and movetext that ends with the marker of its Result. Prints, in this order:
 #   games wins draws losses illegal-move-losses time-forfeit-losses illegal-moves-by-anyone abandoned unterminated malformed
 # wins, draws and losses are BChess's, and count only the games that are well formed.
 pgn_summary() {
@@ -44,7 +44,7 @@ pgn_summary() {
         bchess = (white == "BChess") || (black == "BChess")
         okResult = (result == "1-0" || result == "0-1" || result == "1/2-1/2")
         okTerm = (term == "normal" || term == "adjudication" || term == "time forfeit" || term == "illegal move" || term == "abandoned" || term == "unterminated")
-        if (nresult != 1 || nterm != 1 || !okResult || !okTerm || !bchess) { malformed++; return }
+        if (nresult != 1 || nterm != 1 || !okResult || !okTerm || !bchess || last != result) { malformed++; return }
         lost = (white == "BChess" && result == "0-1") || (black == "BChess" && result == "1-0")
         if (result == "1/2-1/2") draws++
         else if (lost) losses++
@@ -57,11 +57,13 @@ pgn_summary() {
     function tag(line, name,    v) {
         v = line; sub("^\\[" name " \"", "", v); sub("\"\\]$", "", v); return v
     }
-    /^\[Event / { finish(); started = 1; white = black = result = term = ""; nresult = nterm = 0 }
+    /^\[Event / { finish(); started = 1; white = black = result = term = last = ""; nresult = nterm = 0; next }
     /^\[White "/ { white = tag($0, "White") }
     /^\[Black "/ { black = tag($0, "Black") }
     /^\[Result "/ { result = tag($0, "Result"); nresult++ }
     /^\[Termination "/ { term = tag($0, "Termination"); nterm++ }
+    # The last token of the last line of movetext is the result marker of the game
+    /^[^\[ ]/ { last = $NF }
     END { finish(); print games + 0, wins + 0, draws + 0, losses + 0, illegalLosses + 0, timeouts + 0, anyIllegal + 0, abandoned + 0, unterminated + 0, malformed + 0 }' "$1"
 }
 
@@ -69,30 +71,42 @@ pgn_summary() {
 if [[ ${1:-} == --self-test ]]; then
     TMP=$(mktemp -d)
     trap 'rm -rf "$TMP"' EXIT
-    game() { printf '[Event "x"]\n[White "%s"]\n[Black "%s"]\n' "$1" "$2"; shift 2; for tag in "$@"; do printf '%s\n' "$tag"; done; printf '\n1. e4 e5 *\n\n'; }
+    # game <white> <black> <movetext-marker> [tags...]; a marker of "" leaves out the movetext
+    game() {
+        printf '[Event "x"]\n[White "%s"]\n[Black "%s"]\n' "$1" "$2"
+        local marker=$3; shift 3
+        for tag in "$@"; do printf '%s\n' "$tag"; done
+        if [[ -n $marker ]]; then printf '\n1. e4 e5 %s\n\n' "$marker"; else printf '\n'; fi
+    }
     check() { # name expected-output pgn-file
         local got; got=$(pgn_summary "$3")
         [[ $got == "$2" ]] && echo "ok   $1" || { echo "FAIL $1: got '$got', expected '$2'" >&2; FAILED=1; }
     }
     FAILED=0
-    { game BChess SF1600 '[Result "1-0"]' '[Termination "normal"]'
-      game SF1600 BChess '[Result "1-0"]' '[Termination "time forfeit"]'
-      game BChess SF1600 '[Result "1/2-1/2"]' '[Termination "adjudication"]'; } > "$TMP/good.pgn"
+    { game BChess SF1600 1-0 '[Result "1-0"]' '[Termination "normal"]'
+      game SF1600 BChess 1-0 '[Result "1-0"]' '[Termination "time forfeit"]'
+      game BChess SF1600 1/2-1/2 '[Result "1/2-1/2"]' '[Termination "adjudication"]'; } > "$TMP/good.pgn"
     check "a complete run" "3 1 1 1 0 1 0 0 0 0" "$TMP/good.pgn"
-    game BChess SF1600 '[Result "1-0"]' > "$TMP/noterm.pgn"
+    game BChess SF1600 1-0 '[Result "1-0"]' > "$TMP/noterm.pgn"
     check "a game without a termination" "1 0 0 0 0 0 0 0 0 1" "$TMP/noterm.pgn"
-    { game BChess SF1600 '[Result "1-0"]' '[Result "1-0"]' '[Termination "normal"]'
-      game BChess SF1600 '[Termination "normal"]'; } > "$TMP/mixed.pgn"
+    { game BChess SF1600 1-0 '[Result "1-0"]' '[Result "1-0"]' '[Termination "normal"]'
+      game BChess SF1600 1-0 '[Termination "normal"]'; } > "$TMP/mixed.pgn"
     check "one game with two results, one with none" "2 0 0 0 0 0 0 0 0 2" "$TMP/mixed.pgn"
-    game BChess SF1600 '[Result "1-0"]' '[Termination "mystery"]' > "$TMP/unknown.pgn"
+    game BChess SF1600 1-0 '[Result "1-0"]' '[Termination "mystery"]' > "$TMP/unknown.pgn"
     check "an unknown termination" "1 0 0 0 0 0 0 0 0 1" "$TMP/unknown.pgn"
-    game BChess SF1600 '[Result "*"]' '[Termination "unterminated"]' > "$TMP/unfinished.pgn"
+    game BChess SF1600 '*' '[Result "*"]' '[Termination "unterminated"]' > "$TMP/unfinished.pgn"
     check "an unfinished game" "1 0 0 0 0 0 0 0 0 1" "$TMP/unfinished.pgn"
-    game SF1600 SF1700 '[Result "1-0"]' '[Termination "normal"]' > "$TMP/strangers.pgn"
+    game SF1600 SF1700 1-0 '[Result "1-0"]' '[Termination "normal"]' > "$TMP/strangers.pgn"
     check "a game without BChess" "1 0 0 0 0 0 0 0 0 1" "$TMP/strangers.pgn"
-    { game BChess SF1600 '[Result "0-1"]' '[Termination "illegal move"]'
-      game SF1600 BChess '[Result "0-1"]' '[Termination "abandoned"]'; } > "$TMP/bad.pgn"
+    { game BChess SF1600 0-1 '[Result "0-1"]' '[Termination "illegal move"]'
+      game SF1600 BChess 0-1 '[Result "0-1"]' '[Termination "abandoned"]'; } > "$TMP/bad.pgn"
     check "an illegal move and an abandoned game" "2 1 0 1 1 0 1 1 0 0" "$TMP/bad.pgn"
+    game BChess SF1600 "" '[Result "1-0"]' '[Termination "normal"]' > "$TMP/nomovetext.pgn"
+    check "a game without movetext" "1 0 0 0 0 0 0 0 0 1" "$TMP/nomovetext.pgn"
+    game BChess SF1600 '*' '[Result "1-0"]' '[Termination "normal"]' > "$TMP/truncated.pgn"
+    check "movetext cut off before its result" "1 0 0 0 0 0 0 0 0 1" "$TMP/truncated.pgn"
+    game BChess SF1600 0-1 '[Result "1-0"]' '[Termination "normal"]' > "$TMP/mismatch.pgn"
+    check "a movetext result that differs from the tag" "1 0 0 0 0 0 0 0 0 1" "$TMP/mismatch.pgn"
     : > "$TMP/empty.pgn"
     check "an empty file" "0 0 0 0 0 0 0 0 0 0" "$TMP/empty.pgn"
     exit $FAILED

@@ -196,7 +196,8 @@ bool FFEN::setFEN(std::string fen, ChessBoard &board) {
                     return false;
                 }
                 // A piece that does not fit on the board is ignored, as earlier versions did
-                if (coord.file <= 7 && coord.rank <= 7) {
+                // The first piece on a square stays: the wrapped counter can come back to a square that is taken
+                if (coord.file <= 7 && coord.rank <= 7 && parsed.get(coord.file, coord.rank).empty) {
                     parsed.set(square, coord.file, coord.rank);
                 }
                 coord.file = File(coord.file + 1);
