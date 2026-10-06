@@ -68,6 +68,7 @@
 		442FF3DD428D7AA67F14CEC4 /* IterativeDeepeningTests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D15ACC05CB5B63796D43739F /* IterativeDeepeningTests.cpp */; };
 		450FF83A5DCA3959E33F8FB4 /* PlayAgainst.swift in Sources */ = {isa = PBXBuildFile; fileRef = 117C3F2306D0FD7602AA2488 /* PlayAgainst.swift */; };
 		465254AFEEF7A4F592EDE8B8 /* GameHistory.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FECF3456A6E4C0D9547AC353 /* GameHistory.cpp */; };
+		46CB63298005A0CDB71943E2 /* FENTests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B3F0F2B581B6FB0840CCD894 /* FENTests.cpp */; };
 		472D5FF088052271DF546D2E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7AE6FC034D3D248278A55641 /* Assets.xcassets */; };
 		4970DCEF72BD80A9CA8156B9 /* Square.swift in Sources */ = {isa = PBXBuildFile; fileRef = E62F53FB8737C917EACA573D /* Square.swift */; };
 		4AF0DF735024EDD20F5D4126 /* ConditionalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6436166D3A4BF3D36CDCE690 /* ConditionalView.swift */; };
@@ -329,6 +330,7 @@
 		B1C4B3C222B45C0C99C5CED0 /* PerftTests.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = PerftTests.cpp; sourceTree = "<group>"; };
 		B2F90389CE311A6A7172FBE4 /* LabelsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LabelsView.swift; sourceTree = "<group>"; };
 		B33D8737F4BC31AFA0BD8E97 /* BChessTests-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "BChessTests-Bridging-Header.h"; sourceTree = "<group>"; };
+		B3F0F2B581B6FB0840CCD894 /* FENTests.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = FENTests.cpp; sourceTree = "<group>"; };
 		B4127DC8F0333054AE16B921 /* FENgineInfo+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FENgineInfo+Extension.swift"; sourceTree = "<group>"; };
 		B62D3039628BC097D49AA710 /* BChessUITests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = BChessUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		B6DAF02F87837948771A4958 /* GameTextTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameTextTests.swift; sourceTree = "<group>"; };
@@ -468,6 +470,7 @@
 				F37D108593DEDA1EAC945852 /* EvaluationTests.cpp */,
 				34E712ACCD1156718C34F831 /* FEngineConcurrencyTests.swift */,
 				C4D6AC18DAF20B619B734F5B /* FEngineTests.swift */,
+				B3F0F2B581B6FB0840CCD894 /* FENTests.cpp */,
 				93D05661AEFDD830ACE4D2C5 /* GameLibraryTests.swift */,
 				368A041E11904F2B624D0C96 /* GameSessionTests.swift */,
 				DE010CC0D7A64B49DAAC7DF7 /* GameShellTests.swift */,
@@ -912,6 +915,7 @@
 				ACA37B48A9D01A6F6CEF1618 /* ChessState.cpp in Sources */,
 				CC197AF6A5A175F902CC5F85 /* EngineGoogleTests.swift in Sources */,
 				185D96A20E05349A2931C0E3 /* EvaluationTests.cpp in Sources */,
+				46CB63298005A0CDB71943E2 /* FENTests.cpp in Sources */,
 				1814025A5197978BAEE7F6D6 /* FENgineInfo+Extension.swift in Sources */,
 				EACA4E6233CF4D5C7B703014 /* FEngine.mm in Sources */,
 				19352E0CBD75C14FAB9EE2AD /* FEngineConcurrencyTests.swift in Sources */,

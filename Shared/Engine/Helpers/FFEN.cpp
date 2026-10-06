@@ -143,6 +143,16 @@ std::string FFEN::getFEN(ChessBoard board, bool hash) {
     return fen;
 }
 
+// The move generator trusts the castling rights: a right is only kept when its king and rook are home
+static void dropImpossibleCastlingRights(ChessBoard &board) {
+    bool whiteKing = bb_test(board.pieces[WHITE][KING], e1);
+    bool blackKing = bb_test(board.pieces[BLACK][KING], e8);
+    board.whiteCanCastleKingSide = board.whiteCanCastleKingSide && whiteKing && bb_test(board.pieces[WHITE][ROOK], h1);
+    board.whiteCanCastleQueenSide = board.whiteCanCastleQueenSide && whiteKing && bb_test(board.pieces[WHITE][ROOK], a1);
+    board.blackCanCastleKingSide = board.blackCanCastleKingSide && blackKing && bb_test(board.pieces[BLACK][ROOK], h8);
+    board.blackCanCastleQueenSide = board.blackCanCastleQueenSide && blackKing && bb_test(board.pieces[BLACK][ROOK], a8);
+}
+
 bool FFEN::setFEN(std::string fen, ChessBoard &board) {
     // Non-fully formed FEN should also be supported (for example using
     // the EPD format - https://chessprogramming.wikispaces.com/Kaufman+Test).
@@ -163,6 +173,9 @@ bool FFEN::setFEN(std::string fen, ChessBoard &board) {
     std::vector<std::string> ranks;
     split4(pieces, ranks, "/");
 
+    // Start from a new board so that nothing of the previous position survives: the fields the FEN
+    // omits take the value of a new board (KQkq, no en passant, clocks 0 and 1).
+    board.reset();
     board.clear();
     
     Coordinate coord = { 7, 0 };
@@ -197,9 +210,8 @@ bool FFEN::setFEN(std::string fen, ChessBoard &board) {
     // En passant
     if (fields.size() > 3) {
         auto enPassant = fields[3];
-        if (enPassant == "-") {
-            board.enPassant = 0;
-        } else {
+        board.enPassant = 0;
+        if (enPassant != "-") {
             bb_set(board.enPassant, squareForName(enPassant));
         }
     }
@@ -213,6 +225,8 @@ bool FFEN::setFEN(std::string fen, ChessBoard &board) {
     if (fields.size() > 5) {
         board.fullMoveCount = integer(fields[5]);
     }
+    
+    dropImpossibleCastlingRights(board);
     
     return true;
 }
