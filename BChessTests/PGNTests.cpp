@@ -536,3 +536,10 @@ TEST_F(PGN, StorageFormattingReopensAFENGameWithAPromotion) {
     ASSERT_EQ(FFEN::getFEN(game.board), FFEN::getFEN(again.board)) << stored;
     ASSERT_EQ(stored, FPGN::getGame(again));
 }
+
+// The I1 exception (AGENTS.md): a game whose only move was an en passant capture with no pawn to capture
+// opened before ENGINE-1 because of an engine bug, and is illegal chess.
+TEST_F(PGN, IllegalEnPassantGameNoLongerOpens) {
+    ChessGame game;
+    ASSERT_FALSE(FPGN::setGame("[SetUp \"1\"]\n[FEN \"4k3/8/8/4P3/8/8/8/4K3 w - d6 0 1\"]\n\n1. exd6 *", game));
+}

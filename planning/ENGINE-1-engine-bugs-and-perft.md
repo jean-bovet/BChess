@@ -416,3 +416,10 @@ Performance (from the performance review, not re-measured here):
    becomes a smoke test (both configurations complete with a legal move and a sound score), since a table
    legitimately changes the line. `SearchChessTests.OrderedMove` (same horizon effect on the same family of positions) goes from 23846/136314 nodes and score 105 to 39168/311437 and 50. Standing rule for steps 5-8: adjust a best-move test this way when its purpose
    still holds, document it in the commit; stop only when the purpose genuinely fails.
+6. **Widen the I1 exception to ENGINE-1 illegal moves (Jean, 2026-10-06; Codex code review round 3).**
+   A saved PGN such as `[FEN "4k3/8/8/4P3/8/8/8/4K3 w - d6 0 1"] 1. exd6 *` (an en passant capture with no
+   pawn to capture) opened before ENGINE-1 and no longer does, because `setFEN` drops an en-passant square
+   nothing can capture and the generator no longer offers the move. Accepted, no code change: the `AGENTS.md`
+   I1 exception now names both cases (castling made possible only by the rook-capture or FEN-rights bugs, and
+   an en passant capture with no pawn to capture or onto an occupied square). `PGN.IllegalEnPassantGameNoLongerOpens`
+   documents it.
