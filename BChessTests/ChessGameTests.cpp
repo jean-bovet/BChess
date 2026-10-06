@@ -185,3 +185,68 @@ TEST_F(ChessGameTests, ReplayedHistoryMatchesPlayedHistory) {
     game.moveTo(ChessGame::Direction::end, 0);
     ASSERT_EQ(played, *game.history);
 }
+
+static void play(ChessGame &game, std::vector<std::string> moves) {
+    for (auto &m : moves) {
+        ASSERT_TRUE(game.move(m)) << m;
+    }
+}
+
+// No position before the last pawn move or capture can recur, so the scan stops there, and the bound comes from
+// the moves that were played, not from any FEN
+TEST_F(ChessGameTests, RepetitionIsBoundedByTheLastIrreversibleMove) {
+    ChessGame game;
+    play(game, {"e2e4", "e7e5", "g1f3", "g8f6", "f3g1", "f6g8"});
+    ASSERT_EQ(4, game.board.reversiblePlies);
+    
+    // Played honestly, the position occurred twice (after e7e5 and now)
+    ASSERT_FALSE(ChessEvaluater::isDraw(game.board, game.history));
+    
+    // Two extra copies before the e7e5 entry, which real play cannot produce: a full scan would find a threefold
+    auto planted = std::make_shared<std::vector<BoardHash>>(*game.history);
+    BoardHash current = game.board.getHash();
+    planted->insert(planted->begin(), 2, current);
+    ChessBoard unknown = game.board;
+    unknown.reversiblePlies = -1;
+    ASSERT_TRUE(ChessEvaluater::isDraw(unknown, planted)) << "a full scan counts the planted copy";
+    
+    ChessHistory::entriesRead = 0;
+    ASSERT_FALSE(ChessEvaluater::isDraw(game.board, planted)) << "the scan stops at the pawn move";
+    ASSERT_LE(ChessHistory::entriesRead, 5);
+}
+
+// The bound holds up over many reversible moves, and a FEN's own clock plays no part in it
+TEST_F(ChessGameTests, RepetitionAfterManyReversibleMoves) {
+    ChessGame game;
+    play(game, {"e2e4", "e7e5"});
+    for (int i = 0; i < 10; i++) {
+        play(game, {"g1f3", "g8f6", "f3g1", "f6g8"});
+    }
+    ASSERT_EQ(40, game.board.reversiblePlies);
+    ASSERT_EQ(43u, game.history->size());
+    ASSERT_TRUE(ChessEvaluater::isDraw(game.board, game.history));
+    
+    // The same threefold from a FEN whose clock (90) is larger than its one-entry history
+    ChessGame fenGame;
+    ASSERT_TRUE(fenGame.setFEN("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 90 1"));
+    ASSERT_EQ(-1, fenGame.board.reversiblePlies);
+    play(fenGame, {"g1f3", "g8f6", "f3g1", "f6g8", "g1f3", "g8f6", "f3g1", "f6g8"});
+    ASSERT_EQ(-1, fenGame.board.reversiblePlies) << "no pawn move or capture was played: still unknown";
+    ASSERT_TRUE(ChessEvaluater::isDraw(fenGame.board, fenGame.history));
+}
+
+// A FEN can carry any half-move clock, and old files do: none may hide a repetition
+TEST_F(ChessGameTests, RepetitionWithOddFENClocks) {
+    for (int clock : {-8, -100, 200}) {
+        ChessEngine engine;
+        std::string fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - " + std::to_string(clock) + " 1";
+        ASSERT_TRUE(engine.setFEN(fen)) << clock;
+        for (int round = 0; round < 2; round++) {
+            for (auto m : {"g1f3", "g8f6", "f3g1", "f6g8"}) {
+                ASSERT_TRUE(engine.move(m)) << clock << " " << m;
+            }
+        }
+        ASSERT_TRUE(ChessEvaluater::isDraw(engine.game().board, engine.game().history)) << clock;
+        ASSERT_EQ(ChessEngine::GameEnd::repetition, engine.gameEnd()) << clock;
+    }
+}

@@ -109,7 +109,7 @@ public:
     
     // pv: Principal Variation that will be available when this method returns.
     // bv: Best Variation that is provided from an earlier search (typically by the iterative deepening algorithm).
-    int alphabeta(ChessBoard node, HistoryPtr history, TranspositionTable &table, int depth, bool maximizingPlayer, Variation &pv, const Variation &bv) {
+    int alphabeta(ChessBoard node, const HistoryPtr &history, TranspositionTable &table, int depth, bool maximizingPlayer, Variation &pv, const Variation &bv) {
         Variation currentLine;
         int color = maximizingPlayer ? 1 : -1;
         int score = alphabeta(node, history, table, depth, -INT_MAX, INT_MAX, color, pv, currentLine, bv);
@@ -163,7 +163,7 @@ private:
     // bv: Best Variation - if available
     // https://en.wikipedia.org/wiki/Negamax
     // https://chessprogramming.wikispaces.com/Principal+variation
-    int alphabeta(ChessBoard node, HistoryPtr history, TranspositionTable &table, int depth, int alpha, int beta, int color, Variation &pv, Variation &cv, const Variation &bv) {
+    int alphabeta(ChessBoard node, const HistoryPtr &history, TranspositionTable &table, int depth, int alpha, int beta, int color, Variation &pv, Variation &cv, const Variation &bv) {
         pv.depth = depth;
         maxPly = std::max<int64_t>(maxPly, depth);
 
@@ -187,23 +187,25 @@ private:
             }
         }
 
+        // The only repetition check of the node: quiescence and evaluate trust it. A quiescence move is a capture,
+        // and no position after a capture can repeat an earlier one.
         if (ChessEvaluater::isDraw(node, history)) {
             return 0;
         }
 
         if (depth == config.maxDepth) {
             if (config.quiescenceSearch) {
-                int score = quiescence(node, history, depth, alpha, beta, color, pv, cv);
+                int score = quiescence(node, depth, alpha, beta, color, pv, cv);
                 return score;
             } else {
-                int score = mateAtPly(ChessEvaluater::evaluate(node, history) * color, depth);
+                int score = mateAtPly(ChessEvaluater::evaluate(node) * color, depth);
                 return score;
             }
         }
         
         auto moves = ChessMoveGenerator::generateMoves(node);
         if (moves.count == 0) {
-            int score = mateAtPly(ChessEvaluater::evaluate(node, history, moves) * color, depth);
+            int score = mateAtPly(ChessEvaluater::evaluate(node, moves) * color, depth);
             return score;
         }
         
@@ -298,15 +300,11 @@ private:
     // this link shows quiescence search that returns the score, like regular negamax
     // and this is way better IMO:
     // https://www.ics.uci.edu/~eppstein/180a/990204.html
-    int quiescence(ChessBoard node, HistoryPtr history, int depth, int alpha, int beta, int color, Variation &pv, Variation &cv) {
+    int quiescence(ChessBoard node, int depth, int alpha, int beta, int color, Variation &pv, Variation &cv) {
         pv.qsDepth = depth;
         maxPly = std::max<int64_t>(maxPly, depth);
         
-        if (ChessEvaluater::isDraw(node, history)) {
-            return 0;
-        }
-
-        auto stand_pat = mateAtPly(ChessEvaluater::evaluate(node, history) * color, depth);
+        auto stand_pat = mateAtPly(ChessEvaluater::evaluate(node) * color, depth);
         if (stand_pat >= beta) {
             return stand_pat;
         }
@@ -335,13 +333,11 @@ private:
             newNode.move(move);
 
             cv.moves.push(move);
-            history->push_back(newNode.getHash());
 
             Variation line;
-            int score = -quiescence(newNode, history, depth+1, -beta, -alpha, -color, line, cv);
+            int score = -quiescence(newNode, depth+1, -beta, -alpha, -color, line, cv);
             
             cv.moves.pop();
-            history->pop_back();
 
             if (score > bestValue) {
                 bestValue = score;

@@ -46,6 +46,12 @@ public:
     // Halfmove clock: This is the number of halfmoves since the last capture or pawn advance. This is used to determine if a draw can be claimed under the fifty-move rule.
     int halfMoveClock = 0;
 
+    // The plies since the last pawn move or capture that were played on this board, which no earlier position can
+    // follow into a repetition. It is -1 ("unknown") after a FEN, a reset or any edit of the squares: a FEN's
+    // halfMoveClock can hold any value, so it cannot say how many positions the game really has behind it.
+    // Not part of the position: it is not in the hash, the FEN or ChessState.
+    int reversiblePlies = -1;
+    
     // Fullmove number: The number of the full move. It starts at 1, and is incremented after Black's move
     int fullMoveCount = 1;
 

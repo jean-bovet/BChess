@@ -607,3 +607,4 @@ Bench: `scripts/bench.sh`, depth 6, TT cut-offs off, best of 3, Apple M2 under l
 | 2 TT lazy, sized, safe | (step 2 commit) | 15,069,745 / 5cbdcd84043b9398 (identical) | 84,253,210,195 | −0.21 % | — | 18.7 MB | — | yes (memory and safety, signature identical; the 2 % rule does not apply to a memory step) |
 | 3 cheaper make-move | (step 3 commit) | 15,069,745 / 5cbdcd84043b9398 (identical) | 63,699,852,681 | −24.39 % | 16.7–49.6 (load-dependent) | 18.7 MB | — | yes |
 | 4 no large copies | (step 4 commit) | 15,069,745 / 5cbdcd84043b9398 (identical) | 57,436,235,003 | −9.83 % | — | 18.7 MB | — | yes |
+| 5 draw checks once per node, bounded | (step 5 commit) | 15,069,745 / 5cbdcd84043b9398 (identical) | 51,816,111,209 (history position: 5,591,675,247 → 3,768,636,854, −32.6 %) | −9.78 % | — | 18.7 MB | — | yes |

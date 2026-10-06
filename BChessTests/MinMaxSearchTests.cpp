@@ -34,7 +34,7 @@ static int search(const char *fen, int maxDepth, bool sortMoves, MinMaxSearch::V
 static int standPat(const char *fen) {
     ChessBoard board;
     EXPECT_TRUE(FFEN::setFEN(fen, board));
-    return ChessEvaluater::evaluate(board, NEW_HISTORY);
+    return ChessEvaluater::evaluate(board);
 }
 
 // Alpha-beta and quiescence return the minimax value, whatever the order the moves are tried in
@@ -65,7 +65,7 @@ TEST_F(MinMaxSearchTests, QuiescenceReturnsTheBestCapture) {
     // The value of the position after Qxd7, where Black has no capture left
     ChessBoard after;
     ASSERT_TRUE(FFEN::setFEN("k7/3Q4/1p6/2p5/8/8/8/K7 b - - 0 1", after));
-    ASSERT_EQ(ChessEvaluater::evaluate(after, NEW_HISTORY), score);
+    ASSERT_EQ(ChessEvaluater::evaluate(after), score);
     ASSERT_GT(score, standPat(fen));
     
     ASSERT_GT(pv.moves.count, 0);

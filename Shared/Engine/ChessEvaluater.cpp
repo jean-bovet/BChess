@@ -133,16 +133,16 @@ int ChessEvaluater::getBonus(Piece piece, Color color, Square square) {
     }
 }
 
-bool ChessEvaluater::isDraw(ChessBoard board, HistoryPtr history) {
-    return ChessHistory::isThreefoldRepetition(board.getHash(), history);
+bool ChessEvaluater::isDraw(ChessBoard &board, const HistoryPtr &history) {
+    return ChessHistory::isThreefoldRepetition(board.getHash(), board.reversiblePlies, history);
 }
 
-int ChessEvaluater::evaluate(ChessBoard &board, HistoryPtr history) {
+int ChessEvaluater::evaluate(ChessBoard &board) {
     auto moves = ChessMoveGenerator::generateMoves(board, board.color, ChessMoveGenerator::Mode::firstMoveOnly);
-    return evaluate(board, history, moves);
+    return evaluate(board, moves);
 }
 
-int ChessEvaluater::evaluate(ChessBoard &board, HistoryPtr history, const MoveList &moves) {
+int ChessEvaluater::evaluate(ChessBoard &board, const MoveList &moves) {
     if (moves.count == 0) {
         if (board.isCheck(board.color)) {
             // No moves but a check, that's a mat
@@ -152,12 +152,6 @@ int ChessEvaluater::evaluate(ChessBoard &board, HistoryPtr history, const MoveLi
             // No moves and not check, that's a draw
             return 0;
         }
-    }
-    
-    // Check for threefold repetition
-    if (isDraw(board, history)) {
-        // It's a draw if the repetition is detected
-        return 0;
     }
     
     // Compute the piece balance value

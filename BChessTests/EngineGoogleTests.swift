@@ -27,6 +27,6 @@ struct EngineGoogleTests {
 
     /// The floor that turns "zero GoogleTest cases ran" into a failure.
     @Test func registersAllCases() {
-        #expect(GTestRunner.testNames().count >= 171)
+        #expect(GTestRunner.testNames().count >= 174)
     }
 }

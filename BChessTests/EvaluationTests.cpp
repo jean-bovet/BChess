@@ -130,10 +130,10 @@ TEST_F(EvaluationTests, MirroredPositionsScoreOpposite) {
         auto mirror = mirrorFEN(fen);
         auto board = boardFor(fen);
         auto mirrored = boardFor(mirror);
-        ASSERT_EQ(ChessEvaluater::evaluate(board, NEW_HISTORY),
-                  -ChessEvaluater::evaluate(mirrored, NEW_HISTORY)) << fen << " vs " << mirror;
+        ASSERT_EQ(ChessEvaluater::evaluate(board),
+                  -ChessEvaluater::evaluate(mirrored)) << fen << " vs " << mirror;
     }
     
     auto start = boardFor(fens[0]);
-    ASSERT_EQ(0, ChessEvaluater::evaluate(start, NEW_HISTORY));
+    ASSERT_EQ(0, ChessEvaluater::evaluate(start));
 }

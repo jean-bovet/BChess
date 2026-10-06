@@ -190,6 +190,7 @@ void ChessBoard::clear() {
     std::memset(pieces, 0, sizeof(pieces));
     occupancyDirty = true;
     hash = 0; // need to recompute it
+    reversiblePlies = -1;
 }
 
 void ChessBoard::reset() {
@@ -374,6 +375,13 @@ void ChessBoard::applyMove(Move move) {
         }
     }
     
+    // A pawn move or a capture cannot be undone: no position before it can come back
+    if (movePiece == PAWN || MOVE_IS_CAPTURE(move)) {
+        reversiblePlies = 0;
+    } else if (reversiblePlies >= 0) {
+        reversiblePlies++;
+    }
+    
     // Switch the side that is moving
     color = INVERSE(color);
     
@@ -495,6 +503,7 @@ void ChessBoard::set(BoardSquare square, File file, Rank rank) {
     }
     hash = 0; // Need to recompute it
     occupancyDirty = true;
+    reversiblePlies = -1;
 }
 
 bool ChessBoard::isEnPassantTargetValid(Color color) const {

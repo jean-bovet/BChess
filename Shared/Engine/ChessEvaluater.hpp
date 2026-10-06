@@ -37,11 +37,14 @@ public:
     static bool positionalAnalysis;
     
     static bool isQuiet(Move move);    
-    static bool isDraw(ChessBoard board, HistoryPtr history);
+    // Threefold repetition: the board's own count of reversible plies bounds the scan of the history
+    static bool isDraw(ChessBoard &board, const HistoryPtr &history);
 
     // The board is not const because generateMoves, isCheck and getHash update its caches
-    static int evaluate(ChessBoard &board, HistoryPtr history);
-    static int evaluate(ChessBoard &board, HistoryPtr history, const MoveList &moves);
+    // The score of the position, from White's point of view. A mate or a stalemate is told by the moves. A
+    // repetition is not: the search checks it once per node, before it gets here.
+    static int evaluate(ChessBoard &board);
+    static int evaluate(ChessBoard &board, const MoveList &moves);
 
     static int evaluateAction(ChessBoard board);
     static int evaluateMobility(ChessBoard board);
