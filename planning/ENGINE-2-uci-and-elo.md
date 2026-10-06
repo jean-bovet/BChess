@@ -555,16 +555,11 @@ with no invalid game, reported in the step's commit message.
   them rare, and the report counts them.
 - No device needed. The gates in `/develop` cover the code, and step 6 runs on Jean's Mac.
 
-## Decision left open for Jean
+## Decisions (Jean's go, 2026-10-06 — all defaults)
 
-1. **Match runner.** Default: **fastchess**. Alternative: cutechess-cli (needs a Qt build).
-2. **Reference opponent.** Default: **Stockfish 19 with `UCI_LimitStrength`**, one `brew install`.
-   Alternative (also the fallback if BChess is below 1320): a small engine with a published CCRL
-   rating near BChess, built from source into `.elo/`.
-3. **Time control.** Default: **10+0.1** (≈ 30 min for 300 games; indicative). Alternative: 60+0.6,
-   Stockfish's calibration TC (≈ 3 h).
-4. **First run.** Default: **probe + 300 games at one level (±35)**, run as step 6 and recorded.
-   Alternatives: leave the run to Jean, or 1000 games (±19, ≈ 1¾ h).
-5. **Transposition table in the tool.** Default: **off, as today** (it never clears and has no
-   aging, and ENGINE-1 lists TT/repetition follow-ups). Alternative: a later run with it on, behind
-   a `Hash` option, once those follow-ups land.
+1. **Match runner:** fastchess.
+2. **Reference opponent:** Stockfish 19 with `UCI_LimitStrength`. A CCRL-rated small engine is used
+   only as the fallback if BChess scores below 10% at 1320.
+3. **Time control:** 10+0.1.
+4. **First run:** a probe, then 300 games at one level, recorded as step 6.
+5. **Transposition table in the tool:** off.
