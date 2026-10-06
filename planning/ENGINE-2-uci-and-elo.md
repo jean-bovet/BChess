@@ -1,6 +1,6 @@
 # ENGINE-2 — A match-ready UCI engine, and its Elo
 
-Revision 3 (2026-10-06). Planned on `main` (`--no-worktree`, Jean's call). Implemented **after
+Revision 4 (2026-10-06). Codex plan rounds exhausted (3/3); the round-3 changes are covered by the phase-5 code review. Planned on `main` (`--no-worktree`, Jean's call). Implemented **after
 ENGINE-1** lands; this plan assumes its fixes (castling rights on rook capture, ep hash, quiescence
 return, bishop-pair sign, PGN round-trip, `setFEN` reset) and does not repeat them.
 
@@ -23,6 +23,15 @@ return, bishop-pair sign, PGN round-trip, `setFEN` reset) and does not repeat th
   - TT mate-ply normalization gets a store-at-one-ply / probe-at-another test in both directions.
   - Final statistics include the interrupted depth's work.
   - Cumulative counters are 64-bit, and nps is 0 when no time has elapsed.
+- r4 — Codex plan round 3 (substantive; last allowed round). Changes:
+  - `setFEN` now **rejects** only input that is unsafe or was already rejected, and **sanitizes**
+    everything else earlier versions accepted and could save, so I1 holds for old files. There are
+    PGN and JSON fixtures for it.
+  - Every caller of the deleted APIs is listed and migrated (C++ tests included).
+  - A final `info` line is printed before `bestmove`.
+  - The TT test uses White-relative scores.
+  - `seldepth` is the maximum ply visited.
+  - Jean's ENGINE-1 judge for changed best-move tests is reused.
 
 Jean's request: "I am curious to know the ELO of my engine — play it against a reference engine."
 
@@ -49,12 +58,19 @@ whenever the king goes e1→g1/c1 (`ChessBoard.cpp:244-267`). It still does not 
 flag the generator sets (`createCastling`, `Move.hpp:106`).
 
 The only caller of `getMove` is `ChessGame::move(from, to)` (`ChessGame.cpp:133-138`), reached
-through `FEngine move:to:` (`FEngine.h:83`, `FEngine.mm:225-229`). Its Swift callers are:
+through `FEngine move:to:` (`FEngine.h:83`, `FEngine.mm:225-229`). C++ tests also call both
+directly:
+- `ChessBoard::getMove`: `StateTests.cpp:29-59` (8 calls).
+- `ChessGame::move(from, to)`: `PGNTests.cpp:190,213,405`, `ChessEngineTests.cpp:73,79` and
+  `ChessGameTests.cpp:143,152`.
+
+The bridge's Swift callers are:
 - `UCI.swift:87`;
 - the test helpers `GameSessionTests.swift:29`, `MoveRowsTests.swift:20` and
   `UCIProcessTests.swift:88`;
 - `FEngineConcurrencyTests.swift:50` (the legality check in a concurrency test) and `:154`
-  (`expectInvalidates("move:to:")`).
+  (`expectInvalidates("move:to:")`);
+- `GameStateCodingTests.swift:62`.
 
 `isLegalMove` and the check at `:50` therefore accept some illegal moves, so neither can catch an
 illegal `bestmove`.
@@ -137,36 +153,72 @@ on move 1. A bare `go` crashes, because `tokens.removeFirst()` runs on an empty 
 - **`FPGN::to_string(…, SANType::uci)`** appends the lowercase promotion letter
   (`FPGN.cpp:152-154`). `bestmove` and `pv` then carry `e7e8q`, and the helper in
   `ChessGameTests.cpp:41` matches promotions too.
-- **`bool ChessEngine::move(std::string uciMove)`** replaces `ChessEngine::move(from, to)`
-  (`ChessEngine.hpp:118`; the header already includes `FPGN.hpp`). It walks
-  `ChessMoveGenerator::generateMoves(game().board)` and plays the one candidate whose
-  `FPGN::to_string(candidate, SANType::uci)` equals the token, using the existing
-  `game().move(m, "", false)`. Otherwise it returns `false` and changes nothing.
+- **`Move FPGN::uciMove(ChessBoard board, std::string uci)`** sits next to `getMatchingMoves`
+  (`FPGN.cpp:224`). It walks `ChessMoveGenerator::generateMoves(board)` and returns the one
+  candidate whose `FPGN::to_string(candidate, SANType::uci)` equals the token, or `INVALID_MOVE`.
   - Exact string equality checks the squares, the promotion letter, castling and en passant at
     once, with no second parser.
-  - Malformed tokens, illegal moves and a pawn reaching the last rank without a letter all fail.
-  - `ChessGame::move(from, to)` (`ChessGame.cpp:133-138`, `ChessGame.hpp`) and
-    `ChessBoard::getMove` (`ChessBoard.cpp:364-389`, `ChessBoard.hpp:67`) have no other caller and
-    are **deleted**.
+  - Malformed tokens, illegal moves and a pawn reaching the last rank without a letter all give
+    `INVALID_MOVE`.
+  - It has two callers: `ChessGame::move` below, and `StateTests.cpp`, which works on a bare
+    `ChessBoard`.
+- **`bool ChessGame::move(std::string uciMove)`** replaces `ChessGame::move(from, to)`
+  (`ChessGame.cpp:133-138`). It plays `uciMove(board, token)` with the existing
+  `move(m, "", false)`, or returns `false` and changes nothing. `ChessEngine::move(from, to)`
+  (`ChessEngine.hpp:118`) becomes `bool move(std::string uciMove)` and keeps forwarding, as it does
+  today.
+- **`ChessBoard::getMove`** (`ChessBoard.cpp:364-389`, `ChessBoard.hpp:67`) is **deleted**.
+- **Every caller migrates in the same commit** (the full list is in P1):
+  - `StateTests.cpp`: `board.move(board.getMove("e2", "e4"))` becomes
+    `board.move(FPGN::uciMove(board, "e2e4"))`, with `ASSERT_TRUE(MOVE_ISVALID(…))` through a
+    one-line local lambda.
+  - `PGNTests.cpp`, `ChessEngineTests.cpp` and `ChessGameTests.cpp`: `game.move("c1", "d1")` becomes
+    `ASSERT_TRUE(game.move("c1d1"))`. A test that silently relied on an illegal or flagless move
+    fails and is fixed there. Expected strings stay the same; the generator's move now also carries
+    the check flag.
+  - The Swift callers are covered in the next bullet.
+
+  A grep for `getMove(`, `.move("` with two square arguments, and `move(_:to:)` must come back
+  empty before the step is done.
 - **Bridge:** `- (BOOL)moveUCI:(NSString*)move NS_SWIFT_NAME(move(uci:))` replaces `move:to:`
   (`FEngine.h:83`, `FEngine.mm:225-229`) and keeps the `[self invalidate]` first.
-  - All six call sites move to it.
+  - All seven Swift call sites move to it, including `GameStateCodingTests.swift:62`
+    (`move(uci: "a7a6")`).
   - `FEngineConcurrencyTests.swift:154` becomes `expectInvalidates("move(uci:)") { $0.move(uci: "a2a3") }`,
     so the invalidation regression stays covered.
   - `:50` and `isLegalMove` use the returned `Bool`: legal means `true`. That is a real legality
     check, where comparing FENs was not.
-- **`FFEN::setFEN` validates and is all-or-nothing.** This builds on ENGINE-1 step 7 (`board.reset(); board.clear();` at the start). That reset now runs on a local `ChessBoard parsed`, which is filled and assigned `board = parsed` only when every check passes, so on `false` the caller's board is untouched. It
-  rejects:
-  - a placement that isn't exactly 8 ranks of exactly 8 files each (digits 1–8 and the 12 piece
-    letters);
-  - a side to move other than `w` or `b`;
-  - a castling field other than `-` or a subset of `KQkq`;
-  - an ep field other than `-` or a square on rank 3 or 6.
+- **`FFEN::setFEN` is safe and all-or-nothing, without rejecting anything earlier versions could
+  save.** It builds on ENGINE-1 step 7 (`board.reset(); board.clear();` at the start), which now runs
+  on a local `ChessBoard parsed`. `parsed` is assigned to `board` only on success, so on `false` the
+  caller's board is untouched.
 
-  EPD keeps working: only the first two fields are required, and the half-move and full-move
-  numbers stay lenient (`integer()` returns 0 on text, as today, e.g. `bm Nf6+;`). King count and
-  legality of the position are out of scope (a separate concern; existing tests use such
-  positions). FENs BChess writes (`FFEN::getFEN`) always pass, so I1 holds for its own files.
+  This matters because earlier versions saved the *original* FEN text: `ChessGame::setFEN` keeps it
+  in `initialFEN` (`ChessGame.cpp:36`), and `FPGN::getGame` writes it to `[FEN]` (`FPGN.cpp:981-984`).
+  It is inside the `pgn` of a `GameState` JSON too (`GameState.swift:32`). So whatever the old
+  parser accepted may be in a user's file. The rules apply to every caller (files, Paste, UCI):
+  - **Rejected** (return `false`) — only what is unsafe or already rejected:
+    - a rank with more than 8 files, or more than 8 ranks (today these write outside the board or
+      shift by a negative or ≥ 64 amount, `FFEN.cpp:169-187`);
+    - an unknown piece letter (already rejected today, `:178-179`; now without a half-built board);
+    - fewer than two fields (already rejected, `:156`).
+  - **Sanitized** (accepted, with the value made safe):
+    - an ep field that isn't a square on rank 3 or 6, unknown names like `z9` included, becomes `-`
+      (today `z9` is a shift by 255);
+    - castling letters other than `KQkq` are dropped. ENGINE-1 step 7 already drops rights whose
+      king or rook is not at home.
+  - **Unchanged**, because earlier versions accepted them and they are safe:
+    - short ranks and fewer than 8 ranks (the missing squares are empty);
+    - a side-to-move token other than `w`, which means Black (`:190`);
+    - lenient half-move and full-move numbers (`integer()` gives 0 on text), which keeps EPD
+      (`… w - - bm Nf6+;`) working.
+
+  Here r4 deliberately keeps short placements and odd side tokens, which the lead's guidance listed
+  as reject. Both are safe, and both may be in saved files, so rejecting them would break I1.
+  `initialFEN` keeps the original text, as today. The sanitizing is the same on every read, so a
+  replay (`ChessGame.cpp:199,226`) and a re-save are stable. This does **not** rely on ENGINE-1's
+  narrowed I1 exception, which covers only illegal games the castling bug let through. King count
+  and legality of the position are out of scope.
 
 ### Step 2 — Mate distance and consistent statistics (engine)
 
@@ -205,9 +257,16 @@ on move 1. A bare `go` crashes, because `tokens.removeFirst()` runs on an empty 
 
   The elapsed time lives in each search's own evaluation, so UCI keeps no mutable timestamp that
   the search thread would read.
-- **Best-move tests that change** because the engine now prefers the shorter mate follow ENGINE-1's
-  rule for changed best-move tests ("Best-move tests that change"). That rule judges the new line
-  with Stockfish, or with the fixed engine at depth + 2.
+- **`seldepth` is the deepest ply visited.** `MinMaxSearch` keeps `int64_t maxPly`, reset when the
+  search is armed, and raised to `depth` on entry to every `alphabeta` and `quiescence` node.
+  `MinMaxVariation::push` overwrites `qsDepth` with the chosen line's own depth
+  (`MinMaxSearch.hpp:46-50`), so `qsDepth` can't measure exploration off the PV. A new
+  `ChessEvaluation.selDepth` and `FEngineInfo.selDepth` carry the maximum. `quiescenceDepth` keeps
+  its meaning for the app's readout (`EngineView.swift:71-72`).
+- **Best-move tests that change** because the engine now prefers the shorter mate use Jean's
+  ENGINE-1 judge (decided 2026-10-06): Stockfish from Homebrew. A new line is accepted when its
+  first move is within 30 cp of Stockfish's best at depth 20 and no worse than the old one. Mate
+  positions are judged by Stockfish's `mate N`, so the new move must mate at least as fast.
 
 ### Step 3 — UCI protocol hygiene (`BChess/UCI/UCI.swift`, `FENgineInfo+Extension.swift`)
 
@@ -228,7 +287,11 @@ on move 1. A bare `go` crashes, because `tokens.removeFirst()` runs on an empty 
 - `ucinewgame` calls `engine.setFEN(StartPosFEN)`.
 - `info`, one line per completed depth (step 2):
   `info depth D seldepth S score cp X|mate N time T nodes K nps P pv …`.
-  - `depth` is `info.depth`, and `seldepth` is `max(depth, quiescenceDepth)`.
+  - `depth` is `info.depth`, and `seldepth` is `info.selDepth`, the maximum ply visited (step 2).
+  - **On the `completed` callback, `processCmdGo` prints one final `info` line, then `bestmove`.**
+    That line carries the refreshed totals (step 2: `nodes`/`time`/`nps` through termination, with
+    the score and PV of the last completed depth). It is skipped when there is no best move; then
+    only `bestmove 0000` is printed.
   - `time`, `nodes` and `nps` come straight from the step 2 values.
   - `score` is from the engine's point of view, as now (`FENgineInfo+Extension.swift:18-26`).
   - `uciInfoMessage` is also compiled into the apps (`project.yml:47,78`), but they never call it.
@@ -382,6 +445,7 @@ An invalid run is a bug to fix in steps 1–4, not a number to record.
 - **Report mates without a distance** (Codex's fallback). Rejected because it leaves the strength
   bug: without a distance, the engine still doesn't prefer the faster mate. The fix is about a dozen
   lines in one function, plus the TT adjustment.
+- **Strict FEN validation, rejecting short ranks, odd side tokens and bad ep/castling (r3).** It would stop files earlier versions saved from opening (Codex r3; I1). Unsafe input is rejected; the rest is sanitized.
 - **Validate the FEN only at the UCI boundary** (Codex r2's suggestion). It would leave the app's Paste and PGN `[FEN]` path with the same undefined behaviour. One check in the parser covers every caller, and it is plain C++ that GoogleTests can exercise.
 - **Saturating arithmetic for `go`** (Codex r2). Clamping every input to a bounded range at parse time makes overflow impossible with ordinary arithmetic, and it is easier to read and test.
 - **A UCI-side `go` timestamp (r1).** It is mutable state read from the search thread; the
@@ -412,10 +476,13 @@ Each test is written first and seen red on `main` + ENGINE-1.
 | 1 | `MoveTests.UCIStringHasPromotion` (GoogleTest): `to_string(createPromotion(b7,b8,WHITE,PAWN,QUEEN), uci) == "b7b8q"`; knight → `"b7b8n"` | P2 | yes |
 | 1 | `FEngineTests.moveUCIPlaysSpecialMoves` (Swift): from `8/1P6/8/8/8/8/8/k3K3 w - - 0 1`, `b7b8n` → knight on b8; en passant `e5d6` → the captured pawn is gone; `e1g1` → rook on f1; each returns `true` and the FEN is exact | legal matching of every special move | yes (no `move(uci:)`; ep leaves the pawn) |
 | 1 | `FEngineTests.moveUCIRejectsIllegal`: `e2e5`, `b7b8` (no letter), `zz99`, `e2e4q`, `""` → `false`, FEN unchanged | no silent illegal moves | yes |
-| 1 | `FEngineConcurrencyTests.positionChangeInvalidatesSearch` with `move(uci:)` | invalidation still covered | — (migrated) |
-| 1 | `FEN.RejectsMalformed` (GoogleTest, new `BChessTests/FENTests.cpp`): `setFEN` returns `false` **and the board equals its prior value** for a 9-file rank `4k4/…`, 9 ranks, 7 ranks, `x` piece letter, side `z`, castling `KX`, ep `z9`, ep `e4`; accepts `4k3/8/8/8/8/8/8/4K3 w`, the EPD line `1rbq1rk1/p1b1nppp/1p2p3/8/1B1pN3/P2B4/1P3PPP/2RQ1R1K w - - bm Nf6+; id "position 01";` and every FEN `getFEN` writes for the perft positions (round trip) | FEN input can no longer write outside the board or leave a half-built one; EPD and own output still accepted (I1) | yes (UB, half-filled board, `z` = Black) |
+| 1 | `FEngineConcurrencyTests.positionChangeInvalidatesSearch` with `move(uci:)`, and the migrated C++ callers (`StateTests`, `PGNTests`, `ChessEngineTests`, `ChessGameTests`) asserting each move is legal | invalidation still covered; no test relied on an illegal move | — (migrated) |
+| 1 | `FEN.RejectsOnlyUnsafe` (GoogleTest, new `BChessTests/FENTests.cpp`): `setFEN` returns `false` **and the board keeps its prior value** for a 9-file rank `4k4/8/8/8/8/8/8/4K3 w`, 9 ranks, and an `x` piece letter (the last one half-filled the board before) | unsafe input can't write outside the board or leave a half-built one | yes (UB, half-filled board) |
+| 1 | `FEN.SanitizesLegacy`: `4k3/8/8/8/8/8/8/4K3 w - z9 0 1` and `… w - e4 0 1` load with ep `-`; `… w KXq - 0 1` loads with only the rights ENGINE-1 keeps; `4k3/8/8/8/8/8/8/4K2 w` (short rank) and `4k3/8/8/8/8/8/8/4K3 x` (odd side token → Black) load as today; the EPD line `1rbq1rk1/p1b1nppp/1p2p3/8/1B1pN3/P2B4/1P3PPP/2RQ1R1K w - - bm Nf6+; id "position 01";` loads; every perft position's `getFEN` round-trips | I1: nothing an earlier version accepted is rejected, and unsafe values are neutralised | yes (`z9` UB) |
+| 1 | `GameStateCodingTests.legacyFENFilesOpen` (Swift; inline fixtures holding the exact bytes of a saved file, so no bundle resources are needed): a `.pgn` with `[FEN "4k3/8/8/8/8/8/8/4K3 w KXq e4 0 1"]` and one move, and a `GameState` `.json` whose `pgn` holds the same tag, both open through the app's own reading path (`GameState` decoding + `FEngine.setPGN`), with the expected position after the move | I1 on real saved-file shapes | yes (ep `e4` gives a wrong ep bit today; the fixture asserts the sanitized FEN) |
 | 2 | `MinMaxSearch.MateCarriesDistance` (GoogleTest, TT off **and** on): `6k1/5ppp/8/8/8/8/8/R5K1 w - - 0 1` at depth 3 → `MAT_VALUE − 1`; a mate-in-2 FEN (chosen by the implementer and confirmed by `stockfish` reporting `mate 2`) at depth 4 → `MAT_VALUE − 3`, and Black to move in a mirrored mate → `−(MAT_VALUE − 1)` | P3 distance, sign, TT adjustment | yes (`MAT_VALUE`) |
-| 2 | `MinMaxSearch.TTMateIsPlyRelative` (GoogleTest, one shared `TranspositionTable`, TT on). P = a mate-in-2 for the side to move; Q = the position one forced move before P (the opponent has a single legal move into P). (a) Search P at depth 4, then Q at depth 5 with the same table: P is reached at ply 1 and probed, and Q scores `−(MAT_VALUE − 4)` from Q's side. (b) Fresh table: search Q at depth 5 (P stored at ply 1), then P at depth 4: the root probe gives `MAT_VALUE − 3`. Both mirrored colours. | (a) fails if the probe adjustment is removed, (b) if the store adjustment is removed; positive and negative mates; bound entries compared in root-relative values | yes (no adjustment) |
+| 2 | `MinMaxSearch.TTMateIsPlyRelative` (GoogleTest, one shared `TranspositionTable`, TT on). **All scores are White-relative, as the public `alphabeta` returns them (`return score * color`, `MinMaxSearch.hpp:96-101`).** P = White to move, mate in 2; Q = Black to move with a single legal move, which leads to P. (a) Search P at depth 4 (expect `+(MAT_VALUE − 3)`), then Q at depth 5 with the same table: P is probed at ply 1, and Q gives `+(MAT_VALUE − 4)`. (b) Fresh table: Q at depth 5 first (P stored at ply 1), then P at depth 4: the root probe gives `+(MAT_VALUE − 3)`. Mirrored (Black mates): the same with the sign flipped, `−(MAT_VALUE − 3)` and `−(MAT_VALUE − 4)`. | (a) fails if the probe adjustment is removed, (b) if the store adjustment is removed; both signs; bound entries compared in root-relative values | yes (no adjustment) |
+| 2 | `MinMaxSearch.SelDepthIsDeepestVisited`: a position where a capture sequence off the PV runs deeper in quiescence than the PV line (the implementer picks one, checked by logging `maxPly` vs the PV's `qsDepth`) → `selDepth` > the PV's `qsDepth` | `seldepth` is the maximum ply, not the PV's | yes (no `selDepth`) |
 | 2 | `MinMaxSearch.PrefersShorterMate`: a position with a mate in 1 and a longer mate available, depth 4 → the best move is the mate in 1 | P3 strength effect | yes, if the longer mate's move is generated first (the implementer picks such a position) |
 | 2 | `IterativeDeepening.StatisticsAreCumulative` (GoogleTest): depth-3 search; the callback fires 3 times, with depths 1, 2, 3; nodes strictly increase; the last `nodes` = sum of the per-depth visits; `time` (ms) does not decrease | P4 | yes (per-depth nodes) |
 | 2 | `IterativeDeepening.NoCallbackForInterruptedDepth`: stop during depth 2 through the `MinMaxSearch::checkpoint` test hook (`MinMaxSearch.hpp:72`, `:213`) → no second per-depth callback | P4 | yes |
@@ -423,7 +490,8 @@ Each test is written first and seen red on `main` + ENGINE-1.
 | 2 | `IterativeDeepening.NpsWithZeroTime`: the helper that computes nps returns 0 for `time` 0 and `nodes * 1000 / time` otherwise, with `int64_t` nodes above 2³¹ | no divide by zero, no 32-bit wrap | yes |
 | 3 | `UCICommandTests` (in-process, `UCI().process`, `FEngine.fen()`, new file): bare `position` → unchanged; `position fen` with no FEN → start; `position fen 4k3/8/8/8/8/8/8/4K2X w - - 0 1 moves e1e2` → start position, moves ignored; 4-field `position fen 4k3/8/8/8/8/8/8/4K3 w -` → that position; `position startpos moves e2e4 e7e9 d2d4` → after e4 only; `position fen X` then `ucinewgame` → start | P6 all-or-nothing `position`, `ucinewgame` | yes (crashes, partial board, no reset) |
 | 3 | `UCIProcessTests.promotionInPositionMoves`: `position fen 8/1P6/8/8/8/8/8/k3K3 w - - 0 1 moves b7b8q`, `go depth 1` → `bestmove` legal (`move(uci:)` returns `true`) in `1Q6/8/8/8/8/8/8/k3K3 b - - 0 1` | P1 end to end, no crash | yes (assert) |
-| 3 | `UCIProcessTests.malformedFENFallsBackToStart`: `position fen 4k3/8/8/8/8/8/8/4K3 w - z9 0 1 moves e1e2`, `isready` → `readyok` (process alive), `go depth 1` → `bestmove` legal from the **start** position | the UB input end to end | yes (UB / a move from the bad board) |
+| 3 | `UCIProcessTests.unsafeAndLegacyFENs`: (a) `position fen 4k4/8/8/8/8/8/8/4K3 w - - 0 1 moves e1e2` (9-file rank) → `isready` gives `readyok` (process alive), and `go depth 1` gives a `bestmove` legal from the **start** position. (b) `position fen 4k3/8/8/8/8/8/8/4K3 w - z9 0 1 moves e1e2` → sanitized, not rejected: `go depth 1` gives a `bestmove` legal for Black in `4k3/8/8/8/8/8/4K3/8 b - - 1 1` | unsafe input falls back to the start position; legacy input is sanitized, end to end | yes (UB / a move from a bad board) |
+| 3 | `UCIProcessTests.finalInfoBeforeBestMove`: middlegame, `go movetime 300` → the line just before `bestmove` is an `info` whose `nodes` are greater than the previous `info`'s, and whose `time` is not smaller | the final totals reach stdout and include the interrupted depth | yes (no final line) |
 | 3 | `UCIProcessTests.promotionInBestMoveAndPV`: same start, `go depth 3` → some `info … pv b7b8q …` and `bestmove b7b8q` | P2 end to end | yes (`b7b8`) |
 | 3 | `UCIProcessTests.onlyUCILinesOnStdout`: `uci`, a blank line, `setoption name Hash value 16`, `foo`, bare `position`, `isready`, `position fen <middlegame>`, `ucinewgame`, `go depth 2` (no `position` after `ucinewgame`) → every line matches `^(id |uciok$|readyok$|info |bestmove )`; the `bestmove` is legal from the **start** position | stdout clean, and the reset is seen end to end | yes |
 | 3 | `UCIProcessTests.scoreIsFromTheEngineSide`: White to move, White a queen up → `score cp` > 0; the same position mirrored with Black to move → `score cp` > 0; Black to move with a mate in 1 → `score mate 1` | sign on both sides, `mate N` | yes (`mate`) |
@@ -446,7 +514,11 @@ with no invalid game, reported in the step's commit message.
   - PGN writing uses the SAN types, and only `SANType::uci` gains the letter.
   - No stored format holds UCI text (`FEngineMoveNode.mm:27` uses `tight`).
   - Scores are never stored.
-  - `FFEN::setFEN` now rejects malformed FENs. Every FEN BChess writes comes from `getFEN` and passes (round-trip test), so its own `.json`/`.pgn` files keep opening. A third-party PGN whose `[FEN]` tag is malformed in one of the listed ways stops loading. Before, it gave undefined behaviour or a wrong position, so failing is the correct result.
+  - `FFEN::setFEN` rejects only input that is unsafe (writes outside the board) or was already
+    rejected. Everything else earlier versions accepted keeps loading, with an impossible ep square
+    or unknown castling letters sanitized. Earlier saves can hold the *original* pasted FEN text
+    (`initialFEN` → `[FEN]`), so this is checked with saved-file fixtures (`legacyFENFilesOpen`).
+    It does not rely on ENGINE-1's narrowed I1 exception.
 - **I2 — Search results land on their position.** Holds. `move(uci:)` keeps `[self invalidate]`, and
   the migrated `expectInvalidates` proves it. The other step 2 changes (mate scores, statistics, one
   callback per completed depth) change what a callback says, not when or whether it can land.
