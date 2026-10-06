@@ -58,6 +58,8 @@ private final class UCIProcess: @unchecked Sendable {
 
     var lineCount: Int { lines.value.count }
 
+    var allLines: [String] { lines.value }
+
     func terminate() {
         output.fileHandleForReading.readabilityHandler = nil
         if process.isRunning {
@@ -131,5 +133,137 @@ struct UCIProcessTests {
         #expect(best == "bestmove 0000")
         uci.send("quit")
         #expect(uci.waitForExit())
+    }
+
+    private static let mateInOne = "6k1/5ppp/8/8/8/8/8/R5K1 w - - 0 1"
+    private static let start = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
+
+    /// Searches from `position` until an info line satisfies `enough`, then stops. Returns the lines printed since `go`.
+    private func search(_ uci: UCIProcess, position: String, until enough: (String) -> Bool = { $0.hasPrefix("info depth 2 ") }) throws -> [String] {
+        uci.send("position \(position)")
+        let mark = uci.lineCount
+        uci.send("go infinite")
+        #expect(uci.waitForLine(after: mark, timeout: 20, where: enough) != nil)
+        uci.send("stop")
+        #expect(uci.waitForLine(after: mark) { $0.hasPrefix("bestmove") } != nil)
+        return Array(uci.allLines.dropFirst(mark))
+    }
+
+    private func bestMove(in lines: [String]) -> String {
+        lines.last(where: { $0.hasPrefix("bestmove") })?.dropFirst("bestmove ".count).description ?? ""
+    }
+
+    @Test func promotionInPositionMoves() throws {
+        let uci = try UCIProcess()
+        defer { uci.terminate() }
+
+        let lines = try search(uci, position: "fen 8/1P6/8/8/8/8/8/k3K3 w - - 0 1 moves b7b8q")
+        #expect(isLegalMove(bestMove(in: lines), in: "1Q6/8/8/8/8/8/8/k3K3 b - - 0 1"))
+    }
+
+    @Test func unsafeAndLegacyFENs() throws {
+        let uci = try UCIProcess()
+        defer { uci.terminate() }
+
+        // A rank with 9 files: refused, the process stays alive and plays from the start position
+        uci.send("position fen 4k4/8/8/8/8/8/8/4K3 w - - 0 1 moves e1e2")
+        let mark = uci.lineCount
+        uci.send("isready")
+        #expect(uci.waitForLine(after: mark) { $0 == "readyok" } != nil)
+        var lines = try search(uci, position: "fen 4k4/8/8/8/8/8/8/4K3 w - - 0 1 moves e1e2")
+        #expect(isLegalMove(bestMove(in: lines), in: Self.start))
+
+        // An en passant square that cannot exist: sanitized, so the move is played
+        lines = try search(uci, position: "fen 4k3/8/8/8/8/8/8/4K3 w - z9 0 1 moves e1e2")
+        #expect(isLegalMove(bestMove(in: lines), in: "4k3/8/8/8/8/8/4K3/8 b - - 1 1"))
+    }
+
+    @Test func promotionInBestMoveAndPV() throws {
+        let uci = try UCIProcess()
+        defer { uci.terminate() }
+
+        let lines = try search(uci, position: "fen 8/1P6/8/8/8/8/8/k3K3 w - - 0 1", until: { $0.hasPrefix("info depth 3 ") })
+        #expect(lines.contains { $0.hasPrefix("info ") && $0.contains(" pv b7b8q") })
+        #expect(bestMove(in: lines) == "b7b8q")
+    }
+
+    @Test func finalInfoBeforeBestMove() throws {
+        let uci = try UCIProcess()
+        defer { uci.terminate() }
+
+        uci.send("position fen \(Self.first)")
+        let mark = uci.lineCount
+        uci.send("go infinite")
+        #expect(uci.waitForLine(after: mark, timeout: 20) { $0.hasPrefix("info depth 4 ") } != nil)
+        // Into the next depth, so that it is interrupted
+        Thread.sleep(forTimeInterval: 0.05)
+        uci.send("stop")
+        #expect(uci.waitForLine(after: mark) { $0.hasPrefix("bestmove") } != nil)
+
+        let lines = Array(uci.allLines.dropFirst(mark))
+        let infos = lines.filter { $0.hasPrefix("info ") }
+        #expect(infos.count >= 2)
+        #expect(lines.last?.hasPrefix("bestmove") == true)
+        // The last line before bestmove is the final one: its totals cover the interrupted depth
+        #expect(lines[lines.count - 2] == infos.last)
+        let final = infos[infos.count - 1]
+        let before = infos[infos.count - 2]
+        #expect(field("nodes", in: final) > field("nodes", in: before))
+        #expect(field("time", in: final) >= field("time", in: before))
+    }
+
+    private func field(_ name: String, in line: String) -> Int {
+        let tokens = line.split(separator: " ")
+        guard let index = tokens.firstIndex(of: Substring(name)), index + 1 < tokens.count else { return -1 }
+        return Int(tokens[index + 1]) ?? -1
+    }
+
+    @Test func onlyUCILinesOnStdout() throws {
+        let uci = try UCIProcess()
+        defer { uci.terminate() }
+
+        for command in ["uci", "", "setoption name Hash value 16", "foo", "position", "isready", "position fen \(Self.first)", "ucinewgame"] {
+            uci.send(command)
+        }
+        let mark = uci.lineCount
+        uci.send("go infinite")
+        #expect(uci.waitForLine(after: mark, timeout: 20) { $0.hasPrefix("info ") } != nil)
+        uci.send("stop")
+        let best = try #require(uci.waitForLine(after: mark) { $0.hasPrefix("bestmove") })
+
+        let pattern = /^(id |uciok$|readyok$|info |bestmove )/
+        for line in uci.allLines {
+            #expect(line.firstMatch(of: pattern) != nil, "\(line)")
+        }
+        #expect(uci.allLines.contains("uciok"))
+        #expect(uci.allLines.contains("readyok"))
+        // ucinewgame without a position after it: the start position
+        #expect(isLegalMove(String(best.dropFirst("bestmove ".count)), in: Self.start))
+    }
+
+    @Test func scoreIsFromTheEngineSide() throws {
+        let uci = try UCIProcess()
+        defer { uci.terminate() }
+
+        // A queen up for the side to move, White then Black
+        for position in ["fen rnb1kbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+                         "fen rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNB1KBNR b KQkq - 0 1"] {
+            let lines = try search(uci, position: position, until: { $0.hasPrefix("info depth 2 ") })
+            let info = try #require(lines.first { $0.hasPrefix("info depth 2 ") })
+            #expect(field("cp", in: info) > 0, "\(position)")
+        }
+
+        // Black has a mate in 1
+        let lines = try search(uci, position: "fen 8/6k1/p7/2rbp3/8/7P/5qPK/8 b - - 3 39", until: { $0.hasPrefix("info depth 2 ") })
+        #expect(lines.contains { $0.contains(" score mate 1 ") })
+    }
+
+    @Test func mateIsReportedAsMate() throws {
+        let uci = try UCIProcess()
+        defer { uci.terminate() }
+
+        let lines = try search(uci, position: "fen \(Self.mateInOne)", until: { $0.hasPrefix("info depth 3 ") })
+        #expect(lines.contains { $0.hasPrefix("info ") && $0.contains(" score mate 1 ") })
+        #expect(bestMove(in: lines) == "a1a8")
     }
 }

@@ -47,48 +47,59 @@ class UCI {
         return readLine(strippingNewline: true)
     }
     
-    func write(_ what: String) {
-        print(what)
-    }
-    
     func processCmdPosition(_ tokens: inout [String]) {
         // position startpos moves e2e4
         // position fen 8/8/8/1q1k4/8/2P5/1N6/4K3 w - - 0 1 moves c3c4
-        // position fen 8/8/8/1q1k4/8/2P5/1N6/4K3 w - - 0 1
+        // position fen 8/8/8/1q1k4/8/2P5/1N6/4K3 w -
+        guard !tokens.isEmpty else {
+            os_log("position without arguments ignored", log: log)
+            return
+        }
         let cmd = tokens.removeFirst()
         
-        if cmd == "startpos" {
-            engine.setFEN(StartPosFEN)
-        } else if cmd == "fen" {
-            let fen = tokens[0...5].joined(separator: " ")
-            engine.setFEN(fen)
-            tokens.removeFirst(6)
+        // The FEN, if any, runs up to "moves" or the end of the line
+        var moves: [String] = []
+        if let index = tokens.firstIndex(of: "moves") {
+            moves = Array(tokens[(index + 1)...])
+            tokens.removeSubrange(index...)
         }
         
-        // Optional moves
-        if tokens.first == "moves" {
-            processCmdMove(&tokens)
+        switch cmd {
+        case "startpos":
+            engine.setFEN(StartPosFEN)
+            
+        case "fen":
+            let fen = tokens.joined(separator: " ")
+            if fen.isEmpty || !engine.setFEN(fen) {
+                // All or nothing: no half-read position, and the moves belong to the position that was refused
+                os_log("Invalid FEN \"%{public}@\": using the start position", log: log, fen)
+                engine.setFEN(StartPosFEN)
+                return
+            }
+            
+        default:
+            os_log("Unknown position %{public}@ ignored", log: log, cmd)
+            return
         }
+        
+        processCmdMove(moves)
     }
     
-    func processCmdMove(_ tokens: inout [String]) {
-        let result = tokens.removeFirst() == "moves"
-        assert(result)
-        for moveToken in tokens {
+    func processCmdMove(_ moves: [String]) {
+        for moveToken in moves {
             // http://wbec-ridderkerk.nl/html/UCIProtocol.html
             // Examples:  e2e4, e7e5, e1g1 (white short castling), e7e8q (for promotion)
             if !engine.move(uci: moveToken) {
-                os_log("Illegal move %{public}@", log: log, moveToken)
+                os_log("Illegal move %{public}@: the rest of the moves is ignored", log: log, moveToken)
                 break
             }
         }
-        tokens.removeAll()
     }
-    
+
     func processCmdGo(_ tokens: inout [String]) {
         // go infinite
         // go wtime 300000 btime 300000
-        let cmd = tokens.removeFirst()
+        let cmd = tokens.first
         
         // UCI only plays with time control
         let depth: Int
@@ -104,14 +115,30 @@ class UCI {
         let log = self.log
         let xcodeMode = self.xcodeMode
         engine.evaluate(depth, time: time) { (info, completed) in
-            UCI.output(completed ? info.uciBestMove : info.uciInfoMessage, log: log, xcodeMode: xcodeMode)
+            if completed {
+                // The totals of the whole search, then the move
+                if info.hasBestMove {
+                    UCI.output(info.uciInfoMessage, log: log, xcodeMode: xcodeMode)
+                }
+                UCI.output(info.uciBestMove, log: log, xcodeMode: xcodeMode)
+            } else {
+                UCI.output(info.uciInfoMessage, log: log, xcodeMode: xcodeMode)
+            }
         }
     }
     
     func process(_ tokens: inout [String]) {
+        guard !tokens.isEmpty else {
+            return
+        }
         let cmd = tokens.removeFirst()
         
         switch cmd {
+        case "uci":
+            engineOutput("id name BChess")
+            engineOutput("id author Jean Bovet")
+            engineOutput("uciok")
+            
         case "xcode":
             xcodeMode = true
             engine.async = false
@@ -120,11 +147,10 @@ class UCI {
             exit(0)
             
         case "isready":
-            write("readyok")
+            engineOutput("readyok")
             
         case "ucinewgame":
-            // New game
-            break
+            engine.setFEN(StartPosFEN)
             
         case "position":
             processCmdPosition(&tokens)
@@ -136,30 +162,13 @@ class UCI {
             engine.stop()
             
         default:
-            engineOutput("Unknown command \(cmd)")
+            // Nothing but UCI lines goes to stdout: setoption, debug, register, ponderhit and anything
+            // unknown are ignored
+            os_log("Ignored command %{public}@", log: log, cmd)
         }
     }
-    
-    func performance() {
-        engine.async = false
-        engine.setFEN("1rbq1rk1/p1b1nppp/1p2p3/8/1B1pN3/P2B4/1P3PPP/2RQ1R1K w - - 0 1")
-        engine.evaluate(8) { (info, completed) in
-            print(info.uciInfoMessage)
-        }
-    }
-
     
     func run() {
-        // Performance testing
-//        if true {
-//            let arguments = ["xcode", "position fen 3r3k/6pp/8/6N1/2Q5/1B6/8/7K w - - 0 1", "go infinite"]
-//            for tokens in arguments {
-//                var t = tokens.split(separator: " ").map { String($0) }
-//                process(&t)
-//            }
-//            exit(0)
-//        }
-        
         if CommandLine.arguments.count > 1 {
             let arguments = CommandLine.arguments[1...].map { String($0) }
             for tokens in arguments.split(separator: "||") {
@@ -169,23 +178,11 @@ class UCI {
             exit(0)
         }
         
-        if let line = read() {
-            os_log("Bootstrapped with %{public}@", log: log, line)
+        while let line = read() {
+            os_log("Received: %{public}@", log: log, line)
             
-            write("id name BChess")
-            write("id author Jean Bovet")
-            write("uciok")
-            
-            while let line = read() {
-                os_log("Received: %{public}@", log: log, line)
-                
-                // position startpos
-                // go infinite
-                // stop
-                
-                var tokens = line.split(separator: " ").map { String($0) }
-                process(&tokens)
-            }
+            var tokens = line.split(whereSeparator: \.isWhitespace).map { String($0) }
+            process(&tokens)
         }
     }
 }

@@ -122,7 +122,8 @@ public:
                 
                 evaluation.value = score;
 
-                evaluation.depth = pv.depth;
+                // The depth that was searched: a line that ends early (a mate) is shorter than that
+                evaluation.depth = curMaxDepth;
                 evaluation.quiescenceDepth = pv.qsDepth;
                 evaluation.selDepth = int(minMaxSearch.maxPly);
 

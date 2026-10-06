@@ -122,6 +122,7 @@
 		878940D221C9C6AAAD6D7D34 /* ChessEvaluater.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 947CCE0E46399FFD55FC32BC /* ChessEvaluater.cpp */; };
 		87E363FD341DAB6E7724C21E /* FEngine.mm in Sources */ = {isa = PBXBuildFile; fileRef = 107058D83675D2AF04C3E091 /* FEngine.mm */; };
 		894F4AF87419939C628038FC /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C986E8C85A8DD1C80E51BAB7 /* SettingsView.swift */; };
+		89B0AEECAAE198D5521D5480 /* UCICommandTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04A09D1A221F0D289C106E21 /* UCICommandTests.swift */; };
 		8A39952C2F27B18FEDBBCE2A /* FEngineMoveNode.mm in Sources */ = {isa = PBXBuildFile; fileRef = 67B30EF56BB2ADE44B075F8F /* FEngineMoveNode.mm */; };
 		8A77F9705BB9B600B005EE97 /* FEngineGame.mm in Sources */ = {isa = PBXBuildFile; fileRef = D05BA0CF62011F29A83BC02B /* FEngineGame.mm */; };
 		8CFD2DC7D5930C0738CD3794 /* SquareView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FDBE14AD20196EBDEB22043A /* SquareView.swift */; };
@@ -239,6 +240,7 @@
 		02349FE00E1E4BF129C077AB /* BestMoveTests.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = BestMoveTests.cpp; sourceTree = "<group>"; };
 		0318AE9A862AD390FF9642EF /* ChessDocument.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChessDocument.swift; sourceTree = "<group>"; };
 		0324AFBE64AEA9CAF1E5ED66 /* NewGameView_iOS.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewGameView_iOS.swift; sourceTree = "<group>"; };
+		04A09D1A221F0D289C106E21 /* UCICommandTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UCICommandTests.swift; sourceTree = "<group>"; };
 		0C3AF2DF91FF284FE10C1A44 /* BChessUCI */ = {isa = PBXFileReference; includeInIndex = 0; path = BChessUCI; sourceTree = BUILT_PRODUCTS_DIR; };
 		0CF72A21B24ED326F0B371AE /* Color.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Color.hpp; sourceTree = "<group>"; };
 		0D0B880575533E500966B9FF /* BChessUIApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BChessUIApp.swift; sourceTree = "<group>"; };
@@ -487,6 +489,7 @@
 				19CA422D6799EFFF17A2BDAE /* PGNTests.cpp */,
 				CBA33EA4ACC347FB0DF9ABA4 /* SearchChessTests.cpp */,
 				2AD84B737192936DAA406CD7 /* StateTests.cpp */,
+				04A09D1A221F0D289C106E21 /* UCICommandTests.swift */,
 				9CE26D46FB2EB6963C3B70EE /* UCIProcessTests.swift */,
 				C5006601DFB324FFE15ECF30 /* VerdictTests.swift */,
 				EE7BB1F240C4F49C31C96878 /* Helper */,
@@ -960,6 +963,7 @@
 				51597C0234CFC27A93176646 /* StateTests.cpp in Sources */,
 				9AC10D64359B02B9DE926458 /* TestSupport.swift in Sources */,
 				FA1FB12A80F60CB81B9E451D /* UCI.swift in Sources */,
+				89B0AEECAAE198D5521D5480 /* UCICommandTests.swift in Sources */,
 				58225EBA11A0DBD6C47AE30D /* UCIProcessTests.swift in Sources */,
 				670721415A71F2EA7C283D3C /* UnitTestHelper.cpp in Sources */,
 				EA570E8F0D08DF0F3154968C /* Variation.swift in Sources */,

@@ -18,16 +18,18 @@ extension FEngineInfo {
         // For UCI, the value is always from the engine's point of view.
         // Because the evaluation function always evaluate from WHITE's point of view,
         // if the engine is playing black, make sure to inverse the value.
-        let uciValue: String
-        if isWhite {
-            uciValue = String(value)
+        let uciValue = isWhite ? value : -value
+        
+        // A mate is counted in moves, not plies, and is negative when the engine is the one mated
+        let score: String
+        if mat {
+            let moves = (matePlies + 1) / 2
+            score = "mate \(uciValue > 0 ? moves : -moves)"
         } else {
-            uciValue = String(-value)
+            score = "cp \(uciValue)"
         }
         
-        let totalDepth = max(depth, quiescenceDepth)
-        
-        return "info depth \(totalDepth) time \(time) nodes \(nodeEvaluated) nps \(movesPerSecond) score cp \(uciValue) pv \(lineInfo)"
+        return "info depth \(depth) seldepth \(selDepth) score \(score) time \(time) nodes \(nodeEvaluated) nps \(movesPerSecond) pv \(lineInfo)"
     }
     
     var uciBestMove: String {
