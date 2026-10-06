@@ -34,6 +34,9 @@ public:
         return isMateScore(value) ? MAT_VALUE - (value < 0 ? -value : value) : 0;
     }
     
+    // The material value of a piece, in centipawns
+    static int pieceValue(Piece piece);
+    
     static bool positionalAnalysis;
     
     static bool isQuiet(Move move);    

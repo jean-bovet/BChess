@@ -33,6 +33,9 @@ struct Configuration {
     bool quiescenceSearch = true;
     bool sortMoves = true;
     bool transpositionTable = true;
+    
+    // Quiescence skips a capture that cannot lift the score to alpha even with a margin, unless it gives check
+    bool deltaPruning = true;
 };
 
 struct MinMaxVariation {
@@ -79,6 +82,12 @@ public:
     int64_t maxPly = 0;
     
 #ifdef BCHESS_TEST_HOOKS
+    // Quiescence from the position as the search calls it at the horizon, with a window chosen by the test
+    int quiescenceForTest(ChessBoard node, int alpha, int beta, int color, MinMaxVariation &pv) {
+        Variation cv;
+        return quiescence(node, 0, alpha, beta, color, pv, cv);
+    }
+    
     // Called in the move loop right after the move has been pushed on the history. Tests use it to
     // stop the search at an exact node, or to park the search thread inside alpha-beta.
     std::function<void()> checkpoint;
@@ -349,6 +358,9 @@ private:
         return bestValue;
     }
     
+    // Delta pruning's margin in centipawns, for what a position is worth beyond the material it wins
+    static const int DELTA_MARGIN = 200;
+    
     // https://chessprogramming.wikispaces.com/Quiescence+Search
     // Note: the search described in the link above returns alpha which doesn't work
     // with the positions I've been analyzing (returning alpha will never return the
@@ -383,10 +395,19 @@ private:
         for (int index=0; index<moves.count && !stopped(); index++) {
             auto move = moves.moves[index];
             
-            visitedNodes++;
-            
             auto newNode = node;
             newNode.move(move);
+            
+            // Delta pruning: this capture cannot lift the score to alpha, even with a margin. Not a promotion,
+            // not while alpha is a mate score, and never a capture that gives check, which may mate. One rule
+            // for every pruning of the quiescence search.
+            if (config.deltaPruning && MOVE_PROMOTION_PIECE(move) == 0 && !ChessEvaluater::isMateScore(alpha) &&
+                stand_pat + ChessEvaluater::pieceValue(MOVE_CAPTURED_PIECE(move)) + DELTA_MARGIN <= alpha &&
+                !newNode.isCheck(newNode.color)) {
+                continue;
+            }
+            
+            visitedNodes++;
 
             cv.moves.push(move);
 

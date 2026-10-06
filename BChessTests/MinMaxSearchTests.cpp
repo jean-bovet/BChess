@@ -289,6 +289,8 @@ static void iterate(const char *fen, int depth, bool sortMoves, std::vector<int>
     
     IterativeDeepening search;
     search.minMaxSearch.config.transpositionTable = false;
+    // Delta pruning depends on alpha, so on the order: plain alpha-beta is the one that the order cannot change
+    search.minMaxSearch.config.deltaPruning = false;
     search.minMaxSearch.config.sortMoves = sortMoves;
     search.start();
     search.search(board, NEW_HISTORY, depth, [&](ChessEvaluation e) {
@@ -388,3 +390,69 @@ TEST_F(MinMaxSearchTests, KillerIsAQuietMove) {
     search.search(board, NEW_HISTORY, 1, nullptr);
     ASSERT_FALSE(MOVE_ISVALID(search.minMaxSearch.killers[3][0]));
 }
+
+#ifdef BCHESS_TEST_HOOKS
+// Quiescence alone from the position, with a window of the test's choosing and delta pruning on or off.
+// Fills the result, its line and the nodes it visited.
+static int quiescenceAt(const char *fen, bool deltaPruning, int alphaOverStandPat, MinMaxSearch::Variation &pv, int64_t &nodes, int &standPatValue) {
+    ChessBoard board;
+    EXPECT_TRUE(FFEN::setFEN(fen, board));
+    standPatValue = ChessEvaluater::evaluate(board) * (board.color == WHITE ? 1 : -1);
+    
+    MinMaxSearch search;
+    search.config.deltaPruning = deltaPruning;
+    int score = search.quiescenceForTest(board, standPatValue + alphaOverStandPat, INT_MAX, board.color == WHITE ? 1 : -1, pv);
+    nodes = search.visitedNodes;
+    return score;
+}
+
+// A capture that can lift the score above alpha is never pruned
+TEST_F(MinMaxSearchTests, DeltaPruningKeepsAWinningCapture) {
+    auto fen = "k7/3r4/8/8/3Q4/8/8/K7 w - - 0 1"; // Qxd7 wins a rook for nothing
+    MinMaxSearch::Variation pruned, plain;
+    int64_t prunedNodes, plainNodes;
+    int standPat, standPat2;
+    int withDelta = quiescenceAt(fen, true, 300, pruned, prunedNodes, standPat);
+    int without = quiescenceAt(fen, false, 300, plain, plainNodes, standPat2);
+    ASSERT_GT(withDelta, standPat + 300);
+    ASSERT_EQ(without, withDelta);
+    ASSERT_EQ(plainNodes, prunedNodes);
+}
+
+// A pawn capture that is hopeless against alpha is skipped: fewer nodes, and the node still fails low
+TEST_F(MinMaxSearchTests, DeltaPruningSkipsHopelessCapture) {
+    auto fen = "k7/8/8/3p4/4P3/8/8/K7 w - - 0 1"; // exd5 wins a pawn
+    MinMaxSearch::Variation pruned, plain;
+    int64_t prunedNodes, plainNodes;
+    int standPat, standPat2;
+    int withDelta = quiescenceAt(fen, true, 1000, pruned, prunedNodes, standPat);
+    int without = quiescenceAt(fen, false, 1000, plain, plainNodes, standPat2);
+    ASSERT_EQ(0, prunedNodes);
+    ASSERT_GT(plainNodes, 0);
+    ASSERT_LE(withDelta, standPat + 1000);
+    ASSERT_LE(without, standPat + 1000);
+    ASSERT_EQ(standPat, withDelta);
+}
+
+// 1. fxg7 is mate with a pawn that takes a knight: it wins little, but it ends the game, so a node that is far
+// below alpha still searches it
+TEST_F(MinMaxSearchTests, DeltaPruningKeepsAMatingCapture) {
+    auto fen = "7k/6np/5P2/4B3/2B5/8/8/6K1 w - - 0 1"; // Stockfish: mate in 1, fxg7
+    MinMaxSearch::Variation pv;
+    int64_t nodes;
+    int standPat;
+    int score = quiescenceAt(fen, true, 1000, pv, nodes, standPat);
+    ASSERT_EQ(ChessEvaluater::MAT_VALUE - 1, score);
+    ASSERT_EQ("f6g7", FPGN::to_string(pv.moves.bestMove(), FPGN::SANType::uci));
+    
+    // The search at maxDepth 0 is quiescence alone, and finds it too
+    ChessBoard board;
+    ASSERT_TRUE(FFEN::setFEN(fen, board));
+    MinMaxSearch search;
+    search.config.maxDepth = 0;
+    TranspositionTable table;
+    MinMaxSearch::Variation rootPV, bv;
+    ASSERT_EQ(ChessEvaluater::MAT_VALUE - 1, search.alphabeta(board, NEW_HISTORY, table, 0, true, rootPV, bv));
+    ASSERT_EQ("f6g7", FPGN::to_string(rootPV.moves.bestMove(), FPGN::SANType::uci));
+}
+#endif

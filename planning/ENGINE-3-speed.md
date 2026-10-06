@@ -576,6 +576,8 @@ run by the implementer, not in CI.
 
 ## Decisions (Jean's go, 2026-10-06: all four as recommended)
 
+**Decision (Jean, 2026-10-06): steps 8-9 are gated by a non-regression SPRT [-5, 0] (elo0=-5 elo1=0, alpha=beta=0.05, logistic, 5+0.05, 8000 games, concurrency 4) instead of the gain test [0, 10] below; the [0, 10] run for step 8 was stopped at 1222 games (+5.97 ± 9.66, LLR 0.40).** The whole-plan SPRT stays [0, 10]. Later the same day: step 9 (SEE) is skipped, see Follow-ups.
+
 Decided: **D1** TT cut-offs stay for the search plan (this plan uses the table for ordering only); **D2** 16 MB on iOS and 64 MB on macOS, lazy, no `Hash` UCI option; **D3** the bench gates the exact and ordering steps, SPRT gates steps 8 and 9, plus one whole-plan SPRT and a Stockfish row; **D4** SEE is attempted after delta pruning and kept only on an SPRT pass. The text below is the original statement of each.
 
 - **D1 — TT cut-offs on by default:** in this plan, or in the search plan? **Recommended: the search
@@ -612,3 +614,8 @@ Bench: `scripts/bench.sh`, depth 6, TT cut-offs off, best of 3, Apple M2 under l
 | 6 hash move first, every mode | (step 6 commit) | 8,349,812 / 9471c621bb7f9cab (scores and best moves identical on all nine positions; nodes −44.59 %; TT on: 6,777,226) | 28,943,893,626 | −44.14 % | — | 19.2 MB | — | yes |
 | 7 killer moves | (step 7 commit) | 3,524,456 / a94e9fb705a12d12 (scores and best moves identical; nodes −57.79 %) | 13,092,539,000 | −54.77 % | — | 19.2 MB | — | yes |
 | 7b history heuristic (from/to, depth² on a quiet cut-off, sorts the remaining quiet moves) | not committed | 3,477,057 / 02930b0dcf7dc7ae (scores identical) | 13,381,059,942 | +2.20 % (nodes −1.34 %) | — | — | — | **no, dropped**: nodes fall 1.34 % (the plan asks for 5 %) and instructions rise 2.2 % |
+| 8 delta pruning in quiescence (200 cp margin, check/promotion/mate-alpha exempt) | (step 8 commit) | bench scores and best moves identical; nodes 3,524,456 -> 2,214,483 (-37.17 %) | 11,794,246,723 | -9.92 % | — | 19.2 MB | non-regression SPRT [-5, 0] vs 95d8285, accepted: run 20261006-191738: 1958 games 599/799/560 (W/D/L), +6.92 ± 7.65 Elo, LLR 3.04 (H1) | yes. **Accepted by Jean despite validator exit 2: symmetric scheduler-jitter forfeits.** That run had 5 time forfeits (2 by BChess, 3 by Base); without them 1953 games 596/799/558, +6.8 Elo. The earlier refused run 20261006-170044 (1692 games 512/714/466, +9.45 ± 8.75, LLR 3.00, H1) had 2 forfeits, both by Base (104 and 149 ms overruns). Logs are kept in .elo/runs. |
+
+## Follow-ups
+
+- **Step 9, SEE pruning in quiescence, was skipped** (Jean, 2026-10-06): the time cost of its SPRT is high against a small expected gain, and step 8 already prunes the hopeless captures. A finished candidate is in the scratch copy `/private/tmp/claude-501/bchess-engine3/wt9` (`ChessEvaluater::see`, `Configuration::seePruning`, `SEETests.cpp` with 11 cases, `MinMaxSearchTests.PruningKeepsPinnedMate`; red proofs done there: exemption deleted, en-passant removal, promotion handling, x-ray). Deviations found while building it: the plan's `kr5R/1p6/1QBN4/...` position also has Bxb7# (searched first, hides the exemption), so the test drops the bishop (SEE(Qxb7) = -620); the king-recapture rule does not change any SEE value (the exchange fold already stops), it is kept as the plan says; the plan's rook-battery fixture did not need an x-ray, a second black rook behind the first does.

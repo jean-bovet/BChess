@@ -58,6 +58,7 @@ TEST_F(SearchChessTests, OrderedMove) {
     ASSERT_TRUE(FFEN::setFEN(fen, board));
 
     Configuration config;
+    config.deltaPruning = false; // the counts are those of plain alpha-beta with quiescence
 
     config.sortMoves = true;
     assertChessSearch(16437, 50, config, board);

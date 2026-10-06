@@ -99,6 +99,10 @@ static Square blackIndex(Square original) {
     return rank*8+file;
 }
 
+int ChessEvaluater::pieceValue(Piece piece) {
+    return PieceValue[piece];
+}
+
 bool ChessEvaluater::isQuiet(Move move) {
     // A quiet move is a move that is not:
     // - a capture
