@@ -82,8 +82,6 @@ TEST_F(FEN, RejectsOnlyUnsafe) {
     auto hash = board.getHash();
     
     for (auto fen : {
-        "4k3k/8/8/8/8/8/8/4K3 w - - 0 1",               // a piece on a 9th file
-        "4k3/8/8/8/8/8/8/4K3/4K3 w - - 0 1",            // a piece on a 9th rank
         "4k3/8/8/8/8/8/8/4X3 w - - 0 1",                // an unknown piece letter, after a half-filled board
         "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNX w KQkq - 0 1",
         "4k3",                                          // no side to move
@@ -114,6 +112,11 @@ TEST_F(FEN, SanitizesLegacy) {
     ASSERT_TRUE(FFEN::setFEN("4k4/8/8/8/8/8/8/4K3 w - - 0 1", board));
     ASSERT_EQ("4k3/8/8/8/8/8/8/4K3 w - - 0 1", FFEN::getFEN(board));
     ASSERT_TRUE(FFEN::setFEN("4k3/8/8/8/8/8/8/4K3/8 w - - 0 1", board));
+    ASSERT_EQ("4k3/8/8/8/8/8/8/4K3 w - - 0 1", FFEN::getFEN(board));
+    // A piece that is off the board is ignored (earlier versions did the same)
+    ASSERT_TRUE(FFEN::setFEN("4k3k/8/8/8/8/8/8/4K3 w - - 0 1", board));
+    ASSERT_EQ("4k3/8/8/8/8/8/8/4K3 w - - 0 1", FFEN::getFEN(board));
+    ASSERT_TRUE(FFEN::setFEN("4k3/8/8/8/8/8/8/4K3/4K3 w - - 0 1", board));
     ASSERT_EQ("4k3/8/8/8/8/8/8/4K3 w - - 0 1", FFEN::getFEN(board));
     ASSERT_TRUE(FFEN::setFEN("4k9/8/8/8/8/8/8/4K3 w - - 0 1", board) == false); // 9 is not a count
     

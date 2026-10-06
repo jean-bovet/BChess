@@ -194,13 +194,11 @@ bool FFEN::setFEN(std::string fen, ChessBoard &board) {
                 if (!charToSquare(p, square)) {
                     return false;
                 }
-                // A piece that does not fit on the board is not a position
-                if (coord.file > 7 || coord.rank < 0 || coord.rank > 7) {
-                    std::cerr << "Invalid FEN string, a piece is off the board: " << fen << std::endl;
-                    return false;
+                // A piece that does not fit on the board is ignored, as earlier versions did
+                if (coord.file <= 7 && coord.rank >= 0 && coord.rank <= 7) {
+                    parsed.set(square, coord.file, coord.rank);
                 }
-                parsed.set(square, coord.file, coord.rank);
-                coord.file += 1;
+                coord.file = std::min(int(coord.file) + 1, 8);
             }
         }
         coord.rank -= 1;

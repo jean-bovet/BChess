@@ -140,11 +140,14 @@ struct GameStateCodingTests {
         }
     }
 
-    // A rank that runs past the 8th file with empty squares was accepted before and was saved as it was typed
-    @Test func overlongEmptyRankFilesOpen() throws {
-        let tag = #"[FEN "4k4/8/8/8/8/8/8/4K3 w - - 0 1"]"#
+    // A rank that runs past the 8th file, with empty squares or with a piece that is then ignored, was accepted
+    // before and was saved as it was typed
+    @Test(arguments: ["4k4/8/8/8/8/8/8/4K3 w - - 0 1", "4k3k/8/8/8/8/8/8/4K3 w - - 0 1"])
+    func overlongRankFilesOpen(fen: String) throws {
+        let tag = "[FEN \"\(fen)\"]"
         let pgn = "[Event \"Test\"]\n\(tag)\n[SetUp \"1\"]\n\n1. Ke2 *"
-        let json = #"{"pgn":"[Event \"Test\"]\n[FEN \"4k4/8/8/8/8/8/8/4K3 w - - 0 1\"]\n[SetUp \"1\"]\n\n1. Ke2 *","rotated":false}"#
+        let escapedTag = tag.replacingOccurrences(of: "\"", with: "\\\"")
+        let json = "{\"pgn\":\"[Event \\\"Test\\\"]\\n\(escapedTag)\\n[SetUp \\\"1\\\"]\\n\\n1. Ke2 *\",\"rotated\":false}"
 
         for (data, type) in [(Data(pgn.utf8), UTType.pgn), (Data(json.utf8), UTType.json)] {
             let state = try GameState(data: data, contentType: type)

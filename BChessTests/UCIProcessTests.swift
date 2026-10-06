@@ -168,12 +168,12 @@ struct UCIProcessTests {
         let uci = try UCIProcess()
         defer { uci.terminate() }
 
-        // A piece on a 9th file: refused, the process stays alive and plays from the start position
-        uci.send("position fen 4k3k/8/8/8/8/8/8/4K3 w - - 0 1 moves e1e2")
+        // An unknown piece letter: refused, the process stays alive and plays from the start position
+        uci.send("position fen 4k3/8/8/8/8/8/8/4K2X w - - 0 1 moves e1e2")
         let mark = uci.lineCount
         uci.send("isready")
         #expect(uci.waitForLine(after: mark) { $0 == "readyok" } != nil)
-        var lines = try search(uci, position: "fen 4k3k/8/8/8/8/8/8/4K3 w - - 0 1 moves e1e2")
+        var lines = try search(uci, position: "fen 4k3/8/8/8/8/8/8/4K2X w - - 0 1 moves e1e2")
         #expect(isLegalMove(bestMove(in: lines), in: Self.start))
 
         // An en passant square that cannot exist: sanitized, so the move is played

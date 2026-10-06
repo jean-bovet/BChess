@@ -198,9 +198,9 @@ on move 1. A bare `go` crashes, because `tokens.removeFirst()` runs on an empty 
   It is inside the `pgn` of a `GameState` JSON too (`GameState.swift:32`). So whatever the old
   parser accepted may be in a user's file. The rules apply to every caller (files, Paste, UCI):
   - **Rejected** (return `false`) — only what is unsafe or already rejected:
-    - a piece that does not fit on the board (past the 8th file or on a 9th rank). Empty squares past
-      the end of a rank, and an empty 9th rank, did no harm and stay accepted (review r1: `bb_set`
-      already ignored off-board squares);
+    - nothing about the placement's size: empty squares past the end of a rank, an empty 9th rank
+      and a piece that does not fit on the board (it is ignored) all stay accepted (review r1/r1b:
+      `bb_set` already ignored off-board squares, so no write was ever out of bounds);
     - an unknown piece letter (already rejected today, `:178-179`; now without a half-built board);
     - fewer than two fields (already rejected, `:156`).
   - **Sanitized** (accepted, with the value made safe):

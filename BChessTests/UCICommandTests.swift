@@ -39,9 +39,9 @@ struct UCICommandTests {
         run("position fen \(middlegame)", on: uci)
         // An unknown piece letter
         #expect(run("position fen 4k3/8/8/8/8/8/8/4K2X w - - 0 1 moves e1e2", on: uci) == start)
-        // A piece on a 9th file
+        // Another unknown piece letter
         run("position fen \(middlegame)", on: uci)
-        #expect(run("position fen 4k3k/8/8/8/8/8/8/4K3 w - - 0 1 moves e1e2", on: uci) == start)
+        #expect(run("position fen 4k3/8/8/8/8/8/8/4K2X w - - 0 1 moves e1e2", on: uci) == start)
     }
 
     @Test func shortFENsAreAccepted() {
