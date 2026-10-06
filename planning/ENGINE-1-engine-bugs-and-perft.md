@@ -1,5 +1,11 @@
 # ENGINE-1 — Engine bug fixes, proven by perft
 
+Revision 4 (2026-10-06): Jean's decisions recorded (Stockfish judge, I1 narrowed in `AGENTS.md`,
+minimal SAN, scope as planned, go). Codex plan round 2 folded in: its blocker and its legacy-hash
+item concerned option (a) of the I1 decision, which Jean did not pick, so both are moot; its en
+passant item is accepted (two-candidate and Black-to-move cases, hash inclusion and exclusion
+against python-chess, incremental == `ChessBoardHash::hash` after the capture). Last revision
+before implementation.
 Revision 3 (2026-10-06): Codex plan round 1 folded in. I1 exposure (saved games with a castle B1
 allowed) is now an open decision with two specified options instead of a default; en passant enters
 the hash only when the capture is legal (pinned and rank-exposure cases tested against FIDE
@@ -110,10 +116,8 @@ requires.
   rook leaving, a rook being captured, and anything else touching the corner. The king block stays.
 - Add `assert(bb_test(pieces[moveColor][ROOK], <corner>))` before each castling rook move
   (`ChessBoard.cpp:249-267`), so a regression that conjures a rook aborts the Debug perft instead of
-  silently miscounting. (With option (a) of decision 2 the assert is skipped while a legacy game is
-  loaded, since that path replays exactly such a castle.)
-- Plus whatever decision 2 picks: option (a) adds the legacy load path described there; option (b)
-  changes the I1 wording in `AGENTS.md` in this commit.
+  silently miscounting.
+- Per decision 2, this commit also narrows I1 in `AGENTS.md` (wording under "Decisions").
 
 ### Step 2 — En passant hash (B2)
 
@@ -255,6 +259,7 @@ changes, so no new Swift test. Each test is shown red on the unfixed code before
 | 2 | `Perft.HashMatchesFromScratchAtEveryNode`: walk Kiwipete d3, position 3 d4, position 4 d3; at every node `board.getHash() == ChessBoardHash::hash(board)` (`PerftTests.cpp`, same walker with a hash flag) | Incremental hash is exact across ep, castling, promotion, captures | yes, 97 / 153 bad nodes |
 | 2 | `BoardHash.EnPassantKeepsHashExact`: the B2 repro (`BoardHashTests.cpp`) | B2 in one case | yes |
 | 3 | `BoardHash.CastlingAndEnPassantChangeTheHash`: `r3k2r/8/8/8/8/8/8/R3K2R w KQkq -` ≠ same with `Kkq`; `4k3/8/8/3pP3/8/8/8/4K3 w - d6` ≠ same with `-`; after 1. e4 (`…b KQkq e3`) == same with `-` (no black pawn can take) | Rights and legal ep are in the hash; an unusable ep square is not | first two yes, third no (guard) |
+| 3 | `BoardHash.EnPassantInTheHashOnlyWhenLegal`, Black to move and two-candidate cases: `4k3/8/8/8/3Pp3/8/8/4K3 b - d3 0 1` ≠ same with `-` (exd3 legal); `4k3/8/8/8/3Pp3/8/8/K3R3 b - d3 0 1` == same with `-` (exd3 opens the e-file); `4K3/8/8/8/k2Pp2R/8/8/8 b - d3 0 1` == same with `-` (rank-4 exposure); `4k3/6b1/8/2PpP3/8/2K5/8/8 w - d6 0 1` ≠ same with `-` (e5 pinned, c5 can take); `8/8/2k5/8/2pPp3/8/6B1/4K3 b - d3 0 1` ≠ same with `-` (e4 pinned, c4 can take). For each "≠" case, play the legal ep capture and assert `getHash() == ChessBoardHash::hash(board)` | Inclusion and exclusion follow the rules for either side and either candidate; expectations from python-chess `has_legal_en_passant()` (true, false, false, true, true, checked) | "≠" cases yes (ep not hashed on `main`); "==" cases shown red against the stubbed legality check, as below |
 | 3 | `BoardHash.IllegalEnPassantIsNotInTheHash`: `k3r3/8/8/3pP3/8/8/8/4K3 w - d6 0 1` == same with `-` (exd6 opens the e-file to the rook); `8/8/8/K2pP2r/8/8/8/4k3 w - d6 0 1` == same with `-` (both pawns leave rank 5, the rook sees the king); `4k3/6b1/8/3pP3/8/2K5/8/8 w - d6 0 1` (e5 pinned on the c3–g7 diagonal) == same with `-` | The expectation comes from the rules (python-chess `has_legal_en_passant()` is false for all three while `has_pseudo_legal_en_passant()` is true, checked), not from `hash()` | no on `main` (ep is not hashed at all); it is the guard that fails against a pseudo-legal step 3 (a pawn attacks d6 in each), and is shown red that way: run it once with the legality check stubbed out |
 | 3 | `ChessEngineTests.CastlingRightsMakeAPositionDifferent`: `1. Nf3 Nf6 2. Rg1 Rg8 3. Rh1 Rh8 4. Ng1 Ng8 5. Nf3 Nf6 6. Ng1 Ng8 *` → `canPlay()` true; two more knight round trips → false | Repetition follows FIDE rights | yes (false) |
 | 3 | The step-2 walk now also checks the state keys | `stateKey` is maintained incrementally | — |
@@ -304,7 +309,8 @@ the start position, which includes Black's bogus pair bonus) and possibly TT-dep
    in the step's commit message.
 2. Record old and new line and score, and confirm the old expectation comes from the bug: revert only
    the step's engine change and see the old value come back.
-3. Judge the new line independently (see the open decision for the judge). The test's stated intent
+3. Judge the new line with Stockfish (decision 1: Homebrew, developer tool only; accept when the new
+   first move is within 30 centipawns of Stockfish's best at depth 20 and not worse than the old one). The test's stated intent
    (its comment: "pawn fork", "knight escapes", "black king is about to get mate") must still hold.
 4. If the new line is worse by the judge, or the intent no longer holds, **stop and report** — do not
    update the test; it points at a real problem.
@@ -315,12 +321,13 @@ The 115 GoogleTest cases and 112 Swift tests must otherwise stay green; any othe
 
 ## Invariants
 
-- **I1 — Files keep opening.** *At risk; resolved by decision 2.* Games are stored as PGN
+- **I1 — Files keep opening.** *Narrowed by Jean's decision 2.* Games are stored as PGN
   (`GameState.pgn`, `Shared/Model/GameState.swift:32`) and re-parsed against the legal moves. A
   stored game that contains a castle made possible only by B1 (e.g. position 5 then
   `8. Bxf7 Nxh1 9. O-O *`, which opens today), or by a FEN claiming impossible rights, no longer
-  parses after steps 1 and 7. As written, I1 has no exception for that; decision 2 either keeps
-  such files opening (option a) or narrows I1 (option b). Held otherwise: the parser only accepts
+  parses after steps 1 and 7. Step 1 adds that exception to I1 in `AGENTS.md`; BChess has not
+  shipped (App Store Connect: 1.0 "Prepare for Submission" on both platforms), so such files can
+  exist only on Jean's devices. Held otherwise: the parser only accepts
   more (every file that opened still opens, `OpeningsTests` and the PGN corpus tests stay green); the
   writer still writes standard PGN and becomes more standard (`R1xe2` instead of `Re1xe2`). Older
   BChess versions cannot read `R1xe2`, but they already cannot read their own `b8=Q+`. Missing FEN
@@ -331,8 +338,8 @@ The 115 GoogleTest cases and 112 Swift tests must otherwise stay green; any othe
   engine headers.
 - **I4 — UCI keeps working.** Holds. `position fen … moves …` now gets correct rights and hashes;
   the `BChessUCI` build gate covers it.
-- **I5 — Private and offline.** Holds. If Stockfish is used as a judge it is a developer tool on
-  Jean's Mac, never linked or shipped.
+- **I5 — Private and offline.** Holds. Stockfish, the judge for changed best-move tests, is a
+  developer tool on Jean's Mac, never linked or shipped.
 
 ## Risks and rollout
 
@@ -369,35 +376,13 @@ Performance (from the performance review, not re-measured here):
 - The transposition table is allocated (≈549 MB, calloc in the constructor) for every `FEngine`,
   including short-lived probe engines.
 
-## Decision left open for Jean
+## Decisions (Jean, 2026-10-06)
 
-1. **Judge for changed best-move tests.** Default: install Stockfish with Homebrew (developer tool,
-   never shipped) and accept a new line when its first move is within 30 centipawns of Stockfish's
-   best at depth 20 and not worse than the old one. Alternative: no new tool — the fixed engine at
-   depth + 2 and a written hand analysis in the commit message.
-2. **Saved games that contain a castle only the bug allowed (I1).** After steps 1 and 7, a game
-   where a side castled after its rook was captured on the corner (e.g. from position 5:
-   `8. Bxf7 Nxh1 9. O-O`), or castled with rights a FEN claimed without the king and rook in place,
-   no longer opens: the parser matches moves against the now-correct legal moves. Pick one:
-
-   **(a) Keep them opening with a legacy load path.** `FPGN::setGame` parses strictly first. Only if
-   that fails, it parses again in legacy mode: a `legacyCastlingRights` flag on `ChessGame`, copied
-   onto its board by `reset()`, `setFEN()` and `replayMoves()`, makes `ChessBoard::move` clear a right
-   only when the king or that rook *moves* (the pre-fix rule) and makes `FFEN::setFEN` skip the
-   step-7 drop of impossible rights; the step-1 castling assert is skipped in that mode. The game
-   keeps the flag for as long as it is open (navigation replays and new moves follow the old rule, as
-   before the fix); a new game, paste or FEN starts strict. Fixtures: the position-5 PGN above, a FEN
-   game with `KQkq` and no rooks that castles, and the same PGN inside a `GameState` `.json`
-   (`GameStateCodingTests` + `FEngine` `setPGN`): each opens, reaches the pre-fix final FEN, and
-   writes back unchanged; a strict-valid game never gets the flag. Cost: about 40 lines across
-   `ChessBoard`, `ChessGame`, `FFEN`, `FPGN`, 3 fixtures, and one flag the engine must carry
-   (and every future castling change must respect) to keep illegal positions loadable; risk: the
-   flag leaking into a normal game (a copy through `FEngine.mm:335` or a FEN game) would bring B1
-   back for that game.
-
-   **(b) Accept, and narrow I1 to the actual exposure.** BChess has never shipped (both App Store
-   versions are 1.0, "Prepare for Submission"), so such files can exist only on Jean's own devices,
-   and no other chess program reads them either. Step 1 changes `AGENTS.md` I1 from:
+1. **Judge for changed best-move tests:** Stockfish via Homebrew, developer tool only, never shipped.
+   A new line is accepted when its first move is within 30 centipawns of Stockfish's best at depth 20
+   and not worse than the old one.
+2. **Saved games with a castle only the bug allowed (I1):** accept; narrow I1. Step 1 changes
+   `AGENTS.md` I1 from:
 
    > **I1 — Files keep opening.** Every game file an earlier BChess wrote (`.json` with the
    > `GameState` shape, `.pgn`) still opens, and PGN written by BChess stays standard PGN.
@@ -411,11 +396,10 @@ Performance (from the performance review, not re-measured here):
    > claimed without king and rook in place); BChess had not shipped when that was fixed, so such
    > files can exist only on the developer's own devices.
 
-   Cost: none in code; such a file reports the usual "could not open" error.
-
-   **Recommendation: (b).** The exposure is a handful of files at most, on Jean's devices only, and
-   (a) would keep an illegal-move path alive in the engine permanently for them.
-3. **Minimal SAN in the writer (`R1xe2`).** Default: yes, it is the standard form and round-trips
-   once step 6 lands. Alternative: keep writing the full square for rank cases (parser fix only).
-4. **Scope.** Default: this plan (B1–B6, the hash state, nits); the other risks become ENGINE-3 candidates.
-   Alternative: fold some follow-ups in here.
+   Considered and not chosen: a legacy load path that re-parses failing games with the pre-fix
+   castling rule. It would keep an illegal-move path (and its rook-conjuring, hash-breaking castle)
+   alive in the engine permanently for a handful of files on Jean's own devices. Codex round 2's
+   blocker and its legacy-hash item were about that path and are moot.
+3. **Minimal SAN in exported PGN (`R1xe2`):** yes.
+4. **Scope:** as planned (B1–B6, castling and en passant in the hash, nits); the other risks are
+   ENGINE-3 candidates. Go.
