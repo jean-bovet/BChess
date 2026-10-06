@@ -3,3 +3,6 @@ BChess.xcodeproj/project.xcworkspace/xcshareddata
 
 # Claude worktrees
 .claude/worktrees/
+
+# Elo measurement: tools, book, build and match logs (scripts/elo-match.sh)
+.elo/
