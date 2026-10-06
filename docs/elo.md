@@ -15,7 +15,7 @@ reference; read it with the caveats below.
   checked against its sha256. Every opening is played twice, once with each colour.
 - **BChess:** `BChessUCI`, built in Release from the current checkout, with the transposition table
   off and no opening book (the tool loads none).
-- **Time control:** 10+0.1 by default, with a time margin of 100 ms. A draw is adjudicated after
+- **Time control:** 10+0.1 by default, with a time margin of 100 ms (`TIMEMARGIN=<ms>`, applied to both engines and written to the run's `.info` file; ENGINE-3's late matches used 200 ms because scheduler jitter on a loaded machine caused forfeits of 100 to 150 ms). A draw is adjudicated after
   move 40 when both scores stay within 10 cp for 8 moves; a game ends when both engines agree that
   one side is 10 pawns up for 4 moves.
 - **Tools are checked on every run:** Stockfish 19, and fastchess at the pinned commit (also when

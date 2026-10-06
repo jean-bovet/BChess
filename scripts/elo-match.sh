@@ -14,6 +14,7 @@
 # CONCURRENCY  games played at once
 # BASE         a git ref: A/B mode against that commit instead of Stockfish
 # MAX_GAMES    A/B mode: the most games played, an even number (default 8000)
+# TIMEMARGIN  ms a engine may overrun its clock before it loses on time, for both engines (default 100)
 # ELO0, ELO1   A/B mode: the SPRT hypotheses (default 0 and 10: a gain test; -5 and 0 tests for no regression)
 
 set -euo pipefail
@@ -34,6 +35,7 @@ BASE=${BASE:-}
 LEVEL=${LEVEL:-1600}
 GAMES=${GAMES:-300}
 MAX_GAMES=${MAX_GAMES:-8000}
+TIMEMARGIN=${TIMEMARGIN:-100}
 ELO0=${ELO0:-0}
 ELO1=${ELO1:-10}
 if [[ -n $BASE ]]; then TC=${TC:-5+0.05}; else TC=${TC:-10+0.1}; fi
@@ -321,9 +323,9 @@ COMMIT=$(git -C "$ROOT" rev-parse --short HEAD)
     echo "fastchess:   $FASTCHESS_ID, $FASTCHESS, sha256 $(sha256 "$FASTCHESS")"
     echo "Book:        8moves_v3.pgn sha256 $BOOK_PGN_SHA256, opening seed $SEED"
     if [[ -n $BASE ]]; then
-        echo "Settings:    BASE=$BASE MAX_GAMES=$MAX_GAMES TC=$TC CONCURRENCY=$CONCURRENCY, SPRT elo0=$ELO0 elo1=$ELO1 alpha=0.05 beta=0.05 model=logistic"
+        echo "Settings:    BASE=$BASE MAX_GAMES=$MAX_GAMES TC=$TC TIMEMARGIN=$TIMEMARGIN CONCURRENCY=$CONCURRENCY, SPRT elo0=$ELO0 elo1=$ELO1 alpha=0.05 beta=0.05 model=logistic"
     else
-        echo "Settings:    LEVEL=$LEVEL GAMES=$GAMES TC=$TC CONCURRENCY=$CONCURRENCY"
+        echo "Settings:    LEVEL=$LEVEL GAMES=$GAMES TC=$TC TIMEMARGIN=$TIMEMARGIN CONCURRENCY=$CONCURRENCY"
     fi
 } | tee "$INFO"
 if [[ -n $BASE ]]; then
@@ -341,7 +343,7 @@ cd "$ELO/runs"
 "$FASTCHESS" \
     -engine cmd="$BCHESS" name=BChess \
     "${OPPONENT[@]}" \
-    -each tc=$TC timemargin=100 \
+    -each tc=$TC timemargin=$TIMEMARGIN \
     -openings file="$BOOK" format=pgn order=random -srand "$SEED" \
     -repeat -games 2 -rounds $((EXPECTED / 2)) -concurrency "$CONCURRENCY" -recover \
     -draw movenumber=40 movecount=8 score=10 \
