@@ -39,8 +39,9 @@ public:
     static bool isQuiet(Move move);    
     static bool isDraw(ChessBoard board, HistoryPtr history);
 
-    static int evaluate(ChessBoard board, HistoryPtr history);
-    static int evaluate(ChessBoard board, HistoryPtr history, MoveList moves);
+    // The board is not const because generateMoves, isCheck and getHash update its caches
+    static int evaluate(ChessBoard &board, HistoryPtr history);
+    static int evaluate(ChessBoard &board, HistoryPtr history, const MoveList &moves);
 
     static int evaluateAction(ChessBoard board);
     static int evaluateMobility(ChessBoard board);
@@ -48,6 +49,6 @@ public:
     static int getBonus(Piece piece, Color color, Square square);
     
 private:
-    static int evaluateAction(MoveList moves);
-    static int evaluateMobility(MoveList moves);
+    static int evaluateAction(const MoveList &moves);
+    static int evaluateMobility(const MoveList &moves);
 };

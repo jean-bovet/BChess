@@ -43,7 +43,7 @@ struct MinMaxVariation {
     
     int value = 0;
 
-    void push(int score, Move move, MinMaxVariation line) {
+    void push(int score, Move move, const MinMaxVariation &line) {
         value = score;
         
         depth = std::max(depth, line.depth);
@@ -52,6 +52,15 @@ struct MinMaxVariation {
         moves.count = 0;
         moves.push(move);
         moves.push(line.moves);
+    }
+
+    // A line of one move: the same as pushing an empty line, without building one
+    void push(int score, Move move) {
+        value = score;
+        qsDepth = 0;
+        
+        moves.count = 0;
+        moves.push(move);
     }
 
 };
@@ -95,9 +104,12 @@ public:
     
     typedef MinMaxVariation Variation;
     
+    // The line that a move off the best variation is searched with. Read only, so it is built once.
+    inline static const Variation emptyLine = Variation();
+    
     // pv: Principal Variation that will be available when this method returns.
     // bv: Best Variation that is provided from an earlier search (typically by the iterative deepening algorithm).
-    int alphabeta(ChessBoard node, HistoryPtr history, TranspositionTable &table, int depth, bool maximizingPlayer, Variation &pv, Variation &bv) {
+    int alphabeta(ChessBoard node, HistoryPtr history, TranspositionTable &table, int depth, bool maximizingPlayer, Variation &pv, const Variation &bv) {
         Variation currentLine;
         int color = maximizingPlayer ? 1 : -1;
         int score = alphabeta(node, history, table, depth, -INT_MAX, INT_MAX, color, pv, currentLine, bv);
@@ -151,7 +163,7 @@ private:
     // bv: Best Variation - if available
     // https://en.wikipedia.org/wiki/Negamax
     // https://chessprogramming.wikispaces.com/Principal+variation
-    int alphabeta(ChessBoard node, HistoryPtr history, TranspositionTable &table, int depth, int alpha, int beta, int color, Variation &pv, Variation &cv, Variation &bv) {
+    int alphabeta(ChessBoard node, HistoryPtr history, TranspositionTable &table, int depth, int alpha, int beta, int color, Variation &pv, Variation &cv, const Variation &bv) {
         pv.depth = depth;
         maxPly = std::max<int64_t>(maxPly, depth);
 
@@ -170,7 +182,7 @@ private:
             int value = 0;
             if (entry.depth >= evalDepth && ttCutoff(entry, depth, alpha, beta, value)) {
                 assert(ChessMoveGenerator::isValid(entry.bestMove));
-                pv.push(value, entry.bestMove, Variation());
+                pv.push(value, entry.bestMove);
                 return value;
             }
         }
@@ -240,7 +252,7 @@ private:
 #endif
             
             Variation line;
-            Variation bestLine = (move == bestMovePV) ? bv : Variation();
+            const Variation &bestLine = (move == bestMovePV) ? bv : emptyLine;
             int score = -alphabeta(newNode, history, table, depth + 1, -beta, -alpha, -color, line, cv, bestLine);
             
             cv.moves.pop();
