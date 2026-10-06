@@ -1,6 +1,6 @@
 # ENGINE-3 (speed) — A faster search at the same strength of play, measured
 
-Revision 2 (2026-10-06). Planned on `main` (`--no-worktree`, Jean's call). This is the first of three
+Revision 3 (2026-10-06). Planned on `main` (`--no-worktree`, Jean's call). This is the first of three
 ENGINE-3 plans: **speed** (this one), then **search** (pruning, check extension, TT cut-offs and draws),
 then **evaluation**. It assumes ENGINE-1 (bug fixes, perft) and ENGINE-2 (match-ready `BChessUCI`, mate
 distance, `scripts/elo-match.sh`, 1736 ± 40 in `docs/elo.md`) and repeats neither.
@@ -18,6 +18,16 @@ distance, `scripts/elo-match.sh`, 1736 ± 40 in `docs/elo.md`) and repeats neith
   - The GoogleTest registration floor is raised with every step that adds cases.
   - The board is passed as `ChessBoard &`, not `const`, because `getHash`, `isCheck` and
     `generateMoves` update caches.
+- r3 — Codex plan round 2 (substantive). All findings accepted:
+  - **Blocker.** The repetition scan trusts the half-move clock only when
+    `0 <= clock <= history size − 1`, and scans the full history otherwise. Old files with
+    negative clocks keep working (I1); test with a −100 clock.
+  - **Blocker.** SEE pruning shares delta pruning's check exemption. Ignoring pins made SEE score
+    the mate `Qxb7#` in `kr5R/1p6/1QBN4/…` as −300; it gets a test with both rules on.
+  - The bench signature hashes every position's (nodes, score, best move), not only the total.
+  - Step 4 names the caller migrations: `const Variation &bv`, const `MoveList::lookup`/`bestMove`,
+    and named boards in `EvaluationTests`.
+  - A SEE en-passant test where removing the captured pawn opens a slider line onto the square.
 
 Jean's request: "Start with the speed plan." The goal is a higher Elo through a faster search: more
 depth in the same time. Out of scope here: new pruning of the main search (null move, LMR, futility),
@@ -109,7 +119,10 @@ without a match.
   For each position the bench runs `IterativeDeepening::search` to a fixed depth (default 6;
   `DEPTH=`, `TT=0|1`) on a fresh engine. It prints the per-position line (nodes, score, best move) and
   then two totals:
-  - the **signature**: total nodes, plus a hash of all the scores and best moves;
+  - the **signature**: a hash over every position's tuple (FEN index, node count, score, best
+    move), printed with the total nodes. A per-position change cannot cancel out in a total.
+    `bench.sh --compare <old-output> <new-output>` diffs the per-position lines and names any
+    tuple that differs;
   - the **cost**: retired instructions and cycles (`proc_pid_rusage(RUSAGE_INFO_V4)`, macOS only,
     behind `__APPLE__`; this file is a developer tool outside `Shared/Engine`, so I3 holds), and CPU
     time.
@@ -244,7 +257,12 @@ without a match.
   `evaluateAction` and `evaluateMobility`, which take a `MoveList` by value
   (`ChessEvaluater.hpp:45-52`).
 - `MinMaxSearch.hpp:243`: pass the child either `bv` or a reference to one empty `Variation` (a
-  `static const` in `MinMaxSearch`). No per-move copy, no zero-fill.
+  `static const` in `MinMaxSearch`). No per-move copy, no zero-fill. For that to compile, `bv` is
+  only read, so it becomes `const Variation &bv` in both `alphabeta` overloads
+  (`MinMaxSearch.hpp:100`, `:154`), and `MoveList::lookup` and `MoveList::bestMove` become `const`
+  member functions (`MoveList.hpp:54`, `:62`). Callers that pass a mutable `Variation`
+  (`IterativeDeepening.hpp:108`, `SearchChessTests.cpp:37`, `MinMaxSearchTests`, `BestMoveTests`)
+  bind to the const reference unchanged. `pv` and `cv` stay mutable references.
 - `MinMaxSearch.hpp:173`: push an empty line without building a value-initialized temporary. For
   example, an overload `push(int score, Move move)` that sets `moves.count = 1`.
 - Local `Variation` objects stay default-initialized, as they are today. `count = 0` suffices, and
@@ -265,15 +283,24 @@ without a match.
     mate/stalemate branch, which returns before the draw check, and tests with a fresh history.
 
   `evaluate` then no longer needs the history. Its `HistoryPtr` parameter is removed and the
-  callers are updated: `MinMaxSearch.hpp` (3) and `EvaluationTests.cpp:131-135`,
-  `MinMaxSearchTests.cpp:37`, `:68`.
-- **Bounded scan.** `ChessHistory::isThreefoldRepetition(hash, halfMoveClock, history)` stops after
-  `min(halfMoveClock, size − 1)` plies back. This is sound:
+  callers are updated: `MinMaxSearch.hpp` (3), `EvaluationTests.cpp:131-135` and
+  `MinMaxSearchTests.cpp:37`, `:68`. `EvaluationTests` passes temporaries
+  (`evaluate(boardFor(fen), …)`), which cannot bind to `ChessBoard &`, so they become named locals
+  (`auto board = boardFor(fen);`). The `MinMaxSearchTests` calls already pass named boards.
+- **Bounded scan.** `ChessHistory::isThreefoldRepetition(hash, halfMoveClock, history)` stops
+  `halfMoveClock` plies back, but **only when `0 <= halfMoveClock <= size − 1`**. In every other
+  case it scans the whole history, as today. This is sound:
   - The clock resets on every capture and pawn move (`ChessBoard.cpp:283-285`, `:338-339`), and no
     position before such a move can recur.
   - A lost castling right does not reset the clock, but it changes the hash, so the bound is still
     only an upper limit.
-  - A FEN can claim a clock larger than the history; the `min` handles it.
+  - **A clock the history cannot back is not trusted.** `FFEN::setFEN` parses the clock with
+    `integer()` (`FFEN.cpp:230`), which accepts negative values, and `move()` keeps incrementing
+    them. Older files can carry such a clock, and I1 forbids rejecting them now. Start from the
+    start position with clock −100 and play `g1f3 g8f6 f3g1 f6g8` twice: the start position has
+    occurred three times, yet the clock is −92. A bound taken from it would miss the repetition.
+    A clock larger than the history (a FEN that claims 90) also falls back to the full scan, which
+    is then the same set of entries.
 
   `ChessEvaluater::isDraw(ChessBoard &, const HistoryPtr &)` passes `board.halfMoveClock`.
   `ChessEngine::gameEnd` (`ChessEngine.hpp:157`) goes through the same function, so the game's draw
@@ -344,6 +371,9 @@ without a match.
   exemption, delta pruning would skip it, and the `firstMoveOnly` mate check would never see the
   position after it. Keeping mates is worth more than a few saved nodes.
 
+  **This is the one exemption shared by every quiescence pruning rule.** Step 9's SEE pruning uses
+  it too: a capture that gives check is never pruned, whatever its delta or SEE.
+
   The test is cheap and exact. The capture is made on the copy `quiescence` already builds
   (`MinMaxSearch.hpp:320-321`), then `newNode.isCheck(newNode.color)`. Only when that is false and
   the delta condition holds is the recursive `quiescence` call skipped. The recursive call
@@ -374,8 +404,12 @@ without a match.
     may capture only when the opponent has no attacker left on the square after the exchange so
     far. Otherwise the exchange stops before the king's capture, because that capture would be
     illegal.
-- **Pruning.** In `quiescence`, captures with `see < 0` are skipped, except promotions. They can
-  also be sorted below winning captures; sorting them is part of the same commit.
+- **Pruning.** In `quiescence`, captures with `see < 0` are skipped, except promotions and except
+  **captures that give check** (step 8's shared exemption, tested after the move on `newNode`).
+  The exemption is needed, not a nicety: with pins ignored, SEE can score a mating capture as
+  losing. In `kr5R/1p6/1QBN4/8/8/8/8/7K w - - 0 1`, `Qxb7#` mates, because the b8 rook is pinned
+  by Rh8. SEE counts the rook's recapture and gives 100 − 900 + 500 = −300. Losing captures can
+  also be sorted below winning ones; that sorting is part of the same commit.
 - **The step is attempted only if step 8 landed**, and lands only on an SPRT pass against step 8's
   commit. Otherwise it is dropped and recorded (D4).
 - **Gate.** SPRT pass. Plus `see` unit tests, listed in the test plan.
@@ -448,14 +482,16 @@ proves and whether it is red before its step.
 | 3 | `BoardHash.LegalityMoveLeavesRulesIntact`: for every pseudo-legal move of Kiwipete and position 4, the legality-only path and `move()` leave identical `pieces`, `enPassant`, castling flags and counters. | The two paths share one rule set | yes (no such path) |
 | 4 | Existing `MinMaxSearch.*`, `SearchChess.*`, `IterativeDeepening.*`, `BestMove.*` unchanged | Exact | guards |
 | 5 | `ChessGameTests.RepetitionIsBoundedByTheHalfMoveClock`: a hand-built history whose earlier occurrences sit behind a pawn move (positions that real play cannot produce: the same hash before and after a pawn move). Not a repetition with the bound, a repetition without it. | The bound is applied | yes |
-| 5 | `ChessGameTests.RepetitionAfterManyReversibleMoves`: knights shuffled 40 plies, so the threefold still comes from the last 8 plies, and a FEN with clock 90 and a one-entry history does not read out of range. | Bound is sound, `min` handles FEN clocks | no (guard; ASan/Debug assert on `at()`) |
+| 5 | `ChessGameTests.RepetitionAfterManyReversibleMoves`: knights shuffled 40 plies, so the threefold still comes from the last 8 plies, and a FEN with clock 90 and a one-entry history does not read out of range. | Bound is sound, and a too-large clock falls back to the full scan | no (guard; ASan/Debug assert on `at()`) |
+| 5 | `ChessGameTests.RepetitionWithNegativeFENClock`: `rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - -100 1`, then `g1f3 g8f6 f3g1 f6g8` twice through `ChessGame::move`. `isDraw` is true and `ChessEngine::gameEnd` reports `repetition` (clock −92). The same with clock 200 and a short history also detects the repetition. | Legacy negative or oversized clocks never hide a repetition (I1) | yes against a bound that trusts any clock (proven in a scratch copy) |
 | 5 | Existing `ChessGameTests` lines 164/170 (`isDraw`), `EvaluationTests` (signature updated) | | guards |
 | 6 | `MinMaxSearchTests.OrderingDoesNotChangeTheScore`: TT cut-offs off, `IterativeDeepening` to depth 4 on Kiwipete and two middlegames, with `sortMoves` on (MVV/LVA + hash move, + killers after step 7) and off. Same score at every depth. | Ordering stays value-neutral. The node saving is proven by the bench gate, not by a unit test. | no (guard) |
 | 6 | `MinMaxSearchTests.BogusHashMoveIsIgnored`: store, under the root hash, an entry whose `bestMove` is illegal in the root position. Search depth 3 with TT cut-offs off. The PV's first move is legal, and the score equals a fresh-table search. | Validation against the list | not before step 6, where nothing reads the move. Proven red by deleting the validation in a scratch copy, then restored. |
 | 6, 7 | `SearchChessTests.OrderedMove` / `ChessTree`: the sorted node counts are updated (the score, 50 / 0, unchanged). The unsorted counts (341,658 / 142,400) are **unchanged**. | `sortMoves=false` is still the plain baseline | n/a (recorded) |
 | 7 | `MinMaxSearchTests.KillerIsAQuietMove`: after a search, killers hold only non-captures and non-promotions, at most 2 per ply, distinct. | Killer bookkeeping | yes |
 | 8 | `MinMaxSearchTests.QuiescenceReturnsTheBestCapture`, `QuiescenceNeverBelowStandPat`, `MateCarriesDistance`, `PrefersShorterMate` unchanged. New `DeltaPruningKeepsAWinningCapture`: a position where a queen capture lifts the score above alpha keeps it. `DeltaPruningSkipsHopelessCapture`: a pawn capture far below alpha visits fewer quiescence nodes, same result. `DeltaPruningKeepsAMatingCapture`: the side to move is far behind (alpha well above stand-pat + pawn + 200), and a pawn capture mates (the implementer builds the FEN and confirms the mate with Stockfish). Quiescence at `maxDepth = 0` returns the mate score `MAT_VALUE − 1`, with that capture as the PV. | No regression of the ENGINE-1/2 fixes; a mating capture is never pruned | the last two are red (the last with the check exemption deleted in a scratch copy) |
-| 9 | `SEETests`: PxN, knight undefended = **+320**; PxN, knight defended by a pawn = **+220** (320 − 100); QxP defended by a pawn = −800; an x-ray rook battery on a file; an en-passant capture = +100; a king capturing an undefended piece = its value. **King recapture refused:** a piece captured on a square the capturer's side still attacks after the exchange, where the only defender is the king → the king does not recapture, and the value is the full piece. **Pins ignored:** a capture defended only by a pinned piece is scored as defended, the documented approximation. | SEE values and the two exchange rules | yes |
+| 9 | `SEETests`: PxN, knight undefended = **+320**; PxN, knight defended by a pawn = **+220** (320 − 100); QxP defended by a pawn = −800; an x-ray rook battery on a file; an en-passant capture = +100; **an en-passant exchange where removing the captured pawn opens a line onto the exchange square**: the removed pawn was the only blocker between an enemy rook or bishop and the target, so SEE must count that slider's recapture (expected value < +100; the implementer builds the FEN and states the value). It fails if SEE leaves the captured pawn in its occupancy; a king capturing an undefended piece = its value. **King recapture refused:** a piece captured on a square the capturer's side still attacks after the exchange, where the only defender is the king → the king does not recapture, and the value is the full piece. **Pins ignored:** a capture defended only by a pinned piece is scored as defended, the documented approximation. | SEE values and the two exchange rules | yes |
+| 9 | `MinMaxSearchTests.PruningKeepsPinnedMate`: `kr5R/1p6/1QBN4/8/8/8/8/7K w - - 0 1`, delta and SEE pruning both on, `alphabeta` at `maxDepth = 0` (quiescence only) and at depth 1. Both return `MAT_VALUE − 1`, with `Qb6xb7` as the PV. A unit check that `see(Qxb7) < 0` shows that the exemption, not SEE, keeps it. | The shared check exemption covers SEE | yes, with the exemption deleted in a scratch copy |
 | every step that adds GoogleTests | `EngineGoogleTests.registersAllCases` (`EngineGoogleTests.swift:30`, today `>= 166`) is raised to the new total in the same commit. | New cases cannot silently fail to register | n/a (floor) |
 | all | Changed best-move tests: the ENGINE-1 rule (Stockfish depth 20, within 30 cp and not worse than the old line), documented in the commit. Stop only if a test's purpose fails. | | |
 
