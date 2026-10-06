@@ -5,6 +5,9 @@
 
 #include <gtest/gtest.h>
 
+#include <climits>
+#include <string>
+
 #include "ChessBoardHash.hpp"
 #include "ChessEngine.hpp"
 #include "ChessMoveGenerator.hpp"
@@ -149,5 +152,33 @@ TEST_F(FEN, SanitizesLegacy) {
     }) {
         ASSERT_TRUE(FFEN::setFEN(fen, board)) << fen;
         ASSERT_EQ(fen, FFEN::getFEN(board));
+    }
+}
+
+// The file counter of earlier versions was an unsigned byte that wrapped: 32 times "8" put the king of the
+// next group on the first file. Such text may be in a saved file, so it keeps its meaning.
+TEST_F(FEN, FileCounterWrapsLikeBefore) {
+    ChessBoard board;
+    ASSERT_TRUE(FFEN::setFEN(std::string(32, '8') + "k7/8/8/8/8/8/8/4K3 b - - 0 1", board));
+    ASSERT_EQ("k7/8/8/8/8/8/8/4K3 b - - 0 1", FFEN::getFEN(board));
+    
+    // Off the board before the wrap: ignored, as before
+    ASSERT_TRUE(FFEN::setFEN("4k3/8/8/8/8/8/8/4K3/" + std::string(30, '8') + "k7 b - - 0 1", board));
+    ASSERT_EQ("4k3/8/8/8/8/8/8/4K3 b - - 0 1", FFEN::getFEN(board));
+}
+
+// Counters that a FEN carries must not overflow when moves are generated or played
+TEST_F(FEN, HugeCountersSaturate) {
+    ChessBoard board;
+    ASSERT_TRUE(FFEN::setFEN("4k3/8/8/8/8/8/8/4K3 b - - 2147483647 2147483647", board));
+    ASSERT_EQ("4k3/8/8/8/8/8/8/4K3 b - - 2147483647 2147483647", FFEN::getFEN(board));
+    
+    MoveList moves = ChessMoveGenerator::generateMoves(board);
+    ASSERT_GT(moves.count, 0);
+    for (int i = 0; i < moves.count; i++) {
+        ChessBoard next = board;
+        next.move(moves.moves[i]);
+        ASSERT_EQ(INT_MAX, next.halfMoveClock);
+        ASSERT_EQ(INT_MAX, next.fullMoveCount);
     }
 }

@@ -9,6 +9,7 @@
 #include "ChessBoard.hpp"
 #include "ChessBoardHash.hpp"
 
+#include <climits>
 #include <iostream>
 #include <cassert>
 #include "magicmoves.h"
@@ -231,11 +232,14 @@ void ChessBoard::move(Move move) {
     // Take the castling rights and en-passant square out of the hash, they are put back at the end
     hash ^= ChessBoardHash::stateKey(*this);
     
-    if (color == BLACK) {
+    // A FEN can carry any counters: they stop at the largest value instead of overflowing
+    if (color == BLACK && fullMoveCount < INT_MAX) {
         fullMoveCount++;
     }
 
-    halfMoveClock++;
+    if (halfMoveClock < INT_MAX) {
+        halfMoveClock++;
+    }
     
     auto moveColor = MOVE_COLOR(move);
     auto movePiece = MOVE_PIECE(move);

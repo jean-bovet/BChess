@@ -32,6 +32,72 @@ CONCURRENCY=${CONCURRENCY:-4}
 
 fail() { echo "error: $*" >&2; exit 1; }
 
+# One pass over a fastchess PGN. Every game (it starts at its [Event] tag) must have a BChess side, exactly one
+# Result and exactly one Termination, both from the allowed values. Prints, in this order:
+#   games wins draws losses illegal-move-losses time-forfeit-losses illegal-moves-by-anyone abandoned unterminated malformed
+# wins, draws and losses are BChess's, and count only the games that are well formed.
+pgn_summary() {
+    awk '
+    function finish() {
+        if (!started) return
+        games++
+        bchess = (white == "BChess") || (black == "BChess")
+        okResult = (result == "1-0" || result == "0-1" || result == "1/2-1/2")
+        okTerm = (term == "normal" || term == "adjudication" || term == "time forfeit" || term == "illegal move" || term == "abandoned" || term == "unterminated")
+        if (nresult != 1 || nterm != 1 || !okResult || !okTerm || !bchess) { malformed++; return }
+        lost = (white == "BChess" && result == "0-1") || (black == "BChess" && result == "1-0")
+        if (result == "1/2-1/2") draws++
+        else if (lost) losses++
+        else wins++
+        if (term == "illegal move") { anyIllegal++; if (lost) illegalLosses++ }
+        if (term == "time forfeit" && lost) timeouts++
+        if (term == "abandoned") abandoned++
+        if (term == "unterminated") unterminated++
+    }
+    function tag(line, name,    v) {
+        v = line; sub("^\\[" name " \"", "", v); sub("\"\\]$", "", v); return v
+    }
+    /^\[Event / { finish(); started = 1; white = black = result = term = ""; nresult = nterm = 0 }
+    /^\[White "/ { white = tag($0, "White") }
+    /^\[Black "/ { black = tag($0, "Black") }
+    /^\[Result "/ { result = tag($0, "Result"); nresult++ }
+    /^\[Termination "/ { term = tag($0, "Termination"); nterm++ }
+    END { finish(); print games + 0, wins + 0, draws + 0, losses + 0, illegalLosses + 0, timeouts + 0, anyIllegal + 0, abandoned + 0, unterminated + 0, malformed + 0 }' "$1"
+}
+
+# --self-test: the validator against small sample runs, with no tools needed
+if [[ ${1:-} == --self-test ]]; then
+    TMP=$(mktemp -d)
+    trap 'rm -rf "$TMP"' EXIT
+    game() { printf '[Event "x"]\n[White "%s"]\n[Black "%s"]\n' "$1" "$2"; shift 2; for tag in "$@"; do printf '%s\n' "$tag"; done; printf '\n1. e4 e5 *\n\n'; }
+    check() { # name expected-output pgn-file
+        local got; got=$(pgn_summary "$3")
+        [[ $got == "$2" ]] && echo "ok   $1" || { echo "FAIL $1: got '$got', expected '$2'" >&2; FAILED=1; }
+    }
+    FAILED=0
+    { game BChess SF1600 '[Result "1-0"]' '[Termination "normal"]'
+      game SF1600 BChess '[Result "1-0"]' '[Termination "time forfeit"]'
+      game BChess SF1600 '[Result "1/2-1/2"]' '[Termination "adjudication"]'; } > "$TMP/good.pgn"
+    check "a complete run" "3 1 1 1 0 1 0 0 0 0" "$TMP/good.pgn"
+    game BChess SF1600 '[Result "1-0"]' > "$TMP/noterm.pgn"
+    check "a game without a termination" "1 0 0 0 0 0 0 0 0 1" "$TMP/noterm.pgn"
+    { game BChess SF1600 '[Result "1-0"]' '[Result "1-0"]' '[Termination "normal"]'
+      game BChess SF1600 '[Termination "normal"]'; } > "$TMP/mixed.pgn"
+    check "one game with two results, one with none" "2 0 0 0 0 0 0 0 0 2" "$TMP/mixed.pgn"
+    game BChess SF1600 '[Result "1-0"]' '[Termination "mystery"]' > "$TMP/unknown.pgn"
+    check "an unknown termination" "1 0 0 0 0 0 0 0 0 1" "$TMP/unknown.pgn"
+    game BChess SF1600 '[Result "*"]' '[Termination "unterminated"]' > "$TMP/unfinished.pgn"
+    check "an unfinished game" "1 0 0 0 0 0 0 0 0 1" "$TMP/unfinished.pgn"
+    game SF1600 SF1700 '[Result "1-0"]' '[Termination "normal"]' > "$TMP/strangers.pgn"
+    check "a game without BChess" "1 0 0 0 0 0 0 0 0 1" "$TMP/strangers.pgn"
+    { game BChess SF1600 '[Result "0-1"]' '[Termination "illegal move"]'
+      game SF1600 BChess '[Result "0-1"]' '[Termination "abandoned"]'; } > "$TMP/bad.pgn"
+    check "an illegal move and an abandoned game" "2 1 0 1 1 0 1 1 0 0" "$TMP/bad.pgn"
+    : > "$TMP/empty.pgn"
+    check "an empty file" "0 0 0 0 0 0 0 0 0 0" "$TMP/empty.pgn"
+    exit $FAILED
+fi
+
 [[ $LEVEL =~ ^[0-9]+$ ]] && (( LEVEL >= 1320 && LEVEL <= 3190 )) || fail "LEVEL must be between 1320 and 3190"
 [[ $GAMES =~ ^[0-9]+$ ]] && (( GAMES >= 2 && GAMES % 2 == 0 )) || fail "GAMES must be an even number"
 [[ $CONCURRENCY =~ ^[0-9]+$ ]] && (( CONCURRENCY >= 1 )) || fail "CONCURRENCY must be a positive number"
@@ -118,43 +184,17 @@ DRAWS=$(sed -E 's/.*Draws: ([0-9]+).*/\1/' <<< "$GAMELINE")
 SCORE=$(sed -E 's/.*\(([0-9.]+) %\).*/\1/' <<< "$GAMELINE")
 PLAYED=$((WINS + LOSSES + DRAWS))
 
-# The games themselves are the authority: exactly GAMES results, each with a termination, agreeing with the summary
-read -r PGNRESULTS PGNTERMINATIONS PGNWINS PGNLOSSES PGNDRAWS < <(awk '
-    /^\[White "/ { white = ($2 == "\"BChess\"]") }
-    /^\[Result "/ {
-        r = $2; gsub(/[\]"]/, "", r)
-        if (r == "1-0" || r == "0-1" || r == "1/2-1/2") results++
-        if (r == "1/2-1/2") draws++
-        else if ((white && r == "1-0") || (!white && r == "0-1")) wins++
-        else if (r == "1-0" || r == "0-1") losses++
-    }
-    /^\[Termination "/ { terminations++ }
-    END { print results + 0, terminations + 0, wins + 0, losses + 0, draws + 0 }' "$PGN")
-
-# BChess's losses by how they ended, and the games that must not happen, from the PGN's Termination tag
-read -r ILLEGAL TIMEOUTS ABANDONED UNTERMINATED < <(awk '
-    /^\[White "/ { white = ($2 == "\"BChess\"]") }
-    /^\[Result "/ { result = $2; gsub(/[\]"]/, "", result) }
-    /^\[Termination "/ {
-        t = $0; sub(/^\[Termination "/, "", t); sub(/"\]$/, "", t)
-        lost = (white && result == "0-1") || (!white && result == "1-0")
-        if (t == "illegal move" && lost) illegal++
-        if (t == "time forfeit" && lost) timeouts++
-        if (t == "abandoned") abandoned++
-        if (t == "unterminated") unterminated++
-    }
-    END { print illegal + 0, timeouts + 0, abandoned + 0, unterminated + 0 }' "$PGN")
-# Whoever made an illegal move, it is a bug to look at
-ANYILLEGAL=$(grep -c '^\[Termination "illegal move"\]' "$PGN" || true)
+# The games themselves are the authority: every game must be complete, and they must agree with the summary
+read -r PGNGAMES PGNWINS PGNDRAWS PGNLOSSES ILLEGAL TIMEOUTS ANYILLEGAL ABANDONED UNTERMINATED MALFORMED < <(pgn_summary "$PGN")
 
 echo
 echo "Result: BChess $WINS wins, $LOSSES losses, $DRAWS draws out of $PLAYED games, score $SCORE %"
 echo "BChess losses by illegal move: $ILLEGAL, by time forfeit: $TIMEOUTS. Games abandoned (disconnect or stall): $ABANDONED, unterminated: $UNTERMINATED"
 echo "Wall time: $((WALL / 60)) min $((WALL % 60)) s. Games: $PGN"
 
-if (( ANYILLEGAL > 0 || ABANDONED > 0 || UNTERMINATED > 0 || PLAYED != GAMES || PGNRESULTS != GAMES || PGNTERMINATIONS != GAMES \
+if (( ANYILLEGAL > 0 || ABANDONED > 0 || UNTERMINATED > 0 || MALFORMED > 0 || PLAYED != GAMES || PGNGAMES != GAMES \
       || PGNWINS != WINS || PGNLOSSES != LOSSES || PGNDRAWS != DRAWS )); then
-    echo "PGN: $PGNRESULTS results, $PGNTERMINATIONS terminations, $PGNWINS/$PGNDRAWS/$PGNLOSSES (W/D/L); summary: $PLAYED games, $WINS/$DRAWS/$LOSSES; expected $GAMES games" >&2
+    echo "PGN: $PGNGAMES games ($MALFORMED malformed), $PGNWINS/$PGNDRAWS/$PGNLOSSES (W/D/L); summary: $PLAYED games, $WINS/$DRAWS/$LOSSES; expected $GAMES games" >&2
     echo "INVALID RUN: an illegal move, a disconnect or an unfinished game is a bug to fix, not a rating. No Elo is reported." >&2
     echo "Look at the games whose Termination is not normal or adjudication in $PGN, and at $LOG" >&2
     exit 2

@@ -39,7 +39,9 @@ that takes under a minute: `LEVEL=1320 GAMES=4 TC=2+0.05 scripts/elo-match.sh`.
 The script builds, plays, and prints a Markdown row for the table below. It refuses to give a number when:
 
 - **the run is invalid:** an illegal move, a disconnect, a stall or an unfinished game, or a PGN
-  that does not hold exactly `GAMES` results that agree with fastchess's summary. That is a bug
+  that does not hold exactly `GAMES` complete games (each with one result and one termination from
+  the allowed set, one side BChess) agreeing with fastchess's summary. `scripts/elo-match.sh
+  --self-test` checks that validator against sample runs. That is a bug
   to fix, not a rating. It exits with status 2.
 - **the score is out of range:** below 10 % or above 90 %, or fastchess gives no finite interval. It
   prints the level to try next (300 further, at least 1320) and exits with status 3.

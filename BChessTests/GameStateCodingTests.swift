@@ -157,4 +157,20 @@ struct GameStateCodingTests {
             #expect(engine.pgnAllGames().contains(tag))
         }
     }
+
+    // The file counter of earlier versions wrapped after 256 empty squares: the king lands on a8
+    @Test func wrappedFileCounterFilesOpen() throws {
+        let fen = String(repeating: "8", count: 32) + "k7/8/8/8/8/8/8/4K3 b - - 0 1"
+        let tag = "[FEN \"\(fen)\"]"
+        let pgn = "[Event \"Test\"]\n\(tag)\n[SetUp \"1\"]\n\n1... Ka7 *"
+        let json = "{\"pgn\":\"[Event \\\"Test\\\"]\\n[FEN \\\"\(fen)\\\"]\\n[SetUp \\\"1\\\"]\\n\\n1... Ka7 *\",\"rotated\":false}"
+
+        for (data, type) in [(Data(pgn.utf8), UTType.pgn), (Data(json.utf8), UTType.json)] {
+            let state = try GameState(data: data, contentType: type)
+            let engine = FEngine()
+            #expect(engine.loadAllGames(state.pgn))
+            #expect(engine.fen() == "8/k7/8/8/8/8/8/4K3 w - - 1 2")
+            #expect(engine.pgnAllGames().contains(tag))
+        }
+    }
 }

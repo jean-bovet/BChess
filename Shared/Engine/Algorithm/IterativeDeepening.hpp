@@ -12,6 +12,7 @@
 #include "ChessEvaluater.hpp"
 #include "TranspositionTable.hpp"
 
+#include <algorithm>
 #include <atomic>
 #include <chrono>
 #include <climits>
@@ -88,6 +89,7 @@ public:
         TimeManagement searchClock;
         searchClock.start();
         int64_t totalNodes = 0;
+        int64_t deepestPly = 0;
         auto elapsedMilli = [&searchClock] {
             searchClock.stop();
             return int64_t(searchClock.elapsedMilli());
@@ -106,6 +108,7 @@ public:
             int score = minMaxSearch.alphabeta(board, history, table, 0, board.color == WHITE, pv, bestVariation);
             
             totalNodes += minMaxSearch.visitedNodes;
+            deepestPly = std::max(deepestPly, minMaxSearch.maxPly);
             
 //            int percentCollision = (float)table.collisionCount / table.storeCount * 100;
 //            std::cout << "Entry count = " << table.storeCount << ", collision = " << table.collisionCount << " (" << percentCollision << "%)" << ", new = " << table.newStoreCount << std::endl;
@@ -125,7 +128,7 @@ public:
                 // The depth that was searched: a line that ends early (a mate) is shorter than that
                 evaluation.depth = curMaxDepth;
                 evaluation.quiescenceDepth = pv.qsDepth;
-                evaluation.selDepth = int(minMaxSearch.maxPly);
+                evaluation.selDepth = int(deepestPly);
 
                 evaluation.line.push(pv.moves);
                 
@@ -151,6 +154,7 @@ public:
         // The returned evaluation keeps the score and the line of the last completed depth, but its
         // totals cover all the work, including a depth that was interrupted
         evaluation.nodes = totalNodes;
+        evaluation.selDepth = int(deepestPly);
         evaluation.time = elapsedMilli();
         evaluation.movesPerSecond = nodesPerSecond(evaluation.nodes, evaluation.time);
         

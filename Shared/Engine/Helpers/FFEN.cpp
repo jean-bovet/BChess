@@ -187,21 +187,22 @@ bool FFEN::setFEN(std::string fen, ChessBoard &board) {
         for (char p : rank) {
             auto emptySquares = p - '0';
             if (emptySquares >= 1 && emptySquares <= 8) {
-                // Empty squares past the end of the rank are harmless (earlier versions accepted them)
-                coord.file = std::min(int(coord.file) + emptySquares, 8);
+                // The file counter wraps like earlier versions' (an unsigned byte), and only the squares of the
+                // board are ever written
+                coord.file = File(coord.file + emptySquares);
             } else {
                 BoardSquare square;
                 if (!charToSquare(p, square)) {
                     return false;
                 }
                 // A piece that does not fit on the board is ignored, as earlier versions did
-                if (coord.file <= 7 && coord.rank >= 0 && coord.rank <= 7) {
+                if (coord.file <= 7 && coord.rank <= 7) {
                     parsed.set(square, coord.file, coord.rank);
                 }
-                coord.file = std::min(int(coord.file) + 1, 8);
+                coord.file = File(coord.file + 1);
             }
         }
-        coord.rank -= 1;
+        coord.rank = Rank(coord.rank - 1);
         coord.file = 0;
     }
     

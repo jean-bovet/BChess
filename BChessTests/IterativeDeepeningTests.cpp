@@ -153,6 +153,29 @@ TEST_F(IterativeDeepeningTests, FinalStatsIncludeInterruptedDepth) {
     ASSERT_GT(extra, 0);
     ASSERT_EQ(reported[1].nodes + extra, evaluation.nodes);
     ASSERT_GE(evaluation.time, reported[1].time);
+    
+    // The deepest ply of the whole search, the interrupted depth included
+    int64_t interruptedPly = search.minMaxSearch.maxPly;
+    ASSERT_EQ(std::max<int64_t>(reported[1].selDepth, interruptedPly), evaluation.selDepth);
+    ASSERT_GE(evaluation.selDepth, reported[0].selDepth);
+}
+
+// The depth that is interrupted reached plies that the completed depth did not: seldepth covers them
+TEST_F(IterativeDeepeningTests, FinalSelDepthIncludesInterruptedDepth) {
+    IterativeDeepening search;
+    ChessBoard board;
+    ASSERT_TRUE(FFEN::setFEN(middlegame, board));
+    
+    std::vector<ChessEvaluation> reported;
+    search.start();
+    stopInDepth(search, 2, 100);
+    auto evaluation = search.search(board, NEW_HISTORY, 2, [&](ChessEvaluation e) {
+        reported.push_back(e);
+    });
+    
+    ASSERT_EQ(1u, reported.size());
+    ASSERT_GT(search.minMaxSearch.maxPly, reported[0].selDepth);
+    ASSERT_EQ(search.minMaxSearch.maxPly, evaluation.selDepth);
 }
 
 #endif
