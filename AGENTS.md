@@ -16,7 +16,11 @@ commit both).
 **Invariants.** A violation is always wrong:
 
 - **I1 — Files keep opening.** Every game file an earlier BChess wrote (`.json` with the
-  `GameState` shape, `.pgn`) still opens, and PGN written by BChess stays standard PGN.
+  `GameState` shape, `.pgn`) still opens, and PGN written by BChess stays standard PGN. The one
+  exception is a game whose moves are illegal chess that only an engine bug let BChess accept
+  (ENGINE-1: castling after the rook was captured on its corner, or with castling rights a FEN
+  claimed without king and rook in place); BChess had not shipped when that was fixed, so such
+  files can exist only on the developer's own devices.
 - **I2 — A search result only lands on the position it was computed for.** Once the position
   changes (move, undo, new game, paste, navigation, mode change), no callback from an earlier
   search may change the game. The main thread never waits on a search.

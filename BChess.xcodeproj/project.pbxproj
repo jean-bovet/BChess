@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		0401A8739A8AE962C5B83EDF /* GameState.swift in Sources */ = {isa = PBXBuildFile; fileRef = E918E82CA52FD5A787214464 /* GameState.swift */; };
 		04AA9D1F6F5B25621FBDDAC2 /* BChessUIApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D0B880575533E500966B9FF /* BChessUIApp.swift */; };
+		04B0CC14841707C623C04EA9 /* PerftTests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B1C4B3C222B45C0C99C5CED0 /* PerftTests.cpp */; };
 		0765B5599107D096C64103B5 /* MinMaxSearchTests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 53E1CB7DFCB5C3399E0AFAE5 /* MinMaxSearchTests.cpp */; };
 		07DF6D4FB0FB1DA0235D77C4 /* OpeningsTests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 19F55617E5E81201E906F8EA /* OpeningsTests.cpp */; };
 		09B208471B25168203A8199A /* MoveTests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 679F482FF7CFC630243800C2 /* MoveTests.cpp */; };
@@ -325,6 +326,7 @@
 		AE369A268D78EE76D0D84F80 /* ChessBoard.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ChessBoard.cpp; sourceTree = "<group>"; };
 		AEC6B2A69F9EAD135A9433ED /* Arrow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Arrow.swift; sourceTree = "<group>"; };
 		B06D783FF88F314CC998FEC5 /* PiecesFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PiecesFactory.swift; sourceTree = "<group>"; };
+		B1C4B3C222B45C0C99C5CED0 /* PerftTests.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = PerftTests.cpp; sourceTree = "<group>"; };
 		B2F90389CE311A6A7172FBE4 /* LabelsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LabelsView.swift; sourceTree = "<group>"; };
 		B33D8737F4BC31AFA0BD8E97 /* BChessTests-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "BChessTests-Bridging-Header.h"; sourceTree = "<group>"; };
 		B4127DC8F0333054AE16B921 /* FENgineInfo+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FENgineInfo+Extension.swift"; sourceTree = "<group>"; };
@@ -478,6 +480,7 @@
 				9BA0B234E3F267394AD43C1F /* MovesTests.cpp */,
 				679F482FF7CFC630243800C2 /* MoveTests.cpp */,
 				19F55617E5E81201E906F8EA /* OpeningsTests.cpp */,
+				B1C4B3C222B45C0C99C5CED0 /* PerftTests.cpp */,
 				19CA422D6799EFFF17A2BDAE /* PGNTests.cpp */,
 				CBA33EA4ACC347FB0DF9ABA4 /* SearchChessTests.cpp */,
 				2AD84B737192936DAA406CD7 /* StateTests.cpp */,
@@ -943,6 +946,7 @@
 				687625833AC8552DF1728B21 /* MovesTests.cpp in Sources */,
 				07DF6D4FB0FB1DA0235D77C4 /* OpeningsTests.cpp in Sources */,
 				766704256B00BAE218AF2C79 /* PGNTests.cpp in Sources */,
+				04B0CC14841707C623C04EA9 /* PerftTests.cpp in Sources */,
 				79234A2D05908EE2A080C99E /* PiecesFactory.swift in Sources */,
 				50F769517A70B9DCFD18284B /* PlayAgainst.swift in Sources */,
 				8E85EF2B2D8E4A802F14F47D /* Position.swift in Sources */,

@@ -248,10 +248,12 @@ void ChessBoard::move(Move move) {
             
             if (from == e1 && to == g1) {
                 // White castle king side, need to move the rook
+                assert(bb_test(pieces[moveColor][ROOK], h1));
                 ChessBoard::move(moveColor, ROOK, h1, f1);
             }
             if (from == e1 && to == c1) {
                 // White castle queen side, need to move the rook
+                assert(bb_test(pieces[moveColor][ROOK], a1));
                 ChessBoard::move(moveColor, ROOK, a1, d1);
             }
         } else {
@@ -259,10 +261,12 @@ void ChessBoard::move(Move move) {
             
             if (from == e8 && to == g8) {
                 // Black castle king side, need to move the rook
+                assert(bb_test(pieces[moveColor][ROOK], h8));
                 ChessBoard::move(moveColor, ROOK, h8, f8);
             }
             if (from == e8 && to == c8) {
                 // Black castle queen side, need to move the rook
+                assert(bb_test(pieces[moveColor][ROOK], a8));
                 ChessBoard::move(moveColor, ROOK, a8, d8);
             }
         }
@@ -315,20 +319,18 @@ void ChessBoard::move(Move move) {
         }
     }
 
-    if (movePiece == ROOK) {
-        if (moveColor == WHITE) {
-            if (from == a1) {
-                whiteCanCastleQueenSide = false;
-            } else if (from == h1) {
-                whiteCanCastleKingSide = false;
-            }
-        } else {
-            if (from == a8) {
-                blackCanCastleQueenSide = false;
-            } else if (from == h8) {
-                blackCanCastleKingSide = false;
-            }
-        }
+    // A right goes when anything touches its rook's corner: the rook leaves, or is captured there
+    if (from == a1 || to == a1) {
+        whiteCanCastleQueenSide = false;
+    }
+    if (from == h1 || to == h1) {
+        whiteCanCastleKingSide = false;
+    }
+    if (from == a8 || to == a8) {
+        blackCanCastleQueenSide = false;
+    }
+    if (from == h8 || to == h8) {
+        blackCanCastleKingSide = false;
     }
     
     if (MOVE_IS_CAPTURE(move)) {
