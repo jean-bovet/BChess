@@ -574,7 +574,9 @@ run by the implementer, not in CI.
 - **Node-count tests.** `SearchChessTests` asserts exact counts. They change in steps 6–9 and are
   updated with the old and new values in the commit message. The scores stay.
 
-## Decisions left open for Jean
+## Decisions (Jean's go, 2026-10-06: all four as recommended)
+
+Decided: **D1** TT cut-offs stay for the search plan (this plan uses the table for ordering only); **D2** 16 MB on iOS and 64 MB on macOS, lazy, no `Hash` UCI option; **D3** the bench gates the exact and ordering steps, SPRT gates steps 8 and 9, plus one whole-plan SPRT and a Stockfish row; **D4** SEE is attempted after delta pruning and kept only on an SPRT pass. The text below is the original statement of each.
 
 - **D1 — TT cut-offs on by default:** in this plan, or in the search plan? **Recommended: the search
   plan.** This plan uses the table for move ordering in every mode, which does not change any score.
@@ -597,6 +599,8 @@ run by the implementer, not in CI.
 
 ## Results (filled in by the implementer)
 
+Bench: `scripts/bench.sh`, depth 6, TT cut-offs off, best of 3, Apple M2 under load (instructions do not depend on it). Perft Mnps is wall-clock and load-dependent.
+
 | Step | Commit | Signature (nodes / scores hash) | Instructions | Δ instr. | Perft Mnps (start d5) | Max RSS | SPRT | Landed? |
 |---|---|---|---:|---:|---:|---:|---|---|
-| baseline | 2eb86d5 | | | | | | — | — |
+| baseline | 2eb86d5 | 15,069,745 / 5cbdcd84043b9398 | 84,427,765,172 | — | 22.1 | 552 MB | — | — |

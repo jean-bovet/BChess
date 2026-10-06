@@ -6,3 +6,4 @@ BChess.xcodeproj/project.xcworkspace/xcshareddata
 
 # Elo measurement: tools, book, build and match logs (scripts/elo-match.sh)
 .elo/
+.bench/

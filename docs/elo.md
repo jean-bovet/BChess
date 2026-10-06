@@ -43,12 +43,54 @@ The script builds, plays, and prints a Markdown row for the table below. It refu
   the allowed set, one side BChess) agreeing with fastchess's summary. `scripts/elo-match.sh
   --self-test` checks that validator against sample runs. That is a bug
   to fix, not a rating. It exits with status 2.
+- **a side lost a game on time:** a `time forfeit` termination by either engine makes the run
+  invalid (exit 2). A forfeit by the opponent would otherwise inflate BChess's score. ENGINE-2's
+  runs had none, so the results recorded below stand.
 - **the score is out of range:** below 10 % or above 90 %, or fastchess gives no finite interval. It
   prints the level to try next (300 further, at least 1320) and exits with status 3.
 
 **How long it takes** on an M2 with a concurrency of 4: a 10+0.1 game lasts at most
 2 × (10 + 0.1 × moves) s, about 25 s of wall time with adjudication, so 300 games take about
 30 minutes. At 60+0.6 the same run takes about 3 hours.
+
+## A/B (SPRT)
+
+`BASE=<git ref> scripts/elo-match.sh` plays this checkout against an earlier commit instead of
+Stockfish, to decide whether a change makes BChess stronger:
+
+```
+BASE=2eb86d5 scripts/elo-match.sh                        # SPRT [0, 10], 5+0.05, at most 8000 games
+BASE=HEAD~1 MAX_GAMES=4000 TC=5+0.05 CONCURRENCY=4 scripts/elo-match.sh
+```
+
+- **Base build:** `git archive <ref>` is extracted into `.elo/base/<sha>` and built there in
+  Release (cached by sha). The checkout is built as before, uncommitted changes included, and the
+  `.info` file says whether the tree was dirty.
+- **The test:** fastchess's SPRT, `elo0=0 elo1=10 alpha=0.05 beta=0.05 model=logistic`, stops when
+  the log-likelihood ratio (LLR) leaves its bounds (about ±2.94) or at `MAX_GAMES`. W/D/L are
+  BChess's, as always; the other engine is called `Base`.
+- **Reading the result:**
+  - exit 0, "H1 accepted": the change is worth at least about 0 to 10 Elo. It lands.
+  - exit 4, "H0 accepted": no gain was shown. It does not land.
+  - exit 5, "inconclusive at MAX_GAMES": no decision, so it does not land either.
+  - exit 2, invalid run: an illegal move, a time forfeit by either engine, a disconnect, an
+    unfinished game, a PGN that disagrees with fastchess's summary, or fewer games than
+    `MAX_GAMES` without a decision. The decision counts only when the LLR is outside its bounds:
+    fastchess prints "H1 was accepted" also when it merely ran out of rounds.
+- **How long:** an SPRT of a small gain needs a few thousand games, 1 to 3 hours at 5+0.05 with a
+  concurrency of 4. An SPRT can stop between the two games of an opening, so the game count may be
+  odd.
+
+`scripts/elo-match.sh --self-test` covers the validator and the decision logic with sample runs.
+
+## Benchmark
+
+`scripts/bench.sh` is the speed benchmark: a fixed-depth search of nine positions (the six perft
+positions, two more, and a 130-ply game so that the repetition scan has a long history), built
+standalone with plain `clang++ -O2`. It prints each position's nodes, score and best move, a
+signature hash over all of them, and the retired instructions (the speed metric: it barely depends
+on the load of the machine) and the maximum memory of the run. `scripts/bench.sh --compare old new`
+diffs two outputs, and `scripts/bench.sh --perft` runs ENGINE-1's perft check.
 
 ## Caveats
 
