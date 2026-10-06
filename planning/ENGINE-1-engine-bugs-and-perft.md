@@ -359,6 +359,9 @@ ENGINE-2 is the UCI plan (`planning/ENGINE-2-uci-and-elo.md`); it owns the UCI p
 
 Correctness:
 
+- Quiescence horizon at depth 4 (found in step 4): stand-pat with two pieces attacked after a check
+  sequence (`1...Bb4+ 2.c3 Qe7+ 3.Ne2`, Black to move with bishop and knight attacked) scores as if both
+  were saved. Candidate remedies: check extension, threat detection in quiescence.
 - Draws: fifty-move rule (`halfMoveClock` is kept but unused) and insufficient material.
 - Search: probe the TT after `isDraw` and do not store repetition-dependent 0s. (Mate distance is
   in ENGINE-2 r2, which also changes `IterativeDeepening` and `MinMaxSearch`; the step-4 tests here
@@ -370,6 +373,8 @@ Correctness:
   with ENGINE-2's mate distance.)
 
 Performance (from the performance review, not re-measured here):
+- `stateKey` costs about 20-25 % of standalone perft speed (start d5 ~45 to ~35 Mnps, Kiwipete d4 ~50
+  to ~37, measured in step 3): maintain the state key incrementally instead of recomputing it twice per move.
 - TT best move first plus killer moves in move ordering (reported −29 % / −43 % nodes).
 - Bound the repetition scan by the half-move clock (`GameHistory.cpp:12-23` scans the whole history).
 - Quiescence cost (no delta pruning or SEE; it searches every capture).
@@ -403,3 +408,11 @@ Performance (from the performance review, not re-measured here):
 3. **Minimal SAN in exported PGN (`R1xe2`):** yes.
 4. **Scope:** as planned (B1–B6, castling and en passant in the hash, nits); the other risks are
    ENGINE-3 candidates. Go.
+
+5. **Step 4 (B3) best-move fallout (Jean, 2026-10-06): keep the fix, adjust the tests.**
+   `KnightEscapeAttackByPawn` now runs at `maxDepth` 5 (depth 4 picks `Bf8b4` through the horizon effect
+   listed in the follow-ups; depth 5 plays `Nc6e5`, Stockfish -100 cp vs best -94). `WhiteThreatenMate` accepts
+   `f7f6` (Stockfish's best at depth 20; the old `Rd8d7` was -444 cp against -292 cp). `WithAndWithoutTT`
+   becomes a smoke test (both configurations complete with a legal move and a sound score), since a table
+   legitimately changes the line. `SearchChessTests.OrderedMove` (same horizon effect on the same family of positions) goes from 23846/136314 nodes and score 105 to 39168/311437 and 50. Standing rule for steps 5-8: adjust a best-move test this way when its purpose
+   still holds, document it in the commit; stop only when the purpose genuinely fails.

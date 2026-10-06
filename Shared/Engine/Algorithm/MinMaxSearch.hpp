@@ -283,7 +283,8 @@ private:
             ChessMoveGenerator::sortMoves(moves);
         }
         
-        int score = stand_pat;
+        // Fail-soft like alphabeta: the best score so far, never below the stand-pat
+        int bestValue = stand_pat;
         for (int index=0; index<moves.count && !stopped(); index++) {
             auto move = moves.moves[index];
             
@@ -296,11 +297,15 @@ private:
             history->push_back(newNode.getHash());
 
             Variation line;
-            score = -quiescence(newNode, history, depth+1, -beta, -alpha, -color, line, cv);
+            int score = -quiescence(newNode, history, depth+1, -beta, -alpha, -color, line, cv);
             
             cv.moves.pop();
             history->pop_back();
 
+            if (score > bestValue) {
+                bestValue = score;
+            }
+            
             if (score >= alpha) {
                 alpha = score;
                 pv.push(score, move, line);
@@ -309,7 +314,7 @@ private:
             }
         }
                 
-        return score;
+        return bestValue;
     }
     
 };

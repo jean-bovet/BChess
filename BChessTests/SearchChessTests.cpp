@@ -59,8 +59,8 @@ TEST_F(SearchChessTests, OrderedMove) {
     Configuration config;
 
     config.sortMoves = true;
-    assertChessSearch(23846, 105, config, board);
+    assertChessSearch(39168, 50, config, board);
     
     config.sortMoves = false;
-    assertChessSearch(136314, 105, config, board);
+    assertChessSearch(311437, 50, config, board);
 }
