@@ -212,7 +212,7 @@ TEST_F(ChessGameTests, RepetitionIsBoundedByTheLastIrreversibleMove) {
     
     ChessHistory::entriesRead = 0;
     ASSERT_FALSE(ChessEvaluater::isDraw(game.board, planted)) << "the scan stops at the pawn move";
-    ASSERT_LE(ChessHistory::entriesRead, 5);
+    ASSERT_LE(ChessHistory::entriesRead.load(), 5);
 }
 
 // The bound holds up over many reversible moves, and a FEN's own clock plays no part in it

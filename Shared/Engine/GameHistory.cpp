@@ -18,7 +18,7 @@ bool ChessHistory::isThreefoldRepetition(BoardHash hash, int reversiblePlies, co
     int count = 0;
     for (long index=last; index>=oldest; index -= 2) {
 #ifdef BCHESS_TEST_HOOKS
-        entriesRead++;
+        entriesRead.fetch_add(1, std::memory_order_relaxed);
 #endif
         if (history->at(index) == hash) {
             count++;

@@ -10,11 +10,14 @@
 
 #include "Types.hpp"
 
+#include <atomic>
+
 class ChessHistory {        
 public:
 #ifdef BCHESS_TEST_HOOKS
     // The history entries that the scans read since the tests last cleared it
-    inline static long entriesRead = 0;
+    // (atomic: searches on other threads read histories too)
+    inline static std::atomic<long> entriesRead{0};
 #endif
     
     // Whether `hash`, the last entry of the history, occurred three times on the same side to move. No position
