@@ -88,6 +88,17 @@ public:
         visitedNodes = 0;
         maxPly = 0;
     }
+    
+    // The two quiet moves that most recently cut a node off at each ply, newest first. A ply past MAX_PLY has
+    // none. Iterative deepening clears them at the start of a search and keeps them across its depths.
+    static const int MAX_PLY = 128;
+    Move killers[MAX_PLY][2] = {};
+    
+    void clearKillers() {
+        for (auto &ply : killers) {
+            ply[0] = ply[1] = INVALID_MOVE;
+        }
+    }
 
     void cancel() {
         stopRequested.store(true, std::memory_order_relaxed);
@@ -158,6 +169,36 @@ private:
         return value > 0 ? value - ply : value + ply;
     }
     
+    // A quiet move that cuts a node off becomes the first killer of its ply, the previous one the second
+    void recordKiller(int ply, Move move) {
+        if (ply >= MAX_PLY || MOVE_IS_CAPTURE(move) || MOVE_PROMOTION_PIECE(move) != 0 || killers[ply][0] == move) {
+            return;
+        }
+        killers[ply][1] = killers[ply][0];
+        killers[ply][0] = move;
+    }
+    
+    // Puts the killers of the ply that the list has first among the quiet moves, behind the captures that the
+    // sort put at the front. The order stays: captures, killer 0, killer 1, the other quiet moves.
+    void promoteKillers(MoveList &moves, int ply) {
+        int target = 0;
+        while (target < moves.count && MOVE_IS_CAPTURE(moves.moves[target])) {
+            target++;
+        }
+        for (Move killer : killers[ply]) {
+            if (!ChessMoveGenerator::isValid(killer)) {
+                continue;
+            }
+            for (int index=target; index<moves.count; index++) {
+                if (moves.moves[index] == killer) {
+                    std::rotate(moves.moves + target, moves.moves + index, moves.moves + index + 1);
+                    target++;
+                    break;
+                }
+            }
+        }
+    }
+    
     // The best move that the table holds for the position, or an invalid move
     static Move tableMove(TranspositionTable &table, ChessBoard &node) {
         BoardHash hash = node.getHash();
@@ -224,6 +265,9 @@ private:
         
         if (config.sortMoves) {
             ChessMoveGenerator::sortMoves(moves);
+            if (depth < MAX_PLY) {
+                promoteKillers(moves, depth);
+            }
         }
         
         // The move to try first. The previous iteration's best variation comes first, whatever sortMoves says.
@@ -282,6 +326,9 @@ private:
                 
                 if (config.alphaBetaPrunning && beta <= alpha) {
                     entryType = TranspositionEntryType::BETA;
+                    if (config.sortMoves) {
+                        recordKiller(depth, move);
+                    }
                     break; // Beta cut-off
                 }
             }

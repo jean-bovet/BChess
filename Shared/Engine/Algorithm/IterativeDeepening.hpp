@@ -90,6 +90,7 @@ public:
         MinMaxSearch::Variation bestVariation;
         
         table.newSearch();
+        minMaxSearch.clearKillers();
         
         // One clock and one node count for the whole search, so that the figures add up over the depths
         TimeManagement searchClock;

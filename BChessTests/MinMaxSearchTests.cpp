@@ -354,3 +354,37 @@ TEST_F(MinMaxSearchTests, BogusHashMoveIsIgnored) {
         ASSERT_TRUE(found) << "the first move of the line is legal";
     }
 }
+
+// A killer is a quiet move that cut the search off at its ply: never a capture or a promotion, at most two per
+// ply, and the two differ
+TEST_F(MinMaxSearchTests, KillerIsAQuietMove) {
+    ChessBoard board;
+    ASSERT_TRUE(FFEN::setFEN("r1bqkb1r/pppp1ppp/2n2n2/4p3/2B1P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 4 4", board));
+    IterativeDeepening search;
+    search.minMaxSearch.config.transpositionTable = false;
+    search.start();
+    search.search(board, NEW_HISTORY, 4, nullptr);
+    
+    int recorded = 0;
+    for (int ply = 0; ply < MinMaxSearch::MAX_PLY; ply++) {
+        Move first = search.minMaxSearch.killers[ply][0];
+        Move second = search.minMaxSearch.killers[ply][1];
+        if (!MOVE_ISVALID(first)) {
+            ASSERT_FALSE(MOVE_ISVALID(second)) << "a second killer without a first, ply " << ply;
+            continue;
+        }
+        for (Move killer : {first, second}) {
+            if (!MOVE_ISVALID(killer)) continue;
+            recorded++;
+            ASSERT_FALSE(MOVE_IS_CAPTURE(killer)) << "ply " << ply;
+            ASSERT_EQ(0, (int)MOVE_PROMOTION_PIECE(killer)) << "ply " << ply;
+        }
+        ASSERT_NE(first, second) << "ply " << ply;
+    }
+    ASSERT_GT(recorded, 0);
+    
+    // Starting a search clears them
+    search.start();
+    search.search(board, NEW_HISTORY, 1, nullptr);
+    ASSERT_FALSE(MOVE_ISVALID(search.minMaxSearch.killers[3][0]));
+}
