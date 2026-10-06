@@ -8,24 +8,19 @@
 
 import SwiftUI
 
+/// The 64 squares, with the last move and the selection on them.
 struct BoardView: View {
     
     let session: GameSession
 
-    /// The squares keep these colors in light and dark mode
-    static let lightSquare = Color.white
-    static let darkSquare = Color.gray
-
     func backgroundColor(rank: Int, file: Int) -> Color {
         if rank % 2 == 0 {
-            return file % 2 == 0 ? Self.darkSquare : Self.lightSquare
+            return file % 2 == 0 ? Walnut.darkSquare : Walnut.lightSquare
         } else {
-            return file % 2 == 0 ? Self.lightSquare : Self.darkSquare
+            return file % 2 == 0 ? Walnut.lightSquare : Walnut.darkSquare
         }
     }
     
-    // We draw a board that has one more rank and one more file
-    // which are going to be used to display the labels
     var body: some View {
         VStack(spacing: 0) {
             ForEach((0...7).reversed(), id: \.self) { rank in
@@ -45,6 +40,41 @@ struct BoardView: View {
     }
 }
 
+/// The walnut frame around the board: rounded, with a soft shadow, and the coordinates drawn in it.
+/// The content is laid out in the square inside the frame. A ring around the frame shows the mode.
+struct BoardFrame<Content: View>: View {
+    let session: GameSession
+    /// Yellow for analyze, green for train: the ring around the frame.
+    var ring: Color?
+    @ViewBuilder let content: Content
+
+    var body: some View {
+        GeometryReader { geometry in
+            let side = min(geometry.size.width, geometry.size.height)
+            let thickness = side * Walnut.frameFraction
+            ZStack {
+                RoundedRectangle(cornerRadius: 10)
+                    .fill(Walnut.frame)
+                    .shadow(color: .black.opacity(0.25), radius: 12, y: 6)
+                    .overlay {
+                        if let ring {
+                            RoundedRectangle(cornerRadius: 10).strokeBorder(ring, lineWidth: 3).padding(-3)
+                        }
+                    }
+                LabelsView(session: session)
+                content
+                    .padding(thickness)
+            }
+            .frame(width: side, height: side)
+            .position(x: geometry.size.width / 2, y: geometry.size.height / 2)
+        }
+        .aspectRatio(1, contentMode: .fit)
+    }
+}
+
 #Preview {
-    BoardView(session: GameSession())
+    BoardFrame(session: GameSession()) {
+        BoardView(session: GameSession())
+    }
+    .padding()
 }

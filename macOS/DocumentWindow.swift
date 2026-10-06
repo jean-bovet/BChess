@@ -37,6 +37,7 @@ struct DocumentWindow: View {
     var body: some View {
         let session = box.session
         ContentView(session: session)
+            .containerBackground(Walnut.background, for: .window)
             .background(WindowTitle(title: GameText.title(white: session.gameState.white, black: session.gameState.black),
                                     subtitle: session.openingName ?? ""))
             .toolbar {

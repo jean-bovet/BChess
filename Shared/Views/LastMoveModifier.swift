@@ -8,6 +8,7 @@
 
 import SwiftUI
 
+/// Tints the two squares of the last move: honey while playing, green or red while practicing openings.
 struct LastMoveModifier: ViewModifier {
     let rank: Int
     let file: Int
@@ -16,26 +17,18 @@ struct LastMoveModifier: ViewModifier {
     func moveColor() -> Color {
         if session.mode.value == .train {
             if session.isValidOpeningMoves {
-                return Color.green.opacity(0.8)
+                return Color.green.opacity(0.55)
             } else {
-                return Color.red.opacity(0.8)
+                return Color.red.opacity(0.55)
             }
         } else {
-            return Color.orange.opacity(0.8)
+            return Walnut.lastMove
         }
     }
     
-    func isLastMoveStart(_ rank: Int, _ file: Int) -> Bool {
+    func isLastMoveSquare(_ rank: Int, _ file: Int) -> Bool {
         if let move = session.lastMove {
-            return move.fromRank == rank && move.fromFile == file
-        } else {
-            return false
-        }
-    }
-
-    func isLastMoveEnd(_ rank: Int, _ file: Int) -> Bool {
-        if let move = session.lastMove {
-            return move.toRank == rank && move.toFile == file
+            return (move.fromRank == rank && move.fromFile == file) || (move.toRank == rank && move.toFile == file)
         } else {
             return false
         }
@@ -43,11 +36,10 @@ struct LastMoveModifier: ViewModifier {
 
     func body(content: Content) -> some View {
         return content
-            .if(isLastMoveStart(rank, file)) { view in
-                view.border(moveColor(), width: 3)
-            }
-            .if(isLastMoveEnd(rank, file)) { view in
-                view.border(moveColor(), width: 5)
+            .overlay {
+                if isLastMoveSquare(rank, file) {
+                    moveColor()
+                }
             }
     }
 }

@@ -8,6 +8,8 @@
 
 import SwiftUI
 
+/// Tints the selected square, and marks where its piece can go: a dot on an empty square, a ring where
+/// it captures.
 struct SelectionModifier: ViewModifier {
     
     let rank: Int
@@ -15,8 +17,25 @@ struct SelectionModifier: ViewModifier {
     let selection: Selection
 
     func body(content: Content) -> some View {
-        return content.if(selection.selected(rank: rank, file: file) || selection.isPossibleMove(rank, file)) { view in
-                view.overlay(Color.yellow.opacity(0.8))
+        content
+            .overlay {
+                if selection.selected(rank: rank, file: file) {
+                    Walnut.lastMove
+                } else if let move = selection.possibleMove(rank, file) {
+                    GeometryReader { geometry in
+                        let side = min(geometry.size.width, geometry.size.height)
+                        Group {
+                            if move.isCapture {
+                                Circle().strokeBorder(Color.black.opacity(0.25), lineWidth: side * 0.09)
+                                    .frame(width: side * 0.9, height: side * 0.9)
+                            } else {
+                                Circle().fill(Color.black.opacity(0.25))
+                                    .frame(width: side * 0.3, height: side * 0.3)
+                            }
+                        }
+                        .frame(width: side, height: side)
+                    }
+                }
             }
     }
 }

@@ -43,6 +43,14 @@ struct GameTextTests {
         }
     }
 
+    @Test func sideDetails() {
+        #expect(GameText.sideDetail(of: human, isWhite: true, opponent: computer, toMove: true) == "White \u{00B7} your move")
+        #expect(GameText.sideDetail(of: human, isWhite: false, opponent: human, toMove: true) == "Black \u{00B7} to move")
+        #expect(GameText.sideDetail(of: human, isWhite: false, opponent: computer, toMove: false) == "Black")
+        #expect(GameText.sideDetail(of: computer, isWhite: false, opponent: human, toMove: true) == "Black \u{00B7} 2 s")
+        #expect(GameText.sideDetail(of: computer, isWhite: true, opponent: human, toMove: false) == "White \u{00B7} 2 s")
+    }
+
     @Test func moveLabels() {
         #expect(GameText.moveLabel(number: 8, isWhite: true, san: "c3") == "8. c3")
         #expect(GameText.moveLabel(number: 8, isWhite: false, san: "O-O") == "8\u{2026}O-O")

@@ -19,9 +19,6 @@ struct ContentView: View {
 
     @State private var showAllMoves = false
 
-    /// The a–h labels (title 2) and the space under them, growing with Dynamic Type
-    @ScaledMetric(relativeTo: .title2) private var fileLabelBand: CGFloat = 46
-
     /// The sidebar sits beside the board when there is more width than height, and the status below it
     /// otherwise (iPhone in portrait). The Mac is always wide.
     @State private var isWide = true
@@ -30,32 +27,41 @@ struct ContentView: View {
         session.gameState.rotated
     }
 
-    private var board: some View {
-        ZStack {
-            BoardView(session: session)
-                .if(session.mode.value == .analyze) {
-                    $0.border(Color.yellow, width: 4)
-                }
-                .if(session.mode.value == .train) {
-                    $0.border(Color.green, width: 4)
-                }
-            LabelsView(session: session)
-            PiecesView(session: session)
-            VariationSelectionView(session: session)
+    private var ring: Color? {
+        switch session.mode.value {
+        case .analyze: return .yellow
+        case .train: return .green
+        case .play: return nil
         }
-        // Keeps the greedy GeometryReader layers from taking more than the board's square
-        .aspectRatio(1, contentMode: .fit)
+    }
+
+    private var board: some View {
+        BoardFrame(session: session, ring: ring) {
+            ZStack {
+                BoardView(session: session)
+                PiecesView(session: session)
+                VariationSelectionView(session: session)
+            }
+        }
         .accessibilityElement(children: .contain)
         .accessibilityIdentifier("board")
         .accessibilityValue(session.fen)
-        .padding(.horizontal)
-        // The a–h labels are drawn below the board's square: reserve their band plus a clear gap
-        // before the player row
-        .padding(.bottom, fileLabelBand)
+        // The evaluation bar stands left of the board, as tall as its frame
+        .padding(.leading, evaluation == nil ? 0 : EvaluationBar.width + 6)
+        .overlay(alignment: .leading) {
+            if let evaluation {
+                EvaluationBar(verdict: evaluation, rotated: session.gameState.rotated)
+            }
+        }
+    }
+
+    /// The verdict the bar shows: only while the engine is on and has one.
+    private var evaluation: Verdict? {
+        showEngine ? EngineView.verdict(of: session) : nil
     }
 
     private var boardColumn: some View {
-        VStack(alignment: .leading) {
+        VStack(alignment: .leading, spacing: 10) {
             PlayerRow(session: session, isWhite: topIsWhite)
             board
             PlayerRow(session: session, isWhite: !topIsWhite)
@@ -67,9 +73,9 @@ struct ContentView: View {
             return nil
         }
         #if os(macOS)
-        return EngineView.make(session: session, showStatistics: showStatistics)
+        return EngineView.make(session: session, showStatistics: showStatistics, stacked: isWide)
         #else
-        return EngineView.make(session: session, showStatistics: false)
+        return EngineView.make(session: session, showStatistics: false, stacked: isWide)
         #endif
     }
 
@@ -80,13 +86,10 @@ struct ContentView: View {
                     // The board gets its full size first; the sidebar takes what is left
                     boardColumn
                         .layoutPriority(1)
-                    VStack(alignment: .leading, spacing: 10) {
-                        if let opening = session.openingName {
-                            Label(opening, systemImage: "book")
-                                .font(.headline)
-                        }
-                        MoveListView(session: session)
+                    VStack(alignment: .leading, spacing: 12) {
+                        MoveListView(session: session, card: true)
                         StatusLine(session: session)
+                            .padding(.horizontal, 4)
                         engine
                     }
                     .frame(width: 320)
@@ -96,14 +99,15 @@ struct ContentView: View {
                 VStack(alignment: .leading, spacing: 10) {
                     boardColumn
                     StatusLine(session: session)
-                    // The engine goes below the moves so that showing it doesn't move them
-                    MoveStrip(session: session) { showAllMoves = true }
+                        .padding(.horizontal, 2)
                     engine
+                    MoveStrip(session: session) { showAllMoves = true }
                     Spacer(minLength: 0)
                 }
             }
         }
         .padding()
+        .background(Walnut.background.ignoresSafeArea())
         #if os(iOS)
         .onGeometryChange(for: Bool.self) { proxy in
             proxy.size.width > proxy.size.height
@@ -123,6 +127,7 @@ struct ContentView: View {
         .sheet(isPresented: $showAllMoves) {
             NavigationStack {
                 MoveListView(session: session)
+                    .background(Walnut.background)
                     .navigationTitle("Moves")
                     .toolbar {
                         ToolbarItem(placement: .confirmationAction) {
@@ -142,6 +147,18 @@ struct ContentView: View {
 #Preview("Wide") {
     ContentView(session: GameSession(state: GameState(pgn: "1. e4 e5 2. Nf3 Nc6 3. Bb5 *")))
         .frame(width: 900, height: 600)
+}
+
+#Preview("Tall, dark") {
+    ContentView(session: GameSession(state: GameState(pgn: "1. e4 e5 2. Nf3 Nc6 3. Bb5 *")))
+        .frame(width: 390, height: 800)
+        .preferredColorScheme(.dark)
+}
+
+#Preview("Wide, dark") {
+    ContentView(session: GameSession(state: GameState(pgn: "1. e4 e5 2. Nf3 Nc6 3. Bb5 *")))
+        .frame(width: 900, height: 600)
+        .preferredColorScheme(.dark)
 }
 
 #Preview("Analyze") {

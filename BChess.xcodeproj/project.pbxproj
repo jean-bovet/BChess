@@ -185,6 +185,7 @@
 		D1BA917F5C4104B5A8BBC3E6 /* GameState.swift in Sources */ = {isa = PBXBuildFile; fileRef = E918E82CA52FD5A787214464 /* GameState.swift */; };
 		D23BBF0091D67647832949B2 /* GameShell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4664882CCC95A474A5F6075D /* GameShell.swift */; };
 		D2FA408F51B18E96D62CAC1B /* Game.swift in Sources */ = {isa = PBXBuildFile; fileRef = BAC64B5B0C55E00286BBAD36 /* Game.swift */; };
+		D320DF1A5D21CEA537560C4D /* Walnut.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1BD58D3FF9A1D7CD2C2CAAFB /* Walnut.swift */; };
 		D3A1929F5B38B2F0B4F6CFDE /* GameText.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A73C37996CF31F3FA756B29 /* GameText.swift */; };
 		D4299D14FE94AE75F3F9F0CD /* magicmoves.c in Sources */ = {isa = PBXBuildFile; fileRef = D11C33D8BBE6428E42241039 /* magicmoves.c */; };
 		D5465461B1242AE87333473B /* ChessDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0318AE9A862AD390FF9642EF /* ChessDocument.swift */; };
@@ -200,6 +201,7 @@
 		DF2CCAD477BD63192BE669E2 /* FEngineMoveNode.mm in Sources */ = {isa = PBXBuildFile; fileRef = 67B30EF56BB2ADE44B075F8F /* FEngineMoveNode.mm */; };
 		E02D34F54D320E2F5EDA02B7 /* StatusLine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 165CC2E716C38E0D22CAE062 /* StatusLine.swift */; };
 		E2375AA2D60123A58309DFB6 /* FEngineGame.mm in Sources */ = {isa = PBXBuildFile; fileRef = D05BA0CF62011F29A83BC02B /* FEngineGame.mm */; };
+		E6799604808B3886E3B8FFB8 /* Walnut.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1BD58D3FF9A1D7CD2C2CAAFB /* Walnut.swift */; };
 		E82472307660320279C501A7 /* Arrow.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEC6B2A69F9EAD135A9433ED /* Arrow.swift */; };
 		EA570E8F0D08DF0F3154968C /* Variation.swift in Sources */ = {isa = PBXBuildFile; fileRef = F14DD2B61B0DFA99631A8621 /* Variation.swift */; };
 		EAB4A88DCE96E3F283CAD532 /* GameSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 449B35D4D73E3A74D24EEC1D /* GameSession.swift */; };
@@ -256,6 +258,7 @@
 		1798BECBBBED258BED2E2CA1 /* ChessGame.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ChessGame.cpp; sourceTree = "<group>"; };
 		19CA422D6799EFFF17A2BDAE /* PGNTests.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = PGNTests.cpp; sourceTree = "<group>"; };
 		19F55617E5E81201E906F8EA /* OpeningsTests.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = OpeningsTests.cpp; sourceTree = "<group>"; };
+		1BD58D3FF9A1D7CD2C2CAAFB /* Walnut.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Walnut.swift; sourceTree = "<group>"; };
 		20FCADEB3C5F59400CF1FB32 /* UnitTestHelper.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = UnitTestHelper.cpp; sourceTree = "<group>"; };
 		22A67D77D757A723C8D8CA0A /* EngineView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EngineView.swift; sourceTree = "<group>"; };
 		280A9084A6C57B4D90C7FD95 /* ChessEngineTests.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ChessEngineTests.cpp; sourceTree = "<group>"; };
@@ -637,6 +640,7 @@
 				FDBE14AD20196EBDEB22043A /* SquareView.swift */,
 				165CC2E716C38E0D22CAE062 /* StatusLine.swift */,
 				71EBF0402256A6790224AAB8 /* VariationSelectionView.swift */,
+				1BD58D3FF9A1D7CD2C2CAAFB /* Walnut.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -902,6 +906,7 @@
 				2BB1B9AEADF0979C105D77BC /* Variation.swift in Sources */,
 				B41FE1EDC76F30A0313E8D66 /* VariationSelectionView.swift in Sources */,
 				D61A90FB148150C06D903C04 /* Verdict.swift in Sources */,
+				E6799604808B3886E3B8FFB8 /* Walnut.swift in Sources */,
 				4B990CD24C52E42ADCB349EB /* magicmoves.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1042,6 +1047,7 @@
 				A7AB1E23A4C9B895CF215660 /* Variation.swift in Sources */,
 				32BB425A448B3B372DCA707D /* VariationSelectionView.swift in Sources */,
 				7043C353E57249FDC0E195C8 /* Verdict.swift in Sources */,
+				D320DF1A5D21CEA537560C4D /* Walnut.swift in Sources */,
 				830AF3ECE9A3E9A8BDC1AFCB /* magicmoves.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

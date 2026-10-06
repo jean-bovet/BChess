@@ -8,10 +8,9 @@
 
 import SwiftUI
 
+/// The ranks and files, small and in the frame around the board. Lay it over a `BoardFrame`'s square:
+/// it expects the frame to be `Walnut.frameFraction` of that square on every side.
 struct LabelsView: View {
-    /// Space between the bottom of the board and the a–h labels
-    static let fileLabelGap: CGFloat = 4
-
     let session: GameSession
 
     func actualIndex(_ index: Int) -> Int {
@@ -24,45 +23,46 @@ struct LabelsView: View {
     
     var body: some View {
         GeometryReader { geometry in
-            let minSize: CGFloat = min(geometry.size.width, geometry.size.height)
-            let xOffset: CGFloat = (geometry.size.width - minSize) / 2
-            let yOffset: CGFloat = (geometry.size.height - minSize) / 2
-            let squareSize: CGFloat = minSize / 8
-            
+            let side: CGFloat = min(geometry.size.width, geometry.size.height)
+            let xOffset: CGFloat = (geometry.size.width - side) / 2
+            let yOffset: CGFloat = (geometry.size.height - side) / 2
+            let thickness: CGFloat = side * Walnut.frameFraction
+            let squareSize: CGFloat = (side - 2 * thickness) / CGFloat(numberOfSquares)
+            let font = Font.system(size: max(7, thickness * 0.7), weight: .semibold)
+
             ForEach(0...7, id:\.self) { index in
                 let ai = actualIndex(index)
-                let x = xOffset - 0.1 * squareSize - squareSize
-                let y = yOffset + CGFloat(index) * squareSize
                 Text("\(8 - ai)")
-                    .font(.title2)
-                    .frame(width: squareSize, height: squareSize, alignment: .trailing)
-                    .offset(x: x, y: y)
+                    .font(font)
+                    .frame(width: thickness, height: squareSize)
+                    .offset(x: xOffset, y: yOffset + thickness + CGFloat(index) * squareSize)
             }
             
             ForEach(Array(["a", "b", "c", "d", "e", "f", "g", "h"].enumerated()), id:\.offset) { index, value in
-                let x = xOffset + CGFloat(actualIndex(index)) * squareSize
-                let y = yOffset + CGFloat(numberOfSquares) * squareSize + LabelsView.fileLabelGap
                 Text("\(value)")
-                    .font(.title2)
-                    .frame(width: squareSize, height: squareSize, alignment: .top)
-                    .offset(x: x, y: y)
+                    .font(font)
+                    .frame(width: squareSize, height: thickness)
+                    .offset(x: xOffset + thickness + CGFloat(actualIndex(index)) * squareSize,
+                            y: yOffset + side - thickness)
             }
         }
+        .foregroundStyle(Walnut.coordinates)
+        .allowsHitTesting(false)
     }
 }
 
 #Preview("White at the bottom") {
     let session = GameSession()
-    ZStack {
+    BoardFrame(session: session) {
         BoardView(session: session)
-        LabelsView(session: session)
     }
+    .padding()
 }
 
 #Preview("Rotated") {
     let session = GameSession(state: GameState(pgn: "*", rotated: true))
-    ZStack {
+    BoardFrame(session: session) {
         BoardView(session: session)
-        LabelsView(session: session)
     }
+    .padding()
 }

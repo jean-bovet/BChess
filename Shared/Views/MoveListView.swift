@@ -10,16 +10,39 @@ import SwiftUI
 struct MoveListView: View {
 
     let session: GameSession
+    /// The wide layout's card: a surface with a "MOVES" caption above the rows.
+    var card = false
 
     private static let scheme = "bchess-move"
 
     var body: some View {
+        if card {
+            VStack(alignment: .leading, spacing: 0) {
+                Text("MOVES")
+                    .font(.caption2.weight(.bold))
+                    .tracking(0.6)
+                    .foregroundStyle(Walnut.textSecondary)
+                    .padding(.horizontal, 16)
+                    .padding(.top, 14)
+                    .padding(.bottom, 4)
+                list
+            }
+            .walnutCard(radius: 12)
+        } else {
+            list
+        }
+    }
+
+    private var list: some View {
         ScrollViewReader { proxy in
             List(session.game.rows) { row in
                 MoveRowView(row: row, current: session.currentMoveUUID, select: { session.selectMove(uuid: $0) })
                     .id(row.id)
+                    .listRowBackground(Color.clear)
+                    .listRowSeparator(.hidden)
             }
             .listStyle(.plain)
+            .scrollContentBackground(.hidden)
             .environment(\.openURL, OpenURLAction { url in
                 guard url.scheme == Self.scheme, let host = url.host(), let uuid = UInt(host) else {
                     return .discarded
@@ -51,16 +74,21 @@ private struct MoveRowView: View {
         Group {
             if let node {
                 Button { select(node.uuid) } label: {
+                    let isCurrent = node.uuid == current
                     Text(node.name)
-                        .fontWeight(node.uuid == current ? .bold : .regular)
-                        .underline(node.uuid == current)
+                        .fontWeight(isCurrent ? .bold : .regular)
+                        .padding(.vertical, 4)
+                        .padding(.horizontal, 8)
+                        .foregroundStyle(isCurrent ? Walnut.pillText : Walnut.textPrimary)
+                        .background(isCurrent ? Walnut.pillBackground : .clear, in: RoundedRectangle(cornerRadius: 6))
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
             } else {
                 Text("\u{2026}")
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(Walnut.textSecondary)
+                    .padding(.horizontal, 8)
                     .frame(maxWidth: .infinity, alignment: .leading)
             }
         }
@@ -84,6 +112,8 @@ private struct MoveRowView: View {
                 piece.link = MoveListView.link(for: uuid)
                 if uuid == current {
                     piece.font = .footnote.bold()
+                    piece.foregroundColor = Walnut.pillText
+                    piece.backgroundColor = Walnut.pillBackground
                 }
             case .comment(let text):
                 piece = AttributedString(text)
@@ -106,7 +136,7 @@ private struct MoveRowView: View {
         VStack(alignment: .leading, spacing: 2) {
             HStack(spacing: 8) {
                 Text("\(row.number).")
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(Walnut.textSecondary)
                     .monospacedDigit()
                     .frame(width: 36, alignment: .trailing)
                 moveButton(row.white)
@@ -134,4 +164,13 @@ private struct MoveRowView: View {
 #Preview("Variations and comments") {
     MoveListView(session: GameSession(state: GameState(
         pgn: "1. e4 {King's pawn} e5 (1... c5 {Sicilian} 2. Nf3 (2. c3 {Alapin}) d6) 2. Nf3 Nc6 3. Bb5 *")))
+}
+
+#Preview("Card, dark") {
+    MoveListView(session: GameSession(state: GameState(
+        pgn: "1. e4 e5 2. Nf3 Nc6 3. Bb5 (3. Bc4 Bc5) a6 4. Bxc6 dxc6 5. O-O f6 *")), card: true)
+        .padding()
+        .frame(width: 320, height: 400)
+        .background(Walnut.background)
+        .preferredColorScheme(.dark)
 }

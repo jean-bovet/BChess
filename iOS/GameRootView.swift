@@ -87,6 +87,7 @@ private struct GameView: View {
             ContentView(session: shell.session)
             .id(shell.current.url)
             .navigationBarTitleDisplayMode(.inline)
+            .toolbarBackground(Walnut.background, for: .navigationBar, .bottomBar)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
                     Button { showGames = true } label: {
@@ -96,11 +97,13 @@ private struct GameView: View {
                 ToolbarItem(placement: .principal) {
                     VStack(spacing: 0) {
                         Text(GameText.title(white: shell.session.gameState.white, black: shell.session.gameState.black))
-                            .font(.headline)
+                            .font(.system(.title3, design: .serif, weight: .semibold))
+                            .foregroundStyle(Walnut.textPrimary)
                         if let opening = shell.session.openingName {
                             Text(opening)
                                 .font(.caption)
-                                .foregroundStyle(.secondary)
+                                .italic()
+                                .foregroundStyle(Walnut.textSecondary)
                         }
                     }
                 }

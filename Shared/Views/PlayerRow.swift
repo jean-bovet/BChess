@@ -22,42 +22,57 @@ struct PlayerRow: View {
         isWhite ? session.gameState.black : session.gameState.white
     }
 
-    private var label: String {
-        let name = GameText.name(of: player, isWhite: isWhite, opponent: opponent)
-        let toMove = session.isWhiteToMove == isWhite && session.gameEnd == .none
-        guard let detail = GameText.detail(of: player, toMove: toMove) else {
-            return name
-        }
-        return "\(name) \u{00B7} \(detail)"
+    private var toMove: Bool {
+        session.isWhiteToMove == isWhite && session.gameEnd == .none
     }
 
+    private var name: String {
+        GameText.name(of: player, isWhite: isWhite, opponent: opponent)
+    }
+
+    private var detail: String {
+        GameText.sideDetail(of: player, isWhite: isWhite, opponent: opponent, toMove: toMove)
+    }
+
+    @Environment(\.colorScheme) private var colorScheme
+    @ScaledMetric(relativeTo: .headline) private var nameSize: CGFloat = 18
+
     var body: some View {
-        HStack {
-            Image(systemName: "circle.fill")
-                .imageScale(.small)
-                .foregroundStyle(.tint)
-                .hide(session.isWhiteToMove != isWhite)
-            Image(systemName: player.computer ? "cpu" : "person.fill")
-            Text(label)
+        HStack(spacing: 8) {
+            HStack(alignment: .firstTextBaseline, spacing: 8) {
+                Text(name)
+                    .font(.system(size: nameSize, weight: .semibold, design: .serif))
+                    .foregroundStyle(Walnut.textPrimary)
+                    .lineLimit(1)
+                // The accent says whose move it is
+                Text(detail)
+                    .font(.footnote.weight(toMove ? .semibold : .regular))
+                    .foregroundStyle(toMove ? Color.accentColor : Walnut.textSecondary)
+                    .lineLimit(1)
+            }
+
+            Spacer(minLength: 0)
 
             let captured = session.capturedPieces(white: isWhite)
             if !captured.isEmpty {
                 HStack(spacing: 0) {
                     ForEach(captured, id: \.self) { piece in
                         SquareView(piece: Piece(name: piece, file: 0, rank: 0))
-                            .frame(width: 24, height: 24)
+                            .frame(width: 22, height: 22)
                     }
                 }
-                .padding(.horizontal, 4)
-                // The board's light square, so black pieces stay visible on a dark background
-                .background(BoardView.lightSquare, in: Capsule())
-                .overlay(Capsule().strokeBorder(.separator))
+                // The black pieces are dark: in dark mode they sit on a light square's color
+                .padding(.horizontal, colorScheme == .dark ? 6 : 0)
+                .background(colorScheme == .dark ? Walnut.lightSquare : .clear, in: Capsule())
             }
 
             if let points = session.materialPoints(white: isWhite) {
                 Text(points)
+                    .font(.footnote)
+                    .foregroundStyle(Walnut.textSecondary)
             }
         }
+        .padding(.horizontal, 2)
         .accessibilityElement(children: .combine)
     }
 }
@@ -74,4 +89,14 @@ struct PlayerRow: View {
         PlayerRow(session: GameSession(state: GameState(pgn: "1. e4 e5 2. Nf3 Nf6 3. Nxe5 d6 4. Nc3 dxe5 *")), isWhite: false)
         PlayerRow(session: GameSession(state: GameState(pgn: "1. e4 e5 2. Nf3 Nf6 3. Nxe5 d6 4. Nc3 dxe5 *")), isWhite: true)
     }
+}
+
+#Preview("Dark") {
+    VStack(alignment: .leading) {
+        PlayerRow(session: GameSession(state: GameState(pgn: "1. e4 e5 2. Nf3 Nf6 3. Nxe5 d6 4. Nc3 dxe5 *")), isWhite: false)
+        PlayerRow(session: GameSession(state: GameState(pgn: "1. e4 e5 2. Nf3 Nf6 3. Nxe5 d6 4. Nc3 dxe5 *")), isWhite: true)
+    }
+    .padding()
+    .background(Walnut.background)
+    .preferredColorScheme(.dark)
 }

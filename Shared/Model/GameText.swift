@@ -36,6 +36,19 @@ enum GameText {
         return toMove ? "to move" : nil
     }
 
+    /// The colour with what `detail` says, for the line under a player's name: "White \u{00B7} your move" for a
+    /// human against a computer, "Black \u{00B7} 5 s" for a computer, the bare colour for a human waiting.
+    static func sideDetail(of player: GamePlayer, isWhite: Bool, opponent: GamePlayer, toMove: Bool) -> String {
+        let color = isWhite ? "White" : "Black"
+        if player.computer {
+            return "\(color) \u{00B7} \(Int(player.thinkingTime)) s"
+        }
+        guard toMove else {
+            return color
+        }
+        return "\(color) \u{00B7} \(opponent.computer ? "your move" : "to move")"
+    }
+
     /// "8. c3" for White, "8…O-O" for Black.
     static func moveLabel(number: Int, isWhite: Bool, san: String) -> String {
         isWhite ? "\(number). \(san)" : "\(number)\u{2026}\(san)"
