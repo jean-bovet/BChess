@@ -510,6 +510,12 @@ TEST_F(PGN, PromotionPieceMustBeExplicit) {
         ChessGame game;
         ASSERT_FALSE(gameFrom(fen, bad, game)) << bad;
     }
+    
+    // A promotion mark on a move that does not promote used to be accepted
+    for (auto bad : {"1. e4= *", "1. e4=P *"}) {
+        ChessGame game;
+        ASSERT_FALSE(FPGN::setGame(bad, game)) << bad;
+    }
 }
 
 // Bad input fails instead of hitting an assert

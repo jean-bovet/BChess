@@ -116,6 +116,18 @@ static bool canCaptureEnPassant(const ChessBoard &board) {
         return false;
     }
     
+    // The pawn to capture sits behind the target square, which must be empty
+    Square victim = color == WHITE ? target - 8 : target + 8;
+    Bitboard occupied = 0;
+    for (auto &byColor : board.pieces) {
+        for (auto pieces : byColor) {
+            occupied |= pieces;
+        }
+    }
+    if (!bb_test(board.pieces[INVERSE(color)][PAWN], victim) || bb_test(occupied, target)) {
+        return false;
+    }
+    
     // Same trick as isAttacked(): a pawn of the other color placed on the target square sees the
     // squares our pawns capture from
     Bitboard candidates = PawnAttacks[INVERSE(color)][target] & board.pieces[color][PAWN];

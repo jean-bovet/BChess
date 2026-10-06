@@ -86,6 +86,7 @@ public:
         whiteCanCastleQueenSide = castling.find('Q') != std::string::npos;
         blackCanCastleKingSide = castling.find('k') != std::string::npos;
         blackCanCastleQueenSide = castling.find('q') != std::string::npos;
+        hash = 0; // Need to recompute it
     }
     
     std::string getCastling() {

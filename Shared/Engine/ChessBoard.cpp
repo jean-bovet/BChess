@@ -9,7 +9,6 @@
 #include "ChessBoard.hpp"
 #include "ChessBoardHash.hpp"
 
-#include <bitstring.h>
 #include <iostream>
 #include <cassert>
 #include "magicmoves.h"

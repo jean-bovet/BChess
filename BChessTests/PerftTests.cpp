@@ -16,35 +16,23 @@
 #include "ChessMoveGenerator.hpp"
 #include "FFEN.hpp"
 
-static uint64_t perft(ChessBoard &board, int depth) {
+// Counts the leaf nodes. With a non-null badHashNodes it also counts the nodes (below the root) whose
+// incrementally updated hash differs from the one computed from scratch.
+static uint64_t perft(ChessBoard &board, int depth, uint64_t *badHashNodes = nullptr) {
     MoveList moves = ChessMoveGenerator::generateMoves(board);
-    if (depth == 1) {
+    if (depth == 1 && !badHashNodes) {
         return moves.count;
     }
     uint64_t nodes = 0;
     for (int i = 0; i < moves.count; i++) {
         ChessBoard next = board;
         next.move(moves.moves[i]);
-        nodes += perft(next, depth - 1);
+        if (badHashNodes && next.getHash() != ChessBoardHash::hash(next)) {
+            (*badHashNodes)++;
+        }
+        nodes += depth == 1 ? 1 : perft(next, depth - 1, badHashNodes);
     }
     return nodes;
-}
-
-// Counts the nodes whose incrementally updated hash differs from the one computed from scratch
-static uint64_t badHashNodes(ChessBoard &board, int depth) {
-    MoveList moves = ChessMoveGenerator::generateMoves(board);
-    uint64_t bad = 0;
-    for (int i = 0; i < moves.count; i++) {
-        ChessBoard next = board;
-        next.move(moves.moves[i]);
-        if (next.getHash() != ChessBoardHash::hash(next)) {
-            bad++;
-        }
-        if (depth > 1) {
-            bad += badHashNodes(next, depth - 1);
-        }
-    }
-    return bad;
 }
 
 static void expectPerft(const char *fen, const std::vector<uint64_t> &expected) {
@@ -137,6 +125,8 @@ TEST(Perft, HashMatchesFromScratchAtEveryNode) {
     for (auto &walk : walks) {
         ChessBoard board;
         ASSERT_TRUE(FFEN::setFEN(walk.fen, board));
-        ASSERT_EQ(badHashNodes(board, walk.depth), 0u) << walk.fen << " depth " << walk.depth;
+        uint64_t bad = 0;
+        perft(board, walk.depth, &bad);
+        ASSERT_EQ(bad, 0u) << walk.fen << " depth " << walk.depth;
     }
 }

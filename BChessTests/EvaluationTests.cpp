@@ -10,6 +10,7 @@
 
 #include "ChessEngine.hpp"
 #include "FFEN.hpp"
+#include "FUtility.hpp"
 
 class EvaluationTests: public ::testing::Test {
 public:
@@ -89,14 +90,6 @@ TEST_F(EvaluationTests, HangingWhitePiece) {
 
 // Reverses the ranks, swaps the colors, the side to move, the castling rights and the en-passant rank
 static std::string mirrorFEN(const std::string &fen) {
-    std::vector<std::string> fields;
-    size_t start = 0;
-    while (true) {
-        size_t space = fen.find(' ', start);
-        fields.push_back(fen.substr(start, space == std::string::npos ? std::string::npos : space - start));
-        if (space == std::string::npos) break;
-        start = space + 1;
-    }
     auto swapCase = [](std::string text) {
         for (auto &c : text) {
             c = isupper(c) ? tolower(c) : toupper(c);
@@ -104,17 +97,13 @@ static std::string mirrorFEN(const std::string &fen) {
         return text;
     };
     
-    std::vector<std::string> ranks;
-    size_t from = 0;
-    while (true) {
-        size_t slash = fields[0].find('/', from);
-        ranks.insert(ranks.begin(), fields[0].substr(from, slash == std::string::npos ? std::string::npos : slash - from));
-        if (slash == std::string::npos) break;
-        from = slash + 1;
-    }
+    std::vector<std::string> fields, ranks;
+    split4(fen, fields, " ");
+    split4(fields[0], ranks, "/");
+    
     std::string mirrored;
-    for (size_t index = 0; index < ranks.size(); index++) {
-        mirrored += (index > 0 ? "/" : "") + swapCase(ranks[index]);
+    for (auto rank = ranks.rbegin(); rank != ranks.rend(); rank++) {
+        mirrored += (mirrored.empty() ? "" : "/") + swapCase(*rank);
     }
     
     mirrored += fields[1] == "w" ? " b " : " w ";
@@ -123,10 +112,7 @@ static std::string mirrorFEN(const std::string &fen) {
     if (enPassant != "-") {
         enPassant[1] = enPassant[1] == '3' ? '6' : '3';
     }
-    mirrored += " " + enPassant;
-    for (size_t index = 4; index < fields.size(); index++) {
-        mirrored += " " + fields[index];
-    }
+    mirrored += " " + enPassant + " " + fields[4] + " " + fields[5];
     return mirrored;
 }
 

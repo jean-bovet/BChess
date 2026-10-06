@@ -129,6 +129,8 @@ TEST(BoardHash, EnPassantInTheHashOnlyWhenLegal) {
         {"4K3/8/8/8/k2Pp2R/8/8/8 b - d3 0 1", "4K3/8/8/8/k2Pp2R/8/8/8 b - - 0 1", false},
         // two candidates: e5 is pinned, c5 can take
         {"4k3/6b1/8/2PpP3/8/2K5/8/8 w - d6 0 1", "4k3/6b1/8/2PpP3/8/2K5/8/8 w - - 0 1", true},
+        // two candidates, the pinned one comes first in square order: c5 is pinned by the rook, e5 can take
+        {"2r1k3/8/8/2PpP3/8/2K5/8/8 w - d6 0 1", "2r1k3/8/8/2PpP3/8/2K5/8/8 w - - 0 1", true},
         // two candidates for Black: e4 is pinned, c4 can take
         {"8/8/2k5/8/2pPp3/8/6B1/4K3 b - d3 0 1", "8/8/2k5/8/2pPp3/8/6B1/4K3 b - - 0 1", true},
     };
@@ -158,4 +160,26 @@ TEST(BoardHash, StateKeysAreMaintainedIncrementally) {
     ChessGame game;
     ASSERT_TRUE(FPGN::setGame("1. e4 a6 2. e5 d5 3. exd6 Nf6 4. Nf3 Nc6 5. Rg1 *", game));
     ASSERT_EQ(game.board.getHash(), ChessBoardHash::hash(game.board));
+}
+
+// Nothing to capture: no pawn behind the target square (python-chess agrees only for legal positions)
+TEST(BoardHash, EnPassantWithoutAPawnToCaptureIsNotInTheHash) {
+    ChessEngine::initialize();
+
+    ASSERT_EQ(hashOfFEN("4k3/8/8/4P3/8/8/8/4K3 w - d6 0 1"), hashOfFEN("4k3/8/8/4P3/8/8/8/4K3 w - - 0 1"));
+    // The target square is occupied
+    ASSERT_EQ(hashOfFEN("4k3/8/3n4/3pP3/8/8/8/4K3 w - d6 0 1"), hashOfFEN("4k3/8/3n4/3pP3/8/8/8/4K3 w - - 0 1"));
+}
+
+// A setter that changes hashed state must not leave a stale cached hash behind
+TEST(BoardHash, SetCastlingInvalidatesTheHash) {
+    ChessEngine::initialize();
+
+    ChessBoard board;
+    board.getHash();
+    board.setCastling("-");
+    ASSERT_EQ(board.getHash(), ChessBoardHash::hash(board));
+    
+    board.move(createMove(e2, e4, WHITE, PAWN));
+    ASSERT_EQ(board.getHash(), ChessBoardHash::hash(board));
 }
