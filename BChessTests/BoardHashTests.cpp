@@ -70,3 +70,14 @@ TEST(BoardHash, PlayAndTestForCollision) {
     // Finally, each hash should be different because the board is different!
     ASSERT_NE(gameA.board.getHash(), gameB.board.getHash());
 }
+
+TEST(BoardHash, EnPassantKeepsHashExact) {
+    ChessEngine::initialize();
+
+    ChessBoard board;
+    ASSERT_TRUE(FFEN::setFEN("4k3/8/8/3pP3/8/8/8/4K3 w - d6 0 1", board));
+    board.move(createEnPassant(e5, d6, WHITE, PAWN));
+
+    ASSERT_EQ(FFEN::getFEN(board), "4k3/8/3P4/8/8/8/8/4K3 b - - 0 1");
+    ASSERT_EQ(board.getHash(), ChessBoardHash::hash(board));
+}

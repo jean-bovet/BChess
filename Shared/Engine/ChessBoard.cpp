@@ -291,13 +291,8 @@ void ChessBoard::move(Move move) {
     // First detect if the move is the "en-passant" move
     if (MOVE_IS_ENPASSANT(move)) {
         auto otherColor = INVERSE(moveColor);
-        auto enPassantSquare = lsb(enPassant);
         // The pawn to remove by the "en-passant" move is actually below the pawn doing the "en-passant" move.
-        if (moveColor == WHITE) {
-            enPassantSquare -= 8;
-        } else {
-            enPassantSquare += 8;
-        }
+        auto enPassantSquare = moveColor == WHITE ? to - 8 : to + 8;
         
         bb_clear(pieces[otherColor][PAWN], enPassantSquare);
         
@@ -336,12 +331,15 @@ void ChessBoard::move(Move move) {
     if (MOVE_IS_CAPTURE(move)) {
         halfMoveClock = 0; // reset halfmove clock if capture is done
         
-        auto otherColor = INVERSE(moveColor);
-        auto capturedPiece = MOVE_CAPTURED_PIECE(move);
-        bb_clear(pieces[otherColor][capturedPiece], to);
-        
-        // Update the hash by removing the piece being captured
-        hash ^= ChessBoardHash::getPseudoNumber(to, otherColor, capturedPiece);
+        // An en-passant capture already removed its pawn above: the target square is empty
+        if (!MOVE_IS_ENPASSANT(move)) {
+            auto otherColor = INVERSE(moveColor);
+            auto capturedPiece = MOVE_CAPTURED_PIECE(move);
+            bb_clear(pieces[otherColor][capturedPiece], to);
+            
+            // Update the hash by removing the piece being captured
+            hash ^= ChessBoardHash::getPseudoNumber(to, otherColor, capturedPiece);
+        }
     }
 
     // Switch the side that is moving

@@ -11,6 +11,7 @@
 
 #include <vector>
 
+#include "ChessBoardHash.hpp"
 #include "ChessEngine.hpp"
 #include "ChessMoveGenerator.hpp"
 #include "FFEN.hpp"
@@ -27,6 +28,23 @@ static uint64_t perft(ChessBoard &board, int depth) {
         nodes += perft(next, depth - 1);
     }
     return nodes;
+}
+
+// Counts the nodes whose incrementally updated hash differs from the one computed from scratch
+static uint64_t badHashNodes(ChessBoard &board, int depth) {
+    MoveList moves = ChessMoveGenerator::generateMoves(board);
+    uint64_t bad = 0;
+    for (int i = 0; i < moves.count; i++) {
+        ChessBoard next = board;
+        next.move(moves.moves[i]);
+        if (next.getHash() != ChessBoardHash::hash(next)) {
+            bad++;
+        }
+        if (depth > 1) {
+            bad += badHashNodes(next, depth - 1);
+        }
+    }
+    return bad;
 }
 
 static void expectPerft(const char *fen, const std::vector<uint64_t> &expected) {
@@ -104,4 +122,21 @@ TEST(Perft, CapturedRookOnH1LosesCastling) {
     ASSERT_TRUE(play(board, f2, h1));
     ASSERT_FALSE(board.whiteCanCastleKingSide);
     ASSERT_FALSE(canPlay(board, e1, g1));
+}
+
+TEST(Perft, HashMatchesFromScratchAtEveryNode) {
+    ChessEngine::initialize();
+
+    struct Walk { const char *fen; int depth; };
+    const Walk walks[] = {
+        {"r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1", 3},
+        {"8/2p5/3p4/KP5r/1R3p1k/8/4P1P1/8 w - - 0 1", 4},
+        {"r3k2r/Pppp1ppp/1b3nbN/nP6/BBP1P3/q4N2/Pp1P2PP/R2Q1RK1 w kq - 0 1", 3},
+        {"rnbq1k1r/pp1Pbppp/2p5/8/2B5/8/PPP1NnPP/RNBQK2R w KQ - 1 8", 3},
+    };
+    for (auto &walk : walks) {
+        ChessBoard board;
+        ASSERT_TRUE(FFEN::setFEN(walk.fen, board));
+        ASSERT_EQ(badHashNodes(board, walk.depth), 0u) << walk.fen << " depth " << walk.depth;
+    }
 }
