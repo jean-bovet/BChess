@@ -70,13 +70,13 @@ TEST_F(ChessEngineTests, NoBookMoveFromAFENGame) {
     ASSERT_TRUE(engine.loadOpening("1. e4 e5 2. Nf3 *"));
     
     // From the start position the book answers 1. e4 with e5
-    engine.game().move("e2", "e4");
+    ASSERT_TRUE(engine.game().move("e2e4"));
     ChessEvaluation fromStart;
     ASSERT_TRUE(engine.lookupOpeningMove(fromStart));
     
     // From a FEN where e2-e4 is also legal, there is no book move
     ASSERT_TRUE(engine.setFEN("4k3/8/8/8/8/8/4P3/4K3 w - - 0 1"));
-    engine.game().move("e2", "e4");
+    ASSERT_TRUE(engine.game().move("e2e4"));
     ChessEvaluation fromFEN;
     ASSERT_FALSE(engine.lookupOpeningMove(fromFEN));
 }

@@ -174,26 +174,36 @@ bool FFEN::setFEN(std::string fen, ChessBoard &board) {
     std::vector<std::string> ranks;
     split4(pieces, ranks, "/");
 
-    // Start from a new board so that nothing of the previous position survives: the fields the FEN
-    // omits take the value of a new board (KQkq, no en passant, clocks 0 and 1).
-    board.reset();
-    board.clear();
+    // The position is built on a new board, so that nothing of the previous one survives (the fields the
+    // FEN omits take the value of a new board: KQkq, no en passant, clocks 0 and 1), and the caller's
+    // board only changes when the whole FEN has been read.
+    ChessBoard parsed;
+    parsed.reset();
+    parsed.clear();
+    
+    // More than 8 ranks, or more than 8 files in a rank, would write outside the board
+    if (ranks.size() > 8) {
+        std::cerr << "Invalid FEN string, too many ranks: " << fen << std::endl;
+        return false;
+    }
     
     Coordinate coord = { 7, 0 };
     for (std::string rank : ranks) {
         for (char p : rank) {
             auto emptySquares = p - '0';
             if (emptySquares >= 1 && emptySquares <= 8) {
-                for (int i=0; i<emptySquares; i++) {
-                    coord.file += 1;
-                }
+                coord.file += emptySquares;
             } else {
                 BoardSquare square;
-                if (!charToSquare(p, square)) {
+                if (!charToSquare(p, square) || coord.file > 7) {
                     return false;
                 }
-                board.set(square, coord.file, coord.rank);
+                parsed.set(square, coord.file, coord.rank);
                 coord.file += 1;
+            }
+            if (coord.file > 8) {
+                std::cerr << "Invalid FEN string, too many files: " << fen << std::endl;
+                return false;
             }
         }
         coord.rank -= 1;
@@ -201,38 +211,40 @@ bool FFEN::setFEN(std::string fen, ChessBoard &board) {
     }
     
     auto sideToMove = fields[1];
-    board.color = (sideToMove == "w") ? WHITE : BLACK;
+    parsed.color = (sideToMove == "w") ? WHITE : BLACK;
     
     // KQkq
     if (fields.size() > 2) {
-        board.setCastling(fields[2]);
+        parsed.setCastling(fields[2]);
     }
     
-    // En passant
+    // En passant: a name that is not a square on the third or sixth rank is ignored
     if (fields.size() > 3) {
         auto enPassant = fields[3];
-        board.enPassant = 0;
-        if (enPassant != "-") {
-            bb_set(board.enPassant, squareForName(enPassant));
+        parsed.enPassant = 0;
+        auto square = squareForName(enPassant);
+        if (square != SquareUndefined && (RankFrom(square) == 2 || RankFrom(square) == 5)) {
+            bb_set(parsed.enPassant, square);
         }
     }
     
     // Half move
     if (fields.size() > 4) {
-        board.halfMoveClock = integer(fields[4]);
+        parsed.halfMoveClock = integer(fields[4]);
     }
 
     // Full move
     if (fields.size() > 5) {
-        board.fullMoveCount = integer(fields[5]);
+        parsed.fullMoveCount = integer(fields[5]);
     }
     
-    dropImpossibleCastlingRights(board);
+    dropImpossibleCastlingRights(parsed);
     
     // Nothing can capture on this square: drop it so no move or hash ever depends on it
-    if (!board.isEnPassantTargetValid(board.color)) {
-        board.enPassant = 0;
+    if (!parsed.isEnPassantTargetValid(parsed.color)) {
+        parsed.enPassant = 0;
     }
     
+    board = parsed;
     return true;
 }

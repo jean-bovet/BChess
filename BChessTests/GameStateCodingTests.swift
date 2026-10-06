@@ -59,7 +59,7 @@ struct GameStateCodingTests {
         let fen = "r1bqkbnr/pppp1ppp/2n5/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 3 3"
         let engine = FEngine()
         #expect(engine.setFEN(fen))
-        engine.move("a7", to: "a6")
+        engine.move(uci: "a7a6")
 
         let pgn = engine.pgnAllGames()
         #expect(pgn.contains("[FEN \"\(fen)\"]"))
@@ -116,6 +116,27 @@ struct GameStateCodingTests {
         }
         #expect(throws: CocoaError.self) {
             try GameState.newGame.data(for: .png)
+        }
+    }
+
+    // Files saved with a FEN the parser used to take at face value: the tag keeps its text, the
+    // position that is played is the sanitized one (no castling rights or en passant square that cannot exist)
+    private let legacyFENTag = #"[FEN "4k3/8/8/8/8/8/8/4K3 w KXq e4 0 1"]"#
+
+    @Test func legacyFENFilesOpen() throws {
+        let pgn = "[Event \"Test\"]\n\(legacyFENTag)\n[SetUp \"1\"]\n\n1. Ke2 *"
+        let json = #"{"pgn":"[Event \"Test\"]\n[FEN \"4k3/8/8/8/8/8/8/4K3 w KXq e4 0 1\"]\n[SetUp \"1\"]\n\n1. Ke2 *","rotated":false}"#
+
+        for (data, type) in [(Data(pgn.utf8), UTType.pgn), (Data(json.utf8), UTType.json)] {
+            let state = try GameState(data: data, contentType: type)
+            let engine = FEngine()
+            #expect(engine.loadAllGames(state.pgn))
+            #expect(engine.fen() == "4k3/8/8/8/8/8/4K3/8 b - - 1 1")
+            #expect(engine.allMoves().count == 1)
+            engine.move(to: .start, variation: 0)
+            #expect(engine.fen() == "4k3/8/8/8/8/8/8/4K3 w - - 0 1")
+            // Saving again keeps the original text of the tag
+            #expect(engine.pgnAllGames().contains(legacyFENTag))
         }
     }
 }

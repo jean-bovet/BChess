@@ -151,7 +151,11 @@ std::string FPGN::to_string(Move move, SANType sanType) {
     
     // UCI requires a very simple representation
     if (sanType == SANType::uci) {
-        return fromSquare+toSquare;
+        std::string uci = fromSquare+toSquare;
+        if (promotionPiece > PAWN) {
+            uci += static_cast<char>(tolower(pgnPiece(promotionPiece)[0]));
+        }
+        return uci;
     }
     
     // Non-UCI mode is a bit more complex
@@ -228,6 +232,17 @@ std::string FPGN::to_string(Move move, SANType sanType) {
     }
     
     return pgn;
+}
+
+Move FPGN::uciMove(ChessBoard board, std::string uci) {
+    MoveList moveList = ChessMoveGenerator::generateMoves(board);
+    for (int index=0; index<moveList.count; index++) {
+        auto m = moveList.moves[index];
+        if (to_string(m, SANType::uci) == uci) {
+            return m;
+        }
+    }
+    return INVALID_MOVE;
 }
 
 // This function takes a board (which represents a particular board of a chess game)

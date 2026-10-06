@@ -187,7 +187,7 @@ TEST_F(PGN, GameOutput) {
 TEST_F(PGN, GameWithBlackFromFEN) {
     ChessGame game;
     game.setFEN("1K1k4/1P6/8/8/8/8/r7/2R5 w - - 0 1");
-    game.move("c1", "d1");
+    ASSERT_TRUE(game.move("c1d1"));
     
     auto pgn = FPGN::getGame(game);
     ASSERT_EQ("[Event \"\"]\n[Site \"\"]\n[Date \"\"]\n[Round \"\"]\n[White \"\"]\n[Black \"\"]\n[Result \"*\"]\n[FEN \"1K1k4/1P6/8/8/8/8/r7/2R5 w - - 0 1\"]\n[SetUp \"1\"]\n\n 1. Rd1+ *", pgn);
@@ -210,7 +210,7 @@ TEST_F(PGN, OutputFromInitialPosition) {
 
     ASSERT_EQ("*", FPGN::getGame(game, FPGN::Formatting::history));
 
-    game.move("e2", "e4");
+    ASSERT_TRUE(game.move("e2e4"));
     
     ASSERT_EQ("1. e4 *", FPGN::getGame(game, FPGN::Formatting::history));
 }
@@ -402,7 +402,7 @@ TEST_F(PGN, ResultTagFollowsTheOutcome) {
     ChessGame resigned;
     ASSERT_TRUE(FPGN::setGame("[Result \"1-0\"]\n\n1. e4 e5 1-0", resigned));
     ASSERT_NE(std::string::npos, FPGN::getGame(resigned).find("[Result \"1-0\"]"));
-    resigned.move("g1", "f3");
+    ASSERT_TRUE(resigned.move("g1f3"));
     auto continued = FPGN::getGame(resigned);
     ASSERT_NE(std::string::npos, continued.find("[Result \"*\"]\n"));
     ASSERT_EQ(std::string::npos, continued.find("1-0"));

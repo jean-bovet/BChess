@@ -97,7 +97,7 @@ struct GamesTests {
     @Test func pawnPromotionToKnightToMate() async {
         let s = "position fen 6br/5Ppk/7p/8/8/8/8/4K3 w - - 0 1"
         let fen = "6br/5Ppk/7p/8/8/8/8/4K3 w - - 0 1"
-        await assert(command: s, resultingFEN: fen, bestMove: "bestmove f7f8")
+        await assert(command: s, resultingFEN: fen, bestMove: "bestmove f7f8n")
     }
     
     func assert(command: String, resultingFEN: String, bestMove: String, depth: Int = UCI.defaultDepth) async {

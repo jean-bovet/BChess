@@ -82,11 +82,7 @@ struct UCIProcessTests {
     private func isLegalMove(_ move: String, in fen: String) -> Bool {
         let engine = FEngine()
         engine.setFEN(fen)
-        let before = engine.fen()
-        let from = String(move.prefix(2))
-        let to = String(move.dropFirst(2).prefix(2))
-        engine.move(from, to: to)
-        return engine.fen() != before
+        return engine.move(uci: move)
     }
 
     @Test func goInfiniteThenStopPrintsBestMove() throws {

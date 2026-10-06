@@ -8,6 +8,7 @@
 
 #include <gtest/gtest.h>
 
+#include "FPGN.hpp"
 #include "Move.hpp"
 
 TEST(Move, InvalidMove) {
@@ -92,4 +93,13 @@ TEST(Move, MoveSetPromotion) {
     
     SET_MOVE_PROMOTION_PIECE(m, KNIGHT);
     ASSERT_EQ(MOVE_PROMOTION_PIECE(m), KNIGHT);
+}
+
+// UCI writes the promotion piece after the squares
+TEST(Move, UCIStringHasPromotion) {
+    ASSERT_EQ("b7b8q", FPGN::to_string(createPromotion(b7, b8, WHITE, PAWN, QUEEN), FPGN::SANType::uci));
+    ASSERT_EQ("b7b8n", FPGN::to_string(createPromotion(b7, b8, WHITE, PAWN, KNIGHT), FPGN::SANType::uci));
+    ASSERT_EQ("a2b1r", FPGN::to_string(createPromotion(a2, b1, BLACK, PAWN, ROOK), FPGN::SANType::uci));
+    ASSERT_EQ("g7g8b", FPGN::to_string(createPromotion(g7, g8, WHITE, PAWN, BISHOP), FPGN::SANType::uci));
+    ASSERT_EQ("e2e4", FPGN::to_string(createMove(e2, e4, WHITE, PAWN), FPGN::SANType::uci));
 }

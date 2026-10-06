@@ -117,8 +117,8 @@ public:
         game().move(move, comment, replace);
     }
     
-    void move(std::string from, std::string to) {
-        game().move(from, to);
+    bool move(std::string uciMove) {
+        return game().move(uciMove);
     }
         
     void stop() {

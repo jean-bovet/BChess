@@ -46,9 +46,7 @@ struct FEngineConcurrencyTests {
         let move = info?.bestMove(true) ?? ""
         let checker = FEngine()
         checker.setFEN(middlegame)
-        let before = checker.fen()
-        checker.move(String(move.prefix(2)), to: String(move.dropFirst(2).prefix(2)))
-        #expect(checker.fen() != before)
+        #expect(checker.move(uci: String(move)))
         #expect(!engine.isAnalyzing())
     }
 
@@ -151,7 +149,7 @@ struct FEngineConcurrencyTests {
         expectInvalidates("setFEN") { $0.setFEN(middlegame) }
         expectInvalidates("setPGN") { $0.setPGN("1. d4 d5 *") }
         expectInvalidates("loadAllGames") { $0.loadAllGames("1. d4 d5 *") }
-        expectInvalidates("move:to:") { $0.move("a2", to: "a3") }
+        expectInvalidates("move(uci:)") { $0.move(uci: "a2a3") }
         expectInvalidates("move:") { engine in
             let moves = engine.moves(at: 1, file: 0) // the pawn on a2
             engine.move(moves[0].rawMoveValue)

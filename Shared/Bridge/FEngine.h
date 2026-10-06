@@ -80,7 +80,8 @@ typedef NS_CLOSED_ENUM(NSInteger, GameEnd){
 - (NSArray<FEngineMoveNode*>* _Nonnull)nextMoveChoices;
 // Returns the next move UUID given the direction
 
-- (void)move:(NSString* _Nonnull)from to:(NSString* _Nonnull)to;
+// Plays the legal move that the UCI text spells (e2e4, e1g1, e7e8q); NO, and nothing changes, when it is not legal
+- (BOOL)moveUCI:(NSString* _Nonnull)move NS_SWIFT_NAME(move(uci:));
 
 // This stops the current search and return the best result so far. This is used
 // when the time alloted to think has expired.

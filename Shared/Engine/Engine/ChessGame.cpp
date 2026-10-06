@@ -8,6 +8,7 @@
 
 #include "ChessGame.hpp"
 #include "FFEN.hpp"
+#include "FPGN.hpp"
 #include "ChessMoveGenerator.hpp"
 #include "ChessEvaluater.hpp"
 #include "ChessBoardHash.hpp"
@@ -131,11 +132,13 @@ void ChessGame::move(Move move, std::string comment, bool replace) {
     }
 }
 
-void ChessGame::move(std::string from, std::string to) {
-    auto move = board.getMove(from, to);
-    if (MOVE_ISVALID(move)) {
-        ChessGame::move(move, "", false);
+bool ChessGame::move(std::string uciMove) {
+    auto move = FPGN::uciMove(board, uciMove);
+    if (!MOVE_ISVALID(move)) {
+        return false;
     }
+    ChessGame::move(move, "", false);
+    return true;
 }
 
 bool ChessGame::canMoveTo(Direction direction) {

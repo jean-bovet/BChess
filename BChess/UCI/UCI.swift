@@ -75,16 +75,12 @@ class UCI {
         let result = tokens.removeFirst() == "moves"
         assert(result)
         for moveToken in tokens {
-            assert(moveToken.count == 4)
-            let start = moveToken.startIndex
-            let middle = moveToken.index(start, offsetBy: 1)
-            let from = String(moveToken[start...middle])
-            
-            let secondToken = moveToken.index(start, offsetBy: 2)
-            let to = String(moveToken[secondToken...])
             // http://wbec-ridderkerk.nl/html/UCIProtocol.html
             // Examples:  e2e4, e7e5, e1g1 (white short castling), e7e8q (for promotion)
-            engine.move(from, to: to)
+            if !engine.move(uci: moveToken) {
+                os_log("Illegal move %{public}@", log: log, moveToken)
+                break
+            }
         }
         tokens.removeAll()
     }

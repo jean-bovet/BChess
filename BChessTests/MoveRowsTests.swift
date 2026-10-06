@@ -17,7 +17,7 @@ private func rebuilt(pgn: String? = nil, fen: String? = nil, moves: [(String, St
         engine.setPGN(pgn)
     }
     for (from, to) in moves {
-        engine.move(from, to: to)
+        #expect(engine.move(uci: from + to))
     }
     var game = Game()
     game.rebuild(engine: engine)

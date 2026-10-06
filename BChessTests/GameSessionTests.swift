@@ -26,7 +26,7 @@ private func fen(after moves: [(String, String)], from start: String = startFEN)
     let engine = FEngine()
     engine.setFEN(start)
     for (from, to) in moves {
-        engine.move(from, to: to)
+        #expect(engine.move(uci: from + to))
     }
     return engine.fen()
 }

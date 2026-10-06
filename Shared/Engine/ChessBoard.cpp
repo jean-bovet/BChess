@@ -361,33 +361,6 @@ Bitboard ChessBoard::getOccupancy() {
     return occupancy;
 }
 
-Move ChessBoard::getMove(std::string from, std::string to) {
-    Square fromSquare = squareForName(from);
-    Square toSquare = squareForName(to);
-    for (unsigned piece=PAWN; piece<Piece::PCOUNT; piece++) {
-        if (bb_test(pieces[color][piece], fromSquare)) {
-            auto attackedColor = INVERSE(color);
-            bool capture = bb_test(allPieces(attackedColor), toSquare);
-            if (capture) {
-                unsigned attackedPiece = PAWN;
-                for (; attackedPiece<PCOUNT; attackedPiece++) {
-                    if (bb_test(pieces[attackedColor][attackedPiece], toSquare)) {
-                        break;
-                    }
-                }
-                assert(attackedPiece != PCOUNT);
-                Move m = createCapture(fromSquare, toSquare, color, Piece(piece), attackedColor, Piece(attackedPiece));
-                return m;
-            } else {
-                Move m = createMove(fromSquare, toSquare, color, Piece(piece));
-                return m;
-            }
-            break;
-        }
-    }
-    return 0; // Invalid move
-}
-
 void ChessBoard::move(Color color, Piece piece, Square from, Square to) {
     // Removes the piece from the square it comes from
     bb_clear(pieces[color][piece], from);

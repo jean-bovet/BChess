@@ -70,6 +70,9 @@ public:
 
     static std::string to_string(Move move, SANType sanType = SANType::full);
     
+    // The legal move that `uci` (e2e4, e1g1, e7e8q) spells on this board, or INVALID_MOVE
+    static Move uciMove(ChessBoard board, std::string uci);
+    
     static bool setGame(std::string pgn, ChessGame &game);
     
     static bool setGames(std::string pgn, std::vector<ChessGame> & games);

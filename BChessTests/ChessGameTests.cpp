@@ -26,7 +26,7 @@ public:
 static std::string fenAfter(std::vector<std::string> moves) {
     ChessGame game;
     for (auto & m : moves) {
-        game.move(m.substr(0, 2), m.substr(2, 2));
+        EXPECT_TRUE(game.move(m)) << m;
     }
     return game.getFEN();
 }
@@ -140,7 +140,7 @@ TEST_F(ChessGameTests, MoveMidLineDropsStaleTail) {
     ASSERT_EQ(fenAfter({"e2e4"}), game.getFEN());
     
     // A new variation: nothing follows it
-    game.move("c7", "c5");
+    ASSERT_TRUE(game.move("c7c5"));
     ASSERT_EQ(fenAfter({"e2e4", "c7c5"}), game.getFEN());
     ASSERT_FALSE(game.canMoveTo(ChessGame::Direction::forward));
     ASSERT_EQ(2, game.getNumberOfMoves());
@@ -149,7 +149,7 @@ TEST_F(ChessGameTests, MoveMidLineDropsStaleTail) {
 TEST_F(ChessGameTests, MoveMidLineOntoExistingNodeContinuesMainLine) {
     auto game = gameFromPGN("1. e4 e5 2. Nf3 *");
     game.moveTo(ChessGame::Direction::start, 0);
-    game.move("e2", "e4");
+    ASSERT_TRUE(game.move("e2e4"));
     ASSERT_EQ(1, game.getNumberOfMoves());
     ASSERT_TRUE(game.canMoveTo(ChessGame::Direction::end));
     game.moveTo(ChessGame::Direction::end, 0);
@@ -176,7 +176,7 @@ TEST_F(ChessGameTests, NavigationRebuildsHistory) {
 TEST_F(ChessGameTests, ReplayedHistoryMatchesPlayedHistory) {
     ChessGame game;
     for (auto & m : std::vector<std::string> { "g1f3", "g8f6", "f3g1", "f6g8", "g1f3" }) {
-        game.move(m.substr(0, 2), m.substr(2, 2));
+        ASSERT_TRUE(game.move(m)) << m;
     }
     auto played = *game.history;
     ASSERT_EQ(6u, played.size()); // the initial position and 5 moves

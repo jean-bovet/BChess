@@ -222,10 +222,9 @@
     engine.move((Move)move, "", true);
 }
 
-- (void)move:(NSString*)from to:(NSString*)to {
+- (BOOL)moveUCI:(NSString*)move {
     [self invalidate];
-    engine.move(std::string([from cStringUsingEncoding:NSUTF8StringEncoding]),
-                std::string([to cStringUsingEncoding:NSUTF8StringEncoding]));
+    return engine.move(StringFromNSString(move));
 }
 
 - (ChessGame::Direction)gameDirection:(Direction)direction {

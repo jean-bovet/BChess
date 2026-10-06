@@ -73,3 +73,72 @@ TEST_F(FEN, ImpossibleEnPassantSquareIsDropped) {
     ASSERT_TRUE(FFEN::setFEN("4k3/8/8/3pP3/8/8/8/4K3 w - d6 0 1", board));
     ASSERT_NE(0u, board.enPassant);
 }
+
+// Input that writes outside the board, or that is not a position, is refused and leaves the board as it was
+TEST_F(FEN, RejectsOnlyUnsafe) {
+    ChessBoard board;
+    ASSERT_TRUE(FFEN::setFEN("r3k2r/8/8/8/8/8/8/R3K2R b KQkq - 3 7", board));
+    std::string before = FFEN::getFEN(board);
+    auto hash = board.getHash();
+    
+    for (auto fen : {
+        "4k4/8/8/8/8/8/8/4K3 w - - 0 1",                // a rank with 9 files
+        "4kk3k/8/8/8/8/8/8/4K3 w - - 0 1",              // 9 files made of pieces
+        "4k3/8/8/8/8/8/8/4K3/8 w - - 0 1",              // 9 ranks
+        "4k3/8/8/8/8/8/8/4X3 w - - 0 1",                // an unknown piece letter, after a half-filled board
+        "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNX w KQkq - 0 1",
+        "4k3",                                          // no side to move
+    }) {
+        ASSERT_FALSE(FFEN::setFEN(fen, board)) << fen;
+        ASSERT_EQ(before, FFEN::getFEN(board)) << fen;
+        ASSERT_EQ(hash, board.getHash()) << fen;
+    }
+}
+
+// Everything an earlier version accepted still loads, with the unsafe values neutralised
+TEST_F(FEN, SanitizesLegacy) {
+    ChessBoard board;
+    
+    // Unknown and impossible en passant squares
+    ASSERT_TRUE(FFEN::setFEN("4k3/8/8/8/8/8/8/4K3 w - z9 0 1", board));
+    ASSERT_EQ("4k3/8/8/8/8/8/8/4K3 w - - 0 1", FFEN::getFEN(board));
+    ASSERT_TRUE(FFEN::setFEN("4k3/8/8/8/8/8/8/4K3 w - e4 0 1", board));
+    ASSERT_EQ("4k3/8/8/8/8/8/8/4K3 w - - 0 1", FFEN::getFEN(board));
+    ASSERT_TRUE(FFEN::setFEN("4k3/8/8/8/8/8/8/4K3 w - 99 0 1", board));
+    ASSERT_EQ("4k3/8/8/8/8/8/8/4K3 w - - 0 1", FFEN::getFEN(board));
+    
+    // Castling letters that mean nothing
+    ASSERT_TRUE(FFEN::setFEN("r3k2r/8/8/8/8/8/8/R3K2R w KXq - 0 1", board));
+    ASSERT_EQ("r3k2r/8/8/8/8/8/8/R3K2R w Kq - 0 1", FFEN::getFEN(board));
+    
+    // Short ranks: the missing squares are empty
+    ASSERT_TRUE(FFEN::setFEN("4k3/8/8/8/8/8/8/4K2 w - - 0 1", board));
+    ASSERT_EQ("4k3/8/8/8/8/8/8/4K3 w - - 0 1", FFEN::getFEN(board));
+    ASSERT_TRUE(FFEN::setFEN("4k3/8/8/8/8/8/8/4K3 w - - 0 1", board));
+    
+    // Fewer than 8 ranks
+    ASSERT_TRUE(FFEN::setFEN("4k3/8/8/8/8 w - - 0 1", board));
+    ASSERT_EQ("4k3/8/8/8/8/8/8/8 w - - 0 1", FFEN::getFEN(board));
+    
+    // A side to move other than "w" means Black
+    ASSERT_TRUE(FFEN::setFEN("4k3/8/8/8/8/8/8/4K3 x", board));
+    ASSERT_EQ(BLACK, board.color);
+    
+    // EPD
+    ASSERT_TRUE(FFEN::setFEN("1rbq1rk1/p1b1nppp/1p2p3/8/1B1pN3/P2B4/1P3PPP/2RQ1R1K w - - bm Nf6+; id \"position 01\";", board));
+    ASSERT_EQ(0u, FFEN::getFEN(board).find("1rbq1rk1/p1b1nppp/1p2p3/8/1B1pN3/P2B4/1P3PPP/2RQ1R1K w - - "));
+    
+    // A valid position round-trips unchanged
+    for (auto fen : {
+        "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+        "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1",
+        "8/2p5/3p4/KP5r/1R3p1k/8/4P1P1/8 w - - 0 1",
+        "r3k2r/Pppp1ppp/1b3nbN/nP6/BBP1P3/q4N2/Pp1P2PP/R2Q1RK1 w kq - 0 1",
+        "rnbq1k1r/pp1Pbppp/2p5/8/2B5/8/PPP1NnPP/RNBQK2R w KQ - 1 8",
+        "r4rk1/1pp1qppp/p1np1n2/2b1p1B1/2B1P1b1/P1NP1N2/1PP1QPPP/R4RK1 w - - 0 10",
+        "4k3/8/8/3pP3/8/8/8/4K3 w - d6 0 1",
+    }) {
+        ASSERT_TRUE(FFEN::setFEN(fen, board)) << fen;
+        ASSERT_EQ(fen, FFEN::getFEN(board));
+    }
+}

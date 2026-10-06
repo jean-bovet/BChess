@@ -236,7 +236,9 @@ public:
     std::vector<Move> allMoves();
 
     void move(Move move, std::string comment, bool replace);
-    void move(std::string from, std::string to);
+    // Plays the legal move that the UCI text spells (e2e4, e1g1, e7e8q). Returns false, and changes nothing, when
+    // there is none.
+    bool move(std::string uciMove);
     
     enum class Direction {
         start, end, backward, forward
