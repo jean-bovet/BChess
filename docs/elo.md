@@ -72,3 +72,11 @@ score point is about 695 Elo at 50 %):
 
 | Date | Commit | TC | Book | Stockfish level | Games | W/D/L | Performance (95 %) | Wall time |
 |---|---|---|---|---|---:|---|---|---:|
+| 2026-10-06 | c527652 | 10+0.1 | 8moves_v3 | 1600 | 40 | 28/2/10 | 1768 ± 125 | 4 min |
+| 2026-10-06 | c527652 | 10+0.1 | 8moves_v3 | 1800 | 300 | 115/15/170 | **1736 ± 40** | 34 min |
+
+The first row is the probe that picked the level for the second. The second is the measurement:
+`LEVEL=1800 GAMES=300 scripts/elo-match.sh` (10+0.1, concurrency 4, Apple M2, Stockfish 19,
+fastchess v1.8.2-alpha). Score 40.8 %, Elo difference to Stockfish 1800 of −64 ± 40 (95 %). No
+illegal move, time forfeit, disconnect or stall in either run. BChess at this commit therefore
+plays at about 1740 ± 40 on Stockfish's `UCI_Elo` scale at 10+0.1.
