@@ -26,4 +26,11 @@ public:
     /// and the en-passant file when an en-passant capture is legal (FIDE 9.2.3: positions are the
     /// same when the same moves are possible, so an en-passant square nothing can use does not count).
     static uint64_t stateKey(const ChessBoard &board);
+    
+    /// The castling part of the state key, one right at a time: 0 white king side, 1 white queen side,
+    /// 2 black king side, 3 black queen side
+    static uint64_t castlingKey(int right);
+    
+    /// The en-passant part of the state key: the file key when an en-passant capture is legal, else 0
+    static uint64_t enPassantKey(const ChessBoard &board);
 };

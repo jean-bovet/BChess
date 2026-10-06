@@ -24,7 +24,7 @@ std::string MoveList::description() {
 
 void MoveList::addSingleMove(ChessBoard &board, Move move) {
     ChessBoard validBoard = board;
-    validBoard.move(move);
+    validBoard.moveForLegality(move);
     // Note: make sure the move that was just played doesn't make it's king in check.
     if (!validBoard.isCheck(MOVE_COLOR(move))) {
         // Determine if the move makes the king of the opposite side in check.

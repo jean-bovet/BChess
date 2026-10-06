@@ -132,14 +132,19 @@ static bool canCaptureEnPassant(const ChessBoard &board) {
     return false;
 }
 
+uint64_t ChessBoardHash::castlingKey(int right) {
+    return castling[right];
+}
+
+uint64_t ChessBoardHash::enPassantKey(const ChessBoard &board) {
+    return canCaptureEnPassant(board) ? enPassantFile[FileFrom(lsb(board.enPassant))] : 0;
+}
+
 uint64_t ChessBoardHash::stateKey(const ChessBoard &board) {
     uint64_t key = 0;
     if (board.whiteCanCastleKingSide) key ^= castling[0];
     if (board.whiteCanCastleQueenSide) key ^= castling[1];
     if (board.blackCanCastleKingSide) key ^= castling[2];
     if (board.blackCanCastleQueenSide) key ^= castling[3];
-    if (canCaptureEnPassant(board)) {
-        key ^= enPassantFile[FileFrom(lsb(board.enPassant))];
-    }
-    return key;
+    return key ^ enPassantKey(board);
 }

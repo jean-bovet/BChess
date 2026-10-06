@@ -66,6 +66,10 @@ public:
     
     void move(Move move);
     
+    // Plays the move for the legality test of MoveList::addSingleMove, which only reads isCheck on the copy it
+    // makes it on. It skips all the hash work, so the hash is left "to be computed" and nothing may rely on it.
+    void moveForLegality(Move move);
+    
     void move(Color color, Piece piece, Square from, Square to);
     
     Bitboard allPieces(Color color) const;
@@ -112,5 +116,10 @@ public:
     }
     
     void print();
+    
+private:
+    // move() and moveForLegality() are one body: the rules cannot drift apart
+    template<bool UpdateHash> void applyMove(Move move);
+    template<bool UpdateHash> void movePieceOnBoard(Color color, Piece piece, Square from, Square to);
 };
 

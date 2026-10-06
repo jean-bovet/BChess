@@ -229,3 +229,48 @@ TEST(BoardHash, ImpossibleEnPassantGeneratesNoCapture) {
         expectEveryMoveKeepsTheHashExact(direct);
     }
 }
+
+// The legality-only move shares one body with move(): the same position, castling rights, en passant and
+// counters come out, only the hash is left to be computed
+TEST(BoardHash, LegalityMoveLeavesRulesIntact) {
+    ChessEngine::initialize();
+
+    const char *fens[] = {
+        "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1",   // Kiwipete: castling, captures
+        "r3k2r/Pppp1ppp/1b3nbN/nP6/BBP1P3/q4N2/Pp1P2PP/R2Q1RK1 w kq - 0 1",       // position 4: promotions
+        "rnbqkbnr/ppp1p1pp/8/3pPp2/8/8/PPPP1PPP/RNBQKBNR w KQkq f6 0 3",           // en passant, double pushes
+        "r3k2r/8/8/8/8/8/8/R3K2R b KQkq - 5 20",                                    // black castling and counters
+    };
+    int checked = 0;
+    for (auto fen : fens) {
+        ChessBoard board;
+        ASSERT_TRUE(FFEN::setFEN(fen, board));
+        MoveList moves = ChessMoveGenerator::generateMoves(board);
+        for (int i = 0; i < moves.count; i++) {
+            ChessBoard full = board, legality = board;
+            full.move(moves.moves[i]);
+            legality.moveForLegality(moves.moves[i]);
+            
+            std::string what = std::string(fen) + " " + FPGN::to_string(moves.moves[i], FPGN::SANType::uci);
+            for (int color = 0; color < COUNT; color++) {
+                for (int piece = 0; piece < PCOUNT; piece++) {
+                    ASSERT_EQ(full.pieces[color][piece], legality.pieces[color][piece]) << what;
+                }
+            }
+            ASSERT_EQ(full.color, legality.color) << what;
+            ASSERT_EQ(full.enPassant, legality.enPassant) << what;
+            ASSERT_EQ(full.whiteCanCastleKingSide, legality.whiteCanCastleKingSide) << what;
+            ASSERT_EQ(full.whiteCanCastleQueenSide, legality.whiteCanCastleQueenSide) << what;
+            ASSERT_EQ(full.blackCanCastleKingSide, legality.blackCanCastleKingSide) << what;
+            ASSERT_EQ(full.blackCanCastleQueenSide, legality.blackCanCastleQueenSide) << what;
+            ASSERT_EQ(full.halfMoveClock, legality.halfMoveClock) << what;
+            ASSERT_EQ(full.fullMoveCount, legality.fullMoveCount) << what;
+            ASSERT_EQ(full.getOccupancy(), legality.getOccupancy()) << what;
+            // A board that was only made for the legality test still hashes right if anyone asks
+            ASSERT_EQ(full.getHash(), legality.getHash()) << what;
+            ASSERT_EQ(full.isCheck(full.color), legality.isCheck(legality.color)) << what;
+            checked++;
+        }
+    }
+    ASSERT_GT(checked, 100);
+}

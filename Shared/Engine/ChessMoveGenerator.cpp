@@ -169,6 +169,9 @@ void ChessMoveGenerator::generatePawnsMoves(ChessBoard &board, Color color, Move
     auto pawns = board.pieces[color][PAWN];
     auto emptySquares = board.emptySquares();
     
+    // The answer is the same for every pawn
+    const bool enPassantValid = board.isEnPassantTargetValid(color);
+    
     // Generate moves for each white pawn
     while (pawns > 0) {
         // Find the first white pawn starting from the least significant bit (that is, square a1)
@@ -190,7 +193,7 @@ void ChessMoveGenerator::generatePawnsMoves(ChessBoard &board, Color color, Move
         if (mode == Mode::firstMoveOnly && moveList.count > 0) return;
 
         // Also check if it's possible to do the en-passant
-        if (board.isEnPassantTargetValid(color)) {
+        if (enPassantValid) {
             auto enPassantMove = PawnAttacks[color][square] & board.enPassant;
             if (enPassantMove > 0) {
                 auto enPassantToSquare = lsb(enPassantMove);

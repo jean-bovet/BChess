@@ -225,12 +225,32 @@ void ChessBoard::reset() {
 }
 
 void ChessBoard::move(Move move) {
-    // The hash is updated incrementally below: it must be exact before the first update, and it is
-    // zero ("to be computed") after a FEN was set
-    getHash();
+    applyMove<true>(move);
+}
+
+// Same rules as move(), without the hash. The hash is left "to be computed", so that an accidental getHash()
+// on the board still returns the right value, but nothing here pays for it.
+void ChessBoard::moveForLegality(Move move) {
+    applyMove<false>(move);
+    hash = 0;
+}
+
+template<bool UpdateHash>
+void ChessBoard::applyMove(Move move) {
+    // The castling rights before the move, to put only the ones that change into the hash
+    const bool hadWhiteKingSide = whiteCanCastleKingSide, hadWhiteQueenSide = whiteCanCastleQueenSide;
+    const bool hadBlackKingSide = blackCanCastleKingSide, hadBlackQueenSide = blackCanCastleQueenSide;
     
-    // Take the castling rights and en-passant square out of the hash, they are put back at the end
-    hash ^= ChessBoardHash::stateKey(*this);
+    if constexpr (UpdateHash) {
+        // The hash is updated incrementally below: it must be exact before the first update, and it is
+        // zero ("to be computed") after a FEN was set
+        getHash();
+        
+        // Take the en-passant file out of the hash, it is put back at the end (only after a double push)
+        if (enPassant != 0) {
+            hash ^= ChessBoardHash::enPassantKey(*this);
+        }
+    }
     
     // A FEN can carry any counters: they stop at the largest value instead of overflowing
     if (color == BLACK && fullMoveCount < INT_MAX) {
@@ -247,7 +267,7 @@ void ChessBoard::move(Move move) {
     auto from = MOVE_FROM(move);
     auto to = MOVE_TO(move);
     
-    ChessBoard::move(moveColor, movePiece, from, to);
+    movePieceOnBoard<UpdateHash>(moveColor, movePiece, from, to);
     
     if (movePiece == KING) {
         if (moveColor == WHITE) {
@@ -256,12 +276,12 @@ void ChessBoard::move(Move move) {
             if (from == e1 && to == g1) {
                 // White castle king side, need to move the rook
                 assert(bb_test(pieces[moveColor][ROOK], h1));
-                ChessBoard::move(moveColor, ROOK, h1, f1);
+                movePieceOnBoard<UpdateHash>(moveColor, ROOK, h1, f1);
             }
             if (from == e1 && to == c1) {
                 // White castle queen side, need to move the rook
                 assert(bb_test(pieces[moveColor][ROOK], a1));
-                ChessBoard::move(moveColor, ROOK, a1, d1);
+                movePieceOnBoard<UpdateHash>(moveColor, ROOK, a1, d1);
             }
         } else {
             blackCanCastleKingSide = blackCanCastleQueenSide = false;
@@ -269,12 +289,12 @@ void ChessBoard::move(Move move) {
             if (from == e8 && to == g8) {
                 // Black castle king side, need to move the rook
                 assert(bb_test(pieces[moveColor][ROOK], h8));
-                ChessBoard::move(moveColor, ROOK, h8, f8);
+                movePieceOnBoard<UpdateHash>(moveColor, ROOK, h8, f8);
             }
             if (from == e8 && to == c8) {
                 // Black castle queen side, need to move the rook
                 assert(bb_test(pieces[moveColor][ROOK], a8));
-                ChessBoard::move(moveColor, ROOK, a8, d8);
+                movePieceOnBoard<UpdateHash>(moveColor, ROOK, a8, d8);
             }
         }
     }
@@ -290,9 +310,10 @@ void ChessBoard::move(Move move) {
         bb_clear(pieces[color][movePiece], to);
         bb_set(pieces[color][promotionPiece], to);
         
-        // Update the hash
-        hash ^= ChessBoardHash::getPseudoNumber(to, color, movePiece); // Remove the piece that is going to be promoted
-        hash ^= ChessBoardHash::getPseudoNumber(to, color, promotionPiece); // Set the promoted piece
+        if constexpr (UpdateHash) {
+            hash ^= ChessBoardHash::getPseudoNumber(to, color, movePiece); // Remove the piece that is going to be promoted
+            hash ^= ChessBoardHash::getPseudoNumber(to, color, promotionPiece); // Set the promoted piece
+        }
     }
     
     // First detect if the move is the "en-passant" move
@@ -304,7 +325,9 @@ void ChessBoard::move(Move move) {
         bb_clear(pieces[otherColor][PAWN], enPassantSquare);
         
         // Update the hash by removing the pawn being captured by the "en-passant" move
-        hash ^= ChessBoardHash::getPseudoNumber(enPassantSquare, otherColor, PAWN);
+        if constexpr (UpdateHash) {
+            hash ^= ChessBoardHash::getPseudoNumber(enPassantSquare, otherColor, PAWN);
+        }
     }
     
     // Detect if a pawn moves two squares in order to enable
@@ -345,14 +368,27 @@ void ChessBoard::move(Move move) {
             bb_clear(pieces[otherColor][capturedPiece], to);
             
             // Update the hash by removing the piece being captured
-            hash ^= ChessBoardHash::getPseudoNumber(to, otherColor, capturedPiece);
+            if constexpr (UpdateHash) {
+                hash ^= ChessBoardHash::getPseudoNumber(to, otherColor, capturedPiece);
+            }
         }
     }
-
+    
     // Switch the side that is moving
     color = INVERSE(color);
-    hash = hash ^ ChessBoardHash::getWhiteTurn();
-    hash ^= ChessBoardHash::stateKey(*this);
+    
+    if constexpr (UpdateHash) {
+        hash = hash ^ ChessBoardHash::getWhiteTurn();
+        
+        // The castling rights that went, and the en-passant file after a double push
+        if (hadWhiteKingSide != whiteCanCastleKingSide) hash ^= ChessBoardHash::castlingKey(0);
+        if (hadWhiteQueenSide != whiteCanCastleQueenSide) hash ^= ChessBoardHash::castlingKey(1);
+        if (hadBlackKingSide != blackCanCastleKingSide) hash ^= ChessBoardHash::castlingKey(2);
+        if (hadBlackQueenSide != blackCanCastleQueenSide) hash ^= ChessBoardHash::castlingKey(3);
+        if (enPassant != 0) {
+            hash ^= ChessBoardHash::enPassantKey(*this);
+        }
+    }
 }
 
 Bitboard ChessBoard::getOccupancy() {
@@ -366,13 +402,22 @@ Bitboard ChessBoard::getOccupancy() {
 }
 
 void ChessBoard::move(Color color, Piece piece, Square from, Square to) {
+    movePieceOnBoard<true>(color, piece, from, to);
+}
+
+template<bool UpdateHash>
+void ChessBoard::movePieceOnBoard(Color color, Piece piece, Square from, Square to) {
     // Removes the piece from the square it comes from
     bb_clear(pieces[color][piece], from);
-    hash ^= ChessBoardHash::getPseudoNumber(from, color, piece);
+    if constexpr (UpdateHash) {
+        hash ^= ChessBoardHash::getPseudoNumber(from, color, piece);
+    }
     
     // Sets the piece to the square it arrives to
     bb_set(pieces[color][piece], to);
-    hash ^= ChessBoardHash::getPseudoNumber(to, color, piece);
+    if constexpr (UpdateHash) {
+        hash ^= ChessBoardHash::getPseudoNumber(to, color, piece);
+    }
     
     // Needs to re-compute the occupancy bitboard
     occupancyDirty = true;
