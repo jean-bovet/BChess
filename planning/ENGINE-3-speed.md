@@ -1,6 +1,6 @@
 # ENGINE-3 (speed) — A faster search at the same strength of play, measured
 
-Revision 3 (2026-10-06). Planned on `main` (`--no-worktree`, Jean's call). This is the first of three
+Revision 4 (2026-10-06). Codex plan rounds exhausted (3/3); the round-3 changes are covered by the phase-5 code review. Planned on `main` (`--no-worktree`, Jean's call). This is the first of three
 ENGINE-3 plans: **speed** (this one), then **search** (pruning, check extension, TT cut-offs and draws),
 then **evaluation**. It assumes ENGINE-1 (bug fixes, perft) and ENGINE-2 (match-ready `BChessUCI`, mate
 distance, `scripts/elo-match.sh`, 1736 ± 40 in `docs/elo.md`) and repeats neither.
@@ -28,6 +28,18 @@ distance, `scripts/elo-match.sh`, 1736 ± 40 in `docs/elo.md`) and repeats neith
   - Step 4 names the caller migrations: `const Variation &bv`, const `MoveList::lookup`/`bestMove`,
     and named boards in `EvaluationTests`.
   - A SEE en-passant test where removing the captured pawn opens a slider line onto the square.
+- r4 — Codex plan round 3 (substantive; last allowed round). All findings accepted:
+  - **Blocker.** The repetition boundary no longer comes from the FEN clock. A clock of −8 reaches
+    0 after eight reversible plies and would have hidden a real threefold. `ChessBoard` now counts
+    the plies since the last pawn move or capture actually played on it (`reversiblePlies`). The
+    counter is "unknown" (−1) after a FEN or reset, so the full history is scanned until a real
+    irreversible move is played.
+  - SEE models a promotion during the exchange: the promotion gain, and the promoted piece's value
+    in the later exchanges. It gets a recapture-promotion fixture.
+  - Step 6 keeps the best-variation (`bv`) move first whatever `sortMoves` says, as today. A new
+    test runs an unsorted search with a populated `bv`.
+  - Quiescence loses its `history` parameter and its `push_back`/`pop_back`, which nothing reads
+    once step 5 lands.
 
 Jean's request: "Start with the speed plan." The goal is a higher Elo through a faster search: more
 depth in the same time. Out of scope here: new pruning of the main search (null move, LMR, futility),
@@ -83,9 +95,10 @@ instructions.
   (`MinMaxSearch.hpp:304-342`). Stand-pat calls `evaluate(node, history)`, which generates moves in
   `firstMoveOnly` mode (`ChessEvaluater.cpp:140-143`) to detect mate and stalemate. That call is
   needed for exactness. See step 5.
-- **Repetition is not bounded by the half-move clock.** The clock is maintained (`ChessBoard.cpp:239-243`,
-  `:283-285`, `:338-339`) but unused. No position before the last capture or pawn move can recur, so
-  the scan could stop `halfMoveClock` plies back.
+- **Repetition is not bounded by the last irreversible move.** The scan walks the whole history
+  (`GameHistory.cpp:14`), although no position before the last capture or pawn move can recur.
+  `halfMoveClock` (`ChessBoard.cpp:239-243`, `:283-285`, `:338-339`) cannot serve as the bound,
+  because a FEN can set it to any value (step 5).
 
 ## Design
 
@@ -287,28 +300,51 @@ without a match.
   `MinMaxSearchTests.cpp:37`, `:68`. `EvaluationTests` passes temporaries
   (`evaluate(boardFor(fen), …)`), which cannot bind to `ChessBoard &`, so they become named locals
   (`auto board = boardFor(fen);`). The `MinMaxSearchTests` calls already pass named boards.
-- **Bounded scan.** `ChessHistory::isThreefoldRepetition(hash, halfMoveClock, history)` stops
-  `halfMoveClock` plies back, but **only when `0 <= halfMoveClock <= size − 1`**. In every other
-  case it scans the whole history, as today. This is sound:
-  - The clock resets on every capture and pawn move (`ChessBoard.cpp:283-285`, `:338-339`), and no
-    position before such a move can recur.
-  - A lost castling right does not reset the clock, but it changes the hash, so the bound is still
-    only an upper limit.
-  - **A clock the history cannot back is not trusted.** `FFEN::setFEN` parses the clock with
-    `integer()` (`FFEN.cpp:230`), which accepts negative values, and `move()` keeps incrementing
-    them. Older files can carry such a clock, and I1 forbids rejecting them now. Start from the
-    start position with clock −100 and play `g1f3 g8f6 f3g1 f6g8` twice: the start position has
-    occurred three times, yet the clock is −92. A bound taken from it would miss the repetition.
-    A clock larger than the history (a FEN that claims 90) also falls back to the full scan, which
-    is then the same set of entries.
+- **Bounded scan, from moves actually played.** No position before a pawn move or a capture can
+  recur, so the scan can stop at the last such move. The boundary must not come from
+  `halfMoveClock`: `FFEN::setFEN` parses the clock with `integer()` (`FFEN.cpp:230`), which accepts
+  any value, and `move()` keeps incrementing it. Older files can carry such clocks, and I1 forbids
+  rejecting them now. Two examples:
+  - Clock −100, start position, then `g1f3 g8f6 f3g1 f6g8` twice: a threefold at clock −92.
+  - Clock −8 and the same moves: the clock reaches exactly 0 at the third occurrence, so even a
+    "trust it only when it is in range" rule (r3) would scan one entry and miss the draw. Today's
+    full scan detects it.
 
-  `ChessEvaluater::isDraw(ChessBoard &, const HistoryPtr &)` passes `board.halfMoveClock`.
-  `ChessEngine::gameEnd` (`ChessEngine.hpp:157`) goes through the same function, so the game's draw
-  detection gets the same bound. Today's semantics are kept: three occurrences, counted on the same
-  side to move.
-- **`HistoryPtr` by `const &`** through `alphabeta`, `quiescence`, `isDraw` and
-  `isThreefoldRepetition`. That is no atomic refcount traffic per node. The object stays shared,
-  and the search still pushes and pops on it.
+  The mechanism:
+  - **The counter.** `ChessBoard` gains `int reversiblePlies = -1`: the plies since the last pawn
+    move or capture **played on this board**, with −1 meaning unknown.
+  - **When it changes.** `reset()`, `clear()` and FEN parsing leave it at −1. `move()` sets it to 0
+    on a pawn move or capture (the same two places that reset `halfMoveClock`,
+    `ChessBoard.cpp:283-285`, `:338-339`). On any other move it adds one, but only when it is
+    already ≥ 0.
+  - **Not position state.** It is not part of the hash, the FEN or `ChessState`: two boards with
+    the same position and different counters are the same position.
+  - **Why it agrees with the history.** The history is built by the same `move()` calls that
+    update the counter, in `ChessGame::move` (`ChessGame.cpp:114-116`) and `replayMoves`
+    (`:207-213`), each of which pushes one hash per `board.move`. In the search, the board is
+    copied and moved once per pushed hash (`MinMaxSearch.hpp:233-237`). So the counter always
+    counts plies that the history holds, and it needs no bookkeeping of its own.
+
+    Where a board travels with a shorter history (`FEngineInfo.mm:117` gives a line's game a fresh
+    history), the scan is bounded by `min(reversiblePlies, size − 1)`. Scanning less than the
+    history holds is never needed, and never more than it holds.
+  - **The scan.** `ChessHistory::isThreefoldRepetition(hash, reversiblePlies, history)` walks back
+    `min(reversiblePlies, size − 1)` plies when `reversiblePlies >= 0`, and the whole history when it
+    is −1. An empty history is never a repetition. Today's semantics are otherwise kept: three occurrences, counted on the same side to move.
+  - **Callers.** `ChessEvaluater::isDraw(ChessBoard &, const HistoryPtr &)` passes
+    `board.reversiblePlies`. `ChessEngine::gameEnd` (`ChessEngine.hpp:157`) goes through the same
+    function, so the game's draw detection gets the same bound.
+  - **Soundness.** A lost castling right does not reset the counter, but it changes the hash, so the
+    bound remains an upper limit. `halfMoveClock` itself is untouched and keeps its FEN role (the
+    fifty-move rule is the search plan's).
+- **`HistoryPtr` by `const &`** through `alphabeta`, `isDraw` and `isThreefoldRepetition`. That is
+  no atomic refcount traffic per node. The object stays shared, and `alphabeta` still pushes and
+  pops on it.
+- **Quiescence loses the history.** Once its draw check and `evaluate`'s are gone, nothing in
+  `quiescence` reads the history. The `HistoryPtr history` parameter, the
+  `history->push_back(newNode.getHash())` and the `history->pop_back()` (`MinMaxSearch.hpp:287`,
+  `:324`, `:330`) are removed, along with the hash computation they forced. This is exact for the
+  same reason the draw check could go: nothing below a quiescence node reads those entries.
 - **`firstMoveOnly` in stand-pat stays.** It is what makes a mated or stalemated quiescence node
   score correctly (`ChessEvaluater.cpp:146-155`), and ENGINE-2's mate scores rely on it. It is
   cheap: generation stops at the first legal move, and after step 3 that legality test no longer
@@ -330,8 +366,11 @@ without a match.
   again" check (`MinMaxSearch.hpp:225-228`) goes with it. The `bv` line is still passed to the
   child of the `bv` move only.
 - **Probing for ordering ignores `config.transpositionTable`.** That flag now gates only cut-offs.
-- **`config.sortMoves = false`** turns off the hash move as well. "Unsorted" stays a real baseline,
-  and `SearchChessTests.OrderedMove`'s unsorted count (341,658) is unchanged.
+- **`config.sortMoves = false`** turns off the TT hash move (and step 7's killers), and nothing
+  else. The `bv` move stays first whatever `sortMoves` says, exactly as today
+  (`MinMaxSearch.hpp:203-229` does not look at the flag), so the unsorted iterative-deepening
+  baseline is unchanged. `SearchChessTests.OrderedMove`'s unsorted count (341,658) uses an empty
+  `bv` and stays as it is. A new test covers the populated-`bv` case (test plan).
 - **Gate.** Same scores on every bench position at the fixed depth, TT cut-offs off. Total nodes
   −5 % or better. With TT on, nodes are reported.
 
@@ -400,6 +439,11 @@ without a match.
     approximation, and SEE only decides whether quiescence skips a capture, so a misjudged exchange
     costs a pruning decision, never legality: the moves searched still come from the legal
     generator. A test pins this behaviour down so that it cannot change silently.
+  - **Promotions during the exchange.** A pawn that captures onto its last rank, whether the first
+    capture or a recapture, gains `pieceValue(QUEEN) − pieceValue(PAWN)` on top of the piece it
+    takes. From then on the piece standing on the square, and so the value the next capturer wins,
+    is a queen. The first capture's own promotion piece is taken from the move. A recapturing pawn
+    is assumed to promote to a queen.
   - **The king recaptures only into safety.** A king is the last attacker taken for its side. It
     may capture only when the opponent has no attacker left on the square after the exchange so
     far. Otherwise the exchange stops before the king's capture, because that capture would be
@@ -481,16 +525,17 @@ proves and whether it is red before its step.
 | 3 | Existing `Perft.*` (6 positions + 2 castling cases), `Perft.HashMatchesFromScratchAtEveryNode`, all `BoardHash.*` | Move generation and hash unchanged | guards |
 | 3 | `BoardHash.LegalityMoveLeavesRulesIntact`: for every pseudo-legal move of Kiwipete and position 4, the legality-only path and `move()` leave identical `pieces`, `enPassant`, castling flags and counters. | The two paths share one rule set | yes (no such path) |
 | 4 | Existing `MinMaxSearch.*`, `SearchChess.*`, `IterativeDeepening.*`, `BestMove.*` unchanged | Exact | guards |
-| 5 | `ChessGameTests.RepetitionIsBoundedByTheHalfMoveClock`: a hand-built history whose earlier occurrences sit behind a pawn move (positions that real play cannot produce: the same hash before and after a pawn move). Not a repetition with the bound, a repetition without it. | The bound is applied | yes |
-| 5 | `ChessGameTests.RepetitionAfterManyReversibleMoves`: knights shuffled 40 plies, so the threefold still comes from the last 8 plies, and a FEN with clock 90 and a one-entry history does not read out of range. | Bound is sound, and a too-large clock falls back to the full scan | no (guard; ASan/Debug assert on `at()`) |
-| 5 | `ChessGameTests.RepetitionWithNegativeFENClock`: `rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - -100 1`, then `g1f3 g8f6 f3g1 f6g8` twice through `ChessGame::move`. `isDraw` is true and `ChessEngine::gameEnd` reports `repetition` (clock −92). The same with clock 200 and a short history also detects the repetition. | Legacy negative or oversized clocks never hide a repetition (I1) | yes against a bound that trusts any clock (proven in a scratch copy) |
+| 5 | `ChessGameTests.RepetitionIsBoundedByTheLastIrreversibleMove` (a normal game where the bound saves work): play `e2e4 e7e5`, then `g1f3 g8f6 f3g1 f6g8` once. `reversiblePlies == 4`. Then plant two extra copies of the current hash in the history **before** the `e7e5` entry, which real play cannot produce. Not a repetition: the scan stops at the pawn move, and the call reads at most 5 entries (asserted through a test-only scan counter). With `reversiblePlies` set to −1 on a copy of the board it is a repetition. | The bound is applied, and it comes from played moves | yes |
+| 5 | `ChessGameTests.RepetitionAfterManyReversibleMoves`: after `e2e4 e7e5`, knights are shuffled 40 plies, so the threefold still comes from the last 8 plies. A FEN with clock 90 (larger than its one-entry history) is followed by 8 knight plies that make a threefold: it is detected, and nothing reads out of range. | The bound is sound; a clock larger than the history plays no part | no (guard; Debug `at()` throws out of range) |
+| 5 | `ChessGameTests.RepetitionWithOddFENClocks`: the start position with half-move clock **−8**, **−100** and **200**, each followed by `g1f3 g8f6 f3g1 f6g8` twice through `ChessGame::move`. In all three, `isDraw` is true and `ChessEngine::gameEnd` reports `repetition`. With −8 the clock is exactly 0 at the third occurrence. | No FEN clock hides a repetition (I1); the boundary comes from played moves only | yes, with a clock-based bound (the r2 or r3 rule, proven in a scratch copy) |
 | 5 | Existing `ChessGameTests` lines 164/170 (`isDraw`), `EvaluationTests` (signature updated) | | guards |
 | 6 | `MinMaxSearchTests.OrderingDoesNotChangeTheScore`: TT cut-offs off, `IterativeDeepening` to depth 4 on Kiwipete and two middlegames, with `sortMoves` on (MVV/LVA + hash move, + killers after step 7) and off. Same score at every depth. | Ordering stays value-neutral. The node saving is proven by the bench gate, not by a unit test. | no (guard) |
+| 6 | `MinMaxSearchTests.UnsortedSearchKeepsBestVariationFirst`: `IterativeDeepening` with `sortMoves = false`, TT cut-offs off, to depth 4 on the `OrderedMove` FEN. Per-depth node counts are recorded before step 6 and asserted equal after it, so `bv` is still tried first in unsorted mode. | The unsorted baseline is unchanged, populated `bv` included | yes, if the `bv`-first pass were tied to `sortMoves` (proven in a scratch copy) |
 | 6 | `MinMaxSearchTests.BogusHashMoveIsIgnored`: store, under the root hash, an entry whose `bestMove` is illegal in the root position. Search depth 3 with TT cut-offs off. The PV's first move is legal, and the score equals a fresh-table search. | Validation against the list | not before step 6, where nothing reads the move. Proven red by deleting the validation in a scratch copy, then restored. |
 | 6, 7 | `SearchChessTests.OrderedMove` / `ChessTree`: the sorted node counts are updated (the score, 50 / 0, unchanged). The unsorted counts (341,658 / 142,400) are **unchanged**. | `sortMoves=false` is still the plain baseline | n/a (recorded) |
 | 7 | `MinMaxSearchTests.KillerIsAQuietMove`: after a search, killers hold only non-captures and non-promotions, at most 2 per ply, distinct. | Killer bookkeeping | yes |
 | 8 | `MinMaxSearchTests.QuiescenceReturnsTheBestCapture`, `QuiescenceNeverBelowStandPat`, `MateCarriesDistance`, `PrefersShorterMate` unchanged. New `DeltaPruningKeepsAWinningCapture`: a position where a queen capture lifts the score above alpha keeps it. `DeltaPruningSkipsHopelessCapture`: a pawn capture far below alpha visits fewer quiescence nodes, same result. `DeltaPruningKeepsAMatingCapture`: the side to move is far behind (alpha well above stand-pat + pawn + 200), and a pawn capture mates (the implementer builds the FEN and confirms the mate with Stockfish). Quiescence at `maxDepth = 0` returns the mate score `MAT_VALUE − 1`, with that capture as the PV. | No regression of the ENGINE-1/2 fixes; a mating capture is never pruned | the last two are red (the last with the check exemption deleted in a scratch copy) |
-| 9 | `SEETests`: PxN, knight undefended = **+320**; PxN, knight defended by a pawn = **+220** (320 − 100); QxP defended by a pawn = −800; an x-ray rook battery on a file; an en-passant capture = +100; **an en-passant exchange where removing the captured pawn opens a line onto the exchange square**: the removed pawn was the only blocker between an enemy rook or bishop and the target, so SEE must count that slider's recapture (expected value < +100; the implementer builds the FEN and states the value). It fails if SEE leaves the captured pawn in its occupancy; a king capturing an undefended piece = its value. **King recapture refused:** a piece captured on a square the capturer's side still attacks after the exchange, where the only defender is the king → the king does not recapture, and the value is the full piece. **Pins ignored:** a capture defended only by a pinned piece is scored as defended, the documented approximation. | SEE values and the two exchange rules | yes |
+| 9 | `SEETests`: PxN, knight undefended = **+320**; PxN, knight defended by a pawn = **+220** (320 − 100); QxP defended by a pawn = −800; an x-ray rook battery on a file; an en-passant capture = +100; **an en-passant exchange where removing the captured pawn opens a line onto the exchange square**: the removed pawn was the only blocker between an enemy rook or bishop and the target, so SEE must count that slider's recapture (expected value < +100; the implementer builds the FEN and states the value). It fails if SEE leaves the captured pawn in its occupancy; a king capturing an undefended piece = its value. **Recapture-promotion:** a white piece takes a black rook on d1, and a black pawn on e2 recaptures `exd1=Q`. SEE must count the recapture's promotion gain and value the d1 piece as a queen in any further exchange. The implementer builds the FEN, states the expected value with its arithmetic in the test comment, and adds a second fixture where the first capture is itself a promotion capture; **King recapture refused:** a piece captured on a square the capturer's side still attacks after the exchange, where the only defender is the king → the king does not recapture, and the value is the full piece. **Pins ignored:** a capture defended only by a pinned piece is scored as defended, the documented approximation. | SEE values and the two exchange rules | yes |
 | 9 | `MinMaxSearchTests.PruningKeepsPinnedMate`: `kr5R/1p6/1QBN4/8/8/8/8/7K w - - 0 1`, delta and SEE pruning both on, `alphabeta` at `maxDepth = 0` (quiescence only) and at depth 1. Both return `MAT_VALUE − 1`, with `Qb6xb7` as the PV. A unit check that `see(Qxb7) < 0` shows that the exemption, not SEE, keeps it. | The shared check exemption covers SEE | yes, with the exemption deleted in a scratch copy |
 | every step that adds GoogleTests | `EngineGoogleTests.registersAllCases` (`EngineGoogleTests.swift:30`, today `>= 166`) is raised to the new total in the same commit. | New cases cannot silently fail to register | n/a (floor) |
 | all | Changed best-move tests: the ENGINE-1 rule (Stockfish depth 20, within 30 cp and not worse than the old line), documented in the commit. Stop only if a test's purpose fails. | | |
