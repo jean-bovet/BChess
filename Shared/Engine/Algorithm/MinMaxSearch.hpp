@@ -74,9 +74,10 @@ public:
     
 #ifdef BCHESS_TEST_HOOKS
     // Quiescence from the position as the search calls it at the horizon, with a window chosen by the test
-    int quiescenceForTest(ChessBoard node, int alpha, int beta, int color, MinMaxVariation &pv) {
+    // and, when it matters, the ply it starts at
+    int quiescenceForTest(ChessBoard node, int alpha, int beta, int color, MinMaxVariation &pv, int ply = 0) {
         Variation cv;
-        return quiescence(node, 0, alpha, beta, color, pv, cv);
+        return quiescence(node, ply, alpha, beta, color, pv, cv);
     }
     
     // Called in the move loop right after the move has been pushed on the history. Tests use it to
@@ -120,10 +121,12 @@ public:
     
     // pv: Principal Variation that will be available when this method returns.
     // bv: Best Variation that is provided from an earlier search (typically by the iterative deepening algorithm).
-    int alphabeta(ChessBoard node, const HistoryPtr &history, TranspositionTable &table, int depth, bool maximizingPlayer, Variation &pv, const Variation &bv) {
+    // ply: the ply the root is at, 0 in every caller but the tests that put it at the boundary of MAX_PLY. The
+    // search itself goes config.maxDepth plies deep from the root, wherever it starts.
+    int alphabeta(ChessBoard node, const HistoryPtr &history, TranspositionTable &table, int ply, bool maximizingPlayer, Variation &pv, const Variation &bv) {
         Variation currentLine;
         int color = maximizingPlayer ? 1 : -1;
-        int score = alphabeta(node, history, table, depth, -INT_MAX, INT_MAX, color, pv, currentLine, bv);
+        int score = alphabeta(node, history, table, ply, config.maxDepth, -INT_MAX, INT_MAX, color, pv, currentLine, bv);
         return score * color;
     }
     
@@ -212,16 +215,22 @@ private:
         return INVALID_MOVE;
     }
     
+    // ply: plies from the root. depthLeft: plies still to search below this node, the horizon being 0.
     // pv: Principal Variation - the best line found so far.
     // cv: Current Variation - the current line being examined.
     // bv: Best Variation - if available
     // https://en.wikipedia.org/wiki/Negamax
     // https://chessprogramming.wikispaces.com/Principal+variation
-    int alphabeta(ChessBoard node, const HistoryPtr &history, TranspositionTable &table, int depth, int alpha, int beta, int color, Variation &pv, Variation &cv, const Variation &bv) {
-        pv.depth = depth;
-        maxPly = std::max<int64_t>(maxPly, depth);
+    int alphabeta(ChessBoard node, const HistoryPtr &history, TranspositionTable &table, int ply, int depthLeft, int alpha, int beta, int color, Variation &pv, Variation &cv, const Variation &bv) {
+        pv.depth = ply;
+        maxPly = std::max<int64_t>(maxPly, ply);
 
-        int evalDepth = config.maxDepth - depth;
+        // The line cannot get any longer: the killers and the move list are sized for MAX_PLY
+        if (ply >= MAX_PLY) {
+            return mateAtPly(ChessEvaluater::evaluate(node) * color, ply);
+        }
+        
+        int evalDepth = depthLeft;
         
         // Check if we have the same node already in our transposition table.
         if (config.transpositionTable &&
@@ -234,7 +243,7 @@ private:
             
             // Make sure the entry exists and that its depth is at least what we are at right now
             int value = 0;
-            if (entry.depth >= evalDepth && ttCutoff(entry, depth, alpha, beta, value)) {
+            if (entry.depth >= evalDepth && ttCutoff(entry, ply, alpha, beta, value)) {
                 assert(ChessMoveGenerator::isValid(entry.bestMove));
                 pv.push(value, entry.bestMove, emptyLine);
                 return value;
@@ -247,34 +256,32 @@ private:
             return 0;
         }
 
-        if (depth == config.maxDepth) {
+        if (depthLeft <= 0) {
             if (config.quiescenceSearch) {
-                int score = quiescence(node, depth, alpha, beta, color, pv, cv);
+                int score = quiescence(node, ply, alpha, beta, color, pv, cv);
                 return score;
             } else {
-                int score = mateAtPly(ChessEvaluater::evaluate(node) * color, depth);
+                int score = mateAtPly(ChessEvaluater::evaluate(node) * color, ply);
                 return score;
             }
         }
         
         auto moves = ChessMoveGenerator::generateMoves(node);
         if (moves.count == 0) {
-            int score = mateAtPly(ChessEvaluater::evaluate(node, moves) * color, depth);
+            int score = mateAtPly(ChessEvaluater::evaluate(node, moves) * color, ply);
             return score;
         }
         
         if (config.sortMoves) {
             ChessMoveGenerator::sortMoves(moves);
-            if (depth < MAX_PLY) {
-                promoteKillers(moves, depth);
-            }
+            promoteKillers(moves, ply);
         }
         
         // The move to try first. The previous iteration's best variation comes first, whatever sortMoves says.
         // Without one, the table's best move for this position, which every search stores whether or not the
         // table cuts off. sortMoves = false leaves the table out. A move the position does not have (a collision
         // or an old entry) is not in the list and so is never played.
-        auto bestMovePV = bv.moves.lookup(depth);
+        auto bestMovePV = bv.moves.lookup(ply);
         Move firstMove = bestMovePV;
         if (!ChessMoveGenerator::isValid(firstMove) && config.sortMoves) {
             firstMove = tableMove(table, node);
@@ -308,7 +315,7 @@ private:
             
             Variation line;
             const Variation &bestLine = (move == bestMovePV) ? bv : emptyLine;
-            int score = -alphabeta(newNode, history, table, depth + 1, -beta, -alpha, -color, line, cv, bestLine);
+            int score = -alphabeta(newNode, history, table, ply + 1, depthLeft - 1, -beta, -alpha, -color, line, cv, bestLine);
             
             cv.moves.pop();
             history->pop_back();
@@ -327,7 +334,7 @@ private:
                 if (config.alphaBetaPrunning && beta <= alpha) {
                     entryType = TranspositionEntryType::BETA;
                     if (config.sortMoves) {
-                        recordKiller(depth, move);
+                        recordKiller(ply, move);
                     }
                     break; // Beta cut-off
                 }
@@ -339,7 +346,7 @@ private:
         // A loop that was cut short holds a partial value, which must not be trusted by a later search
         // of the same position. Its parents are cut short too, so they store nothing either.
         if (ChessMoveGenerator::isValid(bestMove) && !stopped()) {
-            table.store(evalDepth, node.getHash(), ttValueToStore(bestValue, depth), bestMove, entryType
+            table.store(evalDepth, node.getHash(), ttValueToStore(bestValue, ply), bestMove, entryType
 #ifdef ASSERT_TT_KEY_COLLISION
                         , FFEN::getFEN(node, true)
 #endif
@@ -364,7 +371,9 @@ private:
         maxPly = std::max<int64_t>(maxPly, depth);
         
         auto stand_pat = mateAtPly(ChessEvaluater::evaluate(node) * color, depth);
-        if (stand_pat >= beta) {
+        
+        // The line cannot get any longer, as in alphabeta
+        if (depth >= MAX_PLY || stand_pat >= beta) {
             return stand_pat;
         }
         

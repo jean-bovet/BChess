@@ -54,6 +54,42 @@ TEST_F(MinMaxSearchTests, SortingDoesNotChangeTheScore) {
     }
 }
 
+// At MAX_PLY the search returns the static evaluation before visiting a move, and one ply earlier it still
+// searches. The starting-ply argument of the public overload puts the root at the boundary.
+TEST_F(MinMaxSearchTests, PlyGuardStopsAtMaxPly) {
+    auto fen = "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1"; // Kiwipete
+    ChessBoard board;
+    ASSERT_TRUE(FFEN::setFEN(fen, board));
+    
+    for (int ply : {MinMaxSearch::MAX_PLY, MinMaxSearch::MAX_PLY - 1}) {
+        MinMaxSearch search;
+        search.config.maxDepth = 3;
+        TranspositionTable table;
+        MinMaxSearch::Variation pv, bv;
+        int score = search.alphabeta(board, NEW_HISTORY, table, ply, true, pv, bv);
+        if (ply == MinMaxSearch::MAX_PLY) {
+            ASSERT_EQ(0, search.visitedNodes);
+            ASSERT_EQ(ChessEvaluater::evaluate(board), score);
+        } else {
+            ASSERT_GT(search.visitedNodes, 0);
+        }
+    }
+    
+#ifdef BCHESS_TEST_HOOKS
+    // Quiescence at MAX_PLY: Kiwipete has captures, none is visited
+    MinMaxSearch search;
+    MinMaxSearch::Variation pv;
+    int score = search.quiescenceForTest(board, -INT_MAX, INT_MAX, 1, pv, MinMaxSearch::MAX_PLY);
+    ASSERT_EQ(0, search.visitedNodes);
+    ASSERT_EQ(ChessEvaluater::evaluate(board), score);
+    
+    MinMaxSearch earlier;
+    MinMaxSearch::Variation pv2;
+    earlier.quiescenceForTest(board, -INT_MAX, INT_MAX, 1, pv2, MinMaxSearch::MAX_PLY - 1);
+    ASSERT_GT(earlier.visitedNodes, 0);
+#endif
+}
+
 // Qxd7 wins a rook for free. Qxc5 (sorted last) loses the queen to bxc5, so the last capture must not
 // become the result, and the best one must not be replaced by the stand-pat either.
 TEST_F(MinMaxSearchTests, QuiescenceReturnsTheBestCapture) {
