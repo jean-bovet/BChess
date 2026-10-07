@@ -39,6 +39,16 @@ struct Variations {
     }
     var selectedVariationIndex = 0
     var variations = [FEngineMoveNode]()
+
+    /// The moves on offer for the picker, the main line first.
+    var choices: [Variation] {
+        variations.enumerated().map { index, node in
+            Variation(index: index,
+                      from: Position(rank: Int(node.fromRank), file: Int(node.fromFile)),
+                      to: Position(rank: Int(node.toRank), file: Int(node.toFile)),
+                      label: GameText.moveLabel(number: Int(node.moveNumber), isWhite: node.whiteMove, san: node.name))
+        }
+    }
 }
 
 extension GamePlayer {
@@ -247,9 +257,10 @@ final class GameSession {
 
     // MARK: Funnels
 
-    /// Drops every pending search, the computer's and the analysis.
+    /// Drops every pending search, the computer's and the analysis, and the promotion that waits for a piece.
     private func stopSearches() {
         positionID += 1
+        pending = nil
         isThinking = false
         isAnalyzing = false
         engine.cancel()
@@ -422,6 +433,35 @@ final class GameSession {
 
     /// A move made by a human, from the board or the promotion sheet. The engine replies, if it plays
     /// the side to move, once the move animation has completed.
+    /// A promotion that waits for the player's choice of piece, and the position it was started on.
+    private var pending: (promotion: Promotion, positionID: Int)?
+
+    /// The promotion to choose a piece for, nil once the position has changed since it started.
+    var pendingPromotion: Promotion? {
+        guard let pending, pending.positionID == positionID else {
+            return nil
+        }
+        return pending.promotion
+    }
+
+    /// Starts a promotion: the move is played only when a piece is chosen, and only on this position.
+    func beginPromotion(_ move: FEngineMove) {
+        pending = (Promotion(move: move, isWhite: isWhiteToMove), positionID)
+    }
+
+    func choosePromotion(_ pieceName: String) {
+        guard let promotion = pendingPromotion else {
+            return
+        }
+        pending = nil
+        promotion.move.setPromotionPiece(pieceName)
+        playHuman(promotion.move)
+    }
+
+    func cancelPromotion() {
+        pending = nil
+    }
+
     func playHuman(_ move: FEngineMove) {
         perform(animated: {
             self.play(rawMove: move.rawMoveValue, lastMove: move)

@@ -13,6 +13,7 @@ struct LastMoveModifier: ViewModifier {
     let rank: Int
     let file: Int
     let session: GameSession
+    @AppStorage(AppSettings.highlightLastMoveKey) private var highlightLastMove = AppSettings.highlightLastMoveDefault
     
     func moveColor() -> Color {
         if session.mode.value == .train {
@@ -37,7 +38,8 @@ struct LastMoveModifier: ViewModifier {
     func body(content: Content) -> some View {
         return content
             .overlay {
-                if isLastMoveSquare(rank, file) {
+                if AppSettings.showsLastMoveTint(mode: session.mode.value, highlightLastMove: highlightLastMove),
+                   isLastMoveSquare(rank, file) {
                     moveColor()
                 }
             }

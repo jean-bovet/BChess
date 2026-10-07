@@ -15,13 +15,14 @@ struct SelectionModifier: ViewModifier {
     let rank: Int
     let file: Int
     let selection: Selection
+    @AppStorage(AppSettings.showLegalMovesKey) private var showLegalMoves = AppSettings.showLegalMovesDefault
 
     func body(content: Content) -> some View {
         content
             .overlay {
                 if selection.selected(rank: rank, file: file) {
                     Walnut.lastMove
-                } else if let move = selection.possibleMove(rank, file) {
+                } else if showLegalMoves, let move = selection.possibleMove(rank, file) {
                     GeometryReader { geometry in
                         let side = min(geometry.size.width, geometry.size.height)
                         Group {

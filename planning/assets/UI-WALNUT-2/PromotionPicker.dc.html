@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Promotion picker</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0}
+a{color:#8A4B22}a:hover{color:#5E3215}
+</style>
+</helmet>
+<div style="width: 390px; height: 560px; box-sizing: border-box; background: #F4F1EC; color: #2A211B; font-family: -apple-system, 'SF Pro Text', 'Helvetica Neue', sans-serif; display: flex; flex-direction: column; gap: 12px; padding: 16px">
+  <div style="display: flex; align-items: baseline; justify-content: space-between; padding: 0 2px">
+    <span style="font-family: 'New York', 'Iowan Old Style', 'Palatino', serif; font-size: 18px; font-weight: 600">You</span>
+    <span style="font-size: 13px; color: #8A4B22; font-weight: 600">Choose a piece</span>
+  </div>
+
+  <div style="position: relative; width: 358px; height: 358px; box-sizing: border-box; padding: 14px; background: #4A3222; border-radius: 10px; box-shadow: 0 10px 24px rgba(42,33,27,0.25)">
+    <div style="position: relative; width: 330px; height: 330px; display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); border-radius: 2px; overflow: hidden">
+      <sc-for list="{{squares}}" as="sq" hint-placeholder-count="64">
+        <div style="position: relative; background: {{sq.bg}}">
+          <sc-if value="{{sq.has}}" hint-placeholder-val="{{ false }}">
+            <img src="{{sq.img}}" alt="" style="position: absolute; inset: 0; width: 100%; height: 100%">
+          </sc-if>
+        </div>
+      </sc-for>
+      <div style="position: absolute; inset: 0; background: rgba(42,33,27,0.45)"></div>
+      <div role="listbox" aria-label="Promote to" style="position: absolute; left: 247.5px; top: 0; width: 41.25px; display: flex; flex-direction: column; background: #FBF8F3; border-radius: 0 0 8px 8px; box-shadow: 0 8px 20px rgba(0,0,0,0.35)">
+        <sc-for list="{{choices}}" as="c" hint-placeholder-count="4">
+          <button aria-label="{{c.label}}" style="width: 41.25px; height: 41.25px; border: 0; padding: 0; background: {{c.bg}}; display: flex; align-items: center; justify-content: center">
+            <img src="{{c.img}}" alt="" style="width: 38px; height: 38px">
+          </button>
+        </sc-for>
+        <button aria-label="Cancel" style="width: 41.25px; height: 30px; border: 0; padding: 0; background: transparent; color: #6E6056; display: flex; align-items: center; justify-content: center">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"></path></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div style="font-size: 13px; color: #6E6056; padding: 0 2px">Tap a piece, or tap outside to cancel. Queen comes first.</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":560}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const PIECES = {K:'/_blob/ccb885a37c2ef0fc6634b9b8da792411',Q:'/_blob/d5aac2d1c7dea93288fb3eb835fcafe9',R:'/_blob/5a5003a3c09f056b62ca99020ad9d16e',B:'/_blob/9b72916cab7b4674f4f8ce2ac5380ee9',N:'/_blob/117899e9e882a6171fb6ef905e08f710',P:'/_blob/40c7a18597b66234d0357d0f148c11c2',k:'/_blob/b9ff6ec344378fb226567af83cbe30ad',q:'/_blob/015d6c9ce5ce3e8b51d77b4c9c9c7010',r:'/_blob/2c06870ffd470a04373fa4c1e1e29160',b:'/_blob/9aa6dd1591bbdaa8b9e1787db1db01bd',n:'/_blob/3fb4e2a85a0d9a274bcec0c809c4db8d',p:'/_blob/fbd1185e69a8fd531fd6f55fc3248515'};
+    const FEN = '1k6/6P1/8/8/3p4/8/5K2/8';
+    const squares = [];
+    FEN.split('/').forEach((row, ri) => {
+      const rank = 8 - ri, cells = [];
+      for (const ch of row) { if (/\d/.test(ch)) { for (let i = 0; i < +ch; i++) cells.push(null); } else cells.push(ch); }
+      cells.forEach((ch, fi) => squares.push({ bg: (fi + rank) % 2 === 0 ? '#ECD9B6' : '#B07E52', has: !!ch && !(rank === 7 && fi === 6), img: ch ? PIECES[ch] : '' }));
+    });
+    const choices = [['Queen', 'Q'], ['Rook', 'R'], ['Bishop', 'B'], ['Knight', 'N']].map(([label, k], i) => ({ label, img: PIECES[k], bg: i === 0 ? '#F2DFB8' : 'transparent' }));
+    return { squares, choices };
+  }
+}
+</script>
+</body>
+</html>

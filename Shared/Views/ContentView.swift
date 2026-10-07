@@ -65,6 +65,7 @@ struct ContentView: View {
             PlayerRow(session: session, isWhite: topIsWhite)
             board
             PlayerRow(session: session, isWhite: !topIsWhite)
+            VariationCards(session: session)
         }
     }
 

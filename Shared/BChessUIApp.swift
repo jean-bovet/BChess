@@ -31,16 +31,19 @@ struct BChessUIApp: App {
         #if os(macOS)
         DocumentGroup(newDocument: ChessDocument()) { file in
             DocumentWindow(document: file.$document, isNew: file.fileURL == nil)
+                .appTheme()
         }
         .commands {
             GameCommands()
         }
         Settings {
             SettingsView()
+                .appTheme()
         }
         #else
         WindowGroup {
             GameRootView(library: library)
+                .appTheme()
         }
         #endif
     }

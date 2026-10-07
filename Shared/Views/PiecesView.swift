@@ -8,23 +8,15 @@
 
 import SwiftUI
 
-struct Promotion {
-    let move: FEngineMove
-    let isWhite: Bool
-}
-
 struct PiecesView: View {
     
     let session: GameSession
     
-    @State private var isPromotionViewShown = false
-    @State private var promotion = Promotion(move: FEngineMove(), isWhite: true)
 
     func processTap(_ rank: Int, _ file: Int) {
         if let move = session.selection.possibleMove(rank, file) {
             if move.isPromotion {
-                promotion = Promotion(move: move, isWhite: session.isWhiteToMove)
-                isPromotionViewShown.toggle()
+                session.beginPromotion(move)
             } else {
                 session.playHuman(move)
             }
@@ -49,11 +41,6 @@ struct PiecesView: View {
         "square-\(["a", "b", "c", "d", "e", "f", "g", "h"][position.file])\(position.rank + 1)"
     }
     
-    func applyPromotion(pieceName: String) {
-        promotion.move.setPromotionPiece(pieceName)
-        session.playHuman(promotion.move)
-    }
-        
     var body: some View {
         GeometryReader { geometry in
             let minSize: CGFloat = min(geometry.size.width, geometry.size.height)
@@ -83,10 +70,25 @@ struct PiecesView: View {
             // the engine when the game is first shown
             session.startIfNeeded()
         }
-        .sheet(isPresented: $isPromotionViewShown) {
-            PromotionView(promotion: $promotion, callback: { name in
-                self.applyPromotion(pieceName: name)
-            })
+        .overlay {
+            if let pending = session.pendingPromotion {
+                GeometryReader { geometry in
+                    let side = min(geometry.size.width, geometry.size.height)
+                    let rotated = session.gameState.rotated
+                    PromotionView(promotion: pending,
+                                  squareSize: side / CGFloat(numberOfSquares),
+                                  screenFile: Promotion.screenFile(file: Int(pending.move.toFile), rotated: rotated),
+                                  screenRow: Promotion.screenRow(rank: Int(pending.move.toRank), rotated: rotated)) { name in
+                        if let name {
+                            session.choosePromotion(name)
+                        } else {
+                            session.cancelPromotion()
+                        }
+                    }
+                    .frame(width: side, height: side)
+                    .position(x: geometry.size.width / 2, y: geometry.size.height / 2)
+                }
+            }
         }
     }
 }

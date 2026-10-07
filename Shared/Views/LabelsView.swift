@@ -12,6 +12,7 @@ import SwiftUI
 /// it expects the frame to be `Walnut.frameFraction` of that square on every side.
 struct LabelsView: View {
     let session: GameSession
+    @AppStorage(AppSettings.showCoordinatesKey) private var showCoordinates = AppSettings.showCoordinatesDefault
 
     func actualIndex(_ index: Int) -> Int {
         if session.gameState.rotated {
@@ -22,6 +23,12 @@ struct LabelsView: View {
     }
     
     var body: some View {
+        if showCoordinates {
+            labels
+        }
+    }
+
+    private var labels: some View {
         GeometryReader { geometry in
             let side: CGFloat = min(geometry.size.width, geometry.size.height)
             let xOffset: CGFloat = (geometry.size.width - side) / 2

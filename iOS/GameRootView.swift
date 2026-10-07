@@ -78,6 +78,8 @@ private struct GameView: View {
     @Environment(\.scenePhase) private var scenePhase
     @AppStorage("showEngine") private var showEngine = false
     @State private var showGames = false
+    @State private var showSettings = false
+    @State private var newGameAfterGames = false
     @State private var playersSheet: PlayersSheet?
     @State private var pending: PendingSwitch?
     @State private var actionError: String?
@@ -137,8 +139,29 @@ private struct GameView: View {
                 attempt(.create(white, black))
             })
         }
-        .sheet(isPresented: $showGames) {
-            GamesList(shell: shell, attempt: attempt, actionError: $actionError)
+        .sheet(isPresented: $showSettings) {
+            NavigationStack {
+                SettingsView()
+                    .navigationTitle("Settings")
+                    .navigationBarTitleDisplayMode(.inline)
+                    .toolbar {
+                        ToolbarItem(placement: .confirmationAction) {
+                            Button("Done") { showSettings = false }
+                        }
+                    }
+            }
+        }
+        .sheet(isPresented: $showGames, onDismiss: {
+            // A sheet cannot open while another is closing: the New Game button waits for this
+            if newGameAfterGames {
+                newGameAfterGames = false
+                playersSheet = .newGame
+            }
+        }) {
+            GamesList(shell: shell, attempt: attempt, onNewGame: {
+                newGameAfterGames = true
+                showGames = false
+            }, actionError: $actionError)
         }
         .alert("Couldn't save this game", isPresented: Binding(get: { shell.saveError != nil }, set: { if !$0 { shell.dismissSaveError() } })) {
             Button("Retry") { shell.save() }
@@ -173,6 +196,7 @@ private struct GameView: View {
                       preview: SharePreview(shell.current.title)) {
                 Label("Share Game", systemImage: "square.and.arrow.up")
             }
+            Button("Settings", systemImage: "gearshape") { showSettings = true }
             Divider()
             Button("Copy Position", systemImage: "doc.on.doc") { Pasteboard.set(shell.session.fen) }
             Button("Copy Game", systemImage: "doc.on.doc") { Pasteboard.set(shell.session.pgnCurrentGame) }
@@ -215,52 +239,129 @@ private struct GameView: View {
 private struct GamesList: View {
     let shell: GameShell
     let attempt: (PendingSwitch) -> Void
+    let onNewGame: () -> Void
     @Binding var actionError: String?
 
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.scenePhase) private var scenePhase
     @State private var showImporter = false
+    /// The day the groups are relative to; refreshed when the day changes and when the app returns.
+    @State private var now = Date()
+
+    private func delete(_ files: [GameFile]) {
+        for file in files {
+            do {
+                try shell.delete(file)
+            } catch {
+                actionError = "Couldn't delete this game. \(error.localizedDescription)"
+            }
+        }
+    }
+
+    /// The time for a game of the last two days, the date for an older one.
+    private func when(_ file: GameFile, in group: GameSection.Group) -> Text {
+        group == .earlier ? Text(file.modified, format: .dateTime.month(.abbreviated).day().year())
+                          : Text(file.modified, format: .dateTime.hour().minute())
+    }
+
+    private func row(_ file: GameFile, in group: GameSection.Group) -> some View {
+        let isOpen = file.url == shell.current.url
+        return Button {
+            attempt(.open(file))
+        } label: {
+            HStack(spacing: 12) {
+                Image("knight_b")
+                    .resizable()
+                    .scaledToFit()
+                    .padding(4)
+                    .frame(width: 36, height: 36)
+                    .background(Walnut.pillBackground, in: RoundedRectangle(cornerRadius: 9))
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(file.title)
+                        .font(.system(.callout, design: .serif, weight: .semibold))
+                        .foregroundStyle(Walnut.textPrimary)
+                        .lineLimit(1)
+                    when(file, in: group)
+                        .font(.caption)
+                        .foregroundStyle(Walnut.textSecondary)
+                }
+                Spacer(minLength: 0)
+                if isOpen {
+                    Text("OPEN")
+                        .font(.caption2.weight(.bold))
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 3)
+                        .foregroundStyle(Walnut.scoreChipText)
+                        .background(Walnut.scoreChip, in: RoundedRectangle(cornerRadius: 6))
+                }
+            }
+        }
+        .listRowBackground(Walnut.card)
+    }
 
     var body: some View {
         NavigationStack {
             List {
-                ForEach(shell.library.games) { file in
-                    Button {
-                        attempt(.open(file))
-                    } label: {
-                        HStack {
-                            VStack(alignment: .leading) {
-                                Text(file.title)
-                                Text(file.modified, style: .date)
-                                    .font(.caption)
-                                    .foregroundStyle(.secondary)
-                            }
-                            Spacer()
-                            if file.url == shell.current.url {
-                                Image(systemName: "checkmark")
-                            }
+                ForEach(GameSection.sections(of: shell.library.games, now: now, calendar: .current)) { section in
+                    Section {
+                        ForEach(section.games) { file in
+                            row(file, in: section.group)
                         }
-                    }
-                    .foregroundStyle(.primary)
-                }
-                .onDelete { offsets in
-                    let files = offsets.map { shell.library.games[$0] }
-                    for file in files {
-                        do {
-                            try shell.delete(file)
-                        } catch {
-                            actionError = "Couldn't delete this game. \(error.localizedDescription)"
+                        .onDelete { offsets in
+                            delete(offsets.map { section.games[$0] })
                         }
+                    } header: {
+                        Text(section.group.title)
+                            .font(.caption.weight(.semibold))
+                            .foregroundStyle(Walnut.textSecondary)
                     }
                 }
             }
+            .scrollContentBackground(.hidden)
+            .background(Walnut.background.ignoresSafeArea())
+            .onReceive(NotificationCenter.default.publisher(for: .NSCalendarDayChanged)) { _ in
+                now = Date()
+            }
+            .onChange(of: scenePhase) { _, phase in
+                if phase == .active {
+                    now = Date()
+                }
+            }
+            .safeAreaInset(edge: .bottom) {
+                VStack(spacing: 8) {
+                    Text("Swipe left on a game to delete it.")
+                        .font(.caption)
+                        .foregroundStyle(Walnut.textSecondary)
+                    Button(action: onNewGame) {
+                        Label("New Game", systemImage: "plus")
+                            .font(.headline)
+                            .frame(maxWidth: .infinity)
+                            .frame(height: 52)
+                            .foregroundStyle(Walnut.scoreChipText)
+                            .background(Walnut.scoreChip, in: RoundedRectangle(cornerRadius: 14))
+                    }
+                    .accessibilityIdentifier("games-new-game")
+                }
+                .padding(.horizontal, 16)
+                .padding(.bottom, 8)
+                .padding(.top, 8)
+                .background(Walnut.background)
+            }
             .navigationTitle("Games")
             .navigationBarTitleDisplayMode(.inline)
+            .toolbarBackground(Walnut.background, for: .navigationBar)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
                     Button("Import") { showImporter = true }
                 }
+                ToolbarItem(placement: .principal) {
+                    Text("Games")
+                        .font(.system(.headline, design: .serif, weight: .semibold))
+                        .foregroundStyle(Walnut.textPrimary)
+                }
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button("Done") { dismiss() }
+                        .fontWeight(.semibold)
                 }
             }
             .fileImporter(isPresented: $showImporter, allowedContentTypes: [.bchessGame, .json, .pgn]) { result in
@@ -272,6 +373,35 @@ private struct GamesList: View {
                 }
             }
         }
+    }
+}
+
+/// A library of a few games from different days, for the previews.
+@MainActor
+private func previewShell() -> GameShell? {
+    let directory = FileManager.default.temporaryDirectory.appendingPathComponent("Preview-\(UUID().uuidString)", isDirectory: true)
+    try? FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+    let library = GameLibrary(directory: directory)
+    for (name, daysAgo) in [("You vs Computer", 0), ("Ruy Lopez practice", 0), ("Anna vs Jean", 1), ("Imported game", 9)] {
+        if let file = try? library.create(GameState(pgn: "*"), baseName: name) {
+            let date = Date().addingTimeInterval(-Double(daysAgo) * 86_400 - 600)
+            try? FileManager.default.setAttributes([.modificationDate: date], ofItemAtPath: file.url.path)
+        }
+    }
+    library.reload()
+    return try? GameShell(library: library)
+}
+
+#Preview("Games") {
+    if let shell = previewShell() {
+        GamesList(shell: shell, attempt: { _ in }, onNewGame: {}, actionError: .constant(nil))
+    }
+}
+
+#Preview("Games, dark") {
+    if let shell = previewShell() {
+        GamesList(shell: shell, attempt: { _ in }, onNewGame: {}, actionError: .constant(nil))
+            .preferredColorScheme(.dark)
     }
 }
 

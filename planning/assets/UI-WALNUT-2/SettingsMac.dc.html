@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Settings on Mac</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0}
+a{color:#8A4B22}a:hover{color:#5E3215}
+</style>
+</helmet>
+<div style="width: 520px; height: 400px; box-sizing: border-box; background: #F4F1EC; border: 1px solid #DDD3C6; border-radius: 12px; font-family: -apple-system, 'SF Pro Text', 'Helvetica Neue', sans-serif; color: #2A211B; display: flex; flex-direction: column; overflow: hidden">
+  <div style="height: 38px; display: flex; align-items: center; justify-content: center; background: #EAE4DB; border-bottom: 1px solid #DDD3C6; font-size: 13px; font-weight: 600">Settings</div>
+  <div style="flex-grow: 1; display: flex; flex-direction: column; gap: 14px; padding: 18px 22px">
+    <sc-for list="{{sections}}" as="s" hint-placeholder-count="3">
+      <section style="display: flex; flex-direction: column; gap: 6px">
+        <span style="font-family: 'New York', 'Iowan Old Style', 'Palatino', serif; font-size: 14px; font-weight: 600">{{s.title}}</span>
+        <div style="display: flex; flex-direction: column; background: #FFFFFF; border: 1px solid #E4DCD1; border-radius: 10px">
+          <sc-for list="{{s.rows}}" as="r" hint-placeholder-count="2">
+            <label style="display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 8px 12px; border-top: {{r.divider}}; font-size: 13px">
+              <span style="display: flex; flex-direction: column; gap: 1px">
+                <span>{{r.label}}</span>
+                <span style="font-size: 11px; color: #6E6056">{{r.hint}}</span>
+              </span>
+              <sc-if value="{{r.isToggle}}" hint-placeholder-val="{{ true }}">
+                <span role="switch" aria-checked="{{r.on}}" style="width: 32px; height: 18px; border-radius: 9px; background: {{r.track}}; position: relative; flex-shrink: 0">
+                  <span style="position: absolute; top: 2px; left: {{r.knob}}px; width: 14px; height: 14px; border-radius: 7px; background: #FFFFFF; box-shadow: 0 1px 2px rgba(0,0,0,0.25)"></span>
+                </span>
+              </sc-if>
+              <sc-if value="{{r.isSegment}}" hint-placeholder-val="{{ false }}">
+                <span role="radiogroup" aria-label="Appearance" style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); padding: 2px; border-radius: 7px; background: #E9E2D8; width: 210px; flex-shrink: 0">
+                  <span aria-checked="true" style="height: 22px; border-radius: 5px; background: #FFFFFF; box-shadow: 0 1px 2px rgba(42,33,27,0.2); display: flex; align-items: center; justify-content: center; font-size: 12px">System</span>
+                  <span style="height: 22px; display: flex; align-items: center; justify-content: center; font-size: 12px; color: #6E6056">Light</span>
+                  <span style="height: 22px; display: flex; align-items: center; justify-content: center; font-size: 12px; color: #6E6056">Dark</span>
+                </span>
+              </sc-if>
+            </label>
+          </sc-for>
+        </div>
+      </section>
+    </sc-for>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":520,"height":400}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const t = (label, hint, on, first) => ({ label, hint, on: String(on), isToggle: true, isSegment: false, track: on ? '#8A4B22' : '#D5CABC', knob: on ? 16 : 2, divider: first ? '0' : '1px solid #EFE9E1' });
+    const sections = [
+      { title: 'Board', rows: [
+        t('Show coordinates', 'Files and ranks on the walnut frame', true, true),
+        t('Show legal moves', 'Dots and rings when a piece is selected', true, false),
+        t('Highlight the last move', 'Tints the two squares of the move just played', true, false)] },
+      { title: 'Engine', rows: [
+        t('Show engine statistics', 'Depth, nodes and speed under the engine card', false, true)] },
+      { title: 'Appearance', rows: [
+        { label: 'Theme', hint: 'Follow the system, or always light or dark', isToggle: false, isSegment: true, divider: '0' }] }
+    ];
+    return { sections };
+  }
+}
+</script>
+</body>
+</html>

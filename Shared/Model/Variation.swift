@@ -15,5 +15,8 @@ struct Variation: Identifiable {
     let index: Int
     let from: Position
     let to: Position
+    /// The move as the move list writes it: "2. Nf3" or "2…Nc6".
     let label: String
+
+    var isMainLine: Bool { index == 0 }
 }
