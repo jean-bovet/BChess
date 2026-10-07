@@ -9,6 +9,7 @@
 import SwiftUI
 
 enum Walnut {
+    static let accent = Color("AccentColor")
     static let background = Color("WalnutBackground")
     static let card = Color("WalnutCard")
     static let cardBorder = Color("WalnutCardBorder")

@@ -142,8 +142,6 @@ private struct GameView: View {
         .sheet(isPresented: $showSettings) {
             NavigationStack {
                 SettingsView()
-                    .navigationTitle("Settings")
-                    .navigationBarTitleDisplayMode(.inline)
                     .toolbar {
                         ToolbarItem(placement: .confirmationAction) {
                             Button("Done") { showSettings = false }

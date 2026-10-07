@@ -82,7 +82,12 @@ enum PreviewScenarios {
     // MARK: Settings
 
     static let settings = PreviewScenario(file: "SettingsView.swift", name: "Settings") {
+        #if os(iOS)
+        // The sheet on the iPhone sits in a navigation stack, which carries the title
+        AnyView(NavigationStack { SettingsView() })
+        #else
         AnyView(SettingsView())
+        #endif
     }
 
     // MARK: PlayerRow
