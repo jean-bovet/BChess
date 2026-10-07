@@ -23,20 +23,30 @@ struct NewGameView_iOS: View {
     
     var body: some View {
         NavigationStack {
-            Form {
-                Section(header: Text("White Player").bold()) {
-                    NewPlayerConfigurationView(player: $temporaryWhitePlayer)
+            ScrollView {
+                VStack(alignment: .leading, spacing: 20) {
+                    NewPlayerConfigurationView(title: "White Player", player: $temporaryWhitePlayer)
+                    NewPlayerConfigurationView(title: "Black Player", player: $temporaryBlackPlayer)
                 }
-                Section(header: Text("Black Player").bold()) {
-                    NewPlayerConfigurationView(player: $temporaryBlackPlayer)
-                }
+                .padding(16)
             }
+            .scrollDismissesKeyboard(.interactively)
+            .background(Walnut.background.ignoresSafeArea())
             .onAppear() {
                 temporaryWhitePlayer = session.gameState.white
                 temporaryBlackPlayer = session.gameState.black
             }
             .navigationTitle(editMode ? "Players & Level" : "New Game")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbarBackground(Walnut.background, for: .navigationBar)
             .toolbar {
+                ToolbarItem(placement: .principal) {
+                    Text(editMode ? "Players & Level" : "New Game")
+                        .font(.system(.headline, design: .serif, weight: .semibold))
+                        .foregroundStyle(Walnut.textPrimary)
+                        .accessibilityAddTraits(.isHeader)
+                }
+
                 ToolbarItem(placement: .navigationBarLeading) {
                     Button("Cancel") {
                         dismiss()
@@ -50,11 +60,13 @@ struct NewGameView_iOS: View {
                             session.requestEngineMoveIfNeeded()
                             dismiss()
                         }
+                        .fontWeight(.semibold)
                     } else {
                         Button("New Game") {
                             onNewGame(temporaryWhitePlayer, temporaryBlackPlayer)
                             dismiss()
                         }
+                        .fontWeight(.semibold)
                     }
                 }
             }
