@@ -43,6 +43,12 @@ public:
     // Threefold repetition: the board's own count of reversible plies bounds the scan of the history
     static bool isDraw(ChessBoard &board, const HistoryPtr &history);
 
+    // The fifty-move rule: a clock of 100 half-moves is a draw, unless the side to move is checkmated
+    static bool isFiftyMoveDraw(ChessBoard &board);
+    
+    // FIDE's dead positions, in which no sequence of legal moves can give mate (see evaluate)
+    static bool isDeadPosition(const ChessBoard &board);
+    
     // The board is not const because generateMoves, isCheck and getHash update its caches
     // The score of the position, from White's point of view. A mate or a stalemate is told by the moves. A
     // repetition is not: the search checks it once per node, before it gets here.

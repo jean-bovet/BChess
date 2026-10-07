@@ -137,3 +137,38 @@ TEST_F(EvaluationTests, MirroredPositionsScoreOpposite) {
     auto start = boardFor(fens[0]);
     ASSERT_EQ(0, ChessEvaluater::evaluate(start));
 }
+// Dead positions (FIDE): no sequence of legal moves can give mate, so they score 0 whoever is to move
+TEST_F(EvaluationTests, DeadPositionsScoreZero) {
+    const char *fens[] = {
+        "4k3/8/8/8/8/8/8/4K3",     // K v K
+        "4k3/8/8/8/8/8/8/3NK3",    // K+N v K
+        "4k3/8/8/8/8/8/8/2B1K3",   // K+B v K
+        "4k3/8/8/8/8/8/8/3nK3",    // K v K+N
+        "4kb2/8/8/8/8/8/8/2B1K3",  // c1 and f8 are both dark squares
+    };
+    for (int i = 0; i < 5; i++) {
+        for (const char *turn : {" w - - 0 1", " b - - 0 1"}) {
+            auto board = boardFor(std::string(fens[i]) + turn);
+            ASSERT_TRUE(ChessEvaluater::isDeadPosition(board)) << fens[i];
+            ASSERT_EQ(0, ChessEvaluater::evaluate(board)) << fens[i] << turn;
+        }
+    }
+}
+
+// Every other material stays what it was: it is not dead, and its score is the one before the rule existed
+TEST_F(EvaluationTests, LiveMaterialKeepsItsScore) {
+    struct Case { const char *fen; int value; };
+    const Case cases[] = {
+        {"2b1k3/8/8/8/8/8/8/2B1K3 w - - 0 1", 0},    // bishops on opposite colours: a mate is possible
+        {"4k3/8/8/8/8/8/8/1NN1K3 w - - 0 1", 570},   // K+N+N v K
+        {"4k3/6n1/8/8/8/8/8/1N2K3 w - - 0 1", -20},  // K+N v K+N
+        {"4k3/6n1/8/8/8/8/8/2B1K3 w - - 0 1", 20},   // K+B v K+N
+        {"4k3/8/8/8/8/8/4P3/4K3 w - - 0 1", 80},     // K+P v K
+        {"4kb2/8/8/8/8/8/8/2B1K2B w - - 0 1", 360},  // two bishops on both colours against one
+    };
+    for (auto &c : cases) {
+        auto board = boardFor(c.fen);
+        ASSERT_FALSE(ChessEvaluater::isDeadPosition(board)) << c.fen;
+        ASSERT_EQ(c.value, ChessEvaluater::evaluate(board)) << c.fen;
+    }
+}

@@ -90,6 +90,68 @@ TEST_F(MinMaxSearchTests, PlyGuardStopsAtMaxPly) {
 #endif
 }
 
+// K+Q v K at a clock of 99: every quiet move reaches 100, which is a draw by the fifty-move rule, and none mates
+// in one. The same position at clock 0 is a large win.
+TEST_F(MinMaxSearchTests, FiftyMoveRuleDrawsAWin) {
+    ChessBoard board;
+    ASSERT_TRUE(FFEN::setFEN("8/8/6k1/8/8/8/8/Q3K3 w - - 99 1", board));
+    MinMaxSearch search;
+    search.config.maxDepth = 2;
+    search.config.transpositionTable = false;
+    TranspositionTable table;
+    MinMaxSearch::Variation pv, bv;
+    ASSERT_EQ(0, search.alphabeta(board, NEW_HISTORY, table, 0, true, pv, bv));
+    ASSERT_GT(search.pathDraws, 0);
+    
+    ChessBoard fresh;
+    ASSERT_TRUE(FFEN::setFEN("8/8/6k1/8/8/8/8/Q3K3 w - - 0 1", fresh));
+    MinMaxSearch other;
+    other.config.maxDepth = 2;
+    other.config.transpositionTable = false;
+    TranspositionTable otherTable;
+    MinMaxSearch::Variation pv2, bv2;
+    ASSERT_GT(other.alphabeta(fresh, NEW_HISTORY, otherTable, 0, true, pv2, bv2), 500);
+    ASSERT_EQ(0, other.pathDraws);
+}
+
+// Ra8 mates on the hundredth ply: the mate is not a draw
+TEST_F(MinMaxSearchTests, MateOnTheHundredthPlyIsMate) {
+    MinMaxSearch::Variation pv;
+    ASSERT_EQ(ChessEvaluater::MAT_VALUE - 1, search("6k1/5ppp/8/8/8/8/8/R3K3 w - - 99 1", 2, true, pv));
+    ASSERT_EQ("a1a8", FPGN::to_string(pv.moves.bestMove(), FPGN::SANType::uci));
+}
+
+// The rules never draw the root: it is searched and returns a move, as a GUI that sends such a position expects
+static void expectLegalFirstMove(ChessBoard board, HistoryPtr history) {
+    IterativeDeepening deepening;
+    deepening.start();
+    auto evaluation = deepening.search(board, history, 3, nullptr);
+    ASSERT_GT(evaluation.line.count, 0);
+    auto legal = ChessMoveGenerator::generateMoves(board);
+    bool found = false;
+    for (int i = 0; i < legal.count; i++) {
+        found = found || legal.moves[i] == evaluation.line.moves[0];
+    }
+    ASSERT_TRUE(found);
+}
+
+TEST_F(MinMaxSearchTests, DrawnRootStillReturnsAMove) {
+    // (a) a clock of 100
+    ChessBoard board;
+    ASSERT_TRUE(FFEN::setFEN("8/8/6k1/8/8/8/8/Q3K3 w - - 100 1", board));
+    expectLegalFirstMove(board, NEW_HISTORY);
+    
+    // (b) a threefold repetition of the start position
+    ChessGame game;
+    for (int round = 0; round < 2; round++) {
+        for (auto m : {"g1f3", "g8f6", "f3g1", "f6g8"}) {
+            ASSERT_TRUE(game.move(m)) << m;
+        }
+    }
+    ASSERT_TRUE(ChessEvaluater::isDraw(game.board, game.history));
+    expectLegalFirstMove(game.board, game.history);
+}
+
 // Qxd7 wins a rook for free. Qxc5 (sorted last) loses the queen to bxc5, so the last capture must not
 // become the result, and the best one must not be replaced by the stand-pat either.
 TEST_F(MinMaxSearchTests, QuiescenceReturnsTheBestCapture) {

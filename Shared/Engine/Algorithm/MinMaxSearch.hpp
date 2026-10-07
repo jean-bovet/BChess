@@ -72,6 +72,11 @@ public:
     // The deepest ply visited by alphabeta or quiescence since reset()
     int64_t maxPly = 0;
     
+    // The 0s that a repetition or the fifty-move rule returned since reset(). Both belong to the path, not to the
+    // position, so a node that saw one below it must not store its value for another path to read.
+    // Insufficient material does not count: it is a property of the position.
+    int64_t pathDraws = 0;
+    
 #ifdef BCHESS_TEST_HOOKS
     // Quiescence from the position as the search calls it at the horizon, with a window chosen by the test
     // and, when it matters, the ply it starts at
@@ -88,6 +93,7 @@ public:
     void reset() {
         visitedNodes = 0;
         maxPly = 0;
+        pathDraws = 0;
     }
     
     // The two quiet moves that most recently cut a node off at each ply, newest first. A ply past MAX_PLY has
@@ -251,8 +257,10 @@ private:
         }
 
         // The only repetition check of the node: quiescence and evaluate trust it. A quiescence move is a capture,
-        // and no position after a capture can repeat an earlier one.
-        if (ChessEvaluater::isDraw(node, history)) {
+        // and no position after a capture can repeat an earlier one. The root is never drawn by a rule: it is
+        // searched and returns a move, whatever the history says.
+        if (ply > 0 && (ChessEvaluater::isDraw(node, history) || ChessEvaluater::isFiftyMoveDraw(node))) {
+            pathDraws++;
             return 0;
         }
 

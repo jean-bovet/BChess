@@ -141,6 +141,40 @@ bool ChessEvaluater::isDraw(ChessBoard &board, const HistoryPtr &history) {
     return ChessHistory::isThreefoldRepetition(board.getHash(), board.reversiblePlies, history);
 }
 
+bool ChessEvaluater::isFiftyMoveDraw(ChessBoard &board) {
+    if (board.halfMoveClock < 100) {
+        return false;
+    }
+    // Only a side in check can be mated, and the mate is told by one legal move at most
+    if (board.isCheck(board.color)) {
+        auto moves = ChessMoveGenerator::generateMoves(board, board.color, ChessMoveGenerator::Mode::firstMoveOnly);
+        return moves.count > 0;
+    }
+    return true;
+}
+
+bool ChessEvaluater::isDeadPosition(const ChessBoard &board) {
+    int knights = 0;
+    Bitboard bishops = 0;
+    for (unsigned color=0; color<COUNT; color++) {
+        // A pawn, a rook or a queen can always mate in some line
+        if (board.pieces[color][PAWN] || board.pieces[color][ROOK] || board.pieces[color][QUEEN]) {
+            return false;
+        }
+        knights += bb_count(board.pieces[color][KNIGHT]);
+        bishops |= board.pieces[color][BISHOP];
+    }
+    
+    // Only kings and minor pieces are left: one minor piece or none cannot mate
+    if (knights + bb_count(bishops) <= 1) {
+        return true;
+    }
+    
+    // Bishops alone, all on squares of one colour, cannot mate whoever owns them
+    const Bitboard darkSquares = 0x55AA55AA55AA55AAULL;
+    return knights == 0 && ((bishops & darkSquares) == 0 || (bishops & ~darkSquares) == 0);
+}
+
 int ChessEvaluater::evaluate(ChessBoard &board) {
     auto moves = ChessMoveGenerator::generateMoves(board, board.color, ChessMoveGenerator::Mode::firstMoveOnly);
     return evaluate(board, moves);
@@ -156,6 +190,12 @@ int ChessEvaluater::evaluate(ChessBoard &board, const MoveList &moves) {
             // No moves and not check, that's a draw
             return 0;
         }
+    }
+    
+    // A dead position is a draw, and every leaf of the search comes through here to be told so. It depends on the
+    // pieces alone, so the transposition table can keep it.
+    if (isDeadPosition(board)) {
+        return 0;
     }
     
     // Compute the piece balance value
