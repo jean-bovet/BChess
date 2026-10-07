@@ -600,8 +600,9 @@ TEST_F(MinMaxSearchTests, UnsortedSearchKeepsBestVariationFirst) {
     std::vector<int> scores;
     std::vector<int64_t> nodes;
     iterate("r1bqkbnr/pppp1ppp/2n5/3P4/8/8/PPP2PPP/RNBQKBNR b KQkq - 0 5", 3, false, scores, nodes);
-    // Recorded before the hash move existed (ENGINE-3 step 6): the cumulative nodes of depths 1 to 3
-    ASSERT_EQ((std::vector<int64_t>{95, 1065, 40717}), nodes);
+    // Recorded before the hash move existed (ENGINE-3 speed step 6): the cumulative nodes of depths 1 to 3.
+    // Quiescence in check (ENGINE-3 search step 4) changed them from 95, 1065, 40717.
+    ASSERT_EQ((std::vector<int64_t>{107, 1475, 93131}), nodes);
 }
 
 // An entry that a collision or an old game left under this position's hash can name any move: the move
@@ -755,5 +756,88 @@ TEST_F(MinMaxSearchTests, DeltaPruningKeepsAMatingCapture) {
     MinMaxSearch::Variation rootPV, bv;
     ASSERT_EQ(ChessEvaluater::MAT_VALUE - 1, search.alphabeta(board, NEW_HISTORY, table, 0, true, rootPV, bv));
     ASSERT_EQ("f6g7", FPGN::to_string(rootPV.moves.bestMove(), FPGN::SANType::uci));
+}
+// 1... Nf3+ forks the king and the queen. In check, White cannot decline to move: every evasion loses the queen
+// to Nxh2, and the stand-pat that counts the queen as White's must not be the answer. (The pawns keep the ending
+// live: K+N v K is a dead position, worth 0.)
+TEST_F(MinMaxSearchTests, QuiescenceDoesNotStandPatInCheck) {
+    ChessBoard board;
+    ASSERT_TRUE(FFEN::setFEN("4k3/p7/8/8/8/5n2/P6Q/4K3 w - - 0 1", board));
+    ASSERT_TRUE(board.isCheck(WHITE));
+    int standPat = ChessEvaluater::evaluate(board);
+    
+    MinMaxSearch search;
+    MinMaxSearch::Variation pv;
+    int score = search.quiescenceForTest(board, -INT_MAX, INT_MAX, 1, pv);
+    ASSERT_LE(score, standPat - (ChessEvaluater::pieceValue(QUEEN) - ChessEvaluater::pieceValue(KNIGHT)));
+    ASSERT_GT(pv.moves.count, 0);
+}
+
+// Re8+ checks the king and every evasion is quiet, so each one reaches a clock of 100 at once. The clock is
+// not in the hash and a quiescence line can run past it: the draw comes from inside quiescence, loaded from
+// a FEN (reversiblePlies -1).
+TEST_F(MinMaxSearchTests, QuiescenceSeesFiftyMoveDraw) {
+    ChessBoard board;
+    ASSERT_TRUE(FFEN::setFEN("4r3/7k/8/8/8/8/8/Q3K3 w - - 99 1", board));
+    ASSERT_TRUE(board.isCheck(WHITE));
+    ASSERT_EQ(-1, board.reversiblePlies);
+    auto evasions = ChessMoveGenerator::generateMoves(board);
+    
+    MinMaxSearch search;
+    MinMaxSearch::Variation pv;
+    ASSERT_EQ(0, search.quiescenceForTest(board, -INT_MAX, INT_MAX, 1, pv));
+    ASSERT_EQ(evasions.count, search.pathDraws);
+    
+    // The same position at clock 0 is not a draw: White keeps its queen against the rook
+    ChessBoard fresh;
+    ASSERT_TRUE(FFEN::setFEN("4r3/7k/8/8/8/8/8/Q3K3 w - - 0 1", fresh));
+    MinMaxSearch other;
+    MinMaxSearch::Variation pv2;
+    ASSERT_NE(0, other.quiescenceForTest(fresh, -INT_MAX, INT_MAX, 1, pv2));
+    ASSERT_EQ(0, other.pathDraws);
+}
+
+// The history holds every evasion's position twice, at the parity that makes the evasion a third occurrence
+TEST_F(MinMaxSearchTests, QuiescenceSeesRepetition) {
+    ChessBoard board;
+    ASSERT_TRUE(FFEN::setFEN("4r3/7k/8/8/8/8/8/Q3K3 w - - 0 1", board));
+    auto evasions = ChessMoveGenerator::generateMoves(board);
+    ASSERT_GT(evasions.count, 1);
+    
+    auto history = NEW_HISTORY;
+    for (int i = 0; i < 4 * evasions.count; i++) {
+        history->push_back(BoardHash(1000 + i)); // the entries between are never the node's position
+    }
+    history->push_back(board.getHash());
+    for (int i = 0; i < evasions.count; i++) {
+        ChessBoard child = board;
+        child.move(evasions.moves[i]);
+        history->at(history->size() - 2 - 4 * i) = child.getHash();
+        history->at(history->size() - 4 - 4 * i) = child.getHash();
+    }
+    
+    // A game played from the start knows how far back a repetition can reach (reversiblePlies); a FEN does not
+    for (int reversible : {int(history->size()) - 1, -1}) {
+        board.reversiblePlies = reversible;
+        MinMaxSearch search;
+        MinMaxSearch::Variation pv;
+        ASSERT_EQ(0, search.quiescenceForTest(board, -INT_MAX, INT_MAX, 1, pv, 0, history)) << reversible;
+        ASSERT_EQ(evasions.count, search.pathDraws) << reversible;
+    }
+    
+    // Without the planted copies the evasions are not draws
+    MinMaxSearch search;
+    MinMaxSearch::Variation pv;
+    ASSERT_NE(0, search.quiescenceForTest(board, -INT_MAX, INT_MAX, 1, pv, 0, NEW_HISTORY));
+}
+
+// Ra8 mates: in check with no evasion, quiescence scores the mate at its own ply
+TEST_F(MinMaxSearchTests, QuiescenceMateInCheck) {
+    ChessBoard board;
+    ASSERT_TRUE(FFEN::setFEN("R5k1/5ppp/8/8/8/8/8/4K3 b - - 0 1", board));
+    ASSERT_TRUE(board.isCheck(BLACK));
+    MinMaxSearch search;
+    MinMaxSearch::Variation pv;
+    ASSERT_EQ(-(mate - 3), search.quiescenceForTest(board, -INT_MAX, INT_MAX, -1, pv, 3));
 }
 #endif

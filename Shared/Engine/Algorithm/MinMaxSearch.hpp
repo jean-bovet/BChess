@@ -79,10 +79,10 @@ public:
     
 #ifdef BCHESS_TEST_HOOKS
     // Quiescence from the position as the search calls it at the horizon, with a window chosen by the test
-    // and, when it matters, the ply it starts at
-    int quiescenceForTest(ChessBoard node, int alpha, int beta, int color, MinMaxVariation &pv, int ply = 0) {
+    // and, when it matters, the ply it starts at and the history behind it (empty by default)
+    int quiescenceForTest(ChessBoard node, int alpha, int beta, int color, MinMaxVariation &pv, int ply = 0, HistoryPtr history = nullptr) {
         Variation cv;
-        return quiescence(node, ply, alpha, beta, color, pv, cv);
+        return quiescence(node, history ? history : NEW_HISTORY, ply, alpha, beta, color, pv, cv);
     }
     
     // Called in the move loop right after the move has been pushed on the history. Tests use it to
@@ -157,6 +157,12 @@ private:
     
     // From this half-move clock on, the table does not settle a node
     static const int TT_CLOCK_LIMIT = 90;
+    
+    // A draw that the path decides, and not the position: a threefold repetition or the fifty-move rule. A
+    // position that follows a pawn move or a capture (reversiblePlies 0) cannot repeat an earlier one.
+    static bool drawnByPath(ChessBoard &node, const HistoryPtr &history) {
+        return (node.reversiblePlies != 0 && ChessEvaluater::isDraw(node, history)) || ChessEvaluater::isFiftyMoveDraw(node);
+    }
     
     // A mate found at this ply from the root is worth less than a mate found closer to it
     static int mateAtPly(int score, int ply) {
@@ -247,7 +253,7 @@ private:
         // check of the node: quiescence and evaluate trust it. A quiescence move is a capture, and no position
         // after a capture can repeat an earlier one. The root is never drawn by a rule: it is searched and
         // returns a move, whatever the history says.
-        if (ply > 0 && (ChessEvaluater::isDraw(node, history) || ChessEvaluater::isFiftyMoveDraw(node))) {
+        if (ply > 0 && drawnByPath(node, history)) {
             pathDraws++;
             return 0;
         }
@@ -278,7 +284,7 @@ private:
 
         if (depthLeft <= 0) {
             if (config.quiescenceSearch) {
-                int score = quiescence(node, ply, alpha, beta, color, pv, cv);
+                int score = quiescence(node, history, ply, alpha, beta, color, pv, cv);
                 return score;
             } else {
                 int score = mateAtPly(ChessEvaluater::evaluate(node) * color, ply);
@@ -389,32 +395,46 @@ private:
     // this link shows quiescence search that returns the score, like regular negamax
     // and this is way better IMO:
     // https://www.ics.uci.edu/~eppstein/180a/990204.html
-    int quiescence(ChessBoard node, int depth, int alpha, int beta, int color, Variation &pv, Variation &cv) {
+    int quiescence(ChessBoard node, const HistoryPtr &history, int depth, int alpha, int beta, int color, Variation &pv, Variation &cv) {
         pv.qsDepth = depth;
         maxPly = std::max<int64_t>(maxPly, depth);
         
-        auto stand_pat = mateAtPly(ChessEvaluater::evaluate(node) * color, depth);
+        // A side in check cannot decline to move: it has no stand-pat, and its legal moves are the evasions. The
+        // line cannot get any longer past MAX_PLY, as in alphabeta, and there the stand-pat is the answer.
+        bool inCheck = depth < MAX_PLY && node.isCheck(node.color);
         
-        // The line cannot get any longer, as in alphabeta
-        if (depth >= MAX_PLY || stand_pat >= beta) {
-            return stand_pat;
-        }
-        
-        if (alpha < stand_pat) {
-            alpha = stand_pat;
-        }
-
-        auto moves = ChessMoveGenerator::generateQuiescenceMoves(node);
-        if (moves.count == 0) {
-            return stand_pat;
+        int standPat = 0;
+        int bestValue;
+        MoveList moves;
+        if (inCheck) {
+            moves = ChessMoveGenerator::generateMoves(node);
+            if (moves.count == 0) {
+                return mateAtPly(-ChessEvaluater::MAT_VALUE, depth);
+            }
+            bestValue = -INT_MAX;
+        } else {
+            standPat = mateAtPly(ChessEvaluater::evaluate(node) * color, depth);
+            if (depth >= MAX_PLY || standPat >= beta) {
+                return standPat;
+            }
+            
+            if (alpha < standPat) {
+                alpha = standPat;
+            }
+            
+            moves = ChessMoveGenerator::generateQuiescenceMoves(node);
+            if (moves.count == 0) {
+                return standPat;
+            }
+            
+            // Fail-soft like alphabeta: the best score so far, never below the stand-pat
+            bestValue = standPat;
         }
         
         if (config.sortMoves) {
             ChessMoveGenerator::sortMoves(moves);
         }
         
-        // Fail-soft like alphabeta: the best score so far, never below the stand-pat
-        int bestValue = stand_pat;
         for (int index=0; index<moves.count && !stopped(); index++) {
             auto move = moves.moves[index];
             
@@ -423,9 +443,9 @@ private:
             
             // Delta pruning: this capture cannot lift the score to alpha, even with a margin. Not a promotion,
             // not while alpha is a mate score, and never a capture that gives check, which may mate. One rule
-            // for every pruning of the quiescence search.
-            if (config.deltaPruning && MOVE_PROMOTION_PIECE(move) == 0 && !ChessEvaluater::isMateScore(alpha) &&
-                stand_pat + ChessEvaluater::pieceValue(MOVE_CAPTURED_PIECE(move)) + DELTA_MARGIN <= alpha &&
+            // for every pruning of the quiescence search, and none for an evasion.
+            if (!inCheck && config.deltaPruning && MOVE_PROMOTION_PIECE(move) == 0 && !ChessEvaluater::isMateScore(alpha) &&
+                standPat + ChessEvaluater::pieceValue(MOVE_CAPTURED_PIECE(move)) + DELTA_MARGIN <= alpha &&
                 !newNode.isCheck(newNode.color)) {
                 continue;
             }
@@ -433,11 +453,21 @@ private:
             visitedNodes++;
 
             cv.moves.push(move);
+            history->push_back(newNode.getHash());
 
+            // A quiet evasion can repeat a position or reach the fifty-move clock. Alpha-beta checked the node
+            // that entered quiescence, so only the moves from here on are looked at.
             Variation line;
-            int score = -quiescence(newNode, depth+1, -beta, -alpha, -color, line, cv);
+            int score;
+            if (drawnByPath(newNode, history)) {
+                pathDraws++;
+                score = 0;
+            } else {
+                score = -quiescence(newNode, history, depth+1, -beta, -alpha, -color, line, cv);
+            }
             
             cv.moves.pop();
+            history->pop_back();
 
             if (score > bestValue) {
                 bestValue = score;

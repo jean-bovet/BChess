@@ -60,9 +60,11 @@ TEST_F(SearchChessTests, OrderedMove) {
     Configuration config;
     config.deltaPruning = false; // the counts are those of plain alpha-beta with quiescence
 
+    // Quiescence in check (ENGINE-3 search step 4) changed the counts from 16437 and 341919: the evasions of
+    // a side in check are searched where the stand-pat used to end the line
     config.sortMoves = true;
-    assertChessSearch(16437, 50, config, board);
+    assertChessSearch(19296, 50, config, board);
     
     config.sortMoves = false;
-    assertChessSearch(341919, 50, config, board);
+    assertChessSearch(1611681, 50, config, board);
 }
