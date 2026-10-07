@@ -1,6 +1,6 @@
 # APP-3 — Strength levels and the New Game sheet
 
-Revision 3 (2026-10-07), accepted by Jean with D1 changed to its alternative (see §9). Planned in the worktree `.claude/worktrees/app-3-strength-levels` (branch
+Revision 3 (2026-10-07), accepted by Jean with D1–D4 as recommended (see §9). Planned in the worktree `.claude/worktrees/app-3-strength-levels` (branch
 `app-3-strength-levels`, from `main` 278d1bf), against the search as ENGINE-3 search
 (`planning/ENGINE-3-search.md` r3 on branch `engine-3-search`, steps 1–4 committed) will leave it.
 
@@ -323,9 +323,8 @@ nonisolated struct NewGame: Equatable, Sendable {
   - `sideLabel`: "You play", or "First player plays" against a friend.
   - `firstNameLabel`: "Your name", or "White", "Black" or "Random color" against a friend.
   - `secondNameLabel`: the other colour, or "Random color".
-  - `playLabel`: "Play the Club Player", "Play the Full Engine" or "Start Game", the approved mockup's
-    words. They are the sheet's own wording and are not reused as the computer's name on the game
-    screen (D1).
+  - `playLabel`: "Play the Club Player", "Play the Full Engine" or "Start Game". This is the approved
+    mockup's wording, and the same names are the computer's name on the game screen (§2.8, D1).
   - `showsThinkingTime`: true only at Maximum.
 - **`players(firstPlaysWhite:)`.** `coin` resolves Random. The views pass `Bool.random()`, and the
   tests pass a fixed value.
@@ -384,10 +383,11 @@ The friend's tile and the segmented controls use `Walnut.background`. No colour 
 
 ### 2.8 Wording elsewhere (`GameText`)
 
-- `name(of:)` is unchanged (D1, Jean). A computer with no name is still "Computer", so the title
-  stays "You vs Computer" and the status "Computer is thinking…". A player's own name still wins.
-- `sideDetail` for a computer is "Black · Club" (the level's name), or "Black · 10 s" at Maximum, where
-  the time is the setting. This is the only place the level shows on the game screen.
+- `name(of:)` for a computer with no name is "Beginner Player", "Casual Player", "Club Player",
+  "Strong Player" or "Full Engine", the button's words (D1). This gives the title "You vs Club Player"
+  and the status "Club Player is thinking…". A player's own name still wins.
+- `sideDetail` for a computer is "Black · Club", or "Black · 10 s" at Maximum, where the time is the
+  setting (D1).
 - `detail(of:toMove:)` is deleted with its test, because nothing calls it.
 
 ### 2.9 Reuse
@@ -466,7 +466,7 @@ added.
 | `strengthOptionIsAnnounced`, `setoptionSetsTheStrength`, `unknownStrengthIsIgnored`, `handicappedMateAnswersNullMove` (`UCICommandTests`) | the `uci` output has the option line before `uciok`; `setoption name Strength value Club` sets `.club`; a bad value leaves it unchanged and prints nothing; at Beginner, `go` on a mated position prints `bestmove 0000` |
 | `oldLevelsStillOpen` (`GameStateCodingTests`) | the legacy JSON with levels 1 and 3 decodes as Casual and Strong; a level of 9 decodes as Club; levels 4–6 round-trip with 5/10/30 s |
 | `strengthAndTimeFollowTheLevel` (`GameTextTests` or new `GamePlayerTests`) | the table in §2.4 |
-| `computerDetailsShowTheLevel` (`GameTextTests`, replaces the seconds test) | "Black · Beginner" … "Black · Strong", "White · 5 s" and "White · 30 s" at Maximum; the name stays "Computer" and the title "You vs Computer" at every level; a given name wins |
+| `computerNamesAndDetails` (`GameTextTests`, replaces the seconds test) | for every level: the name ("Beginner Player" … "Strong Player", "Full Engine"), the title ("You vs Club Player", "Full Engine vs You"), the status ("Club Player is thinking…") and the row detail ("Black · Beginner" … "Black · Strong", "White · 5 s" and "White · 30 s" at Maximum); a given name wins |
 | `NewGameTests` (new file): `playersAgainstEachLevel`, `randomSideUsesTheCoin`, `friendNamesFollowTheFirstPlayersColor`, `rotatedWhenThePlayerHasBlack`, `thinkingTimeOnlyAtMaximum`, `labelsFollowTheMockups`, `editReadsTheGamesPlayers`, `editOfTwoComputersBecomesYouAgainstBlack` | §2.6 |
 | `searchUsesThePlayersStrength` (`GameSessionTests`) | after `requestEngineMoveIfNeeded`, `engine.strength` is the side to move's strength |
 | `analysisIsFullStrength` (`GameSessionTests`) | a Beginner reply, then the readout on during the human's turn: `engine.strength == .maximum` |
@@ -608,12 +608,10 @@ It runs once ENGINE-3 search is on `main` and APP-3 has landed, on an idle machi
 
 **Decision (Jean, 2026-10-07):** go. Implementation starts after ENGINE-3 search lands on `main`.
 
-- D1: the alternative. The computer keeps the name "Computer" (title "You vs Computer"), and the
-  level shows only in the player row ("Black · Club", or "Black · 10 s" at Maximum).
-  - §2.8 and §4 were updated.
-  - The sheet's button keeps the approved mockup's wording ("Play the Club Player"), which is the
-    simplest choice and needs no new copy.
-- D2, D3 and D4: as recommended.
+- D1–D4 as recommended (D1 revised by Jean the same day).
+  - The computer is named after its level in the title and the status ("You vs Club Player", "Club
+    Player is thinking…").
+  - The row reads "Black · Club", or "Black · 10 s" at Maximum.
 
 - **D1 — How a computer is named on the game screen.**
   - Recommended: the title and status use the button's words ("You vs Club Player", "Full Engine is
