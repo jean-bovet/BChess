@@ -147,11 +147,16 @@ public:
                 return value <= alpha;
             case TranspositionEntryType::BETA:
                 return value >= beta;
+            case TranspositionEntryType::MOVE_ONLY:
+                return false;
         }
         return false;
     }
     
 private:
+    
+    // From this half-move clock on, the table does not settle a node
+    static const int TT_CLOCK_LIMIT = 90;
     
     // A mate found at this ply from the root is worth less than a mate found closer to it
     static int mateAtPly(int score, int ply) {
@@ -238,8 +243,23 @@ private:
         
         int evalDepth = depthLeft;
         
-        // Check if we have the same node already in our transposition table.
-        if (config.transpositionTable &&
+        // The draws of the path come first, so that no table entry can stand in for them. The only repetition
+        // check of the node: quiescence and evaluate trust it. A quiescence move is a capture, and no position
+        // after a capture can repeat an earlier one. The root is never drawn by a rule: it is searched and
+        // returns a move, whatever the history says.
+        if (ply > 0 && (ChessEvaluater::isDraw(node, history) || ChessEvaluater::isFiftyMoveDraw(node))) {
+            pathDraws++;
+            return 0;
+        }
+        
+        // The draws below this node that the path decided. When any was met, the value of this node belongs to
+        // the path and the table gets the move only.
+        int64_t pathDrawsAtEntry = pathDraws;
+        
+        // Check if we have the same node already in our transposition table. The table never settles the root,
+        // whose line is always searched in full, nor a position near the fifty-move rule, whose clock the hash
+        // does not hold (a heuristic, as in Stockfish).
+        if (config.transpositionTable && ply > 0 && node.halfMoveClock < TT_CLOCK_LIMIT &&
             table.exists(node.getHash()
 #ifdef ASSERT_TT_KEY_COLLISION
                          , FFEN::getFEN(node, true)
@@ -254,14 +274,6 @@ private:
                 pv.push(value, entry.bestMove, emptyLine);
                 return value;
             }
-        }
-
-        // The only repetition check of the node: quiescence and evaluate trust it. A quiescence move is a capture,
-        // and no position after a capture can repeat an earlier one. The root is never drawn by a rule: it is
-        // searched and returns a move, whatever the history says.
-        if (ply > 0 && (ChessEvaluater::isDraw(node, history) || ChessEvaluater::isFiftyMoveDraw(node))) {
-            pathDraws++;
-            return 0;
         }
 
         if (depthLeft <= 0) {
@@ -354,6 +366,9 @@ private:
         // A loop that was cut short holds a partial value, which must not be trusted by a later search
         // of the same position. Its parents are cut short too, so they store nothing either.
         if (ChessMoveGenerator::isValid(bestMove) && !stopped()) {
+            if (pathDraws != pathDrawsAtEntry) {
+                entryType = TranspositionEntryType::MOVE_ONLY;
+            }
             table.store(evalDepth, node.getHash(), ttValueToStore(bestValue, ply), bestMove, entryType
 #ifdef ASSERT_TT_KEY_COLLISION
                         , FFEN::getFEN(node, true)

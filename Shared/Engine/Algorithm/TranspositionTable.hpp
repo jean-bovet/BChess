@@ -29,7 +29,11 @@ enum TranspositionEntryType {
      Since some of the search is cut off we do not know what the actual evaluation of the position was.
      All we know is it was at least 'beta' or higher.
      */
-    BETA
+    BETA,
+    
+    /** No value: the position's search met a repetition or the fifty-move rule below it, a result that belongs to
+     the path and not to the position. Only the best move is kept, to order a later search. */
+    MOVE_ONLY
 };
 
 struct TranspositionEntry {

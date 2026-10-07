@@ -270,14 +270,189 @@ TEST_F(MinMaxSearchTests, TTMateIsPlyRelative) {
             ASSERT_EQ(c.sign * (mate - 3), searchWithTable(c.p, 4, true, table, pv1));
             ASSERT_EQ(c.sign * (mate - 4), searchWithTable(c.q, 5, true, table, pv2)) << c.q;
         }
-        // (b) Q stores P at ply 1, the root probe of P at ply 0 reads it back
+        // (b) Q stores P at ply 1; a search of Q that starts at ply 1 (the table does not cut off at ply 0) reads
+        // P back at ply 2, one ply deeper than it was stored
         {
             TranspositionTable table;
-            MinMaxSearch::Variation pv1, pv2;
+            MinMaxSearch::Variation pv1, pv2, pv3;
             ASSERT_EQ(c.sign * (mate - 4), searchWithTable(c.q, 5, true, table, pv1)) << c.q;
-            ASSERT_EQ(c.sign * (mate - 3), searchWithTable(c.p, 4, true, table, pv2));
+            
+            auto searchQ = [&](TranspositionTable &t, MinMaxSearch::Variation &pv) {
+                ChessBoard board;
+                EXPECT_TRUE(FFEN::setFEN(c.q, board));
+                MinMaxSearch search;
+                search.config.maxDepth = 5;
+                MinMaxSearch::Variation bv;
+                return search.alphabeta(board, NEW_HISTORY, t, 1, board.color == WHITE, pv, bv);
+            };
+            TranspositionTable fresh;
+            ASSERT_EQ(c.sign * (mate - 5), searchQ(fresh, pv3));
+            ASSERT_EQ(c.sign * (mate - 5), searchQ(table, pv2)) << c.q;
         }
     }
+}
+
+// The move that `uci` names among the legal moves of the board
+static Move moveNamed(ChessBoard &board, const char *uci) {
+    auto moves = ChessMoveGenerator::generateMoves(board);
+    for (int i = 0; i < moves.count; i++) {
+        if (FPGN::to_string(moves.moves[i], FPGN::SANType::uci) == uci) {
+            return moves.moves[i];
+        }
+    }
+    ADD_FAILURE() << uci;
+    return INVALID_MOVE;
+}
+
+// An entry for the position, stored deep enough for any search of these tests
+static void preload(TranspositionTable &table, ChessBoard &board, int value, TranspositionEntryType type = EXACT) {
+    auto moves = ChessMoveGenerator::generateMoves(board);
+    table.store(10, board.getHash(), value, moves.moves[0], type);
+}
+
+static void playMoves(ChessGame &game, std::vector<const char *> moves) {
+    for (auto m : moves) {
+        ASSERT_TRUE(game.move(m)) << m;
+    }
+}
+
+// Both Knights go out and back, so that the start position has occurred twice, and then a third time after
+// f6g8 when it is Black's turn (Black to move in C below)
+static const std::vector<const char *> backAndForth = {"g1f3", "g8f6", "f3g1", "f6g8", "g1f3", "g8f6", "f3g1"};
+
+// The table's value for a position that the history makes a third occurrence is not used: the draw comes first
+TEST_F(MinMaxSearchTests, RepetitionBeatsTableEntry) {
+    ChessGame game;
+    playMoves(game, backAndForth);
+    ChessBoard child = game.board;
+    child.move(moveNamed(child, "f6g8"));
+    
+    auto searchRoot = [&](bool preloaded) {
+        TranspositionTable table;
+        if (preloaded) {
+            preload(table, child, -5000); // White to move, and lost: Black would score +5000
+        }
+        MinMaxSearch search;
+        search.config.maxDepth = 2;
+        MinMaxSearch::Variation pv, bv;
+        return search.alphabeta(game.board, game.history, table, 0, false, pv, bv);
+    };
+    int fresh = searchRoot(false);
+    ASSERT_LT(fresh, 1000);
+    ASSERT_EQ(fresh, searchRoot(true));
+}
+
+// Kf2+ (a discovered check from the queen) forces Kh2, and a queen move mates, three plies deep: the only mate
+// in that depth. The history can plant two earlier copies of the position after Kh2, which makes it a third
+// occurrence on that path and turns the mate into a draw.
+struct ForcedLine {
+    ChessBoard root, afterQueen, afterKing;
+    MinMaxSearch::Variation firstMove;
+    
+    ForcedLine() {
+        EXPECT_TRUE(FFEN::setFEN("8/8/8/8/8/8/8/Q3K2k w - - 0 1", root));
+        Move check = moveNamed(root, "e1f2");
+        afterQueen = root;
+        afterQueen.move(check);
+        afterKing = afterQueen;
+        afterKing.move(moveNamed(afterQueen, "h1h2"));
+        firstMove.moves.push(check);
+    }
+    
+    // The history of a game that has been here before: two earlier copies of the position after Kh8, at the
+    // parity that makes the one the search reaches the third
+    HistoryPtr repeated() {
+        auto history = NEW_HISTORY;
+        for (BoardHash hash : {afterKing.getHash(), BoardHash(1), afterKing.getHash(), BoardHash(2), root.getHash()}) {
+            history->push_back(hash);
+        }
+        return history;
+    }
+    
+    HistoryPtr clean() {
+        auto history = NEW_HISTORY;
+        history->push_back(root.getHash());
+        return history;
+    }
+    
+    int search(TranspositionTable &table, HistoryPtr history, bool useTable, int64_t *draws = nullptr) {
+        MinMaxSearch search;
+        search.config.maxDepth = 3;
+        search.config.transpositionTable = useTable;
+        MinMaxSearch::Variation pv;
+        int score = search.alphabeta(root, history, table, 0, true, pv, firstMove);
+        if (draws) *draws = search.pathDraws;
+        return score;
+    }
+};
+
+// A subtree that met a repetition has a value that belongs to that path: the table keeps its move, not its value
+TEST_F(MinMaxSearchTests, PathDrawIsNotStoredAsValue) {
+    ForcedLine line;
+    TranspositionTable table;
+    int64_t draws = 0;
+    line.search(table, line.repeated(), true, &draws);
+    ASSERT_GT(draws, 0);
+    
+    // The position after Kf2+ saw the draw below it
+    ASSERT_TRUE(table.exists(line.afterQueen.getHash()));
+    ASSERT_EQ(TranspositionEntryType::MOVE_ONLY, table.get(line.afterQueen.getHash()).type);
+    ASSERT_TRUE(ChessMoveGenerator::isValid(table.get(line.afterQueen.getHash()).bestMove));
+    
+    // Another path with no repetition on it reads the same table and finds the mate
+    TranspositionTable fresh;
+    int mateScore = line.search(fresh, line.clean(), true);
+    ASSERT_EQ(mate - 3, mateScore);
+    ASSERT_EQ(mateScore, line.search(table, line.clean(), true));
+}
+
+// The root is always searched: a table entry for it never ends the search, and the PV is the whole line
+TEST_F(MinMaxSearchTests, NoCutoffAtRoot) {
+    ChessBoard board;
+    ASSERT_TRUE(FFEN::setFEN("r1bqkbnr/pppp1ppp/2n5/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 2 3", board));
+    TranspositionTable table;
+    preload(table, board, 5000);
+    MinMaxSearch search;
+    search.config.maxDepth = 2;
+    MinMaxSearch::Variation pv, bv;
+    int score = search.alphabeta(board, NEW_HISTORY, table, 0, true, pv, bv);
+    ASSERT_LT(score, 1000);
+    ASSERT_GT(pv.moves.count, 1);
+}
+
+// Black's only move is Kh8, after which White mates. The child of the root is probed with a table that says it
+// is lost for White: that is used with a clock of 10, and ignored with a clock of 95 (the 90 guard).
+TEST_F(MinMaxSearchTests, NoCutoffNearFiftyMoves) {
+    for (int clock : {10, 95}) {
+        ChessBoard board;
+        ASSERT_TRUE(FFEN::setFEN(("6k1/5Q2/6K1/8/8/8/8/8 b - - " + std::to_string(clock) + " 1").c_str(), board));
+        ChessBoard child = board;
+        child.move(moveNamed(board, "g8h8"));
+        
+        TranspositionTable table;
+        preload(table, child, -4000);
+        MinMaxSearch search;
+        search.config.maxDepth = 2;
+        MinMaxSearch::Variation pv, bv;
+        int score = search.alphabeta(board, NEW_HISTORY, table, 0, false, pv, bv);
+        ASSERT_EQ(clock == 10 ? -4000 : mate - 2, score) << clock; // White's score
+    }
+}
+
+// What the table cannot know: a descendant that already occurred twice on THIS path. A value stored on a path
+// without it is reused, and the draw below is never seen. A search that does not read the table sees it. A
+// change to this must be deliberate.
+TEST_F(MinMaxSearchTests, HiddenRepetitionIsAKnownLimitation) {
+    ForcedLine line;
+    TranspositionTable table;
+    ASSERT_EQ(mate - 3, line.search(table, line.clean(), true));
+    
+    // The position after Kf2+ is stored with its mate. On the repeated path the table hides the draw below it
+    ASSERT_EQ(mate - 3, line.search(table, line.repeated(), true));
+    
+    // Without the table the draw is seen, and the mate is gone
+    TranspositionTable unused;
+    ASSERT_LT(line.search(unused, line.repeated(), false), mate - 3);
 }
 
 // ALPHA and BETA entries are compared with the window in root-relative values. The stored value is relative to its
