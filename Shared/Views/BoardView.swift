@@ -72,9 +72,8 @@ struct BoardFrame<Content: View>: View {
     }
 }
 
-#Preview {
-    BoardFrame(session: GameSession()) {
-        BoardView(session: GameSession())
-    }
-    .padding()
+#if DEBUG
+#Preview("Board") {
+    PreviewScenarios.board.view()
 }
+#endif

@@ -157,20 +157,16 @@ private struct MoveRowView: View {
     }
 }
 
+#if DEBUG
 #Preview("Short game") {
-    MoveListView(session: GameSession(state: GameState(pgn: "1. e4 e5 2. Nf3 Nc6 *")))
+    PreviewScenarios.moveListShortGame.view()
 }
 
 #Preview("Variations and comments") {
-    MoveListView(session: GameSession(state: GameState(
-        pgn: "1. e4 {King's pawn} e5 (1... c5 {Sicilian} 2. Nf3 (2. c3 {Alapin}) d6) 2. Nf3 Nc6 3. Bb5 *")))
+    PreviewScenarios.moveListVariationsAndComments.view()
 }
 
-#Preview("Card, dark") {
-    MoveListView(session: GameSession(state: GameState(
-        pgn: "1. e4 e5 2. Nf3 Nc6 3. Bb5 (3. Bc4 Bc5) a6 4. Bxc6 dxc6 5. O-O f6 *")), card: true)
-        .padding()
-        .frame(width: 320, height: 400)
-        .background(Walnut.background)
-        .preferredColorScheme(.dark)
+#Preview("Card") {
+    PreviewScenarios.moveListCard.view()
 }
+#endif

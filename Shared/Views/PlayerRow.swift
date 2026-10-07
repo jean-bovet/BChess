@@ -77,26 +77,12 @@ struct PlayerRow: View {
     }
 }
 
+#if DEBUG
 #Preview("To move") {
-    VStack(alignment: .leading) {
-        PlayerRow(session: GameSession(state: GameState(pgn: "1. e4 e5 *", white: .human, black: .human)), isWhite: false)
-        PlayerRow(session: GameSession(state: GameState(pgn: "1. e4 e5 *", white: .human, black: .human)), isWhite: true)
-    }
+    PreviewScenarios.playerRowToMove.view()
 }
 
 #Preview("Captures") {
-    VStack(alignment: .leading) {
-        PlayerRow(session: GameSession(state: GameState(pgn: "1. e4 e5 2. Nf3 Nf6 3. Nxe5 d6 4. Nc3 dxe5 *")), isWhite: false)
-        PlayerRow(session: GameSession(state: GameState(pgn: "1. e4 e5 2. Nf3 Nf6 3. Nxe5 d6 4. Nc3 dxe5 *")), isWhite: true)
-    }
+    PreviewScenarios.playerRowCaptures.view()
 }
-
-#Preview("Dark") {
-    VStack(alignment: .leading) {
-        PlayerRow(session: GameSession(state: GameState(pgn: "1. e4 e5 2. Nf3 Nf6 3. Nxe5 d6 4. Nc3 dxe5 *")), isWhite: false)
-        PlayerRow(session: GameSession(state: GameState(pgn: "1. e4 e5 2. Nf3 Nf6 3. Nxe5 d6 4. Nc3 dxe5 *")), isWhite: true)
-    }
-    .padding()
-    .background(Walnut.background)
-    .preferredColorScheme(.dark)
-}
+#endif

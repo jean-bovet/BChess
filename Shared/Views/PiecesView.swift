@@ -93,18 +93,12 @@ struct PiecesView: View {
     }
 }
 
+#if DEBUG
 #Preview("White at the bottom") {
-    let session = GameSession()
-    ZStack {
-        BoardView(session: session)
-        PiecesView(session: session)
-    }
+    PreviewScenarios.piecesWhiteAtTheBottom.view()
 }
 
 #Preview("Rotated") {
-    let session = GameSession(state: GameState(pgn: "*", rotated: true))
-    ZStack {
-        BoardView(session: session)
-        PiecesView(session: session)
-    }
+    PreviewScenarios.piecesRotated.view()
 }
+#endif

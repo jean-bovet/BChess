@@ -62,11 +62,8 @@ struct SettingsView: View {
     }
 }
 
-#Preview("Light") {
-    SettingsView()
+#if DEBUG
+#Preview("Settings") {
+    PreviewScenarios.settings.view()
 }
-
-#Preview("Dark") {
-    SettingsView()
-        .preferredColorScheme(.dark)
-}
+#endif

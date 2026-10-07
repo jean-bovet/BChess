@@ -27,10 +27,12 @@ struct StatusLine: View {
     }
 }
 
+#if DEBUG
 #Preview("Your move") {
-    StatusLine(session: GameSession(state: GameState(pgn: "1. e4 e5 2. Nf3 *")))
+    PreviewScenarios.statusLineYourMove.view()
 }
 
 #Preview("Checkmate") {
-    StatusLine(session: GameSession(state: GameState(pgn: "1. f3 e5 2. g4 Qh4# *", white: .human, black: .human)))
+    PreviewScenarios.statusLineCheckmate.view()
 }
+#endif

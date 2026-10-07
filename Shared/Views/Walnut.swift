@@ -52,21 +52,8 @@ extension View {
     }
 }
 
+#if DEBUG
 #Preview("Palette") {
-    VStack(alignment: .leading, spacing: 12) {
-        HStack(spacing: 0) {
-            ForEach(0..<8, id: \.self) { i in
-                (i % 2 == 0 ? Walnut.lightSquare : Walnut.darkSquare).frame(width: 30, height: 30)
-            }
-        }
-        .padding(8)
-        .background(Walnut.frame)
-        Text("Primary").foregroundStyle(Walnut.textPrimary)
-        Text("Secondary").foregroundStyle(Walnut.textSecondary)
-        Text("5…f6").padding(.horizontal, 10).padding(.vertical, 6).currentMovePill(true)
-        Text("Card").padding().walnutCard()
-        Button("Accent") {}
-    }
-    .padding()
-    .background(Walnut.background)
+    PreviewScenarios.walnutPalette.view()
 }
+#endif

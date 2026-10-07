@@ -164,6 +164,21 @@ targets:
         PRODUCT_BUNDLE_IDENTIFIER: ch.arizona-software.BChessUITests
         TARGETED_DEVICE_FAMILY: "1,2"
 
+  BChessGalleryTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - path: BChessGalleryTests
+    dependencies:
+      - target: "BChess (iOS)"
+    settings:
+      base:
+        TEST_HOST: $(BUILT_PRODUCTS_DIR)/BChess.app/BChess
+        BUNDLE_LOADER: $(TEST_HOST)
+        GENERATE_INFOPLIST_FILE: YES
+        PRODUCT_BUNDLE_IDENTIFIER: ch.arizona-software.BChessGalleryTests
+        TARGETED_DEVICE_FAMILY: "1,2"
+
 schemes:
   "BChess (macOS)":
     build:
@@ -185,6 +200,10 @@ schemes:
       config: Debug
       targets:
         - BChessUITests
+        - BChessGalleryTests
+      # The hosted gallery tests launch the whole app: it opens an empty library and runs no search
+      commandLineArguments:
+        "-uiTestingFreshLibrary": true
   BChessUCI:
     build:
       targets:

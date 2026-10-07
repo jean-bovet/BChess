@@ -140,36 +140,24 @@ struct ContentView: View {
     }
 }
 
+#if DEBUG
 #Preview("Tall") {
-    ContentView(session: GameSession(state: GameState(pgn: "1. e4 e5 2. Nf3 Nc6 3. Bb5 *")))
-        .frame(width: 390, height: 800)
+    PreviewScenarios.contentTall.view()
 }
 
 #Preview("Wide") {
-    ContentView(session: GameSession(state: GameState(pgn: "1. e4 e5 2. Nf3 Nc6 3. Bb5 *")))
-        .frame(width: 900, height: 600)
-}
-
-#Preview("Tall, dark") {
-    ContentView(session: GameSession(state: GameState(pgn: "1. e4 e5 2. Nf3 Nc6 3. Bb5 *")))
-        .frame(width: 390, height: 800)
-        .preferredColorScheme(.dark)
-}
-
-#Preview("Wide, dark") {
-    ContentView(session: GameSession(state: GameState(pgn: "1. e4 e5 2. Nf3 Nc6 3. Bb5 *")))
-        .frame(width: 900, height: 600)
-        .preferredColorScheme(.dark)
+    PreviewScenarios.contentWide.view()
 }
 
 #Preview("Analyze") {
-    ContentView(session: GameSession(mode: GameMode(value: .analyze)))
+    PreviewScenarios.contentAnalyze.view()
 }
 
 #Preview("Train") {
-    ContentView(session: GameSession(mode: GameMode(value: .train)))
+    PreviewScenarios.contentTrain.view()
 }
 
 #Preview("Rotated") {
-    ContentView(session: GameSession(state: GameState(pgn: "*", rotated: true)))
+    PreviewScenarios.contentRotated.view()
 }
+#endif

@@ -41,12 +41,8 @@ struct Arrow {
 
 }
 
-#Preview {
-    GeometryReader { geometry in
-        let p = Arrow(start: CGPoint(x: 10, y: 10),
-                      end: CGPoint(x: geometry.size.width - 20, y: geometry.size.height - 20),
-                      length: 20).path
-        p.fill(Color.blue)
-        p.stroke(Color.blue, lineWidth: 10)
-    }
+#if DEBUG
+#Preview("Arrow") {
+    PreviewScenarios.arrow.view()
 }
+#endif

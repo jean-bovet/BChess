@@ -41,9 +41,8 @@ struct NavigationButtons: View {
     }
 }
 
-#Preview {
-    HStack {
-        NavigationButtons(session: GameSession(state: GameState(pgn: "1. e4 e5 2. Nf3 *")))
-    }
-    .padding()
+#if DEBUG
+#Preview("Navigation") {
+    PreviewScenarios.navigationButtons.view()
 }
+#endif

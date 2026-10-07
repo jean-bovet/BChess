@@ -105,21 +105,12 @@ struct PromotionView: View {
     }
 }
 
+#if DEBUG
 #Preview("Drops from the top") {
-    ZStack {
-        BoardView(session: GameSession())
-        PromotionView(promotion: Promotion(move: FEngineMove(), isWhite: true),
-                      squareSize: 44, screenFile: 6, screenRow: 0) { _ in }
-    }
-    .frame(width: 352, height: 352)
+    PreviewScenarios.promotionDropsFromTheTop.view()
 }
 
-#Preview("Rises from the bottom, dark") {
-    ZStack {
-        BoardView(session: GameSession())
-        PromotionView(promotion: Promotion(move: FEngineMove(), isWhite: false),
-                      squareSize: 44, screenFile: 2, screenRow: 7) { _ in }
-    }
-    .frame(width: 352, height: 352)
-    .preferredColorScheme(.dark)
+#Preview("Rises from the bottom") {
+    PreviewScenarios.promotionRisesFromTheBottom.view()
 }
+#endif

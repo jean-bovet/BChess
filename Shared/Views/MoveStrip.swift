@@ -65,24 +65,16 @@ struct MoveStrip: View {
     }
 }
 
+#if DEBUG
 #Preview("Start") {
-    MoveStrip(session: GameSession(), showAll: {})
-        .padding()
+    PreviewScenarios.moveStripStart.view()
 }
 
 #Preview("Middle") {
-    MoveStrip(session: GameSession(state: GameState(pgn: "1. e4 e5 2. Nf3 Nc6 3. Bb5 a6 4. Ba4 Nf6 *")), showAll: {})
-        .padding()
+    PreviewScenarios.moveStripMiddle.view()
 }
 
 #Preview("With variations") {
-    MoveStrip(session: GameSession(state: GameState(pgn: "1. e4 e5 (1... c5) 2. Nf3 (2. c3) Nc6 *")), showAll: {})
-        .padding()
+    PreviewScenarios.moveStripWithVariations.view()
 }
-
-#Preview("Dark") {
-    MoveStrip(session: GameSession(state: GameState(pgn: "1. e4 e5 (1... c5) 2. Nf3 Nc6 3. Bb5 a6 4. Ba4 Nf6 *")), showAll: {})
-        .padding()
-        .background(Walnut.background)
-        .preferredColorScheme(.dark)
-}
+#endif

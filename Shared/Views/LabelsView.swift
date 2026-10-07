@@ -58,18 +58,12 @@ struct LabelsView: View {
     }
 }
 
+#if DEBUG
 #Preview("White at the bottom") {
-    let session = GameSession()
-    BoardFrame(session: session) {
-        BoardView(session: session)
-    }
-    .padding()
+    PreviewScenarios.labelsWhiteAtTheBottom.view()
 }
 
 #Preview("Rotated") {
-    let session = GameSession(state: GameState(pgn: "*", rotated: true))
-    BoardFrame(session: session) {
-        BoardView(session: session)
-    }
-    .padding()
+    PreviewScenarios.labelsRotated.view()
 }
+#endif

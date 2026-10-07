@@ -376,15 +376,28 @@ private struct GamesList: View {
     }
 }
 
-/// A library of a few games from different days, for the previews.
+#if DEBUG
+/// A library of a few games from fixed times of day, for the previews. It never touches the real
+/// defaults.
 @MainActor
 private func previewShell() -> GameShell? {
     let directory = FileManager.default.temporaryDirectory.appendingPathComponent("Preview-\(UUID().uuidString)", isDirectory: true)
     try? FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
-    let library = GameLibrary(directory: directory)
-    for (name, daysAgo) in [("You vs Computer", 0), ("Ruy Lopez practice", 0), ("Anna vs Jean", 1), ("Imported game", 9)] {
+    let library = GameLibrary(directory: directory, defaults: PreviewScenarios.defaults)
+    // Calendar arithmetic, so a daylight-saving change cannot move a time of day
+    let calendar = Calendar.current
+    func date(daysAgo: Int, hour: Int, minute: Int) -> Date {
+        let day = calendar.date(byAdding: .day, value: -daysAgo, to: calendar.startOfDay(for: .now))!
+        return calendar.date(bySettingHour: hour, minute: minute, second: 0, of: day)!
+    }
+    let games: [(String, Date)] = [
+        ("You vs Computer", date(daysAgo: 0, hour: 9, minute: 30)),
+        ("Ruy Lopez practice", date(daysAgo: 0, hour: 9, minute: 0)),
+        ("Anna vs Jean", date(daysAgo: 1, hour: 18, minute: 15)),
+        ("Imported game", date(daysAgo: 9, hour: 11, minute: 0)),
+    ]
+    for (name, date) in games {
         if let file = try? library.create(GameState(pgn: "*"), baseName: name) {
-            let date = Date().addingTimeInterval(-Double(daysAgo) * 86_400 - 600)
             try? FileManager.default.setAttributes([.modificationDate: date], ofItemAtPath: file.url.path)
         }
     }
@@ -392,19 +405,19 @@ private func previewShell() -> GameShell? {
     return try? GameShell(library: library)
 }
 
+/// The Games list of the iPhone shell. `GamesList` stays private, so its preview is built here.
+@MainActor @ViewBuilder
+func gamesListPreview() -> some View {
+    if let shell = previewShell() {
+        GamesList(shell: shell, attempt: { _ in }, onNewGame: {}, actionError: .constant(nil))
+    }
+}
+
 #Preview("Games") {
-    if let shell = previewShell() {
-        GamesList(shell: shell, attempt: { _ in }, onNewGame: {}, actionError: .constant(nil))
-    }
+    PreviewScenarios.gamesList.view()
 }
 
-#Preview("Games, dark") {
-    if let shell = previewShell() {
-        GamesList(shell: shell, attempt: { _ in }, onNewGame: {}, actionError: .constant(nil))
-            .preferredColorScheme(.dark)
-    }
+#Preview("Launch") {
+    PreviewScenarios.gamesLaunch.view()
 }
-
-#Preview {
-    GameRootView(library: GameLibrary(directory: FileManager.default.temporaryDirectory.appendingPathComponent("Preview-\(UUID().uuidString)", isDirectory: true)))
-}
+#endif

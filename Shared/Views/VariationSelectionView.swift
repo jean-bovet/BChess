@@ -100,39 +100,8 @@ struct VariationCards: View {
     }
 }
 
+#if DEBUG
 #Preview("Arrows and cards") {
-    let session = GameSession(state: GameState(pgn: "1. e4 e5 (1... c5) 2. Nf3 Nc6 *", white: .human, black: .human))
-    session.move(to: .start)
-    session.move(to: .forward)
-    session.move(to: .forward)
-    return VStack {
-        ZStack {
-            BoardView(session: session)
-            PiecesView(session: session)
-            VariationSelectionView(session: session)
-        }
-        .frame(width: 330, height: 330)
-        VariationCards(session: session)
-    }
-    .padding()
-    .background(Walnut.background)
+    PreviewScenarios.variationArrowsAndCards.view()
 }
-
-#Preview("Dark") {
-    let session = GameSession(state: GameState(pgn: "1. e4 e5 (1... c5) 2. Nf3 Nc6 *", white: .human, black: .human))
-    session.move(to: .start)
-    session.move(to: .forward)
-    session.move(to: .forward)
-    return VStack {
-        ZStack {
-            BoardView(session: session)
-            PiecesView(session: session)
-            VariationSelectionView(session: session)
-        }
-        .frame(width: 330, height: 330)
-        VariationCards(session: session)
-    }
-    .padding()
-    .background(Walnut.background)
-    .preferredColorScheme(.dark)
-}
+#endif

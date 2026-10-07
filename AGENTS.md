@@ -9,7 +9,8 @@ UCI command-line tool.
 `Shared/Bridge/` — Objective-C++ wrapper (`FEngine*`) that Swift sees through the bridging header.
 `Shared/` — SwiftUI views and game model compiled by both apps. `iOS/` and `macOS/` — per-platform
 shells and Info.plists. `BChess/` — the `BChessUCI` command-line tool. `BChessTests/` — engine
-tests (GoogleTest cases plus Swift tests). `Dependencies/gtest` is vendored; do not edit.
+tests (GoogleTest cases plus Swift tests). `BChessGalleryTests/` — the iOS-hosted gallery tests.
+`Dependencies/gtest` is vendored; do not edit.
 `project.yml` — XcodeGen; never hand-edit `BChess.xcodeproj` (edit the spec, `xcodegen generate`,
 commit both).
 
@@ -46,7 +47,10 @@ when Codex is unavailable). The parent never implements.
 GoogleTest case actually executed.
 
 **Tests.** New logic: a failing Swift Testing test first. Views are exempt from unit tests; every
-new view gets a `#Preview`. A thread-safety fix gets a test that would fail (or hang) without it.
+new view gets a named `#Preview`. A view compiled for iOS gets a scenario in
+`Shared/PreviewSupport/PreviewScenarios.swift`, and its `#Preview` renders that scenario;
+`/preview-gallery` renders those on iOS. A macOS-only view keeps an inline `#Preview`, outside the
+gallery. A preview never forces an appearance or a language. A thread-safety fix gets a test that would fail (or hang) without it.
 
 **Conventions.** English UI strings, code, identifiers and comments. New Swift code states
 isolation (`@MainActor` / `nonisolated` / `@Sendable`). Match the surrounding style. Commit when

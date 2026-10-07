@@ -62,10 +62,12 @@ struct NewGameView_iOS: View {
     }
 }
 
+#if DEBUG
 #Preview("New game") {
-    NewGameView_iOS(session: GameSession(), editMode: false, onNewGame: { _, _ in })
+    PreviewScenarios.newGameNewGame.view()
 }
 
 #Preview("Edit game") {
-    NewGameView_iOS(session: GameSession(), editMode: true, onNewGame: { _, _ in })
+    PreviewScenarios.newGameEditGame.view()
 }
+#endif

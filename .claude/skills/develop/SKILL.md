@@ -80,7 +80,7 @@ engine GoogleTest cases must show up as individual Swift Testing cases and must 
 count is printed by the suite) — zero executed is red, never green.
 
 Zero compiler warnings in our own sources (`Shared/`, `iOS/`, `macOS/`, `BChess/`, `BChessTests/`,
-`BChessAppTests/`, `BChessUITests/`; vendored `Dependencies/` and `gtest-all.cc` are exempt),
+`BChessAppTests/`, `BChessUITests/`, `BChessGalleryTests/`; vendored `Dependencies/` and `gtest-all.cc` are exempt),
 checked with **fresh** scratch directories. Read exit status as well as grep (an empty grep is
 clean only if the build succeeded). `COMPILER_INDEX_STORE_ENABLE=NO` is required on `-target`
 builds.
@@ -88,7 +88,10 @@ builds.
 ```
 xcodebuild -target "BChess (iOS)" -sdk iphonesimulator -configuration Debug SYMROOT=<scratch>/build-ios OBJROOT=<scratch>/obj-ios COMPILER_INDEX_STORE_ENABLE=NO build 2>&1 | grep -E '^/Users/.*(warning|error):|^(warning|error):' | grep -v -e ONLY_ACTIVE_ARCH -e /Dependencies/ -e gtest-all
 xcodebuild -target "BChess (macOS)" -configuration Debug SYMROOT=<scratch>/build-mac OBJROOT=<scratch>/obj-mac COMPILER_INDEX_STORE_ENABLE=NO build 2>&1 | grep -E '^/Users/.*(warning|error):|^(warning|error):' | grep -v -e ONLY_ACTIVE_ARCH -e /Dependencies/ -e gtest-all
+xcodebuild -target BChessGalleryTests -sdk iphonesimulator -configuration Debug SYMROOT=<scratch>/build-gt OBJROOT=<scratch>/obj-gt COMPILER_INDEX_STORE_ENABLE=NO build 2>&1 | grep -E '^/Users/.*(warning|error):|^(warning|error):' | grep -v -e ONLY_ACTIVE_ARCH -e /Dependencies/ -e gtest-all
 ```
+
+The first two build only the app targets, so the third compiles the gallery tests (and builds their host app).
 
 ## Deploy (only when Jean asks)
 

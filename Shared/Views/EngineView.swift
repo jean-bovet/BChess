@@ -159,50 +159,32 @@ struct EvaluationBar: View {
     }
 }
 
+#if DEBUG
 #Preview("Equal") {
-    EngineView(verdict: Verdict(centipawns: 10, isMate: false), line: "9. h3 d5 10. exd5")
-        .padding()
+    PreviewScenarios.engineEqual.view()
 }
 
 #Preview("Slightly better") {
-    EngineView(verdict: Verdict(centipawns: -60, isMate: false), line: "9. h3 d5 10. exd5")
-        .padding()
+    PreviewScenarios.engineSlightlyBetter.view()
 }
 
 #Preview("Mate") {
-    EngineView(verdict: Verdict(centipawns: 100_000, isMate: true), line: "Qh7#")
-        .padding()
+    PreviewScenarios.engineMate.view()
 }
 
 #Preview("Analyzing") {
-    EngineView(verdict: nil, line: "")
-        .padding()
+    PreviewScenarios.engineAnalyzing.view()
 }
 
 #Preview("Statistics") {
-    EngineView(verdict: Verdict(centipawns: 120, isMate: false), line: "9. h3 d5 10. exd5",
-               statistics: "Depth 9/12 with 1,234,567 nodes at 410,000 n/s")
-        .padding()
+    PreviewScenarios.engineStatistics.view()
 }
 
 #Preview("Stacked") {
-    EngineView(verdict: Verdict(centipawns: 40, isMate: false), line: "6. d4 exd4 7. Qxd4 Qxd4 8. Nxd4",
-               statistics: "Depth 9/14 \u{00B7} 1,234,567 nodes \u{00B7} 410,000 n/s", stacked: true)
-        .padding()
+    PreviewScenarios.engineStacked.view()
 }
 
-#Preview("Dark") {
-    VStack {
-        EngineView(verdict: Verdict(centipawns: 40, isMate: false), line: "6. d4 exd4 7. Qxd4")
-        EngineView(verdict: Verdict(centipawns: 40, isMate: false), line: "6. d4 exd4 7. Qxd4 Qxd4 8. Nxd4",
-                   statistics: "Depth 9/14", stacked: true)
-        HStack {
-            EvaluationBar(verdict: Verdict(centipawns: 40, isMate: false), rotated: false)
-            EvaluationBar(verdict: Verdict(centipawns: -200, isMate: false), rotated: true)
-        }
-        .frame(height: 200)
-    }
-    .padding()
-    .background(Walnut.background)
-    .preferredColorScheme(.dark)
+#Preview("Evaluation bars") {
+    PreviewScenarios.engineEvaluationBars.view()
 }
+#endif

@@ -44,6 +44,7 @@
 		229B645581DF6309B50513A8 /* AppSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 263BC1CB948C6E46692149DA /* AppSettings.swift */; };
 		2312118FD83EEA4785E54A0E /* FEngineUtility.mm in Sources */ = {isa = PBXBuildFile; fileRef = CE782615578B3D7B3C451A64 /* FEngineUtility.mm */; };
 		23FD802F2F9C69009BCA0DC2 /* FEngineMove.mm in Sources */ = {isa = PBXBuildFile; fileRef = 2E720E71C38BC9C943E23A2A /* FEngineMove.mm */; };
+		2602E3939876C80A559EA957 /* PreviewScenarios.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8600818CEC8A467625B8F357 /* PreviewScenarios.swift */; };
 		26EBEEFC5E0B10F7901879C8 /* FEngine.mm in Sources */ = {isa = PBXBuildFile; fileRef = 107058D83675D2AF04C3E091 /* FEngine.mm */; };
 		275C5182800600AB054701FE /* Position.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CF08685F1E9CDB6EE194D4B /* Position.swift */; };
 		27F45075258D05C48A8CF4F1 /* FEngineMove.mm in Sources */ = {isa = PBXBuildFile; fileRef = 2E720E71C38BC9C943E23A2A /* FEngineMove.mm */; };
@@ -129,6 +130,7 @@
 		869984D8E6A87C1A78CA51A8 /* GameHistory.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FECF3456A6E4C0D9547AC353 /* GameHistory.cpp */; };
 		878940D221C9C6AAAD6D7D34 /* ChessEvaluater.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 947CCE0E46399FFD55FC32BC /* ChessEvaluater.cpp */; };
 		87E363FD341DAB6E7724C21E /* FEngine.mm in Sources */ = {isa = PBXBuildFile; fileRef = 107058D83675D2AF04C3E091 /* FEngine.mm */; };
+		88DA931DF49D88B6B4075507 /* PreviewScenarios.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8600818CEC8A467625B8F357 /* PreviewScenarios.swift */; };
 		894F4AF87419939C628038FC /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C986E8C85A8DD1C80E51BAB7 /* SettingsView.swift */; };
 		89B0AEECAAE198D5521D5480 /* UCICommandTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04A09D1A221F0D289C106E21 /* UCICommandTests.swift */; };
 		8A39952C2F27B18FEDBBCE2A /* FEngineMoveNode.mm in Sources */ = {isa = PBXBuildFile; fileRef = 67B30EF56BB2ADE44B075F8F /* FEngineMoveNode.mm */; };
@@ -155,6 +157,7 @@
 		A1D17872DA6E50A57002D655 /* NewGameView_iOS.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0324AFBE64AEA9CAF1E5ED66 /* NewGameView_iOS.swift */; };
 		A2EDC44DAD4A1B1190684848 /* ChessDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0318AE9A862AD390FF9642EF /* ChessDocument.swift */; };
 		A4C90C9D1B4E2831C3FB3245 /* FFEN.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F7BCF98F9720337F7D257AFA /* FFEN.cpp */; };
+		A5A45A6078078018D83ABD2E /* SnapshotGalleryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1570AE343620BE71BC93AB25 /* SnapshotGalleryTests.swift */; };
 		A6EA1979BBE96B598B08B54E /* NavigationButtons.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8C415E73123152AF470ECCC /* NavigationButtons.swift */; };
 		A7AB1E23A4C9B895CF215660 /* Variation.swift in Sources */ = {isa = PBXBuildFile; fileRef = F14DD2B61B0DFA99631A8621 /* Variation.swift */; };
 		AA9CEB41DA74BF76D9747044 /* SelectionModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2D17161DA74B911FD109203 /* SelectionModifier.swift */; };
@@ -183,6 +186,7 @@
 		C59A2AA362E0BCAF379CA111 /* ChessGame.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1798BECBBBED258BED2E2CA1 /* ChessGame.cpp */; };
 		C6AB2504F416C6620DD490E0 /* LastMoveModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8893A6A3EDE392ADA62194CC /* LastMoveModifier.swift */; };
 		C77F47BEF2A3B59916E914C0 /* PiecesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7041B69703399B00EABB120 /* PiecesView.swift */; };
+		C8674BA4884491D978009944 /* PreviewScenarioTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA961F0E4E254E7799A337F7 /* PreviewScenarioTests.swift */; };
 		C8785E495E8F8380C1CE0F82 /* MoveStrip.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F0CD3AD321BEA14E5A8D141 /* MoveStrip.swift */; };
 		CA7950C7A1E8D98F00DE9E82 /* FEngineMoveNode.mm in Sources */ = {isa = PBXBuildFile; fileRef = 67B30EF56BB2ADE44B075F8F /* FEngineMoveNode.mm */; };
 		CB6A99B05281BBABEC5EBE6A /* FPGN.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5F871687B9D9A0D848DEFFFE /* FPGN.cpp */; };
@@ -249,6 +253,13 @@
 			remoteGlobalIDString = 91D0B727552821ADC37F6F1F;
 			remoteInfo = "BChess (iOS)";
 		};
+		B9873F82E9E75DFA15879038 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 8D3403F4DA379573365B4586 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 91D0B727552821ADC37F6F1F;
+			remoteInfo = "BChess (iOS)";
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
@@ -265,6 +276,7 @@
 		107058D83675D2AF04C3E091 /* FEngine.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = FEngine.mm; sourceTree = "<group>"; };
 		10F73A52A3430FA524DA26BE /* NewGameView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewGameView.swift; sourceTree = "<group>"; };
 		117C3F2306D0FD7602AA2488 /* PlayAgainst.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayAgainst.swift; sourceTree = "<group>"; };
+		1570AE343620BE71BC93AB25 /* SnapshotGalleryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnapshotGalleryTests.swift; sourceTree = "<group>"; };
 		16194F1626E7FC78881DC886 /* BChessTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BChessTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		165CC2E716C38E0D22CAE062 /* StatusLine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusLine.swift; sourceTree = "<group>"; };
 		16CEEED7978C48CDE20D26A4 /* Coordinate.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Coordinate.hpp; sourceTree = "<group>"; };
@@ -319,6 +331,7 @@
 		81D206FD51B7D4574C66BE3B /* PromotionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromotionView.swift; sourceTree = "<group>"; };
 		8239FD746C93352706B1C6FE /* FEngineMoveNode+Private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "FEngineMoveNode+Private.h"; sourceTree = "<group>"; };
 		84BFF85A25C57146CAF30E10 /* FEngineUtility.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FEngineUtility.h; sourceTree = "<group>"; };
+		8600818CEC8A467625B8F357 /* PreviewScenarios.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviewScenarios.swift; sourceTree = "<group>"; };
 		8893A6A3EDE392ADA62194CC /* LastMoveModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LastMoveModifier.swift; sourceTree = "<group>"; };
 		8A73C37996CF31F3FA756B29 /* GameText.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameText.swift; sourceTree = "<group>"; };
 		8ADF2094CD31705EF2946A03 /* FEngineGame.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FEngineGame.h; sourceTree = "<group>"; };
@@ -372,6 +385,7 @@
 		C80EAED5A93B886115810B84 /* BoardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoardView.swift; sourceTree = "<group>"; };
 		C8845AC83986914A0B1BFDD8 /* MinMaxSearch.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = MinMaxSearch.hpp; sourceTree = "<group>"; };
 		C986E8C85A8DD1C80E51BAB7 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		CA961F0E4E254E7799A337F7 /* PreviewScenarioTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviewScenarioTests.swift; sourceTree = "<group>"; };
 		CBA33EA4ACC347FB0DF9ABA4 /* SearchChessTests.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = SearchChessTests.cpp; sourceTree = "<group>"; };
 		CBEDC388A15D182465E02883 /* GameHistory.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = GameHistory.hpp; sourceTree = "<group>"; };
 		CE782615578B3D7B3C451A64 /* FEngineUtility.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = FEngineUtility.mm; sourceTree = "<group>"; };
@@ -393,6 +407,7 @@
 		F14DD2B61B0DFA99631A8621 /* Variation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Variation.swift; sourceTree = "<group>"; };
 		F2AE887434F7DF974A8405C8 /* ChessMoveGenerator.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = ChessMoveGenerator.hpp; sourceTree = "<group>"; };
 		F37D108593DEDA1EAC945852 /* EvaluationTests.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = EvaluationTests.cpp; sourceTree = "<group>"; };
+		F7A6EC66758955DFAC1B687C /* BChessGalleryTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = BChessGalleryTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		F7BCF98F9720337F7D257AFA /* FFEN.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = FFEN.cpp; sourceTree = "<group>"; };
 		F9B7275C706589BBD3FEFC54 /* DocumentWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentWindow.swift; sourceTree = "<group>"; };
 		FB066BF62484862642882974 /* FullMove.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FullMove.swift; sourceTree = "<group>"; };
@@ -439,6 +454,7 @@
 			children = (
 				9DC5A344F0A528B0BA355655 /* BChess.app */,
 				9CC0AFB8437EE6BEB286B9A4 /* BChess.app */,
+				F7A6EC66758955DFAC1B687C /* BChessGalleryTests.xctest */,
 				16194F1626E7FC78881DC886 /* BChessTests.xctest */,
 				0C3AF2DF91FF284FE10C1A44 /* BChessUCI */,
 				B62D3039628BC097D49AA710 /* BChessUITests.xctest */,
@@ -459,6 +475,7 @@
 				83A9530C8ED85F1B497D126E /* Bridge */,
 				35AFF10F2132CA3979C057A3 /* Engine */,
 				8EF1061AD1EE8ABFA0EAD8DC /* Model */,
+				A6F60C7F933E090F10A34A01 /* PreviewSupport */,
 				D64522CC7869D435823EF2DC /* Views */,
 			);
 			path = Shared;
@@ -484,6 +501,15 @@
 				CAA3690860C1765F7D7D3BB8 /* Types */,
 			);
 			path = Engine;
+			sourceTree = "<group>";
+		};
+		4320FABB8B5C183F25DB7E25 /* BChessGalleryTests */ = {
+			isa = PBXGroup;
+			children = (
+				CA961F0E4E254E7799A337F7 /* PreviewScenarioTests.swift */,
+				1570AE343620BE71BC93AB25 /* SnapshotGalleryTests.swift */,
+			);
+			path = BChessGalleryTests;
 			sourceTree = "<group>";
 		};
 		438246EEA921270982C884DF /* BChessTests */ = {
@@ -606,6 +632,7 @@
 			isa = PBXGroup;
 			children = (
 				EBF2831EB8A9DE51AA56C0A9 /* BChess */,
+				4320FABB8B5C183F25DB7E25 /* BChessGalleryTests */,
 				438246EEA921270982C884DF /* BChessTests */,
 				0F5CE133D3F207246A816226 /* BChessUITests */,
 				1C104E777345C9DD5C8E484A /* iOS */,
@@ -613,6 +640,14 @@
 				2A8D555C9D076B7F128FF688 /* Shared */,
 				200599CAEF058B6181E944F2 /* Products */,
 			);
+			sourceTree = "<group>";
+		};
+		A6F60C7F933E090F10A34A01 /* PreviewSupport */ = {
+			isa = PBXGroup;
+			children = (
+				8600818CEC8A467625B8F357 /* PreviewScenarios.swift */,
+			);
+			path = PreviewSupport;
 			sourceTree = "<group>";
 		};
 		CAA3690860C1765F7D7D3BB8 /* Types */ = {
@@ -770,6 +805,24 @@
 			productReference = 9DC5A344F0A528B0BA355655 /* BChess.app */;
 			productType = "com.apple.product-type.application";
 		};
+		A3123C2DF40485F4E7E94FE1 /* BChessGalleryTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A588B1D451A1AC4CF19B32E1 /* Build configuration list for PBXNativeTarget "BChessGalleryTests" */;
+			buildPhases = (
+				DE6A04FA529F1BF8EDC72506 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				5F113EB56CE2462A1F8B9C02 /* PBXTargetDependency */,
+			);
+			name = BChessGalleryTests;
+			packageProductDependencies = (
+			);
+			productName = BChessGalleryTests;
+			productReference = F7A6EC66758955DFAC1B687C /* BChessGalleryTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 		A3F74A0EAA013625F9523E1E /* BChessUITests */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 32FFE681D3C963839BDDA1D2 /* Build configuration list for PBXNativeTarget "BChessUITests" */;
@@ -813,6 +866,10 @@
 						DevelopmentTeam = 28XRU7S6GA;
 						ProvisioningStyle = Automatic;
 					};
+					A3123C2DF40485F4E7E94FE1 = {
+						DevelopmentTeam = 28XRU7S6GA;
+						ProvisioningStyle = Automatic;
+					};
 					A3F74A0EAA013625F9523E1E = {
 						DevelopmentTeam = 28XRU7S6GA;
 						ProvisioningStyle = Automatic;
@@ -839,6 +896,7 @@
 				178ACF2B5B59047059B2ABB2 /* BChessUCI */,
 				0D34FC7106C6F49747B8416E /* BChessTests */,
 				A3F74A0EAA013625F9523E1E /* BChessUITests */,
+				A3123C2DF40485F4E7E94FE1 /* BChessGalleryTests */,
 			);
 		};
 /* End PBXProject section */
@@ -925,6 +983,7 @@
 				450FF83A5DCA3959E33F8FB4 /* PlayAgainst.swift in Sources */,
 				DD330AEC7A92C3C162B81FE8 /* PlayerRow.swift in Sources */,
 				275C5182800600AB054701FE /* Position.swift in Sources */,
+				88DA931DF49D88B6B4075507 /* PreviewScenarios.swift in Sources */,
 				7E9A93B4262B71304C137BE9 /* Promotion.swift in Sources */,
 				2181B8B9D24093453CC60B94 /* PromotionView.swift in Sources */,
 				58DCA4660C044FF537754AB7 /* Selection.swift in Sources */,
@@ -1076,6 +1135,7 @@
 				1B5121713877DF451F9BC427 /* PlayAgainst.swift in Sources */,
 				6BF690B2BDE0C56770902C79 /* PlayerRow.swift in Sources */,
 				14E16E9E72529BF731B49DAB /* Position.swift in Sources */,
+				2602E3939876C80A559EA957 /* PreviewScenarios.swift in Sources */,
 				21771589D669A08650041550 /* Promotion.swift in Sources */,
 				8E93751260FDF488AA388F2F /* PromotionView.swift in Sources */,
 				7B445929EE7F0B52FCDAF886 /* Selection.swift in Sources */,
@@ -1097,6 +1157,15 @@
 			buildActionMask = 2147483647;
 			files = (
 				AC4254D2D4694A597205850D /* BChessUITests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DE6A04FA529F1BF8EDC72506 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C8674BA4884491D978009944 /* PreviewScenarioTests.swift in Sources */,
+				A5A45A6078078018D83ABD2E /* SnapshotGalleryTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1131,6 +1200,11 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		5F113EB56CE2462A1F8B9C02 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 91D0B727552821ADC37F6F1F /* BChess (iOS) */;
+			targetProxy = B9873F82E9E75DFA15879038 /* PBXContainerItemProxy */;
+		};
 		ABB173ECA26684FBB9B725E2 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 91D0B727552821ADC37F6F1F /* BChess (iOS) */;
@@ -1303,6 +1377,23 @@
 			};
 			name = Debug;
 		};
+		9FA88D34027A499A278466DB /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "ch.arizona-software.BChessGalleryTests";
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/BChess.app/BChess";
+			};
+			name = Debug;
+		};
 		A6505E0FA7F743080FD83478 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -1336,6 +1427,23 @@
 				TEST_TARGET_NAME = "BChess (iOS)";
 			};
 			name = Debug;
+		};
+		BD033719D0A31EC792ECDDC7 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "ch.arizona-software.BChessGalleryTests";
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/BChess.app/BChess";
+			};
+			name = Release;
 		};
 		C141881DF666B1485E04ACA2 /* Release */ = {
 			isa = XCBuildConfiguration;
@@ -1523,6 +1631,15 @@
 			buildConfigurations = (
 				B5F560A72853B1D0AA510176 /* Debug */,
 				06A586B11017FD8C2C672D35 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		A588B1D451A1AC4CF19B32E1 /* Build configuration list for PBXNativeTarget "BChessGalleryTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				9FA88D34027A499A278466DB /* Debug */,
+				BD033719D0A31EC792ECDDC7 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
