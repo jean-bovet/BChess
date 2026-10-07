@@ -399,9 +399,13 @@ private:
         pv.qsDepth = depth;
         maxPly = std::max<int64_t>(maxPly, depth);
         
-        // A side in check cannot decline to move: it has no stand-pat, and its legal moves are the evasions. The
-        // line cannot get any longer past MAX_PLY, as in alphabeta, and there the stand-pat is the answer.
-        bool inCheck = depth < MAX_PLY && node.isCheck(node.color);
+        // The line cannot get any longer: the static evaluation is the answer, as in alphabeta
+        if (depth >= MAX_PLY) {
+            return mateAtPly(ChessEvaluater::evaluate(node) * color, depth);
+        }
+        
+        // A side in check cannot decline to move: it has no stand-pat, and its legal moves are the evasions
+        bool inCheck = node.isCheck(node.color);
         
         int standPat = 0;
         int bestValue;
@@ -414,7 +418,7 @@ private:
             bestValue = -INT_MAX;
         } else {
             standPat = mateAtPly(ChessEvaluater::evaluate(node) * color, depth);
-            if (depth >= MAX_PLY || standPat >= beta) {
+            if (standPat >= beta) {
                 return standPat;
             }
             

@@ -270,24 +270,34 @@ TEST_F(MinMaxSearchTests, TTMateIsPlyRelative) {
             ASSERT_EQ(c.sign * (mate - 3), searchWithTable(c.p, 4, true, table, pv1));
             ASSERT_EQ(c.sign * (mate - 4), searchWithTable(c.q, 5, true, table, pv2)) << c.q;
         }
-        // (b) Q stores P at ply 1; a search of Q that starts at ply 1 (the table does not cut off at ply 0) reads
-        // P back at ply 2, one ply deeper than it was stored
+        // (b) a table that holds only P's entry (stored at ply 0), read by a search of Q that starts at ply 1 (the
+        // table does not cut off at ply 0): Q has no entry, so P is probed at ply 2 and nowhere else
         {
-            TranspositionTable table;
-            MinMaxSearch::Variation pv1, pv2, pv3;
-            ASSERT_EQ(c.sign * (mate - 4), searchWithTable(c.q, 5, true, table, pv1)) << c.q;
+            TranspositionTable stored;
+            MinMaxSearch::Variation pv1;
+            ASSERT_EQ(c.sign * (mate - 3), searchWithTable(c.p, 4, true, stored, pv1));
+            ChessBoard pBoard;
+            ASSERT_TRUE(FFEN::setFEN(c.p, pBoard));
+            ASSERT_TRUE(stored.exists(pBoard.getHash()));
+            TranspositionEntry entry = stored.get(pBoard.getHash());
             
-            auto searchQ = [&](TranspositionTable &t, MinMaxSearch::Variation &pv) {
+            auto searchQ = [&](TranspositionTable &t, int64_t &nodes) {
                 ChessBoard board;
                 EXPECT_TRUE(FFEN::setFEN(c.q, board));
                 MinMaxSearch search;
                 search.config.maxDepth = 5;
-                MinMaxSearch::Variation bv;
-                return search.alphabeta(board, NEW_HISTORY, t, 1, board.color == WHITE, pv, bv);
+                MinMaxSearch::Variation pv, bv;
+                int score = search.alphabeta(board, NEW_HISTORY, t, 1, board.color == WHITE, pv, bv);
+                nodes = search.visitedNodes;
+                return score;
             };
-            TranspositionTable fresh;
-            ASSERT_EQ(c.sign * (mate - 5), searchQ(fresh, pv3));
-            ASSERT_EQ(c.sign * (mate - 5), searchQ(table, pv2)) << c.q;
+            TranspositionTable onlyP;
+            onlyP.store(entry.depth, entry.hash, entry.value, entry.bestMove, entry.type);
+            TranspositionTable empty;
+            int64_t withEntry = 0, without = 0;
+            ASSERT_EQ(c.sign * (mate - 5), searchQ(empty, without));
+            ASSERT_EQ(c.sign * (mate - 5), searchQ(onlyP, withEntry)) << c.q;
+            ASSERT_LT(withEntry, without) << "P's entry settled the node at ply 2";
         }
     }
 }
