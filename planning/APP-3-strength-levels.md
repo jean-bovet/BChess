@@ -35,7 +35,10 @@ Jean's decisions (2026-10-07), which this plan does not reopen:
 - **Old levels lose their meaning.** The old `GamePlayer.level` values 0–3 meant 2/5/10/15 s. Every old
   `.json` and `.pgn` file must still open (I1).
 - **The sheet is design "C · Opponent ladder"** on iPhone and Mac (the approved mockups
-  `NewGameLadder.dc.html` and `NewGameMac.dc.html`). It replaces `NewGameView` and `NewGameView_iOS`,
+  `planning/assets/APP-3/NewGameLadder.dc.html` (iPhone) and `planning/assets/APP-3/NewGameMac.dc.html`
+  (Mac): the source of the "NG-C" boards on Jean's design canvas "BChess UI refresh"
+  (https://claude.ai/artifact/RVXpPKHmPnQ1qx9xuUQaJC, private to Jean). Their `/_blob/…` images are the
+  app's own piece images, so the files read as layout and wording but do not render outside the canvas). It replaces `NewGameView` and `NewGameView_iOS`,
   including "Players & Level".
 
 ## 1. Problem, with evidence
@@ -365,7 +368,7 @@ The friend's tile and the segmented controls use `Walnut.background`. No colour 
   card, and the full-width primary button at the bottom.
 - **Mac.** The title, the list (330 pt) on the left and the card's controls on the right, then Cancel
   (`.cancelAction`) and the primary button (`.defaultAction`) at the bottom right, as in
-  `NewGameMac.dc.html`.
+  `planning/assets/APP-3/NewGameMac.dc.html`.
 - **Edit mode** (D4) is the same sheet, titled "Players", with the button "Done". The side picker shows
   White and Black only, since flipping a coin in the middle of a game is not a choice.
 - **The sheet remembers the last choice.** `@AppStorage` keeps `newGame.opponent`, `newGame.side`,
