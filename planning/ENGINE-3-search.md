@@ -260,8 +260,21 @@ caller, the same way `deltaPruning` is used.
   cost.
 - **Not in check: unchanged.** The `firstMoveOnly` mate test in stand-pat stays as it is.
 - **Cost.** Recorded on the bench. Nodes are expected to rise slightly.
+- **Decision (Jean, 2026-10-07): step 4 gets its own non-regression SPRT [−5, 0] against step 3 (b94a8c6).**
+  - Measured at 97ca54b against step 3, depth 6 bench: TT off nodes 2,214,483 → 5,698,320 (+157 %),
+    instructions 11.83 G → 26.65 G (+125 %); TT on nodes 1,680,703 → 4,849,677 (+189 %), instructions
+    7.78 G → 20.76 G (+167 %). Not "slightly": about 10 % of quiescence nodes are in check, with about 4 evasions
+    each.
+  - The command, run from the step 4 head (after the review fixes) with nothing else heavy running:
+    `BASE=b94a8c6 ELO0=-5 ELO1=0 TIMEMARGIN=200 MAX_GAMES=8000 TC=5+0.05 CONCURRENCY=4 scripts/elo-match.sh`
+  - If it fails, the fallback is evasions in check only at the first quiescence ply, and the SPRT is run again.
+  - Not started: runs begin in the evening, when Jean says.
 
 ### Step 5 — Check extension (SPRT, non-regression; D3)
+
+**Decision (Jean, 2026-10-07):** re-check `BestMoveTests.WhiteThreatenMate` against the 30 cp rule after the
+check extension (it accepts `Rd8d7` as a temporary exception, see step 4). If it still fails, fix the search or
+the test before step 5 lands.
 
 - **The rule.** When the move just played gives check, the child is searched with `depthLeft`
   unchanged (one ply of extension).

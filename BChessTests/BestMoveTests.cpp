@@ -138,14 +138,22 @@ TEST_F(BestMoveTests, BlackMoveToMate) {
 
 TEST_F(BestMoveTests, WhiteThreatenMate) {
     std::string start = "3r1k1r/1pp2ppp/pq6/3P4/5Q2/P1P4P/1P1R2P1/5R1K b - - 2 24";
-    std::string end = "5k1r/1ppr1pp1/pq5p/3P4/2P2Q2/P6P/1P2R1P1/5R1K b - - 0 26";
     // Note: black king is about to get mate.
     // Stockfish depth 20: f7f6 is the best move (about -3.6 pawns for a lost position), Rd8d7 -4.4. The search
     // sees both at +0.15 and the move order breaks the tie: the table-less depths 3, 5 and 6 already play
     // Rd8d7. Since quiescence searches the evasions of a side in check (ENGINE-3 search step 4) the depth-4
-    // search plays it too, which the ENGINE-1 judge (within 30 centipawns of the best) does not accept. Kept as
-    // what the search plays; the position needs more than a search of this depth to see the mate.
-    assertBestMove(start, end, "Rd8d7 Rd2e2 h7h6 c3c4");
+    // search plays it too, which the ENGINE-1 judge (within 30 centipawns of the best) does not accept.
+    // TEMPORARY EXCEPTION (Jean, 2026-10-07): Rd8d7 is accepted until the check extension (step 5) has been
+    // measured; then this is re-checked against the 30 cp rule. Any other move is a regression.
+    ChessBoard board;
+    ASSERT_TRUE(FFEN::setFEN(start, board));
+    ChessMinMaxSearch search;
+    TranspositionTable table;
+    ChessMinMaxSearch::Variation pv, bv;
+    search.alphabeta(board, NEW_HISTORY, table, 0, false, pv, bv);
+    ASSERT_GT(pv.moves.count, 0);
+    auto move = FPGN::to_string(pv.moves.bestMove(), FPGN::SANType::uci);
+    ASSERT_TRUE(move == "f7f6" || move == "d8d7") << move;
 }
 
 // A smoke test: a transposition table legitimately changes the line the search finds (entries of other
