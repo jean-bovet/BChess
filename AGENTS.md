@@ -52,6 +52,8 @@ new view gets a named `#Preview`. A view compiled for iOS gets a scenario in
 `/preview-gallery` renders those on iOS. A macOS-only view keeps an inline `#Preview`, outside the
 gallery. A preview never forces an appearance or a language. A thread-safety fix gets a test that would fail (or hang) without it.
 
+**Swift Testing rules.** `#require` for preconditions without which the rest of the test is meaningless; `#expect` for the checks themselves. `#expect(throws: SpecificError.self)` (or a specific value), never a bare `throws`; use the returned error when inspecting it. `.timeLimit` takes whole minutes only. A `confirmation()` must outlive the async work it confirms — await that work inside its closure. Exit tests (`#expect(processExitsWith:)`) cover `precondition` / `fatalError` paths. Verification helpers take `sourceLocation: SourceLocation = #_sourceLocation` so failures point at the caller. `withKnownIssue` for a known failure (it fails once the issue stops reproducing), never a disabled test. `@Suite(.serialized)` serializes **every** test in the suite (not only parameterized ones); a suite touching process-wide state needs it — never remove it as dead code.
+
 **Conventions.** English UI strings, code, identifiers and comments. New Swift code states
 isolation (`@MainActor` / `nonisolated` / `@Sendable`). Match the surrounding style. Commit when
 asked.
