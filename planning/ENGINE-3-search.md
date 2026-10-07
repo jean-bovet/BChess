@@ -23,6 +23,38 @@ SPRT, lazy table, TT-move and killer ordering, delta pruning) and repeats none o
   - PVS's exactness gate turns delta pruning off.
   - The live-material and extension-bound tests now test what they claim.
 
+## Status and how to resume (2026-10-07)
+
+**Paused by Jean before the first SPRT**, waiting for a more powerful machine. Everything needed to
+resume is on the branch `engine-3-search` (pushed to `origin`); nothing lives outside the repository.
+
+- **Done (steps 1–4)**, all gates green at `88cdec2` (macOS: 148 Swift tests and 198 GoogleTest
+  cases; iOS UI test; `BChessUCI` build; zero warnings), plus Codex code review round 1 (no blockers;
+  both findings fixed in `5704eae`). Commits: plan acceptance `ea14055`, then step 1 `907d134`,
+  step 2 `f0ebaa2`, step 3 `b94a8c6`, step 4 `97ca54b`, review fixes `5704eae`, Jean's decisions
+  `88cdec2`.
+- **Next action: the step 4 non-regression SPRT** (Decision under step 4), from the branch head, with
+  nothing else heavy running on the machine:
+
+  ```
+  BASE=b94a8c6 ELO0=-5 ELO1=0 TIMEMARGIN=200 MAX_GAMES=8000 TC=5+0.05 CONCURRENCY=4 scripts/elo-match.sh
+  ```
+
+  On a machine with more cores, raise `CONCURRENCY` (leave at least two cores free; the gates and
+  the A/B results are only comparable when nothing else runs). `scripts/elo-match.sh` downloads
+  fastchess and Stockfish into the git-ignored `.elo/` folder on first use (see `docs/elo.md`).
+  - Pass → step 5 (check extension; re-check `WhiteThreatenMate`, Decision under step 5), then its
+    SPRT, and so on one step at a time (steps 5–13 below).
+  - Fail → the fallback recorded under step 4 (evasions only at the first quiescence ply), rerun.
+- **Process when resuming:** `/develop --execute planning/ENGINE-3-search.md` in this worktree (or a
+  fresh `git worktree add .claude/worktrees/engine-3-search engine-3-search` on the new machine):
+  implementation in a Sonnet subagent, one SPRT at a time, never during an `xcodebuild` gate; a
+  Codex review of steps 5–13 before handing back.
+- **Step 12's SEE candidate** is kept in the repository as a patch:
+  `planning/assets/ENGINE-3-search/see-candidate-on-4f40ae8.patch` (7 files, applies cleanly to
+  speed's step 8 commit `4f40ae8`; `SEETests.cpp` is a new file under `BChessTests/`, so run
+  `xcodegen generate` after porting it).
+
 Jean's request: the search plan. Two parts:
 
 - **Correctness**, proven by tests that fail first, no SPRT:
@@ -405,7 +437,8 @@ the test before step 5 lands.
 
 ### Step 12 — SEE pruning in quiescence (SPRT [0, 10]; optional, D4)
 
-- **Port the finished candidate** from speed's step 9 (`/private/tmp/claude-501/bchess-engine3/wt9`):
+- **Port the finished candidate** from speed's step 9 (kept as
+  `planning/assets/ENGINE-3-search/see-candidate-on-4f40ae8.patch`, made against `4f40ae8`):
   - `ChessEvaluater::see`;
   - `Configuration::seePruning`;
   - `SEETests.cpp` (11 cases);
@@ -446,7 +479,7 @@ the test before step 5 lands.
   `completedDepth`, the `BCHESS_TEST_HOOKS` `checkpoint` and `quiescenceForTest`.
 - **Tools.** `scripts/bench.sh` (signature, `--compare`), `scripts/elo-match.sh` A/B mode with
   `ELO0`/`ELO1`/`TIMEMARGIN`/`MAX_GAMES`, and the method in `docs/elo.md`.
-- **SEE.** The wt9 candidate (step 12).
+- **SEE.** The speed step 9 candidate, kept as a patch in `planning/assets/ENGINE-3-search/` (step 12).
 
 ## Alternatives rejected
 
@@ -581,7 +614,7 @@ developer tools, not CI.
 
 ## Decisions left open for Jean
 
-**Decision (Jean, 2026-10-07):** D1 TT cut-offs always on (the "Use Transposition Table (Beta)" toggle and its reads are removed; `FEngine` defaults on). D2 search only (`gameEnd`, bridge and UI unchanged). D3 gates as recommended: [0, 10] for steps 7–12, [−5, 0] for check extension, one SPRT at a time, never during an `xcodebuild` gate, long runs in the evening. D4 SEE stays as optional step 12 (port from wt9).
+**Decision (Jean, 2026-10-07):** D1 TT cut-offs always on (the "Use Transposition Table (Beta)" toggle and its reads are removed; `FEngine` defaults on). D2 search only (`gameEnd`, bridge and UI unchanged). D3 gates as recommended: [0, 10] for steps 7–12, [−5, 0] for check extension, one SPRT at a time, never during an `xcodebuild` gate, long runs in the evening. D4 SEE stays as optional step 12 (port the candidate patch in `planning/assets/ENGINE-3-search/`).
 
 - **D1 — TT cut-offs in the app.** **Recommended:** always on, the "Use Transposition Table (Beta)"
   toggle and its two reads are removed, and `FEngine` defaults to on. That is one behaviour, which the
@@ -600,8 +633,8 @@ developer tools, not CI.
 
   Alternative: [−5, 0] for every step, as Jean chose for speed's steps 8–9. It accepts faster but
   does not show a gain.
-- **D4 — SEE pruning.** **Recommended:** keep it as the optional step 12, porting the finished wt9
-  candidate. Only an SPRT is new work, and with null move and LMR in place, quiescence is a larger
+- **D4 — SEE pruning.** **Recommended:** keep it as the optional step 12, porting the finished
+  candidate (the patch in `planning/assets/ENGINE-3-search/`). Only an SPRT is new work, and with null move and LMR in place, quiescence is a larger
   share of the nodes. Alternative: drop it from ENGINE-3 for good.
 
 ## Results (filled in by the implementer)

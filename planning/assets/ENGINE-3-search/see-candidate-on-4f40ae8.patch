@@ -1,0 +1,353 @@
+diff --git a/BChessTests/EngineGoogleTests.swift b/BChessTests/EngineGoogleTests.swift
+index 7208dbc..80a362e 100644
+--- a/BChessTests/EngineGoogleTests.swift
++++ b/BChessTests/EngineGoogleTests.swift
+@@ -27,6 +27,6 @@ struct EngineGoogleTests {
+ 
+     /// The floor that turns "zero GoogleTest cases ran" into a failure.
+     @Test func registersAllCases() {
+-        #expect(GTestRunner.testNames().count >= 181)
++        #expect(GTestRunner.testNames().count >= 193)
+     }
+ }
+diff --git a/BChessTests/MinMaxSearchTests.cpp b/BChessTests/MinMaxSearchTests.cpp
+index 34ae49b..1769cfe 100644
+--- a/BChessTests/MinMaxSearchTests.cpp
++++ b/BChessTests/MinMaxSearchTests.cpp
+@@ -291,6 +291,7 @@ static void iterate(const char *fen, int depth, bool sortMoves, std::vector<int>
+     search.minMaxSearch.config.transpositionTable = false;
+     // Delta pruning depends on alpha, so on the order: plain alpha-beta is the one that the order cannot change
+     search.minMaxSearch.config.deltaPruning = false;
++    search.minMaxSearch.config.seePruning = false;
+     search.minMaxSearch.config.sortMoves = sortMoves;
+     search.start();
+     search.search(board, NEW_HISTORY, depth, [&](ChessEvaluation e) {
+@@ -456,3 +457,27 @@ TEST_F(MinMaxSearchTests, DeltaPruningKeepsAMatingCapture) {
+     ASSERT_EQ("f6g7", FPGN::to_string(rootPV.moves.bestMove(), FPGN::SANType::uci));
+ }
+ #endif
++
++#ifdef BCHESS_TEST_HOOKS
++// Qxb7 mates (the rook on b8 is pinned by Rh8 and the knight guards b7), but SEE scores it as losing because it
++// ignores the pin, so only the exemption of the captures that give check keeps it. Both prunings are on. The
++// plan's position also had a bishop on c6; Bxb7 mates there too and is searched first, which would hide the
++// exemption, so the bishop is left out.
++TEST_F(MinMaxSearchTests, PruningKeepsPinnedMate) {
++    auto fen = "kr5R/1p6/1Q1N4/8/8/8/8/7K w - - 0 1";
++    ChessBoard board;
++    ASSERT_TRUE(FFEN::setFEN(fen, board));
++    ASSERT_LT(ChessEvaluater::see(board, FPGN::uciMove(board, "b6b7")), 0);
++    
++    for (int maxDepth : {0, 1}) {
++        MinMaxSearch search;
++        search.config.maxDepth = maxDepth;
++        search.config.deltaPruning = true;
++        search.config.seePruning = true;
++        TranspositionTable table;
++        MinMaxSearch::Variation pv, bv;
++        ASSERT_EQ(ChessEvaluater::MAT_VALUE - 1, search.alphabeta(board, NEW_HISTORY, table, 0, true, pv, bv)) << maxDepth;
++        ASSERT_EQ("b6b7", FPGN::to_string(pv.moves.bestMove(), FPGN::SANType::uci)) << maxDepth;
++    }
++}
++#endif
+diff --git a/BChessTests/SEETests.cpp b/BChessTests/SEETests.cpp
+new file mode 100644
+index 0000000..cafff23
+--- /dev/null
++++ b/BChessTests/SEETests.cpp
+@@ -0,0 +1,101 @@
++//
++//  SEETests.cpp
++//  BChessTests
++//
++
++#include <gtest/gtest.h>
++
++#include <string>
++
++#include "ChessEngine.hpp"
++#include "ChessEvaluater.hpp"
++#include "FFEN.hpp"
++#include "FPGN.hpp"
++
++class SEETests: public ::testing::Test {
++public:
++    void SetUp() {
++        ChessEngine::initialize();
++    }
++};
++
++// The legal move that the UCI text spells, in the position
++static Move moveIn(ChessBoard &board, const char *uci) {
++    Move move = FPGN::uciMove(board, uci);
++    EXPECT_TRUE(MOVE_ISVALID(move)) << uci;
++    return move;
++}
++
++static int seeOf(const char *fen, const char *uci) {
++    ChessBoard board;
++    EXPECT_TRUE(FFEN::setFEN(fen, board));
++    return ChessEvaluater::see(board, moveIn(board, uci));
++}
++
++TEST_F(SEETests, PawnTakesKnight) {
++    // Undefended: the whole knight
++    ASSERT_EQ(320, seeOf("4k3/8/8/3n4/4P3/8/8/4K3 w - - 0 1", "e4d5"));
++    // Defended by a pawn, which takes back the pawn: 320 - 100
++    ASSERT_EQ(220, seeOf("4k3/8/4p3/3n4/4P3/8/8/4K3 w - - 0 1", "e4d5"));
++}
++
++TEST_F(SEETests, QueenTakesDefendedPawn) {
++    ASSERT_EQ(-800, seeOf("4k3/8/4p3/3p4/8/8/3Q4/4K3 w - - 0 1", "d2d5"));
++}
++
++// The rook behind the one that captures joins the exchange once the first has left the file
++TEST_F(SEETests, XRayBattery) {
++    // Rxd5 +100, Rxd5 -500, Rxd5 +500, and the second black rook, which stood behind the first, takes the last
++    // one: -500. White has lost 100 + 500 - 500 - 500. A SEE that does not look through the rook that left
++    // the file stops after the third capture and says +100.
++    ASSERT_EQ(-400, seeOf("3rk3/3r4/8/3p4/8/8/3R4/3RK3 w - - 0 1", "d2d5"));
++    // Without the rook behind: Rxd5 +100, Rxd5 -500, Rxd5 +500, and the pawn is won
++    ASSERT_EQ(100, seeOf("4k3/3r4/8/3p4/8/8/3R4/3RK3 w - - 0 1", "d2d5"));
++}
++
++TEST_F(SEETests, EnPassant) {
++    ASSERT_EQ(100, seeOf("4k3/8/8/3pP3/8/8/8/4K3 w - d6 0 1", "e5d6"));
++}
++
++// Taking the pawn on d5 en passant removes it from the d-file: the rook on d1 then sees d6 and takes the pawn
++// back. 100 - 100 = 0. A SEE that leaves the captured pawn on its square thinks it is blocked and says +100.
++TEST_F(SEETests, EnPassantOpensALine) {
++    ASSERT_EQ(0, seeOf("7k/8/8/3pP3/8/8/6K1/3r4 w - d6 0 1", "e5d6"));
++}
++
++TEST_F(SEETests, KingTakesUndefendedPiece) {
++    ASSERT_EQ(320, seeOf("4k3/8/8/8/8/3n4/4K3/8 w - - 0 1", "e2d3"));
++}
++
++// The only defender is the king, but the second rook still attacks d5 after the first took it, so the king
++// cannot take back: the whole knight
++TEST_F(SEETests, KingRecaptureIsRefused) {
++    ASSERT_EQ(320, seeOf("8/8/4k3/3n4/8/8/3R4/3R2K1 w - - 0 1", "d2d5"));
++    // With nothing behind the rook the king does take back: 320 - 500
++    ASSERT_EQ(-180, seeOf("8/8/4k3/3n4/8/8/3R4/6K1 w - - 0 1", "d2d5"));
++}
++
++// Nb2xd1 (+500), exd1=Q (-320 and a queen for a pawn, -800), Rxd1 (+900), Rxd1 (-500):
++// 500 - 1120 + 900 - 500, and the side to move may stop, so what is left is -220. Treating the d1 piece as a
++// pawn after the promotion would say +180.
++TEST_F(SEETests, RecapturePromotion) {
++    ASSERT_EQ(-220, seeOf("3r3k/8/8/8/8/8/1N2p2K/R2r4 w - - 0 1", "b2d1"));
++}
++
++// exd8=Q takes a rook and promotes (+500 + 800), Rxd8 (-900), Rxd8 (+500): 1300 - 900 + 500 = 900. Treating the
++// pawn as a pawn on d8 would say 500.
++TEST_F(SEETests, PromotionCapture) {
++    ASSERT_EQ(900, seeOf("r2r3k/4P3/8/8/8/8/8/3R2K1 w - - 0 1", "e7d8q"));
++}
++
++// Pins are ignored, as in any usual SEE: the knight on b6 is pinned to its king by the rook on b1 and cannot
++// take back on d5, but it counts as a defender, so Rxd5 looks like a rook for a pawn
++TEST_F(SEETests, PinsAreIgnored) {
++    ASSERT_EQ(-400, seeOf("1k6/8/1n6/3p4/8/8/3R4/1R4K1 w - - 0 1", "d2d5"));
++}
++
++// Qxb7 mates (the rook on b8 is pinned by Rh8, the knight guards b7), but SEE counts the pinned rook: Qxb7 +100,
++// Rxb7 -900, Nxb7 +500, Kxb7 -320, so the queen looks lost for a pawn and a rook
++TEST_F(SEETests, PinnedMateLooksLosing) {
++    ASSERT_EQ(-620, seeOf("kr5R/1p6/1Q1N4/8/8/8/8/7K w - - 0 1", "b6b7"));
++}
+diff --git a/BChessTests/SearchChessTests.cpp b/BChessTests/SearchChessTests.cpp
+index 50ab80e..d6f3b74 100644
+--- a/BChessTests/SearchChessTests.cpp
++++ b/BChessTests/SearchChessTests.cpp
+@@ -58,7 +58,9 @@ TEST_F(SearchChessTests, OrderedMove) {
+     ASSERT_TRUE(FFEN::setFEN(fen, board));
+ 
+     Configuration config;
+-    config.deltaPruning = false; // the counts are those of plain alpha-beta with quiescence
++    // The counts are those of plain alpha-beta with quiescence
++    config.deltaPruning = false;
++    config.seePruning = false;
+ 
+     config.sortMoves = true;
+     assertChessSearch(16437, 50, config, board);
+diff --git a/Shared/Engine/Algorithm/MinMaxSearch.hpp b/Shared/Engine/Algorithm/MinMaxSearch.hpp
+index 360abee..ae490e2 100644
+--- a/Shared/Engine/Algorithm/MinMaxSearch.hpp
++++ b/Shared/Engine/Algorithm/MinMaxSearch.hpp
+@@ -36,6 +36,10 @@ struct Configuration {
+     
+     // Quiescence skips a capture that cannot lift the score to alpha even with a margin, unless it gives check
+     bool deltaPruning = true;
++    
++    // Quiescence skips a capture that loses material in the exchange on its square (SEE below 0), unless it gives
++    // check or promotes
++    bool seePruning = true;
+ };
+ 
+ struct MinMaxVariation {
+@@ -398,13 +402,18 @@ private:
+             auto newNode = node;
+             newNode.move(move);
+             
+-            // Delta pruning: this capture cannot lift the score to alpha, even with a margin. Not a promotion,
+-            // not while alpha is a mate score, and never a capture that gives check, which may mate. One rule
+-            // for every pruning of the quiescence search.
+-            if (config.deltaPruning && MOVE_PROMOTION_PIECE(move) == 0 && !ChessEvaluater::isMateScore(alpha) &&
+-                stand_pat + ChessEvaluater::pieceValue(MOVE_CAPTURED_PIECE(move)) + DELTA_MARGIN <= alpha &&
+-                !newNode.isCheck(newNode.color)) {
+-                continue;
++            // Two prunings, with one exemption for both: a capture that gives check is never pruned, because it
++            // may mate, and SEE ignores pins, so it can score a mating capture as losing. Nor is a promotion.
++            // - Delta pruning: the capture cannot lift the score to alpha, even with a margin. Not while alpha is
++            //   a mate score.
++            // - SEE pruning: the capture loses material in the exchange on its square.
++            if (MOVE_PROMOTION_PIECE(move) == 0) {
++                bool hopeless = config.deltaPruning && !ChessEvaluater::isMateScore(alpha) &&
++                    stand_pat + ChessEvaluater::pieceValue(MOVE_CAPTURED_PIECE(move)) + DELTA_MARGIN <= alpha;
++                bool losing = !hopeless && config.seePruning && ChessEvaluater::see(node, move) < 0;
++                if ((hopeless || losing) && !newNode.isCheck(newNode.color)) {
++                    continue;
++                }
+             }
+             
+             visitedNodes++;
+diff --git a/Shared/Engine/ChessEvaluater.cpp b/Shared/Engine/ChessEvaluater.cpp
+index 8f0c281..dc176ad 100644
+--- a/Shared/Engine/ChessEvaluater.cpp
++++ b/Shared/Engine/ChessEvaluater.cpp
+@@ -13,6 +13,8 @@
+ 
+ #include "magicmoves.h"
+ 
++#include <algorithm>
++#include <cstring>
+ #include <iostream>
+ 
+ bool ChessEvaluater::positionalAnalysis = false;
+@@ -103,6 +105,107 @@ int ChessEvaluater::pieceValue(Piece piece) {
+     return PieceValue[piece];
+ }
+ 
++// Every piece of both colors that attacks `square`, with the pieces `bb` on the board `occupancy`
++static Bitboard attackersOf(Square square, Bitboard occupancy, const Bitboard bb[COUNT][PCOUNT]) {
++    Bitboard attackers = 0;
++    for (unsigned color=0; color<COUNT; color++) {
++        // A pawn of the other color on the square sees the squares that our pawns attack it from
++        attackers |= PawnAttacks[INVERSE(color)][square] & bb[color][PAWN];
++        attackers |= KnightMoves[square] & bb[color][KNIGHT];
++        attackers |= KingMoves[square] & bb[color][KING];
++    }
++    Bitboard diagonal = Bmagic(square, occupancy);
++    Bitboard straight = Rmagic(square, occupancy);
++    for (unsigned color=0; color<COUNT; color++) {
++        attackers |= diagonal & (bb[color][BISHOP] | bb[color][QUEEN]);
++        attackers |= straight & (bb[color][ROOK] | bb[color][QUEEN]);
++    }
++    return attackers & occupancy;
++}
++
++int ChessEvaluater::see(ChessBoard &board, Move move) {
++    const Square from = MOVE_FROM(move), to = MOVE_TO(move);
++    const Color mover = MOVE_COLOR(move);
++    
++    Bitboard bb[COUNT][PCOUNT];
++    memcpy(bb, board.pieces, sizeof(bb));
++    Bitboard occupancy = board.getOccupancy();
++    
++    // The mover leaves its square. The pawn that an en-passant capture takes leaves its own square, which
++    // can open a line onto the target.
++    bb_clear(bb[mover][MOVE_PIECE(move)], from);
++    bb_clear(occupancy, from);
++    if (MOVE_IS_ENPASSANT(move)) {
++        Square victim = mover == WHITE ? to - 8 : to + 8;
++        bb_clear(bb[INVERSE(mover)][PAWN], victim);
++        bb_clear(occupancy, victim);
++    }
++    
++    // gain[d] is what the side that makes capture d nets if the exchange stops after it
++    int gain[32];
++    int depth = 0;
++    Piece promoted = MOVE_PROMOTION_PIECE(move);
++    gain[0] = PieceValue[MOVE_CAPTURED_PIECE(move)];
++    Piece onSquare = MOVE_PIECE(move);
++    if (promoted > PAWN) {
++        gain[0] += PieceValue[promoted] - PieceValue[PAWN];
++        onSquare = promoted;
++    }
++    
++    Color side = INVERSE(mover);
++    while (depth < 31) {
++        Bitboard attackers = attackersOf(to, occupancy, bb);
++        
++        // The least valuable attacker of the side to capture
++        Piece capturer = PCOUNT;
++        Bitboard capturers = 0;
++        for (unsigned piece=PAWN; piece<PCOUNT; piece++) {
++            capturers = attackers & bb[side][piece];
++            if (capturers) {
++                capturer = Piece(piece);
++                break;
++            }
++        }
++        if (capturer == PCOUNT) {
++            break;
++        }
++        // The king may only capture when nothing of the other side still attacks the square
++        if (capturer == KING) {
++            Bitboard others = 0;
++            for (unsigned piece=PAWN; piece<PCOUNT; piece++) {
++                others |= attackers & bb[INVERSE(side)][piece];
++            }
++            if (others) {
++                break;
++            }
++        }
++        
++        Square origin = lsb(capturers);
++        depth++;
++        gain[depth] = PieceValue[onSquare] - gain[depth-1];
++        
++        // A pawn that gets to the last rank is a queen from then on
++        Rank lastRank = side == WHITE ? 7 : 0;
++        if (capturer == PAWN && RankFrom(to) == lastRank) {
++            gain[depth] += PieceValue[QUEEN] - PieceValue[PAWN];
++            onSquare = QUEEN;
++        } else {
++            onSquare = capturer;
++        }
++        
++        bb_clear(bb[side][capturer], origin);
++        bb_clear(occupancy, origin);
++        side = INVERSE(side);
++    }
++    
++    // Each side stops the exchange when continuing would cost it
++    while (depth > 0) {
++        gain[depth-1] = -std::max(-gain[depth-1], gain[depth]);
++        depth--;
++    }
++    return gain[0];
++}
++
+ bool ChessEvaluater::isQuiet(Move move) {
+     // A quiet move is a move that is not:
+     // - a capture
+diff --git a/Shared/Engine/ChessEvaluater.hpp b/Shared/Engine/ChessEvaluater.hpp
+index c568eed..bdd8f86 100644
+--- a/Shared/Engine/ChessEvaluater.hpp
++++ b/Shared/Engine/ChessEvaluater.hpp
+@@ -37,6 +37,12 @@ public:
+     // The material value of a piece, in centipawns
+     static int pieceValue(Piece piece);
+     
++    // Static exchange evaluation: what the side that makes `move` (a capture) gains or loses by the exchange of
++    // pieces on its target square, in centipawns, when both sides capture with their least valuable piece and
++    // stop whenever it pays. Pins are ignored: a pinned piece counts as an attacker, as in any usual SEE. A king
++    // captures only when the other side has no attacker left, and a pawn that reaches the last rank is a queen.
++    static int see(ChessBoard &board, Move move);
++    
+     static bool positionalAnalysis;
+     
+     static bool isQuiet(Move move);    
