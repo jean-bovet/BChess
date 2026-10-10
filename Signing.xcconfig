@@ -1,0 +1,7 @@
+// Code-signing base for every configuration (wired via configFiles in project.yml).
+//
+// The Apple Developer team is NOT committed (this repo is public). Locally it comes from the
+// git-ignored Signing.local.xcconfig (copy Signing.local.xcconfig.example); on Xcode Cloud,
+// ci_scripts/ci_post_clone.sh writes that file from $CI_TEAM_ID. Without it the targets build
+// unsigned/with no team, which is enough for simulator builds and tests.
+#include? "Signing.local.xcconfig"

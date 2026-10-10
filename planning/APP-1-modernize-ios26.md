@@ -175,7 +175,7 @@ document browser and its "Create Document" flow instead of a game.
 
 ### 2.1 Project: XcodeGen (step 1)
 
-Add `project.yml` in the style of `~/GitHub/ArizonaSoftware/xFractal/project.yml`, run
+Add `project.yml` in the style of the other XcodeGen-based apps, run
 `xcodegen generate`, and commit both. Delete the hand-written pbxproj and the user-data scheme
 plist (`xcuserdata/`, which `.gitignore` should already cover).
 
@@ -183,7 +183,7 @@ plist (`xcuserdata/`, which `.gitignore` should already cover).
 - `settings.base`:
   - `SWIFT_VERSION: "5.0"` in step 1 (it becomes `"6.0"` in step 7).
   - `CLANG_CXX_LANGUAGE_STANDARD: c++20`, `CLANG_CXX_LIBRARY: libc++`.
-  - `DEVELOPMENT_TEAM: 28XRU7S6GA`, `CODE_SIGN_STYLE: Automatic`.
+  - `CODE_SIGN_STYLE: Automatic` (the team comes from a git-ignored `Signing.local.xcconfig`).
   - `HEADER_SEARCH_PATHS: [$(SRCROOT)/Shared/Engine/**, $(SRCROOT)/Shared/Bridge]`.
   - `GENERATE_INFOPLIST_FILE: NO`.
   - `MARKETING_VERSION` and `CURRENT_PROJECT_VERSION` copied from the current pbxproj. This is not
@@ -712,7 +712,7 @@ in `BChessUIApp.init`. There is no other test hook.
 
 ### 2.8 CI (step 8)
 
-`.github/workflows/ci.yml`, modeled on `~/GitHub/Symphony/.github/workflows/ci.yml`.
+`.github/workflows/ci.yml`, a standard Xcode build-and-test workflow.
 - It runs on `pull_request` and on `push` to `main`, with `permissions: contents: read` and
   `concurrency` cancel-in-progress.
 - It uses no secrets, so there is no network use beyond GitHub itself (I5 concerns the app, not CI).

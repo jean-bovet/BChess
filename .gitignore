@@ -10,3 +10,6 @@ BChess.xcodeproj/project.xcworkspace/xcshareddata
 
 # Preview gallery (scripts/snapshot-gallery.sh)
 previews/
+
+# Per-machine signing team (see Signing.xcconfig)
+Signing.local.xcconfig
