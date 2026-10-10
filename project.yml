@@ -7,12 +7,16 @@ options:
   createIntermediateGroups: true
   xcodeVersion: "27.0"
 
+# Signing team comes from Signing.xcconfig -> git-ignored Signing.local.xcconfig (public repo).
+configFiles:
+  Debug: Signing.xcconfig
+  Release: Signing.xcconfig
+
 settings:
   base:
     SWIFT_VERSION: "6.0"
     CLANG_CXX_LANGUAGE_STANDARD: c++20
     CLANG_CXX_LIBRARY: libc++
-    DEVELOPMENT_TEAM: 28XRU7S6GA
     CODE_SIGN_STYLE: Automatic
     HEADER_SEARCH_PATHS:
       - $(SRCROOT)/Shared/Engine/**

@@ -416,6 +416,7 @@
 		FECF3456A6E4C0D9547AC353 /* GameHistory.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = GameHistory.cpp; sourceTree = "<group>"; };
 		FEEA804C177D0F7528A254ED /* ChessState.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = ChessState.hpp; sourceTree = "<group>"; };
 		FFBE02E6B7A75B593B086B33 /* BChessUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BChessUITests.swift; sourceTree = "<group>"; };
+		"TEMP_EC100CEF-7562-43B7-B92D-2960AC78BCD7" /* Signing.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Signing.xcconfig; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -730,6 +731,14 @@
 			path = Helper;
 			sourceTree = "<group>";
 		};
+		"TEMP_188252DA-FBAB-4B20-B339-7C77689524A0" /* BChess */ = {
+			isa = PBXGroup;
+			children = (
+				"TEMP_EC100CEF-7562-43B7-B92D-2960AC78BCD7" /* Signing.xcconfig */,
+			);
+			path = BChess;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -851,27 +860,21 @@
 				LastUpgradeCheck = 2700;
 				TargetAttributes = {
 					08FB82B9B37F67BA11C4EB8A = {
-						DevelopmentTeam = 28XRU7S6GA;
 						ProvisioningStyle = Automatic;
 					};
 					0D34FC7106C6F49747B8416E = {
-						DevelopmentTeam = 28XRU7S6GA;
 						ProvisioningStyle = Automatic;
 					};
 					178ACF2B5B59047059B2ABB2 = {
-						DevelopmentTeam = 28XRU7S6GA;
 						ProvisioningStyle = Automatic;
 					};
 					91D0B727552821ADC37F6F1F = {
-						DevelopmentTeam = 28XRU7S6GA;
 						ProvisioningStyle = Automatic;
 					};
 					A3123C2DF40485F4E7E94FE1 = {
-						DevelopmentTeam = 28XRU7S6GA;
 						ProvisioningStyle = Automatic;
 					};
 					A3F74A0EAA013625F9523E1E = {
-						DevelopmentTeam = 28XRU7S6GA;
 						ProvisioningStyle = Automatic;
 						TestTargetID = 91D0B727552821ADC37F6F1F;
 					};
@@ -1464,6 +1467,7 @@
 		};
 		E7C507022C63CE4AB3B5B467 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = "TEMP_EC100CEF-7562-43B7-B92D-2960AC78BCD7" /* Signing.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ANALYZER_NONNULL = YES;
@@ -1500,7 +1504,6 @@
 				CURRENT_PROJECT_VERSION = 110;
 				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
-				DEVELOPMENT_TEAM = 28XRU7S6GA;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
@@ -1539,6 +1542,7 @@
 		};
 		ECE2B603E0677805EDE48B09 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = "TEMP_EC100CEF-7562-43B7-B92D-2960AC78BCD7" /* Signing.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ANALYZER_NONNULL = YES;
@@ -1575,7 +1579,6 @@
 				CURRENT_PROJECT_VERSION = 110;
 				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				DEVELOPMENT_TEAM = 28XRU7S6GA;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
