@@ -86,8 +86,13 @@ replace it.
 - **Reading results.** Read the **exit status** and the summary line of every command; an empty grep
   is clean only if the command succeeded. The number of tests run is part of the result: zero is red,
   and a count that shrinks needs an explanation (a conditionally disabled test counts as skipped).
-- A regression test is proven red without its fix before it goes green. No version bump during
-  feature work.
+- **Red proof.** A regression test is proven red without its fix before it goes green: commit the
+  fix first, revert only the fix's lines, run the test and see it fail, restore with
+  `git checkout -- <file>` (never a hand-written inverse), then confirm `git status` is clean and grep
+  the tree for any temporary marker. No version bump during feature work.
+- **Warnings.** Fix every warning the branch touches or reveals, including ones that predate it.
+  Deprecations are fixed, never silenced (`@available`, `#warning`, suppression flags); if the fix
+  conflicts with a documented decision, update that decision's comment.
 - **Docs-only changes** (no code) skip the build gates: `git diff --check`, every link and citation
   still resolves, and the working agreement, plans index and README stay consistent.
 
@@ -157,10 +162,15 @@ request, findings Jean has already seen, and the worktree path, then reads the f
 
 One plan file (pattern and index in Context), in this shape: **problem with evidence** (design-doc
 section, file:line), **design** (the smallest change that is correct, with what it reuses),
-**alternatives rejected and why**, **test plan** (the failing tests, named, and what each proves),
+**alternatives rejected and why**, **test plan** (the failing tests, named, and what each proves; for every new entity or field,
+the line that writes it, the screen line that shows it, and the test or preview that covers the
+path between them through the production reader — not a parallel test-only path; fixtures carry
+real data shapes — tombstones, empty and removed entries, multi-item records; when a data source is
+replaced, the plan diffs its contents, not just its reader),
 **invariants** (each one: holds / at risk and how it is held / not applicable), **risks and
 rollout** (the plan risks in Context), **decision left open for Jean**. Large work is split into
-numbered steps, one commit each. Add its row to the plans index.
+numbered steps, one commit each, listed under a `## Steps` heading as `1. **<title>** — <what>`
+(the status line counts those lines to show plan progress). Add its row to the plans index.
 
 The simplicity bar: every new abstraction names its second caller or does not exist; no config knob
 nobody will set; no layer that only forwards; extend existing code before adding beside it; no
@@ -180,7 +190,9 @@ forever on "Reading additional input from stdin...". Read-only always; never `--
 
 > Review `<plan file>` against the code in this worktree and the invariants (`<invariants file>`).
 > Return, in order: BLOCKERS (the plan is wrong or breaks an invariant — name the input or state),
-> SHOULD-FIX (a real gap in the design or the test plan), SIMPLER (a smaller design that meets the
+> SHOULD-FIX (a real gap in the design or the test plan — including any new entity or field
+> without a traced path from the line that writes it to the screen that shows it, covered by a
+> test or preview that uses the production read path), SIMPLER (a smaller design that meets the
 > same goal), ALREADY-EXISTS (code the plan reimplements — file and symbol). Say "none" for an empty
 > section. End with one line `substantive: yes|no`. Do not praise the plan.
 
@@ -191,14 +203,18 @@ sections and the closing `substantive:` line. Nothing else counts. Every Codex r
    session. If neither, `ps` for a `codex` process; if none, start it again (once). A non-zero exit,
    or a result file that is empty or lacks the sections, is the same failure.
 2. **Progress every 10 minutes**, never sleep-and-hope. A log untouched for 15 minutes with the
-   process alive is a stall: kill it and restart the round.
+   process alive is a stall: kill it (and a stalled broker, whose pid is in the plugin state's
+   `broker.json`) and restart the round.
 3. **The `codex:codex-rescue` wrapper is the fallback, not the default** — it can fork a job with an
    empty prompt and wait forever. If used, its only evidence is the job log under
-   `~/.claude/plugins/data/codex-openai-codex/state/<repo-or-worktree>-*/jobs/`.
+   `~/.claude/plugins/data/codex-openai-codex/state/<repo-or-worktree>-*/jobs/` — check every state
+   dir, a worktree gets its own. No job log within 2 minutes means it forked with an empty prompt:
+   run `codex exec` directly.
 4. **Never report a round that did not run as a round.** If Codex is down after one restart, run
    the same prompt through the substitute reviewer (Codex policy), label it "substitute review",
    and continue.
-5. **Long results get truncated in delivery**: read the result FILE, never the message.
+5. **Long results get truncated in delivery**: read the result FILE, never the message; if only a
+   message exists, ask for the remainder from the last line you saw.
 
 Fold each finding in: **accept** (edit the plan, bump "revision N" in its header with a one-line
 changelog) or **reject** (write the rationale into the plan, so the next round does not re-raise it).
@@ -219,7 +235,7 @@ Agent(model: "sonnet", name: "<id-slug>-impl", prompt: …)
 The prompt carries: the **absolute worktree path** (every command runs there — state it twice), the
 plan path ("implement this plan; where it is silent, choose the smallest correct option and list it
 as a deviation"), and "follow the working agreement; run the gates in
-`.claude/skills/develop/SKILL.md`". Do not paste the gates. One commit per plan step with the
+`.claude/skills/develop/SKILL.md`". Do not paste the gates. One commit per plan step, subject `<ID> step N: <summary>`, with the
 session's attribution trailer. Its report must list: what was built (commit list), every deviation
 from the plan and why, the test summary lines verbatim, the warnings check and its result, and
 anything left unfinished. Treat "done" claims as claims: check `git log main..HEAD --oneline` and the
@@ -229,7 +245,8 @@ test summary yourself before phase 5.
 
 Same prompt shape as phase 3, against `git diff main...HEAD` **and the plan** — does the code do
 what the plan says, do the tests prove what they claim (would each fail without its change?), which
-invariant is most at risk, what is more complex than its job requires, what is duplicated. Do not
+invariant is most at risk, what is more complex than its job requires, what is duplicated, and
+whether every new entity or field reaches its screen through the production read path. Do not
 attach the whole design doc. Same `codex exec` command and the same "did it run" protocol.
 
 Send each accepted finding to the **same** subagent with `SendMessage`. Rejected findings get a
@@ -241,17 +258,19 @@ the Codex policy.
 The deliverable is a green, reviewed branch in the worktree — the final gate (fresh `<dd>`) run
 last — plus a report: what shipped (commits),
 plan revisions and review rounds with what each changed, findings rejected and why, gates run (the
-test summary lines, the warnings check), and what is owed (the owed checks in Context). **When Jean
+test summary lines, the warnings check, and each conditional gate — which ran and which did not),
+and what is owed (the owed checks in Context). **When Jean
 says land, the feature lands as ONE squashed commit:**
 
 1. `git fetch && git rebase main` in the worktree, then the final gate (fresh `<dd>`) after the rebase.
 2. On `main`: `git merge --squash <branch>` then ONE `git commit` whose subject is the plan id and a
    sentence and whose body carries the branch's commit subjects (`git log main..<branch>
    --format='- %s'`), each regression test's red proof in one line, every gate's summary line, the
-   plan revisions and review rounds, and the attribution trailer.
+   plan revisions and review rounds, the plan's index-row text, and the attribution trailer. Write
+   the message before deleting anything.
 3. The test gate once more on `main`, then `git push origin main`.
-4. Remove the worktree and `git branch -D` the branch. Update the plan's index row to
-   "Implemented on main <date>".
+4. Remove the worktree, `git worktree prune`, and `git branch -D` the branch (`-D`, because git never
+   sees a squashed branch as merged). Update the plan's index row to "Implemented on main <date>".
 
 ## Anti-patterns
 
