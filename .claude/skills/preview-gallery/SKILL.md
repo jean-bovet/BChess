@@ -2,7 +2,7 @@
 name: preview-gallery
 description: Render every iOS screen of BChess in light and dark with one snapshot-test run (scripts/snapshot-gallery.sh) and assemble previews/index.html, one card per #Preview with light and dark side by side. Use when Jean asks to see the screens, to check the UI after a change to a view, or to regenerate the preview gallery. The Xcode MCP RenderPreview (last section) is for spot checks while editing a view.
 argument-hint: [simulator name or id]
-allowed-tools: Read, Glob, Grep, Bash, mcp__xcode__XcodeListWorkspaces, mcp__xcode__XcodeOpenWorkspace, mcp__xcode__RenderPreview
+allowed-tools: Read, Glob, Grep, Bash, mcp__xcode__XcodeListWorkspaces, mcp__xcode__XcodeOpenWorkspace, mcp__xcode__RenderPreview, mcp__xcode__XcodeListSchemes, mcp__xcode__XcodeSwitchScheme
 ---
 
 # /preview-gallery: every screen, rendered light and dark, on one page
@@ -23,7 +23,8 @@ checks the gallery, and opens the page. DerivedData is persistent (`BCHESS_SNAPS
 `test-without-building`, both with `-parallel-testing-enabled NO`. One simulator at a time: the script stops with a message
 when another simulator is booted, and shuts down only a simulator it booted itself. The "BChess Agent" simulator (iPhone
 17 Pro) is created if missing; pass `--keep-booted` for repeated runs and `scripts/snapshot-gallery.sh --shutdown`
-(which never creates one) when finished. Its first boot can take many minutes.
+(which never creates one) when finished. During a `/develop` plan, pass `--keep-booted` from the first gate on and
+`--shutdown` at the plan's end. Its first boot can take many minutes.
 
 - The gallery is iOS only, English only, light and dark. The macOS-only `DocumentWindow` preview is outside it.
 - **Done = `CHECK OK: N cards, light and dark complete and correctly lit`.** Then read the new or changed PNGs in both
@@ -51,22 +52,32 @@ scenario without a `#Preview`, a `#Preview` that does not render its own scenari
 `PreviewScenarios.swift`. Staleness is conservative: the script records the mtime of every file under `Shared/` and `iOS/` and of
 `BChess/Openings.pgn` before the build, and any difference now (edited, added, deleted, also during the run) makes every
 card stale. A PNG in `previews/` that no `#Preview` expects is reported as stray, and so is a `#Preview` written in a form
-the script cannot read (use `#Preview("Name") {` on one line).
+the script cannot read (use `#Preview("Name") {` on one line). Never treat a card tagged "stale" as current.
 
 ## Rule: previews never force an appearance or a language
 
 A `#Preview` and a scenario must not set `.preferredColorScheme(...)` or `.environment(\.locale, ...)`: the light and dark
 passes decide the scheme. A forced scheme makes a "light" card dark (and the reverse). A state that only existed as a
-"dark" preview becomes a named light-and-dark scenario.
+"dark" preview becomes a named light-and-dark scenario. Dynamic Type variants (`.environment(\.dynamicTypeSize, ...)`,
+named "... · XXL" or "... · Accessibility") are fine.
 
 ## Report
 
-The card count, the path opened, and any scenario that would not render. Then read the new or changed screens with the
-Read tool in both appearances and say what looks wrong (copy, hierarchy, colours, missing elements, truncation, contrast).
+The card count, the path opened, and any preview that would not render with the error's first line. Then read at least
+the new or changed screens with the Read tool, **in both appearances** and on every platform rendered, and say what looks
+wrong (copy, hierarchy, colours, missing elements, truncation, contrast).
 Screenshots nobody looks at are not a gate. A visual finding is reported, not fixed in passing.
 
 ## Spot checks while editing a view: Xcode MCP `RenderPreview`
 
-For one view, while editing, `mcp__xcode__XcodeListWorkspaces` (open `BChess.xcodeproj` with `XcodeOpenWorkspace` if
-needed) and `mcp__xcode__RenderPreview` with the project-relative source path and the `#Preview` index render a single
-preview in a few seconds. That output has no import path into `previews/`: only the snapshot run feeds the gallery.
+For one view, while editing, `mcp__xcode__RenderPreview` renders a single preview in a few seconds. That output has no
+import path into `previews/`: only the snapshot run feeds the gallery.
+
+- `mcp__xcode__XcodeListWorkspaces`; if `BChess.xcodeproj` is not open, `mcp__xcode__XcodeOpenWorkspace` with its absolute
+  path. When checking a branch, open **that worktree's** project, not the main checkout's. A permission error means Jean
+  must approve the session from Xcode's menu bar: ask once and stop.
+- `mcp__xcode__XcodeListSchemes`: note `activeSchemeName` and **restore it whenever this skill stops** (after the last
+  render, or on any early exit), so Jean's next unrelated build is not on another scheme.
+- Call `RenderPreview` with the project-relative source path (never an absolute one) and the `#Preview`'s zero-based
+  index within its file. A light render passes `previewVariantOverrides: {"Color Scheme": "Light Appearance"}`
+  explicitly (without it a render follows the Mac's own appearance); a dark one passes `"Dark Appearance"`.

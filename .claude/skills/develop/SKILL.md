@@ -92,7 +92,11 @@ replace it.
   the tree for any temporary marker. No version bump during feature work.
 - **Warnings.** Fix every warning the branch touches or reveals, including ones that predate it.
   Deprecations are fixed, never silenced (`@available`, `#warning`, suppression flags); if the fix
-  conflicts with a documented decision, update that decision's comment.
+  conflicts with a documented decision, update that decision's comment. A build-only warnings check uses
+  `xcodebuild -target <target>` with its own `SYMROOT` — never a scheme, so the shared build (or a running
+  app the scheme drives) stays untouched — and `COMPILER_INDEX_STORE_ENABLE=NO` on the command line:
+  without a derived-data path Xcode emits an empty `-index-store-path` and clang's hardening flag turns
+  into a bare warning. Keep that flag off the project files, so Xcode still indexes.
 - **Docs-only changes** (no code) skip the build gates: `git diff --check`, every link and citation
   still resolves, and the working agreement, plans index and README stay consistent.
 
@@ -116,7 +120,7 @@ count is printed by the suite) — zero executed is red, never green.
 
 **Warnings gate:** zero compiler warnings in our own sources (`Shared/`, `iOS/`, `macOS/`, `BChess/`,
 `BChessTests/`, `BChessAppTests/`, `BChessUITests/`, `BChessGalleryTests/`; vendored `Dependencies/`
-and `gtest-all.cc` are exempt). `COMPILER_INDEX_STORE_ENABLE=NO` is required on `-target` builds.
+and `gtest-all.cc` are exempt).
 
 ```
 xcodebuild -target "BChess (iOS)" -sdk iphonesimulator -configuration Debug SYMROOT=<dd>/build-ios OBJROOT=<dd>/obj-ios COMPILER_INDEX_STORE_ENABLE=NO build 2>&1 | grep -E '^/Users/.*(warning|error):|^(warning|error):' | grep -v -e ONLY_ACTIVE_ARCH -e /Dependencies/ -e gtest-all
@@ -260,17 +264,23 @@ last — plus a report: what shipped (commits),
 plan revisions and review rounds with what each changed, findings rejected and why, gates run (the
 test summary lines, the warnings check, and each conditional gate — which ran and which did not),
 and what is owed (the owed checks in Context). **When Jean
-says land, the feature lands as ONE squashed commit:**
+says land, the feature lands as ONE squashed commit through a pull request** — `main` requires pull
+requests (a GitHub rule): never push `main`.
 
-1. `git fetch && git rebase main` in the worktree, then the final gate (fresh `<dd>`) after the rebase.
-2. On `main`: `git merge --squash <branch>` then ONE `git commit` whose subject is the plan id and a
-   sentence and whose body carries the branch's commit subjects (`git log main..<branch>
-   --format='- %s'`), each regression test's red proof in one line, every gate's summary line, the
-   plan revisions and review rounds, the plan's index-row text, and the attribution trailer. Write
-   the message before deleting anything.
-3. The test gate once more on `main`, then `git push origin main`.
-4. Remove the worktree, `git worktree prune`, and `git branch -D` the branch (`-D`, because git never
-   sees a squashed branch as merged). Update the plan's index row to "Implemented on main <date>".
+1. `git fetch && git rebase origin/main` in the worktree, then the final gate (fresh `<dd>`) after the
+   rebase.
+2. In the worktree, `git switch -c <id-slug>-pr origin/main`, `git merge --squash <id-slug>`, then ONE
+   `git commit` whose subject is the plan id and a sentence and whose body carries the branch's commit
+   subjects (`git log origin/main..<id-slug> --format='- %s'`), each regression test's red proof in one
+   line, every gate's summary line, the plan revisions and review rounds, the plan's index-row text, and
+   the attribution trailer. The same commit sets the plan's index row to "Implemented on main <date>".
+   Write the message before deleting anything.
+3. The test gate once more on `<id-slug>-pr`, then `git push -u origin <id-slug>-pr` and
+   `gh pr create --base main` with the commit message as title and body. Jean merges the PR on GitHub;
+   never merge it yourself unless Jean says so.
+4. After the merge: `git pull --ff-only` in the main checkout, remove the worktree, `git worktree prune`,
+   `git branch -D` both branches (`-D`, because git never sees a squashed branch as merged), and
+   `git push origin --delete <id-slug>-pr` if GitHub did not delete it.
 
 ## Anti-patterns
 
