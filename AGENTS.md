@@ -38,6 +38,7 @@ macOS 26 SDKs.
 
 **How work is done.** Engine, bridge, model and app-logic changes go through `/develop` even
 without the slash command. Docs-only changes (`planning/`, `AGENTS.md`, a skill) may land on
+`main`. `main` requires pull requests (a GitHub rule): push a branch and open a PR, never push
 `main`. Landing is Jean's call. No version bumps during feature work. On Claude Code, planning runs
 in a `general-purpose` subagent with `model` omitted, implementation and fix rounds in a subagent
 launched with `model: "sonnet"`, and reviews in Codex (a fresh read-only `model: "opus"` subagent
