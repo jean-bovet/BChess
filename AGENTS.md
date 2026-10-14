@@ -9,7 +9,7 @@ UCI command-line tool.
 `Shared/Bridge/` — Objective-C++ wrapper (`FEngine*`) that Swift sees through the bridging header.
 `Shared/` — SwiftUI views and game model compiled by both apps. `iOS/` and `macOS/` — per-platform
 shells and Info.plists. `BChess/` — the `BChessUCI` command-line tool. `BChessTests/` — engine
-tests (GoogleTest cases plus Swift tests). `BChessGalleryTests/` — the iOS-hosted gallery tests.
+tests (GoogleTest cases plus Swift tests). `BChessGalleryTests/` — the iOS-hosted gallery: the scenarios and the snapshot test.
 `Dependencies/gtest` is vendored; do not edit.
 `project.yml` — XcodeGen; never hand-edit `BChess.xcodeproj` (edit the spec, `xcodegen generate`,
 commit both).
@@ -47,11 +47,10 @@ when Codex is unavailable). The parent never implements.
 **Done when.** The test and warning gates in `/develop` are green, including every engine
 GoogleTest case actually executed.
 
-**Tests.** New logic: a failing Swift Testing test first. Views are exempt from unit tests; every
-new view gets a named `#Preview`. A view compiled for iOS gets a scenario in
-`Shared/PreviewSupport/PreviewScenarios.swift`, and its `#Preview` renders that scenario;
-`/preview-gallery` renders those on iOS. A macOS-only view keeps an inline `#Preview`, outside the
-gallery. A preview never forces an appearance or a language. A thread-safety fix gets a test that would fail (or hang) without it.
+**Tests.** New logic: a failing Swift Testing test first. Views are exempt from unit tests; **every screen needs
+a scenario** in `BChessGalleryTests/GalleryScenarios.swift`, and the app has no `#Preview` and no preview code.
+`/preview-gallery` renders the scenarios on iOS. A macOS-only view has no scenario until the Mac renderer exists.
+A scenario never forces an appearance or a language. A thread-safety fix gets a test that would fail (or hang) without it.
 
 **Swift Testing rules.** `#require` for preconditions without which the rest of the test is meaningless; `#expect` for the checks themselves. `#expect(throws: SpecificError.self)` (or a specific value), never a bare `throws`; use the returned error when inspecting it. `.timeLimit` takes whole minutes only. A `confirmation()` must outlive the async work it confirms — await that work inside its closure. Exit tests (`#expect(processExitsWith:)`) cover `precondition` / `fatalError` paths. Verification helpers take `sourceLocation: SourceLocation = #_sourceLocation` so failures point at the caller. `withKnownIssue` for a known failure (it fails once the issue stops reproducing), never a disabled test. `@Suite(.serialized)` serializes **every** test in the suite (not only parameterized ones); a suite touching process-wide state needs it — never remove it as dead code.
 

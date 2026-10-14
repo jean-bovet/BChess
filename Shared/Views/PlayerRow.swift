@@ -76,13 +76,3 @@ struct PlayerRow: View {
         .accessibilityElement(children: .combine)
     }
 }
-
-#if DEBUG
-#Preview("To move") {
-    PreviewScenarios.playerRowToMove.view()
-}
-
-#Preview("Captures") {
-    PreviewScenarios.playerRowCaptures.view()
-}
-#endif

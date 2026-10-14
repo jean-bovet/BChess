@@ -158,33 +158,3 @@ struct EvaluationBar: View {
         .accessibilityLabel("Evaluation \(verdict.score)")
     }
 }
-
-#if DEBUG
-#Preview("Equal") {
-    PreviewScenarios.engineEqual.view()
-}
-
-#Preview("Slightly better") {
-    PreviewScenarios.engineSlightlyBetter.view()
-}
-
-#Preview("Mate") {
-    PreviewScenarios.engineMate.view()
-}
-
-#Preview("Analyzing") {
-    PreviewScenarios.engineAnalyzing.view()
-}
-
-#Preview("Statistics") {
-    PreviewScenarios.engineStatistics.view()
-}
-
-#Preview("Stacked") {
-    PreviewScenarios.engineStacked.view()
-}
-
-#Preview("Evaluation bars") {
-    PreviewScenarios.engineEvaluationBars.view()
-}
-#endif

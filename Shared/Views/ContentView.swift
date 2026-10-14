@@ -139,25 +139,3 @@ struct ContentView: View {
         }
     }
 }
-
-#if DEBUG
-#Preview("Tall") {
-    PreviewScenarios.contentTall.view()
-}
-
-#Preview("Wide") {
-    PreviewScenarios.contentWide.view()
-}
-
-#Preview("Analyze") {
-    PreviewScenarios.contentAnalyze.view()
-}
-
-#Preview("Train") {
-    PreviewScenarios.contentTrain.view()
-}
-
-#Preview("Rotated") {
-    PreviewScenarios.contentRotated.view()
-}
-#endif

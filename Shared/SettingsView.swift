@@ -69,9 +69,3 @@ struct SettingsView: View {
         #endif
     }
 }
-
-#if DEBUG
-#Preview("Settings") {
-    PreviewScenarios.settings.view()
-}
-#endif

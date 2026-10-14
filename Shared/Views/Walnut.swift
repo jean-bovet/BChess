@@ -203,9 +203,3 @@ struct WalnutButtonStyle: ButtonStyle {
             .contentShape(RoundedRectangle(cornerRadius: 10))
     }
 }
-
-#if DEBUG
-#Preview("Palette") {
-    PreviewScenarios.walnutPalette.view()
-}
-#endif

@@ -40,9 +40,3 @@ struct NavigationButtons: View {
         .disabled(!session.canMove(to: .forward))
     }
 }
-
-#if DEBUG
-#Preview("Navigation") {
-    PreviewScenarios.navigationButtons.view()
-}
-#endif

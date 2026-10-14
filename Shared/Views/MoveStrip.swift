@@ -64,17 +64,3 @@ struct MoveStrip: View {
         .font(.callout)
     }
 }
-
-#if DEBUG
-#Preview("Start") {
-    PreviewScenarios.moveStripStart.view()
-}
-
-#Preview("Middle") {
-    PreviewScenarios.moveStripMiddle.view()
-}
-
-#Preview("With variations") {
-    PreviewScenarios.moveStripWithVariations.view()
-}
-#endif

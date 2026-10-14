@@ -180,6 +180,8 @@ targets:
         TEST_HOST: $(BUILT_PRODUCTS_DIR)/BChess.app/BChess
         BUNDLE_LOADER: $(TEST_HOST)
         GENERATE_INFOPLIST_FILE: YES
+        # The scenarios build views that take bridge types (FEngineMove) and the fixtures parse PGN with FEngine
+        SWIFT_OBJC_BRIDGING_HEADER: BChess/BChess-Bridging-Header.h
         PRODUCT_BUNDLE_IDENTIFIER: ch.arizona-software.BChessGalleryTests
         TARGETED_DEVICE_FAMILY: "1,2"
 

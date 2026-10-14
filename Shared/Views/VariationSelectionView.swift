@@ -99,9 +99,3 @@ struct VariationCards: View {
         }
     }
 }
-
-#if DEBUG
-#Preview("Arrows and cards") {
-    PreviewScenarios.variationArrowsAndCards.view()
-}
-#endif

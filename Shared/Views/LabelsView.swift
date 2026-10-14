@@ -57,13 +57,3 @@ struct LabelsView: View {
         .allowsHitTesting(false)
     }
 }
-
-#if DEBUG
-#Preview("White at the bottom") {
-    PreviewScenarios.labelsWhiteAtTheBottom.view()
-}
-
-#Preview("Rotated") {
-    PreviewScenarios.labelsRotated.view()
-}
-#endif

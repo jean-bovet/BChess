@@ -26,13 +26,3 @@ struct StatusLine: View {
             .accessibilityIdentifier("status")
     }
 }
-
-#if DEBUG
-#Preview("Your move") {
-    PreviewScenarios.statusLineYourMove.view()
-}
-
-#Preview("Checkmate") {
-    PreviewScenarios.statusLineCheckmate.view()
-}
-#endif

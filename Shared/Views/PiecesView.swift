@@ -92,13 +92,3 @@ struct PiecesView: View {
         }
     }
 }
-
-#if DEBUG
-#Preview("White at the bottom") {
-    PreviewScenarios.piecesWhiteAtTheBottom.view()
-}
-
-#Preview("Rotated") {
-    PreviewScenarios.piecesRotated.view()
-}
-#endif

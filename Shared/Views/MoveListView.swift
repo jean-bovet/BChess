@@ -156,17 +156,3 @@ private struct MoveRowView: View {
         }
     }
 }
-
-#if DEBUG
-#Preview("Short game") {
-    PreviewScenarios.moveListShortGame.view()
-}
-
-#Preview("Variations and comments") {
-    PreviewScenarios.moveListVariationsAndComments.view()
-}
-
-#Preview("Card") {
-    PreviewScenarios.moveListCard.view()
-}
-#endif
