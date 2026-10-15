@@ -1,83 +1,171 @@
 ---
+# repo-specific: identity
 name: preview-gallery
-description: Render every iOS screen of BChess in light and dark with one snapshot-test run (scripts/snapshot-gallery.sh) and assemble previews/index.html, one card per #Preview with light and dark side by side. Use when Jean asks to see the screens, to check the UI after a change to a view, or to regenerate the preview gallery. The Xcode MCP RenderPreview (last section) is for spot checks while editing a view.
-argument-hint: [simulator name or id]
-allowed-tools: Read, Glob, Grep, Bash, mcp__xcode__XcodeListWorkspaces, mcp__xcode__XcodeOpenWorkspace, mcp__xcode__RenderPreview, mcp__xcode__XcodeListSchemes, mcp__xcode__XcodeSwitchScheme
+description: Render every screen of the BChess iPhone app in light and dark with one snapshot-test run (scripts/snapshot-gallery.sh) and open the preview gallery, one card per scenario with light and dark side by side. The app has no #Preview: the scenario list in the test target is the only source. Use when Jean asks to see the screens, to check a branch visually, to look at one screen after a change, or to regenerate the preview gallery.
+argument-hint: [--only pattern]
+# /repo-specific
+allowed-tools: Read, Glob, Grep, Bash
 ---
 
 # /preview-gallery: every screen, rendered light and dark, on one page
 
-## Method: `scripts/snapshot-gallery.sh`
+**The app has no `#Preview`.** Every screen is a named *scenario* in the test target, and one snapshot-test run
+renders them all, light and dark, into PNGs that `scripts/preview-gallery.py` assembles into one HTML page
+(gitignored, regenerated on demand): one card per scenario, light on the left, dark on the right.
+
+Why this and nothing else: a `#Preview` duplicates the scenario, needs a pairing check to stay in step with it,
+and is rendered by Xcode's canvas, the heaviest way to look at a screen (Xcode plus a preview host per file).
+The scenario list is one source, ships nothing in the app, and a test run on one headless simulator renders
+every screen at about one second each. Spot checks use `--only`, not the canvas.
+
+<!-- repo-specific: app -->
+BChess (`BChess.xcodeproj`, scheme "BChess (iOS)"). The gallery lives in the app-hosted unit-test target
+`BChessGalleryTests`: `GalleryScenarios.swift` (the scenario list and the `Fixture` PGN constants),
+`SnapshotGalleryTests.swift` (the render), `GalleryScenarioTests.swift` (the list's own tests, which parse every
+PGN fixture; both suites sit in the serialized parent suite `GallerySuites`). Output: `previews/index.html`
+(gitignored). Groups, in page order: Game, Board, Engine, Moves, Games list, Settings, Walnut (38 cards). The
+approved visual spec is the Walnut design canvas (`planning/README.md`, UI-WALNUT row).
+<!-- /repo-specific -->
+
+<!-- repo-specific: platforms-and-languages -->
+iPhone 17 Pro (402x874 pt), plus one iPad-landscape card ("Game screen · Wide", 1180x820) rendered on the iPhone
+simulator. English only. No Mac pass: macOS-only views (`DocumentWindow`) have no scenario until the Mac renderer is
+proven in another repo.
+<!-- /repo-specific -->
+
+<!-- repo-specific: status -->
+Adopted (APP-5): the app has no `#Preview` and no `#if DEBUG` preview code.
+<!-- /repo-specific -->
+
+## Run: `scripts/snapshot-gallery.sh`
 
 ```
-scripts/snapshot-gallery.sh [--keep-booted] [--shutdown] [simulator name or id]
+scripts/snapshot-gallery.sh                     # every scenario, then the simulator is shut down
+scripts/snapshot-gallery.sh --only "settings,list" # a subset: comma-separated substrings of names or slugs
+scripts/snapshot-gallery.sh --keep-booted       # a series of runs (during a /develop plan: first gate on)
+scripts/snapshot-gallery.sh --shutdown          # then shut it down (never creates a simulator)
 ```
 
-One `xcodebuild test` run of `BChessGalleryTests/SnapshotGalleryTests` renders every scenario of
-`Shared/PreviewSupport/PreviewScenarios.swift` (the single place each `#Preview` is set up) in light and dark through
-`UIHostingController` into a temp tree `<light|dark>/<file stem>/<name>.png` (`TEST_RUNNER_BCHESS_SNAPSHOT_DIR`;
-without that variable the test is skipped, so the normal test gate writes nothing). The script then runs
-`scripts/preview-gallery.py --import`, which replaces `previews/` with the renders, builds `previews/index.html` and
-checks the gallery, and opens the page. DerivedData is persistent (`BCHESS_SNAPSHOT_DD`, default
-`~/Library/Developer/Xcode/DerivedData/BChess-snapshots`): a warm run is an incremental `build-for-testing` plus
-`test-without-building`, both with `-parallel-testing-enabled NO`. One simulator at a time: the script stops with a message
-when another simulator is booted, and shuts down only a simulator it booted itself. The "BChess Agent" simulator (iPhone
-17 Pro) is created if missing; pass `--keep-booted` for repeated runs and `scripts/snapshot-gallery.sh --shutdown`
-(which never creates one) when finished. During a `/develop` plan, pass `--keep-booted` from the first gate on and
-`--shutdown` at the plan's end. Its first boot can take many minutes.
+- **Done = `CHECK OK [<lang>]: <n> cards, light and dark complete and correctly lit`** for every language
+  rendered. Then read the new or changed PNGs in both appearances (see Report) and make sure the simulator is
+  shut down.
+- Costs measured on a proven repo (24 GB Mac, iOS 27 simulator): booting the simulator about **6 GB** of RAM;
+  a run on a booted one about **0.25 GB**; build tools under 0.3 GB. Warm run: about 1 s per scenario plus a
+  fixed 20–25 s (xcodebuild installs and launches the host app), so ~50 scenarios take 1.5–2.5 min and
+  `--only` one scenario about 25 s. From a shut-down simulator add 1–3 min (a fresh boot keeps iOS busy).
+  Keep it booted only for a series of runs; always end with it shut down.
 
-- The gallery is iOS only, English only, light and dark. The macOS-only `DocumentWindow` preview is outside it.
-- **Done = `CHECK OK: N cards, light and dark complete and correctly lit`.** Then read the new or changed PNGs in both
-  appearances (see Report) and shut the simulator down.
-- `python3 scripts/preview-gallery.py --check` rebuilds the page from `previews/` and checks it again, with no render.
+<!-- repo-specific: script -->
+- Snapshot test: `GallerySuites/SnapshotGalleryTests` in `BChessGalleryTests`; it runs only when
+  `BCHESS_SNAPSHOT_DIR` is set (`TEST_RUNNER_BCHESS_SNAPSHOT_DIR` in xcodebuild's environment) and filters with
+  `BCHESS_SNAPSHOT_ONLY` (the script's `--only`). It prints `gallery: <slug> <duration>` per scenario and
+  `gallery: <n> scenario(s)`, which the script forwards.
+- Simulator: "BChess Agent" (iPhone 17 Pro, latest runtime), created if missing; the marker of the one the script
+  booted is `${TMPDIR:-/tmp}/bchess-snapshot-gallery.<UDID>.booted`, outside DerivedData, so any
+  `BCHESS_SNAPSHOT_DD` can shut it down.
+- DerivedData: `BCHESS_SNAPSHOT_DD`, default `~/Library/Developer/Xcode/DerivedData/BChess-snapshots` (one folder
+  for every checkout; a plan passes its own). No SPM packages, so no package flags.
+- Measured (APP-5, 3 scenarios): cold (empty DerivedData, shut-down simulator) boot 39 s, build 61 s, test 59 s,
+  total 161 s; warm boot 1 s, build 10 s, test 20 s. The 38 cards of a warm run took 53 s of test, about 1.4 s
+  per card (the Games list and Launch cards, with their 1 s settle, 2.6 s). Memory (`vm_stat` active + wired +
+  compressed): about +2.4 GB at the simulator boot, +6 GB at the peak of build and test on a busy Mac.
+<!-- /repo-specific -->
 
-## Adding or changing a view
+## A screen needs a scenario
 
-A new `#Preview` needs a scenario:
+One entry in the scenario list, and nothing in the app:
 
-1. Add one line-start declaration to `PreviewScenarios`, exactly
-   `static let <ident> = PreviewScenario(file: "<File>.swift", name: "<Name>"` followed by the builder closure. The `file`
-   is the file holding the `#Preview`, and `name` is exactly the `#Preview` name. Add it to `all`. A scenario only for iOS
-   goes inside `#if os(iOS)`, in its declaration and in `all`.
-   `gallery: false` after `name:` keeps the `#Preview` for Xcode but leaves the scenario out of the render and the page.
-2. The `#Preview` is named, wrapped in `#if DEBUG`, and its body is exactly `PreviewScenarios.<ident>.view()`.
-3. Choose a position where a human is to move and no engine readout is on, so no search starts. `view()` already points
-   `@AppStorage` at a scratch suite, so stored settings never change the picture.
-4. A new file goes into a section: the table `SECTIONS` in `scripts/preview-gallery.py` (a file not listed lands in "Other
-   screens").
+- **name** (unique, the card title; the slug is derived from it: "Settings · Signed out" → `settings-signed-out`),
+  **group** (the page section), **size** (the full phone screen, a short component canvas, or a widget family),
+  an optional **settle** wait for a screen that loads or animates, and a builder that returns the view, seeding
+  a store first when it needs one.
+- **Never force an appearance or a language** (`.preferredColorScheme`, `.environment(\.locale, …)`): the light
+  and dark passes and `-testLanguage` set them. A state that only existed as a "dark" variant is a plain scenario.
+  Dynamic Type variants are fine, as their own scenarios.
+- **Hermetic data.** A fresh in-memory store per scenario. The network is a stub that answers from committed
+  fixtures (real API responses, their times shifted to now so screens look live) or fails with a given error,
+  and counts its calls; the test prints the count. No scenario reaches a real API (quotas, rate limits,
+  changing data). A fixed location and clock-relative data instead of real ones.
+- **Shared singletons.** If a view is wired to a shared instance (a `.shared` actor or store), its scenario
+  uses that instance through the same stub, resets it first, and is flagged so it renders **after** the
+  others: its background work then cannot change another scenario's view through shared notifiers.
+- A view that draws nothing (an invisible trigger, an empty state that is `EmptyView`) gets no scenario; name it
+  in a comment in the scenario file. Live maps can be left out; say so the same way.
+- `scripts/preview-gallery.py --coverage` lists view types no scenario names (informational: most are parts
+  of other screens).
 
-`--check` fails on: a missing or stale slot, a light render that is dark or a dark render that is light (mean luminance
-against 0.45, `scripts/preview-luminance.swift`), an undecodable image, an unnamed `#Preview`, a duplicate (file, name), a
-scenario without a `#Preview`, a `#Preview` that does not render its own scenario, and a forced scheme or locale in
-`PreviewScenarios.swift`. Staleness is conservative: the script records the mtime of every file under `Shared/` and `iOS/` and of
-`BChess/Openings.pgn` before the build, and any difference now (edited, added, deleted, also during the run) makes every
-card stale. A PNG in `previews/` that no `#Preview` expects is reported as stray, and so is a `#Preview` written in a form
-the script cannot read (use `#Preview("Name") {` on one line). Never treat a card tagged "stale" as current.
+## What a repo needs
 
-## Rule: previews never force an appearance or a language
+1. **Scenario list and fixtures** in the app-hosted unit-test target (it has the app's window scene and
+   `@testable import` of the app): no `#if DEBUG`, nothing compiled into the app. An app-extension view
+   (a widget) cannot be imported by a test: compile its view file into the app target as well, and give it an
+   explicit parameter for what WidgetKit normally injects (`widgetFamily` is read-only in the environment).
+2. **The snapshot test**, skipped unless the snapshot-directory variable is set, so normal runs and Xcode
+   Cloud skip it. It filters by the optional `ONLY` variable, renders each scenario in a `UIHostingController`
+   inside a `UIWindow` on the app's scene at a fixed size, once with a light and once with a dark
+   `overrideUserInterfaceStyle`, waits for `settle`, draws with `drawHierarchy` at 2x, writes `<slug>.png` and
+   `<slug>.dark.png`, releases the window, and writes `manifest.json` (name, group, slug, size of **every**
+   scenario) so the page script never parses Swift. It swaps the host app's own shared loader for the stub too.
+3. **`scripts/preview-gallery.py`**: `--import DIR [--partial]` (replace the gallery, or only the files of an
+   `--only` run), `--check`, `--coverage`; with `scripts/preview-luminance.swift` for the lit check.
+4. **`scripts/snapshot-gallery.sh`**:
+   - `xcrun simctl list devices booted` first: one simulator at a time. Wait (up to 10 min) for another one,
+     then stop with a message; never touch a simulator it did not boot. A marker file records the one it
+     booted; a `trap` shuts that one down on any exit unless `--keep-booted`.
+   - Its own agent simulator (created if missing), booted with `simctl boot` (no Simulator.app window).
+   - Persistent DerivedData; `-skipPackageUpdates -disableAutomaticPackageResolution` once the packages are
+     resolved (otherwise every run resolves remote packages: 75 s measured).
+   - `build-for-testing` once, then per language one `test-without-building -only-testing:<snapshot class>
+     -parallel-testing-enabled NO -enableCodeCoverage NO -testLanguage <lang>`.
+   - The variables go in **xcodebuild's environment** as `TEST_RUNNER_<NAME>=… xcodebuild …`; written as
+     arguments they become build settings and never reach the test.
+   - Import, `--check`, open the page, print the timings (boot, build, test, total).
+5. **A Mac target**: a macOS unit test renders natively (an `NSHostingView` with an `NSAppearance`), with no
+   simulator at all. Not proven yet: design and measure it before relying on it.
+6. **Optional passes** when the audience needs them: another language (one more test run on the same
+   simulator), a largest-Dynamic-Type pass, another device family (one simulator after the other).
 
-A `#Preview` and a scenario must not set `.preferredColorScheme(...)` or `.environment(\.locale, ...)`: the light and dark
-passes decide the scheme. A forced scheme makes a "light" card dark (and the reverse). A state that only existed as a
-"dark" preview becomes a named light-and-dark scenario. Dynamic Type variants (`.environment(\.dynamicTypeSize, ...)`,
-named "... · XXL" or "... · Accessibility") are fine.
+## The gate: `--check`
+
+`--check` rebuilds the page from the PNGs on disk and fails on: a scenario of the manifest missing either
+image, a stray PNG no scenario expects, a duplicate slug, a light image that is dark or a dark one that is light
+(mean luminance against a threshold), a dark image byte-identical to its light one, an image that cannot be
+decoded. An `--only` run replaces only its own images; the check still covers every scenario. The gallery is
+done only when `--check` passes for every language rendered.
+
+## Converting a repo (from `#Preview`s)
+
+A planned change (`/develop`), in three gated steps:
+
+1. Test, stub, fixtures and both scripts with **three** scenarios (one full screen with a store, one
+   component, one widget if any). Gate: a cold and a warm run, timings and memory (`vm_stat`: active + wired +
+   compressed, sampled during the run; summed RSS over-counts shared memory) recorded; the normal test run still
+   passes with the gallery skipped.
+2. Every `#Preview` becomes a scenario; delete every `#Preview` and `PreviewProvider`, and the preview-only data
+   and helpers compiled into the app (move what the test needs into the test target; check that fixtures still
+   parse with the current parser). Gate: `CHECK OK`, every target builds with 0 warnings, the tests pass, and
+   every card read in both appearances.
+3. This skill's repo facts and the repo's `AGENTS.md` (replace any "every view needs a `#Preview`" rule with
+   "every screen needs a scenario"). Gate: Jean reviews the gallery.
+
+Gotchas met on the first conversion: xcodebuild can stay alive after a failed test (stop the process it
+started, never one it did not); a view hard-wired to a shared singleton cannot use a private store (see Shared
+singletons); old fixtures may be in a format the parser no longer reads.
+
+<!-- repo-specific: extras -->
+Hermetic by construction: BChess has no network code (I5), so there is no stub and the report states
+"network: none (I5)". Every scenario keeps a human to move or a non-play position and the engine readout off
+(`@AppStorage("showEngine")` reads its default from the scratch "BChessGallery" suite), so no search starts. The
+test host launches with `-uiTestingFreshLibrary` (the scheme). Every PGN a scenario loads is a `Fixture`
+constant, because `GameSession.init` silently falls back to an empty game on a rejected PGN: a test parses each
+one. `--check` also fails on `.preferredColorScheme` or `\.locale` in `GalleryScenarios.swift`.
+<!-- /repo-specific -->
 
 ## Report
 
-The card count, the path opened, and any preview that would not render with the error's first line. Then read at least
-the new or changed screens with the Read tool, **in both appearances** and on every platform rendered, and say what looks
-wrong (copy, hierarchy, colours, missing elements, truncation, contrast).
-Screenshots nobody looks at are not a gate. A visual finding is reported, not fixed in passing.
-
-## Spot checks while editing a view: Xcode MCP `RenderPreview`
-
-For one view, while editing, `mcp__xcode__RenderPreview` renders a single preview in a few seconds. That output has no
-import path into `previews/`: only the snapshot run feeds the gallery.
-
-- `mcp__xcode__XcodeListWorkspaces`; if `BChess.xcodeproj` is not open, `mcp__xcode__XcodeOpenWorkspace` with its absolute
-  path. When checking a branch, open **that worktree's** project, not the main checkout's. A permission error means Jean
-  must approve the session from Xcode's menu bar: ask once and stop.
-- `mcp__xcode__XcodeListSchemes`: note `activeSchemeName` and **restore it whenever this skill stops** (after the last
-  render, or on any early exit), so Jean's next unrelated build is not on another scheme.
-- Call `RenderPreview` with the project-relative source path (never an absolute one) and the `#Preview`'s zero-based
-  index within its file. A light render passes `previewVariantOverrides: {"Color Scheme": "Light Appearance"}`
-  explicitly (without it a render follows the Mac's own appearance); a dark one passes `"Dark Appearance"`.
+The card count (per platform and language), the check line, the timings, the network-call count, and any
+scenario that failed with its error's first line. Then the one thing this skill exists for: read at least the
+new or changed screens with the Read tool, **in both appearances** and on every platform rendered, compare them
+with the approved spec when there is one, and say what looks wrong (copy, hierarchy, truncation, an empty state
+that should not be empty, a colour or border that vanishes in dark mode, low contrast). Screenshots nobody looks
+at are not a gate. A visual finding is reported, not fixed in passing.

@@ -1,179 +1,51 @@
-"""Assemble previews/index.html from the PNGs of BChessGalleryTests and check the gallery.
+"""Build and check BChess's screen gallery (planning/APP-5-gallery-scenarios.md).
 
-Usage: python3 scripts/preview-gallery.py --snapshot FILE             # record the source files (before the build)
-       python3 scripts/preview-gallery.py --import DIR --sources FILE # replace the gallery with the renders in DIR, then check
-       python3 scripts/preview-gallery.py --check                     # rebuild the page from previews/ and check; exit 1 on any problem
+The snapshot test (BChessGalleryTests/SnapshotGalleryTests) writes `<slug>.png`, `<slug>.dark.png` and
+`manifest.json` into a directory; this script imports them into previews/ (gitignored) and builds
+previews/index.html, one card per scenario with light and dark side by side, grouped as the manifest says.
 
-DIR is the tree SnapshotGalleryTests writes (scripts/snapshot-gallery.sh passes it):
-    <light|dark>/<file stem>/<preview name>.png
-Renders are matched to previews by (file, name). The import deletes every PNG and the manifest in
-previews/ first, so a slot with no render in DIR is missing, never an old PNG. Each render is copied to a
-flat name, <slug(file stem)>-<slug(name)>[.dark].png.
+    scripts/preview-gallery.py --import DIR [--partial]   # replace previews/ (--partial: only DIR's files)
+    scripts/preview-gallery.py --check                    # every scenario complete and correctly lit
+    scripts/preview-gallery.py --coverage                 # view types no scenario names (informational)
 
-Freshness is recorded in previews/.freshness.json: the mtime of every file under Shared/ and iOS/ and of
-BChess/Openings.pgn, as snapshotted before the build (--snapshot), and each PNG's mtime. Every card is stale
-when that list differs from the files now (a file edited, added or deleted, also during the run), and a
-single card is stale when its PNG's mtime changed since the import.
-
---check reports: a missing or stale slot, a light render that is dark or a dark render that is light (mean
-luminance against 0.45, scripts/preview-luminance.swift), an undecodable image, an unnamed #Preview, a
-duplicate (file, name) or file basename, a slug collision, a stray PNG in previews/, a #Preview in a form this script
-cannot read, a render with no #Preview (a scenario without a
-preview), a #Preview that does not render its own scenario, and a forced appearance or locale in
-PreviewScenarios.swift.
+--check rebuilds the page, then fails on: a scenario missing either image, a stray PNG no scenario expects,
+a duplicate slug, a light image that is dark or a dark image that is light (mean luminance against 0.45,
+scripts/preview-luminance.swift), a dark image byte-identical to its light one, an image that cannot be
+decoded, and a forced appearance or locale in GalleryScenarios.swift.
 """
-import argparse, glob, html, json, os, re, shutil, struct, subprocess, sys, unicodedata
+import argparse, glob, html, json, os, re, shutil, struct, subprocess, sys
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OUT = os.path.join(REPO, 'previews')
-MANIFEST = os.path.join(OUT, '.freshness.json')
-MANIFEST_VERSION = 2
-SCENARIOS = os.path.join(REPO, 'Shared', 'PreviewSupport', 'PreviewScenarios.swift')
-SOURCE_GLOBS = ['Shared/**/*.swift', 'iOS/**/*.swift']
-FRESHNESS_ROOTS = ['Shared', 'iOS', os.path.join('BChess', 'Openings.pgn')]
+MANIFEST = os.path.join(OUT, 'manifest.json')
+SCENARIOS = os.path.join(REPO, 'BChessGalleryTests', 'GalleryScenarios.swift')
 LUMINANCE_THRESHOLD = 0.45
 PHONE_ASPECT = 402 / 874
 
-# Section title -> file stems, in display order. A file not listed goes to "Other screens".
-SECTIONS = [
-    ('Game', ['ContentView', 'PlayerRow', 'StatusLine', 'NavigationButtons']),
-    ('Board', ['BoardView', 'LabelsView', 'PiecesView', 'PromotionView', 'VariationSelectionView', 'Arrow']),
-    ('Engine', ['EngineView']),
-    ('Moves', ['MoveStrip', 'MoveListView']),
-    ('Games list', ['GameRootView', 'NewGameView_iOS', 'NewGameView']),
-    ('Settings', ['SettingsView']),
-    ]
-
 
 def slug(s):
-    s = unicodedata.normalize('NFKD', s).encode('ascii', 'ignore').decode()
     return re.sub(r'[^a-z0-9]+', '-', s.lower()).strip('-')
 
 
-def base_name(stem, name):
-    return f'{slug(stem)}-{slug(name)}'
-
-
-def discover_previews(problems):
-    """[{file, stem, name, path, line, ident}] for every #Preview under SOURCE_GLOBS, in source order.
-    Reports unnamed previews and bodies that are not exactly PreviewScenarios.<ident>.view()."""
-    paths = sorted({p for pattern in SOURCE_GLOBS for p in glob.glob(os.path.join(REPO, pattern), recursive=True)})
-    previews = []
-    for path in paths:
-        with open(path, encoding='utf-8') as source:
-            lines = source.read().splitlines()
-        relative = os.path.relpath(path, REPO)
-        for i, line in enumerate(lines):
-            if '#Preview' not in line or line.lstrip().startswith('//'):
-                continue
-            match = re.fullmatch(r'#Preview(?:\("([^"]*)"\))? \{', line.strip())
-            if not match:
-                problems.append(f'unsupported #Preview form (use `#Preview("Name") {{`): {relative}:{i + 1}')
-                continue
-            body = []
-            for following in lines[i + 1:]:
-                if following.rstrip() == '}':
-                    break
-                body.append(following.strip())
-            name = match.group(1)
-            if name is None:
-                problems.append(f'unnamed #Preview: {relative}:{i + 1}')
-                continue
-            call = re.fullmatch(r'PreviewScenarios\.(\w+)\.view\(\)', ' '.join(body))
-            previews.append({'file': os.path.basename(path), 'stem': os.path.basename(path)[:-6], 'name': name,
-                             'path': relative, 'line': i + 1, 'ident': call.group(1) if call else None})
-    return previews
-
-
-def read_scenarios(problems):
-    """{ident: (file, name)} from the one-line declarations of PreviewScenarios.swift."""
-    scenarios = {}
-    with open(SCENARIOS, encoding='utf-8') as source:
-        text = source.read()
-    for number, line in enumerate(text.splitlines(), 1):
-        if re.search(r'preferredColorScheme\(|\\\.locale', line):
-            problems.append(f'forced appearance or locale in PreviewScenarios.swift:{number}')
-        if not re.match(r'\s*static let \w+ = PreviewScenario\(', line):
-            continue
-        match = re.match(r'\s*static let (\w+) = PreviewScenario\(file: "([^"]+)", name: "([^"]+)"', line)
-        if match:
-            # (file, name, in the gallery): `gallery: false` keeps the #Preview for Xcode, with no card
-            scenarios[match.group(1)] = (match.group(2), match.group(3), 'gallery: false' not in line)
-        else:
-            problems.append(f'scenario declaration breaks the one-line convention: PreviewScenarios.swift:{number}')
-    return scenarios
-
-
-def check_sources(previews, scenarios, problems):
-    seen, files, slugs = {}, {}, {}
-    for p in previews:
-        key = (p['file'], p['name'])
-        if key in seen:
-            problems.append(f'duplicate #Preview (file, name): {p["file"]} / {p["name"]}')
-        seen[key] = p
-        if files.setdefault(p['file'], p['path']) != p['path']:
-            problems.append(f'duplicate file basename: {p["file"]} ({files[p["file"]]}, {p["path"]})')
-        base = base_name(p['stem'], p['name'])
-        if slugs.setdefault(base, key) != key:
-            problems.append(f'slug collision: {base} ({slugs[base]} and {key})')
-        if p['ident'] is None:
-            problems.append(f'#Preview does not call PreviewScenarios.<scenario>.view(): {p["path"]}:{p["line"]} ({p["name"]})')
-        elif p['ident'] not in scenarios:
-            problems.append(f'#Preview calls an unknown scenario {p["ident"]}: {p["path"]}:{p["line"]}')
-        elif scenarios[p['ident']][:2] != key:
-            problems.append(f'#Preview renders another scenario: {p["path"]}:{p["line"]} ({p["name"]}) calls {p["ident"]}, '
-                            f'which is {scenarios[p["ident"]][0]} / {scenarios[p["ident"]][1]}')
-
-
-def source_files():
-    """{project-relative path: mtime} of every file whose change can change a card."""
-    files = {}
-    for root in FRESHNESS_ROOTS:
-        path = os.path.join(REPO, root)
-        if os.path.isfile(path):
-            files[root] = os.path.getmtime(path)
-            continue
-        for directory, _, names in os.walk(path):
-            for name in names:
-                if name != '.DS_Store':
-                    full = os.path.join(directory, name)
-                    files[os.path.relpath(full, REPO)] = os.path.getmtime(full)
-    return files
-
-
-def do_import(source, previews, sources):
-    """Replace previews/ with the renders in `source`. Returns the manifest."""
-    os.makedirs(OUT, exist_ok=True)
-    for name in os.listdir(OUT):
-        if name.endswith('.png') or name in ('.freshness.json', 'index.html'):
-            os.remove(os.path.join(OUT, name))
-    known = {(p['stem'], p['name']) for p in previews}
-    files, orphans = {}, []
-    for appearance in ('light', 'dark'):
-        for png in sorted(glob.glob(os.path.join(source, appearance, '*', '*.png'))):
-            stem = os.path.basename(os.path.dirname(png))
-            name = os.path.basename(png)[:-4]
-            if (stem, name) not in known:
-                orphans.append(f'{stem}.swift / {name} ({appearance})')
-                continue
-            dest = base_name(stem, name) + ('.dark.png' if appearance == 'dark' else '.png')
-            shutil.copy2(png, os.path.join(OUT, dest))
-            files[dest] = os.path.getmtime(os.path.join(OUT, dest))
-    manifest = {'version': MANIFEST_VERSION, 'sources': sources, 'files': files, 'orphans': orphans}
-    with open(MANIFEST, 'w', encoding='utf-8') as handle:
-        json.dump(manifest, handle, indent=1, sort_keys=True)
-    return manifest
-
-
 def load_manifest():
-    try:
-        with open(MANIFEST, encoding='utf-8') as handle:
-            loaded = json.load(handle)
-        if isinstance(loaded, dict) and loaded.get('version') == MANIFEST_VERSION:
-            return loaded
-    except (OSError, ValueError):
-        pass
-    return {'version': MANIFEST_VERSION, 'sources': None, 'files': {}, 'orphans': []}
+    if not os.path.isfile(MANIFEST):
+        sys.exit('no previews/manifest.json: run scripts/snapshot-gallery.sh')
+    with open(MANIFEST, encoding='utf-8') as handle:
+        return json.load(handle)
+
+
+def do_import(source, partial):
+    source_manifest = os.path.join(source, 'manifest.json')
+    if not os.path.isfile(source_manifest):
+        sys.exit(f'{source} has no manifest.json: the snapshot test did not finish')
+    pngs = sorted(glob.glob(os.path.join(source, '*.png')))
+    if not (partial and os.path.isdir(OUT)):
+        shutil.rmtree(OUT, ignore_errors=True)
+    os.makedirs(OUT, exist_ok=True)
+    for png in pngs:
+        shutil.copy2(png, OUT)
+    shutil.copy2(source_manifest, MANIFEST)
+    print(f'imported {len(pngs)} image(s) into previews/')
 
 
 def luminances():
@@ -186,22 +58,101 @@ def luminances():
     return values, (result.stderr.strip()[:200] if result.returncode != 0 else None)
 
 
-def aspect(path):
-    """Width / height of a PNG, from its header; 0 when unreadable."""
+def size_ratio(entry):
+    """Width / height of a scenario from the manifest's "WxH"; 0 when unreadable."""
     try:
-        with open(path, 'rb') as handle:
-            header = handle.read(24)
-        width, height = struct.unpack('>II', header[16:24])
-        return width / height
-    except (OSError, struct.error, ZeroDivisionError):
+        width, height = entry['size'].split('x')
+        return int(width) / int(height)
+    except (KeyError, ValueError, ZeroDivisionError):
         return 0
 
 
-def section_order(stem):
-    for index, (title, stems) in enumerate(SECTIONS):
-        if stem in stems:
-            return index, stems.index(stem), title
-    return len(SECTIONS), 0, 'Other screens'
+def build_page(manifest):
+    groups = {}
+    for entry in manifest:
+        groups.setdefault(entry['group'], []).append(entry)
+
+    def slot(dest, tag, label):
+        if os.path.isfile(os.path.join(OUT, dest)):
+            return f'<a href="{dest}"><img src="{dest}" alt="{html.escape(label)} · {tag}" loading="lazy"></a>'
+        return '<div class="missing">missing</div>'
+
+    def figure(entry):
+        label = entry['name']
+        # A landscape render is drawn as tall as a phone card, so it gets proportionally wider
+        ratio = size_ratio(entry) / PHONE_ASPECT
+        style = f' style="--r:{ratio:.2f}"' if ratio > 1.05 else ''
+        return (f'<figure id="{entry["slug"]}"{style}><figcaption>{html.escape(label)}</figcaption><div class="pair">'
+                f'<div class="shot shot-light">{slot(entry["slug"] + ".png", "Light", label)}<span class="tag">Light</span></div>'
+                f'<div class="shot shot-dark">{slot(entry["slug"] + ".dark.png", "Dark", label)}<span class="tag">Dark</span></div>'
+                f'</div></figure>')
+
+    sections, links = [], []
+    for title, entries in groups.items():
+        section_id = slug(title)
+        sections.append(f'<section id="{section_id}"><h2>{html.escape(title)}</h2><div class="row">'
+                        f'{"".join(figure(e) for e in entries)}</div></section>')
+        links.append(f'<a href="#{section_id}">{html.escape(title)}</a>')
+    os.makedirs(OUT, exist_ok=True)
+    with open(os.path.join(OUT, 'index.html'), 'w', encoding='utf-8') as handle:
+        handle.write(page(manifest, ''.join(sections), ''.join(links)))
+
+
+def do_check():
+    manifest = load_manifest()
+    build_page(manifest)
+    problems = []
+    slugs = [e['slug'] for e in manifest]
+    for dup in sorted({s for s in slugs if slugs.count(s) > 1}):
+        problems.append(f'duplicate slug: {dup}')
+    expected = {s + suffix for s in slugs for suffix in ('.png', '.dark.png')}
+    on_disk = {name for name in os.listdir(OUT) if name.endswith('.png')}
+    for name in sorted(expected - on_disk):
+        problems.append(f'missing: {name}')
+    for name in sorted(on_disk - expected):
+        problems.append(f'stray image (no scenario): {name}')
+    for s in slugs:
+        light, dark = os.path.join(OUT, s + '.png'), os.path.join(OUT, s + '.dark.png')
+        if os.path.isfile(light) and os.path.isfile(dark):
+            with open(light, 'rb') as a, open(dark, 'rb') as b:
+                if a.read() == b.read():
+                    problems.append(f'dark identical to light: {s}')
+    luminance, error = luminances()
+    if error:
+        problems.append('luminance helper failed: ' + error)
+    for name, value in sorted(luminance.items()):
+        is_dark_slot = name.endswith('.dark.png')
+        if value < 0:
+            problems.append(f'undecodable image: {name}')
+        elif (value < LUMINANCE_THRESHOLD) != is_dark_slot:
+            shown = 'dark' if value < LUMINANCE_THRESHOLD else 'light'
+            problems.append(f'{shown} render in the {"dark" if is_dark_slot else "light"} slot: {name} (luminance {value:.6f})')
+    # The luminance check misses a forced locale, so the scenarios file is read for it
+    with open(SCENARIOS, encoding='utf-8') as handle:
+        for number, line in enumerate(handle, 1):
+            if re.search(r'\.preferredColorScheme|\\\.locale', line):
+                problems.append(f'forced appearance or locale: GalleryScenarios.swift:{number}')
+    if problems:
+        print(f'CHECK FAILED [en] ({len(problems)}):')
+        for problem in problems:
+            print('  ' + problem)
+        sys.exit(1)
+    print(f'CHECK OK [en]: {len(manifest)} cards, light and dark complete and correctly lit')
+
+
+def do_coverage():
+    """View types under Shared/ and iOS/ that GalleryScenarios.swift does not name (informational)."""
+    views = set()
+    for folder in ('Shared', 'iOS'):
+        for path in glob.glob(os.path.join(REPO, folder, '**', '*.swift'), recursive=True):
+            with open(path, encoding='utf-8') as handle:
+                views |= set(re.findall(r'^\s*(?:private |fileprivate )?struct (\w+)\s*:\s*[^{]*\bView\b', handle.read(), re.M))
+    with open(SCENARIOS, encoding='utf-8') as handle:
+        scenarios = handle.read()
+    missing = sorted(v for v in views if not re.search(rf'\b{v}\b', scenarios))
+    print(f'{len(views) - len(missing)} of {len(views)} view types appear in a scenario; not rendered:')
+    for view in missing:
+        print('  ' + view)
 
 
 def page(cards, sections_html, links_html):
@@ -243,7 +194,6 @@ figcaption {{ padding:0 4px 8px; font-weight:600; }}
 .shot {{ width:calc(150px * var(--r, 1)); }}
 .shot img, .shot .missing {{ width:calc(150px * var(--r, 1)); display:block; border:1px solid var(--line); border-radius:16px; background:var(--card); box-sizing:border-box; }}
 .shot .missing {{ aspect-ratio:9/19.5; display:flex; align-items:center; justify-content:center; color:var(--muted); font-size:12px; background:var(--missing-bg); }}
-.shot img.stale {{ opacity:.45; filter:grayscale(60%); }}
 .shot .tag {{ display:block; text-align:center; font-size:11px; color:var(--muted); margin-top:4px; }}
 html[data-mode="light"] .shot-dark, html[data-mode="dark"] .shot-light {{ display:none; }}
 html[data-mode="light"] figure, html[data-mode="dark"] figure {{ width:calc(240px * var(--r, 1) + 16px); }}
@@ -257,7 +207,7 @@ html[data-mode="dark"] .shot img, html[data-mode="dark"] .shot .missing {{ width
 <button type="button" data-mode-btn="both" aria-pressed="false">Both</button>
 </div>
 <h1>BChess — screen gallery</h1>
-<p class="meta">{len(cards)} screens (iPhone) · light and dark side by side · everyday views first.</p>
+<p class="meta">{len(cards)} screens (iPhone) · light and dark side by side.</p>
 <nav aria-label="Gallery sections">{links_html}</nav>
 {sections_html}
 <script>
@@ -285,104 +235,21 @@ html[data-mode="dark"] .shot img, html[data-mode="dark"] .shot .missing {{ width
 
 
 def main():
-    args = argparse.ArgumentParser()
-    mode = args.add_mutually_exclusive_group(required=True)
-    mode.add_argument('--snapshot', metavar='FILE', help='record the source files in FILE (run before the build)')
-    mode.add_argument('--import', dest='source', metavar='DIR', help='replace the gallery with the renders in DIR, then check')
-    mode.add_argument('--check', action='store_true', help='rebuild the page from previews/ and check; exit 1 on any problem')
-    args.add_argument('--sources', metavar='FILE', help='with --import: the --snapshot file made before the build')
-    opts = args.parse_args()
-    if opts.snapshot:
-        with open(opts.snapshot, 'w', encoding='utf-8') as handle:
-            json.dump(source_files(), handle, sort_keys=True)
-        return
-    if opts.source and not opts.sources:
-        args.error('--import needs --sources')
-
-    problems = []
-    previews = discover_previews(problems)
-    scenarios = read_scenarios(problems)
-    check_sources(previews, scenarios, problems)
-    # A scenario with `gallery: false` is known but not expected: no render, no card
-    previews = [p for p in previews if scenarios.get(p['ident'], (0, 0, True))[2]]
-
+    parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    parser.add_argument('--import', dest='source', metavar='DIR', help='replace previews/ with the renders in DIR')
+    parser.add_argument('--partial', action='store_true', help='with --import: keep previews/ and replace only the files in DIR')
+    parser.add_argument('--check', action='store_true', help='rebuild the page and check; exit 1 on any problem')
+    parser.add_argument('--coverage', action='store_true', help='list the view types no scenario names')
+    opts = parser.parse_args()
     if opts.source:
-        with open(opts.sources, encoding='utf-8') as handle:
-            manifest = do_import(opts.source, previews, json.load(handle))
-    else:
-        manifest = load_manifest()
-    os.makedirs(OUT, exist_ok=True)
-    for orphan in manifest.get('orphans', []):
-        problems.append(f'scenario without a preview: {orphan}')
-
-    sources_changed = manifest.get('sources') != source_files()
-    luminance, luminance_error = luminances()
-    if luminance_error:
-        problems.append('luminance helper failed: ' + luminance_error)
-
-    cards = []
-    for p in previews:
-        base = base_name(p['stem'], p['name'])
-        card = {'p': p, 'label': p['name'], 'id': base}
-        for appearance, dest in (('light', base + '.png'), ('dark', base + '.dark.png')):
-            path = os.path.join(OUT, dest)
-            ok = os.path.isfile(path)
-            recorded = manifest.get('files', {}).get(dest)
-            stale = ok and (sources_changed or recorded is None or os.path.getmtime(path) != recorded)
-            card[appearance] = (dest, ok, stale)
-            if not ok:
-                problems.append(f'missing {appearance}: {p["file"]} / {p["name"]} ({dest})')
-            elif stale:
-                problems.append(f'stale {appearance}: {p["file"]} / {p["name"]} ({dest})')
-            elif luminance.get(dest, -1) < 0:
-                problems.append(f'undecodable image: {dest}')
-            elif (luminance[dest] < LUMINANCE_THRESHOLD) != (appearance == 'dark'):
-                shown = 'dark' if luminance[dest] < LUMINANCE_THRESHOLD else 'light'
-                problems.append(f'{shown} render in the {appearance} slot: {dest} (luminance {luminance[dest]:.6f})')
-        cards.append(card)
-
-    expected = {name for c in cards for name in (c['light'][0], c['dark'][0])}
-    for name in sorted(os.listdir(OUT)):
-        if name.endswith('.png') and name not in expected:
-            problems.append(f'stray image: {name}')
-
-    cards.sort(key=lambda c: (section_order(c['p']['stem'])[:2], c['p']['line']))
-    sections, links = [], []
-    for title in [t for t, _ in SECTIONS] + ['Other screens']:
-        entries = [c for c in cards if section_order(c['p']['stem'])[2] == title]
-        if not entries:
-            continue
-
-        def slot(dest, ok, stale, tag, label):
-            if ok:
-                cls = ' class="stale"' if stale else ''
-                return f'<a href="{dest}"><img{cls} src="{dest}" alt="{html.escape(label)} · {tag}" loading="lazy"></a>'
-            return '<div class="missing">missing</div>'
-
-        def figure(c):
-            (dl, lo, ls), (dd, do, ds) = c['light'], c['dark']
-            label = c['label']
-            # A landscape render is drawn as tall as a phone card, so it gets proportionally wider
-            ratio = aspect(os.path.join(OUT, dl)) / PHONE_ASPECT
-            style = f' style="--r:{ratio:.2f}"' if ratio > 1.05 else ''
-            return (f'<figure id="{c["id"]}"{style}><figcaption>{html.escape(label)}</figcaption><div class="pair">'
-                    f'<div class="shot shot-light">{slot(dl, lo, ls, "Light", label)}<span class="tag">Light{" · stale" if ls else ""}</span></div>'
-                    f'<div class="shot shot-dark">{slot(dd, do, ds, "Dark", label)}<span class="tag">Dark{" · stale" if ds else ""}</span></div>'
-                    f'</div></figure>')
-
-        section_id = slug(title)
-        sections.append(f'<section id="{section_id}"><h2>{html.escape(title)}</h2><div class="row">'
-                        f'{"".join(figure(c) for c in entries)}</div></section>')
-        links.append(f'<a href="#{section_id}">{html.escape(title)}</a>')
-    with open(os.path.join(OUT, 'index.html'), 'w', encoding='utf-8') as handle:
-        handle.write(page(cards, ''.join(sections), ''.join(links)))
-
-    if problems:
-        print(f'CHECK FAILED ({len(problems)}):')
-        for problem in problems:
-            print('  ' + problem)
-        sys.exit(1)
-    print(f'CHECK OK: {len(cards)} cards, light and dark complete and correctly lit')
+        do_import(opts.source, opts.partial)
+        build_page(load_manifest())
+    if opts.check:
+        do_check()
+    if opts.coverage:
+        do_coverage()
+    if not (opts.source or opts.check or opts.coverage):
+        parser.print_help()
 
 
 if __name__ == '__main__':

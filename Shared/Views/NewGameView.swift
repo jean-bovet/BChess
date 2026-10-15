@@ -92,9 +92,3 @@ struct NewGameView: View {
         }
     }
 }
-
-#if DEBUG
-#Preview("Players & Level") {
-    PreviewScenarios.newGamePlayersAndLevel.view()
-}
-#endif

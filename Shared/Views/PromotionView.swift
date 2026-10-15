@@ -104,13 +104,3 @@ struct PromotionView: View {
         }
     }
 }
-
-#if DEBUG
-#Preview("Drops from the top") {
-    PreviewScenarios.promotionDropsFromTheTop.view()
-}
-
-#Preview("Rises from the bottom") {
-    PreviewScenarios.promotionRisesFromTheBottom.view()
-}
-#endif

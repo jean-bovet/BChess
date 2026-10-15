@@ -40,9 +40,3 @@ struct Arrow {
     }
 
 }
-
-#if DEBUG
-#Preview("Arrow") {
-    PreviewScenarios.arrow.view()
-}
-#endif

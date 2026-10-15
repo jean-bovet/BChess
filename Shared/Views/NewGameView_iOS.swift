@@ -73,13 +73,3 @@ struct NewGameView_iOS: View {
         }
     }
 }
-
-#if DEBUG
-#Preview("New game") {
-    PreviewScenarios.newGameNewGame.view()
-}
-
-#Preview("Edit game") {
-    PreviewScenarios.newGameEditGame.view()
-}
-#endif

@@ -167,7 +167,7 @@ request, findings Jean has already seen, and the worktree path, then reads the f
 One plan file (pattern and index in Context), in this shape: **problem with evidence** (design-doc
 section, file:line), **design** (the smallest change that is correct, with what it reuses),
 **alternatives rejected and why**, **test plan** (the failing tests, named, and what each proves; for every new entity or field,
-the line that writes it, the screen line that shows it, and the test or preview that covers the
+the line that writes it, the screen line that shows it, and the test or gallery scenario that covers the
 path between them through the production reader — not a parallel test-only path; fixtures carry
 real data shapes — tombstones, empty and removed entries, multi-item records; when a data source is
 replaced, the plan diffs its contents, not just its reader),
@@ -196,7 +196,7 @@ forever on "Reading additional input from stdin...". Read-only always; never `--
 > Return, in order: BLOCKERS (the plan is wrong or breaks an invariant — name the input or state),
 > SHOULD-FIX (a real gap in the design or the test plan — including any new entity or field
 > without a traced path from the line that writes it to the screen that shows it, covered by a
-> test or preview that uses the production read path), SIMPLER (a smaller design that meets the
+> test or gallery scenario that uses the production read path), SIMPLER (a smaller design that meets the
 > same goal), ALREADY-EXISTS (code the plan reimplements — file and symbol). Say "none" for an empty
 > section. End with one line `substantive: yes|no`. Do not praise the plan.
 

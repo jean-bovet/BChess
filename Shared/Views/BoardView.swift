@@ -71,9 +71,3 @@ struct BoardFrame<Content: View>: View {
         .aspectRatio(1, contentMode: .fit)
     }
 }
-
-#if DEBUG
-#Preview("Board") {
-    PreviewScenarios.board.view()
-}
-#endif

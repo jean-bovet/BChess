@@ -130,7 +130,3 @@ private struct WindowTitle: NSViewRepresentable {
         }
     }
 }
-
-#Preview("Document window") {
-    DocumentWindow(document: .constant(ChessDocument()))
-}
