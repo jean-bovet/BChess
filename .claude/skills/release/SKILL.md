@@ -17,8 +17,13 @@ allowed-tools: Read, Edit, Write, Bash, AskUserQuestion
 - **Never released yet.** Version 1.0 exists on both platforms in App Store Connect
   (PREPARE_FOR_SUBMISSION), with an empty page: the first `/release` is the app's first App Store
   submission (see "First release" in §2b and §4).
-- The App Store setup lives in App Store Connect only; this repo has no release document, support
-  page or privacy policy page yet.
+- The App Store setup lives in App Store Connect only; this repo has no release document. The App
+  Store page's URLs: support `https://jean-bovet.ch/bchess/`, privacy policy
+  `https://jean-bovet.ch/bchess/privacy/` — the first `/release` sets them with
+  `app-store metadata --app "BChess (iOS)" --version <v> --support-url https://jean-bovet.ch/bchess/ --privacy-url https://jean-bovet.ch/bchess/privacy/`
+  instead of asking.
+- The privacy manifest is `Shared/PrivacyInfo.xcprivacy`, bundled by both apps: UserDefaults
+  (CA92.1) and file timestamps (C617.1).
 - `main` requires pull requests (a GitHub rule): the notes commit of §5 goes through one; never push
   `main`.
 - No `release` branch: the `v<version>` tag marks the published commit. The `v0.1` tag is older: a

@@ -31,6 +31,8 @@ commit both).
 - **I4 — The UCI tool keeps working.** `BChessUCI` reads stdin on its main thread; engine
   callbacks must not require the main queue to be serviced.
 - **I5 — Private and offline.** No network access, analytics or accounts.
+  A new required-reason API use (UserDefaults, file timestamps, boot time, disk space, keyboards) is
+  declared in `Shared/PrivacyInfo.xcprivacy`, which both apps bundle.
 
 **Stack.** SwiftUI, Swift 6 language mode, Observation (`@Observable`), Swift Testing for new
 tests. iOS 18 / macOS 15 minimum, built and tested with the current Xcode against the iOS 26 /
