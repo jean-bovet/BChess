@@ -1,0 +1,4 @@
+interface:
+  display_name: "App Icon"
+  short_description: "Build layered Apple app icons from reference images"
+  default_prompt: "Use $app-icon to create a reference-faithful layered Apple app icon and verify all appearance modes."
