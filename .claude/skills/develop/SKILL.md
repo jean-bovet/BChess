@@ -76,13 +76,15 @@ replace it.
   `/private/tmp/<id-slug>-dd`, created once), so every build after the first is incremental. The final
   gate uses a fresh `<dd>`, which also re-surfaces warnings an incremental build would not recompile.
   Logs go to a new scratch directory for every gate run.
-- **One build at a time.** Use the repo's build-lock wrapper when it has one (never call `xcodebuild`
-  around it); never start a build while another runs — wait for it.
-- **Simulators** (the global working agreement): one booted at a time — check
-  `xcrun simctl list devices booted` first and never touch one you did not boot; one `-destination` per
-  run and `-parallel-testing-enabled NO` on every simulator test run. Keep the plan's one test simulator
-  booted from the first gate to the final gate (a boot is expensive), then shut it down — also when a
-  gate fails and you stop. Prefer a simulator the repo owns over Jean's own.
+- **One build at a time per build folder.** Use the repo's scripts or build wrapper when it has them
+  (never call `xcodebuild` around them); otherwise `buildlock --folder <dd> -- xcodebuild …`. The host's
+  build slots are shared with other sessions: wait for one, never kill another build.
+- **Simulators** (the global working agreement): lease one from the machine-wide pool for each gate run
+  (`simpool acquire`, or the repo's scripts do it) and release it when the run ends, also when it fails.
+  Don't hold a lease across gates: the pool normally keeps a released simulator booted for the next gate. Never
+  boot, shut down or touch a simulator by hand. One `-destination` per run and
+  `-parallel-testing-enabled NO` on every simulator test run. A repo whose scripts still boot their own
+  simulator follows the global agreement's rule for those.
 - **Reading results.** Read the **exit status** and the summary line of every command; an empty grep
   is clean only if the command succeeded. The number of tests run is part of the result: zero is red,
   and a count that shrinks needs an explanation (a conditionally disabled test counts as skipped).
@@ -104,14 +106,15 @@ replace it.
 without its fix, restored with `git checkout -- <file>`. `xcodegen generate` committed with any
 `project.yml` change; never hand-edit `BChess.xcodeproj`.
 
-**Test gate:** all of these pass, each read by exit status **and** summary line. The iOS tests run
-on the repo's own `BChess Agent` simulator (create it once with
-`xcrun simctl create "BChess Agent" "iPhone 17 Pro"`); shut it down after the final gate.
+**Test gate:** all of these pass, each read by exit status **and** summary line. Each runs under
+`buildlock` on its own DerivedData folder. The iOS tests run on a simulator leased from the pool for
+that run and given back right after it, also when it fails (run the last two lines in one shell):
 
 ```
-xcodebuild test -scheme "BChess (macOS)" -destination 'platform=macOS' -derivedDataPath <dd>/dd-mac
-xcodebuild test -scheme "BChess (iOS)" -destination 'platform=iOS Simulator,name=BChess Agent' -parallel-testing-enabled NO -derivedDataPath <dd>/dd-ios
-xcodebuild -scheme BChessUCI -destination 'platform=macOS' -derivedDataPath <dd>/dd-uci build
+buildlock --folder <dd>/dd-mac -- xcodebuild test -scheme "BChess (macOS)" -destination 'platform=macOS' -derivedDataPath <dd>/dd-mac
+buildlock --folder <dd>/dd-uci -- xcodebuild -scheme BChessUCI -destination 'platform=macOS' -derivedDataPath <dd>/dd-uci build
+udid=$(simpool acquire --spec iphone --pid $$); trap 'simpool release "$udid" --app ch.arizona-software.BChess' EXIT
+buildlock --folder <dd>/dd-ios -- xcodebuild test -scheme "BChess (iOS)" -destination "id=$udid" -parallel-testing-enabled NO -derivedDataPath <dd>/dd-ios
 ```
 
 `** TEST FAILED **`, `** BUILD FAILED **`, a Swift Testing line `✘`, or any `error:` is red. The
@@ -123,9 +126,9 @@ count is printed by the suite) — zero executed is red, never green.
 and `gtest-all.cc` are exempt).
 
 ```
-xcodebuild -target "BChess (iOS)" -sdk iphonesimulator -configuration Debug SYMROOT=<dd>/build-ios OBJROOT=<dd>/obj-ios COMPILER_INDEX_STORE_ENABLE=NO build 2>&1 | grep -E '^/Users/.*(warning|error):|^(warning|error):' | grep -v -e ONLY_ACTIVE_ARCH -e /Dependencies/ -e gtest-all
-xcodebuild -target "BChess (macOS)" -configuration Debug SYMROOT=<dd>/build-mac OBJROOT=<dd>/obj-mac COMPILER_INDEX_STORE_ENABLE=NO build 2>&1 | grep -E '^/Users/.*(warning|error):|^(warning|error):' | grep -v -e ONLY_ACTIVE_ARCH -e /Dependencies/ -e gtest-all
-xcodebuild -target BChessGalleryTests -sdk iphonesimulator -configuration Debug SYMROOT=<dd>/build-gt OBJROOT=<dd>/obj-gt COMPILER_INDEX_STORE_ENABLE=NO build 2>&1 | grep -E '^/Users/.*(warning|error):|^(warning|error):' | grep -v -e ONLY_ACTIVE_ARCH -e /Dependencies/ -e gtest-all
+buildlock --folder <dd>/build-ios -- xcodebuild -target "BChess (iOS)" -sdk iphonesimulator -configuration Debug SYMROOT=<dd>/build-ios OBJROOT=<dd>/obj-ios COMPILER_INDEX_STORE_ENABLE=NO build 2>&1 | grep -E '^/Users/.*(warning|error):|^(warning|error):' | grep -v -e ONLY_ACTIVE_ARCH -e /Dependencies/ -e gtest-all
+buildlock --folder <dd>/build-mac -- xcodebuild -target "BChess (macOS)" -configuration Debug SYMROOT=<dd>/build-mac OBJROOT=<dd>/obj-mac COMPILER_INDEX_STORE_ENABLE=NO build 2>&1 | grep -E '^/Users/.*(warning|error):|^(warning|error):' | grep -v -e ONLY_ACTIVE_ARCH -e /Dependencies/ -e gtest-all
+buildlock --folder <dd>/build-gt -- xcodebuild -target BChessGalleryTests -sdk iphonesimulator -configuration Debug SYMROOT=<dd>/build-gt OBJROOT=<dd>/obj-gt COMPILER_INDEX_STORE_ENABLE=NO build 2>&1 | grep -E '^/Users/.*(warning|error):|^(warning|error):' | grep -v -e ONLY_ACTIVE_ARCH -e /Dependencies/ -e gtest-all
 ```
 
 The first two build only the app targets, so the third compiles the gallery tests (and builds their host app).

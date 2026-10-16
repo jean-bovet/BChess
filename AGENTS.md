@@ -49,8 +49,15 @@ GoogleTest case actually executed.
 
 **Tests.** New logic: a failing Swift Testing test first. Views are exempt from unit tests; **every screen needs
 a scenario** in `BChessGalleryTests/GalleryScenarios.swift`, and the app has no `#Preview` and no preview code.
-`/preview-gallery` renders the scenarios on iOS. A macOS-only view has no scenario until the Mac renderer exists.
+`/preview-gallery` renders the scenarios on iOS (`scripts/snapshot-gallery.sh`; lifecycle tests `scripts/test_snapshot_gallery.sh`). A macOS-only view has no scenario until the Mac renderer exists.
 A scenario never forces an appearance or a language. A thread-safety fix gets a test that would fail (or hang) without it.
+
+**Builds and simulators.** Every local `xcodebuild` runs under `buildlock --folder <its DerivedData> -- xcodebuild …`;
+iOS simulator tests run on a simulator leased with `simpool acquire --spec iphone --pid $$` and given back with
+`simpool release <udid>` (also on failure), with `-parallel-testing-enabled NO` and one `-destination`. Never create,
+boot or shut down a simulator by hand. `scripts/snapshot-gallery.sh` and `scripts/elo-match.sh` do this themselves
+(never wrap them); without `simpool`/`buildlock` on PATH they fall back to plain `xcodebuild` (and, for the gallery,
+its own "BChess Agent" simulator).
 
 **Swift Testing rules.** `#require` for preconditions without which the rest of the test is meaningless; `#expect` for the checks themselves. `#expect(throws: SpecificError.self)` (or a specific value), never a bare `throws`; use the returned error when inspecting it. `.timeLimit` takes whole minutes only. A `confirmation()` must outlive the async work it confirms — await that work inside its closure. Exit tests (`#expect(processExitsWith:)`) cover `precondition` / `fatalError` paths. Verification helpers take `sourceLocation: SourceLocation = #_sourceLocation` so failures point at the caller. `withKnownIssue` for a known failure (it fails once the issue stops reproducing), never a disabled test. `@Suite(.serialized)` serializes **every** test in the suite (not only parameterized ones); a suite touching process-wide state needs it — never remove it as dead code.
 
