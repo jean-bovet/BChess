@@ -294,9 +294,21 @@ if [[ ! -f "$BOOK" || $(sha256 "$BOOK") != "$BOOK_PGN_SHA256" ]]; then
 fi
 
 # 3. BChess, Release
+# xcodebuild runs under `buildlock` on its DerivedData folder when it is on PATH (one build per folder, and the
+# host's build slots); without it, plainly. $1 = DerivedData, $2 = log file, rest = xcodebuild arguments.
+build_uci() {
+    local dd="$1" log="$2"
+    shift 2
+    if command -v buildlock > /dev/null; then
+        : > "$log"
+        buildlock --folder "$dd" --log "$log" -- xcodebuild "$@" -derivedDataPath "$dd" < /dev/null
+    else
+        xcodebuild "$@" -derivedDataPath "$dd" > "$log" 2>&1
+    fi
+}
 echo "Building BChessUCI (Release)"
 mkdir -p "$ELO"
-xcodebuild -project "$ROOT/BChess.xcodeproj" -scheme BChessUCI -configuration Release -derivedDataPath "$ELO/dd" build > "$ELO/build.log" 2>&1 \
+build_uci "$ELO/dd" "$ELO/build.log" -project "$ROOT/BChess.xcodeproj" -scheme BChessUCI -configuration Release build \
     || { tail -30 "$ELO/build.log"; fail "BChessUCI did not build"; }
 BCHESS="$ELO/dd/Build/Products/Release/BChessUCI"
 [[ -x "$BCHESS" ]] || fail "$BCHESS is missing"
@@ -309,7 +321,7 @@ if [[ -n $BASE ]]; then
         echo "Building BChessUCI (Release) of $BASE_SHORT"
         rm -rf "$BASE_DIR"; mkdir -p "$BASE_DIR/src"
         git -C "$ROOT" archive "$BASE_SHA" | tar -x -C "$BASE_DIR/src"
-        xcodebuild -project "$BASE_DIR/src/BChess.xcodeproj" -scheme BChessUCI -configuration Release -derivedDataPath "$BASE_DIR/dd" build > "$BASE_DIR/build.log" 2>&1 \
+        build_uci "$BASE_DIR/dd" "$BASE_DIR/build.log" -project "$BASE_DIR/src/BChess.xcodeproj" -scheme BChessUCI -configuration Release build \
             || { tail -30 "$BASE_DIR/build.log"; rm -rf "$BASE_DIR"; fail "BChessUCI of $BASE_SHORT did not build"; }
         [[ -x "$BASEBIN" ]] || fail "$BASEBIN is missing"
     fi

@@ -13,3 +13,6 @@ previews/
 
 # Per-machine signing team (see Signing.xcconfig)
 Signing.local.xcconfig
+
+# macOS Finder metadata
+.DS_Store

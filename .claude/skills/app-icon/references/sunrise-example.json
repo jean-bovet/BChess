@@ -1,0 +1,38 @@
+{
+  "reference": "reference.png",
+  "background": {
+    "default": "extended-srgb:0.025,0.095,0.27,1",
+    "dark": "extended-srgb:0.008,0.012,0.035,1",
+    "tinted": "extended-srgb:0.02,0.02,0.02,1"
+  },
+  "dark": {
+    "shadow_floor": 0.38,
+    "threshold": 0.18,
+    "range": 0.65
+  },
+  "layers": [
+    {
+      "name": "00-Atmosphere",
+      "diffuse_background": 70,
+      "material": "fidelity"
+    },
+    {
+      "name": "01-Halo",
+      "mask": "circle 509,472 980,472",
+      "feather": 12,
+      "material": "fidelity"
+    },
+    {
+      "name": "02-Orb",
+      "mask": "circle 511,474 734,474",
+      "feather": 12,
+      "material": "fidelity"
+    },
+    {
+      "name": "03-Horizons",
+      "mask": "path 'M0 492 C40 501 76 521 101 540 C155 491 209 507 275 550 C361 605 426 632 511 632 C631 632 722 568 800 534 C854 507 878 503 911 520 C929 529 940 540 945 551 C976 533 1001 518 1024 511 L1024 1024 L0 1024 Z'",
+      "feather": 1.5,
+      "material": "fidelity"
+    }
+  ]
+}

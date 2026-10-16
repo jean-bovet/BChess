@@ -1,9 +1,7 @@
 ---
-# repo-specific: identity
 name: preview-gallery
 description: Render every screen of the BChess iPhone app in light and dark with one snapshot-test run (scripts/snapshot-gallery.sh) and open the preview gallery, one card per scenario with light and dark side by side. The app has no #Preview: the scenario list in the test target is the only source. Use when Jean asks to see the screens, to check a branch visually, to look at one screen after a change, or to regenerate the preview gallery.
 argument-hint: [--only pattern]
-# /repo-specific
 allowed-tools: Read, Glob, Grep, Bash
 ---
 
@@ -18,58 +16,60 @@ and is rendered by Xcode's canvas, the heaviest way to look at a screen (Xcode p
 The scenario list is one source, ships nothing in the app, and a test run on one headless simulator renders
 every screen at about one second each. Spot checks use `--only`, not the canvas.
 
-<!-- repo-specific: app -->
 BChess (`BChess.xcodeproj`, scheme "BChess (iOS)"). The gallery lives in the app-hosted unit-test target
 `BChessGalleryTests`: `GalleryScenarios.swift` (the scenario list and the `Fixture` PGN constants),
 `SnapshotGalleryTests.swift` (the render), `GalleryScenarioTests.swift` (the list's own tests, which parse every
 PGN fixture; both suites sit in the serialized parent suite `GallerySuites`). Output: `previews/index.html`
 (gitignored). Groups, in page order: Game, Board, Engine, Moves, Games list, Settings, Walnut (38 cards). The
 approved visual spec is the Walnut design canvas (`planning/README.md`, UI-WALNUT row).
-<!-- /repo-specific -->
 
-<!-- repo-specific: platforms-and-languages -->
 iPhone 17 Pro (402x874 pt), plus one iPad-landscape card ("Game screen · Wide", 1180x820) rendered on the iPhone
 simulator. English only. No Mac pass: macOS-only views (`DocumentWindow`) have no scenario until the Mac renderer is
 proven in another repo.
-<!-- /repo-specific -->
 
-<!-- repo-specific: status -->
 Adopted (APP-5): the app has no `#Preview` and no `#if DEBUG` preview code.
-<!-- /repo-specific -->
 
 ## Run: `scripts/snapshot-gallery.sh`
 
 ```
-scripts/snapshot-gallery.sh                     # every scenario, then the simulator is shut down
+scripts/snapshot-gallery.sh                     # every scenario; the simulator goes back to the pool
 scripts/snapshot-gallery.sh --only "settings,list" # a subset: comma-separated substrings of names or slugs
-scripts/snapshot-gallery.sh --keep-booted       # a series of runs (during a /develop plan: first gate on)
-scripts/snapshot-gallery.sh --shutdown          # then shut it down (never creates a simulator)
+scripts/snapshot-gallery.sh --no-open           # do not open the page
 ```
 
 - **Done = `CHECK OK [<lang>]: <n> cards, light and dark complete and correctly lit`** for every language
-  rendered. Then read the new or changed PNGs in both appearances (see Report) and make sure the simulator is
-  shut down.
+  rendered. Then read the new or changed PNGs in both appearances (see Report). `simpool status` shows nothing
+  leased by the run.
 - Costs measured on a proven repo (24 GB Mac, iOS 27 simulator): booting the simulator about **6 GB** of RAM;
   a run on a booted one about **0.25 GB**; build tools under 0.3 GB. Warm run: about 1 s per scenario plus a
   fixed 20–25 s (xcodebuild installs and launches the host app), so ~50 scenarios take 1.5–2.5 min and
-  `--only` one scenario about 25 s. From a shut-down simulator add 1–3 min (a fresh boot keeps iOS busy).
-  Keep it booted only for a series of runs; always end with it shut down.
+  `--only` one scenario about 25 s. From a shut-down simulator add 1–3 min (a fresh boot keeps iOS busy). The
+  pool normally keeps a released simulator warm for the next run (within the host's budget) and shuts it
+  down after 30 idle minutes.
 
-<!-- repo-specific: script -->
 - Snapshot test: `GallerySuites/SnapshotGalleryTests` in `BChessGalleryTests`; it runs only when
   `BCHESS_SNAPSHOT_DIR` is set (`TEST_RUNNER_BCHESS_SNAPSHOT_DIR` in xcodebuild's environment) and filters with
   `BCHESS_SNAPSHOT_ONLY` (the script's `--only`). It prints `gallery: <slug> <duration>` per scenario and
   `gallery: <n> scenario(s)`, which the script forwards.
-- Simulator: "BChess Agent" (iPhone 17 Pro, latest runtime), created if missing; the marker of the one the script
-  booted is `${TMPDIR:-/tmp}/bchess-snapshot-gallery.<UDID>.booted`, outside DerivedData, so any
-  `BCHESS_SNAPSHOT_DD` can shut it down.
+- Simulator: a lease from the pool, `simpool acquire --spec iphone --pid $$` (iPhone 17 Pro, iOS 27.0), given back
+  with `simpool release <udid> --app ch.arizona-software.BChess` by the exit trap on success, failure and
+  INT/TERM/HUP; the script never creates, boots, shuts down or erases one. Both `xcodebuild` commands run under
+  `buildlock --folder <DerivedData>` (the test with `--no-slot`). A failed `simpool acquire` exits 1.
+- Fallback (public repo: `simpool` or `buildlock` not on PATH): the script's own "BChess Agent" (iPhone 17 Pro,
+  latest runtime), created if missing, booted and shut down by the script, `xcodebuild` without `buildlock`; the
+  marker of the one it booted is `${TMPDIR:-/tmp}/bchess-snapshot-gallery.<UDID>.booted`, outside DerivedData, so
+  any `BCHESS_SNAPSHOT_DD` can shut it down. `--keep-booted`, `--shutdown` and a simulator name or id apply to it
+  only (with the pool they do nothing).
+- Lifecycle tests: `scripts/test_snapshot_gallery.sh` (stub `xcrun`, `xcodebuild`, `simpool`, `buildlock` and
+  page script; PATH limited to the stubs and the system directories). Pool: lease released on success, failure
+  and INT/TERM/HUP, an interrupted `simpool acquire` stopped, no `simctl` lifecycle call. Fallback: create, boot,
+  shutdown, `--keep-booted`/`--shutdown`, a borrowed simulator left running.
 - DerivedData: `BCHESS_SNAPSHOT_DD`, default `~/Library/Developer/Xcode/DerivedData/BChess-snapshots` (one folder
   for every checkout; a plan passes its own). No SPM packages, so no package flags.
 - Measured (APP-5, 3 scenarios): cold (empty DerivedData, shut-down simulator) boot 39 s, build 61 s, test 59 s,
   total 161 s; warm boot 1 s, build 10 s, test 20 s. The 38 cards of a warm run took 53 s of test, about 1.4 s
   per card (the Games list and Launch cards, with their 1 s settle, 2.6 s). Memory (`vm_stat` active + wired +
   compressed): about +2.4 GB at the simulator boot, +6 GB at the peak of build and test on a busy Mac.
-<!-- /repo-specific -->
 
 ## A screen needs a scenario
 
@@ -109,10 +109,13 @@ One entry in the scenario list, and nothing in the app:
 3. **`scripts/preview-gallery.py`**: `--import DIR [--partial]` (replace the gallery, or only the files of an
    `--only` run), `--check`, `--coverage`; with `scripts/preview-luminance.swift` for the lit check.
 4. **`scripts/snapshot-gallery.sh`**:
-   - `xcrun simctl list devices booted` first: one simulator at a time. Wait (up to 10 min) for another one,
-     then stop with a message; never touch a simulator it did not boot. A marker file records the one it
-     booted; a `trap` shuts that one down on any exit unless `--keep-booted`.
-   - Its own agent simulator (created if missing), booted with `simctl boot` (no Simulator.app window).
+   - The simulator from the machine-wide pool: `simpool acquire --spec iphone --pid $$`, and `simpool release`
+     in the exit trap. Every `xcodebuild` runs under `buildlock --folder <DerivedData>`. Never boots or shuts
+     down a simulator itself.
+   - A repo that may run without the pool (a public repo, a fresh clone): when `simpool` is not on PATH, its
+     own agent simulator (created if missing, booted with `simctl boot`, no Simulator.app window) under the
+     old rule: `xcrun simctl list devices booted` first, wait (up to 10 min) for another one, never touch one
+     it did not boot, a `trap` shuts down the one it booted.
    - Persistent DerivedData; `-skipPackageUpdates -disableAutomaticPackageResolution` once the packages are
      resolved (otherwise every run resolves remote packages: 75 s measured).
    - `build-for-testing` once, then per language one `test-without-building -only-testing:<snapshot class>
@@ -152,14 +155,12 @@ Gotchas met on the first conversion: xcodebuild can stay alive after a failed te
 started, never one it did not); a view hard-wired to a shared singleton cannot use a private store (see Shared
 singletons); old fixtures may be in a format the parser no longer reads.
 
-<!-- repo-specific: extras -->
 Hermetic by construction: BChess has no network code (I5), so there is no stub and the report states
 "network: none (I5)". Every scenario keeps a human to move or a non-play position and the engine readout off
 (`@AppStorage("showEngine")` reads its default from the scratch "BChessGallery" suite), so no search starts. The
 test host launches with `-uiTestingFreshLibrary` (the scheme). Every PGN a scenario loads is a `Fixture`
 constant, because `GameSession.init` silently falls back to an empty game on a rejected PGN: a test parses each
 one. `--check` also fails on `.preferredColorScheme` or `\.locale` in `GalleryScenarios.swift`.
-<!-- /repo-specific -->
 
 ## Report
 

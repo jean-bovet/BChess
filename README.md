@@ -37,6 +37,12 @@ xcodebuild test -scheme "BChess (macOS)" -destination 'platform=macOS'
 xcodebuild test -scheme "BChess (iOS)" -destination 'platform=iOS Simulator,name=iPhone 17 Pro'
 ```
 
+`scripts/snapshot-gallery.sh` renders every screen of the iOS app in light and dark into `previews/` (its lifecycle
+tests: `scripts/test_snapshot_gallery.sh`). It and `scripts/elo-match.sh` share the Mac politely when two
+optional tools are on `PATH`: `simpool` (a machine-wide pool of booted simulators, leased per run) and `buildlock`
+(one `xcodebuild` per DerivedData folder, within the host's build slots). Without them, the gallery script uses
+its own "BChess Agent" simulator, which it creates, boots and shuts down, and `xcodebuild` runs directly.
+
 Continuous integration and TestFlight builds run on Xcode Cloud, whose workflows are configured in App Store Connect.
 
 How changes are planned and reviewed is described in `AGENTS.md` and `planning/`.
