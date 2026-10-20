@@ -41,6 +41,10 @@ Facts this skill relies on:
 - It runs in the main conversation: git, a few files, a check or two — no subagent.
 - It ends when `testflight` is pushed (§10). Processing, the build report and the expiry reminder
   are Jean's to ask for later (§11); never wait on Xcode Cloud after the push.
+- **The `testflight` run is the cloud check.** Never read or wait for a `main` run before the push:
+  to save compute hours (one monthly pool for every app),
+  `main` need not build in Xcode Cloud at all. The run the push starts tests and archives the
+  commit that goes out; whether it succeeded is the §11 build report.
 - Stop on the first failure, say which step failed and why, and leave the rest undone. Never fake
   a check that is Jean's to make.
 
@@ -178,8 +182,7 @@ Never push `main`, and never merge the pull request yourself unless Jean says so
 
 Push the branch and `testflight` (§8) together, right after the commit: Jean's approval of the
 notes (§6) is the go. Never wait for an Xcode Cloud run — before the commit or after the push — and
-never ask again before §8. A CI check reads the most recent **finished** run; one still in progress
-is noted in the report (§10), not waited for.
+never ask again before §8.
 
 ## 8. Start the build: fast-forward `testflight`
 
@@ -208,6 +211,7 @@ background watcher, no "still running" check-ins. Report right away:
   app ▸ Xcode Cloud ▸ Builds shows the run and its build number (never predict it); the
   TestFlight group gets the build when processing ends, with the notes as "What to Test";
 - if the CloudKit gate of §3 fired, that Jean confirmed the Production deploy;
+- that the build is checked only once that run finishes: its tests and archive are the check;
 - how to ask for §11 later ("report Xcode Cloud build <n>", "remind me about <App>'s expiry").
 
 Also: the pull request's URL, and that it must be merged with **Create a merge commit** before the
@@ -215,7 +219,8 @@ next `/testflight` or `/release`.
 
 ## 11. Later, only when Jean asks
 
-**Build report.** Read the finished run — every action, not only the archive — with the
+**Build report** — did the `testflight` branch succeed. Read the finished run — every action,
+not only the archive — with the
 `xcode-cloud` tool (its path is in the global working agreement; it loads its own credentials,
 never open or source them):
 
@@ -225,7 +230,9 @@ xcode-cloud report "BChess (iOS)" <build number>   # warnings, errors, failed te
 ```
 
 List its warnings (grouped by file) and any failed test action, even when the run says SUCCEEDED,
-and offer to fix them in a follow-up commit. For a failed action, `report … --logs DIR` downloads
+and offer to fix them in a follow-up commit. A failed test action on a build that reached the
+testers comes first: say so plainly, so Jean can expire the build in App Store Connect.
+For a failed action, `report … --logs DIR` downloads
 its logs. Report the iOS and the Mac archive separately: one can upload while the other fails (the
 first TestFlight run archived iOS and failed preparing the Mac build). A run still in progress: say
 so and stop; do not wait for it.
