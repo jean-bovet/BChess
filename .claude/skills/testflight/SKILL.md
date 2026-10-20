@@ -78,8 +78,9 @@ answer:
 
 - **Resume** if `HEAD` is this skill's own release commit (§7), on its `testflight-…` branch, and
   `origin/testflight` is behind it: an earlier run committed, then stopped before the build started.
-  Keep its version and notes, skip §4–§6, and continue at §7 (pushing the branch again is a no-op;
-  open the pull request if it is missing).
+  Keep its version and notes, skip §4–§6, and continue at §7 **after its commit**: the commit already
+  exists, so never run `git add` or `git commit` again; push the branch (a no-op if already pushed) and
+  open the pull request if it is missing.
 - **Nothing new** if the range is empty: say "nothing new since the last build (`<sha>`)" and stop,
   unless Jean asks for a §11 step for that build (then do only that). If he
   explicitly wants the same commit rebuilt, make no empty commit: the `xcode-cloud` tool's
@@ -167,7 +168,8 @@ commit before that.**
 ## 7. Commit on a branch and open the pull request
 
 Stage only the files this skill changed — never `git add -A` — and end the commit message with
-the session's attribution trailer.
+the session's attribution trailer. On a resume (§2) the commit already exists: skip straight to the
+push.
 
 ```bash
 git switch -c testflight-<version>-<yyyymmdd>        # from main; a resume is already on it
