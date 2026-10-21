@@ -37,10 +37,10 @@ allowed-tools: Read, Edit, Write, Bash, AskUserQuestion
 - The version was set by `/testflight` and stays the same for every TestFlight build until this
   skill tags it. Fixing a rejected or broken candidate is therefore another `/testflight` at the same
   version, then `/release` again.
-- The `app-store` tool creates the App Store version, sets What's New on every locale and configures
-  the phased release. It and the `release-check` tool (§2b) live where the global working agreement
-  says, and load their own credentials; never open or source them. Attaching the build and
-  submitting it for review are Jean's, in App Store Connect.
+- The `app-store` tool creates the App Store version, sets What's New on every locale, configures
+  the phased release and attaches the candidate's build (`attach-build`). It and the `release-check`
+  tool (§2b) live where the global working agreement says, and load their own credentials; never
+  open or source them. Submitting for review is Jean's, in App Store Connect.
 - Three hard stops: the readiness audit (§2b) when it finds a problem, the notes review (§4) and App
   Review (§6). Never continue past one without an explicit answer from Jean.
 - **Retired domains** (the global working agreement's list, e.g. arizona-software.ch → jean-bovet.ch)
@@ -108,6 +108,13 @@ build number for §6.
 Here: `xcode-cloud builds "BChess (iOS)" --limit 10` and `xcode-cloud report "BChess (iOS)" <build number>`
 (the tool's path is in the global working agreement). The run that pushing `testflight` started holds
 both archives (Archive - iOS, Archive - macOS): both must have passed and uploaded.
+
+**App Store eligible.** `xcode-cloud audience "BChess (iOS)"` must show `APP_STORE_ELIGIBLE` for the
+archive actions of the workflow that built it. An `INTERNAL_ONLY` build is TestFlight-only and App
+Store Connect never attaches it to a version; the API cannot change the setting. Stop and ask Jean to
+set each archive action's Distribution Preparation to "App Store Connect" (Xcode ▸ Integrate ▸ Manage
+Workflows), then `xcode-cloud rebuild "BChess (iOS)" <build>` (the same commit, a new build number:
+use that one from here on).
 
 ## 2b. Readiness audit (STOP on any problem)
 
@@ -214,17 +221,22 @@ app-store prepare --app "BChess (iOS)" --platform IOS --version <version> --note
     [--notes <locale>=<notes file> ...]                      # one file per non-English locale
 app-store prepare --app "BChess (iOS)" --platform MAC_OS --version <version> --notes-file <notes file> \
     [--notes <locale>=<notes file> ...]
-app-store check --app "BChess (iOS)" --platform IOS --version <version> --families iphone,ipad     # must report 0 problems
-app-store check --app "BChess (iOS)" --platform MAC_OS --version <version> --families mac         # must report 0 problems
+app-store attach-build --app "BChess (iOS)" --platform IOS --version <version> --build <build>      # the candidate's, from §2
+app-store attach-build --app "BChess (iOS)" --platform MAC_OS --version <version> --build <build>
+app-store check --app "BChess (iOS)" --platform IOS --version <version> --families iphone,ipad     # must report 0 problems and "build <build> attached"
+app-store check --app "BChess (iOS)" --platform MAC_OS --version <version> --families mac         # must report 0 problems and "build <build> attached"
 ```
+
+`attach-build` refuses a build that is missing, still processing, expired or internal-only; wait
+for processing, or see "App Store eligible" in §2.
 
 For 1.0, no `prepare` (§4). If App Store Connect refuses a step for one platform (What's New, the
 phased release), stop and report the error to Jean.
 
 Then list Jean's manual steps:
 
-- attach build `<build>` (the candidate's, from §2) to version `<version>` and submit for review;
 - confirm the App Privacy label matches the build (the API cannot read it);
+- submit version `<version>` for review;
 
 - each platform separately: the iOS build to the `IOS` version, the Mac build to the `MAC_OS`
   version (both from the candidate's Xcode Cloud run), each submitted;
