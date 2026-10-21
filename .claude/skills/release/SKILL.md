@@ -12,8 +12,7 @@ allowed-tools: Read, Edit, Write, Bash, AskUserQuestion
 - Platforms: iPhone and iPad (`BChess (iOS)`, App Store platform `IOS`, families `iphone,ipad`) and
   the Mac (`BChess (macOS)`, platform `MAC_OS`, family `mac`). They share one App Store record, but
   App Store Connect keeps **one version per platform**: every `app-store` step below runs once for
-  `--platform IOS` and once for `--platform MAC_OS`, and Jean attaches and submits each platform's
-  build.
+  `--platform IOS` and once for `--platform MAC_OS`, and Jean submits each platform's version.
 - **Never released yet.** Version 1.0 exists on both platforms in App Store Connect
   (PREPARE_FOR_SUBMISSION), with an empty page: the first `/release` is the app's first App Store
   submission (see "First release" in §2b and §4).
@@ -187,7 +186,7 @@ item concerns only iPhone/iPad or only the Mac. The listing has one locale, en-U
 
 **First release (1.0): no What's New.** App Store Connect shows no What's New for an app's first
 version and refuses one; skip §4 and §5 (no notes file, no notes commit) and, in §6, `prepare` (both
-1.0 versions already exist): run only `status` and the two `check` lines. The description carries
+1.0 versions already exist): run only `status`, the two `attach-build` and the two `check` lines. The description carries
 what the app does. From the second release on, the full flow applies.
 
 Show Jean every notes file in full, with the commit list it came from, and ask for a yes or his
@@ -236,10 +235,8 @@ phased release), stop and report the error to Jean.
 Then list Jean's manual steps:
 
 - confirm the App Privacy label matches the build (the API cannot read it);
-- submit version `<version>` for review;
+- submit version `<version>` for review, each platform separately (the `IOS` and the `MAC_OS` version);
 
-- each platform separately: the iOS build to the `IOS` version, the Mac build to the `MAC_OS`
-  version (both from the candidate's Xcode Cloud run), each submitted;
 - screenshots retaken (§3 answer 2): upload with `app-store screenshots --app "BChess (iOS)"`
   (`--platform IOS`: `APP_IPHONE_67` or `APP_IPHONE_69`, and `APP_IPAD_13`; `--platform MAC_OS`:
   `APP_DESKTOP`) or in App Store Connect;
