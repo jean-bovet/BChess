@@ -543,3 +543,42 @@ TEST_F(PGN, IllegalEnPassantGameNoLongerOpens) {
     ChessGame game;
     ASSERT_FALSE(FPGN::setGame("[SetUp \"1\"]\n[FEN \"4k3/8/8/4P3/8/8/8/4K3 w - d6 0 1\"]\n\n1. exd6 *", game));
 }
+
+// The SAN of the UCI move `uci` played from `fen`
+static std::string sanOf(const char *fen, const char *uci) {
+    ChessBoard board;
+    FFEN::setFEN(fen, board);
+    auto move = FPGN::uciMove(board, uci);
+    EXPECT_NE(INVALID_MOVE, move) << uci << " from " << fen;
+    return FPGN::san(board, move);
+}
+
+TEST_F(PGN, SANDisambiguatesByFileRankOrSquare) {
+    // Two knights reach d2: the file tells them apart
+    EXPECT_EQ("Nbd2", sanOf("4k3/8/8/8/8/5N2/8/1N2K3 w - - 0 1", "b1d2"));
+    EXPECT_EQ("Nfd2", sanOf("4k3/8/8/8/8/5N2/8/1N2K3 w - - 0 1", "f3d2"));
+    // Two rooks on one file: the rank
+    EXPECT_EQ("R1e2", sanOf("k7/8/8/8/8/4R3/8/4R1K1 w - - 0 1", "e1e2"));
+    EXPECT_EQ("R3e2", sanOf("k7/8/8/8/8/4R3/8/4R1K1 w - - 0 1", "e3e2"));
+    // Neither the file nor the rank is enough
+    EXPECT_EQ("Qa1b2", sanOf("4k3/8/8/8/8/Q7/8/Q1Q1K3 w - - 0 1", "a1b2"));
+    // A lone piece needs nothing
+    EXPECT_EQ("Nd2", sanOf("4k3/8/8/8/8/8/8/1N2K3 w - - 0 1", "b1d2"));
+}
+
+TEST_F(PGN, SANMarksChecksAndMates) {
+    EXPECT_EQ("Qh5+", sanOf("rnbqkbnr/ppppp1pp/5p2/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2", "d1h5"));
+    EXPECT_EQ("Qh5", sanOf("rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2", "d1h5"));
+    EXPECT_EQ("Qxf7#", sanOf("r1bqkb1r/pppp1ppp/2n2n2/4p2Q/2B1P3/8/PPPP1PPP/RNB1K1NR w KQkq - 4 4", "h5f7"));
+    EXPECT_EQ("Qh4#", sanOf("rnbqkbnr/pppp1ppp/8/4p3/6P1/5P2/PPPPP2P/RNBQKBNR b KQkq - 0 2", "d8h4"));
+    EXPECT_EQ("Re8+", sanOf("3k4/8/8/8/8/8/8/4RK2 w - - 0 1", "e1e8"));
+}
+
+TEST_F(PGN, SANSpecialMoves) {
+    EXPECT_EQ("O-O", sanOf("r3k2r/pppppppp/8/8/8/8/PPPPPPPP/R3K2R w KQkq - 0 1", "e1g1"));
+    EXPECT_EQ("O-O-O", sanOf("r3k2r/pppppppp/8/8/8/8/PPPPPPPP/R3K2R b KQkq - 0 1", "e8c8"));
+    EXPECT_EQ("O-O+", sanOf("5k2/8/8/8/8/8/8/4K2R w K - 0 1", "e1g1"));
+    EXPECT_EQ("e8=Q+", sanOf("k7/4P3/8/8/8/8/8/K7 w - - 0 1", "e7e8q"));
+    EXPECT_EQ("b8=N", sanOf("8/1P6/8/8/8/8/8/k3K3 w - - 0 1", "b7b8n"));
+    EXPECT_EQ("exd6", sanOf("4k3/8/8/3pP3/8/8/8/4K3 w - d6 0 1", "e5d6"));
+}

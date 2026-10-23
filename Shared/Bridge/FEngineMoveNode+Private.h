@@ -8,6 +8,7 @@
 
 #import <Foundation/Foundation.h>
 #include "ChessGame.hpp"
+#include "ChessBoard.hpp"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -24,7 +25,11 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong, readwrite) NSString * _Nonnull comment;
 @property (nonatomic, strong, readwrite) NSMutableArray<FEngineMoveNode*> * _Nonnull variations;
 
+// The root node, which carries no move
 - (instancetype)initWithNode:(ChessGame::MoveNode)node;
+
+// A move node named in SAN from the board it is played from (checks, mates and disambiguation included)
+- (instancetype)initWithNode:(ChessGame::MoveNode)node boardBefore:(ChessBoard)boardBefore;
 
 - (void)addVariation:(FEngineMoveNode*)node;
 

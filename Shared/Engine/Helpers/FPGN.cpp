@@ -844,30 +844,10 @@ bool FPGN::setGames(std::string pgn, std::vector<ChessGame> & games) {
     return true;
 }
 
-// Returns a PGN representation of a particular node in the game, including all its descendant.
-static void getPGN(ChessBoard board, // The chess board representation which is used to determine the actual move and state of the board
-                   FPGN::Formatting formatting, // The type of desired formatting
-                   ChessGame::MoveNode & node, // The current node representing the move being output
-                   std::string & pgn, // The PGN being constructed
-                   int moveIndex, // The current move index
-                   int fromMoveIndex, // The move index at which we starts to build up the PGN
-                   int toMoveIndex, // The move index at which to stop building up the PGN
-                   bool mainLine, // True if this node/move represents the main line, false if it represents a variation
-                   bool recursive, // True if this method should continue to traverse the next move and all its variation, false to just output this move and return
-                   bool skip, // True if the PGN output should be skipped for this method executed
-                   bool forceNumber // True if the move that is output next, even Black's, must carry its move number (after a variation)
-) {
-    auto move = node.move;
+// The SAN of a move on the board it is played from: the shortest spelling that no other legal move of the
+// same piece to the same square shares, then "+" for a check or "#" for a mate.
+std::string FPGN::san(ChessBoard board, Move move) {
     auto piece = MOVE_PIECE(move);
-    
-    if (formatting == FPGN::Formatting::line && moveIndex == fromMoveIndex && !skip) {
-        pgn = "";
-    }
-
-    if (moveIndex >= toMoveIndex && !skip) {
-        return;
-    }
-    
     // The shortest SAN that no other legal move of the same piece to the same square shares: the piece
     // and square (Ne3), else the file (Nge3), else the rank (N1e3), else the full origin (Ng1e3).
     FPGN::SANType sanType = FPGN::SANType::tight;
@@ -883,6 +863,41 @@ static void getPGN(ChessBoard board, // The chess board representation which is 
     }
     if (hasOthers) {
         sanType = !sharesFile ? FPGN::SANType::medium : (!sharesRank ? FPGN::SANType::rank : FPGN::SANType::full);
+    }
+
+    auto text = FPGN::to_string(move, sanType);
+
+    // Determine if the position is check or mate
+    board.move(move);
+    if (board.isCheck(board.color)) {
+        ChessMoveGenerator generator;
+        auto moveList = generator.generateMoves(board);
+        text += moveList.count == 0 ? "#" : "+";
+    }
+    return text;
+}
+
+// Returns a PGN representation of a particular node in the game, including all its descendant.
+static void getPGN(ChessBoard board, // The chess board representation which is used to determine the actual move and state of the board
+                   FPGN::Formatting formatting, // The type of desired formatting
+                   ChessGame::MoveNode & node, // The current node representing the move being output
+                   std::string & pgn, // The PGN being constructed
+                   int moveIndex, // The current move index
+                   int fromMoveIndex, // The move index at which we starts to build up the PGN
+                   int toMoveIndex, // The move index at which to stop building up the PGN
+                   bool mainLine, // True if this node/move represents the main line, false if it represents a variation
+                   bool recursive, // True if this method should continue to traverse the next move and all its variation, false to just output this move and return
+                   bool skip, // True if the PGN output should be skipped for this method executed
+                   bool forceNumber // True if the move that is output next, even Black's, must carry its move number (after a variation)
+) {
+    auto move = node.move;
+    
+    if (formatting == FPGN::Formatting::line && moveIndex == fromMoveIndex && !skip) {
+        pgn = "";
+    }
+
+    if (moveIndex >= toMoveIndex && !skip) {
+        return;
     }
     
     // The side to move and the move number come from the board, so that a game that starts from a FEN
@@ -925,6 +940,12 @@ static void getPGN(ChessBoard board, // The chess board representation which is 
         }
     }
     
+    // The move with its disambiguation and its check or mate suffix, named from the board before the move
+    std::string san;
+    if (!skip) {
+        san = FPGN::san(board, move);
+    }
+
     // Execute the move on the board
     board.move(move);
 
@@ -933,18 +954,7 @@ static void getPGN(ChessBoard board, // The chess board representation which is 
         if (pgn.size() > 0) {
             pgn += " ";
         }
-        pgn += FPGN::to_string(move, sanType);
-    }
-
-    // Determine if the position is check or mate
-    if (board.isCheck(board.color) && !skip) {
-        ChessMoveGenerator generator;
-        auto moveList = generator.generateMoves(board);
-        if (moveList.count == 0) {
-            pgn += "#";
-        } else {
-            pgn += "+";
-        }
+        pgn += san;
     }
 
     // Output the comment for the move

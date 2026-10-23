@@ -70,6 +70,10 @@ public:
 
     static std::string to_string(Move move, SANType sanType = SANType::full);
     
+    // The SAN of `move` played from `boardBefore`: disambiguated when another piece of the same kind
+    // can reach the square, with "+" for a check and "#" for a mate. Ne6, Nde6, N1e6, Nd4e6, Qxf7#, e8=Q+, O-O.
+    static std::string san(ChessBoard boardBefore, Move move);
+
     // The legal move that `uci` (e2e4, e1g1, e7e8q) spells on this board, or INVALID_MOVE
     static Move uciMove(ChessBoard board, std::string uci);
     
