@@ -168,18 +168,22 @@ struct FEngineCore: ChessEngine {
 }
 
 - (void)moveNodesFromNode:(ChessGame::MoveNode)node
+                    board:(ChessBoard)board
                  mainLine:(FEngineMoveNode*)mainLine {
     FEngineMoveNode *mainLineNodeWithVariants = nil;
     for (int index=0; index<node.variations.size(); index++) {
         auto child = node.variations[index];
-        auto childNode = [[FEngineMoveNode alloc] initWithNode:child];
+        // Each move is named from the board it is played from, so SAN carries checks and disambiguation
+        auto childNode = [[FEngineMoveNode alloc] initWithNode:child boardBefore:board];
+        ChessBoard boardAfter = board;
+        boardAfter.move(child.move);
         if (index == 0) {
             mainLineNodeWithVariants = childNode;
             [mainLine addVariation:childNode];
-            [self moveNodesFromNode:child mainLine:mainLine];
+            [self moveNodesFromNode:child board:boardAfter mainLine:mainLine];
         } else {
             [mainLineNodeWithVariants addVariation:childNode];
-            [self moveNodesFromNode:child mainLine:childNode];
+            [self moveNodesFromNode:child board:boardAfter mainLine:childNode];
         }
     }
 }
@@ -187,7 +191,9 @@ struct FEngineCore: ChessEngine {
 - (NSArray<FEngineMoveNode*>*)moveNodesTree {
     auto root = engine.getRootMoveNode();
     FEngineMoveNode *rootNode = [[FEngineMoveNode alloc] initWithNode:root];
-    [self moveNodesFromNode:root mainLine:rootNode];
+    ChessBoard startBoard;
+    FFEN::setFEN(engine.game().initialFEN, startBoard);
+    [self moveNodesFromNode:root board:startBoard mainLine:rootNode];
     return rootNode.variations;
 }
 
@@ -266,7 +272,7 @@ struct FEngineCore: ChessEngine {
 - (NSArray<FEngineMoveNode*>*)nextMoveChoices {
     NSMutableArray *choices = [NSMutableArray array];
     for (auto & node : engine.game().getNextMoveNodes()) {
-        [choices addObject:[[FEngineMoveNode alloc] initWithNode:node]];
+        [choices addObject:[[FEngineMoveNode alloc] initWithNode:node boardBefore:engine.game().board]];
     }
     return choices;
 }

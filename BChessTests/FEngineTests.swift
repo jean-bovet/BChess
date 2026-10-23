@@ -124,4 +124,44 @@ struct FEngineTests {
             #expect(engine.fen() == before, "\(move)")
         }
     }
+
+    private func names(_ nodes: [FEngineMoveNode]) -> [String] {
+        nodes.flatMap { [$0.name] + names($0.variations) }
+    }
+
+    @Test func treeNamesCarryChecksAndMates() {
+        let check = FEngine()
+        check.setPGN("1. e4 f6 2. Qh5+ g6 *")
+        #expect(names(check.moveNodesTree()) == ["e4", "f6", "Qh5+", "g6"])
+
+        let mate = FEngine()
+        mate.setPGN("1. e4 e5 2. Bc4 Nc6 3. Qh5 Nf6 4. Qxf7# *")
+        #expect(names(mate.moveNodesTree()) == ["e4", "e5", "Bc4", "Nc6", "Qh5", "Nf6", "Qxf7#"])
+    }
+
+    @Test func treeNamesDisambiguateKnights() {
+        let engine = FEngine()
+        engine.setPGN("1. d4 d5 2. Nf3 Nf6 3. Nc3 (3. Nbd2 e6 4. Nb3) 3... Nc6 4. Nd2 *")
+        // The variation is named from the position it branches at, not from the main line
+        #expect(Set(names(engine.moveNodesTree())) == ["d4", "d5", "Nf3", "Nf6", "Nc3", "Nbd2", "e6", "Nb3", "Nc6", "Nd2"])
+    }
+
+    @Test func treeNamesStartFromTheInitialFEN() {
+        let engine = FEngine()
+        #expect(engine.setFEN("4k3/8/8/8/8/5N2/8/1N2K3 w - - 0 1"))
+        #expect(engine.move(uci: "b1d2"))
+        #expect(engine.move(uci: "e8d8"))
+        #expect(engine.move(uci: "f3d4"))
+        #expect(names(engine.moveNodesTree()) == ["Nbd2", "Kd8", "Nd4"])
+    }
+
+    @Test func variationChoicesAreNamedFromTheCurrentPosition() {
+        let engine = FEngine()
+        engine.setPGN("1. d4 d5 2. Nf3 Nf6 3. Nbd2 (3. Nfd2) (3. Nc3) *")
+        engine.move(to: .start, variation: 0)
+        for _ in 0..<4 {
+            engine.move(to: .forward, variation: 0)
+        }
+        #expect(engine.nextMoveChoices().map(\.name) == ["Nbd2", "Nfd2", "Nc3"])
+    }
 }
