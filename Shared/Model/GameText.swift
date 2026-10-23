@@ -11,8 +11,7 @@ enum GameText {
 
     /// The player's name when it has one, else the computer's level, else "You" against a computer, else the colour.
     static func name(of player: GamePlayer, isWhite: Bool, opponent: GamePlayer) -> String {
-        let name = player.name.trimmingCharacters(in: .whitespaces)
-        if !name.isEmpty {
+        if let name = givenName(of: player) {
             return name
         }
         if player.computer {
@@ -24,16 +23,27 @@ enum GameText {
         return isWhite ? "White" : "Black"
     }
 
+    /// The player's own name, trimmed; nil when it has none (empty or whitespace only).
+    private static func givenName(of player: GamePlayer) -> String? {
+        let name = player.name.trimmingCharacters(in: .whitespaces)
+        return name.isEmpty ? nil : name
+    }
+
     static func title(white: GamePlayer, black: GamePlayer) -> String {
         "\(name(of: white, isWhite: true, opponent: black)) vs \(name(of: black, isWhite: false, opponent: white))"
     }
 
     /// The colour with what the player is doing, for the line under a player's name: "White \u{00B7} your move" for a
-    /// human against a computer, "Black \u{00B7} Club" for a computer ("Black \u{00B7} 10 s" at Maximum), the bare colour for a human waiting.
+    /// human against a computer, the bare colour for a human waiting and for a computer whose name already says its
+    /// level ("Casual Player"). It adds the level only where the name does not: "Black \u{00B7} 10 s" at Maximum (the thinking
+    /// time is not in "Full Engine") and "Black \u{00B7} Club" for a computer with a name of its own.
     static func sideDetail(of player: GamePlayer, isWhite: Bool, opponent: GamePlayer, toMove: Bool) -> String {
         let color = isWhite ? "White" : "Black"
         if player.computer {
-            return "\(color) \u{00B7} \(player.strength == .maximum ? "\(Int(player.thinkingTime)) s" : player.strength.displayName)"
+            if player.strength == .maximum {
+                return "\(color) \u{00B7} \(Int(player.thinkingTime)) s"
+            }
+            return givenName(of: player) == nil ? color : "\(color) \u{00B7} \(player.strength.displayName)"
         }
         guard toMove else {
             return color
