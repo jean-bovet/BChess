@@ -66,11 +66,11 @@ final class GameShell {
 
     /// Creates a game in the library and opens it.
     @discardableResult
-    func createGame(white: GamePlayer, black: GamePlayer, discardingUnsavedChanges: Bool = false) throws -> Bool {
+    func createGame(white: GamePlayer, black: GamePlayer, rotated: Bool = false, discardingUnsavedChanges: Bool = false) throws -> Bool {
         guard canLeaveCurrent(discardingUnsavedChanges) else {
             return false
         }
-        let state = GameState(pgn: "*", white: white, black: black)
+        let state = GameState(pgn: "*", rotated: rotated, white: white, black: black)
         install(try library.create(state), state: state)
         return true
     }

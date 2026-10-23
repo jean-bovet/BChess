@@ -9,14 +9,14 @@ import Foundation
 
 enum GameText {
 
-    /// The player's name when it has one, else "Computer", else "You" against a computer, else the colour.
+    /// The player's name when it has one, else the computer's level, else "You" against a computer, else the colour.
     static func name(of player: GamePlayer, isWhite: Bool, opponent: GamePlayer) -> String {
         let name = player.name.trimmingCharacters(in: .whitespaces)
         if !name.isEmpty {
             return name
         }
         if player.computer {
-            return "Computer"
+            return player.strength.computerName
         }
         if opponent.computer {
             return "You"
@@ -28,20 +28,12 @@ enum GameText {
         "\(name(of: white, isWhite: true, opponent: black)) vs \(name(of: black, isWhite: false, opponent: white))"
     }
 
-    /// "to move" for a human to move, the thinking time for a computer.
-    static func detail(of player: GamePlayer, toMove: Bool) -> String? {
-        if player.computer {
-            return "\(Int(player.thinkingTime)) s"
-        }
-        return toMove ? "to move" : nil
-    }
-
-    /// The colour with what `detail` says, for the line under a player's name: "White \u{00B7} your move" for a
-    /// human against a computer, "Black \u{00B7} 5 s" for a computer, the bare colour for a human waiting.
+    /// The colour with what the player is doing, for the line under a player's name: "White \u{00B7} your move" for a
+    /// human against a computer, "Black \u{00B7} Club" for a computer ("Black \u{00B7} 10 s" at Maximum), the bare colour for a human waiting.
     static func sideDetail(of player: GamePlayer, isWhite: Bool, opponent: GamePlayer, toMove: Bool) -> String {
         let color = isWhite ? "White" : "Black"
         if player.computer {
-            return "\(color) \u{00B7} \(Int(player.thinkingTime)) s"
+            return "\(color) \u{00B7} \(player.strength == .maximum ? "\(Int(player.thinkingTime)) s" : player.strength.displayName)"
         }
         guard toMove else {
             return color

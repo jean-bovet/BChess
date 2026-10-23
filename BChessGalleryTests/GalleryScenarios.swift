@@ -317,14 +317,24 @@ enum GalleryScenarios {
         try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
         return AnyView(GameRootView(library: GameLibrary(directory: directory, defaults: defaults)))
     }
-    static let newGameNewGame = GalleryScenario(name: "New game · New game", group: "Games list") {
-        AnyView(NewGameView_iOS(session: GameSession(), editMode: false, onNewGame: { _, _ in }))
+    // The New Game sheet, from its choice: the caller reads the remembered one, so a scenario can open on any opponent.
+    // The Mac layout has no card until the Mac renderer exists.
+    static let newGameClub = GalleryScenario(name: "New game · Club", group: "Games list") {
+        AnyView(NewGameSheet(choice: NewGame(), mode: .new, onDone: { _ in }))
     }
-    static let newGameEditGame = GalleryScenario(name: "New game · Edit game", group: "Games list") {
-        AnyView(NewGameView_iOS(session: GameSession(), editMode: true, onNewGame: { _, _ in }))
+    static let newGameFriend = GalleryScenario(name: "New game · A friend", group: "Games list") {
+        var choice = NewGame()
+        choice.opponent = .friend
+        return AnyView(NewGameSheet(choice: choice, mode: .new, onDone: { _ in }))
     }
-    static let newGamePlayersAndLevel = GalleryScenario(name: "New game · Players & Level", group: "Games list") {
-        AnyView(NewGameView(session: GameSession()))
+    static let newGameMaximum = GalleryScenario(name: "New game · Maximum", group: "Games list") {
+        var choice = NewGame()
+        choice.opponent = .maximum
+        choice.thinkingTime = 10
+        return AnyView(NewGameSheet(choice: choice, mode: .new, onDone: { _ in }))
+    }
+    static let newGamePlayers = GalleryScenario(name: "New game · Players", group: "Games list") {
+        AnyView(NewGameSheet(choice: NewGame(white: .human, black: .computer(.club)), mode: .edit, onDone: { _ in }))
     }
 
     // Settings
@@ -367,7 +377,7 @@ enum GalleryScenarios {
         engineEqual, engineSlightlyBetter, engineMate, engineAnalyzing, engineStatistics, engineStacked, engineEvaluationBars,
         moveStripStart, moveStripMiddle, moveStripWithVariations,
         moveListShortGame, moveListVariationsAndComments, moveListCard,
-        gamesListFourGames, launchEmptyLibrary, newGameNewGame, newGameEditGame, newGamePlayersAndLevel,
+        gamesListFourGames, launchEmptyLibrary, newGameClub, newGameFriend, newGameMaximum, newGamePlayers,
         settings,
         walnutPalette,
     ]

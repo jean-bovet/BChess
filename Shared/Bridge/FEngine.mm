@@ -78,6 +78,7 @@ struct FEngineCore: ChessEngine {
         _ttEnabled = YES;
         _searchDepth = INT_MAX;
         _thinkingTime = 5;
+        _strength = EngineStrengthMaximum;
         _generation = 0;
         _stopRequestedGeneration = 0;
         _searchQueue = dispatch_queue_create("ch.arizona-software.BChess.search",
@@ -334,7 +335,11 @@ struct FEngineCore: ChessEngine {
 - (void)evaluate:(NSInteger)depth time:(NSTimeInterval)time callback:(FEngineSearchCallback)callback {
     uint64_t gen = [self invalidate];
     
-    if (self.useOpeningBook) {
+    // Read here, on the calling thread, like ttEnabled below
+    const EngineStrength strength = self.strength;
+    
+    // The book plays the first line it has, so every game below Maximum would open the same way
+    if (self.useOpeningBook && strength == EngineStrengthMaximum) {
         FEngineInfo *info = [self lookupOpeningMove];
         if (info) {
             callback(info, YES);
@@ -348,6 +353,7 @@ struct FEngineCore: ChessEngine {
     copy.history = std::make_shared<std::vector<BoardHash>>(*engine.game().history);
     auto snapshot = std::make_shared<const ChessGame>(copy);
     BOOL tt = self.ttEnabled;
+    Strength level = [FEngine engineStrength:strength];
     
     dispatch_block_t search = ^{
         {
@@ -373,7 +379,7 @@ struct FEngineCore: ChessEngine {
             });
         }
         
-        self->engine.searchBestMove(snapshot->board, snapshot->history, (int)depth, tt, [self, snapshot, gen, callback](ChessEvaluation evaluation, bool done) {
+        self->engine.searchBestMove(snapshot->board, snapshot->history, (int)depth, tt, level, [self, snapshot, gen, callback](ChessEvaluation evaluation, bool done) {
             FEngineInfo *info = [self infoFor:evaluation game:*snapshot];
             std::lock_guard<std::recursive_mutex> lock(self->_control);
             if (gen == self->_generation) {
@@ -388,6 +394,17 @@ struct FEngineCore: ChessEngine {
         // The inline path is serialized with any search that is still unwinding
         dispatch_sync(_searchQueue, search);
     }
+}
+
++ (Strength)engineStrength:(EngineStrength)strength {
+    switch (strength) {
+        case EngineStrengthBeginner: return Strength::beginner;
+        case EngineStrengthCasual: return Strength::casual;
+        case EngineStrengthClub: return Strength::club;
+        case EngineStrengthStrong: return Strength::strong;
+        case EngineStrengthMaximum: return Strength::maximum;
+    }
+    return Strength::maximum;
 }
 
 - (FEngineInfo*)lookupOpeningMove {

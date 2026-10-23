@@ -20,11 +20,51 @@ struct GameStateCodingTests {
         #expect(bare.pgn == "1. e4 e5 *")
         #expect(bare.rotated)
         #expect(bare.white == GamePlayer(name: "", computer: false, level: 0))
-        #expect(bare.black == GamePlayer(name: "", computer: true, level: 0))
+        // A file without a black player gets the Club player
+        #expect(bare.black == .computer(.club))
 
         let full = try GameState(data: Data(legacyWithPlayers.utf8), contentType: .json)
         #expect(full.white == GamePlayer(name: "Ann", computer: false, level: 1))
         #expect(full.black == GamePlayer(name: "Bot", computer: true, level: 3))
+    }
+
+    /// The meaning of level changed (APP-3): old levels 0-3 are Beginner...Strong, 4-6 are Maximum at 5, 10 and 30
+    /// seconds, anything else is Club. The keys and types of the file are unchanged.
+    @Test func oldLevelsStillOpen() throws {
+        let full = try GameState(data: Data(legacyWithPlayers.utf8), contentType: .json)
+        #expect(full.white.strength == .casual)
+        #expect(full.black.strength == .strong)
+        #expect(full.black.thinkingTime == 0)
+
+        func black(level: Int) throws -> GamePlayer {
+            let json = #"{"pgn":"*","rotated":false,"white":{"name":"","computer":false,"level":0},"black":{"name":"","computer":true,"level":\#(level)}}"#
+            return try GameState(data: Data(json.utf8), contentType: .json).black
+        }
+        #expect(try black(level: 9).strength == .club)
+        #expect(try black(level: -1).strength == .club)
+        for (level, seconds) in [(4, 5.0), (5, 10.0), (6, 30.0)] {
+            let player = try black(level: level)
+            #expect(player.strength == .maximum)
+            #expect(player.thinkingTime == seconds)
+            let data = try GameState(pgn: "*", black: player).data(for: .json)
+            #expect(try GameState(data: data, contentType: .json).black == player)
+        }
+    }
+
+    @Test func strengthAndTimeFollowTheLevel() {
+        let table: [(Int, EngineStrength, TimeInterval)] = [(0, .beginner, 0), (1, .casual, 0), (2, .club, 0), (3, .strong, 0),
+                                                           (4, .maximum, 5), (5, .maximum, 10), (6, .maximum, 30), (7, .club, 0)]
+        for (level, strength, seconds) in table {
+            let player = GamePlayer(name: "", computer: true, level: level)
+            #expect(player.strength == strength, "level \(level)")
+            #expect(player.thinkingTime == seconds, "level \(level)")
+        }
+        #expect(GamePlayer.computer(.club).level == 2)
+        #expect(GamePlayer.computer(.maximum, thinkingTime: 5).level == 4)
+        #expect(GamePlayer.computer(.maximum).level == 5)
+        #expect(GamePlayer.computer(.maximum, thinkingTime: 30).level == 6)
+        #expect(GamePlayer.computer(.beginner, thinkingTime: 30).level == 0)
+        #expect(GamePlayer.defaultBlack == .computer(.club))
     }
 
     @Test func jsonRoundTrip() throws {

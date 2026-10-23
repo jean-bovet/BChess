@@ -51,19 +51,6 @@ struct Variations {
     }
 }
 
-extension GamePlayer {
-    /// The time the engine thinks when it plays this player's side.
-    var thinkingTime: TimeInterval {
-        switch level {
-        case 0: return 2
-        case 1: return 5
-        case 2: return 10
-        case 3: return 15
-        default: return 2
-        }
-    }
-}
-
 @MainActor @Observable
 final class GameSession {
 
@@ -122,6 +109,22 @@ final class GameSession {
     var analysisBudget = GameSession.analysisTime
 
     private var hasStarted = false
+
+    /// How long the computer waits before it answers below Maximum, from the start of its search. A seam for the
+    /// tests, like `analysisBudget`. At Maximum the engine's thinking time is the wait.
+    @ObservationIgnored
+    var replyDelay: ClosedRange<TimeInterval> = 1.0...2.5
+
+    /// Runs `reply` after `after` seconds. The views use the default; the tests capture the block and run it when
+    /// they choose. The block re-checks the position before it plays.
+    @ObservationIgnored
+    var scheduleReply: @MainActor (_ after: TimeInterval, _ reply: @escaping @MainActor () -> Void) -> Void = { after, reply in
+        DispatchQueue.main.asyncAfter(deadline: .now() + after) { MainActor.assumeIsolated(reply) }
+    }
+
+    /// When the reply that is being searched may be played.
+    @ObservationIgnored
+    private var replyNotBefore = ContinuousClock.now
 
     /// Identifies the position that a search result may be played on. Bumped on every change to the
     /// position, the players or the mode: a result computed for an earlier value is dropped.
@@ -361,9 +364,15 @@ final class GameSession {
         invalidate()
     }
 
-    func setPlayers(white: GamePlayer, black: GamePlayer) {
-        gameState.white = white
-        gameState.black = black
+    /// `rotated` is applied with the players, as one change to the game; nil keeps the board's side.
+    func setPlayers(white: GamePlayer, black: GamePlayer, rotated: Bool? = nil) {
+        var state = gameState
+        state.white = white
+        state.black = black
+        if let rotated {
+            state.rotated = rotated
+        }
+        gameState = state
         invalidate()
     }
 
@@ -514,7 +523,9 @@ final class GameSession {
         isThinking = true
         isAnalyzing = false
         engine.useOpeningBook = true
+        engine.strength = player.strength
         engine.thinkingTime = player.thinkingTime
+        replyNotBefore = player.strength == .maximum ? .now : .now + .seconds(Double.random(in: replyDelay))
 
         // The search runs off the main thread; its result is applied only if it is still for this position
         let token = positionID
@@ -555,8 +566,10 @@ final class GameSession {
         isAnalyzing = true
         analysisID += 1
         let id = analysisID
-        // A book move carries no evaluation
+        // A book move carries no evaluation, and the analysis is always at full strength: it would otherwise
+        // inherit the handicap of the computer's last search
         engine.useOpeningBook = false
+        engine.strength = .maximum
         engine.evaluate(Int.max, time: analysisBudget) { [weak self] info, completed in
             DispatchQueue.main.async {
                 MainActor.assumeIsolated {
@@ -587,11 +600,24 @@ final class GameSession {
             guard info.hasBestMove else {
                 return noReplyPending()
             }
-            perform(animated: {
-                self.play(rawMove: info.bestMove, lastMove: info.bestEngineMove)
-            }, then: {
-                self.requestEngineMoveIfNeeded()
-            })
+            let reply = { [self] in
+                perform(animated: {
+                    self.play(rawMove: info.bestMove, lastMove: info.bestEngineMove)
+                }, then: {
+                    self.requestEngineMoveIfNeeded()
+                })
+            }
+            let wait = replyNotBefore - .now
+            if wait > .zero {
+                // The main thread never waits: any change to the position drops the reply (I2)
+                scheduleReply(Double(wait.components.seconds) + Double(wait.components.attoseconds) * 1e-18) { [weak self] in
+                    if self?.positionID == token {
+                        reply()
+                    }
+                }
+            } else {
+                reply()
+            }
         } else {
             self.info = info
         }

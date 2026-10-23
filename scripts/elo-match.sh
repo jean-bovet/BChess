@@ -12,6 +12,9 @@
 # GAMES        an even number: every opening is played with both colours
 # TC           time control, fastchess syntax (moves/seconds+increment)
 # CONCURRENCY  games played at once
+# STRENGTH     the level BChess plays at: Beginner, Casual, Club, Strong or Maximum (default: the tool's, Maximum)
+# OPPONENT_STRENGTH  self-play: BChess at STRENGTH against the same binary at this level, GAMES games, judged like a
+#              Stockfish run (the opponent is named BChess-<level>; only the measured side is named BChess)
 # BASE         a git ref: A/B mode against that commit instead of Stockfish
 # MAX_GAMES    A/B mode: the most games played, an even number (default 8000)
 # TIMEMARGIN  ms a engine may overrun its clock before it loses on time, for both engines (default 100)
@@ -40,6 +43,8 @@ ELO0=${ELO0:-0}
 ELO1=${ELO1:-10}
 if [[ -n $BASE ]]; then TC=${TC:-5+0.05}; else TC=${TC:-10+0.1}; fi
 CONCURRENCY=${CONCURRENCY:-4}
+STRENGTH=${STRENGTH:-}
+OPPONENT_STRENGTH=${OPPONENT_STRENGTH:-}
 
 fail() { echo "error: $*" >&2; exit 1; }
 
@@ -53,7 +58,8 @@ pgn_summary() {
     function finish() {
         if (!started) return
         games++
-        bchess = (white == "BChess") || (black == "BChess")
+        # Exactly one side is the measured BChess: two engines of that name would count every decisive game as a loss
+        bchess = ((white == "BChess") != (black == "BChess"))
         okResult = (result == "1-0" || result == "0-1" || result == "1/2-1/2")
         okTerm = (term == "normal" || term == "adjudication" || term == "time forfeit" || term == "illegal move" || term == "abandoned" || term == "unterminated")
         if (nresult != 1 || nterm != 1 || !okResult || !okTerm || !bchess || last != result) { malformed++; return }
@@ -148,6 +154,38 @@ judge_run() {
     return 0
 }
 
+# report_elo <elo difference> <its error> <score %>: prints the result of a Stockfish run or a self-play run, with
+# the globals of the run (STRENGTH, OPPONENT_STRENGTH, LEVEL, TC, COMMIT, TREE, PLAYED, WINS, DRAWS, LOSSES, SEED,
+# WALL, INFO). Self-play reports whatever fastchess gives, also an infinite difference or an undefined interval at a
+# score of 0 or 100 %. A Stockfish run needs a finite difference and interval and a score from 10 to 90 %: otherwise it
+# returns 3 with the level to try next, and reports no Elo.
+report_elo() {
+    local ELODIFF=$1 ELOERR=$2 SCORE=$3 FINITE='^-?[0-9]+(\.[0-9]+)?$' NEXT PERFORMANCE ERROR
+    if [[ -n $OPPONENT_STRENGTH ]]; then
+        echo "Elo difference of BChess $STRENGTH to BChess $OPPONENT_STRENGTH: $ELODIFF +/- $ELOERR (95 %), $TC"
+        echo "| $(date +%F) | $COMMIT$([[ $TREE == dirty ]] && echo "+dirty") | $TC | $STRENGTH vs $OPPONENT_STRENGTH | $PLAYED | $WINS/$DRAWS/$LOSSES | $ELODIFF ± $ELOERR |"
+        echo "Tools and hashes: $INFO"
+        return 0
+    fi
+
+    if ! [[ $ELODIFF =~ $FINITE && $ELOERR =~ $FINITE ]] || awk -v e="$ELOERR" 'BEGIN { exit !(e <= 0) }' || awk -v s="$SCORE" 'BEGIN { exit !(s < 10 || s > 90) }'; then
+        if awk -v s="$SCORE" 'BEGIN { exit !(s > 50) }'; then NEXT=$((LEVEL + 300)); else NEXT=$((LEVEL - 300)); fi
+        (( NEXT < 1320 )) && NEXT=1320
+        echo "out of range — try LEVEL=$NEXT (the score is too far from 50 %, or there are too few games, for a useful interval). No Elo is reported."
+        return 3
+    fi
+
+    PERFORMANCE=$(awk -v l="$LEVEL" -v d="$ELODIFF" 'BEGIN { printf "%.0f", l + d }')
+    ERROR=$(awk -v e="$ELOERR" 'BEGIN { printf "%.0f", e }')
+    echo "Elo difference to Stockfish $LEVEL: $ELODIFF +/- $ELOERR (95 %)"
+    echo "Performance: $PERFORMANCE +/- $ERROR (Stockfish UCI_Elo scale, $TC)"
+    echo
+    echo "| Date | Commit | TC | Book (seed) | Stockfish level | Games | W/D/L | Performance (95 %) | Wall time |"
+    echo "|---|---|---|---|---|---:|---|---|---:|"
+    echo "| $(date +%F) | $COMMIT$([[ $TREE == dirty ]] && echo "+dirty") | $TC | 8moves_v3 ($SEED) | $LEVEL | $PLAYED | $WINS/$DRAWS/$LOSSES | $PERFORMANCE ± $ERROR | $(( (WALL + 30) / 60 )) min |"
+    echo "Tools and hashes: $INFO"
+}
+
 # --self-test: the validator against small sample runs, with no tools needed
 if [[ ${1:-} == --self-test ]]; then
     TMP=$(mktemp -d)
@@ -190,6 +228,18 @@ if [[ ${1:-} == --self-test ]]; then
     check "a movetext result that differs from the tag" "1 0 0 0 0 0 0 0 0 1" "$TMP/mismatch.pgn"
     : > "$TMP/empty.pgn"
     check "an empty file" "0 0 0 0 0 0 0 0 0 0" "$TMP/empty.pgn"
+    # self-play: the measured level is BChess, its opponent BChess-<level>, as White and as Black
+    { game BChess BChess-Club 1-0 '[Result "1-0"]' '[Termination "normal"]'
+      game BChess-Club BChess 1-0 '[Result "1-0"]' '[Termination "normal"]'
+      game BChess BChess-Club 1/2-1/2 '[Result "1/2-1/2"]' '[Termination "adjudication"]'
+      game BChess-Club BChess 0-1 '[Result "0-1"]' '[Termination "normal"]'; } > "$TMP/selfplay.pgn"
+    check "self-play with the measured level as White and as Black" "4 2 1 1 0 0 0 0 0 0" "$TMP/selfplay.pgn"
+    { game BChess BChess 1-0 '[Result "1-0"]' '[Termination "normal"]'
+      game BChess BChess 0-1 '[Result "0-1"]' '[Termination "normal"]'; } > "$TMP/samename.pgn"
+    check "both sides named BChess are malformed" "2 0 0 0 0 0 0 0 0 2" "$TMP/samename.pgn"
+    { game BChess BChess-Club 1-0 '[Result "1-0"]' '[Termination "time forfeit"]'
+      game BChess-Club BChess 1-0 '[Result "1-0"]' '[Termination "illegal move"]'; } > "$TMP/selfbad.pgn"
+    check "self-play: a forfeit, and an illegal move lost by BChess" "2 1 0 1 1 1 1 0 0 0" "$TMP/selfbad.pgn"
 
     # judge_run: sample fastchess logs with their games
     # log <wins> <draws> <losses> [<llr-line> <decision-line>]
@@ -262,7 +312,30 @@ if [[ ${1:-} == --self-test ]]; then
     judge "a Stockfish run with every game played" 0 sf 10 "$TMP/sf.log" "$TMP/sf.pgn"
     judge "a Stockfish run that stopped early is invalid" 2 sf 12 "$TMP/sf.log" "$TMP/sf.pgn"
     judge "a Stockfish run with a forfeit by the other engine" 2 sf 10 "$TMP/forfeit-them.log" "$TMP/forfeit-them.pgn"
+    # report_elo: self-play reports any score, a Stockfish run only a score from 10 to 90 %
+    STRENGTH=Casual; LEVEL=1400; TC=40+0.4; COMMIT=abc; TREE=clean; PLAYED=300; WINS=0; DRAWS=0; LOSSES=300; SEED=1; WALL=60; INFO=/x
+    reporting() { # name expected-exit expected-text "<elo> <err> <score>" [opponent-strength]
+        local out code=0
+        out=$(OPPONENT_STRENGTH=${5:-} report_elo $4 2>&1) || code=$?
+        if [[ $code == "$2" && $out == *"$3"* ]]; then echo "ok   $1"; else echo "FAIL $1: exit $code, expected $2 with '$3', got: $out" >&2; FAILED=1; fi
+    }
+    reporting "self-play at 9 %" 0 "Casual to BChess Club: -400.00 +/- 60.00" "-400.00 60.00 9.00" Club
+    reporting "self-play at 95 %" 0 "to BChess Club: 600.00 +/- 80.00" "600.00 80.00 95.00" Club
+    reporting "self-play at 0 % (infinite difference, undefined interval)" 0 "Club: -inf +/- nan" "-inf nan 0.00" Club
+    reporting "self-play at 100 %" 0 "Club: inf +/- nan" "inf nan 100.00" Club
+    reporting "a Stockfish run at 45 %" 0 "Performance: 1366 +/- 40" "-34.00 40.00 45.00"
+    reporting "a Stockfish run at 9 % is out of range" 3 "out of range — try LEVEL=1320" "-400.00 60.00 9.00"
+    reporting "a Stockfish run at 91 % is out of range" 3 "try LEVEL=1700" "400.00 60.00 91.00"
+    reporting "a Stockfish run with an infinite difference" 3 "out of range" "-inf nan 0.00"
     exit $FAILED
+fi
+
+LEVELS="Beginner Casual Club Strong Maximum"
+if [[ -n $STRENGTH && " $LEVELS " != *" $STRENGTH "* ]]; then fail "STRENGTH must be one of: $LEVELS"; fi
+if [[ -n $OPPONENT_STRENGTH ]]; then
+    [[ " $LEVELS " == *" $OPPONENT_STRENGTH "* ]] || fail "OPPONENT_STRENGTH must be one of: $LEVELS"
+    [[ -n $STRENGTH ]] || fail "OPPONENT_STRENGTH needs STRENGTH"
+    [[ -z $BASE ]] || fail "OPPONENT_STRENGTH and BASE are two different modes"
 fi
 
 if [[ -n $BASE ]]; then
@@ -271,7 +344,7 @@ if [[ -n $BASE ]]; then
     BASE_SHORT=${BASE_SHA:0:7}
     EXPECTED=$MAX_GAMES
 else
-    [[ $LEVEL =~ ^[0-9]+$ ]] && (( LEVEL >= 1320 && LEVEL <= 3190 )) || fail "LEVEL must be between 1320 and 3190"
+    [[ -n $OPPONENT_STRENGTH ]] || { [[ $LEVEL =~ ^[0-9]+$ ]] && (( LEVEL >= 1320 && LEVEL <= 3190 )) || fail "LEVEL must be between 1320 and 3190"; }
     [[ $GAMES =~ ^[0-9]+$ ]] && (( GAMES >= 2 && GAMES % 2 == 0 )) || fail "GAMES must be an even number"
     EXPECTED=$GAMES
 fi
@@ -280,7 +353,7 @@ fi
 sha256() { shasum -a 256 "$1" | awk '{print $1}'; }
 
 # 1. Tools
-if [[ -z $BASE ]]; then
+if [[ -z $BASE && -z $OPPONENT_STRENGTH ]]; then
     command -v stockfish > /dev/null || fail "stockfish is missing: brew install stockfish"
     STOCKFISH=$(command -v stockfish)
     STOCKFISH_ID=$({ echo uci; sleep 0.5; echo quit; } | "$STOCKFISH" | sed -n 's/^id name //p; /^Stockfish/p' | head -1 | sed -E 's/ by .*//')
@@ -350,7 +423,9 @@ fi
 # 4. The match
 STAMP=$(date +%Y%m%d-%H%M%S)
 mkdir -p "$ELO/runs"
-if [[ -n $BASE ]]; then NAME=AB-$BASE_SHORT; else NAME=SF$LEVEL; fi
+if [[ -n $BASE ]]; then NAME=AB-$BASE_SHORT
+elif [[ -n $OPPONENT_STRENGTH ]]; then NAME=$STRENGTH-vs-$OPPONENT_STRENGTH
+else NAME=SF$LEVEL${STRENGTH:+-$STRENGTH}; fi
 PGN="$ELO/runs/$STAMP-$NAME.pgn"
 LOG="$ELO/runs/$STAMP-$NAME.log"
 INFO="$ELO/runs/$STAMP-$NAME.info"
@@ -361,6 +436,8 @@ COMMIT=$(git -C "$ROOT" rev-parse --short HEAD)
     echo "BChess:      $COMMIT ($TREE tree), BChessUCI sha256 $(sha256 "$BCHESS")"
     if [[ -n $BASE ]]; then
         echo "Base:        $BASE_SHORT, BChessUCI sha256 $(sha256 "$BASEBIN")"
+    elif [[ -n $OPPONENT_STRENGTH ]]; then
+        echo "Opponent:    the same BChessUCI at $OPPONENT_STRENGTH"
     else
         echo "Stockfish:   $STOCKFISH_ID, $STOCKFISH, sha256 $(sha256 "$STOCKFISH")"
     fi
@@ -368,14 +445,20 @@ COMMIT=$(git -C "$ROOT" rev-parse --short HEAD)
     echo "Book:        8moves_v3.pgn sha256 $BOOK_PGN_SHA256, opening seed $SEED"
     if [[ -n $BASE ]]; then
         echo "Settings:    BASE=$BASE MAX_GAMES=$MAX_GAMES TC=$TC TIMEMARGIN=$TIMEMARGIN CONCURRENCY=$CONCURRENCY, SPRT elo0=$ELO0 elo1=$ELO1 alpha=0.05 beta=0.05 model=logistic"
+    elif [[ -n $OPPONENT_STRENGTH ]]; then
+        echo "Settings:    STRENGTH=$STRENGTH OPPONENT_STRENGTH=$OPPONENT_STRENGTH GAMES=$GAMES TC=$TC TIMEMARGIN=$TIMEMARGIN CONCURRENCY=$CONCURRENCY"
     else
-        echo "Settings:    LEVEL=$LEVEL GAMES=$GAMES TC=$TC TIMEMARGIN=$TIMEMARGIN CONCURRENCY=$CONCURRENCY"
+        echo "Settings:    LEVEL=$LEVEL${STRENGTH:+ STRENGTH=$STRENGTH} GAMES=$GAMES TC=$TC TIMEMARGIN=$TIMEMARGIN CONCURRENCY=$CONCURRENCY"
     fi
 } | tee "$INFO"
 if [[ -n $BASE ]]; then
     echo "Playing up to $MAX_GAMES games against $BASE_SHORT (SPRT [$ELO0, $ELO1]), $TC, $CONCURRENCY at a time"
     OPPONENT=(-engine cmd="$BASEBIN" name=Base)
     SPRT=(-sprt elo0=$ELO0 elo1=$ELO1 alpha=0.05 beta=0.05 model=logistic)
+elif [[ -n $OPPONENT_STRENGTH ]]; then
+    echo "Playing $GAMES games, BChess at $STRENGTH against BChess at $OPPONENT_STRENGTH, $TC, $CONCURRENCY at a time"
+    OPPONENT=(-engine cmd="$BCHESS" name=BChess-$OPPONENT_STRENGTH option.Strength=$OPPONENT_STRENGTH)
+    SPRT=()
 else
     echo "Playing $GAMES games against Stockfish $LEVEL, $TC, $CONCURRENCY at a time"
     OPPONENT=(-engine cmd="$STOCKFISH" name=SF$LEVEL option.UCI_LimitStrength=true option.UCI_Elo=$LEVEL option.Threads=1 option.Hash=16)
@@ -390,7 +473,7 @@ if [[ $(uname) == Darwin ]] && command -v caffeinate > /dev/null; then AWAKE=(ca
 # fastchess saves its state (config.json) in the folder it runs in
 cd "$ELO/runs"
 ${AWAKE[@]+"${AWAKE[@]}"} "$FASTCHESS" \
-    -engine cmd="$BCHESS" name=BChess \
+    -engine cmd="$BCHESS" name=BChess ${STRENGTH:+option.Strength=$STRENGTH} \
     "${OPPONENT[@]}" \
     -each tc=$TC timemargin=$TIMEMARGIN \
     -openings file="$BOOK" format=pgn order=random -srand "$SEED" \
@@ -429,20 +512,5 @@ if [[ -n $BASE ]]; then
     exit $JUDGED
 fi
 
-FINITE='^-?[0-9]+(\.[0-9]+)?$'
-if ! [[ $ELODIFF =~ $FINITE && $ELOERR =~ $FINITE ]] || awk -v e="$ELOERR" 'BEGIN { exit !(e <= 0) }' || awk -v s="$SCORE" 'BEGIN { exit !(s < 10 || s > 90) }'; then
-    if awk -v s="$SCORE" 'BEGIN { exit !(s > 50) }'; then NEXT=$((LEVEL + 300)); else NEXT=$((LEVEL - 300)); fi
-    (( NEXT < 1320 )) && NEXT=1320
-    echo "out of range — try LEVEL=$NEXT (the score is too far from 50 %, or there are too few games, for a useful interval). No Elo is reported."
-    exit 3
-fi
-
-PERFORMANCE=$(awk -v l="$LEVEL" -v d="$ELODIFF" 'BEGIN { printf "%.0f", l + d }')
-ERROR=$(awk -v e="$ELOERR" 'BEGIN { printf "%.0f", e }')
-echo "Elo difference to Stockfish $LEVEL: $ELODIFF +/- $ELOERR (95 %)"
-echo "Performance: $PERFORMANCE +/- $ERROR (Stockfish UCI_Elo scale, $TC)"
-echo
-echo "| Date | Commit | TC | Book (seed) | Stockfish level | Games | W/D/L | Performance (95 %) | Wall time |"
-echo "|---|---|---|---|---|---:|---|---|---:|"
-echo "| $(date +%F) | $COMMIT$([[ $TREE == dirty ]] && echo "+dirty") | $TC | 8moves_v3 ($SEED) | $LEVEL | $PLAYED | $WINS/$DRAWS/$LOSSES | $PERFORMANCE ± $ERROR | $(( (WALL + 30) / 60 )) min |"
-echo "Tools and hashes: $INFO"
+report_elo "$ELODIFF" "$ELOERR" "$SCORE"
+exit $?

@@ -30,6 +30,35 @@ struct FEngineTests {
         #expect(engine.transpositionTableBytes() == 64 * 1024 * 1024)
     }
 
+    /// Below Maximum the opening book is not used: the lower levels open with their own randomness
+    @Test func handicappedSearchSkipsTheBook() throws {
+        let start = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
+        func reply(_ strength: EngineStrength) throws -> FEngineInfo {
+            let engine = FEngine()
+            engine.async = false
+            engine.useOpeningBook = true
+            engine.strength = strength
+            #expect(engine.loadOpening("1. e4 e5 2. Nf3 *"))
+            #expect(engine.setFEN(start))
+            let result = Locked<FEngineInfo?>(nil)
+            engine.evaluate(2) { info, completed in
+                if completed { result.value = info }
+            }
+            return try #require(result.value)
+        }
+        let beginner = try reply(.beginner)
+        #expect(beginner.hasBestMove)
+        #expect(beginner.nodeEvaluated > 0)
+        // The book answers without a search
+        let maximum = try reply(.maximum)
+        #expect(maximum.hasBestMove)
+        #expect(maximum.nodeEvaluated == 0)
+    }
+
+    @Test func strengthDefaultsToMaximum() {
+        #expect(FEngine().strength == .maximum)
+    }
+
     /// The iOS scheme runs UI tests only, so the phone size is checked through the function that chooses it
     @Test func hashSizePerPlatform() {
         #expect(FEngine.hashMegabytes(forPhone: true) == 16)

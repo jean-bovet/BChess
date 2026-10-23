@@ -38,7 +38,7 @@ struct GameCommands: Commands {
             }
             .disabled(session == nil)
 
-            Button("Players & Level\u{2026}") {
+            Button("Players\u{2026}") {
                 showPlayers?.wrappedValue = true
             }
             .disabled(session == nil)

@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>New Game on Mac</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0}
+a{color:#8A4B22}a:hover{color:#5E3215}
+</style>
+</helmet>
+<div style="width: 680px; height: 500px; box-sizing: border-box; background: #F4F1EC; border: 1px solid #DDD3C6; border-radius: 14px; font-family: -apple-system, 'SF Pro Text', 'Helvetica Neue', sans-serif; color: #2A211B; display: flex; flex-direction: column; padding: 22px 24px 20px; gap: 16px; overflow: hidden">
+  <span style="font-family: 'New York', 'Iowan Old Style', 'Palatino', serif; font-size: 20px; font-weight: 600">New Game</span>
+
+  <div style="display: flex; gap: 24px; flex-grow: 1; min-height: 0">
+    <div role="listbox" aria-label="Opponent" style="width: 330px; display: flex; flex-direction: column; gap: 5px">
+      <sc-for list="{{rungs}}" as="r" hint-placeholder-count="6">
+        <button aria-selected="{{r.pressed}}" onClick="{{r.pick}}" style="display: flex; align-items: center; gap: 10px; padding: 6px 10px; border-radius: 10px; border: {{r.border}}; background: {{r.bg}}; text-align: left; color: #2A211B">
+          <span style="width: 32px; height: 32px; border-radius: 8px; background: {{r.tile}}; display: flex; align-items: center; justify-content: center; flex-shrink: 0">
+            <img src="{{r.img}}" alt="" style="width: 24px; height: 24px">
+          </span>
+          <span style="display: flex; flex-direction: column; flex-grow: 1; min-width: 0">
+            <span style="display: flex; align-items: baseline; justify-content: space-between; gap: 8px">
+              <span style="font-family: 'New York', 'Iowan Old Style', 'Palatino', serif; font-size: 14px; font-weight: 600">{{r.name}}</span>
+              <span style="font-size: 11px; color: #6E6056; font-variant-numeric: tabular-nums">{{r.elo}}</span>
+            </span>
+            <span style="font-size: 11px; color: #6E6056">{{r.blurb}}</span>
+          </span>
+        </button>
+      </sc-for>
+    </div>
+
+    <div style="flex-grow: 1; display: flex; flex-direction: column; gap: 16px; font-size: 13px">
+      <div style="display: flex; flex-direction: column; gap: 6px">
+        <span style="color: #6E6056">{{colorLabel}}</span>
+        <div role="radiogroup" aria-label="Color" style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); padding: 2px; border-radius: 7px; background: #E9E2D8">
+          <sc-for list="{{colors}}" as="c" hint-placeholder-count="3">
+            <button aria-pressed="{{c.pressed}}" onClick="{{c.pick}}" style="height: 24px; border: 0; border-radius: 5px; background: {{c.bg}}; box-shadow: {{c.shadow}}; font-size: 13px; color: #2A211B">{{c.label}}</button>
+          </sc-for>
+        </div>
+      </div>
+
+      <label style="display: flex; flex-direction: column; gap: 4px; color: #6E6056">{{firstLabel}}
+        <input value="{{you}}" onChange="{{setYou}}" placeholder="Name" style="height: 24px; border: 1px solid #D5CABC; border-radius: 5px; padding: 0 6px; font-size: 13px; background: #FFFFFF; color: #2A211B">
+      </label>
+      <sc-if value="{{vsFriend}}" hint-placeholder-val="{{ false }}">
+        <label style="display: flex; flex-direction: column; gap: 4px; color: #6E6056">{{secondLabel}}
+          <input value="{{friend}}" onChange="{{setFriend}}" placeholder="Name" style="height: 24px; border: 1px solid #D5CABC; border-radius: 5px; padding: 0 6px; font-size: 13px; background: #FFFFFF; color: #2A211B">
+        </label>
+      </sc-if>
+
+      <sc-if value="{{isMaximum}}" hint-placeholder-val="{{ false }}">
+        <div style="display: flex; flex-direction: column; gap: 6px">
+          <span style="color: #6E6056">Thinking time</span>
+          <div role="radiogroup" aria-label="Thinking time" style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); padding: 2px; border-radius: 7px; background: #E9E2D8">
+            <sc-for list="{{paces}}" as="p" hint-placeholder-count="3">
+              <button aria-pressed="{{p.pressed}}" onClick="{{p.pick}}" style="height: 24px; border: 0; border-radius: 5px; background: {{p.bg}}; box-shadow: {{p.shadow}}; font-size: 13px; color: #2A211B">{{p.label}}</button>
+            </sc-for>
+          </div>
+          <span style="font-size: 11px; color: #6E6056">{{paceNote}}</span>
+        </div>
+      </sc-if>
+    </div>
+  </div>
+
+  <div style="display: flex; justify-content: flex-end; gap: 10px">
+    <button style="height: 28px; padding: 0 16px; border-radius: 6px; border: 1px solid #D5CABC; background: #FFFFFF; font-size: 13px; color: #2A211B">Cancel</button>
+    <button style="height: 28px; padding: 0 16px; border-radius: 6px; border: 0; background: #4A3222; font-size: 13px; font-weight: 600; color: #F4E6CF">{{playLabel}}</button>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":680,"height":500}}'>
+class Component extends DCLogic {
+  constructor(props) { super(props); this.state = { selected: 3, color: 'white', you: 'Jean', friend: '', pace: 1 }; }
+  renderVals() {
+    const s = this.state;
+    const R = [
+      ['A friend', 'Take turns on this Mac', '', '/_blob/40c7a18597b66234d0357d0f148c11c2'],
+      ['Beginner', 'Leaves pieces hanging, misses mates', 'about 600', '/_blob/fbd1185e69a8fd531fd6f55fc3248515'],
+      ['Casual', 'Sensible, but blunders under pressure', 'about 1000', '/_blob/3fb4e2a85a0d9a274bcec0c809c4db8d'],
+      ['Club', 'Solid, with the occasional mistake', 'about 1400', '/_blob/9aa6dd1591bbdaa8b9e1787db1db01bd'],
+      ['Strong', 'Rarely blunders; needs a real plan', 'about 1700', '/_blob/2c06870ffd470a04373fa4c1e1e29160'],
+      ['Maximum', 'The full engine, no handicap', 'about 1950', '/_blob/015d6c9ce5ce3e8b51d77b4c9c9c7010']
+    ];
+    const rungs = R.map(([name, blurb, elo, img], i) => ({
+      name, blurb, elo, img, pressed: String(i === s.selected), pick: () => this.setState({ selected: i }),
+      border: i === s.selected ? '2px solid #8A4B22' : '1px solid #E4DCD1',
+      bg: i === s.selected ? '#FFFBF3' : '#FFFFFF',
+      tile: i === 0 ? '#EFE9E1' : '#F2DFB8'
+    }));
+    const seg = (id, cur) => ({ bg: id === cur ? '#FFFFFF' : 'transparent', shadow: id === cur ? '0 1px 2px rgba(42,33,27,0.2)' : 'none' });
+    const colors = [['white', 'White'], ['random', 'Random'], ['black', 'Black']].map(([id, label]) => ({
+      label, pressed: String(s.color === id), pick: () => this.setState({ color: id }), ...seg(id, s.color)
+    }));
+    const PACES = ['5 s', '10 s', '30 s'];
+    const paces = PACES.map((label, i) => ({ label, pressed: String(i === s.pace), pick: () => this.setState({ pace: i }), ...seg(i, s.pace) }));
+    const vsFriend = s.selected === 0;
+    const side = { white: 'White', black: 'Black', random: 'Random color' }[s.color];
+    const other = { white: 'Black', black: 'White', random: 'Random color' }[s.color];
+    return {
+      rungs, colors, paces, vsFriend, isMaximum: s.selected === 5, you: s.you, friend: s.friend,
+      setYou: (e) => this.setState({ you: e.target.value }),
+      setFriend: (e) => this.setState({ friend: e.target.value }),
+      colorLabel: vsFriend ? 'First player plays' : 'You play',
+      firstLabel: vsFriend ? side : 'Your name',
+      secondLabel: other,
+      paceNote: 'More time, stronger play.',
+      playLabel: vsFriend ? 'Start Game' : (s.selected === 5 ? 'Play the Full Engine' : 'Play the ' + R[s.selected][0] + ' Player')
+    };
+  }
+}
+</script>
+</body>
+</html>

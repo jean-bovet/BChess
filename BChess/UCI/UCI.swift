@@ -190,6 +190,28 @@ class UCI {
         }
     }
     
+    // setoption name Strength value Club
+    // Only Strength is an option. Anything else, and a value that is not a level, is ignored and logged: nothing
+    // but UCI lines goes to stdout.
+    func processCmdSetOption(_ tokens: inout [String]) {
+        guard tokens.first?.lowercased() == "name", let valueIndex = tokens.firstIndex(where: { $0.lowercased() == "value" }) else {
+            os_log("setoption without name and value ignored", log: log)
+            return
+        }
+        let name = tokens[1..<valueIndex].joined(separator: " ")
+        let value = tokens[(valueIndex + 1)...].joined(separator: " ")
+        guard name.lowercased() == "strength" else {
+            os_log("Ignored option %{public}@", log: log, name)
+            return
+        }
+        let levels: [(String, EngineStrength)] = [("beginner", .beginner), ("casual", .casual), ("club", .club), ("strong", .strong), ("maximum", .maximum)]
+        if let level = levels.first(where: { $0.0 == value.lowercased() }) {
+            engine.strength = level.1
+        } else {
+            os_log("Unknown strength %{public}@ ignored", log: log, value)
+        }
+    }
+    
     func process(_ tokens: inout [String]) {
         guard !tokens.isEmpty else {
             return
@@ -200,11 +222,15 @@ class UCI {
         case "uci":
             engineOutput("id name BChess")
             engineOutput("id author Jean Bovet")
+            engineOutput("option name Strength type combo default Maximum var Beginner var Casual var Club var Strong var Maximum")
             engineOutput("uciok")
             
         case "xcode":
             xcodeMode = true
             engine.async = false
+            
+        case "setoption":
+            processCmdSetOption(&tokens)
             
         case "quit":
             exit(0)
@@ -225,7 +251,7 @@ class UCI {
             engine.stop()
             
         default:
-            // Nothing but UCI lines goes to stdout: setoption, debug, register, ponderhit and anything
+            // Nothing but UCI lines goes to stdout: debug, register, ponderhit and anything
             // unknown are ignored
             os_log("Ignored command %{public}@", log: log, cmd)
         }

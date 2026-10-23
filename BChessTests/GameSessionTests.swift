@@ -12,7 +12,7 @@ import Testing
 private let startFEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
 // Outside of the opening book, which answers instantly
 private let middlegame = "r1bqkb1r/pppp1ppp/2n2n2/4p3/2B1P3/5N2/PPPP1PPP/RNBQK2R b KQkq - 4 4"
-private let computerBlack = GamePlayer(name: "", computer: true, level: 0)
+private let computerBlack = GamePlayer.computer(.maximum, thinkingTime: 5)
 private let twoHumans = GameState(pgn: "*", white: .human, black: .human)
 
 /// The PGN of a game that starts from this position.
@@ -392,7 +392,7 @@ struct GameSessionTests {
     }
 
     @Test func computerVersusComputerContinues() async {
-        let computer = GamePlayer(name: "", computer: true, level: 0)
+        let computer = GamePlayer.computer(.maximum, thinkingTime: 5)
         let session = GameSession(state: GameState(pgn: "*", white: computer, black: computer))
         session.requestEngineMoveIfNeeded()
 
@@ -527,7 +527,8 @@ struct GameSessionTests {
         #expect(!session.isAnalyzing)
         session.showsEngine = false
 
-        #expect(await waitUntil(4) { halfMoves(session) >= 1 })
+        // The computer thinks 5 seconds
+        #expect(await waitUntil(10) { halfMoves(session) >= 1 })
     }
 
     @Test func hidingTheEngineStopsAnAnalysis() async {
@@ -707,12 +708,15 @@ struct GameSessionTests {
         defer { session.cancelSearch() }
         session.startIfNeeded()
         #expect(session.isThinking)
-        #expect(await waitUntil { halfMoves(session) >= 1 })
+        // The computer thinks 5 seconds
+        #expect(await waitUntil(10) { halfMoves(session) >= 1 })
     }
 
     @Test func cancelledSearchNeverPlaysItsMove() async throws {
-        let state = GameState(pgn: pgn(fen: middlegame.replacingOccurrences(of: " b ", with: " w ")), white: .human, black: computerBlack)
+        // Strong searches to a depth, so the reply is ready well inside the wait below
+        let state = GameState(pgn: pgn(fen: middlegame.replacingOccurrences(of: " b ", with: " w ")), white: .human, black: .computer(.strong))
         let session = GameSession(state: state)
+        session.replyDelay = 0...0
         let before = session.fen
 
         // White plays, which starts Black's search; then White takes the move back
@@ -732,15 +736,146 @@ struct GameSessionTests {
     }
 
     @Test func thinkingTimeFollowsSideToMove() {
-        // White human at level 3, black computer at level 0: Black thinks 2 seconds
-        let blackComputer = GameSession(state: GameState(pgn: "*", white: GamePlayer(name: "", computer: false, level: 3), black: computerBlack))
+        // Black computer at level 4 (Maximum, 5 s): Black thinks 5 seconds
+        let blackComputer = GameSession(state: GameState(pgn: "*", white: .human, black: GamePlayer(name: "", computer: true, level: 4)))
         play(blackComputer, "h2", "h3")
-        #expect(blackComputer.searchTimeLimit == 2)
+        #expect(blackComputer.searchTimeLimit == 5)
 
-        // White computer at level 3, black human at level 0: White thinks 15 seconds
-        let whiteComputer = GameSession(state: GameState(pgn: "*", white: GamePlayer(name: "", computer: true, level: 3), black: .human))
+        // White computer at level 6 (Maximum, 30 s), black human: White thinks 30 seconds
+        let whiteComputer = GameSession(state: GameState(pgn: "*", white: GamePlayer(name: "", computer: true, level: 6), black: .human))
         whiteComputer.requestEngineMoveIfNeeded()
-        #expect(whiteComputer.searchTimeLimit == 15)
+        #expect(whiteComputer.searchTimeLimit == 30)
         whiteComputer.setPlayers(white: .human, black: .human)
+    }
+
+    // MARK: Strength and the reply delay
+
+    @Test func searchUsesThePlayersStrength() {
+        let white = GamePlayer.computer(.strong)
+        let black = GamePlayer.computer(.casual)
+        let session = GameSession(state: GameState(pgn: "*", white: .human, black: black))
+        defer { session.cancelSearch() }
+        play(session, "h2", "h3")
+        #expect(session.engine.strength == .casual)
+
+        let other = GameSession(state: GameState(pgn: "*", white: white, black: .human))
+        defer { other.cancelSearch() }
+        other.requestEngineMoveIfNeeded()
+        #expect(other.engine.strength == .strong)
+    }
+
+    @Test func analysisIsFullStrength() async {
+        let session = GameSession(state: GameState(pgn: "*", white: .human, black: .computer(.beginner)))
+        defer { session.cancelSearch() }
+        session.replyDelay = 0...0
+        play(session, "h2", "h3")
+        #expect(session.engine.strength == .beginner)
+        #expect(await waitUntil { halfMoves(session) >= 2 })
+
+        session.showsEngine = true
+        #expect(session.isAnalyzing)
+        #expect(session.engine.strength == .maximum)
+    }
+
+    /// The reply of a Beginner, captured instead of scheduled
+    @MainActor
+    private final class Replies {
+        var blocks: [@MainActor () -> Void] = []
+        var delays: [TimeInterval] = []
+    }
+
+    private func delayedSession(_ replies: Replies, fen: String = startFEN) -> GameSession {
+        let session = GameSession(state: GameState(pgn: pgn(fen: fen), white: .human, black: .computer(.beginner)))
+        session.replyDelay = 60...60
+        session.scheduleReply = { after, block in
+            replies.delays.append(after)
+            replies.blocks.append(block)
+        }
+        return session
+    }
+
+    @Test func computerWaitsBeforeReplying() async {
+        let replies = Replies()
+        let session = delayedSession(replies)
+        defer { session.cancelSearch() }
+
+        play(session, "e2", "e4")
+        // The search has completed once a reply has been captured
+        #expect(await waitUntil { !replies.blocks.isEmpty })
+        #expect(halfMoves(session) == 1)
+        #expect(session.isThinking)
+        #expect(replies.delays.first.map { $0 > 50 && $0 <= 60 } == true)
+
+        replies.blocks[0]()
+        #expect(halfMoves(session) == 2)
+        #expect(session.isWhiteToMove)
+    }
+
+    @Test(arguments: ["back", "analyze", "players", "paste", "cancel"])
+    func aDelayedReplyIsDroppedOnPositionChange(_ change: String) async {
+        let replies = Replies()
+        let session = delayedSession(replies)
+        defer { session.cancelSearch() }
+
+        play(session, "e2", "e4")
+        #expect(await waitUntil { !replies.blocks.isEmpty })
+
+        switch change {
+        case "back": session.move(to: .backward)
+        case "analyze": session.toggleAnalyze()
+        case "players": session.setPlayers(white: .human, black: .human)
+        case "paste": #expect(session.paste(middlegame))
+        default: session.cancelSearch()
+        }
+        let position = session.fen
+        let moves = halfMoves(session)
+
+        replies.blocks[0]()
+        #expect(session.fen == position, "\(change)")
+        #expect(halfMoves(session) == moves, "\(change)")
+    }
+
+    @Test func maximumRepliesWithoutDelay() async {
+        let session = GameSession(state: GameState(pgn: "*", white: .human, black: computerBlack))
+        defer { session.cancelSearch() }
+        session.replyDelay = 5...5
+        play(session, "e2", "e4")
+        #expect(await waitUntil(1) { halfMoves(session) >= 2 })
+    }
+
+    /// Counts the writes to `gameState`: each write re-arms the observation of the next one.
+    @MainActor
+    private final class ChangeCounter {
+        let session: GameSession
+        private(set) var count = 0
+
+        init(_ session: GameSession) {
+            self.session = session
+            track()
+        }
+
+        private func track() {
+            withObservationTracking {
+                _ = session.gameState
+            } onChange: {
+                MainActor.assumeIsolated {
+                    self.count += 1
+                    self.track()
+                }
+            }
+        }
+    }
+
+    @Test func setPlayersWithRotationIsOneChange() {
+        let session = GameSession(state: twoHumans)
+        let counter = ChangeCounter(session)
+        session.setPlayers(white: .human, black: .computer(.club), rotated: true)
+        #expect(session.gameState.rotated)
+        #expect(session.gameState.black == .computer(.club))
+        #expect(counter.count == 1)
+
+        // nil keeps the board's side
+        session.setPlayers(white: .human, black: .human)
+        #expect(session.gameState.rotated)
     }
 }

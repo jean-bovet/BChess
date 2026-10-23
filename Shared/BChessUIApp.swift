@@ -21,6 +21,10 @@ struct BChessUIApp: App {
             library = GameLibrary(directory: directory)
             // ... and from the engine readout off, whatever an earlier run left behind
             UserDefaults.standard.removeObject(forKey: "showEngine")
+            // ... and from the New Game sheet on its first choice, Club
+            for key in AppSettings.newGameKeys {
+                UserDefaults.standard.removeObject(forKey: key)
+            }
         } else {
             library = .documents
         }

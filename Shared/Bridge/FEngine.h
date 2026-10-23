@@ -34,6 +34,16 @@ typedef NS_CLOSED_ENUM(NSInteger, GameEnd){
     GameEndFinished
 };
 
+/** How strongly the engine plays. Maximum is the full search; the others choose a move among the best of a
+ shallow search (see Handicap.hpp), without the opening book. */
+typedef NS_CLOSED_ENUM(NSInteger, EngineStrength){
+    EngineStrengthBeginner = 0,
+    EngineStrengthCasual,
+    EngineStrengthClub,
+    EngineStrengthStrong,
+    EngineStrengthMaximum
+};
+
 /** This class is the interface between the C++ engine and the Objective-C/Swift world*/
 @interface FEngine : NSObject
 
@@ -42,6 +52,9 @@ typedef NS_CLOSED_ENUM(NSInteger, GameEnd){
 @property (nonatomic, assign) BOOL ttEnabled;
 @property (nonatomic, assign) NSUInteger searchDepth;
 @property (nonatomic, assign) NSTimeInterval thinkingTime;
+/** Read on the calling thread by evaluate. Below Maximum the search ignores the depth and the thinking time and the
+ opening book is not used. Defaults to Maximum. */
+@property (nonatomic, assign) EngineStrength strength;
 
 @property (nonatomic, strong, readonly) NSString * _Nonnull state;
 
