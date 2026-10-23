@@ -114,6 +114,7 @@ struct NewGameTests {
         #expect(NewGame.Opponent.maximum.elo == "about 2350")
         #expect(NewGame.Opponent.allCases.map(\.elo) == ["", "about 550", "about 950", "about 1350", "about 1600", "about 2350"])
         #expect(NewGame.Opponent.friend.elo == "")
+        #expect(NewGame.Opponent.beginner.blurb == "Sees one move ahead, misses threats")
         #expect(NewGame.Opponent.strong.blurb == "Rarely blunders; needs a real plan")
         #expect(NewGame.Opponent.maximum.blurb == "The full engine, no handicap")
         #expect(NewGame.Opponent.allCases.map(\.pieceImage) == ["pawn_w", "pawn_b", "knight_b", "bishop_b", "rook_b", "queen_b"])
