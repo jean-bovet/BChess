@@ -56,7 +56,8 @@ struct PlayerRow: View {
             let captured = session.capturedPieces(white: isWhite)
             if !captured.isEmpty {
                 HStack(spacing: 0) {
-                    ForEach(captured, id: \.self) { piece in
+                    // By position: the same piece letter is captured more than once
+                    ForEach(Array(captured.enumerated()), id: \.offset) { _, piece in
                         SquareView(piece: Piece(name: piece, file: 0, rank: 0))
                             .frame(width: 22, height: 22)
                     }
