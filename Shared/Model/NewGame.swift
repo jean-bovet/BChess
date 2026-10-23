@@ -35,7 +35,7 @@ nonisolated struct NewGame: Equatable, Sendable {
                 #else
                 return "Pass and play on this device"
                 #endif
-            case .beginner: return "Leaves pieces hanging, misses mates"
+            case .beginner: return "Sees one move ahead, misses threats"
             case .casual: return "Sensible, but blunders under pressure"
             case .club: return "Solid, with the occasional mistake"
             case .strong: return "Rarely blunders; needs a real plan"
