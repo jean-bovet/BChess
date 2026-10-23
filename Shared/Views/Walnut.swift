@@ -126,6 +126,8 @@ struct WalnutToggleRow: View {
             WalnutRowLabel(title, hint)
         }
         .tint(Walnut.accent)
+        // The Mac's checkbox toggle hugs its label, so without this the row centers in the card
+        .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.horizontal, 14)
         .padding(.vertical, 10)
     }
