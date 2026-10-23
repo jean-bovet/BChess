@@ -54,6 +54,104 @@ TEST_F(MinMaxSearchTests, SortingDoesNotChangeTheScore) {
     }
 }
 
+// At MAX_PLY the search returns the static evaluation before visiting a move, and one ply earlier it still
+// searches. The starting-ply argument of the public overload puts the root at the boundary.
+TEST_F(MinMaxSearchTests, PlyGuardStopsAtMaxPly) {
+    auto fen = "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1"; // Kiwipete
+    ChessBoard board;
+    ASSERT_TRUE(FFEN::setFEN(fen, board));
+    
+    for (int ply : {MinMaxSearch::MAX_PLY, MinMaxSearch::MAX_PLY - 1}) {
+        MinMaxSearch search;
+        search.config.maxDepth = 3;
+        TranspositionTable table;
+        MinMaxSearch::Variation pv, bv;
+        int score = search.alphabeta(board, NEW_HISTORY, table, ply, true, pv, bv);
+        if (ply == MinMaxSearch::MAX_PLY) {
+            ASSERT_EQ(0, search.visitedNodes);
+            ASSERT_EQ(ChessEvaluater::evaluate(board), score);
+        } else {
+            ASSERT_GT(search.visitedNodes, 0);
+        }
+    }
+    
+#ifdef BCHESS_TEST_HOOKS
+    // Quiescence at MAX_PLY: Kiwipete has captures, none is visited
+    MinMaxSearch search;
+    MinMaxSearch::Variation pv;
+    int score = search.quiescenceForTest(board, -INT_MAX, INT_MAX, 1, pv, MinMaxSearch::MAX_PLY);
+    ASSERT_EQ(0, search.visitedNodes);
+    ASSERT_EQ(ChessEvaluater::evaluate(board), score);
+    
+    MinMaxSearch earlier;
+    MinMaxSearch::Variation pv2;
+    earlier.quiescenceForTest(board, -INT_MAX, INT_MAX, 1, pv2, MinMaxSearch::MAX_PLY - 1);
+    ASSERT_GT(earlier.visitedNodes, 0);
+#endif
+}
+
+// K+Q v K at a clock of 99: every quiet move reaches 100, which is a draw by the fifty-move rule, and none mates
+// in one. The same position at clock 0 is a large win.
+TEST_F(MinMaxSearchTests, FiftyMoveRuleDrawsAWin) {
+    ChessBoard board;
+    ASSERT_TRUE(FFEN::setFEN("8/8/6k1/8/8/8/8/Q3K3 w - - 99 1", board));
+    MinMaxSearch search;
+    search.config.maxDepth = 2;
+    search.config.transpositionTable = false;
+    TranspositionTable table;
+    MinMaxSearch::Variation pv, bv;
+    ASSERT_EQ(0, search.alphabeta(board, NEW_HISTORY, table, 0, true, pv, bv));
+    ASSERT_GT(search.pathDraws, 0);
+    
+    ChessBoard fresh;
+    ASSERT_TRUE(FFEN::setFEN("8/8/6k1/8/8/8/8/Q3K3 w - - 0 1", fresh));
+    MinMaxSearch other;
+    other.config.maxDepth = 2;
+    other.config.transpositionTable = false;
+    TranspositionTable otherTable;
+    MinMaxSearch::Variation pv2, bv2;
+    ASSERT_GT(other.alphabeta(fresh, NEW_HISTORY, otherTable, 0, true, pv2, bv2), 500);
+    ASSERT_EQ(0, other.pathDraws);
+}
+
+// Ra8 mates on the hundredth ply: the mate is not a draw
+TEST_F(MinMaxSearchTests, MateOnTheHundredthPlyIsMate) {
+    MinMaxSearch::Variation pv;
+    ASSERT_EQ(ChessEvaluater::MAT_VALUE - 1, search("6k1/5ppp/8/8/8/8/8/R3K3 w - - 99 1", 2, true, pv));
+    ASSERT_EQ("a1a8", FPGN::to_string(pv.moves.bestMove(), FPGN::SANType::uci));
+}
+
+// The rules never draw the root: it is searched and returns a move, as a GUI that sends such a position expects
+static void expectLegalFirstMove(ChessBoard board, HistoryPtr history) {
+    IterativeDeepening deepening;
+    deepening.start();
+    auto evaluation = deepening.search(board, history, 3, nullptr);
+    ASSERT_GT(evaluation.line.count, 0);
+    auto legal = ChessMoveGenerator::generateMoves(board);
+    bool found = false;
+    for (int i = 0; i < legal.count; i++) {
+        found = found || legal.moves[i] == evaluation.line.moves[0];
+    }
+    ASSERT_TRUE(found);
+}
+
+TEST_F(MinMaxSearchTests, DrawnRootStillReturnsAMove) {
+    // (a) a clock of 100
+    ChessBoard board;
+    ASSERT_TRUE(FFEN::setFEN("8/8/6k1/8/8/8/8/Q3K3 w - - 100 1", board));
+    expectLegalFirstMove(board, NEW_HISTORY);
+    
+    // (b) a threefold repetition of the start position
+    ChessGame game;
+    for (int round = 0; round < 2; round++) {
+        for (auto m : {"g1f3", "g8f6", "f3g1", "f6g8"}) {
+            ASSERT_TRUE(game.move(m)) << m;
+        }
+    }
+    ASSERT_TRUE(ChessEvaluater::isDraw(game.board, game.history));
+    expectLegalFirstMove(game.board, game.history);
+}
+
 // Qxd7 wins a rook for free. Qxc5 (sorted last) loses the queen to bxc5, so the last capture must not
 // become the result, and the best one must not be replaced by the stand-pat either.
 TEST_F(MinMaxSearchTests, QuiescenceReturnsTheBestCapture) {
@@ -172,14 +270,214 @@ TEST_F(MinMaxSearchTests, TTMateIsPlyRelative) {
             ASSERT_EQ(c.sign * (mate - 3), searchWithTable(c.p, 4, true, table, pv1));
             ASSERT_EQ(c.sign * (mate - 4), searchWithTable(c.q, 5, true, table, pv2)) << c.q;
         }
-        // (b) Q stores P at ply 1, the root probe of P at ply 0 reads it back
+        // (b) a table that holds only P's entry (stored at ply 0), read by a search of Q that starts at ply 1 (the
+        // table does not cut off at ply 0): Q has no entry, so P is probed at ply 2 and nowhere else
         {
-            TranspositionTable table;
-            MinMaxSearch::Variation pv1, pv2;
-            ASSERT_EQ(c.sign * (mate - 4), searchWithTable(c.q, 5, true, table, pv1)) << c.q;
-            ASSERT_EQ(c.sign * (mate - 3), searchWithTable(c.p, 4, true, table, pv2));
+            TranspositionTable stored;
+            MinMaxSearch::Variation pv1;
+            ASSERT_EQ(c.sign * (mate - 3), searchWithTable(c.p, 4, true, stored, pv1));
+            ChessBoard pBoard;
+            ASSERT_TRUE(FFEN::setFEN(c.p, pBoard));
+            ASSERT_TRUE(stored.exists(pBoard.getHash()));
+            TranspositionEntry entry = stored.get(pBoard.getHash());
+            
+            auto searchQ = [&](TranspositionTable &t, int64_t &nodes) {
+                ChessBoard board;
+                EXPECT_TRUE(FFEN::setFEN(c.q, board));
+                MinMaxSearch search;
+                search.config.maxDepth = 5;
+                MinMaxSearch::Variation pv, bv;
+                int score = search.alphabeta(board, NEW_HISTORY, t, 1, board.color == WHITE, pv, bv);
+                nodes = search.visitedNodes;
+                return score;
+            };
+            TranspositionTable onlyP;
+            onlyP.store(entry.depth, entry.hash, entry.value, entry.bestMove, entry.type);
+            TranspositionTable empty;
+            int64_t withEntry = 0, without = 0;
+            ASSERT_EQ(c.sign * (mate - 5), searchQ(empty, without));
+            ASSERT_EQ(c.sign * (mate - 5), searchQ(onlyP, withEntry)) << c.q;
+            ASSERT_LT(withEntry, without) << "P's entry settled the node at ply 2";
         }
     }
+}
+
+// The move that `uci` names among the legal moves of the board
+static Move moveNamed(ChessBoard &board, const char *uci) {
+    auto moves = ChessMoveGenerator::generateMoves(board);
+    for (int i = 0; i < moves.count; i++) {
+        if (FPGN::to_string(moves.moves[i], FPGN::SANType::uci) == uci) {
+            return moves.moves[i];
+        }
+    }
+    ADD_FAILURE() << uci;
+    return INVALID_MOVE;
+}
+
+// An entry for the position, stored deep enough for any search of these tests
+static void preload(TranspositionTable &table, ChessBoard &board, int value, TranspositionEntryType type = EXACT) {
+    auto moves = ChessMoveGenerator::generateMoves(board);
+    table.store(10, board.getHash(), value, moves.moves[0], type);
+}
+
+static void playMoves(ChessGame &game, std::vector<const char *> moves) {
+    for (auto m : moves) {
+        ASSERT_TRUE(game.move(m)) << m;
+    }
+}
+
+// Both Knights go out and back, so that the start position has occurred twice, and then a third time after
+// f6g8 when it is Black's turn (Black to move in C below)
+static const std::vector<const char *> backAndForth = {"g1f3", "g8f6", "f3g1", "f6g8", "g1f3", "g8f6", "f3g1"};
+
+// The table's value for a position that the history makes a third occurrence is not used: the draw comes first
+TEST_F(MinMaxSearchTests, RepetitionBeatsTableEntry) {
+    ChessGame game;
+    playMoves(game, backAndForth);
+    ChessBoard child = game.board;
+    child.move(moveNamed(child, "f6g8"));
+    
+    auto searchRoot = [&](bool preloaded) {
+        TranspositionTable table;
+        if (preloaded) {
+            preload(table, child, -5000); // White to move, and lost: Black would score +5000
+        }
+        MinMaxSearch search;
+        search.config.maxDepth = 2;
+        MinMaxSearch::Variation pv, bv;
+        return search.alphabeta(game.board, game.history, table, 0, false, pv, bv);
+    };
+    int fresh = searchRoot(false);
+    ASSERT_LT(fresh, 1000);
+    ASSERT_EQ(fresh, searchRoot(true));
+}
+
+// Kf2+ (a discovered check from the queen) forces Kh2, and a queen move mates, three plies deep: the only mate
+// in that depth. The history can plant two earlier copies of the position after Kh2, which makes it a third
+// occurrence on that path and turns the mate into a draw.
+struct ForcedLine {
+    ChessBoard root, afterQueen, afterKing;
+    MinMaxSearch::Variation firstMove;
+    
+    ForcedLine() {
+        EXPECT_TRUE(FFEN::setFEN("8/8/8/8/8/8/8/Q3K2k w - - 0 1", root));
+        Move check = moveNamed(root, "e1f2");
+        afterQueen = root;
+        afterQueen.move(check);
+        afterKing = afterQueen;
+        afterKing.move(moveNamed(afterQueen, "h1h2"));
+        firstMove.moves.push(check);
+    }
+    
+    // The history of a game that has been here before: two earlier copies of the position after Kh8, at the
+    // parity that makes the one the search reaches the third
+    HistoryPtr repeated() {
+        auto history = NEW_HISTORY;
+        for (BoardHash hash : {afterKing.getHash(), BoardHash(1), afterKing.getHash(), BoardHash(2), root.getHash()}) {
+            history->push_back(hash);
+        }
+        return history;
+    }
+    
+    HistoryPtr clean() {
+        auto history = NEW_HISTORY;
+        history->push_back(root.getHash());
+        return history;
+    }
+    
+    int search(TranspositionTable &table, HistoryPtr history, bool useTable, int64_t *draws = nullptr) {
+        MinMaxSearch search;
+        search.config.maxDepth = 3;
+        search.config.transpositionTable = useTable;
+        MinMaxSearch::Variation pv;
+        int score = search.alphabeta(root, history, table, 0, true, pv, firstMove);
+        if (draws) *draws = search.pathDraws;
+        return score;
+    }
+    
+    // White's score for the position after Kf2+, searched as a non-PV node at ply 1 (the table may cut off
+    // there; at a PV node it never does, ENGINE-3 search step 7), with `history` plus that position on it
+    int searchAfterQueenAsNonPV(TranspositionTable &table, HistoryPtr history, bool useTable) {
+        MinMaxSearch search;
+        search.config.maxDepth = 3;
+        search.config.transpositionTable = useTable;
+        history->push_back(afterQueen.getHash());
+        MinMaxSearch::Variation pv;
+        return -search.alphabetaForTest(afterQueen, history, table, 1, 2, false, -INT_MAX, INT_MAX, -1, pv);
+    }
+};
+
+// A subtree that met a repetition has a value that belongs to that path: the table keeps its move, not its value
+TEST_F(MinMaxSearchTests, PathDrawIsNotStoredAsValue) {
+    ForcedLine line;
+    TranspositionTable table;
+    int64_t draws = 0;
+    line.search(table, line.repeated(), true, &draws);
+    ASSERT_GT(draws, 0);
+    
+    // The position after Kf2+ saw the draw below it
+    ASSERT_TRUE(table.exists(line.afterQueen.getHash()));
+    ASSERT_EQ(TranspositionEntryType::MOVE_ONLY, table.get(line.afterQueen.getHash()).type);
+    ASSERT_TRUE(ChessMoveGenerator::isValid(table.get(line.afterQueen.getHash()).bestMove));
+    
+    // Another path with no repetition on it reads the same table and finds the mate
+    TranspositionTable fresh;
+    int mateScore = line.search(fresh, line.clean(), true);
+    ASSERT_EQ(mate - 3, mateScore);
+    ASSERT_EQ(mateScore, line.search(table, line.clean(), true));
+}
+
+// The root is always searched: a table entry for it never ends the search, and the PV is the whole line
+TEST_F(MinMaxSearchTests, NoCutoffAtRoot) {
+    ChessBoard board;
+    ASSERT_TRUE(FFEN::setFEN("r1bqkbnr/pppp1ppp/2n5/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 2 3", board));
+    TranspositionTable table;
+    preload(table, board, 5000);
+    MinMaxSearch search;
+    search.config.maxDepth = 2;
+    MinMaxSearch::Variation pv, bv;
+    int score = search.alphabeta(board, NEW_HISTORY, table, 0, true, pv, bv);
+    ASSERT_LT(score, 1000);
+    ASSERT_GT(pv.moves.count, 1);
+}
+
+// Black's only move is Kh8, after which White mates. The position after it is probed (as a non-PV node) with a
+// table that says it is lost for White: that is used with a clock of 10, and ignored with a clock of 95 (the 90 guard).
+TEST_F(MinMaxSearchTests, NoCutoffNearFiftyMoves) {
+    for (int clock : {10, 95}) {
+        ChessBoard board;
+        ASSERT_TRUE(FFEN::setFEN(("6k1/5Q2/6K1/8/8/8/8/8 b - - " + std::to_string(clock) + " 1").c_str(), board));
+        ChessBoard child = board;
+        child.move(moveNamed(board, "g8h8"));
+        
+        TranspositionTable table;
+        preload(table, child, -4000);
+        MinMaxSearch search;
+        search.config.maxDepth = 2;
+        MinMaxSearch::Variation pv;
+        // The child is a non-PV node here (a PV node is never cut off): White's score
+        int score = search.alphabetaForTest(child, NEW_HISTORY, table, 1, 1, false, -INT_MAX, INT_MAX, 1, pv);
+        ASSERT_EQ(clock == 10 ? -4000 : mate - 2, score) << clock;
+    }
+}
+
+// What the table cannot know: a descendant that already occurred twice on THIS path. A value stored on a path
+// without it is reused, and the draw below is never seen. A search that does not read the table sees it. A
+// change to this must be deliberate.
+TEST_F(MinMaxSearchTests, HiddenRepetitionIsAKnownLimitation) {
+    ForcedLine line;
+    TranspositionTable table;
+    ASSERT_EQ(mate - 3, line.search(table, line.clean(), true));
+    
+    // The position after Kf2+ is stored with its mate. On the repeated path the table hides the draw below it,
+    // at a non-PV node: a PV node reads no table, so the draw is seen there
+    ASSERT_EQ(mate - 3, line.searchAfterQueenAsNonPV(table, line.repeated(), true));
+    ASSERT_LT(line.search(table, line.repeated(), true), mate - 3);
+    
+    // Without the table the draw is seen, and the mate is gone
+    TranspositionTable unused;
+    ASSERT_LT(line.searchAfterQueenAsNonPV(unused, line.repeated(), false), mate - 3);
+    ASSERT_LT(line.search(unused, line.repeated(), false), mate - 3);
 }
 
 // ALPHA and BETA entries are compared with the window in root-relative values. The stored value is relative to its
@@ -283,7 +581,7 @@ TEST_F(MinMaxSearchTests, CancelledLoopStoresNoEntry) {
 
 // Iterative deepening to `depth` with the transposition table never read. Fills the score and the cumulative
 // node count of every depth.
-static void iterate(const char *fen, int depth, bool sortMoves, std::vector<int> &scores, std::vector<int64_t> &nodes) {
+static void iterate(const char *fen, int depth, bool sortMoves, std::vector<int> &scores, std::vector<int64_t> &nodes, bool pvs = false, bool nullMove = false, bool lmr = false, bool aspiration = false, int *researches = nullptr, bool futility = false) {
     ChessBoard board;
     EXPECT_TRUE(FFEN::setFEN(fen, board));
     
@@ -291,12 +589,20 @@ static void iterate(const char *fen, int depth, bool sortMoves, std::vector<int>
     search.minMaxSearch.config.transpositionTable = false;
     // Delta pruning depends on alpha, so on the order: plain alpha-beta is the one that the order cannot change
     search.minMaxSearch.config.deltaPruning = false;
+    search.minMaxSearch.config.seePruning = false;
     search.minMaxSearch.config.sortMoves = sortMoves;
+    // The older tests count the nodes of plain alpha-beta
+    search.minMaxSearch.config.principalVariationSearch = pvs;
+    search.minMaxSearch.config.nullMove = nullMove;
+    search.minMaxSearch.config.lateMoveReductions = lmr;
+    search.aspirationWindows = aspiration;
+    search.minMaxSearch.config.futilityPruning = futility;
     search.start();
     search.search(board, NEW_HISTORY, depth, [&](ChessEvaluation e) {
         scores.push_back(e.value);
         nodes.push_back(e.nodes);
     });
+    if (researches) *researches = search.aspirationResearches;
 }
 
 // Ordering moves only changes how soon alpha-beta cuts off, never the minimax value: with the table never
@@ -327,8 +633,419 @@ TEST_F(MinMaxSearchTests, UnsortedSearchKeepsBestVariationFirst) {
     std::vector<int> scores;
     std::vector<int64_t> nodes;
     iterate("r1bqkbnr/pppp1ppp/2n5/3P4/8/8/PPP2PPP/RNBQKBNR b KQkq - 0 5", 3, false, scores, nodes);
-    // Recorded before the hash move existed (ENGINE-3 step 6): the cumulative nodes of depths 1 to 3
-    ASSERT_EQ((std::vector<int64_t>{95, 1065, 40717}), nodes);
+    // Recorded before the hash move existed (ENGINE-3 speed step 6): the cumulative nodes of depths 1 to 3.
+    // Quiescence in check (ENGINE-3 search step 4) changed them from 95, 1065, 40717, the check extension
+    // (step 5) from 107, 1475, 93131, and the PV re-search of a later best child (PVS off, review round 1) from
+    // 107, 31145, 201561.
+    ASSERT_EQ((std::vector<int64_t>{107, 61738, 238554}), nodes);
+}
+
+// Zero windows only change how soon alpha-beta cuts off, never the root value (ENGINE-3 search step 6): with the
+// table and delta pruning off, iterative deepening gives the same score at every depth with and without them.
+// The bench (scripts/bench.sh with DELTA=0, depth 6) checks the same on nine positions.
+TEST_F(MinMaxSearchTests, PvsDoesNotChangeTheScore) {
+    struct Case { const char *fen; int depth; };
+    const Case cases[] = {
+        {"r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1", 3},
+        {"r1bqkb1r/pppp1ppp/2n2n2/4p3/2B1P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 4 4", 3},
+        {"r1bqkbnr/pppp1ppp/2n5/3P4/8/8/PPP2PPP/RNBQKBNR b KQkq - 0 5", 4},
+        {"8/8/8/8/8/8/8/Q3K2k w - - 0 1", 5},
+        {"3r1k1r/1pp2ppp/pq6/3P4/5Q2/P1P4P/1P1R2P1/5R1K b - - 2 24", 4},
+    };
+    for (auto &c : cases) {
+        std::vector<int> plainScores, pvsScores;
+        std::vector<int64_t> plainNodes, pvsNodes;
+        iterate(c.fen, c.depth, true, plainScores, plainNodes, false);
+        iterate(c.fen, c.depth, true, pvsScores, pvsNodes, true);
+        ASSERT_EQ(size_t(c.depth), pvsScores.size()) << c.fen;
+        ASSERT_EQ(plainScores, pvsScores) << c.fen;
+    }
+}
+
+// The table never cuts off a PV node (ENGINE-3 search step 7), so the line the search reports is complete: a
+// second search of the same position with the table the first one filled finds the same full line.
+TEST_F(MinMaxSearchTests, TableDoesNotTruncateThePrincipalVariation) {
+    const char *fen = "r1bqkb1r/pppp1ppp/2n2n2/4p3/2B1P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 4 4";
+    TranspositionTable table;
+    MinMaxSearch::Variation first, second;
+    searchWithTable(fen, 4, true, table, first);
+    searchWithTable(fen, 4, true, table, second);
+    ASSERT_GE(first.moves.count, 4);
+    ASSERT_EQ(first.moves.count, second.moves.count);
+    ASSERT_EQ(first.moves.bestMove(), second.moves.bestMove());
+}
+
+// ENGINE-3 search step 8. A stalemate is scored 0 before any null move: the side to move here has a (pinned)
+// knight, so the null move is allowed by the material rule, and a null move tried first would cut the node
+// off with beta instead.
+TEST_F(MinMaxSearchTests, StalemateIsScoredBeforeTheNullMove) {
+    ChessBoard board;
+    ASSERT_TRUE(FFEN::setFEN("kn5R/8/1K6/8/8/8/8/8 b - - 0 1", board));
+    ASSERT_TRUE(ChessMoveGenerator::generateMoves(board).count == 0);
+    ASSERT_FALSE(board.isCheck(board.color));
+    MinMaxSearch search;
+    MinMaxSearch::Variation pv;
+    TranspositionTable table;
+    int score = search.alphabetaForTest(board, NEW_HISTORY, table, 1, 4, false, -1001, -1000, -1, pv);
+    ASSERT_EQ(0, score);
+}
+
+// A king and pawn ending is full of zugzwang, where passing would be better than moving: no null move there, so
+// the search gives the same score with the pruning on and off.
+TEST_F(MinMaxSearchTests, NoNullMoveInPawnEndings) {
+    const char *fens[] = {
+        "8/8/p1p5/P1P5/1P1k4/8/1K6/8 w - - 0 1",
+        "8/k7/3p4/p2P1p2/P2P1P2/8/8/K7 w - - 0 1",
+    };
+    for (const char *fen : fens) {
+        std::vector<int> off, on;
+        std::vector<int64_t> nodesOff, nodesOn;
+        iterate(fen, 6, true, off, nodesOff, true, false);
+        iterate(fen, 6, true, on, nodesOn, true, true);
+        ASSERT_EQ(off, on) << fen;
+        ASSERT_EQ(nodesOff, nodesOn) << fen;
+    }
+}
+
+// With a lot of material and a quiet position the null move cuts many nodes, and the best move stays the same
+TEST_F(MinMaxSearchTests, NullMoveSavesNodes) {
+    const char *fen = "r1bq1rk1/ppp2ppp/2n2n2/3pp3/1bB1P3/2NP1N2/PPP2PPP/R1BQ1RK1 w - - 0 7";
+    std::vector<int> off, on;
+    std::vector<int64_t> nodesOff, nodesOn;
+    iterate(fen, 6, true, off, nodesOff, true, false);
+    iterate(fen, 6, true, on, nodesOn, true, true);
+    ASSERT_LT(nodesOn.back(), nodesOff.back() * 9 / 10);
+    ASSERT_LT(std::abs(off.back() - on.back()), 150);
+}
+
+// ENGINE-3 search step 9. Late quiet moves are searched shallower, so the search is smaller; the score may differ a
+// little (the pruning is a bet), and the best move stays a good one.
+TEST_F(MinMaxSearchTests, LateMoveReductionsSaveNodes) {
+    const char *fens[] = {
+        "r1bq1rk1/ppp2ppp/2n2n2/3pp3/1bB1P3/2NP1N2/PPP2PPP/R1BQ1RK1 w - - 0 7",
+        "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1",
+    };
+    for (const char *fen : fens) {
+        std::vector<int> off, on;
+        std::vector<int64_t> nodesOff, nodesOn;
+        iterate(fen, 6, true, off, nodesOff, true, true, false);
+        iterate(fen, 6, true, on, nodesOn, true, true, true);
+        ASSERT_LT(nodesOn.back(), nodesOff.back() * 9 / 10) << fen;
+        ASSERT_LT(std::abs(off.back() - on.back()), 150) << fen;
+    }
+}
+
+// A reduced move that beats alpha is not trusted: it is searched again at full depth.
+// (a) A quiet mate in two (Kg6 or Ra7, then Ra8#) at depth 4: the mating moves are late in the list, so they are
+//     reduced, the reduced search beats alpha, the re-search follows, and the mate keeps its exact distance.
+//     (At depth 3 the reduction hides this mate: the reduced result is below alpha and no re-search happens. A
+//     reduced search cannot give a longer mate than the full one, so dropping the re-search does not change a mate
+//     score; the next part is the one that fails without it.)
+// (b) At a non-PV node with a zero window, a reduced move that looks better than alpha but is refuted one ply
+//     deeper would end the node with a false fail-high if its reduced score were trusted. Both nodes are fail-lows
+//     without the reductions, and with them: only the re-search turns the reduced fail-high back into the fail-low.
+TEST_F(MinMaxSearchTests, ReducedMoveThatBeatsAlphaIsSearchedAgain) {
+    {
+        ChessBoard board;
+        ASSERT_TRUE(FFEN::setFEN(mateIn2White, board));
+        MinMaxSearch search;
+        search.config.maxDepth = 4;
+        search.config.transpositionTable = false;
+        search.config.nullMove = false;
+        search.config.futilityPruning = false;
+        MinMaxSearch::Variation pv, bv;
+        TranspositionTable table;
+        int score = search.alphabeta(board, NEW_HISTORY, table, 0, true, pv, bv);
+        ASSERT_GT(search.reductionResearches, 0);
+        ASSERT_EQ(mate - 3, score);
+    }
+    
+    struct Node { const char *fen; int alpha; int color; };
+    const Node nodes[] = {
+        {"rnbqkbn1/pp1pp2r/2p2pp1/6p1/8/4P1PN/PPPP1P1P/RNBQK2R w KQq - 2 6", -300, 1},
+        {"r1bqk1nr/ppppb1pp/n3pp2/8/1P1P1P1P/P7/2P1P1P1/RNBQKBNR b KQkq b3 0 5", 0, -1},
+        {"rnb1kb1r/1p1qppp1/5n2/p1p3N1/3p2Pp/PP5P/2PPPP2/RNBQKB1R w Qkq - 0 9", -75, 1},
+    };
+    for (auto &n : nodes) {
+        ChessBoard board;
+        ASSERT_TRUE(FFEN::setFEN(n.fen, board));
+        for (bool lmr : {false, true}) {
+            MinMaxSearch search;
+            search.config.maxDepth = 4;
+            search.config.transpositionTable = false;
+            search.config.nullMove = false;
+            search.config.futilityPruning = false;
+            search.config.deltaPruning = false;
+            search.config.seePruning = false;
+            search.config.lateMoveReductions = lmr;
+            MinMaxSearch::Variation pv;
+            TranspositionTable table;
+            int score = search.alphabetaForTest(board, NEW_HISTORY, table, 1, 4, false, n.alpha, n.alpha + 1, n.color, pv);
+            ASSERT_LE(score, n.alpha) << n.fen << " lmr " << lmr;
+            if (lmr) {
+                ASSERT_GT(search.reductionResearches, 0) << n.fen;
+            }
+        }
+    }
+}
+
+// ENGINE-3 search step 10. With every pruning that bets turned off, a search inside an aspiration window that is
+// opened on a fail gives the exact value at every depth, whatever the window said. The positions have scores that
+// jump by more than the window between depths, so both fails happen.
+TEST_F(MinMaxSearchTests, AspirationWindowsDoNotChangeTheScore) {
+    const char *fens[] = {
+        "r1bqkbnr/pppp1ppp/2n5/3P4/8/8/PPP2PPP/RNBQKBNR b KQkq - 0 4",
+        "r1bqk1nr/pppp1ppp/2n5/3P4/1b6/8/PPP2PPP/RNBQKBNR w KQkq - 1 5",
+        "r1bq1rk1/ppp2ppp/2n2n2/3pp3/1bB1P3/2NP1N2/PPP2PPP/R1BQ1RK1 w - - 0 7",
+        "3r1k1r/1pp2ppp/pq6/3P4/5Q2/P1P4P/1P1R2P1/5R1K b - - 2 24",
+        "r3k2r/Pppp1ppp/1b3nbN/nP6/BBP1P3/q4N2/Pp1P2PP/R2Q1RK1 w kq - 0 1", // -475 at depth 5, -550 at depth 6
+    };
+    int totalResearches = 0;
+    for (const char *fen : fens) {
+        std::vector<int> plain, aspirated;
+        std::vector<int64_t> nodesPlain, nodesAspirated;
+        int researches = 0;
+        iterate(fen, 6, true, plain, nodesPlain, true, false, false, false);
+        iterate(fen, 6, true, aspirated, nodesAspirated, true, false, false, true, &researches);
+        ASSERT_EQ(plain, aspirated) << fen;
+        totalResearches += researches;
+    }
+    // The window really failed somewhere, or the test proves nothing about the re-search
+    ASSERT_GT(totalResearches, 0);
+}
+
+// ENGINE-3 search step 11. One ply from the horizon, in a node that cannot reach alpha even 200 cp better than its
+// static evaluation, the quiet moves that give no check are skipped. Captures and checks are not.
+TEST_F(MinMaxSearchTests, FutilityPruningKeepsCapturesAndChecks) {
+    // White is a queen down (static about -800), alpha is 0: futile. The capture of the queen is still searched.
+    ChessBoard capture;
+    ASSERT_TRUE(FFEN::setFEN("4k3/8/8/3q4/4P3/8/8/4K3 w - - 0 1", capture));
+    // A rook up with a quiet mating check, and an alpha of 1500: futile too, and the mate is still found
+    ChessBoard check;
+    ASSERT_TRUE(FFEN::setFEN("6k1/5ppp/8/8/8/8/5PPP/3R2K1 w - - 0 1", check));
+    for (bool futility : {true, false}) {
+        MinMaxSearch search;
+        search.config.futilityPruning = futility;
+        MinMaxSearch::Variation pv;
+        TranspositionTable table;
+        ASSERT_GE(search.alphabetaForTest(capture, NEW_HISTORY, table, 1, 1, false, 0, 1, 1, pv), 1) << futility;
+        TranspositionTable table2;
+        ASSERT_GE(search.alphabetaForTest(check, NEW_HISTORY, table2, 1, 1, false, 1500, 1501, 1, pv), 1501) << futility;
+    }
+}
+
+// The node that skipped moves stores no bound: its entry is MOVE_ONLY. That is all that is guaranteed. Like any
+// pruning, the approximate value it returns can still make an ancestor store a bound (not tracked: it would change
+// play).
+TEST_F(MinMaxSearchTests, FutilityPruningStoresNoBound) {
+    ChessBoard board;
+    ASSERT_TRUE(FFEN::setFEN("4k3/8/8/3q4/8/8/4P3/4K3 w - - 0 1", board));
+    MinMaxSearch search;
+    MinMaxSearch::Variation pv;
+    TranspositionTable table;
+    int score = search.alphabetaForTest(board, NEW_HISTORY, table, 1, 1, false, 0, 1, 1, pv);
+    ASSERT_LT(score, 0);
+    ASSERT_TRUE(table.exists(board.getHash()));
+    ASSERT_EQ(TranspositionEntryType::MOVE_ONLY, table.get(board.getHash()).type);
+}
+
+// It prunes little at depth 6 with the table off (these positions are balanced): the search is no bigger and the
+// score stays close
+TEST_F(MinMaxSearchTests, FutilityPruningKeepsTheScoreClose) {
+    const char *fens[] = {
+        "r1bq1rk1/ppp2ppp/2n2n2/3pp3/1bB1P3/2NP1N2/PPP2PPP/R1BQ1RK1 w - - 0 7",
+        "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1",
+        "r3k2r/Pppp1ppp/1b3nbN/nP6/BBP1P3/q4N2/Pp1P2PP/R2Q1RK1 w kq - 0 1",
+    };
+    for (const char *fen : fens) {
+        std::vector<int> off, on;
+        std::vector<int64_t> nodesOff, nodesOn;
+        iterate(fen, 6, true, off, nodesOff, true, true, true, true, nullptr, false);
+        iterate(fen, 6, true, on, nodesOn, true, true, true, true, nullptr, true);
+        ASSERT_LE(nodesOn.back(), nodesOff.back()) << fen;
+        ASSERT_LT(std::abs(off.back() - on.back()), 150) << fen;
+    }
+}
+
+// ENGINE-3 search review: a search that is cancelled at any node leaves no work behind. After the cancel, no
+// re-search of any kind starts (a reduced move that beat alpha, a zero window inside the PV window, a later child at
+// a PV node), whatever partial score the interrupted child returned.
+#ifdef BCHESS_TEST_HOOKS
+TEST_F(MinMaxSearchTests, CancelAtAnyNodeStartsNoReSearch) {
+    const char *fens[] = {
+        "r1bq1rk1/ppp2ppp/2n2n2/3pp3/1bB1P3/2NP1N2/PPP2PPP/R1BQ1RK1 w - - 0 7",
+        "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1",
+    };
+    for (const char *fen : fens) {
+        ChessBoard board;
+        ASSERT_TRUE(FFEN::setFEN(fen, board));
+        
+        // How many nodes an uncancelled search of depth 4 makes
+        int total = 0;
+        {
+            MinMaxSearch search;
+            search.config.maxDepth = 4;
+            search.checkpoint = [&] { total++; };
+            TranspositionTable table;
+            MinMaxSearch::Variation pv, bv;
+            search.alphabeta(board, NEW_HISTORY, table, 0, true, pv, bv);
+        }
+        ASSERT_GT(total, 100) << fen;
+        
+        for (int target = 1; target <= total; target += std::max(1, total / 400)) {
+            MinMaxSearch search;
+            search.config.maxDepth = 4;
+            int calls = 0;
+            int64_t reSearchesAtCancel = -1;
+            search.checkpoint = [&] {
+                if (++calls == target) {
+                    reSearchesAtCancel = search.reductionResearches + search.pvResearches;
+                    search.cancel();
+                }
+            };
+            TranspositionTable table;
+            MinMaxSearch::Variation pv, bv;
+            auto history = NEW_HISTORY;
+            search.alphabeta(board, history, table, 0, true, pv, bv);
+            ASSERT_EQ(target, calls) << fen;
+            ASSERT_EQ(reSearchesAtCancel, search.reductionResearches + search.pvResearches) << fen << " target " << target;
+            // Every node unwound its move from the history
+            ASSERT_EQ(size_t(0), history->size()) << fen << " target " << target;
+        }
+    }
+}
+#endif
+
+// The extension of a check is bounded: past twice maxDepth plies a move that gives check is not extended, so a
+// perpetual check (both sides checking in turn, here the queens and rooks) ends. The line of alphabeta then goes at
+// most maxDepth plies further (the depth left at that ply is at most maxDepth), and the bound did refuse extensions:
+// without it the chain of checks would go on.
+TEST_F(MinMaxSearchTests, PerpetualCheckIsBounded) {
+    ChessBoard board;
+    ASSERT_TRUE(FFEN::setFEN("8/6r1/R6q/6k1/8/8/2Q5/6K1 w - - 0 1", board));
+    MinMaxSearch search;
+    search.config.maxDepth = 1;
+    search.config.transpositionTable = false;
+    int64_t nodes = 0;
+#ifdef BCHESS_TEST_HOOKS
+    // Safety net for the red proof: without the bound this would run for ages
+    search.checkpoint = [&] { if (++nodes > 3000000) search.cancel(); };
+#endif
+    TranspositionTable table;
+    MinMaxSearch::Variation pv, bv;
+    search.alphabeta(board, NEW_HISTORY, table, 0, true, pv, bv);
+    ASSERT_FALSE(search.stopped());
+    ASSERT_LE(search.maxSearchPly, 3 * 1);
+    ASSERT_GT(search.extensionsRefused, 0);
+}
+
+// The root window is (-INT_MAX, INT_MAX): every window the search derives from it stays in range, and the PV flag
+// is explicit (a width computed as beta - alpha would overflow). With the zero windows on and off the root value is
+// the same, and a table filled by a first search does not shorten the line of the second.
+TEST_F(MinMaxSearchTests, RootWindowIsSafe) {
+    const char *fens[] = {
+        "r1bq1rk1/ppp2ppp/2n2n2/3pp3/1bB1P3/2NP1N2/PPP2PPP/R1BQ1RK1 w - - 0 7",
+        "r3k2r/Pppp1ppp/1b3nbN/nP6/BBP1P3/q4N2/Pp1P2PP/R2Q1RK1 w kq - 0 1",
+    };
+    for (const char *fen : fens) {
+        ChessBoard board;
+        ASSERT_TRUE(FFEN::setFEN(fen, board));
+        int scores[2];
+        for (int pvs = 0; pvs < 2; pvs++) {
+            MinMaxSearch search;
+            search.config.maxDepth = 4;
+            search.config.transpositionTable = false;
+            search.config.deltaPruning = false;
+            search.config.seePruning = false;
+            search.config.nullMove = false;
+            search.config.lateMoveReductions = false;
+            search.config.futilityPruning = false;
+            search.config.principalVariationSearch = pvs == 1;
+            TranspositionTable table;
+            MinMaxSearch::Variation pv, bv;
+            scores[pvs] = search.alphabeta(board, NEW_HISTORY, table, 0, true, pv, bv);
+        }
+        ASSERT_EQ(scores[0], scores[1]) << fen;
+        
+        TranspositionTable table;
+        MinMaxSearch::Variation first, second;
+        searchWithTable(fen, 4, true, table, first);
+        searchWithTable(fen, 4, true, table, second);
+        ASSERT_EQ(first.moves.count, second.moves.count) << fen;
+    }
+}
+
+// A null move does not advance the fifty-move clock. White (a knight against a rook) is lost at clock 98. If the
+// pass counted as a move, every quiet move of Black in the null branch would reach clock 100, a draw worth 0, and the
+// null branch would cut the node off with beta = 0. It does not: the node is lost.
+TEST_F(MinMaxSearchTests, NullMoveDoesNotAdvanceTheClock) {
+    ChessBoard board;
+    ASSERT_TRUE(FFEN::setFEN("r3k3/8/8/8/8/8/8/1N4K1 w - - 98 80", board));
+    MinMaxSearch search;
+    search.config.nullMove = true;
+    search.config.futilityPruning = false;
+    MinMaxSearch::Variation pv;
+    TranspositionTable table;
+    int score = search.alphabetaForTest(board, NEW_HISTORY, table, 1, 4, false, -1, 0, 1, pv);
+    ASSERT_LT(score, 0);
+}
+
+// Mates keep their exact distance through iterative deepening with every default on (null move, reductions,
+// futility, SEE, aspiration, PVS, the table). The first four are bare endings searched deeper than the mate; the
+// others are middlegames with a mate in 2 or 3 (Stockfish 19 agrees), searched to the minimal depth 2n + 1.
+// A regression guard, NOT red-proven: no single pruning rule I could break (null-move mate guard, futility guard,
+// reductions of checks, the check extension, aspiration's mate guard) changes the distance of these mates; the rules
+// that protect mates have their own red-proven tests (DeltaPruningStopsAtAMateScoreAlpha, PruningKeepsPinnedMate,
+// ReducedMoveThatBeatsAlphaIsSearchedAgain).
+TEST_F(MinMaxSearchTests, MatesSurvivePruning) {
+    struct Case { const char *fen; int depth; int expected; };
+    const Case cases[] = {
+        {mateIn1White, 6, mate - 1},
+        {mateIn1Black, 6, -(mate - 1)},
+        {mateIn2White, 6, mate - 3},
+        {mateIn2Black, 6, -(mate - 3)},
+        {"r2q2nr/3Q4/pp1p1k1b/2p1pp1p/5PPp/NPP1P1N1/P2P2B1/R1BK2R1 w - - 3 21", 5, mate - 3},
+        {"1r2kbn1/4p1pb/1p1qP3/p1pN2Pp/n4Q2/1P1P3P/P2BPP2/2RK1BNR w - - 2 25", 5, mate - 3},
+        {"3q3r/1b1rk2p/p1P3pb/n4P2/1p4Pn/1PN1p2P/3P4/R1BK1B1R b - - 1 33", 5, -(mate - 3)},
+        {"2b3nr/r1p1p2p/p2qk2b/1p1p1p2/3P1P1P/PPPn1NKR/4P1P1/1RB1QBN1 b - - 4 24", 5, -(mate - 3)},
+        {"rn6/pb4b1/p1p2pqr/1kp3R1/1P1pP3/7p/1R1KnB2/5QN1 w - - 0 34", 7, mate - 5},
+        {"2q2b1N/rn2k2p/Pp1p2p1/P1p1p3/2P4P/5pK1/1R1PBn2/1NBR4 b - - 0 28", 7, -(mate - 5)},
+    };
+    for (auto &c : cases) {
+        ChessBoard board;
+        ASSERT_TRUE(FFEN::setFEN(c.fen, board));
+        IterativeDeepening search;
+        search.start();
+        ChessEvaluation result = search.search(board, NEW_HISTORY, c.depth, [](ChessEvaluation) {});
+        ASSERT_EQ(c.expected, result.value) << c.fen;
+    }
+}
+
+// Without the zero windows (principalVariationSearch off) a later child that turns out to be the new best move is
+// searched again as a PV node. Every child of the root has a deep EXACT entry in the table that says it is
+// worth +500 to White: a child searched as a non-PV node is cut off by it, and only the PV re-search sees the real
+// value and the whole line.
+TEST_F(MinMaxSearchTests, LaterBestChildIsSearchedAsPvNodeWithoutPvs) {
+    ChessBoard board;
+    ASSERT_TRUE(FFEN::setFEN("r1bq1rk1/ppp2ppp/2n2n2/3pp3/1bB1P3/2NP1N2/PPP2PPP/R1BQ1RK1 w - - 0 7", board));
+    TranspositionTable table;
+    auto moves = ChessMoveGenerator::generateMoves(board);
+    for (int i = 0; i < moves.count; i++) {
+        ChessBoard child = board;
+        child.move(moves.moves[i]);
+        preload(table, child, -500);
+    }
+    MinMaxSearch search;
+    search.config.maxDepth = 3;
+    search.config.principalVariationSearch = false;
+    search.config.nullMove = false;
+    search.config.lateMoveReductions = false;
+    search.config.futilityPruning = false;
+    MinMaxSearch::Variation pv, bv;
+    int score = search.alphabeta(board, NEW_HISTORY, table, 0, true, pv, bv);
+    ASSERT_LT(score, 400);
+    ASSERT_GE(pv.moves.count, 3);
+    ASSERT_GT(search.pvResearches, 0);
 }
 
 // An entry that a collision or an old game left under this position's hash can name any move: the move
@@ -482,5 +1199,112 @@ TEST_F(MinMaxSearchTests, DeltaPruningKeepsAMatingCapture) {
     MinMaxSearch::Variation rootPV, bv;
     ASSERT_EQ(ChessEvaluater::MAT_VALUE - 1, search.alphabeta(board, NEW_HISTORY, table, 0, true, rootPV, bv));
     ASSERT_EQ("f6g7", FPGN::to_string(rootPV.moves.bestMove(), FPGN::SANType::uci));
+}
+// 1... Nf3+ forks the king and the queen. In check, White cannot decline to move: every evasion loses the queen
+// to Nxh2, and the stand-pat that counts the queen as White's must not be the answer. (The pawns keep the ending
+// live: K+N v K is a dead position, worth 0.)
+TEST_F(MinMaxSearchTests, QuiescenceDoesNotStandPatInCheck) {
+    ChessBoard board;
+    ASSERT_TRUE(FFEN::setFEN("4k3/p7/8/8/8/5n2/P6Q/4K3 w - - 0 1", board));
+    ASSERT_TRUE(board.isCheck(WHITE));
+    int standPat = ChessEvaluater::evaluate(board);
+    
+    MinMaxSearch search;
+    MinMaxSearch::Variation pv;
+    int score = search.quiescenceForTest(board, -INT_MAX, INT_MAX, 1, pv);
+    ASSERT_LE(score, standPat - (ChessEvaluater::pieceValue(QUEEN) - ChessEvaluater::pieceValue(KNIGHT)));
+    ASSERT_GT(pv.moves.count, 0);
+}
+
+// Re8+ checks the king and every evasion is quiet, so each one reaches a clock of 100 at once. The clock is
+// not in the hash and a quiescence line can run past it: the draw comes from inside quiescence, loaded from
+// a FEN (reversiblePlies -1).
+TEST_F(MinMaxSearchTests, QuiescenceSeesFiftyMoveDraw) {
+    ChessBoard board;
+    ASSERT_TRUE(FFEN::setFEN("4r3/7k/8/8/8/8/8/Q3K3 w - - 99 1", board));
+    ASSERT_TRUE(board.isCheck(WHITE));
+    ASSERT_EQ(-1, board.reversiblePlies);
+    auto evasions = ChessMoveGenerator::generateMoves(board);
+    
+    MinMaxSearch search;
+    MinMaxSearch::Variation pv;
+    ASSERT_EQ(0, search.quiescenceForTest(board, -INT_MAX, INT_MAX, 1, pv));
+    ASSERT_EQ(evasions.count, search.pathDraws);
+    
+    // The same position at clock 0 is not a draw: White keeps its queen against the rook
+    ChessBoard fresh;
+    ASSERT_TRUE(FFEN::setFEN("4r3/7k/8/8/8/8/8/Q3K3 w - - 0 1", fresh));
+    MinMaxSearch other;
+    MinMaxSearch::Variation pv2;
+    ASSERT_NE(0, other.quiescenceForTest(fresh, -INT_MAX, INT_MAX, 1, pv2));
+    ASSERT_EQ(0, other.pathDraws);
+}
+
+// The history holds every evasion's position twice, at the parity that makes the evasion a third occurrence
+TEST_F(MinMaxSearchTests, QuiescenceSeesRepetition) {
+    ChessBoard board;
+    ASSERT_TRUE(FFEN::setFEN("4r3/7k/8/8/8/8/8/Q3K3 w - - 0 1", board));
+    auto evasions = ChessMoveGenerator::generateMoves(board);
+    ASSERT_GT(evasions.count, 1);
+    
+    auto history = NEW_HISTORY;
+    for (int i = 0; i < 4 * evasions.count; i++) {
+        history->push_back(BoardHash(1000 + i)); // the entries between are never the node's position
+    }
+    history->push_back(board.getHash());
+    for (int i = 0; i < evasions.count; i++) {
+        ChessBoard child = board;
+        child.move(evasions.moves[i]);
+        history->at(history->size() - 2 - 4 * i) = child.getHash();
+        history->at(history->size() - 4 - 4 * i) = child.getHash();
+    }
+    
+    // A game played from the start knows how far back a repetition can reach (reversiblePlies); a FEN does not
+    for (int reversible : {int(history->size()) - 1, -1}) {
+        board.reversiblePlies = reversible;
+        MinMaxSearch search;
+        MinMaxSearch::Variation pv;
+        ASSERT_EQ(0, search.quiescenceForTest(board, -INT_MAX, INT_MAX, 1, pv, 0, history)) << reversible;
+        ASSERT_EQ(evasions.count, search.pathDraws) << reversible;
+    }
+    
+    // Without the planted copies the evasions are not draws
+    MinMaxSearch search;
+    MinMaxSearch::Variation pv;
+    ASSERT_NE(0, search.quiescenceForTest(board, -INT_MAX, INT_MAX, 1, pv, 0, NEW_HISTORY));
+}
+
+// Ra8 mates: in check with no evasion, quiescence scores the mate at its own ply
+TEST_F(MinMaxSearchTests, QuiescenceMateInCheck) {
+    ChessBoard board;
+    ASSERT_TRUE(FFEN::setFEN("R5k1/5ppp/8/8/8/8/8/4K3 b - - 0 1", board));
+    ASSERT_TRUE(board.isCheck(BLACK));
+    MinMaxSearch search;
+    MinMaxSearch::Variation pv;
+    ASSERT_EQ(-(mate - 3), search.quiescenceForTest(board, -INT_MAX, INT_MAX, -1, pv, 3));
+}
+#endif
+
+#ifdef BCHESS_TEST_HOOKS
+// Qxb7 mates (the rook on b8 is pinned by Rh8 and the knight guards b7), but SEE scores it as losing because it
+// ignores the pin, so only the exemption of the captures that give check keeps it. Both prunings are on. The
+// plan's position also had a bishop on c6; Bxb7 mates there too and is searched first, which would hide the
+// exemption, so the bishop is left out.
+TEST_F(MinMaxSearchTests, PruningKeepsPinnedMate) {
+    auto fen = "kr5R/1p6/1Q1N4/8/8/8/8/7K w - - 0 1";
+    ChessBoard board;
+    ASSERT_TRUE(FFEN::setFEN(fen, board));
+    ASSERT_LT(ChessEvaluater::see(board, FPGN::uciMove(board, "b6b7")), 0);
+    
+    for (int maxDepth : {0, 1}) {
+        MinMaxSearch search;
+        search.config.maxDepth = maxDepth;
+        search.config.deltaPruning = true;
+        search.config.seePruning = true;
+        TranspositionTable table;
+        MinMaxSearch::Variation pv, bv;
+        ASSERT_EQ(ChessEvaluater::MAT_VALUE - 1, search.alphabeta(board, NEW_HISTORY, table, 0, true, pv, bv)) << maxDepth;
+        ASSERT_EQ("b6b7", FPGN::to_string(pv.moves.bestMove(), FPGN::SANType::uci)) << maxDepth;
+    }
 }
 #endif

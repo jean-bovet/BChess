@@ -229,6 +229,17 @@ void ChessBoard::move(Move move) {
     applyMove<true>(move);
 }
 
+void ChessBoard::moveNull() {
+    getHash();
+    if (enPassant != 0) {
+        hash ^= ChessBoardHash::enPassantKey(*this);
+        enPassant = 0;
+    }
+    color = INVERSE(color);
+    hash ^= ChessBoardHash::getWhiteTurn();
+    reversiblePlies = 0;
+}
+
 // Same rules as move(), without the hash. The hash is left "to be computed", so that an accidental getHash()
 // on the board still returns the right value, but nothing here pays for it.
 void ChessBoard::moveForLegality(Move move) {

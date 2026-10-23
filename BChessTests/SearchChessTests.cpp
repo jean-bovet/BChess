@@ -26,6 +26,12 @@ public:
 static void assertChessSearch(int expectedVisitedNodes, int expectedValue, Configuration config, ChessBoard rootBoard = ChessBoard()) {
     ChessMinMaxSearch alphaBeta;
     alphaBeta.config = config;
+    // The recorded counts are those of plain alpha-beta (ENGINE-3 search step 6 added zero windows)
+    alphaBeta.config.principalVariationSearch = false;
+    alphaBeta.config.nullMove = false;
+    alphaBeta.config.lateMoveReductions = false;
+    alphaBeta.config.futilityPruning = false;
+    alphaBeta.config.seePruning = false;
     
     ChessMinMaxSearch::Variation pv;
     ChessMinMaxSearch::Variation bv;
@@ -46,10 +52,10 @@ TEST_F(SearchChessTests, ChessTree) {
     config.quiescenceSearch = false;
 
     config.alphaBetaPrunning = true;
-    assertChessSearch(4886, 0, config); // with alpha-beta prunning
+    assertChessSearch(5605, 0, config); // with alpha-beta prunning (4886 before the check extension, ENGINE-3 search step 5)
     
     config.alphaBetaPrunning = false;
-    assertChessSearch(142706, 0, config); // without alpha-beta
+    assertChessSearch(146059, 0, config); // without alpha-beta (142706 before it)
 }
 
 TEST_F(SearchChessTests, OrderedMove) {
@@ -60,9 +66,13 @@ TEST_F(SearchChessTests, OrderedMove) {
     Configuration config;
     config.deltaPruning = false; // the counts are those of plain alpha-beta with quiescence
 
+    // Quiescence in check (ENGINE-3 search step 4) changed the counts from 16437 and 341919: the evasions of
+    // a side in check are searched where the stand-pat used to end the line. The check extension (step 5) changed
+    // them again, from 19296 and 1611681; the PV re-search of a later best child (PVS off, review round 1) from
+    // 37408 and 18230535 (ChessTree above: from 5142 and 145596).
     config.sortMoves = true;
-    assertChessSearch(16437, 50, config, board);
+    assertChessSearch(38161, 25, config, board);
     
     config.sortMoves = false;
-    assertChessSearch(341919, 50, config, board);
+    assertChessSearch(18239934, 25, config, board);
 }

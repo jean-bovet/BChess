@@ -37,12 +37,24 @@ public:
     // The material value of a piece, in centipawns
     static int pieceValue(Piece piece);
     
+    // Static exchange evaluation: what the side that makes `move` (a capture) gains or loses by the exchange of
+    // pieces on its target square, in centipawns, when both sides capture with their least valuable piece and
+    // stop whenever it pays. Pins are ignored: a pinned piece counts as an attacker, as in any usual SEE. A king
+    // captures only when the other side has no attacker left, and a pawn that reaches the last rank is a queen.
+    static int see(ChessBoard &board, Move move);
+    
     static bool positionalAnalysis;
     
     static bool isQuiet(Move move);    
     // Threefold repetition: the board's own count of reversible plies bounds the scan of the history
     static bool isDraw(ChessBoard &board, const HistoryPtr &history);
 
+    // The fifty-move rule: a clock of 100 half-moves is a draw, unless the side to move is checkmated
+    static bool isFiftyMoveDraw(ChessBoard &board);
+    
+    // FIDE's dead positions, in which no sequence of legal moves can give mate (see evaluate)
+    static bool isDeadPosition(const ChessBoard &board);
+    
     // The board is not const because generateMoves, isCheck and getHash update its caches
     // The score of the position, from White's point of view. A mate or a stalemate is told by the moves. A
     // repetition is not: the search checks it once per node, before it gets here.

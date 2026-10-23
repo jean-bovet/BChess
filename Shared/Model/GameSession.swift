@@ -515,7 +515,6 @@ final class GameSession {
         isAnalyzing = false
         engine.useOpeningBook = true
         engine.thinkingTime = player.thinkingTime
-        engine.ttEnabled = UserDefaults.standard.bool(forKey: "useTranspositionTable")
 
         // The search runs off the main thread; its result is applied only if it is still for this position
         let token = positionID
@@ -558,7 +557,6 @@ final class GameSession {
         let id = analysisID
         // A book move carries no evaluation
         engine.useOpeningBook = false
-        engine.ttEnabled = UserDefaults.standard.bool(forKey: "useTranspositionTable")
         engine.evaluate(Int.max, time: analysisBudget) { [weak self] info, completed in
             DispatchQueue.main.async {
                 MainActor.assumeIsolated {

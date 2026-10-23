@@ -72,6 +72,11 @@ public:
     
     void move(Move move);
     
+    // Passes the turn without moving (null-move pruning). Only the side to move and the en-passant square change,
+    // with the hash kept exact. The clock stays (a pass is not a move) and reversiblePlies becomes 0, so that no
+    // repetition is counted across the pass.
+    void moveNull();
+    
     // Plays the move for the legality test of MoveList::addSingleMove, which only reads isCheck on the copy it
     // makes it on. It skips all the hash work, so the hash is left "to be computed" and nothing may rely on it.
     void moveForLegality(Move move);

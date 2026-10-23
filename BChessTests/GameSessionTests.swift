@@ -203,16 +203,15 @@ struct GameSessionTests {
     }
 
     @Test func searchResultWithoutMoveIsIgnored() throws {
-        let repeated = "1. Nf3 Nf6 2. Ng1 Ng8 3. Nf3 Nf6 4. Ng1 Ng8 5. Nf3 Nf6 1/2-1/2"
-        let session = GameSession(state: GameState(pgn: repeated, white: .human, black: .human))
-        session.move(to: .backward)
+        // A stalemate: the engine finds no move. (A drawn-by-rule root is searched like any other since ENGINE-3
+        // search step 2, so a repetition no longer gives an empty result.)
+        let stalemate = "7k/5Q2/6K1/8/8/8/8/8 b - - 0 1"
+        let session = GameSession(state: GameState(pgn: pgn(fen: stalemate), white: .human, black: .human))
         let position = session.fen
 
-        // The engine finds no move in a drawn position
         let engine = FEngine()
         engine.useOpeningBook = false
-        engine.loadAllGames(repeated)
-        engine.move(to: .backward, variation: 0)
+        engine.setFEN(stalemate)
         let result = Locked<FEngineInfo?>(nil)
         let done = DispatchSemaphore(value: 0)
         engine.evaluate(2) { info, completed in

@@ -101,14 +101,17 @@ sprt_decision() {
     else echo none; fi
 }
 
-# judge_run <mode: ab|sf> <expected games> <fastchess log> <pgn>
+# judge_run <mode: ab|sf> <expected games> <fastchess log> <pgn> [concurrency]
 # Checks a finished run against its games and reads its result. Sets PLAYED WINS DRAWS LOSSES and the PGN's figures,
 # and returns: 0 valid (sf: go on to the Elo; ab: H1 accepted), 2 invalid, 4 H0 accepted, 5 no decision at the cap.
 # The games are the authority: every game must be complete, nobody may forfeit on time, and they must agree with
 # the summary. In sf mode exactly the expected number is played. In ab mode an SPRT may stop earlier, but only
-# with a decision; an odd count is fine because it can stop between the two games of an opening.
+# with a decision; an odd count is fine because it can stop between the two games of an opening. With a decision,
+# games still running when fastchess printed its last summary may land in the PGN afterwards: fewer than the
+# concurrency of them are accepted (on top of the summary's), if the PGN's totals cover the summary's and the
+# PGN checks (illegal, forfeit, abandoned, unterminated, malformed) pass over all of them.
 judge_run() {
-    local mode=$1 expected=$2 log=$3 pgn=$4 line
+    local mode=$1 expected=$2 log=$3 pgn=$4 concurrency=${5:-0} line
     line=$(grep -E '^Games: ' "$log" | tail -1 || true)
     WINS=$(sed -nE 's/.*Wins: ([0-9]+).*/\1/p' <<< "$line"); WINS=${WINS:-0}
     LOSSES=$(sed -nE 's/.*Losses: ([0-9]+).*/\1/p' <<< "$line"); LOSSES=${LOSSES:-0}
@@ -118,9 +121,13 @@ judge_run() {
     read -r PGNGAMES PGNWINS PGNDRAWS PGNLOSSES ILLEGAL TIMEOUTS ANYILLEGAL ABANDONED UNTERMINATED MALFORMED < <(pgn_summary "$pgn")
     DECISION=none
     [[ $mode == ab ]] && DECISION=$(sprt_decision "$log" $(( PLAYED >= expected ? 1 : 0 )))
-    local bad=0
-    (( ANYILLEGAL > 0 || ABANDONED > 0 || UNTERMINATED > 0 || MALFORMED > 0 || TIMEOUTS > 0 || PLAYED == 0 || PGNGAMES != PLAYED \
-       || PGNWINS != WINS || PGNLOSSES != LOSSES || PGNDRAWS != DRAWS )) && bad=1
+    local bad=0 late=0
+    if [[ $mode == ab && $DECISION != none ]] && (( PGNGAMES > PLAYED && PGNGAMES - PLAYED < concurrency \
+        && PGNWINS >= WINS && PGNLOSSES >= LOSSES && PGNDRAWS >= DRAWS )); then
+        late=$((PGNGAMES - PLAYED))
+    fi
+    (( ANYILLEGAL > 0 || ABANDONED > 0 || UNTERMINATED > 0 || MALFORMED > 0 || TIMEOUTS > 0 || PLAYED == 0 || PGNGAMES != PLAYED + late \
+       || (late == 0 && (PGNWINS != WINS || PGNLOSSES != LOSSES || PGNDRAWS != DRAWS)) )) && bad=1
     if [[ $mode == sf ]]; then
         (( PLAYED != expected )) && bad=1
     else
@@ -205,9 +212,9 @@ if [[ ${1:-} == --self-test ]]; then
         for ((i = 0; i < $2; i++)); do game BChess Base 1/2-1/2 '[Result "1/2-1/2"]' '[Termination "adjudication"]'; done
         for ((i = 0; i < $3; i++)); do game BChess Base 0-1 '[Result "0-1"]' '[Termination "normal"]'; done
     }
-    judge() { # name expected-code mode expected-games log pgn
+    judge() { # name expected-code mode expected-games log pgn [concurrency]
         local code=0
-        judge_run "$3" "$4" "$5" "$6" 2> /dev/null || code=$?
+        judge_run "$3" "$4" "$5" "$6" "${7:-0}" 2> /dev/null || code=$?
         [[ $code == "$2" ]] && echo "ok   $1" || { echo "FAIL $1: exit $code, expected $2" >&2; FAILED=1; }
     }
     log 6 2 2 "$LLR_H1" "$DEC_H1" > "$TMP/h1.log";   pgn 6 2 2 > "$TMP/h1.pgn"
@@ -238,6 +245,19 @@ if [[ ${1:-} == --self-test ]]; then
     { pgn 5 2 2; game BChess Base 1-0 '[Result "1-0"]' '[Termination "time forfeit"]'; } > "$TMP/forfeit-them.pgn"
     log 6 2 2 "$LLR_H1" "$DEC_H1" > "$TMP/forfeit-them.log"
     judge "a time forfeit lost by the other engine" 2 ab 100 "$TMP/forfeit-them.log" "$TMP/forfeit-them.pgn"
+    # a game that finished after fastchess's last summary
+    { pgn 6 2 2; game BChess Base 1-0 '[Result "1-0"]' '[Termination "normal"]'; } > "$TMP/late.pgn"
+    judge "a decided SPRT with one clean game after the last summary" 0 ab 100 "$TMP/h1.log" "$TMP/late.pgn" 14
+    judge "the same at concurrency 1 (nothing can be late)" 2 ab 100 "$TMP/h1.log" "$TMP/late.pgn" 1
+    judge "the same without a concurrency" 2 ab 100 "$TMP/h1.log" "$TMP/late.pgn"
+    { pgn 6 2 2; game BChess Base 1-0 '[Result "1-0"]' '[Termination "time forfeit"]'; } > "$TMP/late-forfeit.pgn"
+    judge "a late game that is a time forfeit" 2 ab 100 "$TMP/h1.log" "$TMP/late-forfeit.pgn" 14
+    { pgn 6 2 2; game BChess Base 1-0 '[Result "1-0"]' '[Termination "illegal move"]'; } > "$TMP/late-illegal.pgn"
+    judge "a late game with an illegal move" 2 ab 100 "$TMP/h1.log" "$TMP/late-illegal.pgn" 14
+    judge "an undecided SPRT with a late game" 2 ab 100 "$TMP/nodec.log" "$TMP/late.pgn" 14
+    { pgn 6 2 2; for i in 1 2; do game BChess Base 1-0 '[Result "1-0"]' '[Termination "normal"]'; done; } > "$TMP/late2.pgn"
+    judge "as many late games as the concurrency" 2 ab 100 "$TMP/h1.log" "$TMP/late2.pgn" 2
+    judge "fewer late games than the concurrency" 0 ab 100 "$TMP/h1.log" "$TMP/late2.pgn" 3
     log 6 2 2 > "$TMP/sf.log"; pgn 6 2 2 > "$TMP/sf.pgn"
     judge "a Stockfish run with every game played" 0 sf 10 "$TMP/sf.log" "$TMP/sf.pgn"
     judge "a Stockfish run that stopped early is invalid" 2 sf 12 "$TMP/sf.log" "$TMP/sf.pgn"
@@ -362,9 +382,14 @@ else
     SPRT=()
 fi
 START=$(date +%s)
+# A Mac that idles to sleep mid-run makes every game in flight forfeit on time: keep it awake while fastchess runs
+AWAKE=()
+# -i alone was not enough: a run slept for 17 minutes under `caffeinate -i` (ENGINE-3 search, 2026-10-23), so it also
+# prevents display sleep (-d is not needed, -m disk and -s system sleep are)
+if [[ $(uname) == Darwin ]] && command -v caffeinate > /dev/null; then AWAKE=(caffeinate -ims); fi
 # fastchess saves its state (config.json) in the folder it runs in
 cd "$ELO/runs"
-"$FASTCHESS" \
+${AWAKE[@]+"${AWAKE[@]}"} "$FASTCHESS" \
     -engine cmd="$BCHESS" name=BChess \
     "${OPPONENT[@]}" \
     -each tc=$TC timemargin=$TIMEMARGIN \
@@ -379,7 +404,7 @@ WALL=$(( $(date +%s) - START ))
 # 5. Report
 read -r ELODIFF ELOERR < <(grep -E '^Elo: ' "$LOG" | tail -1 | sed -E 's/^Elo: ([^ ]+) \+\/- ([^,]+),.*/\1 \2/')
 JUDGED=0
-judge_run "$([[ -n $BASE ]] && echo ab || echo sf)" "$EXPECTED" "$LOG" "$PGN" || JUDGED=$?
+judge_run "$([[ -n $BASE ]] && echo ab || echo sf)" "$EXPECTED" "$LOG" "$PGN" "$CONCURRENCY" || JUDGED=$?
 
 echo
 echo "Result: BChess $WINS wins, $LOSSES losses, $DRAWS draws out of $PLAYED games, score $SCORE %"
