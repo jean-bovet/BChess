@@ -33,27 +33,35 @@ struct GameTextTests {
         #expect(GameText.title(white: ann, black: computer) == "Ann vs Club Player")
     }
 
-    /// Every level: the name, the title, the status and the row detail
-    @Test(arguments: [(0, "Beginner Player", "Beginner"), (1, "Casual Player", "Casual"), (2, "Club Player", "Club"),
-                      (3, "Strong Player", "Strong"), (4, "Full Engine", "5 s"), (5, "Full Engine", "10 s"), (6, "Full Engine", "30 s")])
-    func computerNamesAndDetails(_ level: Int, _ name: String, _ detail: String) {
+    /// Every level: the name, the title, the status and the row detail. Below Maximum the name already says the
+    /// level, so the detail is the bare colour; at Maximum it adds the thinking time ("" means no suffix).
+    @Test(arguments: [(0, "Beginner Player", ""), (1, "Casual Player", ""), (2, "Club Player", ""),
+                      (3, "Strong Player", ""), (4, "Full Engine", " \u{00B7} 5 s"),
+                      (5, "Full Engine", " \u{00B7} 10 s"), (6, "Full Engine", " \u{00B7} 30 s")])
+    func computerNamesAndDetails(_ level: Int, _ name: String, _ suffix: String) {
         let player = GamePlayer(name: "", computer: true, level: level)
         #expect(GameText.name(of: player, isWhite: false, opponent: human) == name)
         #expect(GameText.title(white: human, black: player) == "You vs \(name)")
         #expect(GameText.title(white: player, black: human) == "\(name) vs You")
         #expect(status(thinking: true, black: player, whiteToMove: false) == "\(name) is thinking\u{2026}")
-        #expect(GameText.sideDetail(of: player, isWhite: false, opponent: human, toMove: true) == "Black \u{00B7} \(detail)")
-        #expect(GameText.sideDetail(of: player, isWhite: true, opponent: human, toMove: false) == "White \u{00B7} \(detail)")
-        // A given name wins
+        #expect(GameText.sideDetail(of: player, isWhite: false, opponent: human, toMove: true) == "Black" + suffix)
+        #expect(GameText.sideDetail(of: player, isWhite: true, opponent: human, toMove: false) == "White" + suffix)
+        // A given name wins, and then the level appears nowhere else, so the detail keeps it (D1)
         let ann = GamePlayer(name: "Ann", computer: true, level: level)
         #expect(GameText.name(of: ann, isWhite: false, opponent: human) == "Ann")
+        let annDetail = GameText.sideDetail(of: ann, isWhite: false, opponent: human, toMove: true)
+        #expect(annDetail == (suffix.isEmpty ? "Black \u{00B7} \(ann.strength.displayName)" : "Black" + suffix))
+        // A blank name is no name: the same trimming as `name(of:)`
+        let blank = GamePlayer(name: "   ", computer: true, level: level)
+        #expect(GameText.name(of: blank, isWhite: false, opponent: human) == name)
+        #expect(GameText.sideDetail(of: blank, isWhite: false, opponent: human, toMove: true) == "Black" + suffix)
     }
 
     @Test func sideDetails() {
         #expect(GameText.sideDetail(of: human, isWhite: true, opponent: computer, toMove: true) == "White \u{00B7} your move")
         #expect(GameText.sideDetail(of: human, isWhite: false, opponent: human, toMove: true) == "Black \u{00B7} to move")
         #expect(GameText.sideDetail(of: human, isWhite: false, opponent: computer, toMove: false) == "Black")
-        #expect(GameText.sideDetail(of: computer, isWhite: false, opponent: human, toMove: true) == "Black \u{00B7} Club")
+        #expect(GameText.sideDetail(of: computer, isWhite: false, opponent: human, toMove: true) == "Black")
     }
 
     @Test func moveLabels() {
