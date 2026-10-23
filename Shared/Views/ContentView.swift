@@ -46,18 +46,14 @@ struct ContentView: View {
         .accessibilityElement(children: .contain)
         .accessibilityIdentifier("board")
         .accessibilityValue(session.fen)
-        // The evaluation bar stands left of the board, as tall as its frame
-        .padding(.leading, evaluation == nil ? 0 : EvaluationBar.width + 6)
+        // The evaluation bar stands left of the board, as tall as its frame. Its place depends only on
+        // the setting, so stepping through the moves, which clears the verdict, never moves the board.
+        .padding(.leading, showEngine ? EvaluationBar.width + 6 : 0)
         .overlay(alignment: .leading) {
-            if let evaluation {
-                EvaluationBar(verdict: evaluation, rotated: session.gameState.rotated)
+            if showEngine {
+                EvaluationBar(verdict: EngineView.verdict(of: session), rotated: session.gameState.rotated)
             }
         }
-    }
-
-    /// The verdict the bar shows: only while the engine is on and has one.
-    private var evaluation: Verdict? {
-        showEngine ? EngineView.verdict(of: session) : nil
     }
 
     private var boardColumn: some View {

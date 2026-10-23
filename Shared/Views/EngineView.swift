@@ -17,8 +17,8 @@ struct EngineView: View {
     /// The wide layout: the verdict, the best line and the statistics each on their own line.
     var stacked = false
 
-    private var scoreChip: some View {
-        Text(verdict?.score ?? "")
+    private func scoreChip(_ score: String) -> some View {
+        Text(score)
             .font(.footnote.weight(.bold))
             .monospacedDigit()
             .padding(.horizontal, 7)
@@ -32,7 +32,7 @@ struct EngineView: View {
         if stacked {
             VStack(alignment: .leading, spacing: 8) {
                 HStack(spacing: 8) {
-                    scoreChip
+                    scoreChip(verdict.score)
                     Text(verdict.sentence)
                         .font(.subheadline.weight(.semibold))
                         .foregroundStyle(Walnut.textPrimary)
@@ -52,7 +52,7 @@ struct EngineView: View {
             }
         } else {
             HStack(spacing: 8) {
-                scoreChip
+                scoreChip(verdict.score)
                 // The sentence gives way to the line when the width is short
                 Text(verdict.sentence + (line.isEmpty ? "" : " \u{00B7}"))
                     .foregroundStyle(Walnut.textSecondary)
@@ -75,9 +75,13 @@ struct EngineView: View {
             if let verdict {
                 content(for: verdict)
             } else {
-                Text("Analyzing\u{2026}")
-                    .font(.footnote)
-                    .foregroundStyle(Walnut.textSecondary)
+                // As tall as a one-line verdict, so the cards below stay in place while it is awaited
+                ZStack(alignment: .leading) {
+                    scoreChip("0.0").hidden()
+                    Text("Analyzing\u{2026}")
+                        .foregroundStyle(Walnut.textSecondary)
+                }
+                .font(.footnote)
             }
         }
         .padding(.horizontal, 12)
@@ -124,9 +128,11 @@ struct EngineView: View {
 /// White's share of the evaluation, as a thin vertical bar the height of the board. White's part
 /// grows from White's side: the bottom, or the top when the board is rotated.
 struct EvaluationBar: View {
-    let verdict: Verdict
+    /// Nil while the next verdict is awaited or the game is over: the bar keeps the last one.
+    let verdict: Verdict?
     let rotated: Bool
 
+    @State private var shown: Verdict?
     @Environment(\.colorScheme) private var colorScheme
 
     static var width: CGFloat {
@@ -143,10 +149,15 @@ struct EvaluationBar: View {
             ZStack(alignment: rotated ? .top : .bottom) {
                 Rectangle().fill(dark ? Color.black : Walnut.textPrimary)
                 Rectangle().fill(Color(red: 0.984, green: 0.973, blue: 0.953))
-                    .frame(height: proxy.size.height * verdict.whiteShare)
+                    .frame(height: proxy.size.height * (shown?.whiteShare ?? 0.5))
             }
         }
         .frame(width: Self.width)
+        .onChange(of: verdict, initial: true) { _, verdict in
+            if let verdict {
+                shown = verdict
+            }
+        }
         .clipShape(RoundedRectangle(cornerRadius: Self.width / 2))
         .overlay {
             if dark {
@@ -155,6 +166,6 @@ struct EvaluationBar: View {
             }
         }
         .accessibilityElement()
-        .accessibilityLabel("Evaluation \(verdict.score)")
+        .accessibilityLabel(shown.map { "Evaluation \($0.score)" } ?? "Evaluation")
     }
 }
