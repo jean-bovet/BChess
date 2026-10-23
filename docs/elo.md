@@ -14,7 +14,8 @@ reference; read it with the caveats below.
 - **Openings:** `8moves_v3.pgn` from `official-stockfish/books`, downloaded from a pinned commit and
   checked against its sha256. Every opening is played twice, once with each colour.
 - **BChess:** `BChessUCI`, built in Release from the current checkout, with the transposition table
-  off and no opening book (the tool loads none).
+  cutting off at non-PV nodes (always on since ENGINE-3 search; it was off for cut-offs before) and no
+  opening book (the tool loads none).
 - **Time control:** 10+0.1 by default, with a time margin of 100 ms (`TIMEMARGIN=<ms>`, applied to both engines and written to the run's `.info` file; ENGINE-3's late matches used 200 ms because scheduler jitter on a loaded machine caused forfeits of 100 to 150 ms). A draw is adjudicated after
   move 40 when both scores stay within 10 cp for 8 moves; a game ends when both engines agree that
   one side is 10 pawns up for 4 moves.
@@ -100,8 +101,10 @@ diffs two outputs, and `scripts/bench.sh --perft` runs ENGINE-1's perft check.
 - The rating is relative to that anchor. It is not a FIDE or a CCRL rating.
 - A limited-strength Stockfish plays its weaker moves differently from a human of that rating, and
   from other engines.
-- What the number reflects in BChess: the transposition table orders moves but never cuts off (it is off for cut-offs in the tool), no fifty-move rule, and
-  no quiescence search while in check.
+- What the number reflects in BChess: the table cuts off at non-PV nodes (never at the root or on the principal
+  variation), the fifty-move rule and dead positions are scored as draws, quiescence searches the evasions of a side in
+  check, and the search has a check extension, PVS, null move, late-move reductions, aspiration windows, futility and SEE
+  pruning. Static evaluation is unchanged (that is the third ENGINE-3 plan).
 - The error bars widen as the score moves away from 50 %, which is why the level is chosen near the
   engine's own.
 
@@ -126,6 +129,8 @@ score point is about 695 Elo at 50 %):
 | 2026-10-06 | c527652 | 10+0.1 | 8moves_v3 (not recorded) | 1800 | 300 | 115/15/170 | **1736 ± 40** | 34 min |
 | 2026-10-06 | e0c7f01 | 10+0.1, margin 200 | 8moves_v3 (498536314) | 2000 | 40 | 18/3/19 | 1991 ± 116 | 5 min |
 | 2026-10-06 | e0c7f01 | 10+0.1, margin 200 | 8moves_v3 (124222418) | 2000 | 300 | 116/21/163 | **1945 ± 39** | 35 min |
+| 2026-10-23 | dc5473c | 10+0.1, margin 200 | 8moves_v3 (not recorded) | 2200 | 40 | — | 2337 ± 100 | — |
+| 2026-10-23 | dc5473c | 10+0.1 | 8moves_v3 (1011167814) | 2350 | 300 | 138/36/126 | **2364 ± 36** | 20 min |
 
 The first row is the probe that picked the level for the second. The second is the measurement:
 `LEVEL=1800 GAMES=300 scripts/elo-match.sh` (10+0.1, concurrency 4, Apple M2, Stockfish 19,
@@ -134,3 +139,5 @@ illegal move, time forfeit, disconnect or stall in either run. BChess at this co
 plays at about 1740 ± 40 on Stockfish's `UCI_Elo` scale at 10+0.1.
 
 ENGINE-3 (speed: a faster search at the same evaluation, delta pruning in quiescence; the transposition table orders moves but does not cut off) is in the next two rows, with a 200 ms time margin for both engines (`TIMEMARGIN=200`, in the run info) after forfeits of 100 to 150 ms on a loaded machine. The first is the 40-game probe that picked the level. The second is the measurement: 300 games, no forfeit, score 42.2 %, Elo difference to Stockfish 2000 of -54.9 ± 39.4. Against ENGINE-2 itself (`BASE=2eb86d5 TIMEMARGIN=200 scripts/elo-match.sh`, SPRT [0, 10], 5+0.05) H1 was accepted after 208 games, 142/49/17, +241 ± 51 Elo, LLR 2.95.
+
+ENGINE-3 search (draws by rule, a table fit for cut-offs, quiescence in check, check extension, PVS, null move, late-move reductions, aspiration windows, futility and SEE pruning; the evaluation is unchanged) is in the next two rows, both at `TIMEMARGIN=200`. The first is the 40-game probe at level 2200 (run 20261023-181039-SF2200, +137 ± 100 Elo). The second is the measurement: 300 games against level 2350 (run 20261023-184110-SF2350, concurrency 8), score 52.0 %, Elo difference to Stockfish 2350 of +13.9 ± 35.7, no forfeit, 20 minutes. Against ENGINE-3 speed's base `4986ad7` (SPRT [0, 10], 5+0.05, `TIMEMARGIN=1000`, concurrency 8, run 20261023-164152) H1 was accepted after 208 games, 170/32/6, +370.84 ± 59.95 Elo, LLR 2.95. One earlier 300-game run (20261023-181331-SF2350) is not a result: the Mac slept for 17 minutes during it (pmset 18:13:37 to 18:31:27) although `caffeinate -i` was running, and both engines forfeited 20 games on time; the valid run was wrapped in `caffeinate -dims`, and the script now uses `caffeinate -ims`.

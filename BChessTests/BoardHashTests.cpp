@@ -274,3 +274,30 @@ TEST(BoardHash, LegalityMoveLeavesRulesIntact) {
     }
     ASSERT_GT(checked, 100);
 }
+
+// ENGINE-3 search step 8: a null move passes the turn and nothing else. Its incremental hash is that of the
+// same position with the other side to move and no en-passant square.
+TEST(BoardHash, NullMoveFlipsTheSideAndKeepsTheHashExact) {
+    ChessEngine::initialize();
+    
+    // After 1. e4: Black to move with an en-passant square on e3
+    ChessBoard board;
+    ASSERT_TRUE(FFEN::setFEN("rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 3 5", board));
+    ASSERT_NE(Bitboard(0), board.enPassant);
+    int clock = board.halfMoveClock;
+    
+    ChessBoard nullBoard = board;
+    nullBoard.moveNull();
+    
+    ASSERT_EQ(WHITE, nullBoard.color);
+    ASSERT_EQ(Bitboard(0), nullBoard.enPassant);
+    ASSERT_EQ(clock, nullBoard.halfMoveClock);
+    ASSERT_EQ(0, nullBoard.reversiblePlies);
+    
+    ChessBoard expected;
+    ASSERT_TRUE(FFEN::setFEN("rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 3 5", expected));
+    ASSERT_EQ(ChessBoardHash::hash(expected), nullBoard.getHash());
+    
+    // Passing twice is not the same position: the clock and the lost en-passant square are not undone
+    ASSERT_NE(board.getHash(), nullBoard.getHash());
+}

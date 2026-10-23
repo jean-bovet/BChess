@@ -10,6 +10,11 @@ import Testing
 
 struct FEngineTests {
 
+    /// Cut-offs from the table are always on (ENGINE-3 search step 7): the app has no switch any more
+    @Test func tableCutOffsAreOnByDefault() {
+        #expect(FEngine().ttEnabled)
+    }
+
     /// The probes that validate a pasted text or a file cost no table, and a search allocates the size of
     /// the platform: 16 MB on a phone, 64 MB on a Mac.
     @Test func probeEngineAllocatesNoTable() {

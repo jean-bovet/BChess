@@ -48,6 +48,15 @@ public:
 
     MinMaxSearch minMaxSearch;
 
+    // From depth 5 the root is searched in a window around the previous score; a score outside it is searched again
+    // with that side open. Off for the exactness tests.
+    bool aspirationWindows = true;
+    static const int ASPIRATION_MARGIN = 50;
+    static const int ASPIRATION_MIN_DEPTH = 5;
+    
+    // The searches repeated because the aspiration window failed, since the last start()
+    std::atomic<int> aspirationResearches{0};
+
     TranspositionTable table;
 
     // The table's size in megabytes: it is allocated by the first store of a search, never before
@@ -75,6 +84,7 @@ public:
     // before search() begins is honored instead of being overwritten.
     void start() {
         completedDepth = 0;
+        aspirationResearches = 0;
         minMaxSearch.resume();
         status = Status::running;
     }
@@ -95,6 +105,8 @@ public:
         // One clock and one node count for the whole search, so that the figures add up over the depths
         TimeManagement searchClock;
         searchClock.start();
+        int lastScore = 0;
+        bool haveScore = false;
         int64_t totalNodes = 0;
         int64_t deepestPly = 0;
         auto elapsedMilli = [&searchClock] {
@@ -108,14 +120,37 @@ public:
             }
             
             minMaxSearch.config.maxDepth = curMaxDepth;
-            minMaxSearch.reset();
             
             MinMaxSearch::Variation pv;
+            int score = 0;
             
-            int score = minMaxSearch.alphabeta(board, history, table, 0, board.color == WHITE, pv, bestVariation);
-            
-            totalNodes += minMaxSearch.visitedNodes;
-            deepestPly = std::max(deepestPly, minMaxSearch.maxPly);
+            // The window of the first try (white-relative); a failed side is opened and the depth searched again
+            int alpha = -INT_MAX, beta = INT_MAX;
+            if (aspirationWindows && curMaxDepth >= ASPIRATION_MIN_DEPTH && haveScore && !ChessEvaluater::isMateScore(lastScore)) {
+                alpha = lastScore - ASPIRATION_MARGIN;
+                beta = lastScore + ASPIRATION_MARGIN;
+            }
+            while (true) {
+                minMaxSearch.reset();
+                pv = MinMaxSearch::Variation();
+                score = minMaxSearch.alphabeta(board, history, table, 0, board.color == WHITE, alpha, beta, pv, bestVariation);
+                
+                totalNodes += minMaxSearch.visitedNodes;
+                deepestPly = std::max(deepestPly, minMaxSearch.maxPly);
+                
+                // An interrupted depth is not recorded, so there is nothing to search again
+                if (cancelled() || !running()) {
+                    break;
+                }
+                if (score <= alpha && alpha != -INT_MAX) {
+                    alpha = -INT_MAX;
+                } else if (score >= beta && beta != INT_MAX) {
+                    beta = INT_MAX;
+                } else {
+                    break;
+                }
+                aspirationResearches++;
+            }
             
 //            int percentCollision = (float)table.collisionCount / table.storeCount * 100;
 //            std::cout << "Entry count = " << table.storeCount << ", collision = " << table.collisionCount << " (" << percentCollision << "%)" << ", new = " << table.newStoreCount << std::endl;
@@ -131,6 +166,8 @@ public:
                 evaluation.clear();
                 
                 evaluation.value = score;
+                lastScore = score;
+                haveScore = true;
 
                 // The depth that was searched: a line that ends early (a mate) is shorter than that
                 evaluation.depth = curMaxDepth;

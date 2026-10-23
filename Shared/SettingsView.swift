@@ -15,8 +15,6 @@ struct SettingsView: View {
     @AppStorage(AppSettings.highlightLastMoveKey) private var highlightLastMove = AppSettings.highlightLastMoveDefault
     @AppStorage(AppSettings.themeKey) private var theme = AppTheme.default
 
-    @AppStorage("useTranspositionTable") private var ttTable = false
-
     @AppStorage("showEngineStatistics") private var showStatistics = false
 
     private var content: some View {
@@ -26,13 +24,12 @@ struct SettingsView: View {
                 WalnutToggleRow("Show legal moves", "Dots and rings when a piece is selected", isOn: $showLegalMoves)
                 WalnutToggleRow("Highlight the last move", "Tints the two squares of the move just played", isOn: $highlightLastMove)
             }
+            #if os(macOS)
+            // The iPhone never shows the statistics, so the switch (and the section) is the Mac's only
             WalnutSection("Engine") {
-                #if os(macOS)
-                // The iPhone never shows the statistics, so the switch is the Mac's only
                 WalnutToggleRow("Show engine statistics", "Depth, nodes and speed under the engine card", isOn: $showStatistics)
-                #endif
-                WalnutToggleRow("Use Transposition Table (Beta)", "Remembers positions the engine has searched", isOn: $ttTable)
             }
+            #endif
             WalnutSection("Appearance") {
                 VStack(alignment: .leading, spacing: 10) {
                     WalnutRowLabel("Theme", "Follow the system, or always light or dark")

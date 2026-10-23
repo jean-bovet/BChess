@@ -107,6 +107,6 @@ Each change was planned, reviewed by Codex and implemented following the `/devel
 - Add the 50-move rule
 - Add a heuristic that gives a bonus when the king is safely behind its row of pawns after castling
 - Add more openings: the opening book names only a few lines, so most games show no opening name
-- Finish the transposition table, available today as "Use Transposition Table (Beta)" in the Mac's Settings ([background](http://www.chessbin.com/post/Transposition-Table-and-Zobrist-Hashing), [more](https://chessprogramming.wikispaces.com/Transposition+Table))
+- Finish the transposition table, always on for cut-offs since ENGINE-3 ([background](http://www.chessbin.com/post/Transposition-Table-and-Zobrist-Hashing), [more](https://chessprogramming.wikispaces.com/Transposition+Table))
 - Pick a game from a multi-game PGN file on iPhone and iPad
 - [Optimization](https://people.cs.clemson.edu/~dhouse/courses/405/papers/optimize.pdf)

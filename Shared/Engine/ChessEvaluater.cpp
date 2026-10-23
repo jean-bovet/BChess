@@ -13,6 +13,8 @@
 
 #include "magicmoves.h"
 
+#include <algorithm>
+#include <cstring>
 #include <iostream>
 
 bool ChessEvaluater::positionalAnalysis = false;
@@ -103,6 +105,107 @@ int ChessEvaluater::pieceValue(Piece piece) {
     return PieceValue[piece];
 }
 
+// Every piece of both colors that attacks `square`, with the pieces `bb` on the board `occupancy`
+static Bitboard attackersOf(Square square, Bitboard occupancy, const Bitboard bb[COUNT][PCOUNT]) {
+    Bitboard attackers = 0;
+    for (unsigned color=0; color<COUNT; color++) {
+        // A pawn of the other color on the square sees the squares that our pawns attack it from
+        attackers |= PawnAttacks[INVERSE(color)][square] & bb[color][PAWN];
+        attackers |= KnightMoves[square] & bb[color][KNIGHT];
+        attackers |= KingMoves[square] & bb[color][KING];
+    }
+    Bitboard diagonal = Bmagic(square, occupancy);
+    Bitboard straight = Rmagic(square, occupancy);
+    for (unsigned color=0; color<COUNT; color++) {
+        attackers |= diagonal & (bb[color][BISHOP] | bb[color][QUEEN]);
+        attackers |= straight & (bb[color][ROOK] | bb[color][QUEEN]);
+    }
+    return attackers & occupancy;
+}
+
+int ChessEvaluater::see(ChessBoard &board, Move move) {
+    const Square from = MOVE_FROM(move), to = MOVE_TO(move);
+    const Color mover = MOVE_COLOR(move);
+    
+    Bitboard bb[COUNT][PCOUNT];
+    memcpy(bb, board.pieces, sizeof(bb));
+    Bitboard occupancy = board.getOccupancy();
+    
+    // The mover leaves its square. The pawn that an en-passant capture takes leaves its own square, which
+    // can open a line onto the target.
+    bb_clear(bb[mover][MOVE_PIECE(move)], from);
+    bb_clear(occupancy, from);
+    if (MOVE_IS_ENPASSANT(move)) {
+        Square victim = mover == WHITE ? to - 8 : to + 8;
+        bb_clear(bb[INVERSE(mover)][PAWN], victim);
+        bb_clear(occupancy, victim);
+    }
+    
+    // gain[d] is what the side that makes capture d nets if the exchange stops after it
+    int gain[32];
+    int depth = 0;
+    Piece promoted = MOVE_PROMOTION_PIECE(move);
+    gain[0] = PieceValue[MOVE_CAPTURED_PIECE(move)];
+    Piece onSquare = MOVE_PIECE(move);
+    if (promoted > PAWN) {
+        gain[0] += PieceValue[promoted] - PieceValue[PAWN];
+        onSquare = promoted;
+    }
+    
+    Color side = INVERSE(mover);
+    while (depth < 31) {
+        Bitboard attackers = attackersOf(to, occupancy, bb);
+        
+        // The least valuable attacker of the side to capture
+        Piece capturer = PCOUNT;
+        Bitboard capturers = 0;
+        for (unsigned piece=PAWN; piece<PCOUNT; piece++) {
+            capturers = attackers & bb[side][piece];
+            if (capturers) {
+                capturer = Piece(piece);
+                break;
+            }
+        }
+        if (capturer == PCOUNT) {
+            break;
+        }
+        // The king may only capture when nothing of the other side still attacks the square
+        if (capturer == KING) {
+            Bitboard others = 0;
+            for (unsigned piece=PAWN; piece<PCOUNT; piece++) {
+                others |= attackers & bb[INVERSE(side)][piece];
+            }
+            if (others) {
+                break;
+            }
+        }
+        
+        Square origin = lsb(capturers);
+        depth++;
+        gain[depth] = PieceValue[onSquare] - gain[depth-1];
+        
+        // A pawn that gets to the last rank is a queen from then on
+        Rank lastRank = side == WHITE ? 7 : 0;
+        if (capturer == PAWN && RankFrom(to) == lastRank) {
+            gain[depth] += PieceValue[QUEEN] - PieceValue[PAWN];
+            onSquare = QUEEN;
+        } else {
+            onSquare = capturer;
+        }
+        
+        bb_clear(bb[side][capturer], origin);
+        bb_clear(occupancy, origin);
+        side = INVERSE(side);
+    }
+    
+    // Each side stops the exchange when continuing would cost it
+    while (depth > 0) {
+        gain[depth-1] = -std::max(-gain[depth-1], gain[depth]);
+        depth--;
+    }
+    return gain[0];
+}
+
 bool ChessEvaluater::isQuiet(Move move) {
     // A quiet move is a move that is not:
     // - a capture
@@ -141,6 +244,40 @@ bool ChessEvaluater::isDraw(ChessBoard &board, const HistoryPtr &history) {
     return ChessHistory::isThreefoldRepetition(board.getHash(), board.reversiblePlies, history);
 }
 
+bool ChessEvaluater::isFiftyMoveDraw(ChessBoard &board) {
+    if (board.halfMoveClock < 100) {
+        return false;
+    }
+    // Only a side in check can be mated, and the mate is told by one legal move at most
+    if (board.isCheck(board.color)) {
+        auto moves = ChessMoveGenerator::generateMoves(board, board.color, ChessMoveGenerator::Mode::firstMoveOnly);
+        return moves.count > 0;
+    }
+    return true;
+}
+
+bool ChessEvaluater::isDeadPosition(const ChessBoard &board) {
+    int knights = 0;
+    Bitboard bishops = 0;
+    for (unsigned color=0; color<COUNT; color++) {
+        // A pawn, a rook or a queen can always mate in some line
+        if (board.pieces[color][PAWN] || board.pieces[color][ROOK] || board.pieces[color][QUEEN]) {
+            return false;
+        }
+        knights += bb_count(board.pieces[color][KNIGHT]);
+        bishops |= board.pieces[color][BISHOP];
+    }
+    
+    // Only kings and minor pieces are left: one minor piece or none cannot mate
+    if (knights + bb_count(bishops) <= 1) {
+        return true;
+    }
+    
+    // Bishops alone, all on squares of one colour, cannot mate whoever owns them
+    const Bitboard darkSquares = 0x55AA55AA55AA55AAULL;
+    return knights == 0 && ((bishops & darkSquares) == 0 || (bishops & ~darkSquares) == 0);
+}
+
 int ChessEvaluater::evaluate(ChessBoard &board) {
     auto moves = ChessMoveGenerator::generateMoves(board, board.color, ChessMoveGenerator::Mode::firstMoveOnly);
     return evaluate(board, moves);
@@ -156,6 +293,12 @@ int ChessEvaluater::evaluate(ChessBoard &board, const MoveList &moves) {
             // No moves and not check, that's a draw
             return 0;
         }
+    }
+    
+    // A dead position is a draw, and every leaf of the search comes through here to be told so. It depends on the
+    // pieces alone, so the transposition table can keep it.
+    if (isDeadPosition(board)) {
+        return 0;
     }
     
     // Compute the piece balance value

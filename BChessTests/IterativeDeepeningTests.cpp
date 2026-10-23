@@ -188,3 +188,99 @@ TEST_F(IterativeDeepeningTests, NpsWithZeroTime) {
     int64_t nodes = 5000000000LL;
     ASSERT_EQ(5000000000LL, IterativeDeepening::nodesPerSecond(nodes, 1000));
 }
+
+#ifdef BCHESS_TEST_HOOKS
+// A stop in the middle of an aspiration re-search: the search returns, nothing is reported for that depth, the line
+// of the previous depth is kept, and the re-search is not started again. The position fails low at depth 6
+// (-475 to -550) with the pruning that bets off.
+TEST_F(IterativeDeepeningTests, StopDuringAspirationResearch) {
+    ChessBoard board;
+    ASSERT_TRUE(FFEN::setFEN("r3k2r/Pppp1ppp/1b3nbN/nP6/BBP1P3/q4N2/Pp1P2PP/R2Q1RK1 w kq - 0 1", board));
+    IterativeDeepening search;
+    search.minMaxSearch.config.transpositionTable = false;
+    search.minMaxSearch.config.deltaPruning = false;
+    search.minMaxSearch.config.seePruning = false;
+    search.minMaxSearch.config.nullMove = false;
+    search.minMaxSearch.config.lateMoveReductions = false;
+    search.minMaxSearch.config.futilityPruning = false;
+    
+    bool stopped = false;
+    search.minMaxSearch.checkpoint = [&] {
+        if (!stopped && search.aspirationResearches >= 1) {
+            stopped = true;
+            search.stop();
+        }
+    };
+    std::vector<int> depths;
+    search.start();
+    ChessEvaluation result = search.search(board, NEW_HISTORY, 8, [&](ChessEvaluation e) { depths.push_back(e.depth); });
+    search.minMaxSearch.checkpoint = nullptr;
+    
+    ASSERT_TRUE(stopped);
+    ASSERT_EQ(1, search.aspirationResearches.load());
+    ASSERT_FALSE(depths.empty());
+    ASSERT_EQ(5, depths.back());
+    ASSERT_EQ(5, result.depth);
+    ASSERT_GT(result.line.count, 0);
+    
+    // The same when the stop comes in the first attempt of depth 6: nothing is repeated, the line of depth 5 is kept
+    IterativeDeepening first;
+    first.minMaxSearch.config.transpositionTable = false;
+    first.minMaxSearch.config.deltaPruning = false;
+    first.minMaxSearch.config.seePruning = false;
+    first.minMaxSearch.config.nullMove = false;
+    first.minMaxSearch.config.lateMoveReductions = false;
+    first.minMaxSearch.config.futilityPruning = false;
+    bool stoppedFirst = false;
+    first.minMaxSearch.checkpoint = [&] {
+        if (!stoppedFirst && first.minMaxSearch.config.maxDepth == 6) {
+            stoppedFirst = true;
+            first.stop();
+        }
+    };
+    depths.clear();
+    first.start();
+    ChessEvaluation firstResult = first.search(board, NEW_HISTORY, 8, [&](ChessEvaluation e) { depths.push_back(e.depth); });
+    first.minMaxSearch.checkpoint = nullptr;
+    ASSERT_TRUE(stoppedFirst);
+    ASSERT_EQ(0, first.aspirationResearches.load());
+    ASSERT_EQ(5, depths.back());
+    ASSERT_EQ(5, firstResult.depth);
+}
+#endif
+
+// The principal variation, with every default on, is a legal line from the root: each move is among the moves of
+// the position it is played from, and the line is as long as the depth unless it ends in a mate.
+TEST_F(IterativeDeepeningTests, PrincipalVariationReplaysLegally) {
+    const char *fens[] = {
+        "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+        "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1",
+        "8/2p5/3p4/KP5r/1R3p1k/8/4P1P1/8 w - - 0 1",
+        "r3k2r/Pppp1ppp/1b3nbN/nP6/BBP1P3/q4N2/Pp1P2PP/R2Q1RK1 w kq - 0 1",
+        "rnbq1k1r/pp1Pbppp/2p5/8/2B5/8/PPP1NnPP/RNBQK2R w KQ - 1 8",
+        "r4rk1/1pp1qppp/p1np1n2/2b1p1B1/2B1P1b1/P1NP1N2/1PP1QPPP/R4RK1 w - - 0 10",
+        "r1bq1rk1/ppp2ppp/2n2n2/3pp3/1bB1P3/2NP1N2/PPP2PPP/R1BQ1RK1 w - - 0 7",
+        "r1bqkb1r/pppp1ppp/2n2n2/4p3/2B1P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 4 4",
+    };
+    for (const char *fen : fens) {
+        ChessBoard board;
+        ASSERT_TRUE(FFEN::setFEN(fen, board));
+        IterativeDeepening search;
+        search.start();
+        ChessEvaluation result = search.search(board, NEW_HISTORY, 6, [](ChessEvaluation) {});
+        ASSERT_GT(result.line.count, 0) << fen;
+        if (!ChessEvaluater::isMateScore(result.value)) {
+            ASSERT_GE(result.line.count, 6) << fen;
+        }
+        ChessBoard replay = board;
+        for (int i = 0; i < result.line.count; i++) {
+            auto legal = ChessMoveGenerator::generateMoves(replay);
+            bool found = false;
+            for (int m = 0; m < legal.count; m++) {
+                found = found || legal.moves[m] == result.line.moves[i];
+            }
+            ASSERT_TRUE(found) << fen << " move " << i;
+            replay.move(result.line.moves[i]);
+        }
+    }
+}

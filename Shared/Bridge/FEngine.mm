@@ -75,7 +75,7 @@ struct FEngineCore: ChessEngine {
 - (id)init {
     if (self = [super init]) {
         _async = YES;
-        _ttEnabled = NO;
+        _ttEnabled = YES;
         _searchDepth = INT_MAX;
         _thinkingTime = 5;
         _generation = 0;

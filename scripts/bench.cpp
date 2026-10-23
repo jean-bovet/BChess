@@ -1,7 +1,8 @@
 // Developer tool: a fixed-depth search benchmark for Shared/Engine, built and run by scripts/bench.sh.
 // It is not part of the app and not part of the engine, so it may use Apple headers (behind __APPLE__).
 //
-// Environment: DEPTH (default 6), TT=0|1 (transposition-table cut-offs, default 0).
+// Environment: DEPTH (default 6), TT=0|1 (transposition-table cut-offs, default 1, as shipped), DELTA=0|1 (delta pruning in
+// quiescence, default 1), PVS=0|1 (zero-window searches after the first move, default 1).
 //
 // Prints one "pos" line per position (index, nodes, score, best move), then "signature" (a hash over
 // every position's tuple, and the total nodes) and "cost" (retired instructions, cycles, CPU time and
@@ -84,7 +85,11 @@ int main() {
     const char *depthText = getenv("DEPTH");
     const char *ttText = getenv("TT");
     int depth = depthText ? atoi(depthText) : 6;
-    bool tt = ttText && atoi(ttText) != 0;
+    bool tt = !ttText || atoi(ttText) != 0;
+    const char *deltaText = getenv("DELTA");
+    bool delta = !deltaText || atoi(deltaText) != 0;
+    const char *pvsText = getenv("PVS");
+    bool pvs = !pvsText || atoi(pvsText) != 0;
 
     ChessEngine::initialize();
 
@@ -123,6 +128,8 @@ int main() {
 
         ChessEvaluation result;
         Cost before = now();
+        engine.iterativeSearch.minMaxSearch.config.deltaPruning = delta;
+        engine.iterativeSearch.minMaxSearch.config.principalVariationSearch = pvs;
         engine.iterativeSearch.start();
         engine.searchBestMove(board, history, depth, tt, [&result](ChessEvaluation info, bool finished) {
             if (finished) result = info;
@@ -152,7 +159,7 @@ int main() {
 #else
     double maxRSSMB = usage.ru_maxrss / 1024.0; // kilobytes elsewhere
 #endif
-    printf("signature %016llx nodes %lld depth %d tt %d\n", (unsigned long long)signature, (long long)totalNodes, depth, tt ? 1 : 0);
+    printf("signature %016llx nodes %lld depth %d tt %d delta %d pvs %d\n", (unsigned long long)signature, (long long)totalNodes, depth, tt ? 1 : 0, delta ? 1 : 0, pvs ? 1 : 0);
     printf("cost total instructions %llu cycles %llu cpu_ms %.0f max_rss_mb %.1f\n",
            (unsigned long long)total.instructions, (unsigned long long)total.cycles, total.cpuMilli, maxRSSMB);
     return 0;

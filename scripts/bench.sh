@@ -3,13 +3,14 @@
 # A fixed-depth search benchmark for Shared/Engine, built standalone at -O2 -DNDEBUG (plain C++, no Xcode).
 # See planning/ENGINE-3-speed.md. Everything it builds goes to the git-ignored .bench/ folder.
 #
-#   scripts/bench.sh                         # depth 6, TT cut-offs off, 5 runs
-#   DEPTH=5 TT=1 REPEAT=3 scripts/bench.sh
+#   scripts/bench.sh                         # depth 6, TT cut-offs on, 5 runs
+#   DEPTH=5 TT=0 REPEAT=3 scripts/bench.sh
 #   scripts/bench.sh > old.txt; ...; scripts/bench.sh > new.txt; scripts/bench.sh --compare old.txt new.txt
 #   scripts/bench.sh --perft                 # ENGINE-1's perft harness: all six positions must say OK
 #
 # DEPTH   the fixed search depth (default 6)
-# TT      1 turns the transposition-table cut-offs on (default 0, as shipped)
+# TT      0 turns the transposition-table cut-offs off (default 1, as shipped)
+# DELTA   0 turns delta pruning off (default 1, as shipped); PVS 0 turns the zero-window searches off (default 1)
 # REPEAT  runs; the output keeps the lowest figures, and every run must give the same signature (default 5)
 #
 # The per-position lines and the signature (nodes, score, best move) do not depend on load. Retired
@@ -67,7 +68,7 @@ if [[ ${1:-} == --perft ]]; then
 fi
 
 REPEAT=${REPEAT:-5}
-export DEPTH=${DEPTH:-6} TT=${TT:-0}
+export DEPTH=${DEPTH:-6} TT=${TT:-1} DELTA=${DELTA:-1} PVS=${PVS:-1}
 build "$ROOT/scripts/bench.cpp" "$OUT/bench"
 
 first=""
