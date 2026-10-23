@@ -6,17 +6,17 @@
 import Testing
 
 private let human = GamePlayer.human
-private let computer = GamePlayer(name: "", computer: true, level: 0)
+private let computer = GamePlayer.defaultBlack // Club
 
 struct GameTextTests {
 
     @Test func names() {
         #expect(GameText.name(of: human, isWhite: true, opponent: computer) == "You")
         #expect(GameText.name(of: human, isWhite: false, opponent: computer) == "You")
-        #expect(GameText.name(of: computer, isWhite: false, opponent: human) == "Computer")
+        #expect(GameText.name(of: computer, isWhite: false, opponent: human) == "Club Player")
         #expect(GameText.name(of: human, isWhite: true, opponent: human) == "White")
         #expect(GameText.name(of: human, isWhite: false, opponent: human) == "Black")
-        #expect(GameText.name(of: computer, isWhite: true, opponent: computer) == "Computer")
+        #expect(GameText.name(of: computer, isWhite: true, opponent: computer) == "Club Player")
         let ann = GamePlayer(name: "Ann", computer: false, level: 0)
         #expect(GameText.name(of: ann, isWhite: true, opponent: computer) == "Ann")
         let spaces = GamePlayer(name: "   ", computer: false, level: 0)
@@ -26,29 +26,34 @@ struct GameTextTests {
 
     @Test func titles() {
         let ann = GamePlayer(name: "Ann", computer: false, level: 0)
-        #expect(GameText.title(white: human, black: computer) == "You vs Computer")
-        #expect(GameText.title(white: computer, black: human) == "Computer vs You")
+        #expect(GameText.title(white: human, black: computer) == "You vs Club Player")
+        #expect(GameText.title(white: computer, black: human) == "Club Player vs You")
         #expect(GameText.title(white: human, black: human) == "White vs Black")
-        #expect(GameText.title(white: computer, black: computer) == "Computer vs Computer")
-        #expect(GameText.title(white: ann, black: computer) == "Ann vs Computer")
+        #expect(GameText.title(white: computer, black: computer) == "Club Player vs Club Player")
+        #expect(GameText.title(white: ann, black: computer) == "Ann vs Club Player")
     }
 
-    @Test func details() {
-        #expect(GameText.detail(of: human, toMove: true) == "to move")
-        #expect(GameText.detail(of: human, toMove: false) == nil)
-        for (level, seconds) in [(0, 2), (1, 5), (2, 10), (3, 15)] {
-            let player = GamePlayer(name: "", computer: true, level: level)
-            #expect(GameText.detail(of: player, toMove: true) == "\(seconds) s")
-            #expect(GameText.detail(of: player, toMove: false) == "\(seconds) s")
-        }
+    /// Every level: the name, the title, the status and the row detail
+    @Test(arguments: [(0, "Beginner Player", "Beginner"), (1, "Casual Player", "Casual"), (2, "Club Player", "Club"),
+                      (3, "Strong Player", "Strong"), (4, "Full Engine", "5 s"), (5, "Full Engine", "10 s"), (6, "Full Engine", "30 s")])
+    func computerNamesAndDetails(_ level: Int, _ name: String, _ detail: String) {
+        let player = GamePlayer(name: "", computer: true, level: level)
+        #expect(GameText.name(of: player, isWhite: false, opponent: human) == name)
+        #expect(GameText.title(white: human, black: player) == "You vs \(name)")
+        #expect(GameText.title(white: player, black: human) == "\(name) vs You")
+        #expect(status(thinking: true, black: player, whiteToMove: false) == "\(name) is thinking\u{2026}")
+        #expect(GameText.sideDetail(of: player, isWhite: false, opponent: human, toMove: true) == "Black \u{00B7} \(detail)")
+        #expect(GameText.sideDetail(of: player, isWhite: true, opponent: human, toMove: false) == "White \u{00B7} \(detail)")
+        // A given name wins
+        let ann = GamePlayer(name: "Ann", computer: true, level: level)
+        #expect(GameText.name(of: ann, isWhite: false, opponent: human) == "Ann")
     }
 
     @Test func sideDetails() {
         #expect(GameText.sideDetail(of: human, isWhite: true, opponent: computer, toMove: true) == "White \u{00B7} your move")
         #expect(GameText.sideDetail(of: human, isWhite: false, opponent: human, toMove: true) == "Black \u{00B7} to move")
         #expect(GameText.sideDetail(of: human, isWhite: false, opponent: computer, toMove: false) == "Black")
-        #expect(GameText.sideDetail(of: computer, isWhite: false, opponent: human, toMove: true) == "Black \u{00B7} 2 s")
-        #expect(GameText.sideDetail(of: computer, isWhite: true, opponent: human, toMove: false) == "White \u{00B7} 2 s")
+        #expect(GameText.sideDetail(of: computer, isWhite: false, opponent: human, toMove: true) == "Black \u{00B7} Club")
     }
 
     @Test func moveLabels() {
@@ -80,7 +85,7 @@ struct GameTextTests {
     }
 
     @Test func statusWhileThinking() {
-        #expect(status(thinking: true, whiteToMove: false) == "Computer is thinking\u{2026}")
+        #expect(status(thinking: true, whiteToMove: false) == "Club Player is thinking\u{2026}")
         let ann = GamePlayer(name: "Ann", computer: true, level: 1)
         #expect(status(thinking: true, black: ann, whiteToMove: false) == "Ann is thinking\u{2026}")
     }
@@ -93,12 +98,12 @@ struct GameTextTests {
         let ann = GamePlayer(name: "Ann", computer: false, level: 0)
         #expect(status(white: ann, black: computer) == "Ann to move.")
         // A computer's turn that is not being played (after going back)
-        #expect(status(whiteToMove: false) == "Computer to move.")
+        #expect(status(whiteToMove: false) == "Club Player to move.")
     }
 
     @Test func statusWithTheLastMove() {
         #expect(status(last: "8. c3") == "Your move. Last: 8. c3")
-        #expect(status(whiteToMove: false, last: "8\u{2026}O-O") == "Computer to move. Last: 8\u{2026}O-O")
-        #expect(status(thinking: true, whiteToMove: false, last: "8. c3") == "Computer is thinking\u{2026} Last: 8. c3")
+        #expect(status(whiteToMove: false, last: "8\u{2026}O-O") == "Club Player to move. Last: 8\u{2026}O-O")
+        #expect(status(thinking: true, whiteToMove: false, last: "8. c3") == "Club Player is thinking\u{2026} Last: 8. c3")
     }
 }

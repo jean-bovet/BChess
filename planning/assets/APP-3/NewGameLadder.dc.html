@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>New Game: Opponent ladder</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0}
+a{color:#8A4B22}a:hover{color:#5E3215}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; background: #8C8580; font-family: -apple-system, 'SF Pro Text', 'Helvetica Neue', sans-serif; color: #2A211B; display: flex; flex-direction: column; justify-content: flex-end; overflow: hidden">
+  <div style="height: 790px; box-sizing: border-box; background: #F4F1EC; border-radius: 14px 14px 0 0; display: flex; flex-direction: column; padding: 8px 16px 28px; gap: 12px">
+    <div style="align-self: center; width: 36px; height: 5px; border-radius: 3px; background: #CFC3B4"></div>
+    <div style="display: flex; align-items: center; justify-content: space-between">
+      <button style="height: 44px; border: 0; background: transparent; color: #8A4B22; font-size: 17px; padding: 0">Cancel</button>
+      <span style="font-family: 'New York', 'Iowan Old Style', 'Palatino', serif; font-size: 18px; font-weight: 600">New Game</span>
+      <span style="width: 56px"></span>
+    </div>
+
+    <span style="font-size: 13px; font-weight: 600; color: #6E6056; letter-spacing: 0.3px">OPPONENT</span>
+    <div style="display: flex; flex-direction: column; gap: 6px">
+      <sc-for list="{{rungs}}" as="r" hint-placeholder-count="6">
+        <button aria-pressed="{{r.pressed}}" onClick="{{r.pick}}" style="display: flex; align-items: center; gap: 12px; padding: 8px 12px; border-radius: 12px; border: {{r.border}}; background: {{r.bg}}; text-align: left; color: #2A211B">
+          <span style="width: 40px; height: 40px; border-radius: 10px; background: {{r.tile}}; display: flex; align-items: center; justify-content: center; flex-shrink: 0">
+            <img src="{{r.img}}" alt="" style="width: 30px; height: 30px">
+          </span>
+          <span style="display: flex; flex-direction: column; gap: 1px; flex-grow: 1; min-width: 0">
+            <span style="display: flex; align-items: baseline; justify-content: space-between; gap: 8px">
+              <span style="font-family: 'New York', 'Iowan Old Style', 'Palatino', serif; font-size: 16px; font-weight: 600">{{r.name}}</span>
+              <span style="font-size: 12px; color: #6E6056; font-variant-numeric: tabular-nums">{{r.elo}}</span>
+            </span>
+            <span style="font-size: 12px; color: #6E6056">{{r.blurb}}</span>
+          </span>
+        </button>
+      </sc-for>
+    </div>
+
+    <section aria-label="Players" style="display: flex; flex-direction: column; gap: 10px; padding: 12px; background: #FFFFFF; border: 1px solid #E4DCD1; border-radius: 14px">
+      <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px">
+        <span style="font-size: 14px; font-weight: 600">{{colorLabel}}</span>
+        <div role="radiogroup" aria-label="Color" style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); padding: 3px; border-radius: 10px; background: #EFE9E1; width: 222px">
+          <sc-for list="{{colors}}" as="c" hint-placeholder-count="3">
+            <button aria-pressed="{{c.pressed}}" onClick="{{c.pick}}" style="height: 32px; border: 0; border-radius: 8px; background: {{c.bg}}; box-shadow: {{c.shadow}}; font-size: 13px; font-weight: {{c.weight}}; color: #2A211B">{{c.label}}</button>
+          </sc-for>
+        </div>
+      </div>
+      <div style="display: flex; gap: 8px">
+        <label style="flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; gap: 3px; font-size: 12px; color: #6E6056">{{firstLabel}}
+          <input value="{{you}}" onChange="{{setYou}}" placeholder="Name" style="height: 38px; border: 1px solid #E4DCD1; border-radius: 10px; padding: 0 10px; font-size: 16px; color: #2A211B; background: #FAF7F2; min-width: 0">
+        </label>
+        <sc-if value="{{vsFriend}}" hint-placeholder-val="{{ false }}">
+          <label style="flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; gap: 3px; font-size: 12px; color: #6E6056">{{secondLabel}}
+            <input value="{{friend}}" onChange="{{setFriend}}" placeholder="Name" style="height: 38px; border: 1px solid #E4DCD1; border-radius: 10px; padding: 0 10px; font-size: 16px; color: #2A211B; background: #FAF7F2; min-width: 0">
+          </label>
+        </sc-if>
+      </div>
+      <sc-if value="{{isMaximum}}" hint-placeholder-val="{{ false }}">
+        <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px">
+          <span style="font-size: 14px; font-weight: 600">Thinking time</span>
+          <div role="radiogroup" aria-label="Thinking time" style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); padding: 3px; border-radius: 10px; background: #EFE9E1; width: 222px">
+            <sc-for list="{{paces}}" as="p" hint-placeholder-count="3">
+              <button aria-pressed="{{p.pressed}}" onClick="{{p.pick}}" style="height: 32px; border: 0; border-radius: 8px; background: {{p.bg}}; box-shadow: {{p.shadow}}; font-size: 13px; font-weight: {{p.weight}}; color: #2A211B">{{p.label}}</button>
+            </sc-for>
+          </div>
+        </div>
+      </sc-if>
+    </section>
+
+    <div style="flex-grow: 1"></div>
+    <button style="height: 52px; border: 0; border-radius: 14px; background: #4A3222; color: #F4E6CF; font-size: 17px; font-weight: 600">{{playLabel}}</button>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) { super(props); this.state = { selected: 3, color: 'white', you: 'Jean', friend: '', pace: 1 }; }
+  renderVals() {
+    const s = this.state;
+    const R = [
+      ['A friend', 'Pass and play on this device', '', '/_blob/40c7a18597b66234d0357d0f148c11c2'],
+      ['Beginner', 'Leaves pieces hanging, misses mates', 'about 600', '/_blob/fbd1185e69a8fd531fd6f55fc3248515'],
+      ['Casual', 'Sensible, but blunders under pressure', 'about 1000', '/_blob/3fb4e2a85a0d9a274bcec0c809c4db8d'],
+      ['Club', 'Solid, with the occasional mistake', 'about 1400', '/_blob/9aa6dd1591bbdaa8b9e1787db1db01bd'],
+      ['Strong', 'Rarely blunders; needs a real plan', 'about 1700', '/_blob/2c06870ffd470a04373fa4c1e1e29160'],
+      ['Maximum', 'The full engine, no handicap', 'about 1950', '/_blob/015d6c9ce5ce3e8b51d77b4c9c9c7010']
+    ];
+    const rungs = R.map(([name, blurb, elo, img], i) => ({
+      name, blurb, elo, img, pressed: String(i === s.selected), pick: () => this.setState({ selected: i }),
+      border: i === s.selected ? '2px solid #8A4B22' : '1px solid #E4DCD1',
+      bg: i === s.selected ? '#FFFBF3' : '#FFFFFF',
+      tile: i === 0 ? '#EFE9E1' : '#F2DFB8'
+    }));
+    const colors = [['white', 'White'], ['random', 'Random'], ['black', 'Black']].map(([id, label]) => ({
+      label, pressed: String(s.color === id), pick: () => this.setState({ color: id }),
+      bg: s.color === id ? '#FFFFFF' : 'transparent', shadow: s.color === id ? '0 1px 3px rgba(42,33,27,0.15)' : 'none', weight: s.color === id ? 600 : 400
+    }));
+    const PACES = ['5 s', '10 s', '30 s'];
+    const paces = PACES.map((label, i) => ({
+      label, pressed: String(i === s.pace), pick: () => this.setState({ pace: i }),
+      bg: i === s.pace ? '#FFFFFF' : 'transparent', shadow: i === s.pace ? '0 1px 3px rgba(42,33,27,0.15)' : 'none', weight: i === s.pace ? 600 : 400
+    }));
+    const vsFriend = s.selected === 0;
+    const side = { white: 'White', black: 'Black', random: 'Random color' }[s.color];
+    const other = { white: 'Black', black: 'White', random: 'Random color' }[s.color];
+    const name = R[s.selected][0];
+    return {
+      rungs, colors, paces, vsFriend, isMaximum: s.selected === 5, you: s.you, friend: s.friend,
+      setYou: (e) => this.setState({ you: e.target.value }),
+      setFriend: (e) => this.setState({ friend: e.target.value }),
+      colorLabel: vsFriend ? 'First player plays' : 'You play',
+      firstLabel: vsFriend ? side : 'Your name',
+      secondLabel: other,
+      playLabel: vsFriend ? 'Start Game' : (s.selected === 5 ? 'Play the Full Engine' : 'Play the ' + name + ' Player')
+    };
+  }
+}
+</script>
+</body>
+</html>

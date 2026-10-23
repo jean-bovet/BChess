@@ -25,6 +25,7 @@ struct DocumentWindow: View {
     let isNew: Bool
     @State private var box: SessionBox
     @State private var showPlayers = false
+    @State private var sheetMode = NewGameSheet.Mode.new
     @State private var offeredPlayers = false
     @AppStorage("showEngine") private var showEngine = false
 
@@ -56,14 +57,28 @@ struct DocumentWindow: View {
                 }
             }
             .sheet(isPresented: $showPlayers) {
-                NewGameView(session: session)
+                let isNew = sheetMode == .new
+                NewGameSheet(choice: isNew ? NewGame(remembered: .standard) : NewGame(white: session.gameState.white, black: session.gameState.black),
+                             mode: sheetMode) { choice in
+                    let players = choice.players(firstPlaysWhite: isNew ? Bool.random() : true)
+                    // The edit keeps the board's side
+                    session.setPlayers(white: players.white, black: players.black, rotated: isNew ? players.rotated : nil)
+                    session.requestEngineMoveIfNeeded()
+                }
             }
             // The Game menu acts on the focused window, and is off while the sheet takes the keys
             .focusedSceneValue(\.gameSession, showPlayers ? nil : session)
-            .focusedSceneValue(\.showPlayers, $showPlayers)
+            // The Game menu's "Players…" edits the players of the game; the offer for a new document starts one
+            .focusedSceneValue(\.showPlayers, Binding(get: { showPlayers }, set: { value in
+                if value {
+                    sheetMode = .edit
+                }
+                showPlayers = value
+            }))
             .onAppear {
                 if isNew && !offeredPlayers && document.state == .newGame {
                     offeredPlayers = true
+                    sheetMode = .new
                     showPlayers = true
                 }
             }

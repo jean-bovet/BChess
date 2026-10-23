@@ -87,6 +87,35 @@ struct UCIProcessTests {
         return engine.move(uci: move)
     }
 
+    @Test func strengthOptionIsAnnounced() throws {
+        let uci = try UCIProcess()
+        defer { uci.terminate() }
+
+        uci.send("uci")
+        #expect(uci.waitForLine { $0 == "uciok" } != nil)
+        let lines = uci.allLines
+        let option = try #require(lines.firstIndex { $0.hasPrefix("option name Strength type combo default Maximum") })
+        #expect(lines[option].hasSuffix("var Beginner var Casual var Club var Strong var Maximum"))
+        #expect(option < (try #require(lines.firstIndex(of: "uciok"))))
+    }
+
+    /// At a handicapped level a position with no move answers the null move, and a legal move otherwise
+    @Test func handicappedMateAnswersNullMove() throws {
+        let uci = try UCIProcess()
+        defer { uci.terminate() }
+
+        uci.send("setoption name Strength value Beginner")
+        uci.send("position fen 7k/6Q1/6K1/8/8/8/8/8 b - - 0 1")
+        uci.send("go depth 3")
+        #expect(uci.waitForLine { $0 == "bestmove 0000" } != nil)
+
+        let mark = uci.lineCount
+        uci.send("position fen \(Self.first)")
+        uci.send("go depth 3")
+        let best = try #require(uci.waitForLine(after: mark) { $0.hasPrefix("bestmove") })
+        #expect(isLegalMove(String(best.dropFirst("bestmove ".count)), in: Self.first))
+    }
+
     @Test func goInfiniteThenStopPrintsBestMove() throws {
         let uci = try UCIProcess()
         defer { uci.terminate() }
@@ -243,7 +272,7 @@ struct UCIProcessTests {
         uci.send("stop")
         let best = try #require(uci.waitForLine(after: mark) { $0.hasPrefix("bestmove") })
 
-        let pattern = /^(id |uciok$|readyok$|info |bestmove )/
+        let pattern = /^(id |option name |uciok$|readyok$|info |bestmove )/
         for line in uci.allLines {
             #expect(line.firstMatch(of: pattern) != nil, "\(line)")
         }

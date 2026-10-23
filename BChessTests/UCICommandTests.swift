@@ -73,4 +73,24 @@ struct UCICommandTests {
             #expect(run(command, on: uci) == middlegame, "\(command)")
         }
     }
+
+    @Test func setoptionSetsTheStrength() {
+        let uci = UCI()
+        #expect(uci.engine.strength == .maximum)
+        run("setoption name Strength value Club", on: uci)
+        #expect(uci.engine.strength == .club)
+        run("setoption name strength value BEGINNER", on: uci)
+        #expect(uci.engine.strength == .beginner)
+        run("setoption name Strength value Maximum", on: uci)
+        #expect(uci.engine.strength == .maximum)
+    }
+
+    @Test func unknownStrengthIsIgnored() {
+        let uci = UCI()
+        run("setoption name Strength value Strong", on: uci)
+        for command in ["setoption name Strength value Grandmaster", "setoption name Strength", "setoption name Strength value", "setoption name Level value Club", "setoption"] {
+            run(command, on: uci)
+            #expect(uci.engine.strength == .strong, "\(command)")
+        }
+    }
 }

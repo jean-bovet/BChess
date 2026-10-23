@@ -278,4 +278,102 @@ struct FEngineConcurrencyTests {
         #expect(unwound.wait(seconds: 0.5))
         #expect(!engine.isAnalyzing())
     }
+
+    /// A handicapped level (Strong, so that the children have moves to check) is cancelled inside its root loop
+    @Test func cancelStopsAHandicappedSearch() {
+        let engine = makeEngine()
+        engine.strength = .strong
+        defer {
+            engine.cancel()
+            engine.drainSearchQueue()
+            engine.setSearchCheckpoint(nil)
+        }
+
+        let parked = DispatchSemaphore(value: 0)
+        let release = DispatchSemaphore(value: 0)
+        let first = Locked(true)
+        engine.setSearchCheckpoint {
+            if first.update({ let was = $0; $0 = false; return was }) {
+                parked.signal()
+                release.wait()
+            }
+        }
+        let calls = Locked(0)
+        engine.evaluate { _, _ in calls.update { $0 += 1 } }
+        #expect(parked.wait(seconds: 10))
+
+        engine.cancel()
+        release.signal()
+        engine.drainSearchQueue()
+        #expect(calls.value == 0)
+    }
+
+    /// A stop during the root loop does not cut it short either: every root move is still scored, so the totals
+    /// are those of an undisturbed search (Strong has no blindness and no randomness in its totals).
+    @Test func stopDuringTheRootLoopStillScoresEveryMove() {
+        func search(stopping: Bool) -> FEngineInfo? {
+            let engine = makeEngine()
+            engine.strength = .strong
+            defer {
+                engine.cancel()
+                engine.drainSearchQueue()
+                engine.setSearchCheckpoint(nil)
+            }
+            let parked = DispatchSemaphore(value: 0)
+            let release = DispatchSemaphore(value: 0)
+            if stopping {
+                let first = Locked(true)
+                engine.setSearchCheckpoint {
+                    if first.update({ let was = $0; $0 = false; return was }) {
+                        parked.signal()
+                        release.wait()
+                    }
+                }
+            }
+            let result = Locked<FEngineInfo?>(nil)
+            let delivered = DispatchSemaphore(value: 0)
+            engine.evaluate { info, completed in
+                if completed {
+                    result.value = info
+                    delivered.signal()
+                }
+            }
+            if stopping {
+                #expect(parked.wait(seconds: 10))
+                engine.stop()
+                release.signal()
+            }
+            #expect(delivered.wait(seconds: 30))
+            return result.value
+        }
+
+        let undisturbed = search(stopping: false)
+        let stopped = search(stopping: true)
+        #expect(stopped?.hasBestMove == true)
+        #expect((undisturbed?.nodeEvaluated ?? 0) > 1000)
+        #expect(stopped?.nodeEvaluated == undisturbed?.nodeEvaluated)
+    }
+
+    /// stop() does not cut a handicapped search short: the result is a real move, as for a stop at depth 1
+    @Test func stopFinishesAHandicappedSearch() {
+        let engine = makeEngine()
+        engine.strength = .casual
+        defer { engine.cancel() }
+
+        let gate = DispatchSemaphore(value: 0)
+        engine.perform(onSearchQueue: { gate.wait() })
+        let result = Locked<FEngineInfo?>(nil)
+        let delivered = DispatchSemaphore(value: 0)
+        engine.evaluate { info, completed in
+            if completed {
+                result.value = info
+                delivered.signal()
+            }
+        }
+        engine.stop()
+        gate.signal()
+
+        #expect(delivered.wait(seconds: 5))
+        #expect(result.value?.hasBestMove == true)
+    }
 }

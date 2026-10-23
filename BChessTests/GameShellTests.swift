@@ -171,4 +171,17 @@ struct GameShellTests {
         let date = try FileManager.default.attributesOfItem(atPath: b.url.path)[.modificationDate] as? Date
         #expect(date == old)
     }
+
+    @Test func createGameKeepsTheOrientation() throws {
+        let fixture = try LibraryFixture()
+        defer { fixture.cleanUp() }
+        let (shell, library) = try makeShell(fixture, games: [("a.pgn", "*")])
+
+        #expect(try shell.createGame(white: .human, black: .computer(.club), rotated: true))
+        #expect(shell.session.gameState.rotated)
+        #expect(try library.open(shell.current).rotated)
+
+        #expect(try shell.createGame(white: .human, black: .computer(.club)))
+        #expect(!shell.session.gameState.rotated)
+    }
 }

@@ -17,6 +17,7 @@
 
 #include "MinMaxSearch.hpp"
 #include "IterativeDeepening.hpp"
+#include "Handicap.hpp"
 
 #include "ChessGame.hpp"
 #include "ChessOpenings.hpp"
@@ -26,6 +27,7 @@
 #include "ChessEvaluater.hpp"
 #include "ChessEvaluation.hpp"
 #include <functional>
+#include <random>
 #include <vector>
 
 typedef MinMaxSearch ChessMinMaxSearch;
@@ -42,6 +44,15 @@ public:
     }
     
     IterativeDeepening iterativeSearch;
+    
+    // Chooses among the root moves of a handicapped level. Used on the search queue only: searches on one engine
+    // never overlap.
+    std::mt19937_64 random{std::random_device{}()};
+    
+    // Only the tests seed it
+    void seedRandom(uint64_t seed) {
+        random.seed(seed);
+    }
     
     typedef std::function<void(ChessEvaluation, bool)> SearchCallback;
     
@@ -197,8 +208,17 @@ public:
 
     // Searches the given position, not game(): the caller passes a snapshot, because the history is
     // modified during the search. Call iterativeSearch.start() first.
-    void searchBestMove(ChessBoard board, HistoryPtr history, int maxDepth, bool transpositionTable, SearchCallback callback) {
+    // Below Strength::maximum the position is searched by the handicapped level, which ignores maxDepth and the
+    // timer, and the callback is called once, with done.
+    void searchBestMove(ChessBoard board, HistoryPtr history, int maxDepth, bool transpositionTable, Strength strength, SearchCallback callback) {
         iterativeSearch.minMaxSearch.config.transpositionTable = transpositionTable;
+        if (strength != Strength::maximum) {
+            ChessEvaluation info = HandicappedSearch::search(iterativeSearch, board, history, Handicap::of(strength), random);
+            if (!iterativeSearch.cancelled()) {
+                callback(info, true);
+            }
+            return;
+        }
         ChessEvaluation info = iterativeSearch.search(board, history, maxDepth, [&](ChessEvaluation info) {
             if (!iterativeSearch.cancelled()) {
                 callback(info, false);

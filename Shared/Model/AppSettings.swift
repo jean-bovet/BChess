@@ -41,6 +41,14 @@ enum AppSettings {
     static let highlightLastMoveKey = "highlightLastMove"
     static let themeKey = "appTheme"
 
+    /// The last choice of the New Game sheet (`NewGame.remember(in:)`).
+    static let newGameOpponentKey = "newGame.opponent"
+    static let newGameSideKey = "newGame.side"
+    static let newGameNameKey = "newGame.name"
+    static let newGameSecondNameKey = "newGame.secondName"
+    static let newGameThinkingTimeKey = "newGame.thinkingTime"
+    static let newGameKeys = [newGameOpponentKey, newGameSideKey, newGameNameKey, newGameSecondNameKey, newGameThinkingTimeKey]
+
     static let showCoordinatesDefault = true
     static let showLegalMovesDefault = true
     static let highlightLastMoveDefault = true

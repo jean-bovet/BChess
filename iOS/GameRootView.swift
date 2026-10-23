@@ -25,7 +25,7 @@ struct PGNExport: Transferable {
 /// A switch of game that waits for the user to decide about unsaved changes.
 enum PendingSwitch: Identifiable {
     case open(GameFile)
-    case create(GamePlayer, GamePlayer)
+    case create(GamePlayer, GamePlayer, rotated: Bool)
     case importFile(URL)
 
     var id: String {
@@ -135,9 +135,19 @@ private struct GameView: View {
             }
         }
         .sheet(item: $playersSheet) { sheet in
-            NewGameView_iOS(session: shell.session, editMode: sheet == .players, onNewGame: { white, black in
-                attempt(.create(white, black))
-            })
+            switch sheet {
+            case .newGame:
+                NewGameSheet(choice: NewGame(remembered: .standard), mode: .new) { choice in
+                    let players = choice.players(firstPlaysWhite: Bool.random())
+                    attempt(.create(players.white, players.black, rotated: players.rotated))
+                }
+            case .players:
+                NewGameSheet(choice: NewGame(white: shell.session.gameState.white, black: shell.session.gameState.black), mode: .edit) { choice in
+                    let players = choice.players(firstPlaysWhite: true)
+                    shell.session.setPlayers(white: players.white, black: players.black)
+                    shell.session.requestEngineMoveIfNeeded()
+                }
+            }
         }
         .sheet(isPresented: $showSettings) {
             NavigationStack {
@@ -188,7 +198,7 @@ private struct GameView: View {
     private var moreMenu: some View {
         Menu {
             Button("New Game", systemImage: "plus.circle") { playersSheet = .newGame }
-            Button("Players & Level", systemImage: "person.2") { playersSheet = .players }
+            Button("Players", systemImage: "person.2") { playersSheet = .players }
             Button("Flip Board", systemImage: "arrow.triangle.2.circlepath.circle") { shell.session.rotate() }
             ShareLink(item: PGNExport(text: shell.session.gameState.pgn, name: shell.current.title),
                       preview: SharePreview(shell.current.title)) {
@@ -222,8 +232,8 @@ private struct GameView: View {
             switch action {
             case .open(let file):
                 return try shell.open(file, discardingUnsavedChanges: discarding)
-            case .create(let white, let black):
-                return try shell.createGame(white: white, black: black, discardingUnsavedChanges: discarding)
+            case .create(let white, let black, let rotated):
+                return try shell.createGame(white: white, black: black, rotated: rotated, discardingUnsavedChanges: discarding)
             case .importFile(let url):
                 return try shell.importFile(at: url, discardingUnsavedChanges: discarding)
             }

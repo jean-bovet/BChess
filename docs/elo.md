@@ -26,6 +26,35 @@ reference; read it with the caveats below.
 - **One level per run.** The result is the Elo difference to that level, with fastchess's 95 %
   interval. There is no combined multi-level estimate.
 
+## The strength levels (APP-3)
+
+The New Game sheet offers five computer levels, each a handicapped version of the engine
+(`Shared/Engine/Algorithm/Handicap.hpp`: a depth cap, randomness among the scored root moves, and tactical
+blindness). Maximum is the full engine and keeps the figure of the table below (ENGINE-3 search step 13:
+2364 +/- 36 at 10+0.1). The other four were measured on 2026-10-23 (APP-3 step 7, commit of the table
+`c6deb0b`, Club and Strong at `2c452bb` with the same rows, `scripts/elo-match.sh`, TC 40+0.4, `TIMEMARGIN=200`, concurrency 8, 300 games each, openings
+`8moves_v3`, no forfeit, illegal move or malformed game in any run):
+
+| Level | Measured (95 %) | Label | Target | Handicap {depth, temperature, blindness} | Measured against |
+|---|---|---|---|---|---|
+| Beginner | 538 +/- 98 | about 550 | 600 | {1, 10, 0.1} | BChess Casual: 22/12/266, -395 +/- 66 |
+| Casual | 933 +/- 72 | about 950 | 1000 | {2, 25, 0.2} | BChess Club: 17/21/262, -398 +/- 60 |
+| Club | 1331 +/- 39 | about 1350 | 1400 | {3, 25, 0.0} | Stockfish UCI_Elo 1350: 139/6/155 |
+| Strong | 1624 +/- 40 | about 1600 | 1700 | {5, 8, 0.0} | Stockfish UCI_Elo 1700: 109/17/174 |
+| Maximum | 2364 +/- 36 | about 2350 | 1950 | the full search | Stockfish, 10+0.1 (ENGINE-3 search step 13) |
+
+- **The chain.** Club and Strong are Stockfish performances. Each had a probe first: Club 40 games at 1400 (40+0.4,
+  1347 +/- 88), Strong 20 games at 1700 (60+1, 1665 +/- 164, which also timed its moves). Casual is Club plus the self-play difference, Beginner is Casual plus its difference, and each
+  step adds its error in quadrature (the figures above include it). Stockfish cannot play below 1320, so the two lowest levels
+  carry the wider error and are only as good as Club's figure. A level's number is only meaningful on this scale at this time control.
+- **The clock.** The handicapped levels ignore the clock, but their search cannot be cut. A 20-game timing probe of Strong (60+1,
+  eight games at once) gave a longest move of 0.34 s (mean 0.05 s), so 40+0.4 leaves 80 such moves a large margin.
+- **Tuning.** The first table (Beginner {1, 150, 0.5}, Casual {2, 60, 0.2}) scored 0 % and 2 % in 300 games against Casual and
+  Club, about 650 and 400 Elo below their targets. Beginner and Casual were tuned (temperature first; Beginner's blindness
+  had to fall from 0.5 to 0.1, since at depth 1 blindness dominates) on exploration runs, then measured on the committed table.
+  Club and Strong are within 100 of their targets and were not touched.
+- **Maximum is far above Strong:** 740 Elo from Strong to Maximum. A level between them would be Jean's decision.
+
 ## How to run
 
 ```
@@ -47,8 +76,10 @@ The script builds, plays, and prints a Markdown row for the table below. It refu
 - **a side lost a game on time:** a `time forfeit` termination by either engine makes the run
   invalid (exit 2). A forfeit by the opponent would otherwise inflate BChess's score. ENGINE-2's
   runs had none, so the results recorded below stand.
-- **the score is out of range:** below 10 % or above 90 %, or fastchess gives no finite interval. It
-  prints the level to try next (300 further, at least 1320) and exits with status 3.
+- **a Stockfish run's score is out of range:** below 10 % or above 90 %, or fastchess gives no finite
+  interval. It prints the level to try next (300 further, at least 1320) and exits with status 3. A self-play run
+  (`STRENGTH` with `OPPONENT_STRENGTH`) has no such limit: it reports the difference and interval as fastchess gives
+  them, which at a score of 0 or 100 % is an infinite difference and an undefined interval (`--self-test` covers both).
 
 **How long it takes** on an M2 with a concurrency of 4: a 10+0.1 game lasts at most
 2 × (10 + 0.1 × moves) s, about 25 s of wall time with adjudication, so 300 games take about
@@ -131,6 +162,10 @@ score point is about 695 Elo at 50 %):
 | 2026-10-06 | e0c7f01 | 10+0.1, margin 200 | 8moves_v3 (124222418) | 2000 | 300 | 116/21/163 | **1945 ± 39** | 35 min |
 | 2026-10-23 | dc5473c | 10+0.1, margin 200 | 8moves_v3 (not recorded) | 2200 | 40 | — | 2337 ± 100 | — |
 | 2026-10-23 | dc5473c | 10+0.1 | 8moves_v3 (1011167814) | 2350 | 300 | 138/36/126 | **2364 ± 36** | 20 min |
+| 2026-10-23 | 2c452bb Strong | 60+1, 20 games (timing probe) | 8moves_v3 (694249943) | 1700 | 20 | 9/0/11 | 1665 ± 164 | 5 min |
+| 2026-10-23 | 2c452bb Club | 40+0.4, margin 200 | 8moves_v3 (546126066) | 1400 | 40 | 16/2/22 | 1347 ± 88 | 6 min |
+| 2026-10-23 | 2c452bb Strong | 40+0.4, margin 200 | 8moves_v3 (699535022) | 1700 | 300 | 109/17/174 | **1624 ± 40** | 38 min |
+| 2026-10-23 | 2c452bb Club | 40+0.4, margin 200 | 8moves_v3 (214789468) | 1350 | 300 | 139/6/155 | **1331 ± 39** | 37 min |
 
 The first row is the probe that picked the level for the second. The second is the measurement:
 `LEVEL=1800 GAMES=300 scripts/elo-match.sh` (10+0.1, concurrency 4, Apple M2, Stockfish 19,

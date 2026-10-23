@@ -131,7 +131,7 @@ int main() {
         engine.iterativeSearch.minMaxSearch.config.deltaPruning = delta;
         engine.iterativeSearch.minMaxSearch.config.principalVariationSearch = pvs;
         engine.iterativeSearch.start();
-        engine.searchBestMove(board, history, depth, tt, [&result](ChessEvaluation info, bool finished) {
+        engine.searchBestMove(board, history, depth, tt, Strength::maximum, [&result](ChessEvaluation info, bool finished) {
             if (finished) result = info;
         });
         Cost after = now();

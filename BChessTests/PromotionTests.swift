@@ -104,7 +104,7 @@ struct PromotionTests {
             ("paste", { _ = $0.paste("4k3/8/8/8/8/8/4P3/4K3 w - - 0 1") }),
             ("analyze", { $0.toggleAnalyze() }),
             ("train", { $0.toggleTrain() }),
-            ("players", { $0.setPlayers(white: .human, black: GamePlayer(name: "", computer: true, level: 0)) }),
+            ("players", { $0.setPlayers(white: .human, black: GamePlayer(name: "", computer: true, level: 4)) }),
         ]
         for (name, change) in changes {
             let session = session(fen: start, moves: moves)

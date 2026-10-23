@@ -15,7 +15,29 @@ extension UTType {
     static let pgn = UTType(importedAs: "com.apple.chess.pgn")
 }
 
+extension EngineStrength {
+    /// The level's name on the ladder and in a row's detail: "Club".
+    var displayName: String {
+        switch self {
+        case .beginner: "Beginner"
+        case .casual: "Casual"
+        case .club: "Club"
+        case .strong: "Strong"
+        case .maximum: "Maximum"
+        }
+    }
+
+    /// The computer's name on the game screen and in the New Game button: "Club Player", "Full Engine".
+    var computerName: String {
+        self == .maximum ? "Full Engine" : "\(displayName) Player"
+    }
+}
+
 /// The model of a player.
+///
+/// `level` is the file format of a computer's strength, and only its meaning changed (APP-3): 0 Beginner,
+/// 1 Casual, 2 Club, 3 Strong, 4, 5 and 6 Maximum thinking 5, 10 and 30 seconds, anything else Club. The old
+/// meaning (2, 5, 10 and 15 seconds) is gone.
 struct GamePlayer: Codable, Equatable, Sendable {
     var name: String
     var computer: Bool
@@ -23,7 +45,42 @@ struct GamePlayer: Codable, Equatable, Sendable {
 
     static let human = GamePlayer(name: "", computer: false, level: 0)
     static let defaultWhite = human
-    static let defaultBlack = GamePlayer(name: "", computer: true, level: 0)
+    static let defaultBlack = GamePlayer.computer(.club)
+
+    /// How strongly this player plays when it is a computer.
+    var strength: EngineStrength {
+        switch level {
+        case 0: return .beginner
+        case 1: return .casual
+        case 2: return .club
+        case 3: return .strong
+        case 4, 5, 6: return .maximum
+        default: return .club
+        }
+    }
+
+    /// The seconds the engine thinks: 5, 10 or 30 at Maximum, and 0 below it, where the strength is a depth.
+    var thinkingTime: TimeInterval {
+        switch level {
+        case 4: return 5
+        case 5: return 10
+        case 6: return 30
+        default: return 0
+        }
+    }
+
+    /// The only writer of the new levels. The thinking time counts at Maximum only and is rounded to 5, 10 or 30.
+    static func computer(_ strength: EngineStrength, thinkingTime: TimeInterval = 10) -> GamePlayer {
+        let level: Int
+        switch strength {
+        case .beginner: level = 0
+        case .casual: level = 1
+        case .club: level = 2
+        case .strong: level = 3
+        case .maximum: level = thinkingTime <= 5 ? 4 : (thinkingTime <= 10 ? 5 : 6)
+        }
+        return GamePlayer(name: "", computer: true, level: level)
+    }
 }
 
 /// The state of the game that is saved to the file. The coding keys are the file format: older BChess
