@@ -3,22 +3,60 @@
 //  BChess (iOS)
 //
 //  The iOS shell: the app opens straight onto a game of the library, saves it as it changes, and
-//  lists, imports, shares and deletes games.
+//  lists, imports, exports and deletes games.
 //
 
 import SwiftUI
 import UniformTypeIdentifiers
 
-/// A game as standard PGN, for the share sheet.
-struct PGNExport: Transferable {
-    let text: String
-    let name: String
+/// A game in one format, for the share sheet. The bytes are read when the user picks a destination,
+/// not while a menu renders.
+struct GameExport: Transferable {
+    let shell: GameShell
+    let file: GameFile
+    let format: ExportFormat
 
     static var transferRepresentation: some TransferRepresentation {
         DataRepresentation(exportedContentType: .pgn) { export in
-            Data(export.text.utf8)
+            try await MainActor.run { try export.shell.exportData(of: export.file, as: export.format) }
         }
-        .suggestedFileName { $0.name + ".pgn" }
+        .exportingCondition { $0.format == .pgn }
+        .suggestedFileName { $0.file.title + "." + $0.format.fileExtension }
+
+        DataRepresentation(exportedContentType: .bchessGame) { export in
+            try await MainActor.run { try export.shell.exportData(of: export.file, as: export.format) }
+        }
+        .exportingCondition { $0.format == .bchess }
+        .suggestedFileName { $0.file.title + "." + $0.format.fileExtension }
+    }
+}
+
+/// "Export" with a choice of format, for the open game (More menu) and for a row of the games list.
+struct ExportMenu: View {
+    let shell: GameShell
+    let file: GameFile
+
+    var body: some View {
+        Menu {
+            ShareLink(item: GameExport(shell: shell, file: file, format: .pgn), preview: SharePreview(file.title)) {
+                Label {
+                    Text("PGN")
+                    Text("For other chess apps")
+                } icon: {
+                    Image(systemName: "doc.text")
+                }
+            }
+            ShareLink(item: GameExport(shell: shell, file: file, format: .bchess), preview: SharePreview(file.title)) {
+                Label {
+                    Text("BChess")
+                    Text("Keeps the players and the board side")
+                } icon: {
+                    Image(systemName: "crown")
+                }
+            }
+        } label: {
+            Label("Export", systemImage: "square.and.arrow.up")
+        }
     }
 }
 
@@ -200,10 +238,7 @@ private struct GameView: View {
             Button("New Game", systemImage: "plus.circle") { playersSheet = .newGame }
             Button("Players", systemImage: "person.2") { playersSheet = .players }
             Button("Flip Board", systemImage: "arrow.triangle.2.circlepath.circle") { shell.session.rotate() }
-            ShareLink(item: PGNExport(text: shell.session.gameState.pgn, name: shell.current.title),
-                      preview: SharePreview(shell.current.title)) {
-                Label("Share Game", systemImage: "square.and.arrow.up")
-            }
+            ExportMenu(shell: shell, file: shell.current)
             Button("Settings", systemImage: "gearshape") { showSettings = true }
             Divider()
             Button("Copy Position", systemImage: "doc.on.doc") { Pasteboard.set(shell.session.fen) }
@@ -244,6 +279,12 @@ private struct GameView: View {
     }
 }
 
+/// What the games list's one file picker is for. Never cleared: dismissal cannot lose it.
+private enum FilePicker {
+    case importGame
+    case exportFolder(ExportFormat)
+}
+
 struct GamesList: View {
     let shell: GameShell
     let attempt: (PendingSwitch) -> Void
@@ -253,8 +294,26 @@ struct GamesList: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.scenePhase) private var scenePhase
     @State private var showImporter = false
+    @State private var pickerMode: FilePicker = .importGame
+    @State private var exported: String?
     /// The day the groups are relative to; refreshed when the day changes and when the app returns.
     @State private var now = Date()
+
+    private func showPicker(_ mode: FilePicker) {
+        pickerMode = mode
+        showImporter = true
+    }
+
+    private func exportAll(to folder: URL, as format: ExportFormat) {
+        Task {
+            do {
+                let urls = try await shell.exportAll(to: folder, as: format)
+                exported = "\(urls.count) \(urls.count == 1 ? "game" : "games") exported to “\(folder.lastPathComponent)”"
+            } catch {
+                actionError = "Couldn't export the games. \(error.localizedDescription)"
+            }
+        }
+    }
 
     private func delete(_ files: [GameFile]) {
         for file in files {
@@ -304,7 +363,15 @@ struct GamesList: View {
                 }
             }
         }
+        .contextMenu { ExportMenu(shell: shell, file: file) }
         .listRowBackground(Walnut.card)
+    }
+
+    private var allowedTypes: [UTType] {
+        switch pickerMode {
+        case .importGame: [.bchessGame, .json, .pgn]
+        case .exportFolder: [.folder]
+        }
     }
 
     var body: some View {
@@ -337,7 +404,7 @@ struct GamesList: View {
             }
             .safeAreaInset(edge: .bottom) {
                 VStack(spacing: 8) {
-                    Text("Swipe left on a game to delete it.")
+                    Text("Swipe left on a game to delete it, touch and hold to export it.")
                         .font(.caption)
                         .foregroundStyle(Walnut.textSecondary)
                     Button(action: onNewGame) {
@@ -359,8 +426,12 @@ struct GamesList: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(Walnut.background, for: .navigationBar)
             .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button("Import") { showImporter = true }
+                ToolbarItemGroup(placement: .navigationBarLeading) {
+                    Button("Import") { showPicker(.importGame) }
+                    Menu("Export") {
+                        Button("All Games as PGN") { showPicker(.exportFolder(.pgn)) }
+                        Button("All Games as BChess") { showPicker(.exportFolder(.bchess)) }
+                    }
                 }
                 ToolbarItem(placement: .principal) {
                     Text("Games")
@@ -372,13 +443,22 @@ struct GamesList: View {
                         .fontWeight(.semibold)
                 }
             }
-            .fileImporter(isPresented: $showImporter, allowedContentTypes: [.bchessGame, .json, .pgn]) { result in
-                switch result {
-                case .success(let url):
+            .fileImporter(isPresented: $showImporter, allowedContentTypes: allowedTypes) { result in
+                switch (result, pickerMode) {
+                case (.success(let url), .importGame):
                     attempt(.importFile(url))
-                case .failure(let error):
-                    actionError = error.localizedDescription
+                case (.success(let url), .exportFolder(let format)):
+                    exportAll(to: url, as: format)
+                case (.failure(let error), _):
+                    if (error as? CocoaError)?.code != .userCancelled {
+                        actionError = error.localizedDescription
+                    }
                 }
+            }
+            .alert("Games exported", isPresented: Binding(get: { exported != nil }, set: { if !$0 { exported = nil } })) {
+                Button("OK", role: .cancel) { exported = nil }
+            } message: {
+                Text(exported ?? "")
             }
         }
     }

@@ -318,6 +318,9 @@ enum GalleryScenarios {
     static let gamesListFourGames = GalleryScenario(name: "Games list · Four games", group: "Games list", settle: .seconds(1)) {
         AnyView(GamesList(shell: try gamesShell(), attempt: { _ in }, onNewGame: {}, actionError: .constant(nil)))
     }
+    static let gamesListSmallPhone = GalleryScenario(name: "Games list · Small iPhone", group: "Games list", size: CGSize(width: 375, height: 667), settle: .seconds(1)) {
+        AnyView(GamesList(shell: try gamesShell(), attempt: { _ in }, onNewGame: {}, actionError: .constant(nil)))
+    }
     static let launchEmptyLibrary = GalleryScenario(name: "Launch · Empty library", group: "Games list", settle: .seconds(1)) {
         let directory = FileManager.default.temporaryDirectory.appendingPathComponent("Gallery-\(UUID().uuidString)", isDirectory: true)
         try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
@@ -383,7 +386,7 @@ enum GalleryScenarios {
         engineEqual, engineSlightlyBetter, engineMate, engineAnalyzing, engineStatistics, engineLongLine, engineWide, engineEvaluationBars,
         moveStripStart, moveStripMiddle, moveStripWithVariations,
         moveListShortGame, moveListVariationsAndComments, moveListCard,
-        gamesListFourGames, launchEmptyLibrary, newGameClub, newGameFriend, newGameMaximum, newGamePlayers,
+        gamesListFourGames, gamesListSmallPhone, launchEmptyLibrary, newGameClub, newGameFriend, newGameMaximum, newGamePlayers,
         settings,
         walnutPalette,
     ]

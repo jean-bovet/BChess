@@ -8,6 +8,27 @@
 
 import Foundation
 import Observation
+import UniformTypeIdentifiers
+
+/// The formats a game can be exported in. PGN first: it is what other chess apps read.
+enum ExportFormat: CaseIterable, Sendable {
+    case pgn
+    case bchess
+
+    var contentType: UTType {
+        switch self {
+        case .pgn: .pgn
+        case .bchess: .bchessGame
+        }
+    }
+
+    var fileExtension: String {
+        switch self {
+        case .pgn: "pgn"
+        case .bchess: "bchess"
+        }
+    }
+}
 
 @MainActor @Observable
 final class GameShell {
@@ -103,6 +124,36 @@ final class GameShell {
         }
         install(fallback, state: state)
         try library.delete(file)
+    }
+
+    enum ExportError: LocalizedError {
+        case libraryFolder
+
+        var errorDescription: String? {
+            "Choose a folder outside BChess's own games: exporting there would list every game twice."
+        }
+    }
+
+    /// The bytes of a library game in a format. The open game is exported as the session shows it, saved
+    /// or not; any other game is read from its file. Never saves, never touches the library.
+    func exportData(of file: GameFile, as format: ExportFormat) throws -> Data {
+        let state = file.url == current.url ? session.gameState : try library.open(file)
+        return try state.data(for: format.contentType)
+    }
+
+    /// Writes every game of the library as its own file into `folder`, never replacing a file there
+    /// (`Game.pgn`, then `Game 2.pgn`). Every game is read before the first is written; the writes run
+    /// off the main actor. Files written before a write error stay. Refuses the library's own folder.
+    func exportAll(to folder: URL, as format: ExportFormat,
+                   beforeWrite: @Sendable (URL) throws -> Void = { _ in }) async throws -> [URL] {
+        func resolved(_ url: URL) -> String {
+            url.standardizedFileURL.resolvingSymlinksInPath().path
+        }
+        guard resolved(folder) != resolved(library.directory) else {
+            throw ExportError.libraryFolder
+        }
+        let files = try library.games.map { ExportFile(baseName: $0.title, data: try exportData(of: $0, as: format)) }
+        return try await GameLibrary.writeExports(files, to: folder, extension: format.fileExtension, beforeWrite: beforeWrite)
     }
 
     // The current game is saved first, whether or not the view's autosave has run yet
