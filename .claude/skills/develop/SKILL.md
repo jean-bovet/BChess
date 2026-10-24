@@ -142,7 +142,8 @@ release playbook, only when Jean asks.
 
 Unless `--no-worktree`, or the change touches only the docs-only paths in Context: `git fetch`, then
 create `.claude/worktrees/<id-slug>` on a new branch `<id-slug>` from `main` (`EnterWorktree` when
-available, else `git worktree add`). Everything below — the plan, the code, the subagent, the
+available, else `git worktree add`). If the session already runs in an Orca worktree (under
+`~/orca/workspaces/`), use it and its branch instead of creating one. Everything below — the plan, the code, the subagent, the
 reviews — happens in that path. Leave unrelated changes in the main checkout alone. The worktree
 guard refuses compound Bash commands (variables, `$(…)`, heredocs): write scripts to the scratchpad
 and run them.
@@ -283,7 +284,8 @@ requests (a GitHub rule): never push `main`.
    never merge it yourself unless Jean says so.
 4. After the merge: `git pull --ff-only` in the main checkout, remove the worktree, `git worktree prune`,
    `git branch -D` both branches (`-D`, because git never sees a squashed branch as merged), and
-   `git push origin --delete <id-slug>-pr` if GitHub did not delete it.
+   `git push origin --delete <id-slug>-pr` if GitHub did not delete it. In an Orca worktree, leave removing
+   the worktree and its branch to Orca (still delete `<id-slug>-pr`).
 
 ## Anti-patterns
 
