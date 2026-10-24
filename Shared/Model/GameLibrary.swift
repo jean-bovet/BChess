@@ -24,6 +24,12 @@ struct GameFile: Identifiable, Hashable, Sendable {
     var title: String { url.deletingPathExtension().lastPathComponent }
 }
 
+/// A game's bytes for an export, taken on the main actor and written elsewhere.
+struct ExportFile: Sendable {
+    let baseName: String
+    let data: Data
+}
+
 @MainActor @Observable
 final class GameLibrary {
 
@@ -95,16 +101,67 @@ final class GameLibrary {
     @discardableResult
     func create(_ state: GameState, baseName: String? = nil) throws -> GameFile {
         let base = baseName ?? "Game " + Self.timestamp(Date())
-        var url = directory.appendingPathComponent(base).appendingPathExtension("bchess")
-        var counter = 2
-        while FileManager.default.fileExists(atPath: url.path) {
-            url = directory.appendingPathComponent("\(base) \(counter)").appendingPathExtension("bchess")
-            counter += 1
-        }
+        let url = Self.availableURL(in: directory, baseName: base, extension: "bchess")
         try state.data(for: .bchessGame).write(to: url, options: .atomic)
         reload()
         // The listed file, so that its URL is the one the directory listing returns
         return games.first { $0.name == url.lastPathComponent } ?? GameFile(url: url, modified: Date())
+    }
+
+    /// `Name.ext` in the folder, or `Name 2.ext`, `Name 3.ext` when that file exists.
+    nonisolated static func availableURL(in folder: URL, baseName: String, extension ext: String) -> URL {
+        var url = folder.appendingPathComponent(baseName).appendingPathExtension(ext)
+        var counter = 2
+        while FileManager.default.fileExists(atPath: url.path) {
+            url = folder.appendingPathComponent("\(baseName) \(counter)").appendingPathExtension(ext)
+            counter += 1
+        }
+        return url
+    }
+
+    /// Writes each file into the folder as `baseName.ext`, never replacing a file that is there: a name
+    /// taken (also between the check and the write) moves on to the next " N". Each write is one
+    /// coordinated exclusive create, for iCloud Drive and other providers. Runs off the caller's actor;
+    /// `beforeWrite` (tests only) sees the name chosen, before it is written. Returns the written URLs;
+    /// files written before a failure stay.
+    @concurrent
+    nonisolated static func writeExports(_ files: [ExportFile], to folder: URL, extension ext: String,
+                                         beforeWrite: @Sendable (URL) throws -> Void = { _ in }) async throws -> [URL] {
+        let scoped = folder.startAccessingSecurityScopedResource()
+        defer {
+            if scoped {
+                folder.stopAccessingSecurityScopedResource()
+            }
+        }
+        var written: [URL] = []
+        for file in files {
+            while true {
+                let candidate = availableURL(in: folder, baseName: file.baseName, extension: ext)
+                try beforeWrite(candidate)
+                var coordinationError: NSError?
+                var writeError: Error?
+                NSFileCoordinator(filePresenter: nil).coordinate(writingItemAt: candidate, options: [], error: &coordinationError) { coordinated in
+                    do {
+                        try file.data.write(to: coordinated, options: .withoutOverwriting)
+                    } catch {
+                        writeError = error
+                    }
+                }
+                if let coordinationError {
+                    throw coordinationError
+                }
+                if let writeError {
+                    // Somebody created the name since it was chosen: take the next one
+                    if (writeError as? CocoaError)?.code == .fileWriteFileExists {
+                        continue
+                    }
+                    throw writeError
+                }
+                written.append(candidate)
+                break
+            }
+        }
+        return written
     }
 
     /// Copies a game from outside the library (Files, share sheet) into it as a `.bchess` file.
