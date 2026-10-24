@@ -1,1 +1,17 @@
-- No visible changes: build and stability work.
+- A new look on iPhone, iPad and Mac, in light and dark: a wooden board in a walnut frame with the coordinates on the frame, a vertical evaluation bar, an engine card, and a new app icon (with dark and tinted versions on iPhone and iPad).
+
+- Five computer strengths: Beginner, Casual, Club, Strong and Maximum. The New Game sheet lets you pick your opponent from that ladder and remembers your last choice. Below Maximum the computer takes a moment before it replies, like a human player.
+
+- The engine plays much stronger at Maximum, and it now handles draws correctly (fifty-move rule, repetitions, positions where no one can mate).
+
+- The move list now uses standard chess notation, with check (+) and mate (#) marks and moves like Nbd2 when two pieces could go to the same square.
+
+- The engine's verdict ("White is slightly better") gets its own line and is no longer cut off. The readout keeps its size while you step back and forth through the moves.
+
+- Promotion: choose the piece from a picker over the board. Variations: a new picker shows the main line and the variation with their real moves.
+
+- Settings has three sections (Board, Engine, Appearance), including a System / Light / Dark choice for the whole app. On iPhone it is also in the More menu.
+
+- iPhone and iPad: the Games list is grouped by date. Export a game as PGN or as a BChess file from the More menu or from a game's context menu in the list, or export all games at once into a folder you pick in Files. Existing files are never overwritten.
+
+Please verify: a game against each computer strength feels right for its level, exporting one game and all games works on iPhone or iPad, and old games still open with their moves shown correctly.
