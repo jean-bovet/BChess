@@ -14,8 +14,8 @@ struct EngineView: View {
     let line: String
     /// Depth, nodes and speed, shown only when the user asked for them.
     var statistics: String?
-    /// The wide layout: the verdict, the best line and the statistics each on their own line.
-    var stacked = false
+    /// The wide layout (iPad, a wide Mac window): more room around the lines, and the best line may wrap.
+    var wide = false
 
     private func scoreChip(_ score: String) -> some View {
         Text(score)
@@ -27,65 +27,46 @@ struct EngineView: View {
             .background(Walnut.scoreChip, in: RoundedRectangle(cornerRadius: 6))
     }
 
-    @ViewBuilder
-    private func content(for verdict: Verdict) -> some View {
-        if stacked {
-            VStack(alignment: .leading, spacing: 8) {
+    /// The best line, or a hidden stand-in while there is none, so the card keeps its height.
+    private var bestLine: some View {
+        (Text("Best ").foregroundStyle(Walnut.textSecondary)
+         + Text(line).fontWeight(.semibold).foregroundStyle(Walnut.textPrimary))
+            .font(.footnote)
+            .lineLimit(wide ? 2 : 1)
+            .truncationMode(.tail)
+            .opacity(line.isEmpty ? 0 : 1)
+    }
+
+    var body: some View {
+        // The verdict, the best line and the statistics each on their own line, so the verdict is never cut
+        VStack(alignment: .leading, spacing: wide ? 8 : 4) {
+            if let verdict {
                 HStack(spacing: 8) {
                     scoreChip(verdict.score)
                     Text(verdict.sentence)
                         .font(.subheadline.weight(.semibold))
                         .foregroundStyle(Walnut.textPrimary)
-                }
-                if !line.isEmpty {
-                    (Text("Best ").foregroundStyle(Walnut.textSecondary)
-                     + Text(line).fontWeight(.semibold).foregroundStyle(Walnut.textPrimary))
-                        .font(.footnote)
-                        .lineLimit(2)
-                }
-                if let statistics {
-                    Text(statistics)
-                        .font(.caption)
-                        .monospacedDigit()
-                        .foregroundStyle(Walnut.textSecondary)
-                }
-            }
-        } else {
-            HStack(spacing: 8) {
-                scoreChip(verdict.score)
-                // The sentence gives way to the line when the width is short
-                Text(verdict.sentence + (line.isEmpty ? "" : " \u{00B7}"))
-                    .foregroundStyle(Walnut.textSecondary)
-                    .lineLimit(1)
-                    .layoutPriority(-1)
-                if !line.isEmpty {
-                    Text(line)
-                        .fontWeight(.semibold)
-                        .foregroundStyle(Walnut.textPrimary)
                         .lineLimit(1)
-                        .truncationMode(.tail)
                 }
-            }
-            .font(.footnote)
-        }
-    }
-
-    var body: some View {
-        Group {
-            if let verdict {
-                content(for: verdict)
             } else {
-                // As tall as a one-line verdict, so the cards below stay in place while it is awaited
+                // As tall as a verdict, so the cards below stay in place while it is awaited
                 ZStack(alignment: .leading) {
                     scoreChip("0.0").hidden()
                     Text("Analyzing\u{2026}")
+                        .font(.subheadline)
                         .foregroundStyle(Walnut.textSecondary)
                 }
-                .font(.footnote)
+            }
+            bestLine
+            if let statistics {
+                Text(statistics)
+                    .font(.caption)
+                    .monospacedDigit()
+                    .foregroundStyle(Walnut.textSecondary)
             }
         }
         .padding(.horizontal, 12)
-        .padding(.vertical, stacked ? 14 : 10)
+        .padding(.vertical, wide ? 14 : 10)
         .frame(maxWidth: .infinity, alignment: .leading)
         .walnutCard()
         .accessibilityElement(children: .combine)
@@ -101,17 +82,17 @@ struct EngineView: View {
     }
 
     /// The engine's readout of the session, or nil when there is nothing to show (the game is over).
-    static func make(session: GameSession, showStatistics: Bool, stacked: Bool = false) -> EngineView? {
+    static func make(session: GameSession, showStatistics: Bool, wide: Bool = false) -> EngineView? {
         guard session.gameEnd == .none else {
             return nil
         }
         guard let info = session.info else {
-            return EngineView(verdict: nil, line: "", stacked: stacked)
+            return EngineView(verdict: nil, line: "", wide: wide)
         }
         return EngineView(verdict: Verdict(centipawns: info.value, isMate: info.mat),
                           line: info.bestLine(false),
                           statistics: showStatistics ? statistics(of: info) : nil,
-                          stacked: stacked)
+                          wide: wide)
     }
 
     static func statistics(of info: FEngineInfo) -> String {
