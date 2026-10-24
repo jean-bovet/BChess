@@ -70,9 +70,9 @@ struct ContentView: View {
             return nil
         }
         #if os(macOS)
-        return EngineView.make(session: session, showStatistics: showStatistics, stacked: isWide)
+        return EngineView.make(session: session, showStatistics: showStatistics, wide: isWide)
         #else
-        return EngineView.make(session: session, showStatistics: false, stacked: isWide)
+        return EngineView.make(session: session, showStatistics: false, wide: isWide)
         #endif
     }
 

@@ -262,16 +262,22 @@ enum GalleryScenarios {
                            statistics: "Depth 9/12 with 1,234,567 nodes at 410,000 n/s")
             .padding())
     }
-    static let engineStacked = GalleryScenario(name: "Engine · Stacked", group: "Engine") {
+    static let engineLongLine = GalleryScenario(name: "Engine · Long line", group: "Engine") {
+        AnyView(EngineView(verdict: Verdict(centipawns: 60, isMate: false),
+                           line: "6. d4 exd4 7. Qxd4 Qxd4 8. Nxd4 Nc6 9. Nxc6 bxc6 10. Bd3")
+            .frame(width: 300)
+            .padding())
+    }
+    static let engineWide = GalleryScenario(name: "Engine · Wide", group: "Engine") {
         AnyView(EngineView(verdict: Verdict(centipawns: 40, isMate: false), line: "6. d4 exd4 7. Qxd4 Qxd4 8. Nxd4",
-                           statistics: "Depth 9/14 \u{00B7} 1,234,567 nodes \u{00B7} 410,000 n/s", stacked: true)
+                           statistics: "Depth 9/14 \u{00B7} 1,234,567 nodes \u{00B7} 410,000 n/s", wide: true)
             .padding())
     }
     static let engineEvaluationBars = GalleryScenario(name: "Engine · Evaluation bars", group: "Engine") {
         AnyView(VStack {
             EngineView(verdict: Verdict(centipawns: 40, isMate: false), line: "6. d4 exd4 7. Qxd4")
             EngineView(verdict: Verdict(centipawns: 40, isMate: false), line: "6. d4 exd4 7. Qxd4 Qxd4 8. Nxd4",
-                       statistics: "Depth 9/14", stacked: true)
+                       statistics: "Depth 9/14", wide: true)
             HStack {
                 EvaluationBar(verdict: Verdict(centipawns: 40, isMate: false), rotated: false)
                 EvaluationBar(verdict: Verdict(centipawns: -200, isMate: false), rotated: true)
@@ -374,7 +380,7 @@ enum GalleryScenarios {
         promotionDropsFromTheTop, promotionRisesFromTheBottom,
         variationsArrowsAndCards,
         arrow,
-        engineEqual, engineSlightlyBetter, engineMate, engineAnalyzing, engineStatistics, engineStacked, engineEvaluationBars,
+        engineEqual, engineSlightlyBetter, engineMate, engineAnalyzing, engineStatistics, engineLongLine, engineWide, engineEvaluationBars,
         moveStripStart, moveStripMiddle, moveStripWithVariations,
         moveListShortGame, moveListVariationsAndComments, moveListCard,
         gamesListFourGames, launchEmptyLibrary, newGameClub, newGameFriend, newGameMaximum, newGamePlayers,
