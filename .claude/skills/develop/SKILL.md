@@ -66,16 +66,34 @@ rationale, or nothing.
 ## Gates (run in the worktree)
 
 Two tiers. **Step gates** run after each plan step and each fix round: the build, the warnings check
-and the unit tests; add the UI tests only when the step touches what they drive (navigation, titles,
-accessibility identifiers, launch fixtures), and the preview gallery only when the step changes what a
-screen looks like. The **final gate** runs before handing back and again after the rebase when
-landing: every gate below in full, plus the full gallery when the plan touched UI. Step gates never
-replace it.
+and the unit tests, plus the preview gallery only when the step changes what a screen looks like.
+Step gates never run the UI tests, not even for a step that touches what they drive (navigation,
+titles, accessibility identifiers, launch fixtures): they are slow, and the final gate catches what
+they would. A brief that asks a step gate or a fix round for them is overruled: they wait for the
+final gate. The **final gate** runs **once per plan**, on the tree handed back: every gate
+below in full, the UI tests included, plus the full gallery when the plan touched UI. Step gates never replace it. After it
+passed on a commit G, every later tree (a fix round, the rebase, the squash commit) is classified
+by what changed since G and reruns only what its class requires, not the final gate again:
+
+| Class | When (tracked paths changed since G) | What reruns |
+|---|---|---|
+| `none` | the same tree (a no-op rebase, the squash commit), or only docs-only paths (`planning/`, `AGENTS.md`, `README.md`, `docs/`, `.claude/skills/`) | no build or test; for a docs edit, the docs-only checks below |
+| `quick` | only docs-only paths and `BChessTests/` | the step gate, plus the warnings check on its logs |
+| `full` | any other path (`project.yml`, `BChessUITests/`, `BChessGalleryTests/` included) | the whole final gate on a fresh `<dd>`; that tree becomes the new G |
+
+When in doubt, the class is `full`. BChess has no classifying script: the parent reads
+`git diff --name-only G` and applies the table by hand, after committing (never classify a tree with
+uncommitted tracked changes or untracked files that are not ignored).
 
 - **Build folders.** Step gates reuse ONE build folder for the whole plan (`<dd>`, e.g.
   `/private/tmp/<id-slug>-dd`, created once), so every build after the first is incremental. The final
   gate uses a fresh `<dd>`, which also re-surfaces warnings an incremental build would not recompile.
   Logs go to a new scratch directory for every gate run.
+- **Build once, test without building.** Where the platform allows it, a gate builds the tests once
+  for a generic destination (`xcodebuild build-for-testing`) and runs them with `test-without-building`
+  on the leased simulator: a `build` followed by a `test` compiles twice (two destinations), and the
+  lease is held only while tests run. Any later run on the same tree (another test plan, a rerun)
+  reuses those products.
 - **One build at a time per build folder.** Use the repo's scripts or build wrapper when it has them
   (never call `xcodebuild` around them); otherwise `buildlock --folder <dd> -- xcodebuild …`. The host's
   build slots are shared with other sessions: wait for one, never kill another build.
@@ -91,7 +109,9 @@ replace it.
 - **Red proof.** A regression test is proven red without its fix before it goes green: commit the
   fix first, revert only the fix's lines, run the test and see it fail, restore with
   `git checkout -- <file>` (never a hand-written inverse), then confirm `git status` is clean and grep
-  the tree for any temporary marker. No version bump during feature work.
+  the tree for any temporary marker. A red-proof run builds incrementally in the step gates' `<dd>` and
+  runs only the test class concerned (`xcodebuild test -only-testing:<Target>/<Class>`), never the whole
+  suite: the step and final gates run the rest. No version bump during feature work.
 - **Warnings.** Fix every warning the branch touches or reveals, including ones that predate it.
   Deprecations are fixed, never silenced (`@available`, `#warning`, suppression flags); if the fix
   conflicts with a documented decision, update that decision's comment. A build-only warnings check uses
@@ -107,14 +127,18 @@ without its fix, restored with `git checkout -- <file>`. `xcodegen generate` com
 `project.yml` change; never hand-edit `BChess.xcodeproj`.
 
 **Test gate:** all of these pass, each read by exit status **and** summary line. Each runs under
-`buildlock` on its own DerivedData folder. The iOS tests run on a simulator leased from the pool for
-that run and given back right after it, also when it fails (run the last two lines in one shell):
+`buildlock` on its own DerivedData folder. The step gate runs the first two lines (the unit tests in
+`BChessTests` and the UCI build). The final gate adds the last three: the iOS scheme's tests are the UI
+tests (`BChessUITests`) and the gallery tests, built once for the generic simulator, then run on a
+simulator leased from the pool for that run and given back right after it, also when it fails (run the
+last three lines in one shell):
 
 ```
 buildlock --folder <dd>/dd-mac -- xcodebuild test -scheme "BChess (macOS)" -destination 'platform=macOS' -derivedDataPath <dd>/dd-mac
 buildlock --folder <dd>/dd-uci -- xcodebuild -scheme BChessUCI -destination 'platform=macOS' -derivedDataPath <dd>/dd-uci build
+buildlock --folder <dd>/dd-ios -- xcodebuild build-for-testing -scheme "BChess (iOS)" -destination 'generic/platform=iOS Simulator' -derivedDataPath <dd>/dd-ios
 udid=$(simpool acquire --spec iphone --pid $$); trap 'simpool release "$udid" --app ch.arizona-software.BChess' EXIT
-buildlock --folder <dd>/dd-ios -- xcodebuild test -scheme "BChess (iOS)" -destination "id=$udid" -parallel-testing-enabled NO -derivedDataPath <dd>/dd-ios
+buildlock --folder <dd>/dd-ios -- xcodebuild test-without-building -scheme "BChess (iOS)" -destination "id=$udid" -parallel-testing-enabled NO -derivedDataPath <dd>/dd-ios
 ```
 
 `** TEST FAILED **`, `** BUILD FAILED **`, a Swift Testing line `✘`, or any `error:` is red. The
@@ -258,28 +282,30 @@ whether every new entity or field reaches its screen through the production read
 attach the whole design doc. Same `codex exec` command and the same "did it run" protocol.
 
 Send each accepted finding to the **same** subagent with `SendMessage`. Rejected findings get a
-one-line rationale in the final report, not silence. Re-run the gates after every fix round. Apply
-the Codex policy.
+one-line rationale in the final report, not silence. After every fix round run the step gate plus the
+class from § Gates for the changes since G. Apply the Codex policy.
 
 ## Phase 6 — Hand back (landing is Jean's call)
 
-The deliverable is a green, reviewed branch in the worktree — the final gate (fresh `<dd>`) run
-last — plus a report: what shipped (commits),
+The deliverable is a green, reviewed branch in the worktree — the final gate (fresh `<dd>`) passed
+once on the tree handed back (commit G), or the class from § Gates that the last tree requires —
+plus a report: G's commit, each gate class applied, what shipped (commits),
 plan revisions and review rounds with what each changed, findings rejected and why, gates run (the
 test summary lines, the warnings check, and each conditional gate — which ran and which did not),
 and what is owed (the owed checks in Context). **When Jean
 says land, the feature lands as ONE squashed commit through a pull request** — `main` requires pull
 requests (a GitHub rule): never push `main`.
 
-1. `git fetch && git rebase origin/main` in the worktree, then the final gate (fresh `<dd>`) after the
-   rebase.
+1. `git fetch && git rebase origin/main` in the worktree, then classify the tree against G (§ Gates):
+   the whole final gate (fresh `<dd>`) reruns only on `full`.
 2. In the worktree, `git switch -c <id-slug>-pr origin/main`, `git merge --squash <id-slug>`, then ONE
    `git commit` whose subject is the plan id and a sentence and whose body carries the branch's commit
    subjects (`git log origin/main..<id-slug> --format='- %s'`), each regression test's red proof in one
    line, every gate's summary line, the plan revisions and review rounds, the plan's index-row text, and
    the attribution trailer. The same commit sets the plan's index row to "Implemented on main <date>".
    Write the message before deleting anything.
-3. The test gate once more on `<id-slug>-pr`, then `git push -u origin <id-slug>-pr` and
+3. On `<id-slug>-pr`, classify against G again (a squash of the same tree is `none`) and run what the
+   class requires, then `git push -u origin <id-slug>-pr` and
    `gh pr create --base main` with the commit message as title and body. Jean merges the PR on GitHub;
    never merge it yourself unless Jean says so.
 4. After the merge: `git pull --ff-only` in the main checkout, remove the worktree, `git worktree prune`,
