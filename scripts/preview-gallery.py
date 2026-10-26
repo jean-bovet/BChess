@@ -4,9 +4,16 @@ The snapshot test (BChessGalleryTests/SnapshotGalleryTests) writes `<slug>.png`,
 `manifest.json` into a directory; this script imports them into previews/ (gitignored) and builds
 previews/index.html, one card per scenario with light and dark side by side, grouped as the manifest says.
 
-    scripts/preview-gallery.py --import DIR [--partial]   # replace previews/ (--partial: only DIR's files)
+    scripts/preview-gallery.py --import DIR [--partial]   # replace the gallery (--partial: only DIR's files)
     scripts/preview-gallery.py --check                    # every scenario complete and correctly lit
     scripts/preview-gallery.py --coverage                 # view types no scenario names (informational)
+
+The gallery folder is previews/, or $PREVIEW_GALLERY_OUT (the Duo pass uses previews/duo). Its layout: only
+index.html at the top, the images in <platform>/ (the manifest entry's `platform`, default iphone; an image the
+manifest does not name in other/), the manifest and coverage.json in data/. A folder with its own data/ is another
+gallery (previews/duo inside previews/), never an image folder: a full import removes only the PNGs of the folders
+the manifests name (and other/), the manifest and the page; any other file or folder stays. Every command first moves a flat gallery of an earlier version into the layout
+(resumable: whatever is still at the top is moved by the next command).
 
 --check rebuilds the page, then fails on: a scenario missing either image, a stray PNG no scenario expects,
 a duplicate slug, a light image that is dark or a dark image that is light (mean luminance against 0.45,
@@ -16,8 +23,11 @@ decoded, and a forced appearance or locale in GalleryScenarios.swift.
 import argparse, glob, html, json, os, re, shutil, struct, subprocess, sys
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-OUT = os.path.join(REPO, 'previews')
-MANIFEST = os.path.join(OUT, 'manifest.json')
+OUT = os.path.join(REPO, os.environ.get('PREVIEW_GALLERY_OUT') or 'previews')
+DATA = os.path.join(OUT, 'data')
+MANIFEST = os.path.join(DATA, 'manifest.json')
+DEFAULT_PLATFORM = 'iphone'
+OTHER = 'other'
 SCENARIOS = os.path.join(REPO, 'BChessGalleryTests', 'GalleryScenarios.swift')
 LUMINANCE_THRESHOLD = 0.45
 PHONE_ASPECT = 402 / 874
@@ -29,27 +39,84 @@ def slug(s):
 
 def load_manifest():
     if not os.path.isfile(MANIFEST):
-        sys.exit('no previews/manifest.json: run scripts/snapshot-gallery.sh')
+        sys.exit(f'no {os.path.relpath(MANIFEST, REPO)}: run scripts/snapshot-gallery.sh')
     with open(MANIFEST, encoding='utf-8') as handle:
         return json.load(handle)
+
+
+def platform_of(entry):
+    return entry.get('platform') or DEFAULT_PLATFORM
+
+
+def read_manifest(path):
+    if not os.path.isfile(path):
+        return []
+    with open(path, encoding='utf-8') as handle:
+        return json.load(handle)
+
+
+def image_folders(*manifests):
+    """The folders of OUT this tool owns images in: the platforms the manifests name, and other/. Never another
+    directory (previews/duo is another gallery, previews/notes is somebody's); only their existing ones."""
+    names = {OTHER}
+    for manifest in manifests:
+        names |= {platform_of(entry) for entry in manifest}
+    return sorted(name for name in names if os.path.isdir(os.path.join(OUT, name)))
+
+
+def image_stem(name):
+    return name[:-len('.dark.png')] if name.endswith('.dark.png') else name[:-len('.png')]
+
+
+def migrate():
+    """Moves a flat gallery (images, manifest.json at the top) into the layout; safe to run again after a stop."""
+    if not os.path.isdir(OUT):
+        return
+    flat_manifest = os.path.join(OUT, 'manifest.json')
+    if os.path.isfile(flat_manifest):
+        os.makedirs(DATA, exist_ok=True)
+        os.replace(flat_manifest, MANIFEST)
+    platforms = {}
+    if os.path.isfile(MANIFEST):
+        with open(MANIFEST, encoding='utf-8') as handle:
+            platforms = {entry['slug']: platform_of(entry) for entry in json.load(handle)}
+    for name in sorted(os.listdir(OUT)):
+        path = os.path.join(OUT, name)
+        if name.endswith('.png') and os.path.isfile(path):
+            folder = platforms.get(image_stem(name), OTHER)
+            os.makedirs(os.path.join(OUT, folder), exist_ok=True)
+            os.replace(path, os.path.join(OUT, folder, name))
 
 
 def do_import(source, partial):
     source_manifest = os.path.join(source, 'manifest.json')
     if not os.path.isfile(source_manifest):
         sys.exit(f'{source} has no manifest.json: the snapshot test did not finish')
+    migrate()
+    new_manifest = read_manifest(source_manifest)
+    platforms = {entry['slug']: platform_of(entry) for entry in new_manifest}
     pngs = sorted(glob.glob(os.path.join(source, '*.png')))
-    if not (partial and os.path.isdir(OUT)):
-        shutil.rmtree(OUT, ignore_errors=True)
-    os.makedirs(OUT, exist_ok=True)
+    if not partial:
+        # Only what this tool placed: the PNGs of the folders the manifests name, the manifest and the page
+        for folder in image_folders(read_manifest(MANIFEST), new_manifest):
+            for name in os.listdir(os.path.join(OUT, folder)):
+                if name.endswith('.png'):
+                    os.remove(os.path.join(OUT, folder, name))
+        for stale in (MANIFEST, os.path.join(OUT, 'index.html')):
+            if os.path.isfile(stale):
+                os.remove(stale)
+    os.makedirs(DATA, exist_ok=True)
     for png in pngs:
-        shutil.copy2(png, OUT)
+        folder = platforms.get(image_stem(os.path.basename(png)), OTHER)
+        os.makedirs(os.path.join(OUT, folder), exist_ok=True)
+        shutil.copy2(png, os.path.join(OUT, folder))
     shutil.copy2(source_manifest, MANIFEST)
-    print(f'imported {len(pngs)} image(s) into previews/')
+    print(f'imported {len(pngs)} image(s) into {os.path.relpath(OUT, REPO)}/')
 
 
-def luminances():
-    result = subprocess.run(['swift', os.path.join(REPO, 'scripts', 'preview-luminance.swift'), OUT],
+def luminances(manifest):
+    result = subprocess.run(['swift', os.path.join(REPO, 'scripts', 'preview-luminance.swift'),
+                             *[os.path.join(OUT, folder) for folder in image_folders(manifest)]],
                             capture_output=True, text=True)
     values = {}
     for line in result.stdout.splitlines():
@@ -72,7 +139,9 @@ def build_page(manifest):
     for entry in manifest:
         groups.setdefault(entry['group'], []).append(entry)
 
-    def slot(dest, tag, label):
+    def slot(dest, tag, label, skipped=None):
+        if skipped:
+            return f'<div class="missing">not rendered on this pass: {html.escape(skipped)}</div>'
         if os.path.isfile(os.path.join(OUT, dest)):
             return f'<a href="{dest}"><img src="{dest}" alt="{html.escape(label)} · {tag}" loading="lazy"></a>'
         return '<div class="missing">missing</div>'
@@ -83,8 +152,8 @@ def build_page(manifest):
         ratio = size_ratio(entry) / PHONE_ASPECT
         style = f' style="--r:{ratio:.2f}"' if ratio > 1.05 else ''
         return (f'<figure id="{entry["slug"]}"{style}><figcaption>{html.escape(label)}</figcaption><div class="pair">'
-                f'<div class="shot shot-light">{slot(entry["slug"] + ".png", "Light", label)}<span class="tag">Light</span></div>'
-                f'<div class="shot shot-dark">{slot(entry["slug"] + ".dark.png", "Dark", label)}<span class="tag">Dark</span></div>'
+                f'<div class="shot shot-light">{slot(platform_of(entry) + "/" + entry["slug"] + ".png", "Light", label, entry.get("skipped"))}<span class="tag">Light</span></div>'
+                f'<div class="shot shot-dark">{slot(platform_of(entry) + "/" + entry["slug"] + ".dark.png", "Dark", label, entry.get("skipped"))}<span class="tag">Dark</span></div>'
                 f'</div></figure>')
 
     sections, links = [], []
@@ -99,25 +168,32 @@ def build_page(manifest):
 
 
 def do_check():
+    migrate()
     manifest = load_manifest()
     build_page(manifest)
     problems = []
     slugs = [e['slug'] for e in manifest]
     for dup in sorted({s for s in slugs if slugs.count(s) > 1}):
         problems.append(f'duplicate slug: {dup}')
-    expected = {s + suffix for s in slugs for suffix in ('.png', '.dark.png')}
-    on_disk = {name for name in os.listdir(OUT) if name.endswith('.png')}
+    expected = {f'{platform_of(e)}/{e["slug"]}{suffix}' for e in manifest if not e.get('skipped')
+                for suffix in ('.png', '.dark.png')}
+    on_disk = {f'{folder}/{name}' for folder in image_folders(manifest)
+               for name in os.listdir(os.path.join(OUT, folder)) if name.endswith('.png')}
     for name in sorted(expected - on_disk):
         problems.append(f'missing: {name}')
     for name in sorted(on_disk - expected):
         problems.append(f'stray image (no scenario): {name}')
-    for s in slugs:
-        light, dark = os.path.join(OUT, s + '.png'), os.path.join(OUT, s + '.dark.png')
+    for e in manifest:
+        if e.get('skipped'):
+            continue
+        s = e['slug']
+        light = os.path.join(OUT, platform_of(e), s + '.png')
+        dark = os.path.join(OUT, platform_of(e), s + '.dark.png')
         if os.path.isfile(light) and os.path.isfile(dark):
             with open(light, 'rb') as a, open(dark, 'rb') as b:
                 if a.read() == b.read():
                     problems.append(f'dark identical to light: {s}')
-    luminance, error = luminances()
+    luminance, error = luminances(manifest)
     if error:
         problems.append('luminance helper failed: ' + error)
     for name, value in sorted(luminance.items()):
@@ -153,6 +229,9 @@ def do_coverage():
     print(f'{len(views) - len(missing)} of {len(views)} view types appear in a scenario; not rendered:')
     for view in missing:
         print('  ' + view)
+    os.makedirs(DATA, exist_ok=True)
+    with open(os.path.join(DATA, 'coverage.json'), 'w', encoding='utf-8') as handle:
+        json.dump({'views': len(views), 'notRendered': missing}, handle, indent=2)
 
 
 def page(cards, sections_html, links_html):
@@ -207,7 +286,7 @@ html[data-mode="dark"] .shot img, html[data-mode="dark"] .shot .missing {{ width
 <button type="button" data-mode-btn="both" aria-pressed="false">Both</button>
 </div>
 <h1>BChess — screen gallery</h1>
-<p class="meta">{len(cards)} screens (iPhone) · light and dark side by side.</p>
+<p class="meta">{len(cards)} screens ({'iPhone Duo' if os.path.basename(OUT) == 'duo' else 'iPhone'}) · light and dark side by side.</p>
 <nav aria-label="Gallery sections">{links_html}</nav>
 {sections_html}
 <script>
@@ -241,6 +320,7 @@ def main():
     parser.add_argument('--check', action='store_true', help='rebuild the page and check; exit 1 on any problem')
     parser.add_argument('--coverage', action='store_true', help='list the view types no scenario names')
     opts = parser.parse_args()
+    migrate()
     if opts.source:
         do_import(opts.source, opts.partial)
         build_page(load_manifest())

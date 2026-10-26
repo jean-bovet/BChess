@@ -77,6 +77,8 @@ enum PendingSwitch: Identifiable {
 
 struct GameRootView: View {
     let library: GameLibrary
+    /// A test-only source of the fold's regions, passed to the game screen (the gallery's Duo scenarios).
+    var foldRegions: [FoldRegion]?
 
     @State private var shell: GameShell?
     @State private var launchError: String?
@@ -84,7 +86,7 @@ struct GameRootView: View {
     var body: some View {
         Group {
             if let shell {
-                GameView(shell: shell)
+                GameView(shell: shell, foldRegions: foldRegions)
             } else if let launchError {
                 ContentUnavailableView("Couldn't open your games", systemImage: "exclamationmark.triangle", description: Text(launchError))
             } else {
@@ -112,6 +114,7 @@ private enum PlayersSheet: String, Identifiable {
 
 private struct GameView: View {
     let shell: GameShell
+    let foldRegions: [FoldRegion]?
 
     @Environment(\.scenePhase) private var scenePhase
     @AppStorage("showEngine") private var showEngine = false
@@ -124,12 +127,12 @@ private struct GameView: View {
 
     var body: some View {
         NavigationStack {
-            ContentView(session: shell.session)
+            ContentView(session: shell.session, foldRegions: foldRegions)
             .id(shell.current.url)
             .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(Walnut.background, for: .navigationBar, .bottomBar)
             .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
+                ToolbarItem(placement: .navigation) {
                     Button { showGames = true } label: {
                         Label("Games", systemImage: "list.bullet")
                     }
@@ -147,7 +150,7 @@ private struct GameView: View {
                         }
                     }
                 }
-                ToolbarItem(placement: .navigationBarTrailing) {
+                ToolbarItem(placement: .primaryAction) {
                     moreMenu
                 }
                 ToolbarItemGroup(placement: .bottomBar) {
@@ -426,9 +429,11 @@ struct GamesList: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(Walnut.background, for: .navigationBar)
             .toolbar {
-                ToolbarItemGroup(placement: .navigationBarLeading) {
-                    Button("Import") { showPicker(.importGame) }
-                    Menu("Export") {
+                ToolbarItemGroup(placement: .topBarLeading) {
+                    Button { showPicker(.importGame) } label: {
+                        Label("Import", systemImage: "square.and.arrow.down")
+                    }
+                    Menu("Export", systemImage: "square.and.arrow.up") {
                         Button("All Games as PGN") { showPicker(.exportFolder(.pgn)) }
                         Button("All Games as BChess") { showPicker(.exportFolder(.bchess)) }
                     }
@@ -438,7 +443,7 @@ struct GamesList: View {
                         .font(.system(.headline, design: .serif, weight: .semibold))
                         .foregroundStyle(Walnut.textPrimary)
                 }
-                ToolbarItem(placement: .navigationBarTrailing) {
+                ToolbarItem(placement: .confirmationAction) {
                     Button("Done") { dismiss() }
                         .fontWeight(.semibold)
                 }

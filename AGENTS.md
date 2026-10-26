@@ -51,7 +51,7 @@ GoogleTest case actually executed.
 
 **Tests.** New logic: a failing Swift Testing test first. Views are exempt from unit tests; **every screen needs
 a scenario** in `BChessGalleryTests/GalleryScenarios.swift`, and the app has no `#Preview` and no preview code.
-`/preview-gallery` renders the scenarios on iOS (`scripts/snapshot-gallery.sh`; lifecycle tests `scripts/test_snapshot_gallery.sh`). A macOS-only view has no scenario until the Mac renderer exists.
+A screen whose layout changes at regular width gets an inner-display scenario ("iPhone Duo · inner display"). `/preview-gallery` renders the scenarios on iOS (`scripts/snapshot-gallery.sh`, and `--device duo` for the iPhone Duo pass; lifecycle tests `scripts/test_snapshot_gallery.sh`). A macOS-only view has no scenario until the Mac renderer exists.
 A scenario never forces an appearance or a language. A thread-safety fix gets a test that would fail (or hang) without it.
 
 **Builds and simulators.** Every local `xcodebuild` runs under `buildlock --folder <its DerivedData> -- xcodebuild …`;

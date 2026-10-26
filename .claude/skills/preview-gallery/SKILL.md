@@ -19,8 +19,10 @@ every screen at about one second each. Spot checks use `--only`, not the canvas.
 BChess (`BChess.xcodeproj`, scheme "BChess (iOS)"). The gallery lives in the app-hosted unit-test target
 `BChessGalleryTests`: `GalleryScenarios.swift` (the scenario list and the `Fixture` PGN constants),
 `SnapshotGalleryTests.swift` (the render), `GalleryScenarioTests.swift` (the list's own tests, which parse every
-PGN fixture; both suites sit in the serialized parent suite `GallerySuites`). Output: `previews/index.html`
-(gitignored). Groups, in page order: Game, Board, Engine, Moves, Games list, Settings, Walnut (38 cards). The
+PGN fixture, and lay the pixel oracles of the fold layout over the production render with `GalleryPixels.swift`;
+both suites sit in the serialized parent suite `GallerySuites`). Output: `previews/index.html` (gitignored; the
+images in `previews/iphone/` and `previews/duo-inner/`, the manifest in `previews/data/`). Groups, in page order:
+Game, iPhone Duo · inner display, Board, Engine, Moves, Games list, Settings, Walnut (48 cards). The
 approved visual spec is the Walnut design canvas (`planning/README.md`, UI-WALNUT row).
 
 **English only, in every repo**, whatever languages the app ships (`-testLanguage en -testRegion US`). The gallery
@@ -29,17 +31,15 @@ a language pass to the gallery. The one exception is the App Store screenshots: 
 in each store language keeps a `--lang` option in its gallery scripts, used only by `/app-store-screenshots` with
 `--only` the slides' captures, into its own folder per language (`previews/fr/`). The gallery page stays English.
 
-iPhone 17 Pro (402x874 pt), plus one iPad-landscape card ("Game screen · Wide", 1180x820) rendered on the iPhone
-simulator. No iPad pass. **The iPhone Duo pass is due and not built yet**: the script has no `--device` option, so
-nothing renders on the pool's `duo` simulator and there are no inner-display scenarios. Bringing it means the
-`duo` block of the iPhone Duo bullet below (the outer-display size assertion, `previews/duo/`), inner-display
-scenarios of the Game screen at 951x669 and 669x951 pt with the regular size class (the board fills every pose:
-change the aspect ratio, never letterbox), and the subfolder output layout of "What a repo needs" item 3, which
-the flat gallery does not have. Audit the screens first with maestro's `docs/iphone-duo.md` checklist (what a
-SwiftUI app usually fails: a bottom-centred control on the hinge, a detent sheet on regular width, a hand-made
-two-column layout such as the Wide card's, a close button drawn over the content); the findings go in a plan under
-`planning/` and the fixes through `/develop`. No Mac pass: macOS-only views (`DocumentWindow`) have no scenario
-until the off-screen renderer of item 5 is brought to BChess.
+iPhone 17 Pro (402x874 pt), plus one iPad-landscape card ("Game screen · Wide", 1180x820, regular / regular) and
+the iPhone Duo's inner-display cards (the group "iPhone Duo · inner display": 951x669 and 669x951 pt, regular /
+regular, captured at 3x) rendered on the iPhone simulator. The iPhone app is portrait-locked (a landscape trial was
+reverted: the real rotated board measured 151 pt). No iPad pass. **The iPhone Duo pass is built** (APP-8): `--device duo`
+renders the 48 scenarios (one of them skipped, see below) on the pool's `duo` simulator into `previews/duo/` (see below), after the audit in
+`planning/APP-8-iphone-duo.md` (maestro's `docs/iphone-duo.md` checklist). A screen whose layout changes at regular
+width gets an inner-display scenario. The OS's real division region is a manual check in Xcode's Device Hub: the
+fixtures use a 40 pt stand-in hinge at the centre. No Mac pass: macOS-only views (`DocumentWindow`) have no
+scenario until the off-screen renderer of item 5 is brought to BChess.
 
 Adopted (APP-5): the app has no `#Preview` and no `#if DEBUG` preview code.
 
@@ -49,7 +49,7 @@ Adopted (APP-5): the app has no `#Preview` and no `#if DEBUG` preview code.
 scripts/snapshot-gallery.sh                     # every scenario; the simulator goes back to the pool
 scripts/snapshot-gallery.sh --only "settings,list" # a subset: comma-separated substrings of names or slugs
 scripts/snapshot-gallery.sh --no-open           # do not open the page
-scripts/snapshot-gallery.sh --device duo        # the iPhone Duo: outer display and fixed-size inner poses -> previews/duo/ (due, see above)
+scripts/snapshot-gallery.sh --device duo        # the iPhone Duo: outer display and fixed-size inner poses -> previews/duo/
 ```
 
 - **Done = `CHECK OK [en]: <n> cards, light and dark complete and correctly lit`**. Then read the new or changed
@@ -66,17 +66,24 @@ scripts/snapshot-gallery.sh --device duo        # the iPhone Duo: outer display 
   scenarios at fixed window sizes, 951 x 669 pt (landscape, the hinge vertical at the centre) and 669 x 951 pt
   (portrait), regular size class both ways, captured at 3x. A custom control that steps off the fold takes its fold
   rectangles from a test-only hook (a 40 pt stand-in hinge at the centre); the OS's real reserved regions are a manual
-  check in Xcode's Device Hub. Model: xFractal. Apple's rules and the audit checklist: maestro's `docs/iphone-duo.md`.
+  check in Xcode's Device Hub. The pass prints `gallery: duo screen 466 x 678 pt` and fails before the first
+  capture on a simulator that is not folded (`duoPassProblem()`). A card the pass cannot render honestly is skipped, never captured badly: the folded Duo places the system
+  bars against its own 466 x 678 screen, not the 951 x 669 window (the "Duo inner · Landscape · Shell" card), so it prints `gallery: skipped <slug>: <why>`, is listed in the
+  manifest with a `skipped` reason, and the page shows "not rendered on this pass"; `--check` accepts the missing pair
+  for that reason only, and the render itself fails when a mount's settled bounds differ from the requested size.
+  Read those cards on the iPhone pass. Model: xFractal. Apple's rules and the audit checklist: maestro's `docs/iphone-duo.md`.
 
 - Snapshot test: `GallerySuites/SnapshotGalleryTests` in `BChessGalleryTests`; it runs only when
   `BCHESS_SNAPSHOT_DIR` is set (`TEST_RUNNER_BCHESS_SNAPSHOT_DIR` in xcodebuild's environment) and filters with
   `BCHESS_SNAPSHOT_ONLY` (the script's `--only`). It prints `gallery: <slug> <duration>` per scenario and
   `gallery: <n> scenario(s)`, which the script forwards.
-- Script options today: `--only`, `--no-open`, and the fallback's `--keep-booted` / `--shutdown` / simulator name.
-  Not there yet: `--device` (iPad, Duo), `SIMULATOR_UDID`, `-testRegion US` (the test run passes `-testLanguage en`
-  only), and the subfolder output layout (`previews/` is flat: `<slug>.png`, `<slug>.dark.png`, `manifest.json`
-  at the top; `--check` prints `CHECK OK [en]`). They come with the Duo pass.
-- Simulator: a lease from the pool, `simpool acquire --spec iphone --pid $$` (iPhone 17 Pro, iOS 27.0), given back
+- Script options: `--device iphone|duo` (anything else exits 2 before a lease), `--only`, `--no-open`, the
+  fallback's `--keep-booted` / `--shutdown` / simulator name, and `SIMULATOR_UDID` (used as is, never leased or
+  released). The test runs with `-testLanguage en -testRegion US`. Not there: an iPad pass (`--device ipad`, one more
+  case once wanted). The page script writes the layout of "What a repo needs" item 3 (`PREVIEW_GALLERY_OUT`, the
+  Duo pass's `previews/duo`, survives a full iPhone import and the other way round).
+- Simulator: a lease from the pool, `simpool acquire --spec iphone --pid $$` (iPhone 17 Pro, iOS 27.0; `--spec duo`,
+  iOS 27.1, on the Duo pass), given back
   with `simpool release <udid> --app ch.arizona-software.BChess` by the exit trap on success, failure and
   INT/TERM/HUP; the script never creates, boots, shuts down or erases one. Both `xcodebuild` commands run under
   `buildlock --folder <DerivedData>` (the test with `--no-slot`). A failed `simpool acquire` exits 1.
@@ -88,7 +95,9 @@ scripts/snapshot-gallery.sh --device duo        # the iPhone Duo: outer display 
 - Lifecycle tests: `scripts/test_snapshot_gallery.sh` (stub `xcrun`, `xcodebuild`, `simpool`, `buildlock` and
   page script; PATH limited to the stubs and the system directories). Pool: lease released on success, failure
   and INT/TERM/HUP, an interrupted `simpool acquire` stopped, no `simctl` lifecycle call. Fallback: create, boot,
-  shutdown, `--keep-booted`/`--shutdown`, a borrowed simulator left running.
+  shutdown, `--keep-booted`/`--shutdown`, a borrowed simulator left running. The Duo pass: a `duo` lease, the page in
+  `previews/duo/`, an unknown `--device`, `SIMULATOR_UDID`, and the real page script on fake manifests (the folder
+  layout, the migration of a flat gallery, both galleries surviving each other's import).
 - DerivedData: `BCHESS_SNAPSHOT_DD`, default `~/Library/Developer/Xcode/DerivedData/BChess-snapshots` (one folder
   for every checkout; a plan passes its own). No SPM packages, so no package flags.
 - Measured (APP-5, 3 scenarios): cold (empty DerivedData, shut-down simulator) boot 39 s, build 61 s, test 59 s,

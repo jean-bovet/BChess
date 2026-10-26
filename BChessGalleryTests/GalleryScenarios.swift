@@ -15,19 +15,77 @@
 import SwiftUI
 @testable import BChess
 
+/// The size a card renders at. The phone sizes follow the hosting scene's screen (402 x 874 on the pool's iPhone
+/// 17 Pro, 466 x 678 on a folded iPhone Duo) and keep the scene's own size classes; the others are fixed windows
+/// with the size classes of the device they stand for.
+enum GallerySize: Equatable {
+    /// The hosting scene's screen.
+    case phone
+    /// 375 x 667.
+    case smallPhone
+    /// 1180 x 820, regular / regular.
+    case ipadLandscape
+    /// The Duo's inner display in landscape, 951 x 669, regular / regular, the hinge vertical.
+    case duoInnerLandscape
+    /// The Duo's inner display in portrait, 669 x 951, regular / regular, the hinge horizontal (tabletop pose).
+    case duoInnerPortrait
+
+    /// The window size in points; `screen` is the hosting scene's screen in its portrait orientation.
+    func points(screen: CGSize) -> CGSize {
+        switch self {
+        case .phone: return screen
+        case .smallPhone: return CGSize(width: 375, height: 667)
+        case .ipadLandscape: return CGSize(width: 1180, height: 820)
+        case .duoInnerLandscape: return CGSize(width: 951, height: 669)
+        case .duoInnerPortrait: return CGSize(width: 669, height: 951)
+        }
+    }
+
+    /// The size classes forced on the window and the host; nil keeps the scene's own.
+    var sizeClasses: (horizontal: UIUserInterfaceSizeClass, vertical: UIUserInterfaceSizeClass)? {
+        switch self {
+        case .phone, .smallPhone: return nil
+        case .ipadLandscape, .duoInnerLandscape, .duoInnerPortrait: return (.regular, .regular)
+        }
+    }
+
+    /// The capture scale: the Duo's displays are 3x, so the inner sizes and every capture of the Duo pass use 3.
+    func scale(duoPass: Bool) -> CGFloat {
+        duoPass || isDuoInner ? 3 : 2
+    }
+
+    var isDuoInner: Bool {
+        self == .duoInnerLandscape || self == .duoInnerPortrait
+    }
+
+    /// The manifest field, and the folder of the card in the gallery.
+    var platform: String {
+        isDuoInner ? "duo-inner" : "iphone"
+    }
+}
+
 /// One named screen state: the card title, the page section, the render size and how long to let it settle.
 @MainActor
 struct GalleryScenario {
     let name: String
     let group: String
-    var size = GalleryScenario.phone
+    var size = GallerySize.phone
     /// How long the render waits for onAppear, tasks and List layout before the picture is taken.
     var settle: Duration = .milliseconds(400)
+    /// The scenario mounts the production shell, whose navigation and bottom bars the system places itself.
+    var usesSystemBars = false
     /// Throws when a fixture cannot be set up, which fails the render.
     let build: @MainActor () throws -> AnyView
 
-    /// The iPhone 17 Pro screen in points.
-    static let phone = CGSize(width: 402, height: 874)
+    /// Why this card cannot be rendered honestly on the pass, or nil. A skipped card is listed in the manifest with
+    /// the reason and has no images: a capture the harness cannot place never passes as coverage.
+    func skipReason(duoPass: Bool) -> String? {
+        guard duoPass else { return nil }
+        if usesSystemBars && size.isDuoInner {
+            return "the folded Duo places the system bars against its own 466 x 678 screen, not the 951 x 669 window"
+        }
+        return nil
+    }
 
     /// The file name stem of the card: "Game screen · Tall" is "game-screen-tall".
     var slug: String { Self.slug(of: name) }
@@ -124,6 +182,14 @@ enum GalleryScenarios {
         return try GameShell(library: library)
     }
 
+    /// The production shell on an empty library (the launch screen), with the fold's region when given.
+    /// A filesystem error throws, so it fails the scenario.
+    static func emptyLibraryShell(fold: FoldRegion? = nil) throws -> AnyView {
+        let directory = FileManager.default.temporaryDirectory.appendingPathComponent("Gallery-\(UUID().uuidString)", isDirectory: true)
+        try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+        return AnyView(GameRootView(library: GameLibrary(directory: directory, defaults: defaults), foldRegions: fold.map { [$0] }))
+    }
+
     // MARK: Scenarios
 
     private static func boardFrame(_ state: GameState? = nil) -> some View {
@@ -141,12 +207,14 @@ enum GalleryScenarios {
         }
     }
 
+    static let groupDuo = "iPhone Duo · inner display"
+
     // Game
     static let gameScreenTall = GalleryScenario(name: "Game screen · Tall", group: "Game") {
         AnyView(ContentView(session: humanToMoveSession()))
     }
     // iPad landscape
-    static let gameScreenWide = GalleryScenario(name: "Game screen · Wide", group: "Game", size: CGSize(width: 1180, height: 820)) {
+    static let gameScreenWide = GalleryScenario(name: "Game screen · Wide", group: "Game", size: .ipadLandscape) {
         AnyView(ContentView(session: humanToMoveSession())
             .frame(width: 1180, height: 820))
     }
@@ -184,6 +252,54 @@ enum GalleryScenarios {
         .padding())
     }
 
+    // iPhone Duo · inner display. The regions are the stand-in hinge in the content's coordinates (the window minus
+    // the 16 pt padding): 40 pt wide at the window's centre, the width the reference gives. The real frame is read
+    // off a device in Device Hub later and these are updated then. Only the source of the regions is injected.
+    static let duoLandscapeHinge = FoldRegion(frame: CGRect(x: 439.5, y: 0, width: 40, height: 637), isActive: true)
+    static let duoLandscapeSeam = FoldRegion(frame: CGRect(x: 439.5, y: 0, width: 40, height: 637), isActive: false)
+    static let duoPortraitTabletop = FoldRegion(frame: CGRect(x: 0, y: 439.5, width: 637, height: 40), isActive: true)
+    static let duoPortraitFlat = FoldRegion(frame: CGRect(x: 0, y: 439.5, width: 637, height: 40), isActive: false)
+
+    /// Two humans on the arrows-and-cards game, on the position that has variation arrows and cards.
+    static func variationsSession() -> GameSession {
+        let session = GameSession(state: GameState(pgn: Fixture.arrowsAndCards, white: .human, black: .human))
+        session.move(to: .start)
+        session.move(to: .forward)
+        session.move(to: .forward)
+        return session
+    }
+
+    /// The game screen in a bare window, as the scenarios and the oracle tests build it: it ignores the safe area
+    /// (the fixed windows stand on a phone screen whose insets belong to no inner display), so the content starts
+    /// 16 pt inside the window on every side and the fixtures' coordinates hold. Without a fold, none is injected.
+    static func gameScreen(_ session: GameSession, fold: FoldRegion?) -> AnyView {
+        AnyView(ContentView(session: session, foldRegions: fold.map { [$0] }).ignoresSafeArea())
+    }
+
+    static let duoLandscapeGame = GalleryScenario(name: "Duo inner · Landscape · Game screen", group: groupDuo, size: .duoInnerLandscape) {
+        gameScreen(humanToMoveSession(), fold: duoLandscapeHinge)
+    }
+    static let duoLandscapeFlatOpen = GalleryScenario(name: "Duo inner · Landscape · Flat open", group: groupDuo, size: .duoInnerLandscape) {
+        gameScreen(humanToMoveSession(), fold: duoLandscapeSeam)
+    }
+    static let duoLandscapeVariations = GalleryScenario(name: "Duo inner · Landscape · Variations", group: groupDuo, size: .duoInnerLandscape) {
+        gameScreen(variationsSession(), fold: duoLandscapeHinge)
+    }
+    // The production shell with its navigation and bottom bars (horizontal in a fixed window: the vertical side bars
+    // exist only on the real inner display). The region is the same stand-in: only its x range and shape matter here.
+    static let duoLandscapeShell = GalleryScenario(name: "Duo inner · Landscape · Shell", group: groupDuo, size: .duoInnerLandscape, settle: .seconds(1), usesSystemBars: true) {
+        try emptyLibraryShell(fold: duoLandscapeHinge)
+    }
+    static let duoPortraitGame = GalleryScenario(name: "Duo inner · Portrait · Game screen", group: groupDuo, size: .duoInnerPortrait) {
+        gameScreen(humanToMoveSession(), fold: duoPortraitFlat)
+    }
+    static let duoPortraitTabletopCard = GalleryScenario(name: "Duo inner · Portrait · Tabletop", group: groupDuo, size: .duoInnerPortrait) {
+        gameScreen(humanToMoveSession(), fold: duoPortraitTabletop)
+    }
+    static let duoPortraitTabletopVariations = GalleryScenario(name: "Duo inner · Portrait · Tabletop · Variations", group: groupDuo, size: .duoInnerPortrait) {
+        gameScreen(variationsSession(), fold: duoPortraitTabletop)
+    }
+
     // Board
     static let boardWhiteAtTheBottom = GalleryScenario(name: "Board · White at the bottom", group: "Board") {
         AnyView(boardFrame())
@@ -214,10 +330,7 @@ enum GalleryScenarios {
         .frame(width: 352, height: 352))
     }
     static let variationsArrowsAndCards = GalleryScenario(name: "Variations · Arrows and cards", group: "Board") {
-        let session = GameSession(state: GameState(pgn: Fixture.arrowsAndCards, white: .human, black: .human))
-        session.move(to: .start)
-        session.move(to: .forward)
-        session.move(to: .forward)
+        let session = variationsSession()
         return AnyView(VStack {
             ZStack {
                 BoardView(session: session)
@@ -318,13 +431,11 @@ enum GalleryScenarios {
     static let gamesListFourGames = GalleryScenario(name: "Games list · Four games", group: "Games list", settle: .seconds(1)) {
         AnyView(GamesList(shell: try gamesShell(), attempt: { _ in }, onNewGame: {}, actionError: .constant(nil)))
     }
-    static let gamesListSmallPhone = GalleryScenario(name: "Games list · Small iPhone", group: "Games list", size: CGSize(width: 375, height: 667), settle: .seconds(1)) {
+    static let gamesListSmallPhone = GalleryScenario(name: "Games list · Small iPhone", group: "Games list", size: .smallPhone, settle: .seconds(1)) {
         AnyView(GamesList(shell: try gamesShell(), attempt: { _ in }, onNewGame: {}, actionError: .constant(nil)))
     }
-    static let launchEmptyLibrary = GalleryScenario(name: "Launch · Empty library", group: "Games list", settle: .seconds(1)) {
-        let directory = FileManager.default.temporaryDirectory.appendingPathComponent("Gallery-\(UUID().uuidString)", isDirectory: true)
-        try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
-        return AnyView(GameRootView(library: GameLibrary(directory: directory, defaults: defaults)))
+    static let launchEmptyLibrary = GalleryScenario(name: "Launch · Empty library", group: "Games list", settle: .seconds(1), usesSystemBars: true) {
+        try emptyLibraryShell()
     }
     // The New Game sheet, from its choice: the caller reads the remembered one, so a scenario can open on any opponent.
     // The Mac layout has no card until the Mac renderer exists.
@@ -378,6 +489,8 @@ enum GalleryScenarios {
         playerRowToMove, playerRowCaptures,
         statusLineYourMove, statusLineCheckmate,
         navigationButtons,
+        duoLandscapeGame, duoLandscapeFlatOpen, duoLandscapeVariations, duoLandscapeShell,
+        duoPortraitGame, duoPortraitTabletopCard, duoPortraitTabletopVariations,
         boardWhiteAtTheBottom, boardLabelsRotated,
         piecesWhiteAtTheBottom, piecesRotated,
         promotionDropsFromTheTop, promotionRisesFromTheBottom,

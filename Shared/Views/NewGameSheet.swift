@@ -193,7 +193,7 @@ struct NewGameSheet: View {
                         .foregroundStyle(Walnut.textPrimary)
                         .accessibilityAddTraits(.isHeader)
                 }
-                ToolbarItem(placement: .navigationBarLeading) {
+                ToolbarItem(placement: .cancellationAction) {
                     Button("Cancel") { dismiss() }
                 }
             }
