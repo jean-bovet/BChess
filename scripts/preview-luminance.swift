@@ -1,4 +1,4 @@
-// Prints "<mean luminance 0...1> <file>" for every PNG in the directories given as arguments.
+// Prints "<mean luminance 0...1> <folder>/<file>" for every PNG in the directories given as arguments.
 // scripts/preview-gallery.py uses it to check that light renders are light and dark renders are dark.
 import CoreGraphics
 import Foundation
@@ -22,6 +22,6 @@ func luminance(_ path: String) -> Double? {
 for directory in CommandLine.arguments.dropFirst() {
     let files = ((try? FileManager.default.contentsOfDirectory(atPath: directory)) ?? []).filter { $0.hasSuffix(".png") }.sorted()
     for file in files {
-        print(String(format: "%.6f %@", luminance(directory + "/" + file) ?? -1, file))
+        print(String(format: "%.6f %@", luminance(directory + "/" + file) ?? -1, URL(fileURLWithPath: directory).lastPathComponent + "/" + file))
     }
 }

@@ -1,9 +1,13 @@
 #!/bin/bash
 # Renders every gallery scenario (light + dark) with one run of BChessGalleryTests' SnapshotGalleryTests on an
-# iOS simulator, imports the PNGs into previews/ and checks the gallery.
+# iOS simulator, imports the PNGs into previews/ and checks the gallery. $SIMULATOR_UDID, when set, is the
+# simulator to use: it is never leased and never released (the caller's).
 #
-# Usage: scripts/snapshot-gallery.sh [--only PATTERN] [--keep-booted] [--no-open] [simulator name or id]
+# Usage: scripts/snapshot-gallery.sh [--device iphone|duo] [--only PATTERN] [--keep-booted] [--no-open] [simulator name or id]
 #        scripts/snapshot-gallery.sh --shutdown [simulator name or id]
+#   --device D      iphone (default): the iPhone 17 Pro gallery in previews/. duo: the Duo pass, an iPhone Duo (iOS
+#                   27.1, folded: the outer display, 466 x 678 pt) renders every card and the inner-display ones at
+#                   3x into previews/duo/ (the iPhone gallery stays untouched); anything else exits 2
 #   --only PATTERN  comma-separated substrings of scenario names or slugs; renders just those and imports
 #                   them over the existing previews/ (the check still covers every scenario)
 #   --keep-booted   fallback only: leave the simulator booted for the next run (default: shut it down at the end)
@@ -25,9 +29,10 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
-KEEP=0; ONLY_SHUTDOWN=0; OPEN_PAGE=1; ONLY=""; SIM="BChess Agent"
+KEEP=0; ONLY_SHUTDOWN=0; OPEN_PAGE=1; ONLY=""; SIM=""; DEVICE=iphone
 while [[ $# -gt 0 ]]; do
   case "$1" in
+    --device) [[ $# -ge 2 ]] || { echo "--device needs iphone or duo" >&2; exit 2; }; DEVICE="$2"; shift 2 ;;
     --only) [[ $# -ge 2 ]] || { echo "--only needs a pattern" >&2; exit 2; }; ONLY="$2"; shift 2 ;;
     --keep-booted) KEEP=1; shift ;;
     --no-open) OPEN_PAGE=0; shift ;;
@@ -36,6 +41,16 @@ while [[ $# -gt 0 ]]; do
     *) SIM="$1"; shift ;;
   esac
 done
+case "$DEVICE" in
+  iphone) DEFAULT_SIM="BChess Agent" ;;
+  duo) DEFAULT_SIM="BChess Agent Duo" ;;
+  *) echo "unknown device: $DEVICE (iphone or duo)" >&2; exit 2 ;;
+esac
+[[ -n "$SIM" ]] || SIM="$DEFAULT_SIM"
+# The gallery's folder: the Duo pass has its own, inside previews/
+OUT="previews"
+if [[ $DEVICE == duo ]]; then OUT="previews/duo"; fi
+export PREVIEW_GALLERY_OUT="$OUT"
 
 # The machine-wide simulator pool and build lock, when both are installed.
 POOL=0
@@ -49,14 +64,18 @@ if [[ $POOL == 1 ]]; then
     exit 0
   fi
   [[ $KEEP == 1 ]] && echo "--keep-booted: the pool keeps its simulators booted anyway" >&2
-  [[ $SIM != "BChess Agent" ]] && echo "$SIM: ignored, the simulator comes from the pool (spec iphone)" >&2
+  [[ $SIM != "$DEFAULT_SIM" ]] && echo "$SIM: ignored, the simulator comes from the pool (spec $DEVICE)" >&2
   mkdir -p "$DD"
 else
 # --- fallback: the script's own simulator ---
 # The one place that may fail the run: a failing simctl must abort, never read as "nothing booted"
 AVAILABLE="$(xcrun simctl list devices available)"
 udid_of() { printf '%s\n' "$AVAILABLE" | grep -F "    $1 (" | head -1 | sed -E 's/.*\(([0-9A-F-]{36})\).*/\1/'; }
-if [[ "$SIM" =~ ^[0-9A-F-]{36}$ ]]; then UDID="$SIM"; else UDID="$(udid_of "$SIM" || true)"; fi
+# A caller-supplied simulator is borrowed in this mode too: never marked, created, booted, shut down or released
+CALLER_SIM=0
+if [[ -n "${SIMULATOR_UDID:-}" ]]; then CALLER_SIM=1; SIM="$SIMULATOR_UDID"; fi
+if [[ $CALLER_SIM == 1 ]]; then UDID="$SIMULATOR_UDID"
+elif [[ "$SIM" =~ ^[0-9A-F-]{36}$ ]]; then UDID="$SIM"; else UDID="$(udid_of "$SIM" || true)"; fi
 
 mkdir -p "$DD"
 # Names the simulator this script booted, so only it shuts that one down (here, in a later --shutdown, or on
@@ -76,14 +95,19 @@ release() {
 
 if [[ $ONLY_SHUTDOWN == 1 ]]; then
   # Never creates a simulator, and stops only one this script booted
-  if [[ -n "$UDID" ]]; then set_marker; fi
+  if [[ -n "$UDID" && $CALLER_SIM == 0 ]]; then set_marker; fi
   if owned; then release || exit 1; else echo "This script did not boot ${SIM}; leaving it alone."; fi
   exit 0
 fi
 if [[ -z "$UDID" ]]; then
-  UDID="$(xcrun simctl create "$SIM" "iPhone 17 Pro")"
+  if [[ $DEVICE == duo ]]; then
+    # The iPhone Duo device type exists on the iOS 27.1 runtime only
+    UDID="$(xcrun simctl create "$SIM" "iPhone Duo" "com.apple.CoreSimulator.SimRuntime.iOS-27-1")"
+  else
+    UDID="$(xcrun simctl create "$SIM" "iPhone 17 Pro")"
+  fi
 fi
-set_marker
+if [[ $CALLER_SIM == 0 ]]; then set_marker; fi
 
 # One simulator at a time on this Mac: never boot beside another one, never shut down one we did not boot.
 # Wait up to 10 minutes for the others to go away.
@@ -94,6 +118,7 @@ list_booted() {
 others() { printf '%s\n' "$BOOTED" | grep -E '\([0-9A-F-]{36}\)' | grep -v -F "$UDID" || true; }
 OTHERS=""
 for _ in $(seq 1 40); do
+  [[ $CALLER_SIM == 1 ]] && break   # nothing to boot beside the caller's simulator
   list_booted
   OTHERS="$(others)"
   [[ -z "$OTHERS" ]] && break
@@ -167,12 +192,16 @@ elapsed() { python3 -c "print(f'{$2 - $1:.1f} s')"; }
 fail() { echo "$1 failed (log: $LOG)" >&2; tail -30 "$LOG" >&2; exit 1; }
 
 T0=$(now)
-if [[ $POOL == 1 ]]; then
+if [[ $POOL == 1 && -n "${SIMULATOR_UDID:-}" ]]; then
+  # The caller's simulator: used as is, never leased or released
+  UDID="$SIMULATOR_UDID"
+  echo "using simulator $UDID (SIMULATOR_UDID)"
+elif [[ $POOL == 1 ]]; then
   # Leased to this script's process ($$): waits, interruptibly, while the pool is full.
   LEASE_OUT="$WORK/lease"
   : > "$LEASE_OUT"
   rc=0
-  simpool acquire --spec iphone --pid $$ > "$LEASE_OUT" < /dev/null &
+  simpool acquire --spec "$DEVICE" --pid $$ > "$LEASE_OUT" < /dev/null &
   CHILD=$!
   wait "$CHILD" || rc=$?
   CHILD=""
@@ -180,10 +209,12 @@ if [[ $POOL == 1 ]]; then
   UDID="$LEASED"
   if [[ $rc != 0 || -z "$UDID" ]]; then
     # Exit 1, not simpool's 75 (a wait that ran out): a wrapper under buildlock would read 75 as its own lock wait.
-    echo "No iphone simulator from the pool (simpool exit $rc; simpool status shows who holds them)." >&2
+    echo "No $DEVICE simulator from the pool (simpool exit $rc; simpool status shows who holds them)." >&2
     exit 1
   fi
   echo "leased simulator $UDID from the pool"
+elif [[ $CALLER_SIM == 1 ]]; then
+  echo "using simulator $UDID (SIMULATOR_UDID)"
 else
   list_booted   # fresh: another simulator may have booted since the wait loop; never boot beside it
   OTHERS="$(others)"
@@ -203,8 +234,10 @@ T_BUILD=$(now)
 # TEST_RUNNER_<name> in xcodebuild's environment reaches the test process as <name>.
 STATUS=0
 TEST_RUNNER_BCHESS_SNAPSHOT_DIR="$WORK/png" TEST_RUNNER_BCHESS_SNAPSHOT_ONLY="$ONLY" \
+TEST_RUNNER_BCHESS_SNAPSHOT_DEVICE="$DEVICE" \
 run_xcodebuild test test-without-building -project BChess.xcodeproj -scheme "BChess (iOS)" \
-  -destination "id=$UDID" -derivedDataPath "$DD" -parallel-testing-enabled NO -enableCodeCoverage NO -testLanguage en \
+  -destination "id=$UDID" -derivedDataPath "$DD" -parallel-testing-enabled NO -collect-test-diagnostics never -enableCodeCoverage NO \
+  -testLanguage en -testRegion US \
   -only-testing:BChessGalleryTests/GallerySuites/SnapshotGalleryTests || STATUS=$?
 T_TEST=$(now)
 grep -E '^gallery: |error:|Test run with' "$LOG" | sed 's/^/  /' || true
@@ -217,4 +250,4 @@ rm -f "$LOG"
 echo "network: none (I5)"
 [[ $POOL == 1 ]] && BOOT_LABEL=lease || BOOT_LABEL=boot
 echo "timings: $BOOT_LABEL $(elapsed "$T0" "$T_BOOT"), build $(elapsed "$T_BOOT" "$T_BUILD"), test $(elapsed "$T_BUILD" "$T_TEST"), total $(elapsed "$T0" "$(now)")"
-if [[ $OPEN_PAGE == 1 ]]; then open previews/index.html; fi
+if [[ $OPEN_PAGE == 1 ]]; then open "$OUT/index.html"; fi

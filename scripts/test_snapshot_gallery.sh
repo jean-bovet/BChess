@@ -11,6 +11,7 @@ set -u
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 SCRIPT="${SNAPSHOT_GALLERY_SCRIPT:-$ROOT/scripts/snapshot-gallery.sh}"
 FAILED=0
+ORIG_PATH="$PATH"; ORIG_TMPDIR="${TMPDIR:-}"
 UDID="11111111-2222-3333-4444-555555555555"
 POOL_UDID="77777777-0000-0000-0000-000000000000"
 
@@ -19,7 +20,7 @@ setup() {   # $1 = state of the "BChess Agent" simulator: Booted | Shutdown | mi
     mkdir -p "$T/bin"
     export TMPDIR="$T" STUB_LOG="$T/calls.log" STUB_STATE="$T/state" BCHESS_SNAPSHOT_DD="$T/dd" BCHESS_SNAPSHOT_KILL_GRACE=1 \
         STUB_UDID="$UDID"
-    unset STUB_BUILD_FAIL STUB_TEST_MODE STUB_BUILD_BLOCK STUB_TEST_BLOCK STUB_ACQUIRE_FAIL STUB_ACQUIRE_BLOCK STUB_CHECK
+    unset SIMULATOR_UDID PREVIEW_GALLERY_OUT STUB_BUILD_FAIL STUB_TEST_MODE STUB_BUILD_BLOCK STUB_TEST_BLOCK STUB_ACQUIRE_FAIL STUB_ACQUIRE_BLOCK STUB_CHECK
     : > "$STUB_LOG"
     if [ "$1" = missing ]; then : > "$STUB_STATE"; else echo "$1" > "$STUB_STATE"; fi
     # The state file holds the simulator's state (Booted|Shutdown); empty = it does not exist.
@@ -42,7 +43,7 @@ exit 0
 STUB
     cat > "$T/bin/xcodebuild" <<'STUB'
 #!/bin/bash
-echo "xcodebuild $*" >> "$STUB_LOG"
+echo "xcodebuild $* device=${TEST_RUNNER_BCHESS_SNAPSHOT_DEVICE:-}" >> "$STUB_LOG"
 case "$1" in
     build-for-testing)
         [ -n "${STUB_BUILD_BLOCK:-}" ] && { echo $$ > "$TMPDIR/xcb.pid"; exec sleep 60; }
@@ -65,6 +66,9 @@ STUB
     cat > "$TREE/scripts/preview-gallery.py" <<'STUB'
 import os, sys
 if '--import' in sys.argv:
+    out = os.environ.get('PREVIEW_GALLERY_OUT', 'previews')
+    os.makedirs(out, exist_ok=True)
+    open(os.path.join(out, 'index.html'), 'w').close()
     sys.exit(0 if os.path.isfile(os.path.join(sys.argv[sys.argv.index('--import') + 1], 'manifest.json')) else 1)
 if os.environ.get('STUB_CHECK') == 'fail':
     print('CHECK FAILED [en] (1):'); sys.exit(1)
@@ -166,6 +170,8 @@ pool_run() {
     expect pool_run "built under buildlock on the DerivedData folder" called "buildlock --folder $T/dd --log .* -- xcodebuild build-for-testing"
     expect pool_run "tested under buildlock without a build slot" called "buildlock --folder $T/dd --log .* --no-slot -- xcodebuild test-without-building"
     expect pool_run "on the leased simulator, no parallel testing" called "xcodebuild test-without-building .*-destination id=$POOL_UDID .*-parallel-testing-enabled NO"
+    expect pool_run "tests in the US region, the iphone device, the snapshot test only" called "xcodebuild test-without-building .*-testRegion US .*-only-testing:BChessGalleryTests/GallerySuites/SnapshotGalleryTests device=iphone"
+    expect pool_run "the page lands in previews/" test -f "$TREE/previews/index.html"
     expect pool_run "released the lease" called "simpool release $POOL_UDID --app ch.arizona-software.BChess"
     expect pool_run "released after the test" bash -c 'grep -n "test-without-building\|simpool release" "$0" | tail -1 | grep -q "simpool release"' "$STUB_LOG"
     no_simctl_lifecycle pool_run
@@ -237,9 +243,200 @@ pool_signalled_int_test() { pool_signalled INT test; }
 pool_signalled_term_test() { pool_signalled TERM test; }
 pool_signalled_hup_build() { pool_signalled HUP build; }
 
+pool_duo() {   # the Duo pass: a duo lease, device=duo, the page under previews/duo, the iPhone gallery untouched
+    pool_setup
+    gallery --device duo --no-open; local status=$?
+    expect pool_duo "exits zero" [ "$status" = 0 ]
+    expect pool_duo "leased a duo, never an iphone" called "simpool acquire --spec duo --pid "
+    expect pool_duo "no iphone lease" not_called "spec iphone"
+    expect pool_duo "tested with device=duo" called "xcodebuild test-without-building .*-testRegion US .*device=duo"
+    expect pool_duo "the page is in previews/duo/index.html" test -f "$TREE/previews/duo/index.html"
+    expect pool_duo "no page in previews/" bash -c '! test -e "$0/previews/index.html"' "$TREE"
+    expect pool_duo "released the lease once" bash -c '[ "$(grep -c "simpool release" "$0")" = 1 ]' "$STUB_LOG"
+    expect pool_duo "released the duo" called "simpool release $POOL_UDID"
+    no_simctl_lifecycle pool_duo
+}
+
+unknown_device() {   # --device watch: exit 2 before any lease or build
+    pool_setup
+    gallery --device watch --no-open; local status=$?
+    expect unknown_device "exits 2" [ "$status" = 2 ]
+    expect unknown_device "says so" grep -q "unknown device" "$T/out.log"
+    expect unknown_device "no lease" not_called "simpool"
+    expect unknown_device "no build" not_called "xcodebuild"
+    no_simctl_lifecycle unknown_device
+}
+
+simulator_udid() {   # SIMULATOR_UDID: used as is, never leased, never released
+    pool_setup
+    SIMULATOR_UDID="99999999-0000-0000-0000-000000000000" gallery --no-open; local status=$?
+    expect simulator_udid "exits zero" [ "$status" = 0 ]
+    expect simulator_udid "no lease" not_called "simpool acquire"
+    expect simulator_udid "tested on that id" called "xcodebuild test-without-building .*-destination id=99999999-0000-0000-0000-000000000000 "
+    expect simulator_udid "no release" not_called "simpool release"
+    no_simctl_lifecycle simulator_udid
+}
+
+fallback_udid() {   # SIMULATOR_UDID without the pool: used as is, never marked, booted, shut down or released
+    setup Booted
+    echo "$UDID" > "$MARKER"   # a stale marker of an earlier run must not make it ours
+    SIMULATOR_UDID="$UDID" gallery --no-open; local status=$?
+    expect fallback_udid "exits zero" [ "$status" = 0 ]
+    expect fallback_udid "tested on that id" called "xcodebuild test-without-building .*-destination id=$UDID "
+    expect fallback_udid "no create, boot, bootstatus or shutdown" not_called "simctl \(create\|boot\|bootstatus\|shutdown\|erase\)"
+    expect fallback_udid "left it booted" state_is Booted
+    expect fallback_udid "the marker is untouched" test -f "$MARKER"
+    expect fallback_udid "no pool call" not_called "simpool"
+    setup missing
+    SIMULATOR_UDID="$UDID" gallery --no-open; status=$?
+    expect fallback_udid "an unknown simulator is not created either" not_called "simctl \(create\|boot\|bootstatus\|shutdown\|erase\)"
+}
+
+# --- the page script, real, on a fake manifest and real PNGs ---
+
+png() {   # $1 = path, $2 = grey level: a 4 x 4 PNG
+    python3 -c 'import struct, sys, zlib
+def chunk(kind, data):
+    return struct.pack(">I", len(data)) + kind + data + struct.pack(">I", zlib.crc32(kind + data) & 0xffffffff)
+level = int(sys.argv[2]); row = b"\x00" + bytes([level, level, level]) * 4
+open(sys.argv[1], "wb").write(b"\x89PNG\r\n\x1a\n" + chunk(b"IHDR", struct.pack(">IIBBBBB", 4, 4, 8, 2, 0, 0, 0)) + chunk(b"IDAT", zlib.compress(row * 4)) + chunk(b"IEND", b""))' "$1" "$2"
+}
+
+page_setup() {   # a scratch tree with the real page script, the luminance helper and the scenarios file
+    # The real tools again (the stubs' PATH and TMPDIR of an earlier case are gone), for the swift helper
+    export PATH="$ORIG_PATH"; if [ -n "$ORIG_TMPDIR" ]; then export TMPDIR="$ORIG_TMPDIR"; else unset TMPDIR; fi
+    T="$(mktemp -d)"
+    TREE="$T/tree"; mkdir -p "$TREE/scripts" "$TREE/BChessGalleryTests"
+    cp "$ROOT/scripts/preview-gallery.py" "$ROOT/scripts/preview-luminance.swift" "$TREE/scripts/"
+    cp "$ROOT/BChessGalleryTests/GalleryScenarios.swift" "$TREE/BChessGalleryTests/"
+    unset PREVIEW_GALLERY_OUT
+    PAGE="python3 $TREE/scripts/preview-gallery.py"
+}
+
+fake_run() {   # $1 = directory, $2... = "slug:platform" (platform empty: none in the manifest entry); a light and a dark PNG each
+    local dir="$1" entry slug platform json="" sep=""; shift
+    mkdir -p "$dir"
+    for entry in "$@"; do
+        slug="${entry%%:*}"; platform="${entry#*:}"
+        png "$dir/$slug.png" 240; png "$dir/$slug.dark.png" 20
+        json="$json$sep{\"name\":\"$slug\",\"group\":\"G\",\"slug\":\"$slug\",\"size\":\"402x874\"${platform:+,\"platform\":\"$platform\"}}"; sep=","
+    done
+    echo "[$json]" > "$dir/manifest.json"
+}
+
+layout() {   # images in <platform>/, the manifest in data/, the page at the top only
+    page_setup
+    cd "$TREE" || return
+    fake_run "$T/run" "alpha:" "beta:duo-inner"
+    png "$T/run/stray.png" 100
+    $PAGE --import "$T/run" > "$T/out.log" 2>&1; local status=$?
+    expect layout "the import exits zero" [ "$status" = 0 ]
+    expect layout "no platform means iphone/" test -f previews/iphone/alpha.png -a -f previews/iphone/alpha.dark.png
+    expect layout "the platform picks the folder" test -f previews/duo-inner/beta.png
+    expect layout "an image the manifest does not name lands in other/" test -f previews/other/stray.png
+    expect layout "the manifest is in data/" test -f previews/data/manifest.json
+    expect layout "only the page and folders at the top" bash -c 'cd previews && [ "$(ls | sort | tr "\n" " ")" = "data duo-inner index.html iphone other " ]'
+    expect layout "the page links the folder" grep -q 'href="duo-inner/beta.png"' previews/index.html
+    expect layout "the page links iphone/" grep -q 'href="iphone/alpha.dark.png"' previews/index.html
+    $PAGE --check > "$T/check.log" 2>&1; status=$?
+    expect layout "the check names the stray image by folder" grep -q "stray image (no scenario): other/stray.png" "$T/check.log"
+    rm previews/other/stray.png
+    $PAGE --check > "$T/check.log" 2>&1; status=$?
+    expect layout "the check passes without it" grep -q "CHECK OK \[en\]: 2 cards" "$T/check.log"
+    # A flat gallery of an earlier version is migrated by the next command
+    rm -rf previews; mkdir previews
+    cp "$T/run/alpha.png" "$T/run/alpha.dark.png" "$T/run/beta.png" "$T/run/beta.dark.png" "$T/run/manifest.json" previews/
+    $PAGE --check > "$T/check.log" 2>&1; status=$?
+    expect layout "a flat gallery is migrated" test -f previews/duo-inner/beta.dark.png -a -f previews/iphone/alpha.png -a -f previews/data/manifest.json
+    expect layout "the migrated gallery checks" grep -q "CHECK OK \[en\]: 2 cards" "$T/check.log"
+    expect layout "nothing flat is left" bash -c '! ls previews/*.png previews/manifest.json 2>/dev/null | grep -q .'
+    # Resumable: a half-moved folder (the manifest moved, an image still at the top) is finished by the next command
+    mv previews/iphone/alpha.png previews/alpha.png
+    $PAGE --check > "$T/check.log" 2>&1
+    expect layout "a half-moved folder is finished" test -f previews/iphone/alpha.png -a ! -e previews/alpha.png
+    # data/coverage.json survives a full import
+    echo '{}' > previews/data/coverage.json
+    $PAGE --import "$T/run" > "$T/out.log" 2>&1
+    expect layout "coverage.json survives a full import" test -f previews/data/coverage.json
+    cd "$ROOT" || return; rm -rf "$T"
+}
+
+preserve() {   # a full import deletes only the PNGs the gallery owns
+    page_setup
+    cd "$TREE" || return
+    fake_run "$T/run" "alpha:" "beta:duo-inner"
+    $PAGE --import "$T/run" > "$T/out.log" 2>&1
+    echo notes > previews/iphone/keep.txt
+    png previews/iphone/stale.png 50
+    mkdir -p previews/notes previews/pending
+    echo review > previews/notes/review.txt
+    png previews/notes/shot.png 50
+    png previews/pending/old.png 50; echo '[]' > previews/pending/manifest.json
+    $PAGE --import "$T/run" >> "$T/out.log" 2>&1; local status=$?
+    expect preserve "the second full import exits zero" [ "$status" = 0 ]
+    expect preserve "an unrelated folder survives" test -f previews/notes/review.txt -a -f previews/notes/shot.png
+    expect preserve "a nested flat gallery survives" test -f previews/pending/old.png -a -f previews/pending/manifest.json
+    expect preserve "a non-PNG in an image folder survives" test -f previews/iphone/keep.txt
+    expect preserve "a stale PNG of an owned folder is replaced" test ! -e previews/iphone/stale.png
+    expect preserve "the new images are in place" test -f previews/iphone/alpha.png -a -f previews/duo-inner/beta.dark.png
+    cd "$ROOT" || return; rm -rf "$T"
+}
+
+skipped() {   # a card the pass could not render honestly: in the manifest with its reason, no images, the check accepts only that
+    page_setup
+    cd "$TREE" || return
+    fake_run "$T/run" "alpha:"
+    python3 - "$T/run/manifest.json" <<'PY'
+import json, sys
+path = sys.argv[1]
+manifest = json.load(open(path))
+manifest.append({"name": "beta", "group": "G", "slug": "beta", "size": "678x466", "platform": "iphone", "skipped": "the Duo cannot mount it"})
+json.dump(manifest, open(path, "w"))
+PY
+    $PAGE --import "$T/run" > "$T/out.log" 2>&1
+    $PAGE --check > "$T/check.log" 2>&1; local status=$?
+    expect skipped "the check passes with the skipped card's pair missing" [ "$status" = 0 ]
+    expect skipped "it counts every card" grep -q "CHECK OK \[en\]: 2 cards" "$T/check.log"
+    expect skipped "the page says why" grep -q "not rendered on this pass: the Duo cannot mount it" previews/index.html
+    # Without the flag the same gap fails the check
+    python3 - previews/data/manifest.json <<'PY'
+import json, sys
+path = sys.argv[1]
+manifest = json.load(open(path))
+for entry in manifest:
+    entry.pop("skipped", None)
+json.dump(manifest, open(path, "w"))
+PY
+    $PAGE --check > "$T/check.log" 2>&1; status=$?
+    expect skipped "a missing pair without the flag fails" [ "$status" != 0 ]
+    expect skipped "and names the missing image" grep -q "missing: iphone/beta.png" "$T/check.log"
+    cd "$ROOT" || return; rm -rf "$T"
+}
+
+coexist() {   # iPhone import, Duo import under previews/duo, iPhone import again: both galleries intact
+    page_setup
+    cd "$TREE" || return
+    fake_run "$T/phone" "alpha:" "beta:duo-inner"
+    fake_run "$T/duo" "alpha:" "gamma:duo-inner"
+    $PAGE --import "$T/phone" > "$T/out.log" 2>&1
+    PREVIEW_GALLERY_OUT=previews/duo $PAGE --import "$T/duo" >> "$T/out.log" 2>&1
+    expect coexist "both pages exist" test -f previews/index.html -a -f previews/duo/index.html
+    $PAGE --import "$T/phone" >> "$T/out.log" 2>&1; local status=$?
+    expect coexist "a second full iPhone import exits zero" [ "$status" = 0 ]
+    expect coexist "both pages still exist" test -f previews/index.html -a -f previews/duo/index.html
+    expect coexist "the Duo images are intact" test -f previews/duo/duo-inner/gamma.png -a -f previews/duo/iphone/alpha.dark.png
+    expect coexist "the Duo manifest is intact" grep -q gamma previews/duo/data/manifest.json
+    $PAGE --check > "$T/check.log" 2>&1; status=$?
+    expect coexist "the iPhone check does not count the Duo images as stray" grep -q "CHECK OK \[en\]: 2 cards" "$T/check.log"
+    PREVIEW_GALLERY_OUT=previews/duo $PAGE --check > "$T/check.log" 2>&1
+    expect coexist "the Duo check passes on its own" grep -q "CHECK OK \[en\]: 2 cards" "$T/check.log"
+    cd "$ROOT" || return; rm -rf "$T"
+}
+
 ALL="fallback_run fallback_keep_booted fallback_borrowed fallback_test_fails
 pool_run pool_options pool_acquire_fails pool_build_fails pool_test_fails pool_check_fails
-pool_signalled_int_acquire pool_signalled_int_build pool_signalled_int_test pool_signalled_term_test pool_signalled_hup_build"
+pool_signalled_int_acquire pool_signalled_int_build pool_signalled_int_test pool_signalled_term_test pool_signalled_hup_build
+pool_duo unknown_device simulator_udid fallback_udid layout preserve skipped coexist"
 for c in ${@:-$ALL}; do
     if declare -F "$c" > /dev/null; then "$c"; else echo "FAIL unknown case: $c"; FAILED=1; fi
     rm -rf "$T"
