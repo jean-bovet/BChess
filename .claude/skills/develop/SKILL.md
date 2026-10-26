@@ -101,7 +101,7 @@ uncommitted tracked changes or untracked files that are not ignored).
   (`simpool acquire`, or the repo's scripts do it) and release it when the run ends, also when it fails.
   Don't hold a lease across gates: the pool normally keeps a released simulator booted for the next gate. Never
   boot, shut down or touch a simulator by hand. One `-destination` per run and
-  `-parallel-testing-enabled NO` on every simulator test run. A repo whose scripts still boot their own
+  `-parallel-testing-enabled NO -collect-test-diagnostics never` on every simulator test run (without the second flag a failing test, so every red proof, makes xcodebuild collect a sysdiagnose-like simulator report for up to 10 minutes; the gates read the log, never that report. To debug a failure nobody can explain, rerun that one test without it). A repo whose scripts still boot their own
   simulator follows the global agreement's rule for those.
 - **Reading results.** Read the **exit status** and the summary line of every command; an empty grep
   is clean only if the command succeeded. The number of tests run is part of the result: zero is red,
@@ -138,7 +138,7 @@ buildlock --folder <dd>/dd-mac -- xcodebuild test -scheme "BChess (macOS)" -dest
 buildlock --folder <dd>/dd-uci -- xcodebuild -scheme BChessUCI -destination 'platform=macOS' -derivedDataPath <dd>/dd-uci build
 buildlock --folder <dd>/dd-ios -- xcodebuild build-for-testing -scheme "BChess (iOS)" -destination 'generic/platform=iOS Simulator' -derivedDataPath <dd>/dd-ios
 udid=$(simpool acquire --spec iphone --pid $$); trap 'simpool release "$udid" --app ch.arizona-software.BChess' EXIT
-buildlock --folder <dd>/dd-ios -- xcodebuild test-without-building -scheme "BChess (iOS)" -destination "id=$udid" -parallel-testing-enabled NO -derivedDataPath <dd>/dd-ios
+buildlock --folder <dd>/dd-ios -- xcodebuild test-without-building -scheme "BChess (iOS)" -destination "id=$udid" -parallel-testing-enabled NO -collect-test-diagnostics never -derivedDataPath <dd>/dd-ios
 ```
 
 `** TEST FAILED **`, `** BUILD FAILED **`, a Swift Testing line `✘`, or any `error:` is red. The
