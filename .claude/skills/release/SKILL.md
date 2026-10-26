@@ -148,6 +148,18 @@ Each prints `PROBLEM`, `CHECK` and `ok` lines. What they cover, and what to judg
 | App Privacy label | Not readable through the API: compare it with what the build collects (permissions, SDKs, network use); an app last updated before 2020 may have none |
 | Features removed since the live version | What's New (§4) must say so; the description must not still promise them |
 
+Two things the checkers do not read, judged by hand (rules and sizes in maestro's `docs/iphone-duo.md`):
+
+- **iPhone Duo SDK**: the candidate's iOS build was archived with the iOS 27.1 SDK or later
+  (`xcode-cloud report "BChess (iOS)" <build> --logs DIR`, then grep the iOS archive log for
+  `iPhoneOS27.1.sdk`; "Latest Release" workflows have had it since Xcode 27.1). A 27.0 build leaves
+  the inner display's right edge to the status bar: not a stop, but say so in the report, and never
+  call such a build Duo-ready.
+- **iPhone Duo screenshots**: a set for the inner display (2853 x 2007) and one for the outer display
+  (1398 x 2034) when the repo has them (`/app-store-screenshots`; BChess has neither the skill nor the
+  sets yet); they earn the product-page badge now and are required from April 2027 for 27.1-SDK apps.
+  They are uploaded by hand in App Store Connect until `app-store` can.
+
 **First release.** The 1.0 page starts empty, so the first audit lists the whole page as problems:
 copyright, description, support and privacy policy URLs, screenshots for iPhone, iPad and Mac, the
 age rating questionnaire and the App Review contact. BChess collects nothing and makes no network
@@ -167,7 +179,8 @@ Ask with `AskUserQuestion`, in one call (skip what Jean already answered):
    publish? Anything but yes: stop.
 
 2. **Screenshots** — §2b proved an iPhone 6.9" (or 6.7"), an iPad 13" and a Mac set exist; did the
-   UI change enough to retake any of them (`/preview-gallery` shows the iPhone screens)?
+   UI change enough to retake any of them (`/preview-gallery` shows the iPhone screens)? And the two
+   iPhone Duo sets of §2b: make them now, or ship without the badge?
 3. **Description** — does a new feature, or a change on one platform, belong in it?
 4. **Privacy policy** — does the range change what the app stores or sends, so the privacy policy
    page and the App Privacy label must change?
