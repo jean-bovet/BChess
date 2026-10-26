@@ -121,6 +121,15 @@ enum GalleryScenarios {
         return suite
     }()
 
+    /// The scratch suite with the engine readout switched on, for the one scenario that shows it; the other
+    /// scenarios keep `defaults`, so none of them starts an analysis.
+    static let engineOnDefaults: UserDefaults = {
+        let suite = UserDefaults(suiteName: "BChessGalleryEngineOn")!
+        suite.removePersistentDomain(forName: "BChessGalleryEngineOn")
+        suite.set(true, forKey: "showEngine")
+        return suite
+    }()
+
     /// The PGNs the scenarios load. `GameSession.init` falls back to an empty game when a PGN is
     /// rejected, so `GalleryScenarioTests` parses each one of `allPGNs`.
     enum Fixture {
@@ -220,6 +229,12 @@ enum GalleryScenarios {
     }
     static let gameScreenAnalyze = GalleryScenario(name: "Game screen · Analyze", group: "Game") {
         AnyView(ContentView(session: GameSession(mode: GameMode(value: .analyze))))
+    }
+    /// The engine readout on, over a live analysis of the position: the evaluation bar beside the board and the
+    /// engine card under the moves. The numbers come from the real engine, so they differ from run to run.
+    static let gameScreenEngineOn = GalleryScenario(name: "Game screen · Engine on", group: "Game", settle: .seconds(2)) {
+        AnyView(ContentView(session: humanToMoveSession())
+            .defaultAppStorage(engineOnDefaults))
     }
     static let gameScreenTrain = GalleryScenario(name: "Game screen · Train", group: "Game") {
         AnyView(ContentView(session: GameSession(mode: GameMode(value: .train))))
@@ -485,7 +500,7 @@ enum GalleryScenarios {
 
     /// In the order of the page: the groups, and the cards of each group.
     static let all: [GalleryScenario] = [
-        gameScreenTall, gameScreenWide, gameScreenAnalyze, gameScreenTrain, gameScreenRotated,
+        gameScreenTall, gameScreenWide, gameScreenAnalyze, gameScreenEngineOn, gameScreenTrain, gameScreenRotated,
         playerRowToMove, playerRowCaptures,
         statusLineYourMove, statusLineCheckmate,
         navigationButtons,
