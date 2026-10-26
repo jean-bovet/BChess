@@ -23,9 +23,23 @@ PGN fixture; both suites sit in the serialized parent suite `GallerySuites`). Ou
 (gitignored). Groups, in page order: Game, Board, Engine, Moves, Games list, Settings, Walnut (38 cards). The
 approved visual spec is the Walnut design canvas (`planning/README.md`, UI-WALNUT row).
 
+**English only, in every repo**, whatever languages the app ships (`-testLanguage en -testRegion US`). The gallery
+checks layout and appearance; translations are checked by the repo's catalog tests, not by screenshots. Never add
+a language pass to the gallery. The one exception is the App Store screenshots: a repo whose store pages show the app
+in each store language keeps a `--lang` option in its gallery scripts, used only by `/app-store-screenshots` with
+`--only` the slides' captures, into its own folder per language (`previews/fr/`). The gallery page stays English.
+
 iPhone 17 Pro (402x874 pt), plus one iPad-landscape card ("Game screen · Wide", 1180x820) rendered on the iPhone
-simulator. English only. No Mac pass: macOS-only views (`DocumentWindow`) have no scenario until the Mac renderer is
-proven in another repo.
+simulator. No iPad pass. **The iPhone Duo pass is due and not built yet**: the script has no `--device` option, so
+nothing renders on the pool's `duo` simulator and there are no inner-display scenarios. Bringing it means the
+`duo` block of the iPhone Duo bullet below (the outer-display size assertion, `previews/duo/`), inner-display
+scenarios of the Game screen at 951x669 and 669x951 pt with the regular size class (the board fills every pose:
+change the aspect ratio, never letterbox), and the subfolder output layout of "What a repo needs" item 3, which
+the flat gallery does not have. Audit the screens first with maestro's `docs/iphone-duo.md` checklist (what a
+SwiftUI app usually fails: a bottom-centred control on the hinge, a detent sheet on regular width, a hand-made
+two-column layout such as the Wide card's, a close button drawn over the content); the findings go in a plan under
+`planning/` and the fixes through `/develop`. No Mac pass: macOS-only views (`DocumentWindow`) have no scenario
+until the off-screen renderer of item 5 is brought to BChess.
 
 Adopted (APP-5): the app has no `#Preview` and no `#if DEBUG` preview code.
 
@@ -35,22 +49,33 @@ Adopted (APP-5): the app has no `#Preview` and no `#if DEBUG` preview code.
 scripts/snapshot-gallery.sh                     # every scenario; the simulator goes back to the pool
 scripts/snapshot-gallery.sh --only "settings,list" # a subset: comma-separated substrings of names or slugs
 scripts/snapshot-gallery.sh --no-open           # do not open the page
+scripts/snapshot-gallery.sh --device duo        # the iPhone Duo: outer display and fixed-size inner poses -> previews/duo/ (due, see above)
 ```
 
-- **Done = `CHECK OK [<lang>]: <n> cards, light and dark complete and correctly lit`** for every language
-  rendered. Then read the new or changed PNGs in both appearances (see Report). `simpool status` shows nothing
-  leased by the run.
+- **Done = `CHECK OK [en]: <n> cards, light and dark complete and correctly lit`**. Then read the new or changed
+  PNGs in both appearances (see Report). `simpool status` shows nothing leased by the run.
 - Costs measured on a proven repo (24 GB Mac, iOS 27 simulator): booting the simulator about **6 GB** of RAM;
   a run on a booted one about **0.25 GB**; build tools under 0.3 GB. Warm run: about 1 s per scenario plus a
   fixed 20–25 s (xcodebuild installs and launches the host app), so ~50 scenarios take 1.5–2.5 min and
   `--only` one scenario about 25 s. From a shut-down simulator add 1–3 min (a fresh boot keeps iOS busy). The
   pool normally keeps a released simulator warm for the next run (within the host's budget) and shuts it
   down after 30 idle minutes.
+- **iPhone Duo** (`--device duo`, pool spec `duo`, iOS 27.1): `simctl` cannot fold or unfold a simulator (Xcode 27.1),
+  so it stays folded. The phone-sized scenarios render on the outer display (466 x 678 pt, compact width, the status
+  bar on the side); the script asserts that size before labelling the captures. The inner display's poses are
+  scenarios at fixed window sizes, 951 x 669 pt (landscape, the hinge vertical at the centre) and 669 x 951 pt
+  (portrait), regular size class both ways, captured at 3x. A custom control that steps off the fold takes its fold
+  rectangles from a test-only hook (a 40 pt stand-in hinge at the centre); the OS's real reserved regions are a manual
+  check in Xcode's Device Hub. Model: xFractal. Apple's rules and the audit checklist: maestro's `docs/iphone-duo.md`.
 
 - Snapshot test: `GallerySuites/SnapshotGalleryTests` in `BChessGalleryTests`; it runs only when
   `BCHESS_SNAPSHOT_DIR` is set (`TEST_RUNNER_BCHESS_SNAPSHOT_DIR` in xcodebuild's environment) and filters with
   `BCHESS_SNAPSHOT_ONLY` (the script's `--only`). It prints `gallery: <slug> <duration>` per scenario and
   `gallery: <n> scenario(s)`, which the script forwards.
+- Script options today: `--only`, `--no-open`, and the fallback's `--keep-booted` / `--shutdown` / simulator name.
+  Not there yet: `--device` (iPad, Duo), `SIMULATOR_UDID`, `-testRegion US` (the test run passes `-testLanguage en`
+  only), and the subfolder output layout (`previews/` is flat: `<slug>.png`, `<slug>.dark.png`, `manifest.json`
+  at the top; `--check` prints `CHECK OK [en]`). They come with the Duo pass.
 - Simulator: a lease from the pool, `simpool acquire --spec iphone --pid $$` (iPhone 17 Pro, iOS 27.0), given back
   with `simpool release <udid> --app ch.arizona-software.BChess` by the exit trap on success, failure and
   INT/TERM/HUP; the script never creates, boots, shuts down or erases one. Both `xcodebuild` commands run under
@@ -108,33 +133,54 @@ One entry in the scenario list, and nothing in the app:
    scenario) so the page script never parses Swift. It swaps the host app's own shared loader for the stub too.
 3. **`scripts/preview-gallery.py`**: `--import DIR [--partial]` (replace the gallery, or only the files of an
    `--only` run), `--check`, `--coverage`; with `scripts/preview-luminance.swift` for the lit check.
+   **Output layout**: only the page at the top of the output folder, everything else in subfolders:
+   ```
+   previews/
+     index.html
+     <platform>/<slug>.png, <slug>.dark.png    one folder per platform or device family (iphone/, ipad/, mac/, watch/)
+     other/                                    an imported image no scenario names (--check reports it as stray)
+     data/manifest.json, data/coverage.json    what the page is built from
+   ```
+   The folder is the manifest entry's platform field (with a default for entries without one); the page links
+   `<platform>/<file>`. The snapshot test still writes one flat directory per run: only the import places the files.
+   A full import clears the images of every folder but `data/`, and keeps `data/coverage.json`. `--check` lists
+   the PNGs of every folder but `data/` and names files by their relative path (`ipad/x.dark.png`). The
+   luminance helper prints `<folder>/<file>`. A repo moving from a flat gallery (BChess, today) migrates it in the
+   script (every command first moves what is still at the top, resumably, then rebuilds the page), and
+   `snapshot-gallery.sh` reads `data/manifest.json` with a fallback to the old path. Proven in another repo.
 4. **`scripts/snapshot-gallery.sh`**:
-   - The simulator from the machine-wide pool: `simpool acquire --spec iphone --pid $$`, and `simpool release`
-     in the exit trap. Every `xcodebuild` runs under `buildlock --folder <DerivedData>`. Never boots or shuts
-     down a simulator itself.
+   - The simulator from the machine-wide pool: `SIMULATOR_UDID` if the caller passes one (never released),
+     else `simpool acquire --spec iphone --pid $$` (then `ipad`, `duo`, one device after the other), and
+     `simpool release` in the exit trap. Every `xcodebuild` runs under `buildlock --folder <DerivedData>`.
+     Never boots or shuts down a simulator itself.
    - A repo that may run without the pool (a public repo, a fresh clone): when `simpool` is not on PATH, its
      own agent simulator (created if missing, booted with `simctl boot`, no Simulator.app window) under the
      old rule: `xcrun simctl list devices booted` first, wait (up to 10 min) for another one, never touch one
-     it did not boot, a `trap` shuts down the one it booted.
+     it did not boot, a `trap` shuts down the one it booted. A private repo requires the pool.
    - Persistent DerivedData; `-skipPackageUpdates -disableAutomaticPackageResolution` once the packages are
      resolved (otherwise every run resolves remote packages: 75 s measured).
-   - `build-for-testing` once, then per language one `test-without-building -only-testing:<snapshot class>
-     -parallel-testing-enabled NO -enableCodeCoverage NO -testLanguage <lang>`.
+   - `build-for-testing` once, then one `test-without-building -only-testing:<snapshot class>
+     -parallel-testing-enabled NO -enableCodeCoverage NO -testLanguage en -testRegion US`.
    - The variables go in **xcodebuild's environment** as `TEST_RUNNER_<NAME>=… xcodebuild …`; written as
      arguments they become build settings and never reach the test.
    - Import, `--check`, open the page, print the timings (boot, build, test, total).
-5. **A Mac target**: a macOS unit test renders natively (an `NSHostingView` with an `NSAppearance`), with no
-   simulator at all. Not proven yet: design and measure it before relying on it.
-6. **Optional passes** when the audience needs them: another language (one more test run on the same
-   simulator), a largest-Dynamic-Type pass, another device family (one simulator after the other).
+5. **A Mac target**: an app-hosted macOS test renders each scenario with no simulator, **off screen**: a real
+   `NSWindow` with an `NSHostingController` (so `.toolbar` and `NavigationSplitView` bridge to AppKit) and an
+   `NSAppearance`, never ordered on screen, whose whole layer tree `CARenderer` draws into a Metal texture at 2x.
+   It works with the screen locked, flashes nothing, and draws sidebars, toolbar glass, `PDFView` and materials as
+   on screen; no ScreenCaptureKit, `cacheDisplay` or unlocked-screen check. The recipe, readiness without a visible
+   window, sheets, `PDFView` waits and what differs from an on-screen capture (neutral dark mode, inactive
+   selection, Retina only): [`mac-offscreen-renderer.md`](mac-offscreen-renderer.md).
+6. **Optional passes** when the audience needs them: a largest-Dynamic-Type pass, another device family (one
+   simulator after the other). Never another language (localized store captures belong to `/app-store-screenshots`).
 
 ## The gate: `--check`
 
 `--check` rebuilds the page from the PNGs on disk and fails on: a scenario of the manifest missing either
-image, a stray PNG no scenario expects, a duplicate slug, a light image that is dark or a dark one that is light
+image, a stray PNG no scenario expects (in any folder, or in the wrong platform's folder), a duplicate slug, a light image that is dark or a dark one that is light
 (mean luminance against a threshold), a dark image byte-identical to its light one, an image that cannot be
 decoded. An `--only` run replaces only its own images; the check still covers every scenario. The gallery is
-done only when `--check` passes for every language rendered.
+done only when `--check` passes.
 
 ## Converting a repo (from `#Preview`s)
 
@@ -164,7 +210,7 @@ one. `--check` also fails on `.preferredColorScheme` or `\.locale` in `GallerySc
 
 ## Report
 
-The card count (per platform and language), the check line, the timings, the network-call count, and any
+The card count (per platform), the check line, the timings, the network-call count, and any
 scenario that failed with its error's first line. Then the one thing this skill exists for: read at least the
 new or changed screens with the Read tool, **in both appearances** and on every platform rendered, compare them
 with the approved spec when there is one, and say what looks wrong (copy, hierarchy, truncation, an empty state
