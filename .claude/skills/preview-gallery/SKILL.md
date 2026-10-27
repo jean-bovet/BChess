@@ -98,8 +98,10 @@ scripts/snapshot-gallery.sh --no-open           # do not open the page (agents, 
   page script; PATH limited to the stubs and the system directories). Pool: lease released on success, failure
   and INT/TERM/HUP, an interrupted `simpool acquire` stopped, no `simctl` lifecycle call. Fallback: create, boot,
   shutdown, `--keep-booted`/`--shutdown`, a borrowed simulator left running. The Duo pass: a `duo` lease, the page in
-  `previews/duo/`, an unknown `--device`, `SIMULATOR_UDID`, and the real page script on fake manifests (the folder
-  layout, the migration of a flat gallery, both galleries surviving each other's import).
+  `previews/duo/`, an unknown `--device`, `SIMULATOR_UDID`, `caffeinate`, and the real page script on fake manifests
+  (the folder layout, the migration of a flat gallery, both galleries surviving each other's import, a `skipped`
+  card, a `documentCanvas` pair, a blank render with and without `drawsNothing`, a forced appearance or locale in
+  the scenario file).
 - DerivedData: `BCHESS_SNAPSHOT_DD`, default `~/Library/Developer/Xcode/DerivedData/BChess-snapshots` (one folder
   for every checkout; a plan passes its own). No SPM packages, so no package flags.
 - Measured (APP-5, 3 scenarios): cold (empty DerivedData, shut-down simulator) boot 39 s, build 61 s, test 59 s,
@@ -133,8 +135,8 @@ One entry in the scenario list, and nothing in the app:
   by design sets `drawsNothing: true` (otherwise `--check` fails a blank render). A card a pass cannot render
   honestly is **skipped, never captured badly**: the test prints `gallery: skipped <slug>: <why>`, the manifest
   lists it with a `skipped` reason, the page shows "not rendered on this pass", and `--check` accepts the missing
-  pair for that reason only. BChess's manifest carries `skipped` (the Duo pass); `documentCanvas` and
-  `drawsNothing` are not implemented, as no card needs them yet.
+  pair for that reason only. BChess's manifest carries all three: `skipped` (the Duo pass), and the scenario
+  fields `documentCanvas` and `drawsNothing`, which no card sets yet.
 - `scripts/preview-gallery.py --coverage` lists view types no scenario names (informational: most are parts
   of other screens).
 
@@ -185,7 +187,7 @@ One entry in the scenario list, and nothing in the app:
      arguments they become build settings and never reach the test.
    - Import, `--check`, open the page (`--no-open` skips that: agents, scripted runs), print the timings (boot,
      build, test, total). It keeps the Mac awake for the run (`caffeinate -dims`): a run during which the Mac
-     slept took three times as long. BChess's script does not run `caffeinate` yet.
+     slept took three times as long.
 5. **A Mac target**: an app-hosted macOS test renders each scenario with no simulator, **off screen**: a real
    `NSWindow` with an `NSHostingController` (so `.toolbar` and `NavigationSplitView` bridge to AppKit) and an
    `NSAppearance`, never ordered on screen, whose whole layer tree `CARenderer` draws into a Metal texture at 2x.
@@ -202,8 +204,10 @@ One entry in the scenario list, and nothing in the app:
 
 `--check` rebuilds the page from the PNGs on disk and fails on: a scenario of the manifest missing either
 image, a stray PNG no scenario expects (in any folder, or in the wrong platform's folder), a duplicate slug, a light image that is dark or a dark one that is light
-(mean luminance against a threshold), a dark image byte-identical to its light one, an image that cannot be
-decoded, and `.preferredColorScheme` or `\.locale` anywhere in the scenario file. An `--only` run replaces only its own images; the check still covers every scenario. The gallery is
+(mean luminance against a threshold; a `documentCanvas` scenario is judged as a pair instead, the dark image's
+mean luminance at least 0.05 below the light one's), a dark image byte-identical to its light one, a blank image
+(one colour everywhere) unless its scenario sets `drawsNothing`, an image that cannot be decoded, and
+`.preferredColorScheme` or `\.locale` anywhere in the scenario file (its `//` comments aside). An `--only` run replaces only its own images; the check still covers every scenario. The gallery is
 done only when `--check` passes.
 
 ## Converting a repo (from `#Preview`s)

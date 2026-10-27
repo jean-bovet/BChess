@@ -160,8 +160,8 @@ Two things the checkers do not read, judged by hand (rules and sizes in `docs/ip
 - **iPhone Duo screenshots**: a set for the inner display (2853 x 2007) and one for the outer display
   (1398 x 2034) when the repo has them (`/app-store-screenshots`; BChess renders only the iPhone 6.9" set
   so far, the two Duo slides files do not exist yet); they earn the product-page badge now and are
-  required from April 2027 for 27.1-SDK apps.
-  They are uploaded by hand in App Store Connect until `app-store` can.
+  required from April 2027 for 27.1-SDK apps. `check` lists them as `IPHONE_DUO: <n> (asset library)`; they are
+  uploaded with `app-store screenshots --display-class IPHONE_DUO` (that skill, §4), never by hand.
 
 **First release.** The 1.0 page starts empty, so the first audit lists the whole page as problems:
 copyright, description, support and privacy policy URLs, screenshots for iPhone, iPad and Mac, the
@@ -272,7 +272,8 @@ Then list Jean's manual steps:
 
 - screenshots retaken (§3 answer 2): the iPhone set through `/app-store-screenshots` §4, the others with
   `app-store screenshots --app "BChess (iOS)"` (`--platform IOS`: `APP_IPHONE_67` or `APP_IPHONE_69`, and
-  `APP_IPAD_13`; `--platform MAC_OS`: `APP_DESKTOP`) or in App Store Connect; the Duo sets by hand;
+  `APP_IPAD_13`; `--platform MAC_OS`: `APP_DESKTOP`) or in App Store Connect; the two Duo sets together with
+  `app-store screenshots --display-class IPHONE_DUO` (`/app-store-screenshots` §4);
 - the privacy policy changed (§3 answer 4): the privacy policy page, and the App Privacy label in
   App Store Connect.
 
