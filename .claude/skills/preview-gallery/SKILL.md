@@ -34,7 +34,7 @@ in each store language keeps a `--lang` option in its gallery scripts, used only
 iPhone 17 Pro (402x874 pt), plus one iPad-landscape card ("Game screen · Wide", 1180x820, regular / regular) and
 the iPhone Duo's inner-display cards (the group "iPhone Duo · inner display": 951x669 and 669x951 pt, regular /
 regular, captured at 3x) rendered on the iPhone simulator. The iPhone app is portrait-locked (a landscape trial was
-reverted: the real rotated board measured 151 pt). No iPad pass. **The iPhone Duo pass is built** (APP-8): `--device duo`
+reverted: the real rotated board measured 151 pt). **An iPad pass exists** (`--device ipad`, see below). **The iPhone Duo pass is built** (APP-8): `--device duo`
 renders the 48 scenarios (one of them skipped, see below) on the pool's `duo` simulator into `previews/duo/` (see below), after the audit in
 `planning/APP-8-iphone-duo.md` (the checklist of `docs/iphone-duo.md`, next to the tools the global working
 agreement names). A screen whose layout changes at regular
@@ -79,10 +79,10 @@ scripts/snapshot-gallery.sh --no-open           # do not open the page (agents, 
   `BCHESS_SNAPSHOT_DIR` is set (`TEST_RUNNER_BCHESS_SNAPSHOT_DIR` in xcodebuild's environment) and filters with
   `BCHESS_SNAPSHOT_ONLY` (the script's `--only`). It prints `gallery: <slug> <duration>` per scenario and
   `gallery: <n> scenario(s)`, which the script forwards.
-- Script options: `--device iphone|duo` (anything else exits 2 before a lease), `--only`, `--no-open`, the
+- Script options: `--device iphone|duo|ipad` (anything else exits 2 before a lease), `--only`, `--no-open`, the
   fallback's `--keep-booted` / `--shutdown` / simulator name, and `SIMULATOR_UDID` (used as is, never leased or
-  released). The test runs with `-testLanguage en -testRegion US`. Not there: an iPad pass (`--device ipad`, one more
-  case once wanted). The page script writes the layout of "What a repo needs" item 3 (`PREVIEW_GALLERY_OUT`, the
+  released). The test runs with `-testLanguage en -testRegion US`. The iPad pass (pool spec `ipad`, iPad Pro 13-inch, 1032 x 1376 pt at 2x = 2064 x 2752) renders every card into
+  `previews/ipad/ipad/` (all cards, plus the Duo shell card skipped); the iPhone gallery stays untouched. The page script writes the layout of "What a repo needs" item 3 (`PREVIEW_GALLERY_OUT`, the
   Duo pass's `previews/duo`, survives a full iPhone import and the other way round).
 - Simulator: a lease from the pool, `simpool acquire --spec iphone --pid $$` (iPhone 17 Pro, iOS 27.0; `--spec duo`,
   iOS 27.1, on the Duo pass), given back

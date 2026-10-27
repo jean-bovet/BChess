@@ -3,11 +3,13 @@
 # iOS simulator, imports the PNGs into previews/ and checks the gallery. $SIMULATOR_UDID, when set, is the
 # simulator to use: it is never leased and never released (the caller's).
 #
-# Usage: scripts/snapshot-gallery.sh [--device iphone|duo] [--only PATTERN] [--keep-booted] [--no-open] [simulator name or id]
+# Usage: scripts/snapshot-gallery.sh [--device iphone|duo|ipad] [--only PATTERN] [--keep-booted] [--no-open] [simulator name or id]
 #        scripts/snapshot-gallery.sh --shutdown [simulator name or id]
 #   --device D      iphone (default): the iPhone 17 Pro gallery in previews/. duo: the Duo pass, an iPhone Duo (iOS
 #                   27.1, folded: the outer display, 466 x 678 pt) renders every card and the inner-display ones at
-#                   3x into previews/duo/ (the iPhone gallery stays untouched); anything else exits 2
+#                   3x into previews/duo/ (the iPhone gallery stays untouched). ipad: an iPad Pro 13-inch (1032 x 1376
+#                   pt, 2x = 2064 x 2752, the App Store's iPad 13" size) renders every card into previews/ipad/ipad/
+#                   (the iPhone gallery stays untouched); anything else exits 2
 #   --only PATTERN  comma-separated substrings of scenario names or slugs; renders just those and imports
 #                   them over the existing previews/ (the check still covers every scenario)
 #   --keep-booted   fallback only: leave the simulator booted for the next run (default: shut it down at the end)
@@ -36,7 +38,7 @@ if command -v caffeinate > /dev/null; then caffeinate -dims -w $$ & fi
 KEEP=0; ONLY_SHUTDOWN=0; OPEN_PAGE=1; ONLY=""; SIM=""; DEVICE=iphone
 while [[ $# -gt 0 ]]; do
   case "$1" in
-    --device) [[ $# -ge 2 ]] || { echo "--device needs iphone or duo" >&2; exit 2; }; DEVICE="$2"; shift 2 ;;
+    --device) [[ $# -ge 2 ]] || { echo "--device needs iphone, duo or ipad" >&2; exit 2; }; DEVICE="$2"; shift 2 ;;
     --only) [[ $# -ge 2 ]] || { echo "--only needs a pattern" >&2; exit 2; }; ONLY="$2"; shift 2 ;;
     --keep-booted) KEEP=1; shift ;;
     --no-open) OPEN_PAGE=0; shift ;;
@@ -48,12 +50,14 @@ done
 case "$DEVICE" in
   iphone) DEFAULT_SIM="BChess Agent" ;;
   duo) DEFAULT_SIM="BChess Agent Duo" ;;
-  *) echo "unknown device: $DEVICE (iphone or duo)" >&2; exit 2 ;;
+  ipad) DEFAULT_SIM="BChess Agent iPad" ;;
+  *) echo "unknown device: $DEVICE (iphone, duo or ipad)" >&2; exit 2 ;;
 esac
 [[ -n "$SIM" ]] || SIM="$DEFAULT_SIM"
 # The gallery's folder: the Duo pass has its own, inside previews/
 OUT="previews"
 if [[ $DEVICE == duo ]]; then OUT="previews/duo"; fi
+if [[ $DEVICE == ipad ]]; then OUT="previews/ipad"; fi
 export PREVIEW_GALLERY_OUT="$OUT"
 
 # The machine-wide simulator pool and build lock, when both are installed.
@@ -107,6 +111,8 @@ if [[ -z "$UDID" ]]; then
   if [[ $DEVICE == duo ]]; then
     # The iPhone Duo device type exists on the iOS 27.1 runtime only
     UDID="$(xcrun simctl create "$SIM" "iPhone Duo" "com.apple.CoreSimulator.SimRuntime.iOS-27-1")"
+  elif [[ $DEVICE == ipad ]]; then
+    UDID="$(xcrun simctl create "$SIM" "iPad Pro 13-inch (M5)")"
   else
     UDID="$(xcrun simctl create "$SIM" "iPhone 17 Pro")"
   fi

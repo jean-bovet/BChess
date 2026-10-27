@@ -263,6 +263,20 @@ pool_duo() {   # the Duo pass: a duo lease, device=duo, the page under previews/
     no_simctl_lifecycle pool_duo
 }
 
+pool_ipad() {   # the iPad pass: an ipad lease, device=ipad, the page under previews/ipad, the iPhone gallery untouched
+    pool_setup
+    gallery --device ipad --no-open; local status=$?
+    expect pool_ipad "exits zero" [ "$status" = 0 ]
+    expect pool_ipad "leased an ipad, never an iphone" called "simpool acquire --spec ipad --pid "
+    expect pool_ipad "no iphone lease" not_called "spec iphone"
+    expect pool_ipad "tested with device=ipad" called "xcodebuild test-without-building .*-testRegion US .*device=ipad"
+    expect pool_ipad "the page is in previews/ipad/index.html" test -f "$TREE/previews/ipad/index.html"
+    expect pool_ipad "no page in previews/" bash -c '! test -e "$0/previews/index.html"' "$TREE"
+    expect pool_ipad "released the lease once" bash -c '[ "$(grep -c "simpool release" "$0")" = 1 ]' "$STUB_LOG"
+    expect pool_ipad "released the ipad" called "simpool release $POOL_UDID"
+    no_simctl_lifecycle pool_ipad
+}
+
 unknown_device() {   # --device watch: exit 2 before any lease or build
     pool_setup
     gallery --device watch --no-open; local status=$?
@@ -518,7 +532,7 @@ coexist() {   # iPhone import, Duo import under previews/duo, iPhone import agai
 ALL="fallback_run fallback_keep_booted fallback_borrowed fallback_test_fails
 pool_run pool_options pool_acquire_fails pool_build_fails pool_test_fails pool_check_fails
 pool_signalled_int_acquire pool_signalled_int_build pool_signalled_int_test pool_signalled_term_test pool_signalled_hup_build
-pool_duo unknown_device simulator_udid fallback_udid layout preserve skipped document_canvas draws_nothing forced_appearance coexist"
+pool_duo pool_ipad unknown_device simulator_udid fallback_udid layout preserve skipped document_canvas draws_nothing forced_appearance coexist"
 for c in ${@:-$ALL}; do
     if declare -F "$c" > /dev/null; then "$c"; else echo "FAIL unknown case: $c"; FAILED=1; fi
     rm -rf "$T"

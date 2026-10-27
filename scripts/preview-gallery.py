@@ -8,7 +8,7 @@ previews/index.html, one card per scenario with light and dark side by side, gro
     scripts/preview-gallery.py --check                    # every scenario complete and correctly lit
     scripts/preview-gallery.py --coverage                 # view types no scenario names (informational)
 
-The gallery folder is previews/, or $PREVIEW_GALLERY_OUT (the Duo pass uses previews/duo). Its layout: only
+The gallery folder is previews/, or $PREVIEW_GALLERY_OUT (the Duo pass uses previews/duo, the iPad pass previews/ipad). Its layout: only
 index.html at the top, the images in <platform>/ (the manifest entry's `platform`, default iphone; an image the
 manifest does not name in other/), the manifest and coverage.json in data/. A folder with its own data/ is another
 gallery (previews/duo inside previews/), never an image folder: a full import removes only the PNGs of the folders
@@ -37,6 +37,7 @@ SCENARIOS = os.path.join(REPO, 'BChessGalleryTests', 'GalleryScenarios.swift')
 LUMINANCE_THRESHOLD = 0.45
 CANVAS_CONTRAST = 0.05   # documentCanvas: how much darker (mean luminance) the dark image must be than the light one
 PHONE_ASPECT = 402 / 874
+PASS_LABELS = {'duo': 'iPhone Duo', 'ipad': 'iPad'}   # the gallery folder's name -> the device the page says
 
 
 def slug(s):
@@ -308,7 +309,7 @@ html[data-mode="dark"] .shot img, html[data-mode="dark"] .shot .missing {{ width
 <button type="button" data-mode-btn="both" aria-pressed="false">Both</button>
 </div>
 <h1>BChess — screen gallery</h1>
-<p class="meta">{len(cards)} screens ({'iPhone Duo' if os.path.basename(OUT) == 'duo' else 'iPhone'}) · light and dark side by side.</p>
+<p class="meta">{len(cards)} screens ({PASS_LABELS.get(os.path.basename(OUT), 'iPhone')}) · light and dark side by side.</p>
 <nav aria-label="Gallery sections">{links_html}</nav>
 {sections_html}
 <script>

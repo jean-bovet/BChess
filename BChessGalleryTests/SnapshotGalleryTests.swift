@@ -28,6 +28,9 @@ extension GallerySuites {
         /// True on the Duo pass (`scripts/snapshot-gallery.sh --device duo`): every capture is at the display's 3x.
         static let duoPass = ProcessInfo.processInfo.environment["BCHESS_SNAPSHOT_DEVICE"] == "duo"
 
+        /// True on the iPad pass (`scripts/snapshot-gallery.sh --device ipad`): an iPad Pro 13-inch, 1032 x 1376 pt at 2x.
+        static let ipadPass = ProcessInfo.processInfo.environment["BCHESS_SNAPSHOT_DEVICE"] == "ipad"
+
         private static let snapshotDirectory = ProcessInfo.processInfo.environment["BCHESS_SNAPSHOT_DIR"].flatMap { $0.isEmpty ? nil : $0 }
 
         @Test("render every scenario in light and dark",
@@ -56,7 +59,7 @@ extension GallerySuites {
             let clock = ContinuousClock()
             var rendered = 0
             for scenario in scenarios {
-                if let reason = scenario.skipReason(duoPass: Self.duoPass) {
+                if let reason = scenario.skipReason(duoPass: Self.duoPass, ipadPass: Self.ipadPass) {
                     print("gallery: skipped \(scenario.slug): \(reason)")
                     continue
                 }
@@ -74,7 +77,8 @@ extension GallerySuites {
             let manifest = GalleryScenarios.all.map {
                 ManifestEntry(name: $0.name, group: $0.group, slug: $0.slug,
                               size: "\(Int($0.size.points(screen: screen).width))x\(Int($0.size.points(screen: screen).height))",
-                              platform: $0.size.platform, skipped: $0.skipReason(duoPass: Self.duoPass),
+                              platform: $0.size.platform(ipadPass: Self.ipadPass),
+                              skipped: $0.skipReason(duoPass: Self.duoPass, ipadPass: Self.ipadPass),
                               documentCanvas: $0.documentCanvas ? true : nil, drawsNothing: $0.drawsNothing ? true : nil)
             }
             let encoder = JSONEncoder()
