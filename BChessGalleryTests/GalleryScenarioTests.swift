@@ -312,6 +312,122 @@ extension GallerySuites {
             }
         }
 
+        // MARK: The wide layout's board column
+
+        /// The wide game screen as the production layout draws it, the engine readout on or off through the
+        /// production `@AppStorage` read of `defaults`, optionally at a larger text size.
+        private func wideImage(_ session: GameSession, size: CGSize, style: UIUserInterfaceStyle, defaults: UserDefaults,
+                               textSize: DynamicTypeSize? = nil) async throws -> UIImage {
+            let screen = GalleryScenarios.gameScreen(session, fold: nil)
+            let sized = textSize.map { AnyView(screen.dynamicTypeSize($0)) } ?? screen
+            return try await SnapshotGalleryTests.render(AnyView(sized.defaultAppStorage(defaults)), size: size,
+                                                         sizeClasses: (.regular, .regular), scale: 3, style: style)
+        }
+
+        /// The board's frame: its columns from a band below the corners' rounding, then the topmost contiguous run of
+        /// rows holding the frame colour within them, which must be as tall as the board is wide. The selected
+        /// variation card draws a border in the same colour below the board, and the sidebar may hold it too, so
+        /// neither may stretch the box.
+        private func boardBox(in image: UIImage, style: UIUserInterfaceStyle, _ label: String) throws -> CGRect {
+            let top = try #require(box(Walnut.frame, style, in: image), "\(label): no board frame in the capture").minY
+            let band = try #require(box(Walnut.frame, style, in: image, region: CGRect(x: 0, y: top + 12, width: image.size.width, height: 12)),
+                                    "\(label): no board frame band")
+            let columns = CGRect(x: band.minX - 1, y: 0, width: band.width + 2, height: image.size.height)
+            let run = try #require(GalleryPixels.firstRowRun(of: GalleryPixels.resolved(Walnut.frame, style: style), in: image, region: columns),
+                                   "\(label): no board frame rows")
+            let height = run.upperBound - run.lowerBound
+            #expect(abs(height - band.width) <= 1, "\(label): the board is \(band.width) pt wide and \(height) pt tall")
+            return CGRect(x: band.minX, y: run.lowerBound, width: band.width, height: height)
+        }
+
+        /// The Moves card's columns, found beside the board (the variation cards and the player rows stand elsewhere);
+        /// its vertical bounds are the board's rows, which is all the callers use.
+        private func movesCard(in image: UIImage, style: UIUserInterfaceStyle, board: CGRect, _ label: String) throws -> CGRect {
+            try #require(box(Walnut.card, style, in: image,
+                             region: CGRect(x: board.maxX, y: board.minY, width: image.size.width - board.maxX, height: board.height)),
+                         "\(label): no Moves card beside the board")
+        }
+
+        @Test("the wide layout puts the move list right beside the board, with the engine readout off and on")
+        func wideLayoutPutsTheMoveListBesideTheBoard() async throws {
+            let size = GallerySize.ipadLandscape.points(screen: try SnapshotGalleryTests.screenSize())
+            let gutter = EvaluationBar.width + 6
+            let readouts = [("engine off", GalleryScenarios.defaults, CGFloat(0)), ("engine on", GalleryScenarios.engineOnDefaults, gutter)]
+            for style in styles {
+                for (name, defaults, reserved) in readouts {
+                    let label = "\(style.rawValue), \(name)"
+                    let capture = try await wideImage(GalleryScenarios.humanToMoveSession(), size: size, style: style, defaults: defaults)
+                    let board = try boardBox(in: capture, style: style, label)
+                    let card = try movesCard(in: capture, style: style, board: board, label)
+                    #expect(card.minX - board.maxX <= 12.5, "\(label): the card starts \(card.minX - board.maxX) pt after the board")
+                    #expect(card.maxX >= size.width - 16 - 1, "\(label): the card ends at \(card.maxX)")
+                    #expect(board.minX >= 16 + reserved - 0.5, "\(label): the board starts at \(board.minX)")
+                }
+            }
+        }
+
+        @Test("the widest rows (fifteen captures and variation cards) at the smallest Mac window (740 x 500) and below it: the column ends at its rows, nothing enters the move list or leaves the padding")
+        func wideLayoutKeepsTheWorstRowBesideTheMoveList() async throws {
+            // The supported minimum, and 20 pt narrower: the column is proposed less than its rows need, the floor decides
+            for size in [CGSize(width: 740, height: 500), CGSize(width: 720, height: 500)] {
+                let gutter = EvaluationBar.width + 6
+                for style in styles {
+                    for textSize in [nil, DynamicTypeSize.accessibility1] {
+                        let label = "\(Int(size.width)), \(style.rawValue), \(textSize.map { "\($0)" } ?? "default text")"
+                        let session = GalleryScenarios.worstRowSession()
+                        #expect(max(session.capturedPieces(white: true).count, session.capturedPieces(white: false).count) >= 14)
+                        #expect(session.variations.show)
+                        let capture = try await wideImage(session, size: size, style: style, defaults: GalleryScenarios.engineOnDefaults,
+                                                          textSize: textSize)
+                        let board = try boardBox(in: capture, style: style, label)
+                        // (below the minimum the whole row overflows the window, so only the rows are checked)
+                        if size.width >= 740 {
+                            #expect(board.minX >= 16 + gutter - 0.5, "\(label): the board starts at \(board.minX)")
+                        }
+                        let card = try movesCard(in: capture, style: style, board: board, label)
+
+                        // The column ends where the card begins: no gap, and never short of the board
+                        let background = GalleryPixels.resolved(Walnut.background, style: style)
+                        let column = GalleryPixels.differing(from: background, in: capture,
+                                                             region: CGRect(x: 0, y: 0, width: card.minX - 4, height: size.height))
+                        let columnMaxX = try #require(column.maxX, "\(label): nothing left of the card")
+                        #expect(card.minX - columnMaxX <= 16, "\(label): the column ends at \(columnMaxX), the card starts at \(card.minX)")
+                        #expect(columnMaxX >= board.maxX - 0.5, "\(label): the column ends at \(columnMaxX), the board at \(board.maxX)")
+
+                        // The two player rows, above the board (from the padding to the spacing) and below it (as tall as the
+                        // first), over the column's width
+                        let rowHeight = board.minY - 10 - 16
+                        let bands = [CGRect(x: 0, y: 16, width: card.minX, height: rowHeight),
+                                     CGRect(x: 0, y: board.maxY + 10, width: card.minX, height: rowHeight)]
+                        var stripPixels = 0
+                        for band in bands {
+                            #expect(band.height > 0, "\(label): no row band")
+                            // The gap before the card is free: no row reaches the card
+                            let gap = CGRect(x: card.minX - 6, y: band.minY, width: 4, height: band.height)
+                            #expect(GalleryPixels.differing(from: background, in: capture, region: gap).count == 0,
+                                    "\(label): a row reaches the card at y \(band.minY)")
+                            // Nothing drawn over the card's leading edge (the lower band: the top one is the card's header)
+                            if band.minY > board.minY {
+                                let edge = CGRect(x: card.minX + 1, y: band.minY, width: 3, height: band.height)
+                                #expect(GalleryPixels.differing(from: GalleryPixels.resolved(Walnut.card, style: style), in: capture,
+                                                                region: edge, tolerance: 60.0 / 255).count == 0,
+                                        "\(label): something is drawn over the card's edge at y \(band.minY)")
+                            }
+                            // The row's content (the capture strip) has not vanished behind the sidebar
+                            stripPixels += GalleryPixels.differing(from: background, in: capture,
+                                                                   region: CGRect(x: card.minX - 124, y: band.minY, width: 120, height: band.height)).count
+                        }
+                        #expect(stripPixels > 100, "\(label): the capture strip is not there (\(stripPixels) pixels)")
+
+                        // The column, cards included, ends inside the padding
+                        let beyond = CGRect(x: 0, y: size.height - 16 + 0.5, width: size.width, height: 16)
+                        #expect(box(Walnut.frame, style, in: capture, region: beyond) == nil, "\(label): the frame colour past the padding")
+                        #expect(box(Walnut.card, style, in: capture, region: beyond) == nil, "\(label): a card past the padding")
+                    }
+                }
+            }
+        }
+
         @Test("a fold that leaves a narrow strip falls back to the tall layout inside it")
         func narrowFallbackGoesTallInsideTheUsableArea() async throws {
             let region = FoldRegion(frame: CGRect(x: 140, y: 0, width: 40, height: 240), isActive: true)

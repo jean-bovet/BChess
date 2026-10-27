@@ -158,8 +158,14 @@ enum GalleryScenarios {
         static let commented = "1. e4 {King's pawn} e5 (1... c5 {Sicilian} 2. Nf3 (2. c3 {Alapin}) d6) 2. Nf3 Nc6 3. Bb5 *"
         static let card = "1. e4 e5 2. Nf3 Nc6 3. Bb5 (3. Bc4 Bc5) a6 4. Bxc6 dxc6 5. O-O f6 *"
 
+        /// The widest rows: white captured fifteen pieces by the position before the last move, and that position has a
+        /// variation, so the capture strip is long and the variation cards show (`worstRowSession`).
+        static let worstRow = "1. h4 g5 2. hxg5 d5 3. Rxh7 a5 4. Rxh8 Bh3 5. Rxh3 Bh6 6. Rxh6 f5 7. gxf6 Qd7 8. fxe7 Nc6 9. Rxc6 Qe6 "
+            + "10. Rxe6 Rb8 11. Nh3 d4 12. b3 Kd7 13. e4 Ke8 14. f4 Rd8 15. exd8=R+ Kf7 16. Rxg8 b5 17. Bxb5 c5 18. g4 a4 "
+            + "19. bxa4 c4 20. Bxc4 d3 21. cxd3 Kxg8 22. Re8+ (22. Re7+) *"
+
         static let allPGNs = [ruyLopez, empty, openingE4E5, captures, yourMove, checkmate, arrowsAndCards,
-                              moveStripMiddle, moveStripVariations, shortGame, commented, card]
+                              moveStripMiddle, moveStripVariations, shortGame, commented, card, worstRow]
     }
 
     // MARK: Fixtures
@@ -285,6 +291,17 @@ enum GalleryScenarios {
         let session = GameSession(state: GameState(pgn: Fixture.arrowsAndCards, white: .human, black: .human))
         session.move(to: .start)
         session.move(to: .forward)
+        session.move(to: .forward)
+        return session
+    }
+
+    /// Two humans on the worst-row game, on the position before its last move: fifteen white captures and the
+    /// variation cards offered.
+    static func worstRowSession() -> GameSession {
+        let session = GameSession(state: GameState(pgn: Fixture.worstRow, white: .human, black: .human))
+        session.move(to: .end)
+        session.move(to: .backward)
+        // Forward from a position with two continuations offers them
         session.move(to: .forward)
         return session
     }

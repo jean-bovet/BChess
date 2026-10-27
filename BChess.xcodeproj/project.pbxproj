@@ -90,6 +90,7 @@
 		51597C0234CFC27A93176646 /* StateTests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2AD84B737192936DAA406CD7 /* StateTests.cpp */; };
 		51CE78E1DAEEE155926F36FC /* MoveStrip.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F0CD3AD321BEA14E5A8D141 /* MoveStrip.swift */; };
 		536CCC49CF72BD8D80281500 /* GameStateCodingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB9B23C24F0D870DB254ECD6 /* GameStateCodingTests.swift */; };
+		54949BA5D84349744505EE99 /* BoardColumn.swift in Sources */ = {isa = PBXBuildFile; fileRef = C09D3D7AA4C592422F3276B1 /* BoardColumn.swift */; };
 		54AD5F191D6C9A7151D02B9D /* ChessGame.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1798BECBBBED258BED2E2CA1 /* ChessGame.cpp */; };
 		54BAE9B206E2B941C596C763 /* ChessGame.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1798BECBBBED258BED2E2CA1 /* ChessGame.cpp */; };
 		55520A2B44E600A09A749E1B /* FENgineInfo+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4127DC8F0333054AE16B921 /* FENgineInfo+Extension.swift */; };
@@ -186,6 +187,7 @@
 		B7AB7FC4A683505ADFB314CF /* MoveList.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5706678E59692AD6397F2D59 /* MoveList.cpp */; };
 		B7F67B65AD67362E48C53620 /* GameShell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4664882CCC95A474A5F6075D /* GameShell.swift */; };
 		B8B0B9F88CA78B8C3104CE6B /* FoldSplit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D3FB5FF0F6743B683718D1E /* FoldSplit.swift */; };
+		B9B7926079711D8B1249A497 /* BoardColumn.swift in Sources */ = {isa = PBXBuildFile; fileRef = C09D3D7AA4C592422F3276B1 /* BoardColumn.swift */; };
 		BC3252F10593360ED02A17E6 /* PiecesFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = B06D783FF88F314CC998FEC5 /* PiecesFactory.swift */; };
 		BE677D8292959DBF4EFD1935 /* ChessOpenings.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 94916DB48E273E8C193F571F /* ChessOpenings.cpp */; };
 		C1A1CE815B0234952BBD3C71 /* FEngineUtility.mm in Sources */ = {isa = PBXBuildFile; fileRef = CE782615578B3D7B3C451A64 /* FEngineUtility.mm */; };
@@ -395,6 +397,7 @@
 		BE9B55D22F2C1D0A3ED7D1BD /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		C006F43EBABA2EA45058D0CE /* GameSectionsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameSectionsTests.swift; sourceTree = "<group>"; };
 		C07C992D860E1AF283E82845 /* HandicapTests.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = HandicapTests.cpp; sourceTree = "<group>"; };
+		C09D3D7AA4C592422F3276B1 /* BoardColumn.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoardColumn.swift; sourceTree = "<group>"; };
 		C21D5E42AEF6323A7436DF25 /* Promotion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Promotion.swift; sourceTree = "<group>"; };
 		C2D17161DA74B911FD109203 /* SelectionModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectionModifier.swift; sourceTree = "<group>"; };
 		C4D6AC18DAF20B619B734F5B /* FEngineTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FEngineTests.swift; sourceTree = "<group>"; };
@@ -435,7 +438,7 @@
 		FECF3456A6E4C0D9547AC353 /* GameHistory.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = GameHistory.cpp; sourceTree = "<group>"; };
 		FEEA804C177D0F7528A254ED /* ChessState.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = ChessState.hpp; sourceTree = "<group>"; };
 		FFBE02E6B7A75B593B086B33 /* BChessUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BChessUITests.swift; sourceTree = "<group>"; };
-		"TEMP_5A966350-CC18-4110-8B84-EB4A19F5B12C" /* Signing.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Signing.xcconfig; sourceTree = "<group>"; };
+		"TEMP_1F202D25-A3F6-403C-8FEF-AEB624DAF3F1" /* Signing.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Signing.xcconfig; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -704,6 +707,7 @@
 			isa = PBXGroup;
 			children = (
 				AEC6B2A69F9EAD135A9433ED /* Arrow.swift */,
+				C09D3D7AA4C592422F3276B1 /* BoardColumn.swift */,
 				C80EAED5A93B886115810B84 /* BoardView.swift */,
 				6436166D3A4BF3D36CDCE690 /* ConditionalView.swift */,
 				2B7C82FBD58A56EEA69F8536 /* ContentView.swift */,
@@ -750,12 +754,12 @@
 			path = Helper;
 			sourceTree = "<group>";
 		};
-		"TEMP_A8585058-E7A2-437C-8136-5F9D9CECB7B7" /* app-8-iphone-duo */ = {
+		"TEMP_F185C55D-362B-4422-A315-6476DF8F390D" /* BChess */ = {
 			isa = PBXGroup;
 			children = (
-				"TEMP_5A966350-CC18-4110-8B84-EB4A19F5B12C" /* Signing.xcconfig */,
+				"TEMP_1F202D25-A3F6-403C-8FEF-AEB624DAF3F1" /* Signing.xcconfig */,
 			);
-			path = "app-8-iphone-duo";
+			path = BChess;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -962,6 +966,7 @@
 				6C4CD06F3DECD0D8EC87E4C7 /* AppSettings.swift in Sources */,
 				E82472307660320279C501A7 /* Arrow.swift in Sources */,
 				04AA9D1F6F5B25621FBDDAC2 /* BChessUIApp.swift in Sources */,
+				B9B7926079711D8B1249A497 /* BoardColumn.swift in Sources */,
 				DCDECDF4563125B4DF500148 /* BoardView.swift in Sources */,
 				15D3FD0CCF3383C42DF3EC8F /* ChessBoard.cpp in Sources */,
 				6B674CF5A48A3FEBD21CF92D /* ChessBoardHash.cpp in Sources */,
@@ -1121,6 +1126,7 @@
 				80122EE7DED5431C694D88BE /* AppSettings.swift in Sources */,
 				4406B4C05FB4EC9B01CC1C90 /* Arrow.swift in Sources */,
 				1426B85E993D7B40855AC4F7 /* BChessUIApp.swift in Sources */,
+				54949BA5D84349744505EE99 /* BoardColumn.swift in Sources */,
 				78EFE39F6F4B9F66FAB992F2 /* BoardView.swift in Sources */,
 				3641DE08ADF3ABCD68113A4B /* ChessBoard.cpp in Sources */,
 				DCD4B97AB91741A82C30825A /* ChessBoardHash.cpp in Sources */,
@@ -1499,7 +1505,7 @@
 		};
 		E7C507022C63CE4AB3B5B467 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = "TEMP_5A966350-CC18-4110-8B84-EB4A19F5B12C" /* Signing.xcconfig */;
+			baseConfigurationReference = "TEMP_1F202D25-A3F6-403C-8FEF-AEB624DAF3F1" /* Signing.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ANALYZER_NONNULL = YES;
@@ -1574,7 +1580,7 @@
 		};
 		ECE2B603E0677805EDE48B09 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = "TEMP_5A966350-CC18-4110-8B84-EB4A19F5B12C" /* Signing.xcconfig */;
+			baseConfigurationReference = "TEMP_1F202D25-A3F6-403C-8FEF-AEB624DAF3F1" /* Signing.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ANALYZER_NONNULL = YES;

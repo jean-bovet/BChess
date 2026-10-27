@@ -91,7 +91,7 @@ struct ContentView: View {
         .accessibilityValue(session.fen)
         // The evaluation bar stands left of the board, as tall as its frame. Its place depends only on
         // the setting, so stepping through the moves, which clears the verdict, never moves the board.
-        .padding(.leading, showEngine ? EvaluationBar.width + 6 : 0)
+        .padding(.leading, boardLeading)
         .overlay(alignment: .leading) {
             if showEngine {
                 EvaluationBar(verdict: EngineView.verdict(of: session), rotated: session.gameState.rotated)
@@ -99,12 +99,30 @@ struct ContentView: View {
         }
     }
 
+    /// The evaluation bar's gutter on the board's leading side; the wide column reserves it beside the square.
+    private var boardLeading: CGFloat {
+        showEngine ? EvaluationBar.width + 6 : 0
+    }
+
+    /// The two players, the board between them and the variation cards: the tall layout stacks them, the wide
+    /// layout's `BoardColumn` sizes the column from the board.
+    @ViewBuilder private var boardRows: some View {
+        PlayerRow(session: session, isWhite: topIsWhite)
+        board
+            .layoutValue(key: BoardColumn.IsBoard.self, value: true)
+        PlayerRow(session: session, isWhite: !topIsWhite)
+        VariationCards(session: session)
+    }
+
     private var boardColumn: some View {
         VStack(alignment: .leading, spacing: 10) {
-            PlayerRow(session: session, isWhite: topIsWhite)
-            board
-            PlayerRow(session: session, isWhite: !topIsWhite)
-            VariationCards(session: session)
+            boardRows
+        }
+    }
+
+    private var wideBoardColumn: some View {
+        BoardColumn(leading: boardLeading) {
+            boardRows
         }
     }
 
@@ -135,18 +153,18 @@ struct ContentView: View {
             if let split = placement?.split, let primary = split.primary {
                 // The fold is inside the area: the board column ends before it, the sidebar starts after it
                 HStack(alignment: .top, spacing: split.gap) {
-                    boardColumn
-                        .frame(width: primary)
+                    wideBoardColumn
+                        .frame(width: primary, alignment: .topLeading)
                     sidebar
                         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
                 }
             } else {
                 HStack(alignment: .top) {
                     // The board gets its full size first; the sidebar takes what is left
-                    boardColumn
+                    wideBoardColumn
                         .layoutPriority(1)
                     sidebar
-                        .frame(width: sidebarWidth(placement))
+                        .frame(minWidth: sidebarWidth(placement), maxWidth: .infinity)
                         .frame(maxHeight: .infinity, alignment: .topLeading)
                 }
             }
