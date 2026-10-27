@@ -20,8 +20,9 @@ localized captures. The iPad 13" set (`AppStore/screenshots-ipad.json`, 2064 x 2
 The Mac set (`AppStore/screenshots-mac.json`, 2880 x 1800) comes from the Mac pass (`scripts/snapshot-mac.sh`, captures in
 `previews/mac/mac/`, rendered with `app-store-screenshots --config AppStore/screenshots-mac.json --captures previews/mac/mac`
 into `.build/app-store-screenshots-mac/`). Upload with `app-store screenshots --display-type APP_IPAD_PRO_3GEN_129` / `--platform MAC_OS --display-type APP_DESKTOP`.
-The iPhone Duo sets (inner 2853 x 2007, outer 1398 x 2034) have no slides files yet; when they come, they use the
-`--device duo` pass's captures (`previews/duo/`) with `"device": "duo"` and `"duo-outer"` frames.
+The iPhone Duo sets come from the `--device duo` pass (`previews/duo/`): the inner set (`AppStore/screenshots-duo-inner.json`,
+2853 x 2007, `"device": "duo"`, rendered with `--captures previews/duo/duo-inner`) and the outer set
+(`AppStore/screenshots-duo-outer.json`, 1398 x 2034, `"device": "duo-outer"`, `--captures previews/duo/iphone`).
 
 ## 1. Captures
 
@@ -58,7 +59,7 @@ app-store screenshots --app <product> --version <v> --locale <locale> --display-
   .build/app-store-screenshots/<locale>/*.png
 ```
 
-The two iPhone Duo sets (once their slides files exist) go through the App Asset Library, not a display type: one
+The two iPhone Duo sets go through the App Asset Library, not a display type: one
 call per locale with both sets' files in page order (the inner display's slides, then the outer's; at most 10
 together, PNG without alpha at 2853 x 2007 / 2007 x 2853 / 1398 x 2034 / 2034 x 1398). It replaces the locale's Duo
 placements and reuses an image the library already holds, so a rerun with the same files only redoes the order:

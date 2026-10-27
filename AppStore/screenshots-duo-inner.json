@@ -1,0 +1,68 @@
+{
+  "displayType": "IPHONE_DUO",
+  "width": 2853,
+  "height": 2007,
+  "locales": [
+    "en-US"
+  ],
+  "textStyle": "top:80px; left:110px; width:2633px; text-align:center;",
+  "slides": [
+    {
+      "id": "hero",
+      "background": "radial-gradient(120% 80% at 30% 85%, #d9a066 0%, #8a4b1f 40%, #3b1d0b 80%, #160a03 100%)",
+      "phones": [
+        {
+          "capture": "duo-inner-landscape-game-screen",
+          "style": "left:451px; top:560px; transform: perspective(5200px) rotateX(12deg) rotateY(-14deg) rotateZ(4deg) scale(.82);",
+          "device": "duo"
+        }
+      ],
+      "text": {
+        "en-US": [
+          {
+            "title": "Chess with its own engine",
+            "sub": "Play offline, and see who stands better, the evaluation and the best line."
+          }
+        ]
+      }
+    },
+    {
+      "id": "variations",
+      "background": "radial-gradient(120% 80% at 70% 85%, #6b8f71 0%, #2f4f3a 45%, #0d1a12 100%)",
+      "phones": [
+        {
+          "capture": "duo-inner-landscape-variations",
+          "style": "left:451px; top:560px; transform: perspective(5200px) rotateX(12deg) rotateY(14deg) rotateZ(-4deg) scale(.82);",
+          "device": "duo"
+        }
+      ],
+      "text": {
+        "en-US": [
+          {
+            "title": "Every move, every variation",
+            "sub": "Where the game branches, tap an arrow or a line. The move list keeps variations and comments."
+          }
+        ]
+      }
+    },
+    {
+      "id": "dark",
+      "background": "radial-gradient(120% 80% at 50% 90%, #4a3626 0%, #1e140c 50%, #070402 100%)",
+      "phones": [
+        {
+          "capture": "duo-inner-landscape-game-screen.dark",
+          "style": "left:451px; top:560px; transform: perspective(5200px) rotateX(12deg) rotateY(-14deg) rotateZ(4deg) scale(.82);",
+          "device": "duo"
+        }
+      ],
+      "text": {
+        "en-US": [
+          {
+            "title": "Light and dark",
+            "sub": "A wooden board in a walnut frame. No accounts, no ads, no network: the engine runs on your device."
+          }
+        ]
+      }
+    }
+  ]
+}
