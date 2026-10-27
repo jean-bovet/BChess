@@ -49,9 +49,11 @@
       "background": "radial-gradient(120% 80% at 70% 85%, #6b8f71 0%, #2f4f3a 45%, #0d1a12 100%)",
       "phones": [
         {
-          "capture": "variations-arrows-and-cards",
-          "style": "left:-52px; top:420px; transform: perspective(5000px) rotateX(14deg) rotateY(-20deg) rotateZ(7deg) scale(0.74);",
-          "device": "ipad"
+          "capture": "game-screen-wide",
+          "device": "ipad",
+          "orientation": "landscape",
+          "screenBackground": "#f3f1eb",
+          "style": "left:-420px; top:680px; transform: perspective(5000px) rotateX(10deg) rotateY(-10deg) rotateZ(5deg) scale(0.66);"
         }
       ],
       "text": {
