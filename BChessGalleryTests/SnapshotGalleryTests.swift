@@ -20,6 +20,9 @@ extension GallerySuites {
             let platform: String
             /// Why the card has no images on this pass (nil: it has); the page shows it, `--check` accepts the gap.
             let skipped: String?
+            /// The scenario's `documentCanvas` and `drawsNothing`, written only when set (`--check` reads them).
+            let documentCanvas: Bool?
+            let drawsNothing: Bool?
         }
 
         /// True on the Duo pass (`scripts/snapshot-gallery.sh --device duo`): every capture is at the display's 3x.
@@ -71,7 +74,8 @@ extension GallerySuites {
             let manifest = GalleryScenarios.all.map {
                 ManifestEntry(name: $0.name, group: $0.group, slug: $0.slug,
                               size: "\(Int($0.size.points(screen: screen).width))x\(Int($0.size.points(screen: screen).height))",
-                              platform: $0.size.platform, skipped: $0.skipReason(duoPass: Self.duoPass))
+                              platform: $0.size.platform, skipped: $0.skipReason(duoPass: Self.duoPass),
+                              documentCanvas: $0.documentCanvas ? true : nil, drawsNothing: $0.drawsNothing ? true : nil)
             }
             let encoder = JSONEncoder()
             encoder.outputFormatting = [.prettyPrinted, .sortedKeys]

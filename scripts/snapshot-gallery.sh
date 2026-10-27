@@ -26,8 +26,12 @@
 #
 # DerivedData is persistent (BCHESS_SNAPSHOT_DD, default ~/Library/Developer/Xcode/DerivedData/BChess-snapshots):
 # build-for-testing is incremental and test-without-building runs only the snapshot test.
+#
+# The Mac stays awake for the whole run (`caffeinate -dims`, bound to this process so it ends with it): a run during
+# which the Mac slept took three times as long.
 set -euo pipefail
 cd "$(dirname "$0")/.."
+if command -v caffeinate > /dev/null; then caffeinate -dims -w $$ & fi
 
 KEEP=0; ONLY_SHUTDOWN=0; OPEN_PAGE=1; ONLY=""; SIM=""; DEVICE=iphone
 while [[ $# -gt 0 ]]; do

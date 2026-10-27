@@ -1,10 +1,12 @@
-// Prints "<mean luminance 0...1> <folder>/<file>" for every PNG in the directories given as arguments.
-// scripts/preview-gallery.py uses it to check that light renders are light and dark renders are dark.
+// Prints "<mean luminance 0...1> <spread 0...1> <folder>/<file>" for every PNG in the directories given as arguments:
+// the mean luminance of the image, and the widest difference between two of its pixels' channels (0: one colour
+// everywhere, a blank render). scripts/preview-gallery.py uses them to check that light renders are light, dark
+// renders are dark and nothing came out blank.
 import CoreGraphics
 import Foundation
 import ImageIO
 
-func luminance(_ path: String) -> Double? {
+func measure(_ path: String) -> (luminance: Double, spread: Double)? {
     guard let source = CGImageSourceCreateWithURL(URL(fileURLWithPath: path) as CFURL, nil),
           let image = CGImageSourceCreateImageAtIndex(source, 0, nil) else { return nil }
     let width = 40, height = 80
@@ -13,15 +15,22 @@ func luminance(_ path: String) -> Double? {
                                   space: CGColorSpaceCreateDeviceRGB(), bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue) else { return nil }
     context.draw(image, in: CGRect(x: 0, y: 0, width: width, height: height))
     var sum = 0.0
+    var low = [UInt8](repeating: 255, count: 3), high = [UInt8](repeating: 0, count: 3)
     for i in stride(from: 0, to: pixels.count, by: 4) {
         sum += 0.299 * Double(pixels[i]) + 0.587 * Double(pixels[i + 1]) + 0.114 * Double(pixels[i + 2])
+        for channel in 0..<3 {
+            low[channel] = min(low[channel], pixels[i + channel])
+            high[channel] = max(high[channel], pixels[i + channel])
+        }
     }
-    return sum / Double(width * height) / 255
+    let spread = (0..<3).map { Int(high[$0]) - Int(low[$0]) }.max() ?? 0
+    return (sum / Double(width * height) / 255, Double(spread) / 255)
 }
 
 for directory in CommandLine.arguments.dropFirst() {
     let files = ((try? FileManager.default.contentsOfDirectory(atPath: directory)) ?? []).filter { $0.hasSuffix(".png") }.sorted()
     for file in files {
-        print(String(format: "%.6f %@", luminance(directory + "/" + file) ?? -1, URL(fileURLWithPath: directory).lastPathComponent + "/" + file))
+        let measured = measure(directory + "/" + file) ?? (-1, -1)
+        print(String(format: "%.6f %.6f %@", measured.luminance, measured.spread, URL(fileURLWithPath: directory).lastPathComponent + "/" + file))
     }
 }
