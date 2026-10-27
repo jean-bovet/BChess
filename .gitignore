@@ -16,3 +16,6 @@ Signing.local.xcconfig
 
 # macOS Finder metadata
 .DS_Store
+
+# App Store screenshots renders (app-store-screenshots)
+.build/
