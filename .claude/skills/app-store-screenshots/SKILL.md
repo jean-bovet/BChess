@@ -15,9 +15,10 @@ The app: BChess, App Store product `BChess (iOS)` (`--app "BChess (iOS)"`). The 
 `scripts/snapshot-gallery.sh` (the `/preview-gallery` skill) and land in `previews/iphone/` (the iPhone pass) and
 `previews/duo/` (`--device duo`). The slides file covers the iPhone 6.9" set (`APP_IPHONE_67`, 1320 x 2868), rendered
 with `app-store-screenshots --captures previews/iphone`. One store language, en-US: the app ships English only, so no
-localized captures. What the captures cannot show: there is no iPad gallery pass and no Mac renderer, so the iPad 13"
-and the Mac sets are captured by hand (an iPad simulator or device at 2064 x 2752, a Mac window at 2880 x 1800) and
-uploaded with `app-store screenshots --display-type APP_IPAD_13` / `--platform MAC_OS --display-type APP_DESKTOP`.
+localized captures. The iPad 13" set (`AppStore/screenshots-ipad.json`, 2064 x 2752) now comes from the iPad pass (`scripts/snapshot-gallery.sh
+--device ipad`, captures in `previews/ipad/ipad/`, rendered with `--config AppStore/screenshots-ipad.json --captures previews/ipad/ipad`).
+There is no Mac renderer, so the Mac set (`AppStore/screenshots-mac.json`, 2880 x 1800) uses window captures taken by hand into
+`previews/mac/`. Upload with `app-store screenshots --display-type APP_IPAD_13` / `--platform MAC_OS --display-type APP_DESKTOP`.
 The iPhone Duo sets (inner 2853 x 2007, outer 1398 x 2034) have no slides files yet; when they come, they use the
 `--device duo` pass's captures (`previews/duo/`) with `"device": "duo"` and `"duo-outer"` frames.
 

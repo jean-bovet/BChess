@@ -62,6 +62,11 @@ enum GallerySize: Equatable {
     var platform: String {
         isDuoInner ? "duo-inner" : "iphone"
     }
+
+    /// The manifest field on a pass: every card of the iPad pass lands in the gallery's ipad/ folder.
+    func platform(ipadPass: Bool) -> String {
+        ipadPass ? "ipad" : platform
+    }
 }
 
 /// One named screen state: the card title, the page section, the render size and how long to let it settle.
@@ -84,10 +89,12 @@ struct GalleryScenario {
 
     /// Why this card cannot be rendered honestly on the pass, or nil. A skipped card is listed in the manifest with
     /// the reason and has no images: a capture the harness cannot place never passes as coverage.
-    func skipReason(duoPass: Bool) -> String? {
-        guard duoPass else { return nil }
-        if usesSystemBars && size.isDuoInner {
+    func skipReason(duoPass: Bool, ipadPass: Bool = false) -> String? {
+        if duoPass && usesSystemBars && size.isDuoInner {
             return "the folded Duo places the system bars against its own 466 x 678 screen, not the 951 x 669 window"
+        }
+        if ipadPass && usesSystemBars && size.isDuoInner {
+            return "the iPad places the system bars against its own 1032 x 1376 screen, not the Duo's inner window"
         }
         return nil
     }
