@@ -129,14 +129,14 @@ tests) live in `BChessTests/`. `xcodegen generate` committed with any `project.y
 hand-edit `BChess.xcodeproj`.
 
 **Test gate:** all of these pass, each read by exit status **and** summary line. Each runs under
-`buildlock` on its own DerivedData folder. The step gate runs the first two lines (the unit tests in
+`buildlock` on its own DerivedData folder. The mac line also holds the hosted app's container lock (the outer `buildlock`, no slot): the scheme's `BChessMacGalleryTests` run inside the real Mac app, on its sandbox container, so two worktrees never run the host at once; it opens the app's untitled game window for the seconds the tests take. The step gate runs the first two lines (the unit tests in
 `BChessTests` and the UCI build). The final gate adds the last three: the iOS scheme's tests are the UI
 tests (`BChessUITests`) and the gallery tests, built once for the generic simulator, then run on a
 simulator leased from the pool for that run and given back right after it, also when it fails (run the
 last three lines in one shell):
 
 ```
-buildlock --folder <dd>/dd-mac -- xcodebuild test -scheme "BChess (macOS)" -destination 'platform=macOS' -derivedDataPath <dd>/dd-mac
+buildlock --folder ~/Library/Containers/ch.arizona-software.BChess --no-slot -- buildlock --folder <dd>/dd-mac -- xcodebuild test -scheme "BChess (macOS)" -destination 'platform=macOS' -derivedDataPath <dd>/dd-mac
 buildlock --folder <dd>/dd-uci -- xcodebuild -scheme BChessUCI -destination 'platform=macOS' -derivedDataPath <dd>/dd-uci build
 buildlock --folder <dd>/dd-ios -- xcodebuild build-for-testing -scheme "BChess (iOS)" -destination 'generic/platform=iOS Simulator' -derivedDataPath <dd>/dd-ios
 udid=$(simpool acquire --spec iphone --pid $$); trap 'simpool release "$udid" --app ch.arizona-software.BChess' EXIT
@@ -148,7 +148,7 @@ engine GoogleTest cases must show up as individual Swift Testing cases and must 
 count is printed by the suite) — zero executed is red, never green.
 
 **Warnings gate:** zero compiler warnings in our own sources (`Shared/`, `iOS/`, `macOS/`, `BChess/`,
-`BChessTests/`, `BChessAppTests/`, `BChessUITests/`, `BChessGalleryTests/`; vendored `Dependencies/`
+`BChessTests/`, `BChessAppTests/`, `BChessUITests/`, `BChessGalleryTests/`, `BChessMacGalleryTests/`; vendored `Dependencies/`
 and `gtest-all.cc` are exempt).
 
 ```
@@ -157,12 +157,15 @@ buildlock --folder <dd>/build-mac -- xcodebuild -target "BChess (macOS)" -config
 buildlock --folder <dd>/build-gt -- xcodebuild -target BChessGalleryTests -sdk iphonesimulator -configuration Debug SYMROOT=<dd>/build-gt OBJROOT=<dd>/obj-gt COMPILER_INDEX_STORE_ENABLE=NO build 2>&1 | grep -E '^/.*(warning|error):|^(warning|error):' | grep -v -e ONLY_ACTIVE_ARCH -e /Dependencies/ -e gtest-all
 ```
 
-The first two build only the app targets, so the third compiles the gallery tests (and builds their host app).
+The first two build only the app targets, so the third compiles the gallery tests (and builds their host app). A fourth line does the
+same for the Mac gallery tests on the macOS SDK: `buildlock --folder <dd>/build-mgt -- xcodebuild -target BChessMacGalleryTests -configuration Debug
+SYMROOT=<dd>/build-mgt OBJROOT=<dd>/obj-mgt COMPILER_INDEX_STORE_ENABLE=NO build 2>&1 | grep …` (the same filter).
 
 **Gallery gate** (`/preview-gallery`): every screen has a scenario in `BChessGalleryTests/GalleryScenarios.swift`
 (`AGENTS.md`), rendered by `scripts/snapshot-gallery.sh`. A step gate that changes what a screen looks like runs
 `scripts/snapshot-gallery.sh --no-open --only "<the screens it touched>"`; the final gate of a plan that touched
-UI runs the full gallery, `scripts/snapshot-gallery.sh --no-open`, plus `--device duo` when the plan touched a
+UI runs the full gallery, `scripts/snapshot-gallery.sh --no-open`, plus `scripts/snapshot-mac.sh --no-open` when the plan touched a Mac screen (green: `CHECK OK [en]: 6 cards, light and dark complete and correctly lit`;
+it leases nothing and runs the hosted app under the container lock), plus `--device duo` when the plan touched a
 screen with an inner-display scenario (the group "iPhone Duo · inner display") or a layout that changes at
 regular width. Green is the line `CHECK OK [en]: <n> cards, light and dark complete and correctly lit`, and the
 new or changed cards read in both appearances with the Read tool, as `/preview-gallery` says. The script leases

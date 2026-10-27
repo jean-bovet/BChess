@@ -185,6 +185,26 @@ targets:
         PRODUCT_BUNDLE_IDENTIFIER: ch.arizona-software.BChessGalleryTests
         TARGETED_DEVICE_FAMILY: "1,2"
 
+  # The Mac gallery: scenarios rendered off screen in real windows, hosted by the Mac app (see scripts/snapshot-mac.sh)
+  BChessMacGalleryTests:
+    type: bundle.unit-test
+    platform: macOS
+    sources:
+      - path: BChessMacGalleryTests
+      - path: BChessGalleryTests/GalleryFixtures.swift
+    dependencies:
+      - target: "BChess (macOS)"
+    settings:
+      base:
+        TEST_HOST: $(BUILT_PRODUCTS_DIR)/BChess.app/Contents/MacOS/BChess
+        BUNDLE_LOADER: $(TEST_HOST)
+        GENERATE_INFOPLIST_FILE: YES
+        # The scenarios build views over GameSession, which owns an FEngine, and the fixtures parse PGN with it
+        SWIFT_OBJC_BRIDGING_HEADER: BChess/BChess-Bridging-Header.h
+        PRODUCT_BUNDLE_IDENTIFIER: ch.arizona-software.BChessMacGalleryTests
+        # Xcode 27 also writes it on every macOS target
+        DEAD_CODE_STRIPPING: YES
+
 schemes:
   "BChess (macOS)":
     build:
@@ -196,6 +216,10 @@ schemes:
       config: Debug
       targets:
         - BChessTests
+        - BChessMacGalleryTests
+      # The host is the real app on its own bundle id: without this a hosted launch restores the last game windows
+      commandLineArguments:
+        "-ApplePersistenceIgnoreState YES": true
   "BChess (iOS)":
     build:
       targets:

@@ -19,13 +19,17 @@ struct NewGameSheet: View {
 
     let mode: Mode
     let onDone: (NewGame) -> Void
+    /// Where a new game's choice is remembered: the app's preferences, except in the gallery.
+    let defaults: UserDefaults
 
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.newGameSheetProbe) private var probe
     @State private var choice: NewGame
 
-    init(choice: NewGame, mode: Mode, onDone: @escaping (NewGame) -> Void) {
+    init(choice: NewGame, mode: Mode, defaults: UserDefaults = .standard, onDone: @escaping (NewGame) -> Void) {
         _choice = State(initialValue: choice)
         self.mode = mode
+        self.defaults = defaults
         self.onDone = onDone
     }
 
@@ -35,7 +39,7 @@ struct NewGameSheet: View {
 
     private func done() {
         if mode == .new {
-            choice.remember(in: .standard)
+            choice.remember(in: defaults)
         }
         onDone(choice)
         dismiss()
@@ -154,8 +158,14 @@ struct NewGameSheet: View {
 
     // MARK: Layouts
 
-    #if os(iOS)
     var body: some View {
+        layout
+            .onAppear { probe?.attach(choice: choice, defaults: defaults, start: done) }
+            .onChange(of: choice) { _, new in probe?.update(new) }
+    }
+
+    #if os(iOS)
+    private var layout: some View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: 16) {
@@ -200,7 +210,7 @@ struct NewGameSheet: View {
         }
     }
     #else
-    var body: some View {
+    private var layout: some View {
         VStack(alignment: .leading, spacing: 16) {
             Text(title)
                 .font(.system(.title3, design: .serif, weight: .semibold))
@@ -231,4 +241,34 @@ struct NewGameSheet: View {
         .background(Walnut.background.ignoresSafeArea())
     }
     #endif
+}
+
+/// Lets a test read what a mounted sheet holds (its choice, where it remembers one) and press its Start button's action.
+/// Nothing sets it in the apps, so the sheet reports to no one.
+@MainActor
+final class NewGameSheetProbe {
+    private(set) var choice: NewGame?
+    private(set) var defaults: UserDefaults?
+    /// The action of the Start Game button.
+    private(set) var start: (() -> Void)?
+
+    func reset() {
+        choice = nil
+        defaults = nil
+        start = nil
+    }
+
+    fileprivate func attach(choice: NewGame, defaults: UserDefaults, start: @escaping () -> Void) {
+        self.choice = choice
+        self.defaults = defaults
+        self.start = start
+    }
+
+    fileprivate func update(_ choice: NewGame) {
+        self.choice = choice
+    }
+}
+
+extension EnvironmentValues {
+    @Entry var newGameSheetProbe: NewGameSheetProbe? = nil
 }

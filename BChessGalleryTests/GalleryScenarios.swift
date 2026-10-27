@@ -103,9 +103,7 @@ struct GalleryScenario {
     var slug: String { Self.slug(of: name) }
 
     static func slug(of name: String) -> String {
-        let folded = name.folding(options: .diacriticInsensitive, locale: nil).lowercased()
-        let mapped = folded.map { $0.isASCII && ($0.isLetter || $0.isNumber) ? $0 : "-" }
-        return String(mapped).split(separator: "-", omittingEmptySubsequences: true).joined(separator: "-")
+        gallerySlug(of: name)
     }
 
     /// Isolated settings: every @AppStorage reads its declared default, and nothing writes the app's
@@ -125,56 +123,6 @@ extension View {
 
 @MainActor
 enum GalleryScenarios {
-    /// A scratch suite, emptied once per process, shared by the @AppStorage of every scenario and by the
-    /// fixture libraries.
-    static let defaults: UserDefaults = {
-        let suite = UserDefaults(suiteName: "BChessGallery")!
-        suite.removePersistentDomain(forName: "BChessGallery")
-        return suite
-    }()
-
-    /// The scratch suite with the engine readout switched on, for the one scenario that shows it; the other
-    /// scenarios keep `defaults`, so none of them starts an analysis.
-    static let engineOnDefaults: UserDefaults = {
-        let suite = UserDefaults(suiteName: "BChessGalleryEngineOn")!
-        suite.removePersistentDomain(forName: "BChessGalleryEngineOn")
-        suite.set(true, forKey: "showEngine")
-        return suite
-    }()
-
-    /// The PGNs the scenarios load. `GameSession.init` falls back to an empty game when a PGN is
-    /// rejected, so `GalleryScenarioTests` parses each one of `allPGNs`.
-    enum Fixture {
-        /// White (human) is to move after three moves of each side.
-        static let ruyLopez = "1. e4 e5 2. Nf3 Nc6 3. Bb5 a6 *"
-        /// A game without moves.
-        static let empty = "*"
-        /// Both sides played one move.
-        static let openingE4E5 = "1. e4 e5 *"
-        /// Black took a knight and white took back: both sides have captured a piece.
-        static let captures = "1. e4 e5 2. Nf3 Nf6 3. Nxe5 d6 4. Nc3 dxe5 *"
-        /// White to move after two moves and a half.
-        static let yourMove = "1. e4 e5 2. Nf3 *"
-        /// Fool's mate variant: black checkmates.
-        static let checkmate = "1. f3 e5 2. g4 Qh4# *"
-        /// One alternative to 1... e5, for the arrows and cards.
-        static let arrowsAndCards = "1. e4 e5 (1... c5) 2. Nf3 Nc6 *"
-        static let moveStripMiddle = "1. e4 e5 2. Nf3 Nc6 3. Bb5 a6 4. Ba4 Nf6 *"
-        static let moveStripVariations = "1. e4 e5 (1... c5) 2. Nf3 (2. c3) Nc6 *"
-        static let shortGame = "1. e4 e5 2. Nf3 Nc6 *"
-        static let commented = "1. e4 {King's pawn} e5 (1... c5 {Sicilian} 2. Nf3 (2. c3 {Alapin}) d6) 2. Nf3 Nc6 3. Bb5 *"
-        static let card = "1. e4 e5 2. Nf3 Nc6 3. Bb5 (3. Bc4 Bc5) a6 4. Bxc6 dxc6 5. O-O f6 *"
-
-        /// The widest rows: white captured fifteen pieces by the position before the last move, and that position has a
-        /// variation, so the capture strip is long and the variation cards show (`worstRowSession`).
-        static let worstRow = "1. h4 g5 2. hxg5 d5 3. Rxh7 a5 4. Rxh8 Bh3 5. Rxh3 Bh6 6. Rxh6 f5 7. gxf6 Qd7 8. fxe7 Nc6 9. Rxc6 Qe6 "
-            + "10. Rxe6 Rb8 11. Nh3 d4 12. b3 Kd7 13. e4 Ke8 14. f4 Rd8 15. exd8=R+ Kf7 16. Rxg8 b5 17. Bxb5 c5 18. g4 a4 "
-            + "19. bxa4 c4 20. Bxc4 d3 21. cxd3 Kxg8 22. Re8+ (22. Re7+) *"
-
-        static let allPGNs = [ruyLopez, empty, openingE4E5, captures, yourMove, checkmate, arrowsAndCards,
-                              moveStripMiddle, moveStripVariations, shortGame, commented, card, worstRow]
-    }
-
     // MARK: Fixtures
 
     /// White (human) is to move, so `requestEngineMoveIfNeeded` returns and no search starts
@@ -482,7 +430,7 @@ enum GalleryScenarios {
         try emptyLibraryShell()
     }
     // The New Game sheet, from its choice: the caller reads the remembered one, so a scenario can open on any opponent.
-    // The Mac layout has no card until the Mac renderer exists.
+    // The Mac layout's cards are in BChessMacGalleryTests/MacGalleryScenarios.swift.
     static let newGameClub = GalleryScenario(name: "New game · Club", group: "Games list") {
         AnyView(NewGameSheet(choice: NewGame(), mode: .new, onDone: { _ in }))
     }
@@ -551,12 +499,6 @@ enum GalleryScenarios {
     /// The scenarios whose name or slug contains one of the comma-separated, case-insensitive patterns;
     /// an empty filter is every scenario.
     static func matching(_ filter: String) -> [GalleryScenario] {
-        let patterns = filter.split(separator: ",")
-            .map { $0.trimmingCharacters(in: .whitespaces).lowercased() }
-            .filter { !$0.isEmpty }
-        guard !patterns.isEmpty else { return all }
-        return all.filter { scenario in
-            patterns.contains { scenario.name.lowercased().contains($0) || scenario.slug.contains($0) }
-        }
+        all.filter { galleryMatches(name: $0.name, slug: $0.slug, filter: filter) }
     }
 }
