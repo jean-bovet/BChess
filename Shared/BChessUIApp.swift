@@ -29,6 +29,12 @@ struct BChessUIApp: App {
             library = .documents
         }
     }
+    #else
+    init() {
+        // AppKit shows the Open panel at launch (and on a Dock click with no window) unless this is off;
+        // off, it opens a new document, the way File ▸ New and Game ▸ New Game do
+        UserDefaults.standard.register(defaults: ["NSShowAppCentricOpenPanelInsteadOfUntitledFile": false])
+    }
     #endif
 
     var body: some Scene {
@@ -37,6 +43,9 @@ struct BChessUIApp: App {
             DocumentWindow(document: file.$document, isNew: file.fileURL == nil)
                 .appTheme()
         }
+        // A window without a remembered size: a 600 pt board and the move list beside it (the height
+        // counts the title bar and toolbar, 52 pt, above the 708 pt of content)
+        .defaultSize(width: 960, height: 760)
         .commands {
             GameCommands()
         }

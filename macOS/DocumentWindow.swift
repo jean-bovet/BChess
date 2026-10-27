@@ -38,6 +38,9 @@ struct DocumentWindow: View {
     var body: some View {
         let session = box.session
         ContentView(session: session)
+            // A usability floor: the widest row (fifteen captures, 378 pt in dark mode) beside a 320 pt move list,
+            // and a board that never vanishes
+            .frame(minWidth: 740, minHeight: 500)
             .containerBackground(Walnut.background, for: .window)
             .background(WindowTitle(title: GameText.title(white: session.gameState.white, black: session.gameState.black),
                                     subtitle: session.openingName ?? ""))
