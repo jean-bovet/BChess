@@ -6,10 +6,11 @@
 # scripts/preview-gallery.py is a stub too (previews/ of the checkout is never written).
 #
 #   scripts/test_snapshot_gallery.sh [case ...]                 # all cases, or the named ones
-#   SNAPSHOT_GALLERY_SCRIPT=/path/to/copy scripts/test_snapshot_gallery.sh   # test a mutated copy
+#   SNAPSHOT_GALLERY_SCRIPT=/path/to/copy scripts/test_snapshot_gallery.sh   # test a mutated copy (SNAPSHOT_MAC_SCRIPT: the Mac one)
 set -u
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 SCRIPT="${SNAPSHOT_GALLERY_SCRIPT:-$ROOT/scripts/snapshot-gallery.sh}"
+SCRIPT_MAC="${SNAPSHOT_MAC_SCRIPT:-$ROOT/scripts/snapshot-mac.sh}"
 FAILED=0
 ORIG_PATH="$PATH"; ORIG_TMPDIR="${TMPDIR:-}"
 UDID="11111111-2222-3333-4444-555555555555"
@@ -529,10 +530,136 @@ coexist() {   # iPhone import, Duo import under previews/duo, iPhone import agai
     cd "$ROOT" || return; rm -rf "$T"
 }
 
+# --- the Mac pass: scripts/snapshot-mac.sh, the hosted test's files as base64 lines on stdout ---
+
+MAC_SELECTOR="-only-testing:BChessMacGalleryTests/MacGallerySuites/MacSnapshotGalleryTests"
+
+mac_setup() {   # the pool stubs (buildlock), a stub xcodebuild that prints files only for the exact selector, the script
+    pool_setup
+    cat > "$T/bin/xcodebuild" <<'STUB'
+#!/bin/bash
+echo "xcodebuild $* snapshot=${TEST_RUNNER_BCHESS_MAC_SNAPSHOT:-} only=${TEST_RUNNER_BCHESS_SNAPSHOT_ONLY:-}" >> "$STUB_LOG"
+case " $* " in
+    *" -only-testing:BChessMacGalleryTests/MacGallerySuites/MacSnapshotGalleryTests "*) ;;
+    *) exit 0 ;;
+esac
+[ "${STUB_TEST_MODE:-ok}" = fail ] && exit 1
+if [ "${STUB_MAC_FILES:-}" != none ]; then
+    echo "mac-gallery-file alpha.png $(cat "$STUB_PNG_LIGHT")"
+    echo "mac-gallery-file alpha.dark.png $(cat "$STUB_PNG_DARK")"
+    echo "mac-gallery-file manifest.json $(echo '[{"name":"alpha","group":"G","slug":"alpha","size":"1440x900","platform":"mac"},{"name":"beta","group":"G","slug":"beta","size":"1440x900","platform":"mac"}]' | base64 | tr -d '\n')"
+fi
+echo "gallery: 1 scenario(s)"
+exit 0
+STUB
+    chmod +x "$T/bin/xcodebuild"
+    png "$T/light.png" 240; png "$T/dark.png" 20
+    base64 < "$T/light.png" | tr -d '\n' > "$T/light.b64"; base64 < "$T/dark.png" | tr -d '\n' > "$T/dark.b64"
+    export STUB_PNG_LIGHT="$T/light.b64" STUB_PNG_DARK="$T/dark.b64"
+    unset STUB_MAC_FILES
+    cp "$SCRIPT_MAC" "$TREE/scripts/snapshot-mac.sh"
+    # The page script records what it was given and where it was told to write
+    cat > "$TREE/scripts/preview-gallery.py" <<'STUB'
+import os, sys
+if '--import' in sys.argv:
+    source = sys.argv[sys.argv.index('--import') + 1]
+    with open(os.environ['TMPDIR'] + '/imported.txt', 'w') as handle:
+        handle.write(os.environ.get('PREVIEW_GALLERY_OUT', '') + ' ' + ' '.join(sorted(os.listdir(source))) + '\n')
+    out = os.environ.get('PREVIEW_GALLERY_OUT', 'previews')
+    os.makedirs(out, exist_ok=True)
+    open(os.path.join(out, 'index.html'), 'w').close()
+    sys.exit(0)
+print('CHECK OK [en]: 2 cards')
+STUB
+}
+mac() { "$TREE/scripts/snapshot-mac.sh" "$@" > "$T/out.log" 2>&1; }
+
+mac_run() {
+    mac_setup
+    mac --no-open; local status=$?
+    expect mac_run "exits zero" [ "$status" = 0 ]
+    expect mac_run "reached CHECK OK" grep -q "CHECK OK" "$T/out.log"
+    expect mac_run "ran the snapshot test of the nested suite" called "xcodebuild test .*-scheme BChess (macOS) .*$MAC_SELECTOR "
+    expect mac_run "on the Mac, no parallel testing" called "-destination platform=macOS .*-parallel-testing-enabled NO"
+    expect mac_run "with the render switch on" called "snapshot=1"
+    expect mac_run "locked the app's container (no slot) around the DerivedData lock" called "buildlock --folder .*/Library/Containers/ch.arizona-software.BChess --no-slot -- buildlock --folder $T/dd -- xcodebuild test"
+    expect mac_run "decoded both images and the manifest, imported under previews/mac" grep -q "^previews/mac alpha.dark.png alpha.png manifest.json$" "$T/imported.txt"
+    expect mac_run "the page lands in previews/mac/" test -f "$TREE/previews/mac/index.html"
+    expect mac_run "no page in previews/" bash -c '! test -e "$0/previews/index.html"' "$TREE"
+    expect mac_run "says nothing leaves the Mac" grep -q "network: none (I5)" "$T/out.log"
+    expect mac_run "prints its timings" grep -q "^timings: build+test .* total " "$T/out.log"
+    expect mac_run "kept the Mac awake for its own lifetime" called "caffeinate -dims -w [0-9]"
+    expect mac_run "no simulator, no pool" not_called "simctl\|simpool"
+}
+
+mac_only() {   # --only reaches the test's environment and the importer as --partial; the cards outside it survive
+    mac_setup
+    # The real page script over a gallery that already holds beta: the run renders alpha only
+    cp "$ROOT/scripts/preview-gallery.py" "$ROOT/scripts/preview-luminance.swift" "$TREE/scripts/"
+    mkdir -p "$TREE/BChessGalleryTests"; cp "$ROOT/BChessGalleryTests/GalleryScenarios.swift" "$TREE/BChessGalleryTests/"
+    export PATH="$T/bin:$ORIG_PATH"
+    mkdir -p "$TREE/previews/mac/mac" "$TREE/previews/mac/data"
+    png "$TREE/previews/mac/mac/beta.png" 240; png "$TREE/previews/mac/mac/beta.dark.png" 20
+    cp "$T/seed-manifest.json" "$TREE/previews/mac/data/manifest.json" 2> /dev/null || echo '[]' > "$TREE/previews/mac/data/manifest.json"
+    mac --only alpha --no-open; local status=$?
+    expect mac_only "exits zero" [ "$status" = 0 ]
+    expect mac_only "the filter reached the test runner's environment" called "xcodebuild test .*only=alpha$"
+    expect mac_only "the card outside the filter survived (partial import)" test -f "$TREE/previews/mac/mac/beta.png" -a -f "$TREE/previews/mac/mac/beta.dark.png"
+    expect mac_only "the rendered card is in place" test -f "$TREE/previews/mac/mac/alpha.png" -a -f "$TREE/previews/mac/mac/alpha.dark.png"
+    expect mac_only "the manifest lists both" bash -c 'grep -q alpha "$0" && grep -q beta "$0"' "$TREE/previews/mac/data/manifest.json"
+    expect mac_only "the check covers both cards" grep -q "CHECK OK \\[en\\]: 2 cards" "$T/out.log"
+    # Without --only the filter is empty and the import is whole: the card that was not rendered is gone
+    mac --no-open
+    expect mac_only "no --only: an empty filter" called "xcodebuild test .*only=$"
+    expect mac_only "unknown option exits 2" bash -c '"$0/scripts/snapshot-mac.sh" --bogus > /dev/null 2>&1; [ $? = 2 ]' "$TREE"
+}
+
+mac_test_fails() {
+    mac_setup
+    STUB_TEST_MODE=fail mac --no-open; local status=$?
+    expect mac_test_fails "exits 1" [ "$status" = 1 ]
+    expect mac_test_fails "says the snapshot test failed" grep -q "FAILED: the snapshot test" "$T/out.log"
+    expect mac_test_fails "imported nothing" test ! -e "$T/imported.txt"
+}
+
+mac_no_file() {   # the test passed but printed no file (a wrong selector would do the same): not a success
+    mac_setup
+    STUB_MAC_FILES=none mac --no-open; local status=$?
+    expect mac_no_file "exits 1" [ "$status" = 1 ]
+    expect mac_no_file "says the test printed no file" grep -q "the test printed no file" "$T/out.log"
+    expect mac_no_file "imported nothing" test ! -e "$T/imported.txt"
+}
+
+layout_mac() {   # the Mac gallery: images in mac/, the page says Mac, each card sized by the recorded window size
+    page_setup
+    cd "$TREE" || return
+    fake_run "$T/run" "doc:mac" "settings:mac"
+    python3 - "$T/run/manifest.json" <<'PY'
+import json, sys
+path = sys.argv[1]
+manifest = json.load(open(path))
+for entry in manifest:
+    entry["size"] = "1440x900" if entry["slug"] == "doc" else "460x380"
+json.dump(manifest, open(path, "w"))
+PY
+    export PREVIEW_GALLERY_OUT=previews/mac
+    $PAGE --import "$T/run" > "$T/out.log" 2>&1; local status=$?
+    expect layout_mac "the import exits zero" [ "$status" = 0 ]
+    expect layout_mac "the images are in mac/" test -f previews/mac/mac/doc.png -a -f previews/mac/mac/settings.dark.png
+    expect layout_mac "the manifest is in data/" test -f previews/mac/data/manifest.json
+    expect layout_mac "the page says Mac" grep -q "(Mac)" previews/mac/index.html
+    expect layout_mac "the window card is 3.48 times the phone's width" grep -q 'style="--r:3.48"' previews/mac/index.html
+    expect layout_mac "the Settings card is 2.63 times" grep -q 'style="--r:2.63"' previews/mac/index.html
+    $PAGE --check > "$T/check.log" 2>&1; status=$?
+    expect layout_mac "the check passes" grep -q "CHECK OK \[en\]: 2 cards" "$T/check.log"
+    unset PREVIEW_GALLERY_OUT
+    cd "$ROOT" || return; rm -rf "$T"
+}
 ALL="fallback_run fallback_keep_booted fallback_borrowed fallback_test_fails
 pool_run pool_options pool_acquire_fails pool_build_fails pool_test_fails pool_check_fails
 pool_signalled_int_acquire pool_signalled_int_build pool_signalled_int_test pool_signalled_term_test pool_signalled_hup_build
-pool_duo pool_ipad unknown_device simulator_udid fallback_udid layout preserve skipped document_canvas draws_nothing forced_appearance coexist"
+pool_duo pool_ipad unknown_device simulator_udid fallback_udid layout preserve skipped document_canvas draws_nothing forced_appearance coexist
+mac_run mac_only mac_test_fails mac_no_file layout_mac"
 for c in ${@:-$ALL}; do
     if declare -F "$c" > /dev/null; then "$c"; else echo "FAIL unknown case: $c"; FAILED=1; fi
     rm -rf "$T"

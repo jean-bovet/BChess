@@ -18,7 +18,7 @@ the manifests name (and other/), the manifest and the page; any other file or fo
 --check rebuilds the page, then fails on: a scenario missing either image, a stray PNG no scenario expects,
 a duplicate slug, a light image that is dark or a dark image that is light (mean luminance against 0.45,
 scripts/preview-luminance.swift), a dark image byte-identical to its light one, a blank image (one colour
-everywhere), an image that cannot be decoded, and a forced appearance or locale in GalleryScenarios.swift (its
+everywhere), an image that cannot be decoded, and a forced appearance or locale in a scenario file (its
 `//` comments aside). Three manifest flags, written by the snapshot test from the scenario, make the check honest:
 `documentCanvas: true` (a card dark in both appearances by design: the pair is judged instead of each image, the
 dark image's mean luminance at least 0.05 below the light one's), `drawsNothing: true` (a screen that draws nothing
@@ -33,11 +33,13 @@ DATA = os.path.join(OUT, 'data')
 MANIFEST = os.path.join(DATA, 'manifest.json')
 DEFAULT_PLATFORM = 'iphone'
 OTHER = 'other'
-SCENARIOS = os.path.join(REPO, 'BChessGalleryTests', 'GalleryScenarios.swift')
+SCENARIO_FILES = [os.path.join(REPO, folder, name) for folder, name in (
+    ('BChessGalleryTests', 'GalleryScenarios.swift'), ('BChessGalleryTests', 'GalleryFixtures.swift'),
+    ('BChessMacGalleryTests', 'MacGalleryScenarios.swift'))]
 LUMINANCE_THRESHOLD = 0.45
 CANVAS_CONTRAST = 0.05   # documentCanvas: how much darker (mean luminance) the dark image must be than the light one
 PHONE_ASPECT = 402 / 874
-PASS_LABELS = {'duo': 'iPhone Duo', 'ipad': 'iPad'}   # the gallery folder's name -> the device the page says
+PASS_LABELS = {'duo': 'iPhone Duo', 'ipad': 'iPad', 'mac': 'Mac'}   # the gallery folder's name -> the device the page says
 
 
 def slug(s):
@@ -227,10 +229,13 @@ def do_check():
             problems.append(f'document canvas not darker in dark: {stem} (luminance light {light[0]:.6f}, dark {dark[0]:.6f}, '
                             f'needs {CANVAS_CONTRAST} apart)')
     # The luminance check misses a forced locale, so the scenarios file is read for it (comments aside)
-    with open(SCENARIOS, encoding='utf-8') as handle:
-        for number, line in enumerate(handle, 1):
-            if re.search(r'\.preferredColorScheme|\\\.locale', line.split('//', 1)[0]):
-                problems.append(f'forced appearance or locale: GalleryScenarios.swift:{number}')
+    for path in SCENARIO_FILES:
+        if not os.path.isfile(path):
+            continue
+        with open(path, encoding='utf-8') as handle:
+            for number, line in enumerate(handle, 1):
+                if re.search(r'\.preferredColorScheme|\\\.locale', line.split('//', 1)[0]):
+                    problems.append(f'forced appearance or locale: {os.path.basename(path)}:{number}')
     if problems:
         print(f'CHECK FAILED [en] ({len(problems)}):')
         for problem in problems:
@@ -240,14 +245,17 @@ def do_check():
 
 
 def do_coverage():
-    """View types under Shared/ and iOS/ that GalleryScenarios.swift does not name (informational)."""
+    """View types under Shared/, iOS/ and macOS/ that no scenario file names (informational)."""
     views = set()
-    for folder in ('Shared', 'iOS'):
+    for folder in ('Shared', 'iOS', 'macOS'):
         for path in glob.glob(os.path.join(REPO, folder, '**', '*.swift'), recursive=True):
             with open(path, encoding='utf-8') as handle:
                 views |= set(re.findall(r'^\s*(?:private |fileprivate )?struct (\w+)\s*:\s*[^{]*\bView\b', handle.read(), re.M))
-    with open(SCENARIOS, encoding='utf-8') as handle:
-        scenarios = handle.read()
+    scenarios = ''
+    for path in SCENARIO_FILES:
+        if os.path.isfile(path):
+            with open(path, encoding='utf-8') as handle:
+                scenarios += handle.read()
     missing = sorted(v for v in views if not re.search(rf'\b{v}\b', scenarios))
     print(f'{len(views) - len(missing)} of {len(views)} view types appear in a scenario; not rendered:')
     for view in missing:

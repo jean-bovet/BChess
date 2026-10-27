@@ -28,10 +28,13 @@ struct DocumentWindow: View {
     @State private var sheetMode = NewGameSheet.Mode.new
     @State private var offeredPlayers = false
     @AppStorage("showEngine") private var showEngine = false
+    /// Where the players sheet reads the last choice of a new game; the app's own preferences, except in the gallery.
+    let newGameDefaults: UserDefaults
 
-    init(document: Binding<ChessDocument>, isNew: Bool = false) {
+    init(document: Binding<ChessDocument>, isNew: Bool = false, newGameDefaults: UserDefaults = .standard) {
         _document = document
         self.isNew = isNew
+        self.newGameDefaults = newGameDefaults
         _box = State(initialValue: SessionBox(state: document.wrappedValue.state))
     }
 
@@ -61,8 +64,8 @@ struct DocumentWindow: View {
             }
             .sheet(isPresented: $showPlayers) {
                 let isNew = sheetMode == .new
-                NewGameSheet(choice: isNew ? NewGame(remembered: .standard) : NewGame(white: session.gameState.white, black: session.gameState.black),
-                             mode: sheetMode) { choice in
+                NewGameSheet(choice: isNew ? NewGame(remembered: newGameDefaults) : NewGame(white: session.gameState.white, black: session.gameState.black),
+                             mode: sheetMode, defaults: newGameDefaults) { choice in
                     let players = choice.players(firstPlaysWhite: isNew ? Bool.random() : true)
                     // The edit keeps the board's side
                     session.setPlayers(white: players.white, black: players.black, rotated: isNew ? players.rotated : nil)

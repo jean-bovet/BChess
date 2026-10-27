@@ -22,7 +22,7 @@ BChess (`BChess.xcodeproj`, scheme "BChess (iOS)"). The gallery lives in the app
 PGN fixture, and lay the pixel oracles of the fold layout over the production render with `GalleryPixels.swift`;
 both suites sit in the serialized parent suite `GallerySuites`). Output: `previews/index.html` (gitignored; the
 images in `previews/iphone/` and `previews/duo-inner/`, the manifest in `previews/data/`). Groups, in page order:
-Game, iPhone Duo · inner display, Board, Engine, Moves, Games list, Settings, Walnut (48 cards). The
+Game, iPhone Duo · inner display, Board, Engine, Moves, Games list, Settings, Walnut (48 cards); the Mac pass has its own page with the group Mac (6 cards). The
 approved visual spec is the Walnut design canvas (`planning/README.md`, UI-WALNUT row).
 
 **English only, in every repo**, whatever languages the app ships (`-testLanguage en -testRegion US`). The gallery
@@ -39,8 +39,8 @@ renders the 48 scenarios (one of them skipped, see below) on the pool's `duo` si
 `planning/APP-8-iphone-duo.md` (the checklist of `docs/iphone-duo.md`, next to the tools the global working
 agreement names). A screen whose layout changes at regular
 width gets an inner-display scenario. The OS's real division region is a manual check in Xcode's Device Hub: the
-fixtures use a 40 pt stand-in hinge at the centre. No Mac pass: macOS-only views (`DocumentWindow`) have no
-scenario until the off-screen renderer of item 5 is brought to BChess.
+fixtures use a 40 pt stand-in hinge at the centre. **A Mac pass exists** (APP-10, item 5): `scripts/snapshot-mac.sh`
+renders the Mac windows (6 cards, group "Mac") off screen into `previews/mac/`.
 
 Adopted (APP-5): the app has no `#Preview` and no `#if DEBUG` preview code.
 
@@ -196,7 +196,20 @@ One entry in the scenario list, and nothing in the app:
    window, sheets, `PDFView` waits and what differs from an on-screen capture (neutral dark mode, inactive
    selection, Retina only): [`mac-offscreen-renderer.md`](mac-offscreen-renderer.md). The Mac test also holds a
    second `buildlock --folder <the host app's container or cache folder> --no-slot`, so two worktrees never run
-   the hosted app at once. BChess has no Mac pass yet: `DocumentWindow` and the other macOS-only views wait for it.
+   the hosted app at once.
+
+   **BChess's Mac pass** (APP-10): `scripts/snapshot-mac.sh [--only PATTERN] [--no-open]` runs
+   `BChessMacGalleryTests/MacGallerySuites/MacSnapshotGalleryTests` (app-hosted by the real, sandboxed Mac app, in the
+   `BChess (macOS)` scheme) over `BChessMacGalleryTests/MacGalleryScenarios.swift` and writes `previews/mac/index.html`
+   (images in `previews/mac/mac/`; `CHECK OK [en]: 6 cards, ...`). The cards: the document window at 1440 x 900 (engine
+   on, variations), the New Game sheet composited over it in its three layouts (Club, A friend, Maximum; each seeded
+   through `NewGame.remember(in:)` into a scratch suite that `DocumentWindow(newGameDefaults:)` reads) and the
+   Settings window (`.fits(width: 460)`). The fixtures both gallery targets use live in
+   `BChessGalleryTests/GalleryFixtures.swift`. Differences off screen: the window reports itself visible so that its
+   sheet attaches (it is never ordered on screen), the host's own launch window is closed by the test first, the
+   container is read through base64 lines on stdout (`mac-gallery-file <name> <chunk>`), a 1x display fails by name,
+   and the title bar has no document proxy icon. Run it with BChess closed; the mac gate runs the plain tests of the
+   target under the container lock.
 6. **Optional passes** when the audience needs them: a largest-Dynamic-Type pass, another device family (one
    simulator after the other). Never another language (localized store captures belong to `/app-store-screenshots`).
 

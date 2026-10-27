@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		021877C8AE1C4ABBD3538EEA /* GalleryFixtures.swift in Sources */ = {isa = PBXBuildFile; fileRef = 213F84A59C93C378DDE1766C /* GalleryFixtures.swift */; };
 		0401A8739A8AE962C5B83EDF /* GameState.swift in Sources */ = {isa = PBXBuildFile; fileRef = E918E82CA52FD5A787214464 /* GameState.swift */; };
 		04AA9D1F6F5B25621FBDDAC2 /* BChessUIApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D0B880575533E500966B9FF /* BChessUIApp.swift */; };
 		04B0CC14841707C623C04EA9 /* PerftTests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B1C4B3C222B45C0C99C5CED0 /* PerftTests.cpp */; };
@@ -55,6 +56,7 @@
 		2BC576F891278012F0C6EB1A /* ChessMoveGenerator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ED44E31F4BB157BDE34CAADF /* ChessMoveGenerator.cpp */; };
 		2C446D502A1BB5DC6BB9A7B3 /* ChessBoard.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AE369A268D78EE76D0D84F80 /* ChessBoard.cpp */; };
 		3090063C08ABB80A2165A50A /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B7C82FBD58A56EEA69F8536 /* ContentView.swift */; };
+		31C3F5BC9014C495938FA734 /* MacGalleryScenarios.swift in Sources */ = {isa = PBXBuildFile; fileRef = 385770BEEB397D07383DBBF1 /* MacGalleryScenarios.swift */; };
 		32BB425A448B3B372DCA707D /* VariationSelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71EBF0402256A6790224AAB8 /* VariationSelectionView.swift */; };
 		33A990A09B6560EB68723772 /* FEngineInfo.mm in Sources */ = {isa = PBXBuildFile; fileRef = AB15A1998BD8F52B3436A738 /* FEngineInfo.mm */; };
 		3509940CA0C682612996AD29 /* FEngineInfo.mm in Sources */ = {isa = PBXBuildFile; fileRef = AB15A1998BD8F52B3436A738 /* FEngineInfo.mm */; };
@@ -106,6 +108,7 @@
 		6509A1B57FA393D96E2E7B88 /* GameSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C69641E8C4D121F719476CA /* GameSection.swift */; };
 		652C1D9CC19A455514C7589F /* ChessGameTests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 62BE341484A569C1B3F4DC3B /* ChessGameTests.cpp */; };
 		66486220EE94BDCD483E445B /* VerdictTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5006601DFB324FFE15ECF30 /* VerdictTests.swift */; };
+		66587379C3F13DDE7AD23729 /* MacRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDA854E6780F9E005D7278EB /* MacRenderer.swift */; };
 		670721415A71F2EA7C283D3C /* UnitTestHelper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 20FCADEB3C5F59400CF1FB32 /* UnitTestHelper.cpp */; };
 		687625833AC8552DF1728B21 /* MovesTests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9BA0B234E3F267394AD43C1F /* MovesTests.cpp */; };
 		6A5E612D961C12FD349DC387 /* ChessState.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 431412F9A9BFFBA835CA9E74 /* ChessState.cpp */; };
@@ -165,6 +168,7 @@
 		A4C90C9D1B4E2831C3FB3245 /* FFEN.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F7BCF98F9720337F7D257AFA /* FFEN.cpp */; };
 		A5A45A6078078018D83ABD2E /* SnapshotGalleryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1570AE343620BE71BC93AB25 /* SnapshotGalleryTests.swift */; };
 		A6EA1979BBE96B598B08B54E /* NavigationButtons.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8C415E73123152AF470ECCC /* NavigationButtons.swift */; };
+		A7572E5CAEC5BAAE336853E2 /* GalleryFixtures.swift in Sources */ = {isa = PBXBuildFile; fileRef = 213F84A59C93C378DDE1766C /* GalleryFixtures.swift */; };
 		A7AB1E23A4C9B895CF215660 /* Variation.swift in Sources */ = {isa = PBXBuildFile; fileRef = F14DD2B61B0DFA99631A8621 /* Variation.swift */; };
 		AA9CEB41DA74BF76D9747044 /* SelectionModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2D17161DA74B911FD109203 /* SelectionModifier.swift */; };
 		AB53F831335DF4041610656E /* FPGN.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5F871687B9D9A0D848DEFFFE /* FPGN.cpp */; };
@@ -188,9 +192,11 @@
 		B7F67B65AD67362E48C53620 /* GameShell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4664882CCC95A474A5F6075D /* GameShell.swift */; };
 		B8B0B9F88CA78B8C3104CE6B /* FoldSplit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D3FB5FF0F6743B683718D1E /* FoldSplit.swift */; };
 		B9B7926079711D8B1249A497 /* BoardColumn.swift in Sources */ = {isa = PBXBuildFile; fileRef = C09D3D7AA4C592422F3276B1 /* BoardColumn.swift */; };
+		BBD13F9F43C3D22C7B81C5D2 /* MacGalleryScenarioTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D317C81B07786A63151563A /* MacGalleryScenarioTests.swift */; };
 		BC3252F10593360ED02A17E6 /* PiecesFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = B06D783FF88F314CC998FEC5 /* PiecesFactory.swift */; };
 		BE677D8292959DBF4EFD1935 /* ChessOpenings.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 94916DB48E273E8C193F571F /* ChessOpenings.cpp */; };
 		C1A1CE815B0234952BBD3C71 /* FEngineUtility.mm in Sources */ = {isa = PBXBuildFile; fileRef = CE782615578B3D7B3C451A64 /* FEngineUtility.mm */; };
+		C293D409E40492B5B24BCB8A /* MacSnapshotGalleryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8200E00B9423B85AD84AE55 /* MacSnapshotGalleryTests.swift */; };
 		C59A2AA362E0BCAF379CA111 /* ChessGame.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1798BECBBBED258BED2E2CA1 /* ChessGame.cpp */; };
 		C6AB2504F416C6620DD490E0 /* LastMoveModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8893A6A3EDE392ADA62194CC /* LastMoveModifier.swift */; };
 		C77F47BEF2A3B59916E914C0 /* PiecesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7041B69703399B00EABB120 /* PiecesView.swift */; };
@@ -273,6 +279,13 @@
 			remoteGlobalIDString = 91D0B727552821ADC37F6F1F;
 			remoteInfo = "BChess (iOS)";
 		};
+		F7A1C22B7EA25344DED46F34 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 8D3403F4DA379573365B4586 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 08FB82B9B37F67BA11C4EB8A;
+			remoteInfo = "BChess (macOS)";
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
@@ -282,6 +295,7 @@
 		0318AE9A862AD390FF9642EF /* ChessDocument.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChessDocument.swift; sourceTree = "<group>"; };
 		04A09D1A221F0D289C106E21 /* UCICommandTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UCICommandTests.swift; sourceTree = "<group>"; };
 		0B2AC2A814C4BFFB74353457 /* SEETests.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = SEETests.cpp; sourceTree = "<group>"; };
+		0B577EAF48E8C3EB2900E80C /* BChessMacGalleryTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BChessMacGalleryTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		0C3AF2DF91FF284FE10C1A44 /* BChessUCI */ = {isa = PBXFileReference; includeInIndex = 0; path = BChessUCI; sourceTree = BUILT_PRODUCTS_DIR; };
 		0CF72A21B24ED326F0B371AE /* Color.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Color.hpp; sourceTree = "<group>"; };
 		0D0B880575533E500966B9FF /* BChessUIApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BChessUIApp.swift; sourceTree = "<group>"; };
@@ -298,6 +312,7 @@
 		1BD58D3FF9A1D7CD2C2CAAFB /* Walnut.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Walnut.swift; sourceTree = "<group>"; };
 		1D3FB5FF0F6743B683718D1E /* FoldSplit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoldSplit.swift; sourceTree = "<group>"; };
 		20FCADEB3C5F59400CF1FB32 /* UnitTestHelper.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = UnitTestHelper.cpp; sourceTree = "<group>"; };
+		213F84A59C93C378DDE1766C /* GalleryFixtures.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GalleryFixtures.swift; sourceTree = "<group>"; };
 		22A67D77D757A723C8D8CA0A /* EngineView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EngineView.swift; sourceTree = "<group>"; };
 		263BC1CB948C6E46692149DA /* AppSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSettings.swift; sourceTree = "<group>"; };
 		280A9084A6C57B4D90C7FD95 /* ChessEngineTests.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ChessEngineTests.cpp; sourceTree = "<group>"; };
@@ -309,6 +324,7 @@
 		34E712ACCD1156718C34F831 /* FEngineConcurrencyTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FEngineConcurrencyTests.swift; sourceTree = "<group>"; };
 		368A041E11904F2B624D0C96 /* GameSessionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameSessionTests.swift; sourceTree = "<group>"; };
 		36CC0D446777BA3CF1815BED /* FPGN.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = FPGN.hpp; sourceTree = "<group>"; };
+		385770BEEB397D07383DBBF1 /* MacGalleryScenarios.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacGalleryScenarios.swift; sourceTree = "<group>"; };
 		3A18B566B43232E369485F4D /* Pasteboard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Pasteboard.swift; sourceTree = "<group>"; };
 		3E689B1557F57FDACA81FAE8 /* FUtility.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = FUtility.hpp; sourceTree = "<group>"; };
 		3F0CD3AD321BEA14E5A8D141 /* MoveStrip.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoveStrip.swift; sourceTree = "<group>"; };
@@ -345,6 +361,7 @@
 		78235E48247B716B7C0058B1 /* SearchLimitsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchLimitsTests.swift; sourceTree = "<group>"; };
 		7AE6FC034D3D248278A55641 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		7C69641E8C4D121F719476CA /* GameSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameSection.swift; sourceTree = "<group>"; };
+		7D317C81B07786A63151563A /* MacGalleryScenarioTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacGalleryScenarioTests.swift; sourceTree = "<group>"; };
 		81D206FD51B7D4574C66BE3B /* PromotionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromotionView.swift; sourceTree = "<group>"; };
 		8239FD746C93352706B1C6FE /* FEngineMoveNode+Private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "FEngineMoveNode+Private.h"; sourceTree = "<group>"; };
 		84BFF85A25C57146CAF30E10 /* FEngineUtility.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FEngineUtility.h; sourceTree = "<group>"; };
@@ -374,6 +391,7 @@
 		A7041B69703399B00EABB120 /* PiecesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PiecesView.swift; sourceTree = "<group>"; };
 		A78AB8B57782EC7CB61D27F1 /* EngineGoogleTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EngineGoogleTests.swift; sourceTree = "<group>"; };
 		A7AB0415D932620ED470CEAB /* FFEN.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = FFEN.hpp; sourceTree = "<group>"; };
+		A8200E00B9423B85AD84AE55 /* MacSnapshotGalleryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacSnapshotGalleryTests.swift; sourceTree = "<group>"; };
 		A9C49214C700B590509D6A2C /* UCI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UCI.swift; sourceTree = "<group>"; };
 		A9D7CC6DC2D85B2F268A43FF /* Piece.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Piece.hpp; sourceTree = "<group>"; };
 		AB15A1998BD8F52B3436A738 /* FEngineInfo.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = FEngineInfo.mm; sourceTree = "<group>"; };
@@ -425,6 +443,7 @@
 		EB75FBE1292ED6EA9705DDE9 /* VariationChoicesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VariationChoicesTests.swift; sourceTree = "<group>"; };
 		EB9B23C24F0D870DB254ECD6 /* GameStateCodingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameStateCodingTests.swift; sourceTree = "<group>"; };
 		ED44E31F4BB157BDE34CAADF /* ChessMoveGenerator.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ChessMoveGenerator.cpp; sourceTree = "<group>"; };
+		EDA854E6780F9E005D7278EB /* MacRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacRenderer.swift; sourceTree = "<group>"; };
 		EDF542B4F0103A6B866175C1 /* UnitTestHelper.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = UnitTestHelper.hpp; sourceTree = "<group>"; };
 		F14DD2B61B0DFA99631A8621 /* Variation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Variation.swift; sourceTree = "<group>"; };
 		F2AE887434F7DF974A8405C8 /* ChessMoveGenerator.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = ChessMoveGenerator.hpp; sourceTree = "<group>"; };
@@ -438,7 +457,7 @@
 		FECF3456A6E4C0D9547AC353 /* GameHistory.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = GameHistory.cpp; sourceTree = "<group>"; };
 		FEEA804C177D0F7528A254ED /* ChessState.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = ChessState.hpp; sourceTree = "<group>"; };
 		FFBE02E6B7A75B593B086B33 /* BChessUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BChessUITests.swift; sourceTree = "<group>"; };
-		"TEMP_1F202D25-A3F6-403C-8FEF-AEB624DAF3F1" /* Signing.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Signing.xcconfig; sourceTree = "<group>"; };
+		"TEMP_F5FED308-E8CC-4546-A7D3-F020A572FD17" /* Signing.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Signing.xcconfig; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -478,6 +497,7 @@
 				9DC5A344F0A528B0BA355655 /* BChess.app */,
 				9CC0AFB8437EE6BEB286B9A4 /* BChess.app */,
 				F7A6EC66758955DFAC1B687C /* BChessGalleryTests.xctest */,
+				0B577EAF48E8C3EB2900E80C /* BChessMacGalleryTests.xctest */,
 				16194F1626E7FC78881DC886 /* BChessTests.xctest */,
 				0C3AF2DF91FF284FE10C1A44 /* BChessUCI */,
 				B62D3039628BC097D49AA710 /* BChessUITests.xctest */,
@@ -529,6 +549,7 @@
 		4320FABB8B5C183F25DB7E25 /* BChessGalleryTests */ = {
 			isa = PBXGroup;
 			children = (
+				213F84A59C93C378DDE1766C /* GalleryFixtures.swift */,
 				AC2A21B26F1158DE49490885 /* GalleryPixels.swift */,
 				8C6915D78CC3894D8A1EDCFB /* GalleryScenarios.swift */,
 				60C04DA564CCB61E1404128F /* GalleryScenarioTests.swift */,
@@ -594,6 +615,17 @@
 				8CF09EA88A74DC29E1AAB9BD /* TranspositionTable.hpp */,
 			);
 			path = Algorithm;
+			sourceTree = "<group>";
+		};
+		64C5433801110258B02800BA /* BChessMacGalleryTests */ = {
+			isa = PBXGroup;
+			children = (
+				385770BEEB397D07383DBBF1 /* MacGalleryScenarios.swift */,
+				7D317C81B07786A63151563A /* MacGalleryScenarioTests.swift */,
+				EDA854E6780F9E005D7278EB /* MacRenderer.swift */,
+				A8200E00B9423B85AD84AE55 /* MacSnapshotGalleryTests.swift */,
+			);
+			path = BChessMacGalleryTests;
 			sourceTree = "<group>";
 		};
 		8154253DF1D3E3B7CEB83C67 /* UCI */ = {
@@ -665,6 +697,7 @@
 			children = (
 				EBF2831EB8A9DE51AA56C0A9 /* BChess */,
 				4320FABB8B5C183F25DB7E25 /* BChessGalleryTests */,
+				64C5433801110258B02800BA /* BChessMacGalleryTests */,
 				438246EEA921270982C884DF /* BChessTests */,
 				0F5CE133D3F207246A816226 /* BChessUITests */,
 				1C104E777345C9DD5C8E484A /* iOS */,
@@ -754,12 +787,12 @@
 			path = Helper;
 			sourceTree = "<group>";
 		};
-		"TEMP_F185C55D-362B-4422-A315-6476DF8F390D" /* BChess */ = {
+		"TEMP_8D4EE235-E65F-4B88-BC1D-CA498F54877B" /* app-10-mac-gallery-pass */ = {
 			isa = PBXGroup;
 			children = (
-				"TEMP_1F202D25-A3F6-403C-8FEF-AEB624DAF3F1" /* Signing.xcconfig */,
+				"TEMP_F5FED308-E8CC-4546-A7D3-F020A572FD17" /* Signing.xcconfig */,
 			);
-			path = BChess;
+			path = "app-10-mac-gallery-pass";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -818,6 +851,24 @@
 			productName = BChessUCI;
 			productReference = 0C3AF2DF91FF284FE10C1A44 /* BChessUCI */;
 			productType = "com.apple.product-type.tool";
+		};
+		500C69A6BB302CC6EBB8F8C5 /* BChessMacGalleryTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 29F077D557681993CEF4430D /* Build configuration list for PBXNativeTarget "BChessMacGalleryTests" */;
+			buildPhases = (
+				533E6AC3D9FD728E37090594 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				0A931329004088FB6FAE79F4 /* PBXTargetDependency */,
+			);
+			name = BChessMacGalleryTests;
+			packageProductDependencies = (
+			);
+			productName = BChessMacGalleryTests;
+			productReference = 0B577EAF48E8C3EB2900E80C /* BChessMacGalleryTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
 		};
 		91D0B727552821ADC37F6F1F /* BChess (iOS) */ = {
 			isa = PBXNativeTarget;
@@ -891,6 +942,9 @@
 					178ACF2B5B59047059B2ABB2 = {
 						ProvisioningStyle = Automatic;
 					};
+					500C69A6BB302CC6EBB8F8C5 = {
+						ProvisioningStyle = Automatic;
+					};
 					91D0B727552821ADC37F6F1F = {
 						ProvisioningStyle = Automatic;
 					};
@@ -923,6 +977,7 @@
 				0D34FC7106C6F49747B8416E /* BChessTests */,
 				A3F74A0EAA013625F9523E1E /* BChessUITests */,
 				A3123C2DF40485F4E7E94FE1 /* BChessGalleryTests */,
+				500C69A6BB302CC6EBB8F8C5 /* BChessMacGalleryTests */,
 			);
 		};
 /* End PBXProject section */
@@ -1189,6 +1244,18 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		533E6AC3D9FD728E37090594 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A7572E5CAEC5BAAE336853E2 /* GalleryFixtures.swift in Sources */,
+				BBD13F9F43C3D22C7B81C5D2 /* MacGalleryScenarioTests.swift in Sources */,
+				31C3F5BC9014C495938FA734 /* MacGalleryScenarios.swift in Sources */,
+				66587379C3F13DDE7AD23729 /* MacRenderer.swift in Sources */,
+				C293D409E40492B5B24BCB8A /* MacSnapshotGalleryTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		5AFB8DF1B884B496A099BE90 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -1201,6 +1268,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				021877C8AE1C4ABBD3538EEA /* GalleryFixtures.swift in Sources */,
 				F2C0C8192693B67EA43FB595 /* GalleryPixels.swift in Sources */,
 				F85E56083E7C32DE9AC22277 /* GalleryScenarioTests.swift in Sources */,
 				57E3ED83F272B7D2F4F1DC9A /* GalleryScenarios.swift in Sources */,
@@ -1239,6 +1307,11 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		0A931329004088FB6FAE79F4 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 08FB82B9B37F67BA11C4EB8A /* BChess (macOS) */;
+			targetProxy = F7A1C22B7EA25344DED46F34 /* PBXContainerItemProxy */;
+		};
 		5F113EB56CE2462A1F8B9C02 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 91D0B727552821ADC37F6F1F /* BChess (iOS) */;
@@ -1503,9 +1576,28 @@
 			};
 			name = Release;
 		};
+		DEA6DD4FFC46AA690E3376A5 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				COMBINE_HIDPI_IMAGES = YES;
+				DEAD_CODE_STRIPPING = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "ch.arizona-software.BChessMacGalleryTests";
+				SDKROOT = macosx;
+				SWIFT_OBJC_BRIDGING_HEADER = "BChess/BChess-Bridging-Header.h";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/BChess.app/Contents/MacOS/BChess";
+			};
+			name = Release;
+		};
 		E7C507022C63CE4AB3B5B467 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = "TEMP_1F202D25-A3F6-403C-8FEF-AEB624DAF3F1" /* Signing.xcconfig */;
+			baseConfigurationReference = "TEMP_F5FED308-E8CC-4546-A7D3-F020A572FD17" /* Signing.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ANALYZER_NONNULL = YES;
@@ -1580,7 +1672,7 @@
 		};
 		ECE2B603E0677805EDE48B09 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = "TEMP_1F202D25-A3F6-403C-8FEF-AEB624DAF3F1" /* Signing.xcconfig */;
+			baseConfigurationReference = "TEMP_F5FED308-E8CC-4546-A7D3-F020A572FD17" /* Signing.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ANALYZER_NONNULL = YES;
@@ -1646,6 +1738,25 @@
 			};
 			name = Release;
 		};
+		F812D5A903D5E6E13D33D686 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				COMBINE_HIDPI_IMAGES = YES;
+				DEAD_CODE_STRIPPING = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "ch.arizona-software.BChessMacGalleryTests";
+				SDKROOT = macosx;
+				SWIFT_OBJC_BRIDGING_HEADER = "BChess/BChess-Bridging-Header.h";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/BChess.app/Contents/MacOS/BChess";
+			};
+			name = Debug;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -1663,6 +1774,15 @@
 			buildConfigurations = (
 				E7C507022C63CE4AB3B5B467 /* Debug */,
 				ECE2B603E0677805EDE48B09 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		29F077D557681993CEF4430D /* Build configuration list for PBXNativeTarget "BChessMacGalleryTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F812D5A903D5E6E13D33D686 /* Debug */,
+				DEA6DD4FFC46AA690E3376A5 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
