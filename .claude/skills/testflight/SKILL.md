@@ -135,7 +135,7 @@ buildlock --folder "$dd/dd-ios" -- xcodebuild test -scheme "BChess (iOS)" -desti
 Each must end with `** TEST SUCCEEDED **` (`** BUILD SUCCEEDED **` for BChessUCI); a Swift Testing
 `✘` or any `error:` is red, and the engine GoogleTest cases must all have run (zero is red).
 
-Stop on failure.
+Stop on failure. Never gate on an Xcode Cloud run here (see "How a build reaches TestFlight").
 
 ## 6. What to Test
 
@@ -168,8 +168,9 @@ commit before that.**
 ## 7. Commit on a branch and open the pull request
 
 Stage only the files this skill changed — never `git add -A` — and end the commit message with
-the session's attribution trailer. On a resume (§2) the commit already exists: skip straight to the
-push.
+the session's attribution trailer. After the commit, `git diff --name-only HEAD~1 HEAD` must list only
+those files: anything else was not covered by §5. On a resume (§2) the commit already exists: skip
+straight to the push.
 
 ```bash
 git switch -c testflight-<version>-<yyyymmdd>        # from main; a resume is already on it
@@ -180,7 +181,8 @@ gh pr create --base main --title "TestFlight <version>: <one-line summary>" --bo
 ```
 
 Never push `main`, and never merge the pull request yourself unless Jean says so (then
-`gh pr merge <number> --merge`, never `--squash` or `--rebase`).
+`gh pr merge <number> --merge`, never `--squash` or `--rebase`). No tag: a repo with `/release` tags at
+the App Store release (§4), never here.
 
 Push the branch and `testflight` (§8) together, right after the commit: Jean's approval of the
 notes (§6) is the go. Never wait for an Xcode Cloud run — before the commit or after the push — and
