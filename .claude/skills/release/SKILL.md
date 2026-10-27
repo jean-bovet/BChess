@@ -272,7 +272,7 @@ Then list Jean's manual steps:
 
 - screenshots retaken (§3 answer 2): the iPhone set through `/app-store-screenshots` §4, the others with
   `app-store screenshots --app "BChess (iOS)"` (`--platform IOS`: `APP_IPHONE_67` or `APP_IPHONE_69`, and
-  `APP_IPAD_13`; `--platform MAC_OS`: `APP_DESKTOP`) or in App Store Connect; the two Duo sets together with
+  `APP_IPAD_PRO_3GEN_129`; `--platform MAC_OS`: `APP_DESKTOP`) or in App Store Connect; the two Duo sets together with
   `app-store screenshots --display-class IPHONE_DUO` (`/app-store-screenshots` §4);
 - the privacy policy changed (§3 answer 4): the privacy policy page, and the App Privacy label in
   App Store Connect.
