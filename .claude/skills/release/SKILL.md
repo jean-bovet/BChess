@@ -87,8 +87,10 @@ git describe --tags --abbrev=0 --match 'v*' <candidate>^   # the last release ta
 git log --format='%h %s' <last-tag>..<candidate>      # what the App Store has not received
 ```
 
-For 1.0 the last tag found is `v0.1` (2021); there is no earlier App Store release, and the range
-only informs the description (§3), not What's New (§4).
+On a **first release** there is normally no `v*` tag yet: `describe` fails, and the range is the whole
+history up to the candidate (`git log <candidate>`); it is not empty. Here `describe` finds `v0.1`
+(2021), which marks no App Store release: for 1.0 the range is `v0.1..<candidate>`, and it only
+informs the description (§3), not What's New (§4).
 
 - **Tag on the candidate**: this version is already released. Report `app-store status` and stop.
 - **Tag on another commit**: the candidate's version has shipped before; `/testflight` must bump
@@ -139,7 +141,7 @@ Each prints `PROBLEM`, `CHECK` and `ok` lines. What they cover, and what to judg
 | Privacy manifest | Required-reason APIs (UserDefaults, file timestamps, boot time, disk space, keyboards) used without `PrivacyInfo.xcprivacy` declaring them: ITMS-91053, rejected |
 | Export compliance | No `ITSAppUsesNonExemptEncryption`: every build waits on "Missing Compliance" |
 | Description, keywords, promotional text | Still true of this build: an old description promising removed features (guideline 2.3), a retired domain, an old device ("iPod touch") |
-| Screenshots | A set at the required size for **every** device family the build supports (a newly added iPad needs iPad screenshots); old sets that show an outdated UI |
+| Screenshots | A set at the required size for **every** device family the build supports, in every store locale (a newly added iPad needs iPad screenshots); old sets that show an outdated UI |
 | URLs | Support and marketing URLs on every locale, a privacy policy URL (required), all `https` and returning 200, none on a retired domain |
 | Copyright | Current year |
 | Age rating | Questions Apple added since the last release left unanswered block submission |
@@ -148,7 +150,7 @@ Each prints `PROBLEM`, `CHECK` and `ok` lines. What they cover, and what to judg
 | App Privacy label | Not readable through the API: compare it with what the build collects (permissions, SDKs, network use); an app last updated before 2020 may have none |
 | Features removed since the live version | What's New (§4) must say so; the description must not still promise them |
 
-Two things the checkers do not read, judged by hand (rules and sizes in maestro's `docs/iphone-duo.md`):
+Two things the checkers do not read, judged by hand (rules and sizes in `docs/iphone-duo.md`, next to the tools the global working agreement names):
 
 - **iPhone Duo SDK**: the candidate's iOS build was archived with the iOS 27.1 SDK or later
   (`xcode-cloud report "BChess (iOS)" <build> --logs DIR`, then grep the iOS archive log for
@@ -156,14 +158,16 @@ Two things the checkers do not read, judged by hand (rules and sizes in maestro'
   the inner display's right edge to the status bar: not a stop, but say so in the report, and never
   call such a build Duo-ready.
 - **iPhone Duo screenshots**: a set for the inner display (2853 x 2007) and one for the outer display
-  (1398 x 2034) when the repo has them (`/app-store-screenshots`; BChess has neither the skill nor the
-  sets yet); they earn the product-page badge now and are required from April 2027 for 27.1-SDK apps.
-  They are uploaded by hand in App Store Connect until `app-store` can.
+  (1398 x 2034) when the repo has them (`/app-store-screenshots`; BChess renders only the iPhone 6.9" set
+  so far, the two Duo slides files do not exist yet); they earn the product-page badge now and are
+  required from April 2027 for 27.1-SDK apps. `check` lists them as `IPHONE_DUO: <n> (asset library)`; they are
+  uploaded with `app-store screenshots --display-class IPHONE_DUO` (that skill, §4), never by hand.
 
 **First release.** The 1.0 page starts empty, so the first audit lists the whole page as problems:
 copyright, description, support and privacy policy URLs, screenshots for iPhone, iPad and Mac, the
-age rating questionnaire and the App Review contact. BChess collects nothing and makes no network
-access (invariant I5): its App Privacy label is "Data Not Collected", and the privacy policy says so.
+age rating questionnaire and the App Review contact: all of them are fixed with the page tools below
+before going on. BChess collects nothing and makes no network access (invariant I5): its App Privacy
+label is "Data Not Collected", and the privacy policy says so.
 
 If either checker exits non-zero, or a `CHECK` shows something false, **stop**: list each problem
 with its proposed fix (code fixes follow the repo's own workflow and need a new `/testflight`;
@@ -179,7 +183,8 @@ Ask with `AskUserQuestion`, in one call (skip what Jean already answered):
    publish? Anything but yes: stop.
 
 2. **Screenshots** — §2b proved an iPhone 6.9" (or 6.7"), an iPad 13" and a Mac set exist; did the
-   UI change enough to retake any of them (`/preview-gallery` shows the iPhone screens)? And the two
+   UI change enough to retake any of them (`/preview-gallery` shows the iPhone screens;
+   `/app-store-screenshots` renders the iPhone set from its captures)? And the two
    iPhone Duo sets of §2b: make them now, or ship without the badge?
 3. **Description** — does a new feature, or a change on one platform, belong in it?
 4. **Privacy policy** — does the range change what the app stores or sends, so the privacy policy
@@ -197,6 +202,15 @@ locale, which Jean decides whether to translate). Plain text: a one-line lead, t
 match the previous file's tone once there is one (`app-store status` shows the live notes). Say when an
 item concerns only iPhone/iPad or only the Mac. The listing has one locale, en-US.
 
+**The App Store page.** A repo that keeps its page texts in `AppStore/` (one description per locale, at
+most 4000 characters; `keywords.txt`, at most 100 bytes per locale; `app-info.txt` with the name and
+subtitle, at most 30 characters each) updates the English text and its translations when the range
+changes what a description promises, shows them with the notes, stages them with the notes commit (§5)
+and pushes them with `app-store metadata` in §6 — only when `AppStore/` changed, or `check` reports a
+locale missing something. Refuse any page file that still contains `TODO`. BChess's `AppStore/` holds
+only `screenshots.json` (the slides of `/app-store-screenshots`), no page texts: its description, keywords,
+name and subtitle live in App Store Connect and change through `app-store metadata` (§3 answer 3).
+
 **First release (1.0): no What's New.** App Store Connect shows no What's New for an app's first
 version and refuses one; skip §4 and §5 (no notes file, no notes commit) and, in §6, `prepare` (both
 1.0 versions already exist): run only `status`, the two `attach-build` and the two `check` lines. The description carries
@@ -207,8 +221,8 @@ edits. Apply edits and show again until approved. **Do not commit before that.**
 
 ## 5. Commit the notes on `main`
 
-Stage only the notes files — never `git add -A` — and end the commit message with the session's
-attribution trailer. `main` takes it through a pull request:
+Stage only the notes files (and `AppStore/` when it changed) — never `git add -A` — and end the commit
+message with the session's attribution trailer. `main` takes it through a pull request:
 
 ```bash
 git switch -c release-notes-<version>
@@ -242,17 +256,24 @@ app-store check --app "BChess (iOS)" --platform MAC_OS --version <version> --fam
 `attach-build` refuses a build that is missing, still processing, expired or internal-only; wait
 for processing, or see "App Store eligible" in §2.
 
-For 1.0, no `prepare` (§4). If App Store Connect refuses a step for one platform (What's New, the
-phased release), stop and report the error to Jean.
+`prepare --release-type` sets the type only when it creates the version; one that already existed keeps
+its type (`app-store status` prints `releaseType=`). **On a first release skip `prepare`** (1.0, §4): both
+versions already exist, and `prepare` would set a What's New a first version cannot carry; fill the page
+with `app-store metadata`, `age-rating` and `screenshots` instead, then the two `attach-build` and the two
+`check` lines. A first version has no phased release.
+
+The app ships on two platforms, so each has its own version of the same number. If App Store Connect
+refuses a step for one platform (What's New, the phased release), stop and report the error to Jean.
 
 Then list Jean's manual steps:
 
 - confirm the App Privacy label matches the build (the API cannot read it);
 - submit version `<version>` for review, each platform separately (the `IOS` and the `MAC_OS` version);
 
-- screenshots retaken (§3 answer 2): upload with `app-store screenshots --app "BChess (iOS)"`
-  (`--platform IOS`: `APP_IPHONE_67` or `APP_IPHONE_69`, and `APP_IPAD_13`; `--platform MAC_OS`:
-  `APP_DESKTOP`) or in App Store Connect;
+- screenshots retaken (§3 answer 2): the iPhone set through `/app-store-screenshots` §4, the others with
+  `app-store screenshots --app "BChess (iOS)"` (`--platform IOS`: `APP_IPHONE_67` or `APP_IPHONE_69`, and
+  `APP_IPAD_13`; `--platform MAC_OS`: `APP_DESKTOP`) or in App Store Connect; the two Duo sets together with
+  `app-store screenshots --display-class IPHONE_DUO` (`/app-store-screenshots` §4);
 - the privacy policy changed (§3 answer 4): the privacy policy page, and the App Privacy label in
   App Store Connect.
 
@@ -269,8 +290,11 @@ git push origin v<version>
 git ls-remote origin "refs/tags/v<version>"       # must print the candidate's SHA
 ```
 
-No release branch. Tag only once **both** platforms are approved or released; if Jean releases one
-platform first, the tag waits for the other.
+The app ships on two platforms: tag only once every platform's version is approved — **both** the `IOS`
+and the `MAC_OS` version approved or released; the tag says the candidate shipped everywhere. If Jean
+releases one platform first, the tag waits for the other.
+
+No release branch.
 
 ## 8. Report
 

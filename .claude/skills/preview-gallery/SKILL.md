@@ -36,7 +36,8 @@ the iPhone Duo's inner-display cards (the group "iPhone Duo · inner display": 9
 regular, captured at 3x) rendered on the iPhone simulator. The iPhone app is portrait-locked (a landscape trial was
 reverted: the real rotated board measured 151 pt). No iPad pass. **The iPhone Duo pass is built** (APP-8): `--device duo`
 renders the 48 scenarios (one of them skipped, see below) on the pool's `duo` simulator into `previews/duo/` (see below), after the audit in
-`planning/APP-8-iphone-duo.md` (maestro's `docs/iphone-duo.md` checklist). A screen whose layout changes at regular
+`planning/APP-8-iphone-duo.md` (the checklist of `docs/iphone-duo.md`, next to the tools the global working
+agreement names). A screen whose layout changes at regular
 width gets an inner-display scenario. The OS's real division region is a manual check in Xcode's Device Hub: the
 fixtures use a 40 pt stand-in hinge at the centre. No Mac pass: macOS-only views (`DocumentWindow`) have no
 scenario until the off-screen renderer of item 5 is brought to BChess.
@@ -48,8 +49,8 @@ Adopted (APP-5): the app has no `#Preview` and no `#if DEBUG` preview code.
 ```
 scripts/snapshot-gallery.sh                     # every scenario; the simulator goes back to the pool
 scripts/snapshot-gallery.sh --only "settings,list" # a subset: comma-separated substrings of names or slugs
-scripts/snapshot-gallery.sh --no-open           # do not open the page
 scripts/snapshot-gallery.sh --device duo        # the iPhone Duo: outer display and fixed-size inner poses -> previews/duo/
+scripts/snapshot-gallery.sh --no-open           # do not open the page (agents, scripted runs)
 ```
 
 - **Done = `CHECK OK [en]: <n> cards, light and dark complete and correctly lit`**. Then read the new or changed
@@ -71,7 +72,8 @@ scripts/snapshot-gallery.sh --device duo        # the iPhone Duo: outer display 
   bars against its own 466 x 678 screen, not the 951 x 669 window (the "Duo inner · Landscape · Shell" card), so it prints `gallery: skipped <slug>: <why>`, is listed in the
   manifest with a `skipped` reason, and the page shows "not rendered on this pass"; `--check` accepts the missing pair
   for that reason only, and the render itself fails when a mount's settled bounds differ from the requested size.
-  Read those cards on the iPhone pass. Model: xFractal. Apple's rules and the audit checklist: maestro's `docs/iphone-duo.md`.
+  Read those cards on the iPhone pass (see "A screen needs a scenario"). Model: xFractal. Apple's rules and the
+  audit checklist: `docs/iphone-duo.md`, next to the tools the global working agreement names.
 
 - Snapshot test: `GallerySuites/SnapshotGalleryTests` in `BChessGalleryTests`; it runs only when
   `BCHESS_SNAPSHOT_DIR` is set (`TEST_RUNNER_BCHESS_SNAPSHOT_DIR` in xcodebuild's environment) and filters with
@@ -96,8 +98,10 @@ scripts/snapshot-gallery.sh --device duo        # the iPhone Duo: outer display 
   page script; PATH limited to the stubs and the system directories). Pool: lease released on success, failure
   and INT/TERM/HUP, an interrupted `simpool acquire` stopped, no `simctl` lifecycle call. Fallback: create, boot,
   shutdown, `--keep-booted`/`--shutdown`, a borrowed simulator left running. The Duo pass: a `duo` lease, the page in
-  `previews/duo/`, an unknown `--device`, `SIMULATOR_UDID`, and the real page script on fake manifests (the folder
-  layout, the migration of a flat gallery, both galleries surviving each other's import).
+  `previews/duo/`, an unknown `--device`, `SIMULATOR_UDID`, `caffeinate`, and the real page script on fake manifests
+  (the folder layout, the migration of a flat gallery, both galleries surviving each other's import, a `skipped`
+  card, a `documentCanvas` pair, a blank render with and without `drawsNothing`, a forced appearance or locale in
+  the scenario file).
 - DerivedData: `BCHESS_SNAPSHOT_DD`, default `~/Library/Developer/Xcode/DerivedData/BChess-snapshots` (one folder
   for every checkout; a plan passes its own). No SPM packages, so no package flags.
 - Measured (APP-5, 3 scenarios): cold (empty DerivedData, shut-down simulator) boot 39 s, build 61 s, test 59 s,
@@ -125,6 +129,14 @@ One entry in the scenario list, and nothing in the app:
   others: its background work then cannot change another scenario's view through shared notifiers.
 - A view that draws nothing (an invisible trigger, an empty state that is `EmptyView`) gets no scenario; name it
   in a comment in the scenario file. Live maps can be left out; say so the same way.
+- **Flags for an honest `--check`.** A card that is dark in both appearances by design (a document canvas, a white
+  PDF page, full-bleed imagery) sets `documentCanvas: true` on its scenario: `--check` then judges the pair instead
+  of each image (the dark image's mean luminance at least 0.05 below the light one's). A screen that draws nothing
+  by design sets `drawsNothing: true` (otherwise `--check` fails a blank render). A card a pass cannot render
+  honestly is **skipped, never captured badly**: the test prints `gallery: skipped <slug>: <why>`, the manifest
+  lists it with a `skipped` reason, the page shows "not rendered on this pass", and `--check` accepts the missing
+  pair for that reason only. BChess's manifest carries all three: `skipped` (the Duo pass), and the scenario
+  fields `documentCanvas` and `drawsNothing`, which no card sets yet.
 - `scripts/preview-gallery.py --coverage` lists view types no scenario names (informational: most are parts
   of other screens).
 
@@ -154,9 +166,10 @@ One entry in the scenario list, and nothing in the app:
    `<platform>/<file>`. The snapshot test still writes one flat directory per run: only the import places the files.
    A full import clears the images of every folder but `data/`, and keeps `data/coverage.json`. `--check` lists
    the PNGs of every folder but `data/` and names files by their relative path (`ipad/x.dark.png`). The
-   luminance helper prints `<folder>/<file>`. A repo moving from a flat gallery (BChess, today) migrates it in the
-   script (every command first moves what is still at the top, resumably, then rebuilds the page), and
-   `snapshot-gallery.sh` reads `data/manifest.json` with a fallback to the old path. Proven in another repo.
+   luminance helper prints `<folder>/<file>`. A repo moving from a flat gallery migrates it in the script (every
+   command first moves what is still at the top, resumably, then rebuilds the page), and `snapshot-gallery.sh`
+   reads `data/manifest.json` with a fallback to the old path. Proven in one repo's conversion; BChess's script
+   carries the migration (its lifecycle tests cover it).
 4. **`scripts/snapshot-gallery.sh`**:
    - The simulator from the machine-wide pool: `SIMULATOR_UDID` if the caller passes one (never released),
      else `simpool acquire --spec iphone --pid $$` (then `ipad`, `duo`, one device after the other), and
@@ -172,14 +185,18 @@ One entry in the scenario list, and nothing in the app:
      -parallel-testing-enabled NO -enableCodeCoverage NO -testLanguage en -testRegion US`.
    - The variables go in **xcodebuild's environment** as `TEST_RUNNER_<NAME>=… xcodebuild …`; written as
      arguments they become build settings and never reach the test.
-   - Import, `--check`, open the page, print the timings (boot, build, test, total).
+   - Import, `--check`, open the page (`--no-open` skips that: agents, scripted runs), print the timings (boot,
+     build, test, total). It keeps the Mac awake for the run (`caffeinate -dims`): a run during which the Mac
+     slept took three times as long.
 5. **A Mac target**: an app-hosted macOS test renders each scenario with no simulator, **off screen**: a real
    `NSWindow` with an `NSHostingController` (so `.toolbar` and `NavigationSplitView` bridge to AppKit) and an
    `NSAppearance`, never ordered on screen, whose whole layer tree `CARenderer` draws into a Metal texture at 2x.
    It works with the screen locked, flashes nothing, and draws sidebars, toolbar glass, `PDFView` and materials as
    on screen; no ScreenCaptureKit, `cacheDisplay` or unlocked-screen check. The recipe, readiness without a visible
    window, sheets, `PDFView` waits and what differs from an on-screen capture (neutral dark mode, inactive
-   selection, Retina only): [`mac-offscreen-renderer.md`](mac-offscreen-renderer.md).
+   selection, Retina only): [`mac-offscreen-renderer.md`](mac-offscreen-renderer.md). The Mac test also holds a
+   second `buildlock --folder <the host app's container or cache folder> --no-slot`, so two worktrees never run
+   the hosted app at once. BChess has no Mac pass yet: `DocumentWindow` and the other macOS-only views wait for it.
 6. **Optional passes** when the audience needs them: a largest-Dynamic-Type pass, another device family (one
    simulator after the other). Never another language (localized store captures belong to `/app-store-screenshots`).
 
@@ -187,8 +204,10 @@ One entry in the scenario list, and nothing in the app:
 
 `--check` rebuilds the page from the PNGs on disk and fails on: a scenario of the manifest missing either
 image, a stray PNG no scenario expects (in any folder, or in the wrong platform's folder), a duplicate slug, a light image that is dark or a dark one that is light
-(mean luminance against a threshold), a dark image byte-identical to its light one, an image that cannot be
-decoded. An `--only` run replaces only its own images; the check still covers every scenario. The gallery is
+(mean luminance against a threshold; a `documentCanvas` scenario is judged as a pair instead, the dark image's
+mean luminance at least 0.05 below the light one's), a dark image byte-identical to its light one, a blank image
+(one colour everywhere) unless its scenario sets `drawsNothing`, an image that cannot be decoded, and
+`.preferredColorScheme` or `\.locale` anywhere in the scenario file (its `//` comments aside). An `--only` run replaces only its own images; the check still covers every scenario. The gallery is
 done only when `--check` passes.
 
 ## Converting a repo (from `#Preview`s)
@@ -215,7 +234,7 @@ Hermetic by construction: BChess has no network code (I5), so there is no stub a
 (`@AppStorage("showEngine")` reads its default from the scratch "BChessGallery" suite), so no search starts. The
 test host launches with `-uiTestingFreshLibrary` (the scheme). Every PGN a scenario loads is a `Fixture`
 constant, because `GameSession.init` silently falls back to an empty game on a rejected PGN: a test parses each
-one. `--check` also fails on `.preferredColorScheme` or `\.locale` in `GalleryScenarios.swift`.
+one. The scenario file `--check` reads for a forced appearance or locale is `GalleryScenarios.swift`.
 
 ## Report
 

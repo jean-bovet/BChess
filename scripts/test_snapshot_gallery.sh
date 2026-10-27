@@ -1,6 +1,6 @@
 #!/bin/bash
-# Lifecycle checks for scripts/snapshot-gallery.sh: stub `xcrun`, `xcodebuild`, `simpool` and `buildlock` answer from
-# a state file and log every call, so no real simulator or build is touched. PATH is the stubs plus the system
+# Lifecycle checks for scripts/snapshot-gallery.sh: stub `xcrun`, `xcodebuild`, `simpool`, `buildlock` and `caffeinate`
+# answer from a state file and log every call, so no real simulator or build is touched. PATH is the stubs plus the system
 # directories only, so a real `simpool` / `buildlock` is never reached: the fallback cases run without them, the pool_*
 # cases add stubs of both (pool_setup). The script under test runs from a scratch tree whose
 # scripts/preview-gallery.py is a stub too (previews/ of the checkout is never written).
@@ -57,6 +57,10 @@ case "$1" in
         exit 0 ;;
 esac
 exit 0
+STUB
+    cat > "$T/bin/caffeinate" <<'STUB'
+#!/bin/bash
+echo "caffeinate $*" >> "$STUB_LOG"
 STUB
     chmod +x "$T/bin/"*
     export PATH="$T/bin:/usr/bin:/bin:/usr/sbin:/sbin"
@@ -127,6 +131,7 @@ fallback_run() {   # creates the missing simulator, boots it, renders, shuts it 
     expect fallback_run "shut it down" called "simctl shutdown $UDID"
     expect fallback_run "left it shut down" state_is Shutdown
     expect fallback_run "no pool, no buildlock" not_called "simpool\|buildlock"
+    expect fallback_run "kept the Mac awake for its own lifetime" called "caffeinate -dims -w [0-9]"
 }
 
 fallback_keep_booted() {
@@ -174,6 +179,7 @@ pool_run() {
     expect pool_run "the page lands in previews/" test -f "$TREE/previews/index.html"
     expect pool_run "released the lease" called "simpool release $POOL_UDID --app ch.arizona-software.BChess"
     expect pool_run "released after the test" bash -c 'grep -n "test-without-building\|simpool release" "$0" | tail -1 | grep -q "simpool release"' "$STUB_LOG"
+    expect pool_run "kept the Mac awake for its own lifetime" called "caffeinate -dims -w [0-9]"
     no_simctl_lifecycle pool_run
 }
 
@@ -294,12 +300,14 @@ fallback_udid() {   # SIMULATOR_UDID without the pool: used as is, never marked,
 
 # --- the page script, real, on a fake manifest and real PNGs ---
 
-png() {   # $1 = path, $2 = grey level: a 4 x 4 PNG
+png() {   # $1 = path, $2 = grey level: a 4 x 4 PNG with one pixel 16 levels off (a render); $3 = blank: one colour everywhere
     python3 -c 'import struct, sys, zlib
 def chunk(kind, data):
     return struct.pack(">I", len(data)) + kind + data + struct.pack(">I", zlib.crc32(kind + data) & 0xffffffff)
 level = int(sys.argv[2]); row = b"\x00" + bytes([level, level, level]) * 4
-open(sys.argv[1], "wb").write(b"\x89PNG\r\n\x1a\n" + chunk(b"IHDR", struct.pack(">IIBBBBB", 4, 4, 8, 2, 0, 0, 0)) + chunk(b"IDAT", zlib.compress(row * 4)) + chunk(b"IEND", b""))' "$1" "$2"
+other = level - 16 if level > 127 else level + 16
+last = b"\x00" + bytes([level, level, level]) * 3 + (bytes([level] * 3) if sys.argv[3:] == ["blank"] else bytes([other] * 3))
+open(sys.argv[1], "wb").write(b"\x89PNG\r\n\x1a\n" + chunk(b"IHDR", struct.pack(">IIBBBBB", 4, 4, 8, 2, 0, 0, 0)) + chunk(b"IDAT", zlib.compress(row * 3 + last)) + chunk(b"IEND", b""))' "$1" "$2" "${3:-}"
 }
 
 page_setup() {   # a scratch tree with the real page script, the luminance helper and the scenarios file
@@ -413,6 +421,80 @@ PY
     cd "$ROOT" || return; rm -rf "$T"
 }
 
+flag() {   # $1 = manifest, $2 = slug, $3 = key, $4 = JSON value (empty: remove the key)
+    python3 - "$@" <<'PY'
+import json, sys
+path, slug, key, value = sys.argv[1:5]
+manifest = json.load(open(path))
+for entry in manifest:
+    if entry["slug"] == slug:
+        if value: entry[key] = json.loads(value)
+        else: entry.pop(key, None)
+json.dump(manifest, open(path, "w"))
+PY
+}
+
+document_canvas() {   # a card dark in both appearances by design: the pair is judged, not each image
+    page_setup
+    cd "$TREE" || return
+    fake_run "$T/run" "alpha:" "canvas:"
+    png "$T/run/canvas.png" 60; png "$T/run/canvas.dark.png" 20
+    $PAGE --import "$T/run" > "$T/out.log" 2>&1
+    $PAGE --check > "$T/check.log" 2>&1; local status=$?
+    expect document_canvas "without the flag a dark light image fails" [ "$status" != 0 ]
+    expect document_canvas "and is named" grep -q "dark render in the light slot: iphone/canvas.png" "$T/check.log"
+    flag previews/data/manifest.json canvas documentCanvas true
+    $PAGE --check > "$T/check.log" 2>&1; status=$?
+    expect document_canvas "with the flag the darker-in-dark pair passes" [ "$status" = 0 ]
+    expect document_canvas "it counts every card" grep -q "CHECK OK \[en\]: 2 cards" "$T/check.log"
+    png previews/iphone/canvas.dark.png 60
+    $PAGE --check > "$T/check.log" 2>&1; status=$?
+    expect document_canvas "a dark image as light as the light one fails" [ "$status" != 0 ]
+    expect document_canvas "and the pair is named" grep -q "document canvas not darker in dark: iphone/canvas (luminance" "$T/check.log"
+    png previews/iphone/canvas.dark.png 52   # 8 levels apart: 0.03, under the 0.05 the pair needs
+    $PAGE --check > "$T/check.log" 2>&1; status=$?
+    expect document_canvas "a pair less than 0.05 apart fails" grep -q "document canvas not darker in dark" "$T/check.log"
+    cd "$ROOT" || return; rm -rf "$T"
+}
+
+draws_nothing() {   # a blank image (one colour everywhere) fails unless the scenario draws nothing by design
+    page_setup
+    cd "$TREE" || return
+    fake_run "$T/run" "alpha:" "empty:"
+    png "$T/run/empty.png" 240 blank; png "$T/run/empty.dark.png" 20 blank
+    $PAGE --import "$T/run" > "$T/out.log" 2>&1
+    $PAGE --check > "$T/check.log" 2>&1; local status=$?
+    expect draws_nothing "a blank render fails" [ "$status" != 0 ]
+    expect draws_nothing "both blank images are named" grep -q "blank render (one colour everywhere): iphone/empty.png" "$T/check.log"
+    expect draws_nothing "the dark one too" grep -q "blank render (one colour everywhere): iphone/empty.dark.png" "$T/check.log"
+    expect draws_nothing "a rendered card is not" bash -c '! grep -q "blank render.*alpha" "$0"' "$T/check.log"
+    flag previews/data/manifest.json empty drawsNothing true
+    $PAGE --check > "$T/check.log" 2>&1; status=$?
+    expect draws_nothing "with the flag the blank pair passes" [ "$status" = 0 ]
+    expect draws_nothing "it counts every card" grep -q "CHECK OK \[en\]: 2 cards" "$T/check.log"
+    cd "$ROOT" || return; rm -rf "$T"
+}
+
+forced_appearance() {   # .preferredColorScheme or \.locale in the scenario file fails the check; a // comment does not
+    page_setup
+    cd "$TREE" || return
+    fake_run "$T/run" "alpha:"
+    $PAGE --import "$T/run" > "$T/out.log" 2>&1
+    local file=BChessGalleryTests/GalleryScenarios.swift lines
+    lines=$(wc -l < "$file" | tr -d ' ')
+    printf '%s\n' '// never .preferredColorScheme(.dark) nor .environment(\.locale, Locale(identifier: "fr")) here' >> "$file"
+    $PAGE --check > "$T/check.log" 2>&1; local status=$?
+    expect forced_appearance "a comment naming them passes" [ "$status" = 0 ]
+    printf '%s\n' '    AnyView(Text("x").preferredColorScheme(.dark))' >> "$file"
+    $PAGE --check > "$T/check.log" 2>&1; status=$?
+    expect forced_appearance "a forced appearance fails" [ "$status" != 0 ]
+    expect forced_appearance "with its line" grep -q "forced appearance or locale: GalleryScenarios.swift:$((lines + 2))" "$T/check.log"
+    printf '%s\n' '    AnyView(Text("x").environment(\.locale, Locale(identifier: "fr")))' >> "$file"
+    $PAGE --check > "$T/check.log" 2>&1; status=$?
+    expect forced_appearance "a forced locale fails too" grep -q "forced appearance or locale: GalleryScenarios.swift:$((lines + 3))" "$T/check.log"
+    cd "$ROOT" || return; rm -rf "$T"
+}
+
 coexist() {   # iPhone import, Duo import under previews/duo, iPhone import again: both galleries intact
     page_setup
     cd "$TREE" || return
@@ -436,7 +518,7 @@ coexist() {   # iPhone import, Duo import under previews/duo, iPhone import agai
 ALL="fallback_run fallback_keep_booted fallback_borrowed fallback_test_fails
 pool_run pool_options pool_acquire_fails pool_build_fails pool_test_fails pool_check_fails
 pool_signalled_int_acquire pool_signalled_int_build pool_signalled_int_test pool_signalled_term_test pool_signalled_hup_build
-pool_duo unknown_device simulator_udid fallback_udid layout preserve skipped coexist"
+pool_duo unknown_device simulator_udid fallback_udid layout preserve skipped document_canvas draws_nothing forced_appearance coexist"
 for c in ${@:-$ALL}; do
     if declare -F "$c" > /dev/null; then "$c"; else echo "FAIL unknown case: $c"; FAILED=1; fi
     rm -rf "$T"

@@ -27,13 +27,14 @@ Refresh the captures first when the UI changed since the last gallery run: the s
 name (`"capture": "<slug>"` or `"<slug>.dark"`). A slide that needs a screen state the gallery does not have gets a
 new gallery scenario (the `/preview-gallery` rules), never a hand-made capture. When the store pages show the app in
 each language, re-render the slides' captures in those languages too (`--only` and `--lang`, see the slides file
-below): stale localized captures show an older UI than the English one.
+below): stale localized captures show an older UI than the English one. A localized capture that is missing falls
+back to English silently: before rendering, list every slide capture missing from each language folder.
 
 ## 2. Render
 
 ```sh
-app-store-screenshots                      # every language -> .build/app-store-screenshots/<locale>/NN-<slide>.png
-app-store-screenshots --locale en-US       # one language
+app-store-screenshots --captures previews/iphone                  # every language -> .build/app-store-screenshots/<locale>/NN-<slide>.png
+app-store-screenshots --captures previews/iphone --locale en-US   # one language (BChess has only en-US)
 ```
 
 It checks the slides first and stops with one line per problem: a language without text, captions that do not match a
@@ -55,9 +56,22 @@ app-store screenshots --app <product> --version <v> --locale <locale> --display-
   .build/app-store-screenshots/<locale>/*.png
 ```
 
-The two iPhone Duo sets have no `--display-type`: the screenshot API has no Duo value (only the App Asset Library's
-`IPHONE_DUO` display class has). Until `app-store` uploads through it, upload them by hand in App Store Connect and
-say so in the report. Sizes, badge and the April 2027 deadline: maestro's `docs/iphone-duo.md`.
+The two iPhone Duo sets (once their slides files exist) go through the App Asset Library, not a display type: one
+call per locale with both sets' files in page order (the inner display's slides, then the outer's; at most 10
+together, PNG without alpha at 2853 x 2007 / 2007 x 2853 / 1398 x 2034 / 2034 x 1398). It replaces the locale's Duo
+placements and reuses an image the library already holds, so a rerun with the same files only redoes the order:
+
+```sh
+app-store screenshots --app "BChess (iOS)" --version <v> --locale en-US --display-class IPHONE_DUO \
+  .build/app-store-screenshots-duo-inner/en-US/*.png .build/app-store-screenshots-duo-outer/en-US/*.png
+```
+
+`app-store check` then lists them as `IPHONE_DUO: <n> (asset library)`. Sizes, badge and the April 2027 deadline:
+`docs/iphone-duo.md`, next to the tools the global working agreement names.
+
+After the upload, `app-store check --version <v> --families <families>` must report 0 problems: here
+`app-store check --app "BChess (iOS)" --platform IOS --version <v> --families iphone,ipad` (and `--platform MAC_OS
+--families mac` after a Mac set).
 
 ## The slides file (`AppStore/screenshots.json`)
 
@@ -78,7 +92,7 @@ say so in the report. Sizes, badge and the April 2027 deadline: maestro's `docs/
   phone-sized captures of that pass) or `"window"` (a Mac window capture shown at its natural size with
   a shadow, no frame: the Mac set, 2880 x 1800, `APP_DESKTOP`). A config-level `"textStyle"` adds CSS to every headline
   block (e.g. centred above a Mac window). One slides file per set; upload each with its own `--display-type` (the Mac
-  set with `--platform MAC_OS`).
+  set with `--platform MAC_OS`; the two Duo sets together with `--display-class IPHONE_DUO`, §4).
 - A phone can also carry its device chrome: `"statusBar": "dark"` or `"light"` (9:41, signal, Wi-Fi and battery in the
   color the screen under them needs) and `"buttons": true` (action, volume and side buttons).
 - `"panels": 2` makes a pair: one canvas two screenshots wide, cut in two, so one phone can lie across the seam. Its

@@ -123,8 +123,10 @@ uncommitted tracked changes or untracked files that are not ignored).
   still resolves, and the working agreement, plans index and README stay consistent.
 
 **Tests first:** a failing Swift Testing test before the change; a regression test proven red
-without its fix, restored with `git checkout -- <file>`. `xcodegen generate` committed with any
-`project.yml` change; never hand-edit `BChess.xcodeproj`.
+without its fix, restored with `git checkout -- <file>`. Fixtures: the gallery's PGNs are `Fixture`
+constants in `BChessGalleryTests/GalleryScenarios.swift`; engine tests (GoogleTest cases plus Swift
+tests) live in `BChessTests/`. `xcodegen generate` committed with any `project.yml` change; never
+hand-edit `BChess.xcodeproj`.
 
 **Test gate:** all of these pass, each read by exit status **and** summary line. Each runs under
 `buildlock` on its own DerivedData folder. The step gate runs the first two lines (the unit tests in
@@ -150,17 +152,33 @@ count is printed by the suite) — zero executed is red, never green.
 and `gtest-all.cc` are exempt).
 
 ```
-buildlock --folder <dd>/build-ios -- xcodebuild -target "BChess (iOS)" -sdk iphonesimulator -configuration Debug SYMROOT=<dd>/build-ios OBJROOT=<dd>/obj-ios COMPILER_INDEX_STORE_ENABLE=NO build 2>&1 | grep -E '^/Users/.*(warning|error):|^(warning|error):' | grep -v -e ONLY_ACTIVE_ARCH -e /Dependencies/ -e gtest-all
-buildlock --folder <dd>/build-mac -- xcodebuild -target "BChess (macOS)" -configuration Debug SYMROOT=<dd>/build-mac OBJROOT=<dd>/obj-mac COMPILER_INDEX_STORE_ENABLE=NO build 2>&1 | grep -E '^/Users/.*(warning|error):|^(warning|error):' | grep -v -e ONLY_ACTIVE_ARCH -e /Dependencies/ -e gtest-all
-buildlock --folder <dd>/build-gt -- xcodebuild -target BChessGalleryTests -sdk iphonesimulator -configuration Debug SYMROOT=<dd>/build-gt OBJROOT=<dd>/obj-gt COMPILER_INDEX_STORE_ENABLE=NO build 2>&1 | grep -E '^/Users/.*(warning|error):|^(warning|error):' | grep -v -e ONLY_ACTIVE_ARCH -e /Dependencies/ -e gtest-all
+buildlock --folder <dd>/build-ios -- xcodebuild -target "BChess (iOS)" -sdk iphonesimulator -configuration Debug SYMROOT=<dd>/build-ios OBJROOT=<dd>/obj-ios COMPILER_INDEX_STORE_ENABLE=NO build 2>&1 | grep -E '^/.*(warning|error):|^(warning|error):' | grep -v -e ONLY_ACTIVE_ARCH -e /Dependencies/ -e gtest-all
+buildlock --folder <dd>/build-mac -- xcodebuild -target "BChess (macOS)" -configuration Debug SYMROOT=<dd>/build-mac OBJROOT=<dd>/obj-mac COMPILER_INDEX_STORE_ENABLE=NO build 2>&1 | grep -E '^/.*(warning|error):|^(warning|error):' | grep -v -e ONLY_ACTIVE_ARCH -e /Dependencies/ -e gtest-all
+buildlock --folder <dd>/build-gt -- xcodebuild -target BChessGalleryTests -sdk iphonesimulator -configuration Debug SYMROOT=<dd>/build-gt OBJROOT=<dd>/obj-gt COMPILER_INDEX_STORE_ENABLE=NO build 2>&1 | grep -E '^/.*(warning|error):|^(warning|error):' | grep -v -e ONLY_ACTIVE_ARCH -e /Dependencies/ -e gtest-all
 ```
 
 The first two build only the app targets, so the third compiles the gallery tests (and builds their host app).
 
+**Gallery gate** (`/preview-gallery`): every screen has a scenario in `BChessGalleryTests/GalleryScenarios.swift`
+(`AGENTS.md`), rendered by `scripts/snapshot-gallery.sh`. A step gate that changes what a screen looks like runs
+`scripts/snapshot-gallery.sh --no-open --only "<the screens it touched>"`; the final gate of a plan that touched
+UI runs the full gallery, `scripts/snapshot-gallery.sh --no-open`, plus `--device duo` when the plan touched a
+screen with an inner-display scenario (the group "iPhone Duo · inner display") or a layout that changes at
+regular width. Green is the line `CHECK OK [en]: <n> cards, light and dark complete and correctly lit`, and the
+new or changed cards read in both appearances with the Read tool, as `/preview-gallery` says. The script leases
+and locks itself (never wrap it in `simpool` or `buildlock`), writes under `previews/` (gitignored) and uses its
+own DerivedData (`BCHESS_SNAPSHOT_DD`, default `~/Library/Developer/Xcode/DerivedData/BChess-snapshots`).
+
 ## Deploy (only when Jean asks)
 
-Nothing ships from a `/develop` run. Signing, notarization and distribution follow Jean's Mac
-release playbook, only when Jean asks.
+Nothing ships from a `/develop` run, and nothing is archived, signed or uploaded from this Mac. Both apps
+(`BChess (iOS)` and `BChess (macOS)`, one App Store record) reach devices through Xcode Cloud (product
+`BChess (iOS)`): `/testflight` fast-forwards the `testflight` branch to `main` plus the What to Test commit
+(through a pull request, since `main` is PR-only) and Xcode Cloud archives both apps for the internal
+testers; `/release` publishes the tested candidate to the App Store, one version per platform. Both only
+when Jean asks. Never by accident: a hand push of `testflight` (only `/testflight` moves it), a push to
+`main`, a version bump (`MARKETING_VERSION` in `project.yml` is `/testflight`'s; `CURRENT_PROJECT_VERSION`
+is never bumped, Xcode Cloud numbers the builds), or a `v<version>` tag (`/release` makes it).
 
 ## Phase 0 — Worktree (before anything is written)
 
@@ -327,4 +345,9 @@ requests (a GitHub rule): never push `main`.
 - Spawning a fresh implementer for each fix round instead of messaging the one that built it.
 - Restating the working agreement in the implementer prompt.
 - Bumping the version or landing without being asked.
+- Broad Codex prompts: they make Codex read much of the repo and run commands, and often stall past 30
+  minutes. Every review prompt names the exact plan section and the few source files (with line ranges) to
+  read, says "read only these; no other commands, no builds or tests", and caps each section at a few
+  one-line findings with a severity. A review not back within about 15 minutes is stopped and rerun
+  narrower; a large diff is reviewed per commit (`git diff <sha>^ <sha>`), not in one `main...HEAD` pass.
 - Counting a test run where the GoogleTest suite executed zero cases as green.

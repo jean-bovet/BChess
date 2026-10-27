@@ -17,8 +17,13 @@ the manifests name (and other/), the manifest and the page; any other file or fo
 
 --check rebuilds the page, then fails on: a scenario missing either image, a stray PNG no scenario expects,
 a duplicate slug, a light image that is dark or a dark image that is light (mean luminance against 0.45,
-scripts/preview-luminance.swift), a dark image byte-identical to its light one, an image that cannot be
-decoded, and a forced appearance or locale in GalleryScenarios.swift.
+scripts/preview-luminance.swift), a dark image byte-identical to its light one, a blank image (one colour
+everywhere), an image that cannot be decoded, and a forced appearance or locale in GalleryScenarios.swift (its
+`//` comments aside). Three manifest flags, written by the snapshot test from the scenario, make the check honest:
+`documentCanvas: true` (a card dark in both appearances by design: the pair is judged instead of each image, the
+dark image's mean luminance at least 0.05 below the light one's), `drawsNothing: true` (a screen that draws nothing
+by design: its blank images pass) and `skipped: "<why>"` (a card the pass could not render honestly: no images
+expected, the page says why).
 """
 import argparse, glob, html, json, os, re, shutil, struct, subprocess, sys
 
@@ -30,6 +35,7 @@ DEFAULT_PLATFORM = 'iphone'
 OTHER = 'other'
 SCENARIOS = os.path.join(REPO, 'BChessGalleryTests', 'GalleryScenarios.swift')
 LUMINANCE_THRESHOLD = 0.45
+CANVAS_CONTRAST = 0.05   # documentCanvas: how much darker (mean luminance) the dark image must be than the light one
 PHONE_ASPECT = 402 / 874
 
 
@@ -115,13 +121,14 @@ def do_import(source, partial):
 
 
 def luminances(manifest):
+    """{'<folder>/<file>': (mean luminance, spread)} for every PNG of the gallery; both -1 for an undecodable one."""
     result = subprocess.run(['swift', os.path.join(REPO, 'scripts', 'preview-luminance.swift'),
                              *[os.path.join(OUT, folder) for folder in image_folders(manifest)]],
                             capture_output=True, text=True)
     values = {}
     for line in result.stdout.splitlines():
-        value, _, name = line.partition(' ')
-        values[name] = float(value)
+        value, spread, name = line.split(' ', 2)
+        values[name] = (float(value), float(spread))
     return values, (result.stderr.strip()[:200] if result.returncode != 0 else None)
 
 
@@ -196,17 +203,32 @@ def do_check():
     luminance, error = luminances(manifest)
     if error:
         problems.append('luminance helper failed: ' + error)
-    for name, value in sorted(luminance.items()):
+    flags = {f'{platform_of(e)}/{e["slug"]}': e for e in manifest}
+    for name, (value, spread) in sorted(luminance.items()):
         is_dark_slot = name.endswith('.dark.png')
+        entry = flags.get(image_stem(name), {})
         if value < 0:
             problems.append(f'undecodable image: {name}')
-        elif (value < LUMINANCE_THRESHOLD) != is_dark_slot:
+            continue
+        if spread == 0 and not entry.get('drawsNothing'):
+            problems.append(f'blank render (one colour everywhere): {name}')
+        if entry.get('documentCanvas'):
+            continue   # dark by design in both appearances: the pair is judged below
+        if (value < LUMINANCE_THRESHOLD) != is_dark_slot:
             shown = 'dark' if value < LUMINANCE_THRESHOLD else 'light'
             problems.append(f'{shown} render in the {"dark" if is_dark_slot else "light"} slot: {name} (luminance {value:.6f})')
-    # The luminance check misses a forced locale, so the scenarios file is read for it
+    for e in manifest:
+        if not e.get('documentCanvas') or e.get('skipped'):
+            continue
+        stem = f'{platform_of(e)}/{e["slug"]}'
+        light, dark = luminance.get(stem + '.png'), luminance.get(stem + '.dark.png')
+        if light and dark and min(light[0], dark[0]) >= 0 and light[0] - dark[0] < CANVAS_CONTRAST:
+            problems.append(f'document canvas not darker in dark: {stem} (luminance light {light[0]:.6f}, dark {dark[0]:.6f}, '
+                            f'needs {CANVAS_CONTRAST} apart)')
+    # The luminance check misses a forced locale, so the scenarios file is read for it (comments aside)
     with open(SCENARIOS, encoding='utf-8') as handle:
         for number, line in enumerate(handle, 1):
-            if re.search(r'\.preferredColorScheme|\\\.locale', line):
+            if re.search(r'\.preferredColorScheme|\\\.locale', line.split('//', 1)[0]):
                 problems.append(f'forced appearance or locale: GalleryScenarios.swift:{number}')
     if problems:
         print(f'CHECK FAILED [en] ({len(problems)}):')

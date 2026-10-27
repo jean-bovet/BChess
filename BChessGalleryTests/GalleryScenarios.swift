@@ -74,6 +74,11 @@ struct GalleryScenario {
     var settle: Duration = .milliseconds(400)
     /// The scenario mounts the production shell, whose navigation and bottom bars the system places itself.
     var usesSystemBars = false
+    /// The card is dark in both appearances by design (a document canvas, full-bleed imagery): `--check` then judges
+    /// the pair (the dark image at least 0.05 mean luminance below the light one) instead of each image.
+    var documentCanvas = false
+    /// The screen draws nothing by design: `--check` accepts its blank images (otherwise a blank render fails).
+    var drawsNothing = false
     /// Throws when a fixture cannot be set up, which fails the render.
     let build: @MainActor () throws -> AnyView
 
