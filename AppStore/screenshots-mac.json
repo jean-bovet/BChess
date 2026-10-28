@@ -27,25 +27,6 @@
       }
     },
     {
-      "id": "variations",
-      "background": "radial-gradient(120% 80% at 70% 85%, #6b8f71 0%, #2f4f3a 45%, #0d1a12 100%)",
-      "phones": [
-        {
-          "capture": "document-window-variations",
-          "style": "left:0px; top:320px; transform: scale(.6);",
-          "device": "window"
-        }
-      ],
-      "text": {
-        "en-US": [
-          {
-            "title": "Every move,\nevery variation",
-            "sub": "Where the game branches, click a line. The move list keeps variations and comments."
-          }
-        ]
-      }
-    },
-    {
       "id": "strengths",
       "background": "radial-gradient(120% 80% at 40% 85%, #c98a3e 0%, #7a4a14 45%, #2a1705 100%)",
       "phones": [
