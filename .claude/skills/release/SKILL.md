@@ -99,7 +99,8 @@ informs the description (§3), not What's New (§4).
 - **No tag, and `git log --format=%s <candidate>..main` has `Release notes <version>`** (or its pull
   request is still open: `gh pr list --search "Release notes <version>"`): an earlier run stopped
   after §5. Keep those notes, re-run §6 (`prepare` is idempotent) and continue. A notes file without
-  that commit is only a draft: §4 rewrites it from the range.
+  that commit is only a draft: §4 rewrites it from the range. A first release has no notes commit:
+  a resumed run simply repeats §2b and §6, both read-only or idempotent.
 - Otherwise it is a **new release** of that range.
 
 **CI.** Find the Xcode Cloud run of the candidate's commit (`xcode-cloud builds --limit 10`) and
@@ -158,10 +159,11 @@ Two things the checkers do not read, judged by hand (rules and sizes in `docs/ip
   the inner display's right edge to the status bar: not a stop, but say so in the report, and never
   call such a build Duo-ready.
 - **iPhone Duo screenshots**: a set for the inner display (2853 x 2007) and one for the outer display
-  (1398 x 2034) when the repo has them (`/app-store-screenshots`; BChess renders only the iPhone 6.9" set
-  so far, the two Duo slides files do not exist yet); they earn the product-page badge now and are
+  (1398 x 2034) when the repo has them (`/app-store-screenshots`; BChess's are `AppStore/screenshots-duo-inner.json` and
+  `screenshots-duo-outer.json`); they earn the product-page badge now and are
   required from April 2027 for 27.1-SDK apps. `check` lists them as `IPHONE_DUO: <n> (asset library)`; they are
-  uploaded with `app-store screenshots --display-class IPHONE_DUO` (that skill, §4), never by hand.
+  uploaded with `app-store screenshots --display-class IPHONE_DUO` (both sets' files in one call per locale, the
+  inner display's slides then the outer's: that skill, §4), never by hand.
 
 **First release.** The 1.0 page starts empty, so the first audit lists the whole page as problems:
 copyright, description, support and privacy policy URLs, screenshots for iPhone, iPad and Mac, the
@@ -232,7 +234,9 @@ message with the session's attribution trailer. `main` takes it through a pull r
 
 ```bash
 git switch -c release-notes-<version>
-git add ReleaseNotes/<version>-en-US.txt
+git add ReleaseNotes/<version>-en-US.txt ReleaseNotes/<version>-fr-FR.txt ReleaseNotes/<version>-de-DE.txt \
+    ReleaseNotes/<version>-it.txt ReleaseNotes/<version>-ar-SA.txt ReleaseNotes/<version>-he.txt   # the locales that have a file
+git add AppStore/                                     # only when §4 changed it
 git commit -m "Release notes <version>"
 git push -u origin release-notes-<version>
 gh pr create --base main --title "Release notes <version>" --body "<the notes>"
@@ -277,6 +281,10 @@ with `app-store metadata`, `age-rating` and `screenshots` instead, then the two 
 `check` lines (the `metadata` block above fills the page from `AppStore/`; the screenshots go up per locale with
 `/app-store-screenshots` §4). A first version has no phased release.
 
+When the repo has a product page header or search results image (`/app-store-screenshots`; BChess has none
+yet), upload it here, once Jean approved the renders: `app-store creative --app "BChess (iOS)" --placement <p>
+--version <version> FILE` for a text-less image, one call per locale with `--locale <l>` for a localized one.
+
 The app ships on two platforms, so each has its own version of the same number. If App Store Connect
 refuses a step for one platform (What's New, the phased release), stop and report the error to Jean.
 
@@ -288,7 +296,8 @@ Then list Jean's manual steps:
 - screenshots retaken (§3 answer 2): the iPhone set through `/app-store-screenshots` §4, the others with
   `app-store screenshots --app "BChess (iOS)"` (`--platform IOS`: `APP_IPHONE_67` or `APP_IPHONE_69`, and
   `APP_IPAD_PRO_3GEN_129`; `--platform MAC_OS`: `APP_DESKTOP`) or in App Store Connect; the two Duo sets together with
-  `app-store screenshots --display-class IPHONE_DUO` (`/app-store-screenshots` §4);
+  `app-store screenshots --display-class IPHONE_DUO`, both sets' files in one call per locale, the inner display's
+  slides then the outer's (`/app-store-screenshots` §4);
 - the privacy policy changed (§3 answer 4): the privacy policy page, and the App Privacy label in
   App Store Connect.
 

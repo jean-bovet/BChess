@@ -33,7 +33,9 @@ Flags: `--no-worktree` (only when Jean said so), `--plan-only` (stop after phase
 - **Docs-only paths:** `planning/`, `AGENTS.md`, a skill.
 - **String Catalog:** a change to user-facing strings syncs `Shared/Localizable.xcstrings` (one catalog for both apps)
   headless with `catalog-sync` (the commands in `AGENTS.md` § Languages) instead of an Xcode GUI build: `--delete-stale`,
-  then the translations in every language of the catalog, and `--check --skip-build` must print "catalog unchanged".
+  then the translations in every language of the catalog (the Xcode MCP `StringCatalogEdit`, with the worktree's project
+  open in Xcode, not the main checkout's), then `catalog-sync --skip-build` once (it re-sorts the keys the editor wrote),
+  and `--check --skip-build` must print "catalog unchanged"; commit the catalog with the step.
   `LocalizationCatalogTests` goes red on a missing translation. A screen's translations are read with
   `scripts/snapshot-gallery.sh --only "<slugs>" --lang fr,de,it` (and `scripts/snapshot-mac.sh --lang …`; the review set is in
   `/preview-gallery`): a language run has no page and no check, and never a full gallery.
@@ -128,8 +130,9 @@ uncommitted tracked changes or untracked files that are not ignored).
 - **Red proof.** A regression test is proven red without its fix before it goes green: commit the
   fix first, revert only the fix's lines, run the test and see it fail, restore with
   `git checkout -- <file>` (never a hand-written inverse), then confirm `git status` is clean and grep
-  the tree for any temporary marker. A red-proof run builds incrementally in the step gates' `<dd>` and
-  runs only the test class concerned (`xcodebuild test -only-testing:<Target>/<Class>`), never the whole
+  the tree for any temporary marker. A red-proof run builds incrementally in the step gates' `<dd>`
+  (`build-for-testing`) and runs only the test class concerned (`xcodebuild test-without-building
+  -only-testing:<Target>/<Class>`, e.g. `-only-testing:BChessMacGalleryTests/<Class>` on the Mac line), never the whole
   suite: the step and final gates run the rest. No version bump during feature work.
 - **Warnings.** Fix every warning the branch touches or reveals, including ones that predate it.
   Deprecations are fixed, never silenced (`@available`, `#warning`, suppression flags); if the fix
@@ -148,14 +151,16 @@ tests) live in `BChessTests/`. `xcodegen generate` committed with any `project.y
 hand-edit `BChess.xcodeproj`.
 
 **Test gate:** all of these pass, each read by exit status **and** summary line. Each runs under
-`buildlock` on its own DerivedData folder. The mac line also holds the hosted app's container lock (the outer `buildlock`, no slot): the scheme's `BChessMacGalleryTests` run inside the real Mac app, on its sandbox container, so two worktrees never run the host at once; it opens the app's untitled game window for the seconds the tests take. The step gate runs the first two lines (the unit tests in
-`BChessTests` and the UCI build). The final gate adds the last three: the iOS scheme's tests are the UI
+`buildlock` on its own DerivedData folder. The Mac test line (the second) also holds the hosted app's container lock (the outer `buildlock`, no slot): the scheme's `BChessMacGalleryTests` run inside the real Mac app, on its sandbox container, so two worktrees never run the host at once; it opens the app's untitled game window for the seconds the tests take. The Mac scheme builds its tests once (`build-for-testing`), then runs them with `test-without-building`
+(no build slot: it compiles nothing), so a rerun never re-links, re-signs and relaunches the host for nothing. The step gate runs the first three lines (the unit tests in
+`BChessTests` with the hosted `BChessMacGalleryTests`, and the UCI build). The final gate adds the last three: the iOS scheme's tests are the UI
 tests (`BChessUITests`) and the gallery tests, built once for the generic simulator, then run on a
 simulator leased from the pool for that run and given back right after it, also when it fails (run the
 last three lines in one shell):
 
 ```
-buildlock --folder ~/Library/Containers/ch.arizona-software.BChess --no-slot -- buildlock --folder <dd>/dd-mac -- xcodebuild test -scheme "BChess (macOS)" -destination 'platform=macOS' -derivedDataPath <dd>/dd-mac
+buildlock --folder <dd>/dd-mac -- xcodebuild build-for-testing -scheme "BChess (macOS)" -destination 'platform=macOS' -derivedDataPath <dd>/dd-mac
+buildlock --folder ~/Library/Containers/ch.arizona-software.BChess --no-slot -- buildlock --folder <dd>/dd-mac --no-slot -- xcodebuild test-without-building -scheme "BChess (macOS)" -destination 'platform=macOS' -derivedDataPath <dd>/dd-mac
 buildlock --folder <dd>/dd-uci -- xcodebuild -scheme BChessUCI -destination 'platform=macOS' -derivedDataPath <dd>/dd-uci build
 buildlock --folder <dd>/dd-ios -- xcodebuild build-for-testing -scheme "BChess (iOS)" -destination 'generic/platform=iOS Simulator' -derivedDataPath <dd>/dd-ios
 udid=$(simpool acquire --spec iphone --pid $$); trap 'simpool release "$udid" --app ch.arizona-software.BChess' EXIT

@@ -26,10 +26,12 @@ Game, iPhone Duo · inner display, Board, Engine, Moves, Games list, Settings, W
 approved visual spec is the Walnut design canvas (`planning/README.md`, UI-WALNUT row).
 
 **The gallery is English** (`-testLanguage en -testRegion US`), whatever languages the app ships: the page, the
-`--check` and `CHECK OK [en]` never change. The catalog tests check that every string is translated; a screenshot
+`--check` and `CHECK OK [en]` never change, and the gallery never gets a full language pass. Two exceptions share one
+`--lang` option, always with `--only` (the Mac script aside, below), with no page and no `--check`: the **App Store
+screenshots** (the slides' captures per store language, used by `/app-store-screenshots`) and **review runs**, on
+request only, never part of the gate. The catalog tests check that every string is translated; a review run
 checks that a translation **fits** (truncation, overflow) and, under Hebrew and Arabic, that a screen reads right to
-left. So both gallery scripts (`snapshot-gallery.sh`, `snapshot-mac.sh`) take `--lang en,fr,de,it` (and `he,ar` once the
-app ships them): one test run per language on the one build and lease, with `-testLanguage <lang> -testRegion <region>`
+left. So both gallery scripts (`snapshot-gallery.sh`, `snapshot-mac.sh`) take `--lang en,fr,de,it,he,ar`: one test run per language on the one build and lease, with `-testLanguage <lang> -testRegion <region>`
 (en US, fr FR, de DE, it IT, he IL, ar SA). A language run has no page and no check: its PNGs go into
 `<gallery>/<platform>/<lang>/` (`previews/iphone/fr/`, `previews/duo/duo-inner/fr/`, `previews/ipad/ipad/fr/`,
 `previews/mac/mac/fr/`), which is where `/app-store-screenshots` looks for a localized capture, and the page script
@@ -48,18 +50,19 @@ words or direction the catalog changes (slugs, passed to `--only` as a comma-sep
   `new-game-maximum`, `new-game-players`, `settings`.
 - iPad (`--device ipad`): `game-screen-wide` and the store slides' captures. iPhone Duo (`--device duo`): the
   inner-display scenarios the Duo store config names, plus `duo-inner-landscape-variations`.
-- Mac: every Mac scenario (`scripts/snapshot-mac.sh --lang fr,de,it`: the document window with the engine, the
+- Mac: every Mac scenario (`scripts/snapshot-mac.sh --lang fr,de,it,he,ar`: the document window with the engine, the
   variations, the New Game sheet in its three layouts, Settings).
 
 ```
-scripts/snapshot-gallery.sh --no-open --only "<the review set>" --lang fr,de,it
-scripts/snapshot-gallery.sh --no-open --device ipad --only "game-screen-wide" --lang fr,de,it
-scripts/snapshot-gallery.sh --no-open --device duo --only "<the Duo set>" --lang fr,de,it
-scripts/snapshot-mac.sh --no-open --lang fr,de,it
+scripts/snapshot-gallery.sh --no-open --only "<the review set>" --lang fr,de,it,he,ar
+scripts/snapshot-gallery.sh --no-open --device ipad --only "game-screen-wide" --lang fr,de,it,he,ar
+scripts/snapshot-gallery.sh --no-open --device duo --only "<the Duo set>" --lang fr,de,it,he,ar
+scripts/snapshot-mac.sh --no-open --lang fr,de,it,he,ar
 ```
 
-Then read the PNGs with the Read tool (truncated or overflowing text, a string that wraps badly), and shorten the
-string in the catalog, never the layout. The English gallery is unchanged by all this.
+Then read the result as a contact sheet per language (`contact-sheet previews/iphone/fr -o <scratch>/fr.png`; a single
+PNG only to check one detail): truncated or overflowing text, a string that wraps badly. Shorten the string in the
+catalog, never the layout. The English gallery is unchanged by all this.
 
 **Right to left (`he`, `ar`).** Read the captures against `AGENTS.md` § Languages: the board region of every board capture
 must be pixel-identical to the English one (`magick compare -metric RMSE -crop 640x640+110+250 +repage previews/iphone/<slug>.png
@@ -184,7 +187,8 @@ One entry in the scenario list, and nothing in the app:
   of each image (the dark image's mean luminance at least 0.05 below the light one's). A screen that draws nothing
   by design sets `drawsNothing: true` (otherwise `--check` fails a blank render). A card a pass cannot render
   honestly is **skipped, never captured badly**: the test prints `gallery: skipped <slug>: <why>`, the manifest
-  lists it with a `skipped` reason, the page shows "not rendered on this pass", and `--check` accepts the missing
+  lists it with a `skipped` reason (the scenario's `skipped: "<why>"`, per platform when only one pass cannot
+  render it; BChess computes it per pass in `GalleryScenario.skipReason(duoPass:ipadPass:)`), the page shows "not rendered on this pass", and `--check` accepts the missing
   pair for that reason only. Full-bleed imagery under chrome (a satellite map) does not darken in the dark
   appearance at all, so it cannot meet the pair rule either: such a card sets `imagery: true`, which waives the
   luminance rules for that pair (the byte-identical rule still applies). Measured: a map card at 0.401 light,
@@ -238,9 +242,18 @@ One entry in the scenario list, and nothing in the app:
      -parallel-testing-enabled NO -enableCodeCoverage NO -testLanguage en -testRegion US`.
    - The variables go in **xcodebuild's environment** as `TEST_RUNNER_<NAME>=… xcodebuild …`; written as
      arguments they become build settings and never reach the test.
+   - The exit trap also runs on INT, TERM and HUP, so an interrupted run still releases its lease (a lease granted
+     while the script is being signalled too).
+   - The `test-without-building` runs under `buildlock --folder <DerivedData> --no-slot`: it compiles nothing, so it
+     holds the folder but not a host build slot.
    - Import, `--check`, open the page (`--no-open` skips that: agents, scripted runs), print the timings (boot,
-     build, test, total). It keeps the Mac awake for the run (`caffeinate -dims`): a run during which the Mac
-     slept took three times as long.
+     build, test, total). It keeps the Mac awake for the run (`caffeinate -dims -w $$`, released when the script
+     exits): a run during which the Mac slept took three times as long.
+   - Optional, when the hosted app shares state with the real one (a container, iCloud, defaults): build the gallery
+     hosts under their own bundle id (a `.gallery` suffix through a build setting that is empty in every other
+     build, no iCloud entitlement), so a run never touches the real app's data and the real app may stay open.
+     BChess does not (its Mac gallery runs in the real app's container, under the container lock: run it with BChess
+     closed).
 5. **A Mac target**: an app-hosted macOS test renders each scenario with no simulator, **off screen**: a real
    `NSWindow` with an `NSHostingController` (so `.toolbar` and `NavigationSplitView` bridge to AppKit) and an
    `NSAppearance`, never ordered on screen, whose whole layer tree `CARenderer` draws into a Metal texture at 2x.
@@ -264,8 +277,8 @@ One entry in the scenario list, and nothing in the app:
    and the title bar has no document proxy icon. Run it with BChess closed; the mac gate runs the plain tests of the
    target under the container lock.
 6. **Optional passes** when the audience needs them: a largest-Dynamic-Type pass, another device family (one
-   simulator after the other). Another language only as `--lang` review runs (the review set above), never a language
-gallery page.
+   simulator after the other). Another language only as the `--lang` runs above (store captures, review runs with
+   the review set), never a language gallery page.
 
 ## Looking at a gallery as an agent
 
@@ -277,12 +290,16 @@ has fifty of them.
 ## The gate: `--check`
 
 `--check` rebuilds the page from the PNGs on disk and fails on: a scenario of the manifest missing either
-image, a stray PNG no scenario expects (in any folder, or in the wrong platform's folder), a duplicate slug, a light image that is dark or a dark one that is light
+image (unless its entry is `skipped` with a reason), a stray PNG no scenario expects (in any folder, in the wrong
+platform's folder, or of a skipped scenario), a duplicate slug, a light image that is dark or a dark one that is light
 (mean luminance against a threshold; a `documentCanvas` scenario is judged as a pair instead, the dark image's
 mean luminance at least 0.05 below the light one's; an `imagery` scenario is not judged for luminance), a dark image byte-identical to its light one, a blank image
-(one colour everywhere) unless its scenario sets `drawsNothing`, an image that cannot be decoded, and
+(one colour everywhere) unless its scenario sets `drawsNothing`, an image that cannot be decoded or is not at the
+render scale of its scenario's size (2x; 3x for the Duo's inner poses; not yet checked by BChess's
+`preview-gallery.py`), and
 `.preferredColorScheme` or `\.locale` anywhere in the scenario file (its `//` comments aside, and a `\.locale` on a
-line carrying `// gallery: allowed, <why>`). An `--only` run replaces only its own images; the check still covers every scenario. The gallery is
+line carrying `// gallery: allowed, <why>`). An `--only` run replaces only its own images; the check still covers every
+scenario. The `--lang` folders are not checked and never reach the page. The gallery is
 done only when `--check` passes.
 
 ## Converting a repo (from `#Preview`s)
