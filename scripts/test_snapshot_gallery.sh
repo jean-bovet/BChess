@@ -68,8 +68,11 @@ STUB
     MARKER="$T/bchess-snapshot-gallery.$UDID.booted"
     TREE="$T/tree"; mkdir -p "$TREE/scripts"
     cp "$SCRIPT" "$TREE/scripts/snapshot-gallery.sh"
+    cp "$ROOT/scripts/languages.sh" "$TREE/scripts/languages.sh"
     cat > "$TREE/scripts/preview-gallery.py" <<'STUB'
 import os, sys
+with open(os.environ['TMPDIR'] + '/pg.log', 'a') as handle:
+    handle.write(' '.join(sys.argv[1:]) + '\n')
 if '--import' in sys.argv:
     out = os.environ.get('PREVIEW_GALLERY_OUT', 'previews')
     os.makedirs(out, exist_ok=True)
@@ -313,6 +316,65 @@ fallback_udid() {   # SIMULATOR_UDID without the pool: used as is, never marked,
     expect fallback_udid "an unknown simulator is not created either" not_called "simctl \(create\|boot\|bootstatus\|shutdown\|erase\)"
 }
 
+pool_languages() {   # --lang: one lease and one build, a test run and an import per language; only English is checked
+    pool_setup
+    gallery --lang fr,he --only x --no-open; local status=$?
+    expect pool_languages "exits zero" [ "$status" = 0 ]
+    expect pool_languages "French in the French region" called "xcodebuild test-without-building .*-testLanguage fr -testRegion FR "
+    expect pool_languages "Hebrew in the Israeli region" called "xcodebuild test-without-building .*-testLanguage he -testRegion IL "
+    expect pool_languages "no English run" not_called "-testLanguage en"
+    expect pool_languages "one lease" bash -c '[ "$(grep -c "simpool acquire" "$0")" = 1 ]' "$STUB_LOG"
+    expect pool_languages "one build" bash -c '[ "$(grep -c "^xcodebuild build-for-testing" "$0")" = 1 ]' "$STUB_LOG"
+    expect pool_languages "two test runs" bash -c '[ "$(grep -c "^xcodebuild test-without-building" "$0")" = 2 ]' "$STUB_LOG"
+    expect pool_languages "released the lease once" bash -c '[ "$(grep -c "simpool release" "$0")" = 1 ]' "$STUB_LOG"
+    expect pool_languages "imported French with --lang fr" grep -q -- "--import .* --lang fr" "$T/pg.log"
+    expect pool_languages "imported Hebrew with --lang he" grep -q -- "--import .* --lang he" "$T/pg.log"
+    expect pool_languages "a language run is not checked" bash -c '! grep -q -- "--check" "$0"' "$T/pg.log"
+    no_simctl_lifecycle pool_languages
+    # English in the list: imported as before (partial), and the check runs once
+    pool_setup
+    gallery --lang en,fr --only x --no-open; status=$?
+    expect pool_languages "en,fr exits zero" [ "$status" = 0 ]
+    expect pool_languages "English run in the US region" called "xcodebuild test-without-building .*-testLanguage en -testRegion US "
+    expect pool_languages "English imported without --lang" grep -q -- "--import [^ ]* --partial$" "$T/pg.log"
+    expect pool_languages "English is checked" grep -q -- "^--check$" "$T/pg.log"
+    expect pool_languages "reached CHECK OK" grep -q "CHECK OK" "$T/out.log"
+    # Refusals: before any lease or build
+    local bad
+    for bad in "--lang xx --only x" "--lang fr,xx --only x" "--lang es --only x" "--lang fr" "--lang de,it" "--lang"; do
+        pool_setup
+        gallery $bad --no-open; status=$?
+        expect pool_languages "\"$bad\" exits 2" [ "$status" = 2 ]
+        expect pool_languages "\"$bad\" leased nothing, built nothing" not_called "simpool\|xcodebuild"
+    done
+    # English alone needs no --only: the default run
+    pool_setup
+    gallery --lang en --no-open; status=$?
+    expect pool_languages "--lang en without --only is the default run" [ "$status" = 0 ]
+}
+
+mac_languages() {   # the Mac gallery: --lang renders all six windows per language, no --only needed
+    mac_setup
+    mac --lang ar,it --no-open; local status=$?
+    expect mac_languages "exits zero" [ "$status" = 0 ]
+    expect mac_languages "Arabic in the Saudi region" called "xcodebuild test .*-testLanguage ar -testRegion SA "
+    expect mac_languages "Italian in the Italian region" called "xcodebuild test .*-testLanguage it -testRegion IT "
+    expect mac_languages "no English run" not_called "-testLanguage en"
+    expect mac_languages "imported Arabic with --lang ar" grep -q -- "--import .* --lang ar" "$T/pg.log"
+    expect mac_languages "imported Italian with --lang it" grep -q -- "--import .* --lang it" "$T/pg.log"
+    expect mac_languages "a language run is not checked" bash -c '! grep -q -- "--check" "$0"' "$T/pg.log"
+    local bad
+    for bad in "--lang xx" "--lang"; do
+        mac_setup
+        mac $bad --no-open; status=$?
+        expect mac_languages "\"$bad\" exits 2" [ "$status" = 2 ]
+        expect mac_languages "\"$bad\" ran nothing" not_called "xcodebuild"
+    done
+    mac_setup
+    mac --lang en --no-open; status=$?
+    expect mac_languages "--lang en is the default run: checked" grep -q -- "^--check$" "$T/pg.log"
+}
+
 # --- the page script, real, on a fake manifest and real PNGs ---
 
 png() {   # $1 = path, $2 = grey level: a 4 x 4 PNG with one pixel 16 levels off (a render); $3 = blank: one colour everywhere
@@ -534,6 +596,47 @@ coexist() {   # iPhone import, Duo import under previews/duo, iPhone import agai
 
 MAC_SELECTOR="-only-testing:BChessMacGalleryTests/MacGallerySuites/MacSnapshotGalleryTests"
 
+lang_import() {   # --import DIR --lang fr: the run's PNGs into <platform>/fr/, nothing else touched
+    page_setup
+    cd "$TREE" || return
+    fake_run "$T/run" "alpha:" "beta:duo-inner"
+    $PAGE --import "$T/run" > "$T/out.log" 2>&1
+    cp previews/data/manifest.json "$T/manifest.before"; cp previews/index.html "$T/index.before"
+    fake_run "$T/fr" "alpha:" "beta:duo-inner"
+    # Distinct bytes per language: an import that overwrote the English images (or wrote French over them) would show
+    png "$T/fr/alpha.png" 200; png "$T/fr/alpha.dark.png" 60; png "$T/fr/beta.png" 210; png "$T/fr/beta.dark.png" 50
+    cp previews/iphone/alpha.png "$T/alpha.en.png"; cp previews/iphone/alpha.dark.png "$T/alpha.en.dark.png"; cp previews/duo-inner/beta.png "$T/beta.en.png"
+    echo '[{"name":"alpha","group":"G","slug":"alpha","size":"402x874"},{"name":"beta","group":"G","slug":"beta","size":"402x874","platform":"duo-inner"}]' > "$T/fr/manifest.json"
+    $PAGE --import "$T/fr" --lang fr > "$T/lang.log" 2>&1; local status=$?
+    expect lang_import "exits zero" [ "$status" = 0 ]
+    expect lang_import "the images are in <platform>/fr/" test -f previews/iphone/fr/alpha.png -a -f previews/iphone/fr/alpha.dark.png -a -f previews/duo-inner/fr/beta.png -a -f previews/duo-inner/fr/beta.dark.png
+    expect lang_import "says what it imported, per folder" grep -q "imported 2 image(s) \[fr\] into previews/iphone/fr/" "$T/lang.log"
+    expect lang_import "says it for the other platform too" grep -q "imported 2 image(s) \[fr\] into previews/duo-inner/fr/" "$T/lang.log"
+    expect lang_import "the manifest is untouched" cmp -s previews/data/manifest.json "$T/manifest.before"
+    expect lang_import "the page is untouched" cmp -s previews/index.html "$T/index.before"
+    expect lang_import "the English images are byte-identical to before" bash -c 'cmp -s previews/iphone/alpha.png "$0" && cmp -s previews/iphone/alpha.dark.png "$1" && cmp -s previews/duo-inner/beta.png "$2"' "$T/alpha.en.png" "$T/alpha.en.dark.png" "$T/beta.en.png"
+    expect lang_import "the French images are the French bytes, not the English ones" bash -c 'cmp -s previews/iphone/fr/alpha.png "$0" && ! cmp -s previews/iphone/fr/alpha.png previews/iphone/alpha.png' "$T/fr/alpha.png"
+    expect lang_import "no manifest in the language folder" test ! -e previews/iphone/fr/manifest.json
+    $PAGE --check > "$T/check.log" 2>&1
+    expect lang_import "the English check ignores the language folder" grep -q "CHECK OK \[en\]: 2 cards" "$T/check.log"
+    # A full English import keeps the language folders; a second language lands beside the first
+    $PAGE --import "$T/run" > "$T/out.log" 2>&1
+    expect lang_import "a full English import keeps fr/" test -f previews/iphone/fr/alpha.png -a -f previews/duo-inner/fr/beta.dark.png
+    $PAGE --import "$T/fr" --lang de > "$T/lang.log" 2>&1
+    expect lang_import "a second language beside the first" test -f previews/iphone/de/alpha.png -a -f previews/iphone/fr/alpha.png
+    # A language import needs no gallery of its own: it works before any English import
+    rm -rf previews
+    $PAGE --import "$T/fr" --lang it > "$T/lang.log" 2>&1; status=$?
+    expect lang_import "works without an English gallery" [ "$status" = 0 ]
+    expect lang_import "and writes no manifest or page" bash -c '! test -e previews/data/manifest.json && ! test -e previews/index.html'
+    # --lang alone, or with a name that is not a code, is refused
+    $PAGE --lang fr > "$T/lang.log" 2>&1; status=$?
+    expect lang_import "--lang without --import exits 2" [ "$status" = 2 ]
+    $PAGE --import "$T/fr" --lang "../x" > "$T/lang.log" 2>&1; status=$?
+    expect lang_import "a language that is not a code exits 2" [ "$status" = 2 ]
+    cd "$ROOT" || return; rm -rf "$T"
+}
+
 mac_setup() {   # the pool stubs (buildlock), a stub xcodebuild that prints files only for the exact selector, the script
     pool_setup
     cat > "$T/bin/xcodebuild" <<'STUB'
@@ -558,9 +661,12 @@ STUB
     export STUB_PNG_LIGHT="$T/light.b64" STUB_PNG_DARK="$T/dark.b64"
     unset STUB_MAC_FILES
     cp "$SCRIPT_MAC" "$TREE/scripts/snapshot-mac.sh"
+    cp "$ROOT/scripts/languages.sh" "$TREE/scripts/languages.sh"
     # The page script records what it was given and where it was told to write
     cat > "$TREE/scripts/preview-gallery.py" <<'STUB'
 import os, sys
+with open(os.environ['TMPDIR'] + '/pg.log', 'a') as handle:
+    handle.write(' '.join(sys.argv[1:]) + '\n')
 if '--import' in sys.argv:
     source = sys.argv[sys.argv.index('--import') + 1]
     with open(os.environ['TMPDIR'] + '/imported.txt', 'w') as handle:
@@ -658,8 +764,8 @@ PY
 ALL="fallback_run fallback_keep_booted fallback_borrowed fallback_test_fails
 pool_run pool_options pool_acquire_fails pool_build_fails pool_test_fails pool_check_fails
 pool_signalled_int_acquire pool_signalled_int_build pool_signalled_int_test pool_signalled_term_test pool_signalled_hup_build
-pool_duo pool_ipad unknown_device simulator_udid fallback_udid layout preserve skipped document_canvas draws_nothing forced_appearance coexist
-mac_run mac_only mac_test_fails mac_no_file layout_mac"
+pool_languages pool_duo pool_ipad unknown_device simulator_udid fallback_udid layout preserve skipped document_canvas draws_nothing forced_appearance coexist lang_import
+mac_run mac_only mac_languages mac_test_fails mac_no_file layout_mac"
 for c in ${@:-$ALL}; do
     if declare -F "$c" > /dev/null; then "$c"; else echo "FAIL unknown case: $c"; FAILED=1; fi
     rm -rf "$T"

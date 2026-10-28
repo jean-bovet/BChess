@@ -1,0 +1,13 @@
+BChess is a free, open-source chess app for iPhone, iPad and Mac with its own chess engine. It plays entirely offline and collects no data.
+
+PLAY
+- All the rules of chess, including castling, en passant and promotion. Checkmate, stalemate, the fifty-move rule and threefold repetition end the game.
+- Play against the computer or a friend, or watch the computer play itself.
+- Five computer strengths, from Beginner to Maximum. Below Maximum the computer takes a moment before it replies, like a human player.
+- Promote a pawn by picking the piece over the board.
+- Every game opens in its own document window, saved as a BChess or PGN file.
+
+UNDERSTAND
+- Show Engine, in the toolbar and the Game menu, shows who stands better, the evaluation and the best line, including on your own turn.
+- The full move list in standard notation, beside the board.
+- Step back and forward through the game with the arrow keys.

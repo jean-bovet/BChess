@@ -50,7 +50,7 @@ struct GameTextTests {
         let ann = GamePlayer(name: "Ann", computer: true, level: level)
         #expect(GameText.name(of: ann, isWhite: false, opponent: human) == "Ann")
         let annDetail = GameText.sideDetail(of: ann, isWhite: false, opponent: human, toMove: true)
-        #expect(annDetail == (suffix.isEmpty ? "Black \u{00B7} \(ann.strength.displayName)" : "Black" + suffix))
+        #expect(annDetail == (suffix.isEmpty ? "Black \u{00B7} \(String(localized: ann.strength.displayName))" : "Black" + suffix))
         // A blank name is no name: the same trimming as `name(of:)`
         let blank = GamePlayer(name: "   ", computer: true, level: level)
         #expect(GameText.name(of: blank, isWhite: false, opponent: human) == name)
@@ -89,7 +89,7 @@ struct GameTextTests {
         #expect(status(end: .stalemate) == "Stalemate.")
         #expect(status(end: .repetition) == "Draw by repetition.")
         #expect(status(end: .finished) == "Game over.")
-        #expect(status(end: .checkmate, whiteToMove: false, last: "2\u{2026}Qh4") == "Checkmate. White wins. Last: 2\u{2026}Qh4")
+        #expect(status(end: .checkmate, whiteToMove: false, last: "2\u{2026}Qh4") == "Checkmate. White wins. Last: \u{2066}2\u{2026}Qh4\u{2069}")
     }
 
     @Test func statusWhileThinking() {
@@ -109,9 +109,25 @@ struct GameTextTests {
         #expect(status(whiteToMove: false) == "Club Player to move.")
     }
 
+    /// A human who typed "You" as a name is not "you": the sentence follows the structure, never the text.
+    @Test func aPlayerNamedYouIsNotYou() {
+        let you = GamePlayer(name: "You", computer: false, level: 0)
+        let friend = GamePlayer(name: "Ben", computer: false, level: 0)
+        #expect(status(white: you, black: friend) == "You to move.")
+        #expect(status(white: you, black: computer) == "You to move.")
+    }
+
+    /// The notation reads left to right inside a right-to-left sentence: an isolate, never a layout pin (which does not set
+    /// a paragraph's bidi base direction).
+    @Test func notationIsALeftToRightIsolate() {
+        #expect(GameText.notation("8\u{2026}O-O") == "\u{2066}8\u{2026}O-O\u{2069}")
+        #expect(GameText.notation("") == "\u{2066}\u{2069}")
+        #expect(status(last: "8. c3").hasSuffix("8. c3\u{2069}"))
+    }
+
     @Test func statusWithTheLastMove() {
-        #expect(status(last: "8. c3") == "Your move. Last: 8. c3")
-        #expect(status(whiteToMove: false, last: "8\u{2026}O-O") == "Club Player to move. Last: 8\u{2026}O-O")
-        #expect(status(thinking: true, whiteToMove: false, last: "8. c3") == "Club Player is thinking\u{2026} Last: 8. c3")
+        #expect(status(last: "8. c3") == "Your move. Last: \u{2066}8. c3\u{2069}")
+        #expect(status(whiteToMove: false, last: "8\u{2026}O-O") == "Club Player to move. Last: \u{2066}8\u{2026}O-O\u{2069}")
+        #expect(status(thinking: true, whiteToMove: false, last: "8. c3") == "Club Player is thinking\u{2026} Last: \u{2066}8. c3\u{2069}")
     }
 }

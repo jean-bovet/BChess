@@ -53,6 +53,8 @@ enum GalleryScenarios {}
 enum MacGalleryScenarios {
     static let group = "Mac"
     static let windowFrame = MacWindowSize.frame(CGSize(width: 1440, height: 900))
+    /// The title of a new game's window ("You vs Club Player"), in the language the run is in: the render waits for it.
+    static var defaultTitle: String { GameText.title(white: .defaultWhite, black: .defaultBlack) }
 
     /// A document window over a game.
     private static func documentWindow(pgn: String, white: GamePlayer = .defaultWhite, black: GamePlayer = .defaultBlack,
@@ -116,28 +118,28 @@ enum MacGalleryScenarios {
     static let sheetMaximumSuite = newGameSuite("maximum", seeded: maximumChoice)
 
     static let documentWindowNewGameSheet = MacGalleryScenario(
-        name: "Document window · New game sheet", group: group, size: windowFrame, title: "You vs Club Player",
+        name: "Document window · New game sheet", group: group, size: windowFrame, title: defaultTitle,
         waitsForSheet: true
     ) {
         AnyView(newGameWindow(sheetClubSuite).environment(\.newGameSheetProbe, clubProbe))
     }
 
     static let documentWindowNewGameSheetFriend = MacGalleryScenario(
-        name: "Document window · New game sheet · A friend", group: group, size: windowFrame, title: "You vs Club Player",
+        name: "Document window · New game sheet · A friend", group: group, size: windowFrame, title: defaultTitle,
         waitsForSheet: true
     ) {
         AnyView(newGameWindow(sheetFriendSuite).environment(\.newGameSheetProbe, friendProbe))
     }
 
     static let documentWindowNewGameSheetMaximum = MacGalleryScenario(
-        name: "Document window · New game sheet · Maximum", group: group, size: windowFrame, title: "You vs Club Player",
+        name: "Document window · New game sheet · Maximum", group: group, size: windowFrame, title: defaultTitle,
         waitsForSheet: true
     ) {
         AnyView(newGameWindow(sheetMaximumSuite).environment(\.newGameSheetProbe, maximumProbe))
     }
 
     static let settingsWindow = MacGalleryScenario(
-        name: "Settings window", group: group, size: .fits(width: 460), title: "Settings"
+        name: "Settings window", group: group, size: .fits(width: 460), title: String(localized: "Settings")
     ) {
         // The Settings scene's window is titled by the system; this one by its content
         AnyView(SettingsView().navigationTitle("Settings"))

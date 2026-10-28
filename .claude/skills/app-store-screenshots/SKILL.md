@@ -1,6 +1,6 @@
 ---
 name: app-store-screenshots
-description: Render BChess's iPhone App Store screenshots (tilted phones, an English headline, pairs of screenshots sharing one phone) from the preview-gallery captures with the `app-store-screenshots` command, review them, and upload them once approved. Use when Jean asks for new or updated App Store screenshots, to change a headline, a slide or a phone's angle, or when `/release` says the screenshots must be retaken.
+description: Render BChess's iPhone App Store screenshots (tilted phones, a headline in each store language, pairs of screenshots sharing one phone) from the preview-gallery captures with the `app-store-screenshots` command, review them, and upload them once approved. Use when Jean asks for new or updated App Store screenshots, to change a headline, a slide or a phone's angle, or when `/release` says the screenshots must be retaken.
 allowed-tools: Read, Edit, Bash, AskUserQuestion
 ---
 
@@ -14,8 +14,9 @@ A public repo names the command, never where it comes from.
 The app: BChess, App Store product `BChess (iOS)` (`--app "BChess (iOS)"`). The captures come from
 `scripts/snapshot-gallery.sh` (the `/preview-gallery` skill) and land in `previews/iphone/` (the iPhone pass) and
 `previews/duo/` (`--device duo`). The slides file covers the iPhone 6.9" set (`APP_IPHONE_67`, 1320 x 2868), rendered
-with `app-store-screenshots --captures previews/iphone`. One store language, en-US: the app ships English only, so no
-localized captures. The iPad 13" set (`AppStore/screenshots-ipad.json`, 2064 x 2752) now comes from the iPad pass (`scripts/snapshot-gallery.sh
+with `app-store-screenshots --captures previews/iphone`. The store languages are en-US, fr-FR, de-DE, it, ar-SA and he (the
+Swiss four, then Arabic and Hebrew, which read right to left; the other reach languages come later); the app ships the
+same six, so every language has its own captures (below). The iPad 13" set (`AppStore/screenshots-ipad.json`, 2064 x 2752) now comes from the iPad pass (`scripts/snapshot-gallery.sh
 --device ipad`, captures in `previews/ipad/ipad/`, rendered with `--config AppStore/screenshots-ipad.json --captures previews/ipad/ipad`).
 The Mac set (`AppStore/screenshots-mac.json`, 2880 x 1800) comes from the Mac pass (`scripts/snapshot-mac.sh`, captures in
 `previews/mac/mac/`, rendered with `app-store-screenshots --config AppStore/screenshots-mac.json --captures previews/mac/mac`
@@ -33,11 +34,31 @@ each language, re-render the slides' captures in those languages too (`--only` a
 below): stale localized captures show an older UI than the English one. A localized capture that is missing falls
 back to English silently: before rendering, list every slide capture missing from each language folder.
 
+The slides' captures in each language (run right before rendering, one per device pass; the review set of
+`/preview-gallery` is a superset, so a language run for review serves too):
+
+```sh
+scripts/snapshot-gallery.sh --no-open --only "game-screen-engine-on,new-game-club,variations-arrows-and-cards,games-list-four-games" --lang fr,de,it,he,ar
+scripts/snapshot-gallery.sh --no-open --device ipad --only "game-screen-engine-on,new-game-club,games-list-four-games,game-screen-wide" --lang fr,de,it,he,ar
+scripts/snapshot-gallery.sh --no-open --device duo --only "game-screen-engine-on,new-game-club,variations-arrows-and-cards,games-list-four-games,duo-inner-landscape-game-screen,duo-inner-landscape-variations" --lang fr,de,it,he,ar
+scripts/snapshot-mac.sh --no-open --lang fr,de,it,he,ar
+```
+
+The dark captures (`<slug>.dark`) come with each run. The captures land in `previews/<platform>/<lang>/` where the renderer
+looks (iPhone `previews/iphone/fr/`, iPad `previews/ipad/ipad/fr/`, Duo inner `previews/duo/duo-inner/fr/`, outer
+`previews/duo/iphone/fr/`, Mac `previews/mac/mac/fr/`); the locale codes of the slides files are the store's (`fr-FR`,
+`de-DE`, `it`, `ar-SA`, `he`), the folders' the app's (`fr`, `de`, `it`, `ar`, `he`).
+
+Hebrew and Arabic are right to left, and the renderer lays their headlines out right to left (letter-spacing off, joined
+letters). Whether their storefronts show a locale's screenshots right to left too is unverified until the first upload:
+open the live page on a device set to Hebrew, then Arabic. BChess has no two-panel pair, so no caption swap is needed;
+if the carousel's order looks wrong, report it to Jean.
+
 ## 2. Render
 
 ```sh
 app-store-screenshots --captures previews/iphone                  # every language -> .build/app-store-screenshots/<locale>/NN-<slide>.png
-app-store-screenshots --captures previews/iphone --locale en-US   # one language (BChess has only en-US)
+app-store-screenshots --captures previews/iphone --locale fr-FR   # one language
 ```
 
 It checks the slides first and stops with one line per problem: a language without text, captions that do not match a

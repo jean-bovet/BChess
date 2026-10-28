@@ -16,8 +16,8 @@ extension UTType {
 }
 
 extension EngineStrength {
-    /// The level's name on the ladder and in a row's detail: "Club".
-    var displayName: String {
+    /// The level's name on the ladder and in a row's detail: "Club" (a catalog key, resolved by the view or by `String(localized:)`).
+    var displayName: LocalizedStringResource {
         switch self {
         case .beginner: "Beginner"
         case .casual: "Casual"
@@ -28,8 +28,15 @@ extension EngineStrength {
     }
 
     /// The computer's name on the game screen and in the New Game button: "Club Player", "Full Engine".
-    var computerName: String {
-        self == .maximum ? "Full Engine" : "\(displayName) Player"
+    /// One key per level: the word order and the agreement of "Player" are the translator's.
+    var computerName: LocalizedStringResource {
+        switch self {
+        case .beginner: "Beginner Player"
+        case .casual: "Casual Player"
+        case .club: "Club Player"
+        case .strong: "Strong Player"
+        case .maximum: "Full Engine"
+        }
     }
 }
 

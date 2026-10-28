@@ -97,6 +97,9 @@ struct ContentView: View {
                 EvaluationBar(verdict: EngineView.verdict(of: session), rotated: session.gameState.rotated)
             }
         }
+        // The board never mirrors, in any language: the a-file on the left and rank 1 at the bottom for White, and the
+        // evaluation bar on its left (its side is chrome, not meaning). One pin over the whole subtree, bar included.
+        .environment(\.layoutDirection, .leftToRight)
     }
 
     /// The evaluation bar's gutter on the board's leading side; the wide column reserves it beside the square.

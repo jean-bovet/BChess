@@ -28,7 +28,7 @@ struct GameSectionsTests {
     }
 
     private func titles(_ sections: [GameSection]) -> [String] {
-        sections.map { "\($0.group.title): " + $0.games.map(\.title).joined(separator: ",") }
+        sections.map { "\(String(localized: $0.group.title)): " + $0.games.map(\.title).joined(separator: ",") }
     }
 
     @Test func groupsByDayAndKeepsTheOrder() {
@@ -38,7 +38,7 @@ struct GameSectionsTests {
                      file("c", "2026-10-05T12:00:00-07:00"),
                      file("d", "2026-09-28T12:00:00-07:00")]
         let sections = GameSection.sections(of: games, now: now, calendar: calendar)
-        #expect(titles(sections) == ["TODAY: a", "YESTERDAY: b", "EARLIER: c,d"])
+        #expect(titles(sections) == ["Today: a", "Yesterday: b", "Earlier: c,d"])
     }
 
     @Test func midnightStartsANewDay() {
@@ -48,32 +48,32 @@ struct GameSectionsTests {
                      file("yesterdayStart", "2026-10-06T00:00:00-07:00"),
                      file("beforeYesterday", "2026-10-05T23:59:59-07:00")]
         let sections = GameSection.sections(of: games, now: now, calendar: calendar)
-        #expect(titles(sections) == ["TODAY: justAfter", "YESTERDAY: justBefore,yesterdayStart", "EARLIER: beforeYesterday"])
+        #expect(titles(sections) == ["Today: justAfter", "Yesterday: justBefore,yesterdayStart", "Earlier: beforeYesterday"])
     }
 
     @Test func nowJustAfterMidnightPushesTheEveningToYesterday() {
         let now = date("2026-10-07T00:00:01-07:00")
         let sections = GameSection.sections(of: [file("evening", "2026-10-06T23:30:00-07:00")], now: now, calendar: calendar)
-        #expect(titles(sections) == ["YESTERDAY: evening"])
+        #expect(titles(sections) == ["Yesterday: evening"])
     }
 
     @Test func emptyGroupsAreLeftOut() {
         let now = date("2026-10-07T10:00:00-07:00")
         #expect(GameSection.sections(of: [], now: now, calendar: calendar).isEmpty)
         let onlyEarlier = GameSection.sections(of: [file("old", "2025-01-01T12:00:00-08:00")], now: now, calendar: calendar)
-        #expect(titles(onlyEarlier) == ["EARLIER: old"])
+        #expect(titles(onlyEarlier) == ["Earlier: old"])
     }
 
     @Test func aFileFromTheFutureCountsAsToday() {
         let now = date("2026-10-07T10:00:00-07:00")
         let sections = GameSection.sections(of: [file("skewed", "2026-10-09T10:00:00-07:00")], now: now, calendar: calendar)
-        #expect(titles(sections) == ["TODAY: skewed"])
+        #expect(titles(sections) == ["Today: skewed"])
     }
 
     @Test func daysAreCountedInTheCalendarsTimeZoneAcrossDaylightSaving() {
         // The clocks go back on 2026-11-01: that day has 25 hours, and "yesterday" is still the day before
         let now = date("2026-11-02T00:30:00-08:00")
         let sections = GameSection.sections(of: [file("sunday", "2026-11-01T00:30:00-07:00")], now: now, calendar: calendar)
-        #expect(titles(sections) == ["YESTERDAY: sunday"])
+        #expect(titles(sections) == ["Yesterday: sunday"])
     }
 }

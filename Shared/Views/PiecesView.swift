@@ -90,5 +90,6 @@ struct PiecesView: View {
                 }
             }
         }
+        .neverMirrored()
     }
 }

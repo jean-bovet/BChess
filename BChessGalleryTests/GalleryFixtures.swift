@@ -81,6 +81,8 @@ extension GalleryScenarios {
         static let moveStripVariations = "1. e4 e5 (1... c5) 2. Nf3 (2. c3) Nc6 *"
         static let shortGame = "1. e4 e5 2. Nf3 Nc6 *"
         static let commented = "1. e4 {King's pawn} e5 (1... c5 {Sicilian} 2. Nf3 (2. c3 {Alapin}) d6) 2. Nf3 Nc6 3. Bb5 *"
+        /// Hebrew and Arabic comments between Latin moves, in a variation and under a row (data in a PGN, not a forced language).
+        static let mixedScript = "1. e4 {ملاحظة} e5 (1... c5 {הערה בעברית} 2. Nf3 (2. c3 {Alapin}) d6) 2. Nf3 Nc6 3. Bb5 *"
         static let card = "1. e4 e5 2. Nf3 Nc6 3. Bb5 (3. Bc4 Bc5) a6 4. Bxc6 dxc6 5. O-O f6 *"
 
         /// The widest rows: white captured fifteen pieces by the position before the last move, and that position has a
@@ -94,6 +96,6 @@ extension GalleryScenarios {
             + "19. bxa4 c4 20. Bxc4 d3 21. cxd3 Kxg8 22. Re8+ (22. Re7+) *"
 
         static let allPGNs = [ruyLopez, empty, openingE4E5, captures, yourMove, checkmate, arrowsAndCards,
-                              moveStripMiddle, moveStripVariations, shortGame, commented, card, worstRow, middlegame]
+                              moveStripMiddle, moveStripVariations, shortGame, commented, mixedScript, card, worstRow, middlegame]
     }
 }

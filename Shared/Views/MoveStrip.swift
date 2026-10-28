@@ -44,12 +44,15 @@ struct MoveStrip: View {
                   proxy.scrollTo(uuid, anchor: .trailing)
               }
             }
+            // Moves read left to right, the newest at the right edge, in every language; the button beside the strip
+            // keeps mirroring
+            .environment(\.layoutDirection, .leftToRight)
             Button(action: showAll) {
                 HStack(spacing: 4) {
                     Image(systemName: "list.bullet")
                     Text("Moves")
                     if session.game.variationCount > 0 {
-                        Text("\u{2442}\(session.game.variationCount)")
+                        Text(verbatim: GameText.notation("\u{2442}\(session.game.variationCount)"))
                     }
                 }
                 .font(.footnote.weight(.semibold))

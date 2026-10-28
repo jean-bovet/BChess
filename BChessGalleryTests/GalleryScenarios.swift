@@ -364,7 +364,7 @@ enum GalleryScenarios {
     }
     static let engineStatistics = GalleryScenario(name: "Engine · Statistics", group: "Engine") {
         AnyView(EngineView(verdict: Verdict(centipawns: 120, isMate: false), line: "9. h3 d5 10. exd5",
-                           statistics: "Depth 9/12 with 1,234,567 nodes at 410,000 n/s")
+                           statistics: EngineView.statistics(depth: 9, quiescenceDepth: 12, nodes: 1_234_567, speed: 410_000))
             .padding())
     }
     static let engineLongLine = GalleryScenario(name: "Engine · Long line", group: "Engine") {
@@ -375,14 +375,14 @@ enum GalleryScenarios {
     }
     static let engineWide = GalleryScenario(name: "Engine · Wide", group: "Engine") {
         AnyView(EngineView(verdict: Verdict(centipawns: 40, isMate: false), line: "6. d4 exd4 7. Qxd4 Qxd4 8. Nxd4",
-                           statistics: "Depth 9/14 \u{00B7} 1,234,567 nodes \u{00B7} 410,000 n/s", wide: true)
+                           statistics: EngineView.statistics(depth: 9, quiescenceDepth: 14, nodes: 1_234_567, speed: 410_000), wide: true)
             .padding())
     }
     static let engineEvaluationBars = GalleryScenario(name: "Engine · Evaluation bars", group: "Engine") {
         AnyView(VStack {
             EngineView(verdict: Verdict(centipawns: 40, isMate: false), line: "6. d4 exd4 7. Qxd4")
             EngineView(verdict: Verdict(centipawns: 40, isMate: false), line: "6. d4 exd4 7. Qxd4 Qxd4 8. Nxd4",
-                       statistics: "Depth 9/14", wide: true)
+                       statistics: EngineView.statistics(depth: 9, quiescenceDepth: 14, nodes: 1_234_567, speed: 410_000), wide: true)
             HStack {
                 EvaluationBar(verdict: Verdict(centipawns: 40, isMate: false), rotated: false)
                 EvaluationBar(verdict: Verdict(centipawns: -200, isMate: false), rotated: true)
@@ -411,6 +411,9 @@ enum GalleryScenarios {
     }
     static let moveListVariationsAndComments = GalleryScenario(name: "Move list · Variations and comments", group: "Moves") {
         AnyView(MoveListView(session: GameSession(state: GameState(pgn: Fixture.commented))))
+    }
+    static let moveListMixedScriptComments = GalleryScenario(name: "Move list · Mixed-script comments", group: "Moves") {
+        AnyView(MoveListView(session: GameSession(state: GameState(pgn: Fixture.mixedScript))))
     }
     static let moveListCard = GalleryScenario(name: "Move list · Card", group: "Moves") {
         AnyView(MoveListView(session: GameSession(state: GameState(pgn: Fixture.card)), card: true)
@@ -490,7 +493,7 @@ enum GalleryScenarios {
         arrow,
         engineEqual, engineSlightlyBetter, engineMate, engineAnalyzing, engineStatistics, engineLongLine, engineWide, engineEvaluationBars,
         moveStripStart, moveStripMiddle, moveStripWithVariations,
-        moveListShortGame, moveListVariationsAndComments, moveListCard,
+        moveListShortGame, moveListVariationsAndComments, moveListMixedScriptComments, moveListCard,
         gamesListFourGames, gamesListSmallPhone, launchEmptyLibrary, newGameClub, newGameFriend, newGameMaximum, newGamePlayers,
         settings,
         walnutPalette,

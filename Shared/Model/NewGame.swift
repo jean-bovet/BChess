@@ -25,9 +25,9 @@ nonisolated struct NewGame: Equatable, Sendable {
             }
         }
 
-        var name: String { strength?.displayName ?? "A friend" }
+        var name: LocalizedStringResource { strength?.displayName ?? "A friend" }
 
-        var blurb: String {
+        var blurb: LocalizedStringResource {
             switch self {
             case .friend:
                 #if os(macOS)
@@ -43,10 +43,11 @@ nonisolated struct NewGame: Equatable, Sendable {
             }
         }
 
-        /// The measured strength on Stockfish's UCI_Elo scale, to the nearest 50 (docs/elo.md), empty for a friend.
-        var elo: String {
+        /// The measured strength on Stockfish's UCI_Elo scale, to the nearest 50 (docs/elo.md), nil for a friend.
+        /// The digits are part of the text and stay Western in every language (D1).
+        var elo: LocalizedStringResource? {
             switch self {
-            case .friend: return ""
+            case .friend: return nil
             case .beginner: return "about 550"
             case .casual: return "about 950"
             case .club: return "about 1350"
@@ -68,8 +69,15 @@ nonisolated struct NewGame: Equatable, Sendable {
         }
 
         /// The New Game button's words; the computer has the same name on the game screen (D1).
-        var playLabel: String {
-            strength.map { "Play the \($0.computerName)" } ?? "Start Game"
+        var playLabel: LocalizedStringResource {
+            switch self {
+            case .friend: return "Start Game"
+            case .beginner: return "Play the Beginner Player"
+            case .casual: return "Play the Casual Player"
+            case .club: return "Play the Club Player"
+            case .strong: return "Play the Strong Player"
+            case .maximum: return "Play the Full Engine"
+            }
         }
     }
 
@@ -126,9 +134,9 @@ nonisolated struct NewGame: Equatable, Sendable {
 
     var isFriend: Bool { opponent == .friend }
 
-    var sideLabel: String { isFriend ? "First player plays" : "You play" }
+    var sideLabel: LocalizedStringResource { isFriend ? "First player plays" : "You play" }
 
-    var firstNameLabel: String {
+    var firstNameLabel: LocalizedStringResource {
         guard isFriend else {
             return "Your name"
         }
@@ -139,7 +147,7 @@ nonisolated struct NewGame: Equatable, Sendable {
         }
     }
 
-    var secondNameLabel: String {
+    var secondNameLabel: LocalizedStringResource {
         switch side {
         case .white: return "Black"
         case .black: return "White"
@@ -147,7 +155,7 @@ nonisolated struct NewGame: Equatable, Sendable {
         }
     }
 
-    var playLabel: String { opponent.playLabel }
+    var playLabel: LocalizedStringResource { opponent.playLabel }
 
     var showsThinkingTime: Bool { opponent == .maximum }
 

@@ -95,6 +95,55 @@ struct GameStateCodingTests {
         #expect(try state.data(for: .pgn) == Data(pgn.utf8))
     }
 
+    // MARK: Byte stability (I1 under APP-11): no label, locale or translation reaches a file
+
+    /// The bytes of a game with named and computer players, as literals: sorted keys, the names as typed (Latin,
+    /// Hebrew, Arabic), `name: ""` for a computer, `level` as an integer. A writer that consulted the locale, or
+    /// stored an English label, would no longer match.
+    @Test func namedPlayersWriteTheSameBytes() throws {
+        let ann = GameState(pgn: "*", white: GamePlayer(name: "Ann", computer: false, level: 0), black: .computer(.club))
+        #expect(try ann.data(for: .bchessGame) == Data(
+            #"{"black":{"computer":true,"level":2,"name":""},"pgn":"*","rotated":false,"white":{"computer":false,"level":0,"name":"Ann"}}"#.utf8))
+
+        let scripts = GameState(pgn: "*", rotated: true, white: GamePlayer(name: "דני", computer: false, level: 0),
+                                black: .computer(.maximum, thinkingTime: 30))
+        #expect(try scripts.data(for: .json) == Data(
+            "{\"black\":{\"computer\":true,\"level\":6,\"name\":\"\"},\"pgn\":\"*\",\"rotated\":true,\"white\":{\"computer\":false,\"level\":0,\"name\":\"דני\"}}".utf8))
+
+        let arabic = GameState(pgn: "*", white: GamePlayer(name: "سامي", computer: false, level: 0), black: .computer(.maximum))
+        #expect(try arabic.data(for: .bchessGame) == Data(
+            "{\"black\":{\"computer\":true,\"level\":5,\"name\":\"\"},\"pgn\":\"*\",\"rotated\":false,\"white\":{\"computer\":false,\"level\":0,\"name\":\"سامي\"}}".utf8))
+    }
+
+    /// The PGN, the SAN names, the move labels and the FEN of a short game, against literals.
+    @Test func chessDataIsStandardEnglishNotation() throws {
+        let engine = FEngine()
+        for move in ["e2e4", "e7e5", "g1f3", "b8c6", "f1b5"] {
+            #expect(engine.move(uci: move))
+        }
+        #expect(engine.pgnAllGames() == """
+            [Event ""]
+            [Site ""]
+            [Date ""]
+            [Round ""]
+            [White ""]
+            [Black ""]
+            [Result "*"]
+
+             1. e4 e5 2. Nf3 Nc6 3. Bb5 *
+            """)
+        #expect(engine.fen() == "r1bqkbnr/pppp1ppp/2n5/1B2p3/4P3/5N2/PPPP1PPP/RNBQK2R b KQkq - 3 3")
+
+        let nodes = engine.moveNodesTree()
+        let names = nodes.map(\.name)
+        let labels = nodes.map { GameText.moveLabel(number: Int($0.moveNumber), isWhite: $0.whiteMove, san: $0.name) }
+        #expect(names == ["e4", "e5", "Nf3", "Nc6", "Bb5"])
+        #expect(labels == ["1. e4", "1\u{2026}e5", "2. Nf3", "2\u{2026}Nc6", "3. Bb5"])
+
+        let state = GameState(pgn: engine.pgnAllGames(), white: GamePlayer(name: "דני", computer: false, level: 0), black: .computer(.club))
+        #expect(try state.data(for: .pgn) == Data(engine.pgnAllGames().utf8))
+    }
+
     @Test func generatedFENGameIsStandardPGN() {
         let fen = "r1bqkbnr/pppp1ppp/2n5/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 3 3"
         let engine = FEngine()

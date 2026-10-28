@@ -66,3 +66,35 @@ its own "BChess Agent" simulator).
 **Conventions.** English UI strings, code, identifiers and comments. New Swift code states
 isolation (`@MainActor` / `nonisolated` / `@Sendable`). Match the surrounding style. Commit when
 asked.
+
+## Languages
+
+English (source), French, German and Italian (the Swiss four), plus Hebrew (`he`) and Arabic (`ar`; store `ar-SA`), both
+right to left. The App Store page has the same six (`AppStore/`, store codes en-US, fr-FR, de-DE, it, ar-SA, he). Every
+user-facing string goes in
+`Shared/Localizable.xcstrings` (one catalog for both apps) with all its translations; `LocalizationCatalogTests` fails on a
+key that misses one, on a stale key, and on a number or a direction isolate in a key. View literals (`Text("…")`, `Button`,
+`Label`) are extracted by themselves; a word built in the model is a `LocalizedStringResource` (a leaf) or a
+`String(localized:)` sentence with `%@` arguments, never a concatenation (`Shared/Model/GameText.swift`). Chess notation
+(SAN, PGN, FEN, move labels, coordinates, the score, the depth) is never translated and is shown with `Text(verbatim:)` or
+as a `%@` argument formatted in code (Western digits). `BChessMacGalleryTests/LocalizationTests.swift` resolves the leaves
+per language in the hosted app. After adding or changing strings, sync the catalog headless and translate the new keys:
+
+```sh
+~/GitHub/maestro/bin/catalog-sync              # builds both apps, adds new keys, marks unused ones stale
+~/GitHub/maestro/bin/catalog-sync --delete-stale
+~/GitHub/maestro/bin/catalog-sync --check --skip-build   # "catalog unchanged" before committing
+```
+
+`xcodegen generate` after a new language (`knownRegions` follows the catalog).
+
+**Right to left.** The board never mirrors (the a-file on the left, rank 1 at the bottom for White, the evaluation bar on its
+left): every board component pins itself with `neverMirrored()`, and `ContentView` pins the whole board. The move strip and
+the move-list rows are pinned left to right; the chrome (toolbars, sheets, lists, Settings) mirrors. Notation inside a
+sentence or alone (the last move, the best line, the score, the depth, the variation count) goes through `GameText.notation`
+(a left-to-right isolate), a variation line and each comment in it through `MoveRowView.variationText`; digits of the notation
+and of what sits beside it (coordinates, move numbers, the score, the Elo, the thinking time) are Western in every language,
+the node count, the speed and the dates follow the locale. The check is `scripts/snapshot-gallery.sh --only "<the review
+set>" --lang he,ar` (and `--device ipad`, `--device duo`, `scripts/snapshot-mac.sh --lang he,ar`), the board region compared
+with the English capture (`magick compare -metric RMSE`, 0), and `LocaleIndependenceTests`/`MacMenuTests` run with
+`TEST_RUNNER_BCHESS_EXPECT_LANGUAGE`/`_REGION` set (the `/preview-gallery` skill has the commands).

@@ -29,8 +29,9 @@ struct EngineView: View {
 
     /// The best line, or a hidden stand-in while there is none, so the card keeps its height.
     private var bestLine: some View {
-        (Text("Best ").foregroundStyle(Walnut.textSecondary)
-         + Text(line).fontWeight(.semibold).foregroundStyle(Walnut.textPrimary))
+        // One key, "Best %@": a language may put the line first
+        Text("Best \(Text(GameText.notation(line)).fontWeight(.semibold).foregroundStyle(Walnut.textPrimary))")
+            .foregroundStyle(Walnut.textSecondary)
             .font(.footnote)
             .lineLimit(wide ? 2 : 1)
             .truncationMode(.tail)
@@ -96,13 +97,21 @@ struct EngineView: View {
     }
 
     static func statistics(of info: FEngineInfo) -> String {
-        let nodes = info.nodeEvaluated.formatted(.number)
-        let speed = info.movesPerSecond.formatted(.number)
-        var text = "Depth \(info.depth)"
-        if info.quiescenceDepth > 0 && info.quiescenceDepth != info.depth {
-            text += "/\(info.quiescenceDepth)"
+        statistics(depth: Int(info.depth), quiescenceDepth: Int(info.quiescenceDepth),
+                   nodes: Int(info.nodeEvaluated), speed: Int(info.movesPerSecond))
+    }
+
+    /// "Depth 9/12 with 1,234,567 nodes at 410,000 n/s". The depth is notation and stays in Western digits (D1); the
+    /// node count and the speed are counts and follow the locale.
+    static func statistics(depth: Int, quiescenceDepth: Int, nodes: Int, speed: Int) -> String {
+        var depthText = String(depth)
+        if quiescenceDepth > 0 && quiescenceDepth != depth {
+            depthText += "/\(quiescenceDepth)"
         }
-        return text + " with \(nodes) nodes at \(speed) n/s"
+        depthText = GameText.notation(depthText)
+        let nodeText = nodes.formatted(.number)
+        let speedText = speed.formatted(.number)
+        return String(localized: "Depth \(depthText) with \(nodeText) nodes at \(speedText) n/s")
     }
 }
 
@@ -147,6 +156,6 @@ struct EvaluationBar: View {
             }
         }
         .accessibilityElement()
-        .accessibilityLabel(shown.map { "Evaluation \($0.score)" } ?? "Evaluation")
+        .accessibilityLabel(shown.map { String(localized: $0.accessibilityLabel) } ?? String(localized: "Evaluation"))
     }
 }

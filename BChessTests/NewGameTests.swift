@@ -90,33 +90,33 @@ struct NewGameTests {
     }
 
     @Test func labelsFollowTheMockups() {
-        #expect(NewGame().sideLabel == "You play")
-        #expect(NewGame().firstNameLabel == "Your name")
+        #expect(String(localized: NewGame().sideLabel) == "You play")
+        #expect(String(localized: NewGame().firstNameLabel) == "Your name")
         let labels: [(NewGame.Opponent, String)] = [(.beginner, "Play the Beginner Player"), (.casual, "Play the Casual Player"),
                                                     (.club, "Play the Club Player"), (.strong, "Play the Strong Player"),
                                                     (.maximum, "Play the Full Engine"), (.friend, "Start Game")]
         for (opponent, label) in labels {
-            #expect(game(opponent).playLabel == label)
+            #expect(String(localized: game(opponent).playLabel) == label)
         }
 
-        #expect(game(.friend).sideLabel == "First player plays")
-        #expect(game(.friend, side: .white).firstNameLabel == "White")
-        #expect(game(.friend, side: .white).secondNameLabel == "Black")
-        #expect(game(.friend, side: .black).firstNameLabel == "Black")
-        #expect(game(.friend, side: .black).secondNameLabel == "White")
-        #expect(game(.friend, side: .random).firstNameLabel == "Random color")
-        #expect(game(.friend, side: .random).secondNameLabel == "Random color")
+        #expect(String(localized: game(.friend).sideLabel) == "First player plays")
+        #expect(String(localized: game(.friend, side: .white).firstNameLabel) == "White")
+        #expect(String(localized: game(.friend, side: .white).secondNameLabel) == "Black")
+        #expect(String(localized: game(.friend, side: .black).firstNameLabel) == "Black")
+        #expect(String(localized: game(.friend, side: .black).secondNameLabel) == "White")
+        #expect(String(localized: game(.friend, side: .random).firstNameLabel) == "Random color")
+        #expect(String(localized: game(.friend, side: .random).secondNameLabel) == "Random color")
 
-        #expect(NewGame.Opponent.club.name == "Club")
-        #expect(NewGame.Opponent.friend.name == "A friend")
-        #expect(NewGame.Opponent.maximum.name == "Maximum")
-        #expect(NewGame.Opponent.beginner.elo == "about 550")
-        #expect(NewGame.Opponent.maximum.elo == "about 2350")
-        #expect(NewGame.Opponent.allCases.map(\.elo) == ["", "about 550", "about 950", "about 1350", "about 1600", "about 2350"])
-        #expect(NewGame.Opponent.friend.elo == "")
-        #expect(NewGame.Opponent.beginner.blurb == "Sees one move ahead, misses threats")
-        #expect(NewGame.Opponent.strong.blurb == "Rarely blunders; needs a real plan")
-        #expect(NewGame.Opponent.maximum.blurb == "The full engine, no handicap")
+        #expect(String(localized: NewGame.Opponent.club.name) == "Club")
+        #expect(String(localized: NewGame.Opponent.friend.name) == "A friend")
+        #expect(String(localized: NewGame.Opponent.maximum.name) == "Maximum")
+        #expect(NewGame.Opponent.beginner.elo.map { String(localized: $0) } == "about 550")
+        #expect(NewGame.Opponent.maximum.elo.map { String(localized: $0) } == "about 2350")
+        #expect(NewGame.Opponent.allCases.map { $0.elo.map { String(localized: $0) } } == [nil, "about 550", "about 950", "about 1350", "about 1600", "about 2350"])
+        #expect(NewGame.Opponent.friend.elo == nil)
+        #expect(String(localized: NewGame.Opponent.beginner.blurb) == "Sees one move ahead, misses threats")
+        #expect(String(localized: NewGame.Opponent.strong.blurb) == "Rarely blunders; needs a real plan")
+        #expect(String(localized: NewGame.Opponent.maximum.blurb) == "The full engine, no handicap")
         #expect(NewGame.Opponent.allCases.map(\.pieceImage) == ["pawn_w", "pawn_b", "knight_b", "bishop_b", "rook_b", "queen_b"])
     }
 

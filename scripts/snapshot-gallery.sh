@@ -3,7 +3,7 @@
 # iOS simulator, imports the PNGs into previews/ and checks the gallery. $SIMULATOR_UDID, when set, is the
 # simulator to use: it is never leased and never released (the caller's).
 #
-# Usage: scripts/snapshot-gallery.sh [--device iphone|duo|ipad] [--only PATTERN] [--keep-booted] [--no-open] [simulator name or id]
+# Usage: scripts/snapshot-gallery.sh [--device iphone|duo|ipad] [--only PATTERN] [--lang en,fr,he,...] [--keep-booted] [--no-open] [simulator name or id]
 #        scripts/snapshot-gallery.sh --shutdown [simulator name or id]
 #   --device D      iphone (default): the iPhone 17 Pro gallery in previews/. duo: the Duo pass, an iPhone Duo (iOS
 #                   27.1, folded: the outer display, 466 x 678 pt) renders every card and the inner-display ones at
@@ -12,6 +12,11 @@
 #                   (the iPhone gallery stays untouched); anything else exits 2
 #   --only PATTERN  comma-separated substrings of scenario names or slugs; renders just those and imports
 #                   them over the existing previews/ (the check still covers every scenario)
+#   --lang LIST     comma-separated languages (en, fr, de, it, he, ar; default en): one test run per language on the one build and
+#                   lease, with -testLanguage <lang> -testRegion <region> (en US, fr FR, de DE, it IT, he IL, ar SA). English imports as
+#                   always (and is checked); another language imports its PNGs into <gallery>/<platform>/<lang>/ (where
+#                   the App Store renderer looks) with `preview-gallery.py --import DIR --lang <lang>`, with no page and no
+#                   check. Needs --only for every language but English: never a full gallery in another language
 #   --keep-booted   fallback only: leave the simulator booted for the next run (default: shut it down at the end)
 #   --no-open       do not open previews/index.html at the end
 #   --shutdown      fallback only: shut the simulator down (after a series of --keep-booted runs) and exit
@@ -35,11 +40,12 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 if command -v caffeinate > /dev/null; then caffeinate -dims -w $$ & fi
 
-KEEP=0; ONLY_SHUTDOWN=0; OPEN_PAGE=1; ONLY=""; SIM=""; DEVICE=iphone
+KEEP=0; ONLY_SHUTDOWN=0; OPEN_PAGE=1; ONLY=""; SIM=""; DEVICE=iphone; LANGS=en
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --device) [[ $# -ge 2 ]] || { echo "--device needs iphone, duo or ipad" >&2; exit 2; }; DEVICE="$2"; shift 2 ;;
     --only) [[ $# -ge 2 ]] || { echo "--only needs a pattern" >&2; exit 2; }; ONLY="$2"; shift 2 ;;
+    --lang) [[ $# -ge 2 ]] || { echo "--lang needs a list of languages (en, fr, de, it, he, ar)" >&2; exit 2; }; LANGS="$2"; shift 2 ;;
     --keep-booted) KEEP=1; shift ;;
     --no-open) OPEN_PAGE=0; shift ;;
     --shutdown) ONLY_SHUTDOWN=1; shift ;;
@@ -54,6 +60,15 @@ case "$DEVICE" in
   *) echo "unknown device: $DEVICE (iphone, duo or ipad)" >&2; exit 2 ;;
 esac
 [[ -n "$SIM" ]] || SIM="$DEFAULT_SIM"
+# The languages: the whitelist and the region of each, shared with snapshot-mac.sh
+. scripts/languages.sh
+parse_languages "$LANGS"
+for lang in "${LANG_LIST[@]}"; do
+  if [[ $lang != en && -z "$ONLY" ]]; then
+    echo "--lang $lang needs --only: never a full gallery in another language (the review set is in the preview-gallery skill)" >&2
+    exit 2
+  fi
+done
 # The gallery's folder: the Duo pass has its own, inside previews/
 OUT="previews"
 if [[ $DEVICE == duo ]]; then OUT="previews/duo"; fi
@@ -242,20 +257,29 @@ run_xcodebuild build build-for-testing -project BChess.xcodeproj -scheme "BChess
   -derivedDataPath "$DD" -enableCodeCoverage NO || fail "build-for-testing"
 T_BUILD=$(now)
 # TEST_RUNNER_<name> in xcodebuild's environment reaches the test process as <name>.
-STATUS=0
-TEST_RUNNER_BCHESS_SNAPSHOT_DIR="$WORK/png" TEST_RUNNER_BCHESS_SNAPSHOT_ONLY="$ONLY" \
-TEST_RUNNER_BCHESS_SNAPSHOT_DEVICE="$DEVICE" \
-run_xcodebuild test test-without-building -project BChess.xcodeproj -scheme "BChess (iOS)" \
-  -destination "id=$UDID" -derivedDataPath "$DD" -parallel-testing-enabled NO -collect-test-diagnostics never -enableCodeCoverage NO \
-  -testLanguage en -testRegion US \
-  -only-testing:BChessGalleryTests/GallerySuites/SnapshotGalleryTests || STATUS=$?
-T_TEST=$(now)
-grep -E '^gallery: |error:|Test run with' "$LOG" | sed 's/^/  /' || true
-[[ $STATUS == 0 ]] || fail "the snapshot test"
-grep -q '^gallery: [0-9]* scenario' "$LOG" || fail "the snapshot test (no scenario was rendered)"
-
-python3 scripts/preview-gallery.py --import "$WORK/png" ${ONLY:+--partial}
-python3 scripts/preview-gallery.py --check
+# One test run per language on the one build and lease; each run's PNGs in their own folder, imported right after it.
+CHECK_ENGLISH=0
+for lang in "${LANG_LIST[@]}"; do
+  STATUS=0
+  TEST_RUNNER_BCHESS_SNAPSHOT_DIR="$WORK/png-$lang" TEST_RUNNER_BCHESS_SNAPSHOT_ONLY="$ONLY" \
+  TEST_RUNNER_BCHESS_SNAPSHOT_DEVICE="$DEVICE" \
+  run_xcodebuild test test-without-building -project BChess.xcodeproj -scheme "BChess (iOS)" \
+    -destination "id=$UDID" -derivedDataPath "$DD" -parallel-testing-enabled NO -collect-test-diagnostics never -enableCodeCoverage NO \
+    -testLanguage "$lang" -testRegion "$(region "$lang")" \
+    -only-testing:BChessGalleryTests/GallerySuites/SnapshotGalleryTests || STATUS=$?
+  T_TEST=$(now)
+  [[ ${#LANG_LIST[@]} -gt 1 ]] && echo "language: $lang"
+  grep -E '^gallery: |error:|Test run with' "$LOG" | sed 's/^/  /' || true
+  [[ $STATUS == 0 ]] || fail "the snapshot test ($lang)"
+  grep -q '^gallery: [0-9]* scenario' "$LOG" || fail "the snapshot test (no scenario was rendered, $lang)"
+  if [[ $lang == en ]]; then
+    python3 scripts/preview-gallery.py --import "$WORK/png-$lang" ${ONLY:+--partial}
+    CHECK_ENGLISH=1
+  else
+    python3 scripts/preview-gallery.py --import "$WORK/png-$lang" --lang "$lang"
+  fi
+done
+if [[ $CHECK_ENGLISH == 1 ]]; then python3 scripts/preview-gallery.py --check; fi
 rm -f "$LOG"
 echo "network: none (I5)"
 [[ $POOL == 1 ]] && BOOT_LABEL=lease || BOOT_LABEL=boot

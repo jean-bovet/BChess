@@ -39,14 +39,14 @@ struct LabelsView: View {
 
             ForEach(0...7, id:\.self) { index in
                 let ai = actualIndex(index)
-                Text("\(8 - ai)")
+                Text(verbatim: "\(8 - ai)")
                     .font(font)
                     .frame(width: thickness, height: squareSize)
                     .offset(x: xOffset, y: yOffset + thickness + CGFloat(index) * squareSize)
             }
             
             ForEach(Array(["a", "b", "c", "d", "e", "f", "g", "h"].enumerated()), id:\.offset) { index, value in
-                Text("\(value)")
+                Text(verbatim: value)
                     .font(font)
                     .frame(width: squareSize, height: thickness)
                     .offset(x: xOffset + thickness + CGFloat(actualIndex(index)) * squareSize,
@@ -55,5 +55,6 @@ struct LabelsView: View {
         }
         .foregroundStyle(Walnut.coordinates)
         .allowsHitTesting(false)
+        .neverMirrored()
     }
 }

@@ -14,11 +14,12 @@ struct GameSection: Identifiable {
         case yesterday
         case earlier
 
-        var title: String {
+        /// In title case: the header shows it with `.textCase(.uppercase)`, which Hebrew and Arabic ignore.
+        var title: LocalizedStringResource {
             switch self {
-            case .today: return "TODAY"
-            case .yesterday: return "YESTERDAY"
-            case .earlier: return "EARLIER"
+            case .today: return "Today"
+            case .yesterday: return "Yesterday"
+            case .earlier: return "Earlier"
             }
         }
     }

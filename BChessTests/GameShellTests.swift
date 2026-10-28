@@ -327,6 +327,10 @@ extension GameShellTests {
         let link = target.directory.appendingPathComponent("link")
         try FileManager.default.createSymbolicLink(at: link, withDestinationURL: fixture.directory)
 
+        // The error's text is the catalog's unit (English here: the unhosted bundle has no catalog; the translations are
+        // read hosted, `LocaleIndependenceTests.exportErrorTextIsTheCatalogUnit`)
+        #expect(GameShell.ExportError.libraryFolder.errorDescription
+                == "Choose a folder outside BChess's own games: exporting there would list every game twice.")
         await #expect(throws: GameShell.ExportError.libraryFolder) {
             try await shell.exportAll(to: fixture.directory, as: .pgn)
         }

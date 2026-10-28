@@ -33,8 +33,8 @@ struct NewGameSheet: View {
         self.onDone = onDone
     }
 
-    private var title: String { mode == .new ? "New Game" : "Players" }
-    private var buttonTitle: String { mode == .new ? choice.playLabel : "Done" }
+    private var title: LocalizedStringResource { mode == .new ? "New Game" : "Players" }
+    private var buttonTitle: String { mode == .new ? String(localized: choice.playLabel) : String(localized: "Done") }
     private var sides: [NewGame.Side] { mode == .new ? [.white, .random, .black] : [.white, .black] }
 
     private func done() {
@@ -45,7 +45,7 @@ struct NewGameSheet: View {
         dismiss()
     }
 
-    private func sideTitle(_ side: NewGame.Side) -> String {
+    private func sideTitle(_ side: NewGame.Side) -> LocalizedStringResource {
         switch side {
         case .white: "White"
         case .random: "Random"
@@ -77,8 +77,8 @@ struct NewGameSheet: View {
                         Text(opponent.name)
                             .font(.system(.body, design: .serif, weight: .semibold))
                             .foregroundStyle(Walnut.textPrimary)
-                        if !opponent.elo.isEmpty {
-                            Text(opponent.elo)
+                        if let elo = opponent.elo {
+                            Text(elo)
                                 .font(.caption.monospacedDigit())
                                 .foregroundStyle(Walnut.textSecondary)
                         }
@@ -111,7 +111,7 @@ struct NewGameSheet: View {
         }
     }
 
-    private func field(_ label: String, text: Binding<String>, identifier: String) -> some View {
+    private func field(_ label: LocalizedStringResource, text: Binding<String>, identifier: String) -> some View {
         VStack(alignment: .leading, spacing: 3) {
             Text(label)
                 .font(.caption)
@@ -149,7 +149,7 @@ struct NewGameSheet: View {
                         #endif
                     }
                     Spacer(minLength: 8)
-                    WalnutSegmented(selection: $choice.thinkingTime, options: NewGame.thinkingTimes) { "\(Int($0)) s" }
+                    WalnutSegmented(selection: $choice.thinkingTime, options: NewGame.thinkingTimes) { GameText.seconds(Int($0)) }
                         .frame(maxWidth: 230)
                 }
             }
@@ -169,7 +169,8 @@ struct NewGameSheet: View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: 16) {
-                    Text("OPPONENT")
+                    Text("Opponent")
+                        .textCase(.uppercase)
                         .font(.caption.weight(.semibold))
                         .foregroundStyle(Walnut.textSecondary)
                         .padding(.horizontal, 4)

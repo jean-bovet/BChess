@@ -21,7 +21,7 @@ struct NavigationButtons: View {
             Button("Start of Game", systemImage: "backward.end") { go(.start) }
                 .disabled(!session.canMove(to: .start))
         } label: {
-            Label("Back", systemImage: "chevron.backward")
+            Label("Back", systemImage: "chevron.left")
         } primaryAction: {
             go(.backward)
         }
@@ -32,7 +32,7 @@ struct NavigationButtons: View {
             Button("End of Game", systemImage: "forward.end") { go(.end) }
                 .disabled(!session.canMove(to: .end))
         } label: {
-            Label("Forward", systemImage: "chevron.forward")
+            Label("Forward", systemImage: "chevron.right")
         } primaryAction: {
             go(.forward)
         }

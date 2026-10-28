@@ -30,6 +30,12 @@ Flags: `--no-worktree` (only when Jean said so), `--plan-only` (stop after phase
 - **Plans:** `planning/<AREA>-<n>-<slug>.md`; index `planning/README.md`.
 - **Code to search for reuse:** `Shared/`, `iOS/`, `macOS/`, `BChess/` and the test folders.
 - **Docs-only paths:** `planning/`, `AGENTS.md`, a skill.
+- **String Catalog:** a change to user-facing strings syncs `Shared/Localizable.xcstrings` (one catalog for both apps)
+  headless with `catalog-sync` (the commands in `AGENTS.md` § Languages) instead of an Xcode GUI build: `--delete-stale`,
+  then the translations in every language of the catalog, and `--check --skip-build` must print "catalog unchanged".
+  `LocalizationCatalogTests` goes red on a missing translation. A screen's translations are read with
+  `scripts/snapshot-gallery.sh --only "<slugs>" --lang fr,de,it` (and `scripts/snapshot-mac.sh --lang …`; the review set is in
+  `/preview-gallery`): a language run has no page and no check, and never a full gallery.
 - **Plan risks to cover:** file-format compatibility, what needs a real device.
 - **Owed checks:** a run on a real device, a visual check.
 

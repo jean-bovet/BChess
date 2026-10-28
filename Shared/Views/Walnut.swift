@@ -137,7 +137,7 @@ struct WalnutToggleRow: View {
 struct WalnutSegmented<Option: Hashable>: View {
     @Binding var selection: Option
     let options: [Option]
-    let title: (Option) -> String
+    let title: (Option) -> LocalizedStringResource
 
     var body: some View {
         HStack(spacing: 2) {

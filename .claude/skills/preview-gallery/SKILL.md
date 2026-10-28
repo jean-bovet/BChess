@@ -25,11 +25,56 @@ images in `previews/iphone/` and `previews/duo-inner/`, the manifest in `preview
 Game, iPhone Duo · inner display, Board, Engine, Moves, Games list, Settings, Walnut (48 cards); the Mac pass has its own page with the group Mac (6 cards). The
 approved visual spec is the Walnut design canvas (`planning/README.md`, UI-WALNUT row).
 
-**English only, in every repo**, whatever languages the app ships (`-testLanguage en -testRegion US`). The gallery
-checks layout and appearance; translations are checked by the repo's catalog tests, not by screenshots. Never add
-a language pass to the gallery. The one exception is the App Store screenshots: a repo whose store pages show the app
-in each store language keeps a `--lang` option in its gallery scripts, used only by `/app-store-screenshots` with
-`--only` the slides' captures, into its own folder per language (`previews/fr/`). The gallery page stays English.
+**The gallery is English** (`-testLanguage en -testRegion US`), whatever languages the app ships: the page, the
+`--check` and `CHECK OK [en]` never change. The catalog tests check that every string is translated; a screenshot
+checks that a translation **fits** (truncation, overflow) and, under Hebrew and Arabic, that a screen reads right to
+left. So both gallery scripts (`snapshot-gallery.sh`, `snapshot-mac.sh`) take `--lang en,fr,de,it` (and `he,ar` once the
+app ships them): one test run per language on the one build and lease, with `-testLanguage <lang> -testRegion <region>`
+(en US, fr FR, de DE, it IT, he IL, ar SA). A language run has no page and no check: its PNGs go into
+`<gallery>/<platform>/<lang>/` (`previews/iphone/fr/`, `previews/duo/duo-inner/fr/`, `previews/ipad/ipad/fr/`,
+`previews/mac/mac/fr/`), which is where `/app-store-screenshots` looks for a localized capture, and the page script
+prints `imported N image(s) [fr] into previews/<platform>/fr/`. **Never a full gallery in another language**: the iPhone,
+iPad and Duo scripts refuse `--lang` for a language but English without `--only`; the Mac gallery is six windows and
+renders them all. No scenario forces a language (the language comes from `xcodebuild`).
+
+**The review set** is what a language run renders, one list for the store slides' captures and for the screens whose
+words or direction the catalog changes (slugs, passed to `--only` as a comma-separated list):
+
+- iPhone: `game-screen-engine-on`, `game-screen-rotated`, `player-row-to-move`, `player-row-captures`,
+  `status-line-your-move`, `status-line-checkmate`, `navigation-buttons`, `engine-equal`, `engine-mate`,
+  `engine-analyzing`, `engine-statistics`, `engine-long-line`, `move-strip-start`, `move-strip-middle`,
+  `move-strip-with-variations`, `move-list-variations-and-comments`, `move-list-mixed-script-comments`, `move-list-card`, `promotion-drops-from-the-top`,
+  `variations-arrows-and-cards`, `games-list-four-games`, `launch-empty-library`, `new-game-club`, `new-game-a-friend`,
+  `new-game-maximum`, `new-game-players`, `settings`.
+- iPad (`--device ipad`): `game-screen-wide` and the store slides' captures. iPhone Duo (`--device duo`): the
+  inner-display scenarios the Duo store config names, plus `duo-inner-landscape-variations`.
+- Mac: every Mac scenario (`scripts/snapshot-mac.sh --lang fr,de,it`: the document window with the engine, the
+  variations, the New Game sheet in its three layouts, Settings).
+
+```
+scripts/snapshot-gallery.sh --no-open --only "<the review set>" --lang fr,de,it
+scripts/snapshot-gallery.sh --no-open --device ipad --only "game-screen-wide" --lang fr,de,it
+scripts/snapshot-gallery.sh --no-open --device duo --only "<the Duo set>" --lang fr,de,it
+scripts/snapshot-mac.sh --no-open --lang fr,de,it
+```
+
+Then read the PNGs with the Read tool (truncated or overflowing text, a string that wraps badly), and shorten the
+string in the catalog, never the layout. The English gallery is unchanged by all this.
+
+**Right to left (`he`, `ar`).** Read the captures against `AGENTS.md` § Languages: the board region of every board capture
+must be pixel-identical to the English one (`magick compare -metric RMSE -crop 640x640+110+250 +repage previews/iphone/<slug>.png
+previews/iphone/he/<slug>.png null:` prints 0 on the game screens; a scenario that lays out the board differently needs its
+own crop), the evaluation bar stays left of the board, the move strip and list rows read left to right, the chrome mirrors.
+The process-locale tests run beside the captures, once per language, with the variables set on the command line:
+
+```
+TEST_RUNNER_BCHESS_EXPECT_LANGUAGE=ar TEST_RUNNER_BCHESS_EXPECT_REGION=SA buildlock --folder ~/Library/Containers/ch.arizona-software.BChess --no-slot -- \
+  buildlock --folder <dd>/dd-mac -- xcodebuild test -scheme "BChess (macOS)" -destination 'platform=macOS' -derivedDataPath <dd>/dd-mac \
+  -only-testing:BChessMacGalleryTests/LocaleIndependenceTests -only-testing:BChessMacGalleryTests/MacMenuTests \
+  -only-testing:BChessMacGalleryTests/LocalizationTests -testLanguage ar -testRegion SA      # and he / IL
+```
+
+Read the executed-test count: a skipped suite or a failed `#require` on the locale is red.
 
 iPhone 17 Pro (402x874 pt), plus one iPad-landscape card ("Game screen · Wide", 1180x820, regular / regular) and
 the iPhone Duo's inner-display cards (the group "iPhone Duo · inner display": 951x669 and 669x951 pt, regular /
@@ -79,9 +124,10 @@ scripts/snapshot-gallery.sh --no-open           # do not open the page (agents, 
   `BCHESS_SNAPSHOT_DIR` is set (`TEST_RUNNER_BCHESS_SNAPSHOT_DIR` in xcodebuild's environment) and filters with
   `BCHESS_SNAPSHOT_ONLY` (the script's `--only`). It prints `gallery: <slug> <duration>` per scenario and
   `gallery: <n> scenario(s)`, which the script forwards.
-- Script options: `--device iphone|duo|ipad` (anything else exits 2 before a lease), `--only`, `--no-open`, the
+- Script options: `--device iphone|duo|ipad` (anything else exits 2 before a lease), `--only`, `--lang` (a language
+  outside the whitelist, or another language than English without `--only`, exits 2 before a lease), `--no-open`, the
   fallback's `--keep-booted` / `--shutdown` / simulator name, and `SIMULATOR_UDID` (used as is, never leased or
-  released). The test runs with `-testLanguage en -testRegion US`. The iPad pass (pool spec `ipad`, iPad Pro 13-inch, 1032 x 1376 pt at 2x = 2064 x 2752) renders every card into
+  released). The test runs with `-testLanguage en -testRegion US` unless `--lang` says otherwise. The iPad pass (pool spec `ipad`, iPad Pro 13-inch, 1032 x 1376 pt at 2x = 2064 x 2752) renders every card into
   `previews/ipad/ipad/` (all cards, plus the Duo shell card skipped); the iPhone gallery stays untouched. The page script writes the layout of "What a repo needs" item 3 (`PREVIEW_GALLERY_OUT`, the
   Duo pass's `previews/duo`, survives a full iPhone import and the other way round).
 - Simulator: a lease from the pool, `simpool acquire --spec iphone --pid $$` (iPhone 17 Pro, iOS 27.0; `--spec duo`,
@@ -211,7 +257,8 @@ One entry in the scenario list, and nothing in the app:
    and the title bar has no document proxy icon. Run it with BChess closed; the mac gate runs the plain tests of the
    target under the container lock.
 6. **Optional passes** when the audience needs them: a largest-Dynamic-Type pass, another device family (one
-   simulator after the other). Never another language (localized store captures belong to `/app-store-screenshots`).
+   simulator after the other). Another language only as `--lang` review runs (the review set above), never a language
+gallery page.
 
 ## The gate: `--check`
 

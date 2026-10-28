@@ -8,6 +8,15 @@
 
 import SwiftUI
 
+extension View {
+    /// A board component never mirrors, in any language: the a-file on the left, rank 1 at the bottom for White. Every
+    /// component that places by x (squares, pieces, coordinates, arrows, the promotion column) pins itself, so it holds
+    /// wherever it is composed; `ContentView` pins the whole board with the evaluation bar as well.
+    func neverMirrored() -> some View {
+        environment(\.layoutDirection, .leftToRight)
+    }
+}
+
 /// The 64 squares, with the last move and the selection on them.
 struct BoardView: View {
     
@@ -37,6 +46,7 @@ struct BoardView: View {
             }
         }
         .aspectRatio(1.0, contentMode: .fit)
+        .neverMirrored()
     }
 }
 

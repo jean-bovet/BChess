@@ -5,6 +5,7 @@ The snapshot test (BChessGalleryTests/SnapshotGalleryTests) writes `<slug>.png`,
 previews/index.html, one card per scenario with light and dark side by side, grouped as the manifest says.
 
     scripts/preview-gallery.py --import DIR [--partial]   # replace the gallery (--partial: only DIR's files)
+    scripts/preview-gallery.py --import DIR --lang fr     # a language run: its PNGs into <platform>/fr/, nothing else
     scripts/preview-gallery.py --check                    # every scenario complete and correctly lit
     scripts/preview-gallery.py --coverage                 # view types no scenario names (informational)
 
@@ -14,6 +15,11 @@ manifest does not name in other/), the manifest and coverage.json in data/. A fo
 gallery (previews/duo inside previews/), never an image folder: a full import removes only the PNGs of the folders
 the manifests name (and other/), the manifest and the page; any other file or folder stays. Every command first moves a flat gallery of an earlier version into the layout
 (resumable: whatever is still at the top is moved by the next command).
+
+A language run (`--lang fr`) is not part of the gallery: its PNGs are copied into <platform>/<lang>/ (the platform from the
+run's manifest, as for an English import; where `app-store-screenshots` looks for a localized capture), and no manifest, no
+page and no check changes. A full English import never deletes those folders (it removes only the PNGs directly in a
+platform folder), and the check ignores them.
 
 --check rebuilds the page, then fails on: a scenario missing either image, a stray PNG no scenario expects,
 a duplicate slug, a light image that is dark or a dark image that is light (mean luminance against 0.45,
@@ -121,6 +127,24 @@ def do_import(source, partial):
         shutil.copy2(png, os.path.join(OUT, folder))
     shutil.copy2(source_manifest, MANIFEST)
     print(f'imported {len(pngs)} image(s) into {os.path.relpath(OUT, REPO)}/')
+
+
+def do_import_language(source, lang):
+    """A language run: the PNGs of `source` into <OUT>/<platform>/<lang>/. The gallery itself (manifest, page, English images)
+    is untouched, and it need not exist yet."""
+    source_manifest = os.path.join(source, 'manifest.json')
+    if not os.path.isfile(source_manifest):
+        sys.exit(f'{source} has no manifest.json: the snapshot test did not finish')
+    platforms = {entry['slug']: platform_of(entry) for entry in read_manifest(source_manifest)}
+    counts = {}
+    for png in sorted(glob.glob(os.path.join(source, '*.png'))):
+        folder = platforms.get(image_stem(os.path.basename(png)), OTHER)
+        destination = os.path.join(OUT, folder, lang)
+        os.makedirs(destination, exist_ok=True)
+        shutil.copy2(png, destination)
+        counts[folder] = counts.get(folder, 0) + 1
+    for folder in sorted(counts):
+        print(f'imported {counts[folder]} image(s) [{lang}] into {os.path.relpath(os.path.join(OUT, folder, lang), REPO)}/')
 
 
 def luminances(manifest):
@@ -348,9 +372,17 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument('--import', dest='source', metavar='DIR', help='replace previews/ with the renders in DIR')
     parser.add_argument('--partial', action='store_true', help='with --import: keep previews/ and replace only the files in DIR')
+    parser.add_argument('--lang', metavar='LANG', help='with --import: a language run (fr, de, it, he, ar): copy the PNGs into <platform>/LANG/')
     parser.add_argument('--check', action='store_true', help='rebuild the page and check; exit 1 on any problem')
     parser.add_argument('--coverage', action='store_true', help='list the view types no scenario names')
     opts = parser.parse_args()
+    if opts.lang and not opts.source:
+        parser.error('--lang goes with --import')
+    if opts.lang and not re.fullmatch(r'[a-z]{2,3}(-[A-Za-z]{2,4})?', opts.lang):
+        parser.error(f'--lang {opts.lang!r} is not a language code')
+    if opts.lang:
+        do_import_language(opts.source, opts.lang)
+        return
     migrate()
     if opts.source:
         do_import(opts.source, opts.partial)

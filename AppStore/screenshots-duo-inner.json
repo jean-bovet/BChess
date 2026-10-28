@@ -3,7 +3,12 @@
   "width": 2853,
   "height": 2007,
   "locales": [
-    "en-US"
+    "en-US",
+    "fr-FR",
+    "de-DE",
+    "it",
+    "ar-SA",
+    "he"
   ],
   "textStyle": "top:80px; left:110px; width:2633px; text-align:center;",
   "slides": [
@@ -23,6 +28,36 @@
             "title": "Chess with its own engine",
             "sub": "Play offline, and see who stands better, the evaluation and the best line."
           }
+        ],
+        "fr-FR": [
+          {
+            "title": "Échecs avec leur propre moteur",
+            "sub": "Jouez hors ligne et voyez qui est mieux placé, l’évaluation et la meilleure suite."
+          }
+        ],
+        "de-DE": [
+          {
+            "title": "Schach mit eigener Engine",
+            "sub": "Spielen Sie offline und sehen Sie, wer besser steht, die Bewertung und die beste Zugfolge."
+          }
+        ],
+        "it": [
+          {
+            "title": "Scacchi con un proprio motore",
+            "sub": "Gioca offline e scopri chi sta meglio, la valutazione e la linea migliore."
+          }
+        ],
+        "ar-SA": [
+          {
+            "title": "الشطرنج بمحرّكه الخاص",
+            "sub": "العب دون اتصال، وشاهد من الأفضل، والتقييم، وأفضل خط لعب."
+          }
+        ],
+        "he": [
+          {
+            "title": "שחמט עם מנוע משלו",
+            "sub": "שחקו ללא חיבור, וראו מי עומד טוב יותר, את ההערכה ואת הקו הטוב ביותר."
+          }
         ]
       }
     },
@@ -41,6 +76,36 @@
           {
             "title": "Light and dark",
             "sub": "A wooden board in a walnut frame. No accounts, no ads, no network: the engine runs on your device."
+          }
+        ],
+        "fr-FR": [
+          {
+            "title": "Clair et sombre",
+            "sub": "Un échiquier en bois dans un cadre en noyer. Sans compte, sans publicité, sans réseau : le moteur tourne sur votre appareil."
+          }
+        ],
+        "de-DE": [
+          {
+            "title": "Hell und dunkel",
+            "sub": "Ein Holzbrett im Nussbaumrahmen. Keine Konten, keine Werbung, kein Netzwerk: Die Engine läuft auf Ihrem Gerät."
+          }
+        ],
+        "it": [
+          {
+            "title": "Chiaro e scuro",
+            "sub": "Una scacchiera in legno in una cornice di noce. Niente account, pubblicità o rete: il motore gira sul tuo dispositivo."
+          }
+        ],
+        "ar-SA": [
+          {
+            "title": "فاتح وداكن",
+            "sub": "رقعة خشبية في إطار من الجوز. بلا حسابات، بلا إعلانات، بلا شبكة: يعمل المحرك على جهازك."
+          }
+        ],
+        "he": [
+          {
+            "title": "בהיר וכהה",
+            "sub": "לוח עץ במסגרת אגוז. בלי חשבונות, בלי פרסומות, בלי רשת: המנוע פועל במכשיר שלכם."
           }
         ]
       }

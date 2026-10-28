@@ -1,0 +1,12 @@
+BChess est une application d’échecs gratuite et open source pour iPhone, iPad et Mac, dotée de son propre moteur d’échecs. Elle fonctionne entièrement hors ligne et ne collecte aucune donnée.
+
+JOUER
+- Toutes les règles des échecs, y compris le roque, la prise en passant et la promotion. L’échec et mat, le pat, la règle des cinquante coups et la triple répétition mettent fin à la partie.
+- Jouez contre l’ordinateur ou contre un ami, ou regardez l’ordinateur jouer contre lui-même.
+- Cinq niveaux de force, de Débutant à Maximum. En dessous de Maximum, l’ordinateur prend un instant avant de répondre, comme un joueur humain.
+- Promouvez un pion en choisissant la pièce directement sur l’échiquier.
+
+COMPRENDRE
+- Le bouton Moteur indique qui est mieux placé, l’évaluation et la meilleure suite, y compris quand c’est à vous de jouer.
+- La liste complète des coups en notation standard : à un geste sur iPhone, à côté de l’échiquier sur iPad en mode paysage et sur Mac.
+- Avancez et reculez dans la partie.

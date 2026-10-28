@@ -12,6 +12,7 @@
 		04AA9D1F6F5B25621FBDDAC2 /* BChessUIApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D0B880575533E500966B9FF /* BChessUIApp.swift */; };
 		04B0CC14841707C623C04EA9 /* PerftTests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B1C4B3C222B45C0C99C5CED0 /* PerftTests.cpp */; };
 		0591C139E4D0695DF67B0B1B /* NewGame.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52F1C97D6F9F534EA5F862F2 /* NewGame.swift */; };
+		06393FBB7107B7AE6DC4FFE5 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = F63564CDFD2ECC87262F9776 /* Localizable.xcstrings */; };
 		0765B5599107D096C64103B5 /* MinMaxSearchTests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 53E1CB7DFCB5C3399E0AFAE5 /* MinMaxSearchTests.cpp */; };
 		07DF6D4FB0FB1DA0235D77C4 /* OpeningsTests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 19F55617E5E81201E906F8EA /* OpeningsTests.cpp */; };
 		0844BEA3A3A98A183B3FC601 /* NewGameSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = C52CEBAE5558D2A252361710 /* NewGameSheet.swift */; };
@@ -22,6 +23,7 @@
 		0F9DEF76AC8B3C4582CFC3C4 /* MoveRowsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95D8446DFFA5BCD9EC7FFBA5 /* MoveRowsTests.swift */; };
 		0FABA35E043D77D32C93CF4E /* ChessGame.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1798BECBBBED258BED2E2CA1 /* ChessGame.cpp */; };
 		10F2B28DF63EAEFF238B4485 /* FEngineMove.mm in Sources */ = {isa = PBXBuildFile; fileRef = 2E720E71C38BC9C943E23A2A /* FEngineMove.mm */; };
+		11CDCBC128A4137FE97A7A43 /* MoveListTextTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB92A94DC64B2F4638F2E0C4 /* MoveListTextTests.swift */; };
 		13493B99175ADD17841971A3 /* FullMove.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB066BF62484862642882974 /* FullMove.swift */; };
 		13F134FE9E52935BDB431AA8 /* FoldSplit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D3FB5FF0F6743B683718D1E /* FoldSplit.swift */; };
 		1426B85E993D7B40855AC4F7 /* BChessUIApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D0B880575533E500966B9FF /* BChessUIApp.swift */; };
@@ -57,6 +59,7 @@
 		2C446D502A1BB5DC6BB9A7B3 /* ChessBoard.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AE369A268D78EE76D0D84F80 /* ChessBoard.cpp */; };
 		3090063C08ABB80A2165A50A /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B7C82FBD58A56EEA69F8536 /* ContentView.swift */; };
 		31C3F5BC9014C495938FA734 /* MacGalleryScenarios.swift in Sources */ = {isa = PBXBuildFile; fileRef = 385770BEEB397D07383DBBF1 /* MacGalleryScenarios.swift */; };
+		31F7819EEB1AC76B5966EA9B /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = F63564CDFD2ECC87262F9776 /* Localizable.xcstrings */; };
 		32BB425A448B3B372DCA707D /* VariationSelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71EBF0402256A6790224AAB8 /* VariationSelectionView.swift */; };
 		33A990A09B6560EB68723772 /* FEngineInfo.mm in Sources */ = {isa = PBXBuildFile; fileRef = AB15A1998BD8F52B3436A738 /* FEngineInfo.mm */; };
 		3509940CA0C682612996AD29 /* FEngineInfo.mm in Sources */ = {isa = PBXBuildFile; fileRef = AB15A1998BD8F52B3436A738 /* FEngineInfo.mm */; };
@@ -79,6 +82,7 @@
 		4581254CC0B24731F6FA1A58 /* NewGameSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = C52CEBAE5558D2A252361710 /* NewGameSheet.swift */; };
 		465254AFEEF7A4F592EDE8B8 /* GameHistory.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FECF3456A6E4C0D9547AC353 /* GameHistory.cpp */; };
 		46CB63298005A0CDB71943E2 /* FENTests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B3F0F2B581B6FB0840CCD894 /* FENTests.cpp */; };
+		46E7206A67A118AC193DA846 /* MacMenuTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E470A47D8CB88E7B80BFB5A /* MacMenuTests.swift */; };
 		472D5FF088052271DF546D2E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7AE6FC034D3D248278A55641 /* Assets.xcassets */; };
 		4970DCEF72BD80A9CA8156B9 /* Square.swift in Sources */ = {isa = PBXBuildFile; fileRef = E62F53FB8737C917EACA573D /* Square.swift */; };
 		4AF0DF735024EDD20F5D4126 /* ConditionalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6436166D3A4BF3D36CDCE690 /* ConditionalView.swift */; };
@@ -120,6 +124,7 @@
 		7043C353E57249FDC0E195C8 /* Verdict.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D97E9AA4F42DF8EB4998533 /* Verdict.swift */; };
 		711EDFA58D44E8361F66E3D4 /* DocumentWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9B7275C706589BBD3FEFC54 /* DocumentWindow.swift */; };
 		71E4AD54E9B9C238936E2B39 /* Openings.pgn in Resources */ = {isa = PBXBuildFile; fileRef = C570D7A63E563DBD04ACAF7F /* Openings.pgn */; };
+		72DF4DC03FB95E2418FAA6BC /* LocalizationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0F0726139BFE4EB04CF1890 /* LocalizationTests.swift */; };
 		7353378B36AA7E740A1988C3 /* GameSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C69641E8C4D121F719476CA /* GameSection.swift */; };
 		73A49D1EE51DE8367CA99323 /* SelectionModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2D17161DA74B911FD109203 /* SelectionModifier.swift */; };
 		748C430F2FFB8792965D2293 /* GameText.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A73C37996CF31F3FA756B29 /* GameText.swift */; };
@@ -159,17 +164,20 @@
 		9518620E43D9B847CED8488E /* FEngineUtility.mm in Sources */ = {isa = PBXBuildFile; fileRef = CE782615578B3D7B3C451A64 /* FEngineUtility.mm */; };
 		964A24461F1D8C58BED4431A /* magicmoves.c in Sources */ = {isa = PBXBuildFile; fileRef = D11C33D8BBE6428E42241039 /* magicmoves.c */; };
 		964E68698D0402C887D6283B /* FFEN.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F7BCF98F9720337F7D257AFA /* FFEN.cpp */; };
+		969BE07E432518AF03D52AE0 /* LocalizationCatalogTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CF5F3370A086D7BEC23D1CF /* LocalizationCatalogTests.swift */; };
 		993EDA19151F3900365CC340 /* CheckTests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 30FFD068B173D4656B5A8E33 /* CheckTests.cpp */; };
 		9AC10D64359B02B9DE926458 /* TestSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 558E41B761768D6665905A72 /* TestSupport.swift */; };
 		9C64B7FFF6BEB786AA7946F7 /* FEngineGame.mm in Sources */ = {isa = PBXBuildFile; fileRef = D05BA0CF62011F29A83BC02B /* FEngineGame.mm */; };
 		9F47CDB1A6B0BC4FFD6F3377 /* GameLibrary.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71E5EEE6D0B10E5AD9440A65 /* GameLibrary.swift */; };
 		A1039674D01A68EBFA2D16DE /* ChessOpenings.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 94916DB48E273E8C193F571F /* ChessOpenings.cpp */; };
 		A2EDC44DAD4A1B1190684848 /* ChessDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0318AE9A862AD390FF9642EF /* ChessDocument.swift */; };
+		A3DF8D1A7B64E3D8CE061221 /* LocaleIndependenceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 61E960113EA60E2068B95F5E /* LocaleIndependenceTests.swift */; };
 		A4C90C9D1B4E2831C3FB3245 /* FFEN.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F7BCF98F9720337F7D257AFA /* FFEN.cpp */; };
 		A5A45A6078078018D83ABD2E /* SnapshotGalleryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1570AE343620BE71BC93AB25 /* SnapshotGalleryTests.swift */; };
 		A6EA1979BBE96B598B08B54E /* NavigationButtons.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8C415E73123152AF470ECCC /* NavigationButtons.swift */; };
 		A7572E5CAEC5BAAE336853E2 /* GalleryFixtures.swift in Sources */ = {isa = PBXBuildFile; fileRef = 213F84A59C93C378DDE1766C /* GalleryFixtures.swift */; };
 		A7AB1E23A4C9B895CF215660 /* Variation.swift in Sources */ = {isa = PBXBuildFile; fileRef = F14DD2B61B0DFA99631A8621 /* Variation.swift */; };
+		AA9269F7C594A0AA68B9AE7B /* LocalizationExpectations.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51F567679611E698AE4920B8 /* LocalizationExpectations.swift */; };
 		AA9CEB41DA74BF76D9747044 /* SelectionModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2D17161DA74B911FD109203 /* SelectionModifier.swift */; };
 		AB53F831335DF4041610656E /* FPGN.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5F871687B9D9A0D848DEFFFE /* FPGN.cpp */; };
 		ABBD0D65D9E0F0225839AB02 /* FENgineInfo+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4127DC8F0333054AE16B921 /* FENgineInfo+Extension.swift */; };
@@ -336,6 +344,7 @@
 		4A9958FDE6580C36E49FEE3D /* GamesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GamesTests.swift; sourceTree = "<group>"; };
 		4C55C2ABA848E57FC09A4259 /* Bitboard.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Bitboard.hpp; sourceTree = "<group>"; };
 		4DE855BAF35957BBFF5B2D3C /* FoldSplitTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoldSplitTests.swift; sourceTree = "<group>"; };
+		51F567679611E698AE4920B8 /* LocalizationExpectations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalizationExpectations.swift; sourceTree = "<group>"; };
 		5251F732403CBCD809AEFD86 /* ChessBoard.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = ChessBoard.hpp; sourceTree = "<group>"; };
 		52F1C97D6F9F534EA5F862F2 /* NewGame.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewGame.swift; sourceTree = "<group>"; };
 		53E1CB7DFCB5C3399E0AFAE5 /* MinMaxSearchTests.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = MinMaxSearchTests.cpp; sourceTree = "<group>"; };
@@ -345,6 +354,7 @@
 		5CF08685F1E9CDB6EE194D4B /* Position.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Position.swift; sourceTree = "<group>"; };
 		5F871687B9D9A0D848DEFFFE /* FPGN.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = FPGN.cpp; sourceTree = "<group>"; };
 		60C04DA564CCB61E1404128F /* GalleryScenarioTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GalleryScenarioTests.swift; sourceTree = "<group>"; };
+		61E960113EA60E2068B95F5E /* LocaleIndependenceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocaleIndependenceTests.swift; sourceTree = "<group>"; };
 		62BE341484A569C1B3F4DC3B /* ChessGameTests.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ChessGameTests.cpp; sourceTree = "<group>"; };
 		6436166D3A4BF3D36CDCE690 /* ConditionalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConditionalView.swift; sourceTree = "<group>"; };
 		65F748AE99BB8505E7917CD3 /* FEngine+Testing.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "FEngine+Testing.h"; sourceTree = "<group>"; };
@@ -361,6 +371,7 @@
 		78235E48247B716B7C0058B1 /* SearchLimitsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchLimitsTests.swift; sourceTree = "<group>"; };
 		7AE6FC034D3D248278A55641 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		7C69641E8C4D121F719476CA /* GameSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameSection.swift; sourceTree = "<group>"; };
+		7CF5F3370A086D7BEC23D1CF /* LocalizationCatalogTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalizationCatalogTests.swift; sourceTree = "<group>"; };
 		7D317C81B07786A63151563A /* MacGalleryScenarioTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacGalleryScenarioTests.swift; sourceTree = "<group>"; };
 		81D206FD51B7D4574C66BE3B /* PromotionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromotionView.swift; sourceTree = "<group>"; };
 		8239FD746C93352706B1C6FE /* FEngineMoveNode+Private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "FEngineMoveNode+Private.h"; sourceTree = "<group>"; };
@@ -385,7 +396,9 @@
 		9CE45E5F1D175374FC199B7F /* ChessEngine.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = ChessEngine.hpp; sourceTree = "<group>"; };
 		9D97E9AA4F42DF8EB4998533 /* Verdict.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Verdict.swift; sourceTree = "<group>"; };
 		9DC5A344F0A528B0BA355655 /* BChess.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = BChess.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		9E470A47D8CB88E7B80BFB5A /* MacMenuTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacMenuTests.swift; sourceTree = "<group>"; };
 		9F36671FEEC94EAF64BE69D9 /* ChessBoardHash.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = ChessBoardHash.hpp; sourceTree = "<group>"; };
+		A0F0726139BFE4EB04CF1890 /* LocalizationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalizationTests.swift; sourceTree = "<group>"; };
 		A2A0BBD22E8999C106D3DDBD /* MoveListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoveListView.swift; sourceTree = "<group>"; };
 		A4315B0E7D14507709F7ADAF /* ChessBoardHash.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ChessBoardHash.cpp; sourceTree = "<group>"; };
 		A7041B69703399B00EABB120 /* PiecesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PiecesView.swift; sourceTree = "<group>"; };
@@ -441,6 +454,7 @@
 		EADDC013EB57D3BBC65AAAF4 /* IterativeDeepening.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = IterativeDeepening.hpp; sourceTree = "<group>"; };
 		EB04257DD3615AB196B819EC /* ChessGame.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = ChessGame.hpp; sourceTree = "<group>"; };
 		EB75FBE1292ED6EA9705DDE9 /* VariationChoicesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VariationChoicesTests.swift; sourceTree = "<group>"; };
+		EB92A94DC64B2F4638F2E0C4 /* MoveListTextTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoveListTextTests.swift; sourceTree = "<group>"; };
 		EB9B23C24F0D870DB254ECD6 /* GameStateCodingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameStateCodingTests.swift; sourceTree = "<group>"; };
 		ED44E31F4BB157BDE34CAADF /* ChessMoveGenerator.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ChessMoveGenerator.cpp; sourceTree = "<group>"; };
 		EDA854E6780F9E005D7278EB /* MacRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacRenderer.swift; sourceTree = "<group>"; };
@@ -448,6 +462,7 @@
 		F14DD2B61B0DFA99631A8621 /* Variation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Variation.swift; sourceTree = "<group>"; };
 		F2AE887434F7DF974A8405C8 /* ChessMoveGenerator.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = ChessMoveGenerator.hpp; sourceTree = "<group>"; };
 		F37D108593DEDA1EAC945852 /* EvaluationTests.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = EvaluationTests.cpp; sourceTree = "<group>"; };
+		F63564CDFD2ECC87262F9776 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
 		F7A6EC66758955DFAC1B687C /* BChessGalleryTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = BChessGalleryTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		F7BCF98F9720337F7D257AFA /* FFEN.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = FFEN.cpp; sourceTree = "<group>"; };
 		F9B7275C706589BBD3FEFC54 /* DocumentWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentWindow.swift; sourceTree = "<group>"; };
@@ -457,7 +472,7 @@
 		FECF3456A6E4C0D9547AC353 /* GameHistory.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = GameHistory.cpp; sourceTree = "<group>"; };
 		FEEA804C177D0F7528A254ED /* ChessState.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = ChessState.hpp; sourceTree = "<group>"; };
 		FFBE02E6B7A75B593B086B33 /* BChessUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BChessUITests.swift; sourceTree = "<group>"; };
-		"TEMP_F5FED308-E8CC-4546-A7D3-F020A572FD17" /* Signing.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Signing.xcconfig; sourceTree = "<group>"; };
+		"TEMP_3226A1A8-CC54-4989-BA72-791D7ABE14E5" /* Signing.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Signing.xcconfig; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -513,6 +528,7 @@
 				0318AE9A862AD390FF9642EF /* ChessDocument.swift */,
 				FB066BF62484862642882974 /* FullMove.swift */,
 				BAC64B5B0C55E00286BBAD36 /* Game.swift */,
+				F63564CDFD2ECC87262F9776 /* Localizable.xcstrings */,
 				B06D783FF88F314CC998FEC5 /* PiecesFactory.swift */,
 				59A200AAC989529DF8466777 /* PrivacyInfo.xcprivacy */,
 				C986E8C85A8DD1C80E51BAB7 /* SettingsView.swift */,
@@ -583,6 +599,7 @@
 				B6DAF02F87837948771A4958 /* GameTextTests.swift */,
 				C07C992D860E1AF283E82845 /* HandicapTests.cpp */,
 				D15ACC05CB5B63796D43739F /* IterativeDeepeningTests.cpp */,
+				7CF5F3370A086D7BEC23D1CF /* LocalizationCatalogTests.swift */,
 				53E1CB7DFCB5C3399E0AFAE5 /* MinMaxSearchTests.cpp */,
 				95D8446DFFA5BCD9EC7FFBA5 /* MoveRowsTests.swift */,
 				9BA0B234E3F267394AD43C1F /* MovesTests.cpp */,
@@ -620,10 +637,15 @@
 		64C5433801110258B02800BA /* BChessMacGalleryTests */ = {
 			isa = PBXGroup;
 			children = (
+				61E960113EA60E2068B95F5E /* LocaleIndependenceTests.swift */,
+				51F567679611E698AE4920B8 /* LocalizationExpectations.swift */,
+				A0F0726139BFE4EB04CF1890 /* LocalizationTests.swift */,
 				385770BEEB397D07383DBBF1 /* MacGalleryScenarios.swift */,
 				7D317C81B07786A63151563A /* MacGalleryScenarioTests.swift */,
+				9E470A47D8CB88E7B80BFB5A /* MacMenuTests.swift */,
 				EDA854E6780F9E005D7278EB /* MacRenderer.swift */,
 				A8200E00B9423B85AD84AE55 /* MacSnapshotGalleryTests.swift */,
+				EB92A94DC64B2F4638F2E0C4 /* MoveListTextTests.swift */,
 			);
 			path = BChessMacGalleryTests;
 			sourceTree = "<group>";
@@ -787,12 +809,12 @@
 			path = Helper;
 			sourceTree = "<group>";
 		};
-		"TEMP_8D4EE235-E65F-4B88-BC1D-CA498F54877B" /* app-10-mac-gallery-pass */ = {
+		"TEMP_D49AD50A-4383-479A-9BB2-210250364806" /* hebrew-and-arabic-right-to-left */ = {
 			isa = PBXGroup;
 			children = (
-				"TEMP_F5FED308-E8CC-4546-A7D3-F020A572FD17" /* Signing.xcconfig */,
+				"TEMP_3226A1A8-CC54-4989-BA72-791D7ABE14E5" /* Signing.xcconfig */,
 			);
-			path = "app-10-mac-gallery-pass";
+			path = "hebrew-and-arabic-right-to-left";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -962,7 +984,12 @@
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				Base,
+				ar,
+				de,
 				en,
+				fr,
+				he,
+				it,
 			);
 			mainGroup = 9EEE927A9B2635A2E9157C8E;
 			minimizedProjectReferenceProxies = 1;
@@ -996,6 +1023,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				472D5FF088052271DF546D2E /* Assets.xcassets in Resources */,
+				31F7819EEB1AC76B5966EA9B /* Localizable.xcstrings in Resources */,
 				84D9FEE4B48FD84A2A86C946 /* Openings.pgn in Resources */,
 				D3562D0C2C019B5490579748 /* PrivacyInfo.xcprivacy in Resources */,
 			);
@@ -1006,6 +1034,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				511708FE8F72BD9DBC5E1742 /* Assets.xcassets in Resources */,
+				06393FBB7107B7AE6DC4FFE5 /* Localizable.xcstrings in Resources */,
 				3A9574F98C571558D09A671F /* Openings.pgn in Resources */,
 				FF090C79385002E249665F06 /* PrivacyInfo.xcprivacy in Resources */,
 			);
@@ -1138,6 +1167,7 @@
 				FD98CB38F3FC265A65B03CCA /* GamesTests.swift in Sources */,
 				44E48FA816C4F9D2BE92D313 /* HandicapTests.cpp in Sources */,
 				442FF3DD428D7AA67F14CEC4 /* IterativeDeepeningTests.cpp in Sources */,
+				969BE07E432518AF03D52AE0 /* LocalizationCatalogTests.swift in Sources */,
 				0765B5599107D096C64103B5 /* MinMaxSearchTests.cpp in Sources */,
 				ADEBD8A009DD4420ACDCE850 /* MoveList.cpp in Sources */,
 				0F9DEF76AC8B3C4582CFC3C4 /* MoveRowsTests.swift in Sources */,
@@ -1249,10 +1279,15 @@
 			buildActionMask = 2147483647;
 			files = (
 				A7572E5CAEC5BAAE336853E2 /* GalleryFixtures.swift in Sources */,
+				A3DF8D1A7B64E3D8CE061221 /* LocaleIndependenceTests.swift in Sources */,
+				AA9269F7C594A0AA68B9AE7B /* LocalizationExpectations.swift in Sources */,
+				72DF4DC03FB95E2418FAA6BC /* LocalizationTests.swift in Sources */,
 				BBD13F9F43C3D22C7B81C5D2 /* MacGalleryScenarioTests.swift in Sources */,
 				31C3F5BC9014C495938FA734 /* MacGalleryScenarios.swift in Sources */,
+				46E7206A67A118AC193DA846 /* MacMenuTests.swift in Sources */,
 				66587379C3F13DDE7AD23729 /* MacRenderer.swift in Sources */,
 				C293D409E40492B5B24BCB8A /* MacSnapshotGalleryTests.swift in Sources */,
+				11CDCBC128A4137FE97A7A43 /* MoveListTextTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1597,7 +1632,7 @@
 		};
 		E7C507022C63CE4AB3B5B467 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = "TEMP_F5FED308-E8CC-4546-A7D3-F020A572FD17" /* Signing.xcconfig */;
+			baseConfigurationReference = "TEMP_3226A1A8-CC54-4989-BA72-791D7ABE14E5" /* Signing.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ANALYZER_NONNULL = YES;
@@ -1665,6 +1700,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 6.0;
 			};
@@ -1672,7 +1708,7 @@
 		};
 		ECE2B603E0677805EDE48B09 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = "TEMP_F5FED308-E8CC-4546-A7D3-F020A572FD17" /* Signing.xcconfig */;
+			baseConfigurationReference = "TEMP_3226A1A8-CC54-4989-BA72-791D7ABE14E5" /* Signing.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ANALYZER_NONNULL = YES;
@@ -1733,6 +1769,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				SWIFT_VERSION = 6.0;
 			};
