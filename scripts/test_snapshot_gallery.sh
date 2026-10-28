@@ -377,14 +377,16 @@ mac_languages() {   # the Mac gallery: --lang renders all six windows per langua
 
 # --- the page script, real, on a fake manifest and real PNGs ---
 
-png() {   # $1 = path, $2 = grey level: a 4 x 4 PNG with one pixel 16 levels off (a render); $3 = blank: one colour everywhere
+png() {   # $1 = path, $2 = grey level: a PNG with one pixel 16 levels off (a render); $3 = blank: one colour everywhere;
+          # $4 x $5 = its pixel size (default 12 x 12: a 6x6 pt card at 2x, a 4x4 pt one at 3x)
     python3 -c 'import struct, sys, zlib
 def chunk(kind, data):
     return struct.pack(">I", len(data)) + kind + data + struct.pack(">I", zlib.crc32(kind + data) & 0xffffffff)
-level = int(sys.argv[2]); row = b"\x00" + bytes([level, level, level]) * 4
+level = int(sys.argv[2]); width, height = int(sys.argv[4]), int(sys.argv[5])
+row = b"\x00" + bytes([level, level, level]) * width
 other = level - 16 if level > 127 else level + 16
-last = b"\x00" + bytes([level, level, level]) * 3 + (bytes([level] * 3) if sys.argv[3:] == ["blank"] else bytes([other] * 3))
-open(sys.argv[1], "wb").write(b"\x89PNG\r\n\x1a\n" + chunk(b"IHDR", struct.pack(">IIBBBBB", 4, 4, 8, 2, 0, 0, 0)) + chunk(b"IDAT", zlib.compress(row * 3 + last)) + chunk(b"IEND", b""))' "$1" "$2" "${3:-}"
+last = b"\x00" + bytes([level, level, level]) * (width - 1) + (bytes([level] * 3) if sys.argv[3] == "blank" else bytes([other] * 3))
+open(sys.argv[1], "wb").write(b"\x89PNG\r\n\x1a\n" + chunk(b"IHDR", struct.pack(">IIBBBBB", width, height, 8, 2, 0, 0, 0)) + chunk(b"IDAT", zlib.compress(row * (height - 1) + last)) + chunk(b"IEND", b""))' "$1" "$2" "${3:-}" "${4:-12}" "${5:-12}"
 }
 
 page_setup() {   # a scratch tree with the real page script, the luminance helper and the scenarios file
@@ -399,12 +401,14 @@ page_setup() {   # a scratch tree with the real page script, the luminance helpe
 }
 
 fake_run() {   # $1 = directory, $2... = "slug:platform" (platform empty: none in the manifest entry); a light and a dark PNG each
-    local dir="$1" entry slug platform json="" sep=""; shift
+    # (12 x 12 px: a 6x6 pt card at 2x; at 3x a 4x4 pt one, for duo-inner and for every card when $FAKE_DUO_PASS is set)
+    local dir="$1" entry slug platform size json="" sep=""; shift
     mkdir -p "$dir"
     for entry in "$@"; do
         slug="${entry%%:*}"; platform="${entry#*:}"
+        if [ -n "${FAKE_DUO_PASS:-}" ] || [ "$platform" = duo-inner ]; then size=4x4; else size=6x6; fi
         png "$dir/$slug.png" 240; png "$dir/$slug.dark.png" 20
-        json="$json$sep{\"name\":\"$slug\",\"group\":\"G\",\"slug\":\"$slug\",\"size\":\"402x874\"${platform:+,\"platform\":\"$platform\"}}"; sep=","
+        json="$json$sep{\"name\":\"$slug\",\"group\":\"G\",\"slug\":\"$slug\",\"size\":\"$size\"${platform:+,\"platform\":\"$platform\"}}"; sep=","
     done
     echo "[$json]" > "$dir/manifest.json"
 }
@@ -553,6 +557,34 @@ imagery() {   # full-bleed imagery that does not darken: the luminance rules are
     cd "$ROOT" || return; rm -rf "$T"
 }
 
+render_scale() {   # an image not at its scenario's render scale fails: 2x; 3x for the Duo's inner sizes and the Duo pass
+    page_setup
+    cd "$TREE" || return
+    fake_run "$T/run" "alpha:" "inner:duo-inner" "ipad-inner:ipad"
+    flag "$T/run/manifest.json" ipad-inner size '"4x4"'   # a Duo inner pose on the iPad pass: platform ipad, 12 x 12 px
+    $PAGE --import "$T/run" > "$T/out.log" 2>&1
+    $PAGE --check > "$T/check.log" 2>&1; local status=$?
+    expect render_scale "without duoInner an iPad-pass inner pose is expected at 2x" [ "$status" != 0 ]
+    expect render_scale "and is named" grep -q "wrong render scale: ipad/ipad-inner.png is 12x12 px, not 4x4 at 2x (8x8)" "$T/check.log"
+    flag previews/data/manifest.json ipad-inner duoInner true
+    $PAGE --check > "$T/check.log" 2>&1; status=$?
+    expect render_scale "with duoInner it is at 3x: every card passes" [ "$status" = 0 ]
+    expect render_scale "it counts every card" grep -q "CHECK OK \[en\]: 3 cards" "$T/check.log"
+    png previews/iphone/alpha.dark.png 20 "" 18 18   # a 6x6 pt card captured at 3x on the iPhone pass
+    $PAGE --check > "$T/check.log" 2>&1; status=$?
+    expect render_scale "a 2x card captured at 3x fails" [ "$status" != 0 ]
+    expect render_scale "and the image, its size and the scale are named" grep -q "wrong render scale: iphone/alpha.dark.png is 18x18 px, not 6x6 at 2x (12x12)" "$T/check.log"
+    png previews/iphone/alpha.dark.png 20
+    png previews/duo-inner/inner.png 240 "" 8 8   # a Duo inner pose at 2x
+    $PAGE --check > "$T/check.log" 2>&1; status=$?
+    expect render_scale "a Duo inner pose at 2x fails" grep -q "wrong render scale: duo-inner/inner.png is 8x8 px, not 4x4 at 3x (12x12)" "$T/check.log"
+    fake_run "$T/duo" "alpha:"   # a 6x6 pt card at 2x, imported as the Duo pass
+    PREVIEW_GALLERY_OUT=previews/duo $PAGE --import "$T/duo" > "$T/out.log" 2>&1
+    PREVIEW_GALLERY_OUT=previews/duo $PAGE --check > "$T/check.log" 2>&1; status=$?
+    expect render_scale "the Duo pass expects every card at 3x" grep -q "wrong render scale: iphone/alpha.png is 12x12 px, not 6x6 at 3x (18x18)" "$T/check.log"
+    cd "$ROOT" || return; rm -rf "$T"
+}
+
 draws_nothing() {   # a blank image (one colour everywhere) fails unless the scenario draws nothing by design
     page_setup
     cd "$TREE" || return
@@ -600,7 +632,7 @@ coexist() {   # iPhone import, Duo import under previews/duo, iPhone import agai
     page_setup
     cd "$TREE" || return
     fake_run "$T/phone" "alpha:" "beta:duo-inner"
-    fake_run "$T/duo" "alpha:" "gamma:duo-inner"
+    FAKE_DUO_PASS=1 fake_run "$T/duo" "alpha:" "gamma:duo-inner"
     $PAGE --import "$T/phone" > "$T/out.log" 2>&1
     PREVIEW_GALLERY_OUT=previews/duo $PAGE --import "$T/duo" >> "$T/out.log" 2>&1
     expect coexist "both pages exist" test -f previews/index.html -a -f previews/duo/index.html
@@ -674,7 +706,7 @@ esac
 if [ "${STUB_MAC_FILES:-}" != none ]; then
     echo "mac-gallery-file alpha.png $(cat "$STUB_PNG_LIGHT")"
     echo "mac-gallery-file alpha.dark.png $(cat "$STUB_PNG_DARK")"
-    echo "mac-gallery-file manifest.json $(echo '[{"name":"alpha","group":"G","slug":"alpha","size":"1440x900","platform":"mac"},{"name":"beta","group":"G","slug":"beta","size":"1440x900","platform":"mac"}]' | base64 | tr -d '\n')"
+    echo "mac-gallery-file manifest.json $(echo '[{"name":"alpha","group":"G","slug":"alpha","size":"6x6","platform":"mac"},{"name":"beta","group":"G","slug":"beta","size":"6x6","platform":"mac"}]' | base64 | tr -d '\n')"
 fi
 echo "gallery: 1 scenario(s)"
 exit 0
@@ -769,9 +801,11 @@ import json, sys
 path = sys.argv[1]
 manifest = json.load(open(path))
 for entry in manifest:
-    entry["size"] = "1440x900" if entry["slug"] == "doc" else "460x380"
+    entry["size"] = "144x90" if entry["slug"] == "doc" else "46x38"   # a tenth of the windows: the same ratios
 json.dump(manifest, open(path, "w"))
 PY
+    png "$T/run/doc.png" 240 "" 288 180; png "$T/run/doc.dark.png" 20 "" 288 180   # at 2x
+    png "$T/run/settings.png" 240 "" 92 76; png "$T/run/settings.dark.png" 20 "" 92 76
     export PREVIEW_GALLERY_OUT=previews/mac
     $PAGE --import "$T/run" > "$T/out.log" 2>&1; local status=$?
     expect layout_mac "the import exits zero" [ "$status" = 0 ]
@@ -788,7 +822,7 @@ PY
 ALL="fallback_run fallback_keep_booted fallback_borrowed fallback_test_fails
 pool_run pool_options pool_acquire_fails pool_build_fails pool_test_fails pool_check_fails
 pool_signalled_int_acquire pool_signalled_int_build pool_signalled_int_test pool_signalled_term_test pool_signalled_hup_build
-pool_languages pool_duo pool_ipad unknown_device simulator_udid fallback_udid layout preserve skipped document_canvas imagery draws_nothing forced_appearance coexist lang_import
+pool_languages pool_duo pool_ipad unknown_device simulator_udid fallback_udid layout preserve skipped document_canvas imagery render_scale draws_nothing forced_appearance coexist lang_import
 mac_run mac_only mac_languages mac_test_fails mac_no_file layout_mac"
 for c in ${@:-$ALL}; do
     if declare -F "$c" > /dev/null; then "$c"; else echo "FAIL unknown case: $c"; FAILED=1; fi

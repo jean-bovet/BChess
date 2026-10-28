@@ -67,7 +67,7 @@ extension GallerySuites {
                               platform: $0.size.platform(ipadPass: Self.ipadPass),
                               skipped: $0.skipReason(duoPass: Self.duoPass, ipadPass: Self.ipadPass),
                               documentCanvas: $0.documentCanvas ? true : nil, drawsNothing: $0.drawsNothing ? true : nil,
-                              imagery: $0.imagery ? true : nil)
+                              imagery: $0.imagery ? true : nil, duoInner: $0.size.isDuoInner ? true : nil)
             }
             let encoder = JSONEncoder()
             encoder.outputFormatting = [.prettyPrinted, .sortedKeys]

@@ -41,6 +41,8 @@ struct GalleryManifestEntry: Encodable {
     var documentCanvas: Bool?
     var drawsNothing: Bool?
     var imagery: Bool?
+    /// True for the Duo's inner-display sizes, captured at 3x on every pass (`--check` expects that scale).
+    var duoInner: Bool?
 }
 
 extension GalleryScenarios {

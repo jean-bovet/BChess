@@ -24,7 +24,8 @@ platform folder), and the check ignores them.
 --check rebuilds the page, then fails on: a scenario missing either image, a stray PNG no scenario expects,
 a duplicate slug, a light image that is dark or a dark image that is light (mean luminance against 0.45,
 scripts/preview-luminance.swift), a dark image byte-identical to its light one, a blank image (one colour
-everywhere), an image that cannot be decoded, and a forced appearance or locale in a scenario file (its
+everywhere), an image that cannot be decoded, an image not at its scenario's render scale (its manifest size at 2x;
+3x for a `duoInner` size, the Duo's inner poses, and for every card of the Duo pass, the previews/duo gallery), and a forced appearance or locale in a scenario file (its
 `//` comments aside; a `\.locale` on a line carrying `// gallery: allowed, <why>` passes: a locale forced for its
 region, not its language). Four manifest flags, written by the snapshot test from the scenario, make the check honest:
 `documentCanvas: true` (a card dark in both appearances by design: the pair is judged instead of each image, the
@@ -47,6 +48,7 @@ SCENARIO_FILES = [os.path.join(REPO, folder, name) for folder, name in (
 LUMINANCE_THRESHOLD = 0.45
 CANVAS_CONTRAST = 0.05   # documentCanvas: how much darker (mean luminance) the dark image must be than the light one
 PHONE_ASPECT = 402 / 874
+RENDER_SCALE, DUO_SCALE = 2, 3   # the capture scale; the Duo's displays are 3x (the inner poses on every pass)
 PASS_LABELS = {'duo': 'iPhone Duo', 'ipad': 'iPad', 'mac': 'Mac'}   # the gallery folder's name -> the device the page says
 
 
@@ -170,6 +172,21 @@ def size_ratio(entry):
         return 0
 
 
+def render_scale(entry):
+    """The scale the snapshot test captures a scenario at (GalleryScenarios' `scale(duoPass:)`)."""
+    duo = entry.get('duoInner') or platform_of(entry) == 'duo-inner' or os.path.basename(os.path.normpath(OUT)) == 'duo'
+    return DUO_SCALE if duo else RENDER_SCALE
+
+
+def png_size(path):
+    """(width, height) in pixels from a PNG's header; None when it is not a PNG."""
+    with open(path, 'rb') as handle:
+        header = handle.read(24)
+    if len(header) < 24 or header[:8] != b'\x89PNG\r\n\x1a\n' or header[12:16] != b'IHDR':
+        return None
+    return struct.unpack('>II', header[16:24])
+
+
 def build_page(manifest):
     groups = {}
     for entry in manifest:
@@ -229,6 +246,17 @@ def do_check():
             with open(light, 'rb') as a, open(dark, 'rb') as b:
                 if a.read() == b.read():
                     problems.append(f'dark identical to light: {s}')
+        try:
+            width, height = (int(n) for n in e['size'].split('x'))
+        except (KeyError, ValueError):
+            problems.append(f'unreadable size in the manifest: {s}')
+            continue
+        scale = render_scale(e)
+        for path in (light, dark):
+            size = png_size(path) if os.path.isfile(path) else None
+            if size and size != (width * scale, height * scale):
+                problems.append(f'wrong render scale: {platform_of(e)}/{os.path.basename(path)} is {size[0]}x{size[1]} px, '
+                                f'not {e["size"]} at {scale}x ({width * scale}x{height * scale})')
     luminance, error = luminances(manifest)
     if error:
         problems.append('luminance helper failed: ' + error)
