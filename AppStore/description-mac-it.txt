@@ -1,0 +1,13 @@
+BChess è un’app di scacchi gratuita e open source per iPhone, iPad e Mac, con un proprio motore scacchistico. Funziona interamente offline e non raccoglie alcun dato.
+
+GIOCA
+- Tutte le regole degli scacchi, compresi l’arrocco, la presa al varco e la promozione. Scacco matto, stallo, la regola delle cinquanta mosse e la tripla ripetizione concludono la partita.
+- Gioca contro il computer o contro un amico, oppure guarda il computer giocare contro se stesso.
+- Cinque livelli di forza, da Principiante a Massimo. Sotto il livello Massimo il computer si prende un attimo prima di rispondere, come un giocatore umano.
+- Promuovi un pedone scegliendo il pezzo direttamente sulla scacchiera.
+- Ogni partita si apre in una propria finestra di documento, salvata come file BChess o PGN.
+
+CAPISCI
+- Mostra motore, nella barra degli strumenti e nel menu Partita, indica chi sta meglio, la valutazione e la linea migliore, anche quando tocca a te.
+- L’elenco completo delle mosse in notazione standard, accanto alla scacchiera.
+- Vai avanti e indietro nella partita con i tasti freccia.

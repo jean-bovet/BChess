@@ -50,11 +50,12 @@ struct VariationSelectionView: View {
                         .allowsHitTesting(false)
                 }
             }
+            .neverMirrored()
         }
     }
 }
 
-/// A row of cards below the board, one per move on offer ("MAIN LINE 2…Nc6", "VARIATION 2…d6").
+/// A row of cards below the board, one per move on offer ("Main line 2…Nc6", "Variation 2…d6").
 /// Tapping a card continues with that move. It is empty unless the variation choice is shown.
 struct VariationCards: View {
     let session: GameSession
@@ -73,7 +74,8 @@ struct VariationCards: View {
                             session.chooseVariation(v.index)
                         } label: {
                             VStack(alignment: .leading, spacing: 2) {
-                                Text(v.isMainLine ? "MAIN LINE" : "VARIATION")
+                                (v.isMainLine ? Text("Main line") : Text("Variation"))
+                                    .textCase(.uppercase)
                                     .font(.caption2.weight(.semibold))
                                     .tracking(0.3)
                                     .foregroundStyle(Walnut.textSecondary)

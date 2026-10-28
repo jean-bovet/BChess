@@ -1,0 +1,13 @@
+BChess ist eine kostenlose Open-Source-Schach-App für iPhone, iPad und Mac mit einer eigenen Schach-Engine. Sie spielt vollständig offline und erfasst keine Daten.
+
+SPIELEN
+- Alle Schachregeln, einschliesslich Rochade, en passant und Umwandlung. Schachmatt, Patt, die 50-Züge-Regel und die dreifache Stellungswiederholung beenden die Partie.
+- Spielen Sie gegen den Computer oder gegen einen Freund, oder sehen Sie dem Computer beim Spielen gegen sich selbst zu.
+- Fünf Spielstärken, von Anfänger bis Maximum. Unterhalb von Maximum braucht der Computer einen Moment für seine Antwort, wie ein menschlicher Spieler.
+- Wandeln Sie einen Bauern um, indem Sie die Figur direkt auf dem Brett auswählen.
+- Jede Partie öffnet sich in einem eigenen Dokumentfenster und wird als BChess- oder PGN-Datei gesichert.
+
+VERSTEHEN
+- „Engine anzeigen“ in der Symbolleiste und im Menü „Partie“ zeigt, wer besser steht, die Bewertung und die beste Zugfolge, auch wenn Sie selbst am Zug sind.
+- Die vollständige Zugliste in Standardnotation, neben dem Brett.
+- Gehen Sie mit den Pfeiltasten in der Partie Zug für Zug vor und zurück.

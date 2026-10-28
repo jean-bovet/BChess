@@ -1,0 +1,7 @@
+# App Store keywords per locale (at most 100 bytes each, commas included): app-store metadata --keywords
+en-US=chess,board game,engine,analysis,pgn,fen,offline,open source,strategy,play
+fr-FR=échecs,jeu de société,moteur,analyse,pgn,fen,hors ligne,open source,stratégie,jouer
+de-DE=Schach,Brettspiel,Engine,Analyse,PGN,FEN,offline,Open Source,Strategie,spielen
+it=scacchi,gioco da tavolo,motore,analisi,pgn,fen,offline,open source,strategia,giocare
+ar-SA=شطرنج,لعبة لوحية,محرك,تحليل,pgn,fen,دون إنترنت,استراتيجية
+he=שחמט,משחק לוח,מנוע,ניתוח,pgn,fen,לא מקוון,קוד פתוח,לשחק

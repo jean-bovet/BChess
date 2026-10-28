@@ -28,6 +28,9 @@ settings:
     DEAD_CODE_STRIPPING: YES
     ENABLE_USER_SCRIPT_SANDBOXING: YES
     STRING_CATALOG_GENERATE_SYMBOLS: YES
+    # `catalog-sync` (maestro) refuses a catalog target without it: Xcode's own build then extracts keys with the
+    # compiler, not with a type-blind scanner
+    SWIFT_EMIT_LOC_STRINGS: YES
 
 # The C++ engine and its Objective-C++ bridge, compiled by every target that needs the engine.
 targetTemplates:

@@ -130,7 +130,7 @@ final class GameShell {
         case libraryFolder
 
         var errorDescription: String? {
-            "Choose a folder outside BChess's own games: exporting there would list every game twice."
+            String(localized: "Choose a folder outside BChess's own games: exporting there would list every game twice.")
         }
     }
 

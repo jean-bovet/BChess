@@ -3,7 +3,12 @@
   "width": 1320,
   "height": 2868,
   "locales": [
-    "en-US"
+    "en-US",
+    "fr-FR",
+    "de-DE",
+    "it",
+    "ar-SA",
+    "he"
   ],
   "slides": [
     {
@@ -20,6 +25,36 @@
           {
             "title": "Chess with its\nown engine",
             "sub": "Play offline, and see who stands better, the evaluation and the best line."
+          }
+        ],
+        "fr-FR": [
+          {
+            "title": "Échecs avec\nleur propre moteur",
+            "sub": "Jouez hors ligne et voyez qui est mieux placé, l’évaluation et la meilleure suite."
+          }
+        ],
+        "de-DE": [
+          {
+            "title": "Schach mit\neigener Engine",
+            "sub": "Spielen Sie offline und sehen Sie, wer besser steht, die Bewertung und die beste Zugfolge."
+          }
+        ],
+        "it": [
+          {
+            "title": "Scacchi con\nun proprio motore",
+            "sub": "Gioca offline e scopri chi sta meglio, la valutazione e la linea migliore."
+          }
+        ],
+        "ar-SA": [
+          {
+            "title": "الشطرنج\nبمحرّكه الخاص",
+            "sub": "العب دون اتصال، وشاهد من الأفضل، والتقييم، وأفضل خط لعب."
+          }
+        ],
+        "he": [
+          {
+            "title": "שחמט עם\nמנוע משלו",
+            "sub": "שחקו ללא חיבור, וראו מי עומד טוב יותר, את ההערכה ואת הקו הטוב ביותר."
           }
         ]
       }
@@ -39,6 +74,36 @@
             "title": "Five strengths,\nBeginner to Maximum",
             "sub": "Pick your opponent. Below Maximum the computer takes a moment before it replies, like a human player."
           }
+        ],
+        "fr-FR": [
+          {
+            "title": "Cinq niveaux,\nDébutant à Maximum",
+            "sub": "Choisissez votre adversaire. En dessous de Maximum, l’ordinateur prend un instant avant de répondre, comme un joueur humain."
+          }
+        ],
+        "de-DE": [
+          {
+            "title": "Fünf Stärken,\nAnfänger bis Maximum",
+            "sub": "Wählen Sie Ihren Gegner. Unterhalb von Maximum braucht der Computer einen Moment für seine Antwort, wie ein menschlicher Spieler."
+          }
+        ],
+        "it": [
+          {
+            "title": "Cinque livelli,\nPrincipiante-Massimo",
+            "sub": "Scegli il tuo avversario. Sotto il livello Massimo il computer si prende un attimo prima di rispondere, come un giocatore umano."
+          }
+        ],
+        "ar-SA": [
+          {
+            "title": "خمسة مستويات،\nمن مبتدئ إلى الأقصى",
+            "sub": "اختر خصمك. دون المستوى الأقصى يتمهّل الكمبيوتر لحظة قبل أن يردّ، كما يفعل لاعب بشري."
+          }
+        ],
+        "he": [
+          {
+            "title": "חמש רמות,\nממתחיל ועד מקסימום",
+            "sub": "בחרו יריב. מתחת למקסימום המחשב לוקח רגע לפני שהוא מגיב, כמו שחקן אנושי."
+          }
         ]
       }
     },
@@ -57,6 +122,36 @@
             "title": "Your games,\nsaved as you play",
             "sub": "Grouped by date, kept on your device, shared as standard PGN."
           }
+        ],
+        "fr-FR": [
+          {
+            "title": "Vos parties,\nenregistrées en jouant",
+            "sub": "Classées par date, conservées sur votre appareil, partagées en PGN standard."
+          }
+        ],
+        "de-DE": [
+          {
+            "title": "Ihre Partien,\nautomatisch gesichert",
+            "sub": "Nach Datum gruppiert, auf Ihrem Gerät gespeichert, als Standard-PGN teilbar."
+          }
+        ],
+        "it": [
+          {
+            "title": "Le tue partite,\nsalvate mentre giochi",
+            "sub": "Raggruppate per data, conservate sul tuo dispositivo, condivise come PGN standard."
+          }
+        ],
+        "ar-SA": [
+          {
+            "title": "ألعابك،\nتُحفظ أثناء اللعب",
+            "sub": "مجمّعة حسب التاريخ، محفوظة على جهازك، وتُشارَك بصيغة PGN القياسية."
+          }
+        ],
+        "he": [
+          {
+            "title": "המשחקים שלכם,\nנשמרים תוך כדי משחק",
+            "sub": "מקובצים לפי תאריך, נשמרים במכשיר שלכם, ומשותפים כ-PGN סטנדרטי."
+          }
         ]
       }
     },
@@ -74,6 +169,36 @@
           {
             "title": "Light and dark",
             "sub": "A wooden board in a walnut frame. No accounts, no ads, no network: the engine runs on your device."
+          }
+        ],
+        "fr-FR": [
+          {
+            "title": "Clair et sombre",
+            "sub": "Un échiquier en bois dans un cadre en noyer. Sans compte, sans publicité, sans réseau : le moteur tourne sur votre appareil."
+          }
+        ],
+        "de-DE": [
+          {
+            "title": "Hell und dunkel",
+            "sub": "Ein Holzbrett im Nussbaumrahmen. Keine Konten, keine Werbung, kein Netzwerk: Die Engine läuft auf Ihrem Gerät."
+          }
+        ],
+        "it": [
+          {
+            "title": "Chiaro e scuro",
+            "sub": "Una scacchiera in legno in una cornice di noce. Niente account, pubblicità o rete: il motore gira sul tuo dispositivo."
+          }
+        ],
+        "ar-SA": [
+          {
+            "title": "فاتح وداكن",
+            "sub": "رقعة خشبية في إطار من الجوز. بلا حسابات، بلا إعلانات، بلا شبكة: يعمل المحرك على جهازك."
+          }
+        ],
+        "he": [
+          {
+            "title": "בהיר וכהה",
+            "sub": "לוח עץ במסגרת אגוז. בלי חשבונות, בלי פרסומות, בלי רשת: המנוע פועל במכשיר שלכם."
           }
         ]
       }

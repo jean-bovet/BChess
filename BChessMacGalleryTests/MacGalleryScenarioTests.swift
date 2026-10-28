@@ -70,7 +70,7 @@ extension MacGallerySuites {
             let window = try MacRenderer.mount(scenario, appearance: .light)
             defer { MacRenderer.close(window) }
             try await MacRenderer.waitUntilReady(window, scenario)
-            #expect(window.title == "You vs Club Player")
+            #expect(window.title == GameText.title(white: .defaultWhite, black: .defaultBlack))
             #expect((window.toolbar?.items.count ?? 0) >= 4)
             // Never ordered on screen (the window reports itself visible so that a sheet attaches)
             #expect(!window.occlusionState.contains(.visible))
@@ -162,7 +162,7 @@ extension MacGallerySuites {
             defer { suite.removePersistentDomain(forName: suiteName) }
             let probe = NewGameSheetProbe()
             let scenario = MacGalleryScenario(name: "Probe", group: "Mac", size: MacGalleryScenarios.windowFrame,
-                                              title: "You vs Club Player", waitsForSheet: true) {
+                                              title: MacGalleryScenarios.defaultTitle, waitsForSheet: true) {
                 AnyView(MacGalleryScenarios.newGameWindow(suite).environment(\.newGameSheetProbe, probe))
             }
             // The sheet shows the suite's choice (30 s at Maximum), not the app's

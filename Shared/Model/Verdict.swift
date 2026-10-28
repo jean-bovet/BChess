@@ -17,19 +17,19 @@ struct Verdict: Equatable, Sendable {
         self.isMate = isMate
     }
 
-    private var leader: String {
-        centipawns >= 0 ? "White" : "Black"
+    private var isWhiteAhead: Bool {
+        centipawns >= 0
     }
 
-    var sentence: String {
+    var sentence: LocalizedStringResource {
         if isMate {
-            return "\(leader) has a forced mate"
+            return isWhiteAhead ? "White has a forced mate" : "Black has a forced mate"
         }
         switch abs(centipawns) {
         case ..<30: return "The position is equal"
-        case 30..<100: return "\(leader) is slightly better"
-        case 100..<250: return "\(leader) is better"
-        default: return "\(leader) is winning"
+        case 30..<100: return isWhiteAhead ? "White is slightly better" : "Black is slightly better"
+        case 100..<250: return isWhiteAhead ? "White is better" : "Black is better"
+        default: return isWhiteAhead ? "White is winning" : "Black is winning"
         }
     }
 
@@ -37,14 +37,19 @@ struct Verdict: Equatable, Sendable {
     /// reports without a distance.
     var score: String {
         if isMate {
-            return "Mate"
+            return String(localized: "Mate")
         }
         let tenths = Int((Double(abs(centipawns)) / 10).rounded())
         if tenths == 0 {
-            return "0.0"
+            return GameText.notation("0.0")
         }
         let sign = centipawns > 0 ? "+" : "\u{2212}"
-        return "\(sign)\(tenths / 10).\(tenths % 10)"
+        return GameText.notation("\(sign)\(tenths / 10).\(tenths % 10)")
+    }
+
+    /// The evaluation bar's spoken label.
+    var accessibilityLabel: LocalizedStringResource {
+        "Evaluation \(score)"
     }
 
     /// White's part of the evaluation bar, 0 to 1.

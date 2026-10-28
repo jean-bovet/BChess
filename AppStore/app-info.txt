@@ -1,0 +1,8 @@
+# App Store name and subtitle per locale (at most 30 characters each): app-store metadata --name / --subtitle
+# locale|name|subtitle
+en-US|BChess|Chess with its own engine
+fr-FR|BChess|Échecs avec son propre moteur
+de-DE|BChess|Schach mit eigener Engine
+it|BChess|Scacchi con il suo motore
+ar-SA|BChess|الشطرنج بمحرّك خاص
+he|BChess|שחמט עם מנוע משלו

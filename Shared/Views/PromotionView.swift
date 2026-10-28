@@ -41,7 +41,7 @@ struct PromotionView: View {
                 .background(index == 0 ? Walnut.pillBackground : .clear)
         }
         .buttonStyle(.plain)
-        .accessibilityLabel(Self.label(of: name))
+        .accessibilityLabel(Text(Self.label(of: name)))
         .accessibilityIdentifier("promote-\(name.uppercased())")
     }
 
@@ -93,9 +93,10 @@ struct PromotionView: View {
         }
         .accessibilityElement(children: .contain)
         .accessibilityLabel("Promote to")
+        .neverMirrored()
     }
 
-    private static func label(of name: String) -> String {
+    static func label(of name: String) -> LocalizedStringResource {
         switch name.uppercased() {
         case "Q": return "Queen"
         case "R": return "Rook"

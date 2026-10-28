@@ -18,7 +18,7 @@ struct AppThemeTests {
 
     @Test func storedValuesAreStable() {
         #expect(AppTheme.allCases.map(\.rawValue) == ["system", "light", "dark"])
-        #expect(AppTheme.allCases.map(\.title) == ["System", "Light", "Dark"])
+        #expect(AppTheme.allCases.map { String(localized: $0.title) } == ["System", "Light", "Dark"])
     }
 
     @Test func defaultsKeepTodaysBehavior() {

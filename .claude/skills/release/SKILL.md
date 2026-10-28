@@ -196,25 +196,31 @@ Read the subjects and bodies of the §2 range. Keep only what a user of the App 
 notice, written from their side: no ticket ids, internal names, file names or "fix for #…"; no
 emoji (App Store Connect rejects some); at most 4000 characters per locale.
 
-One notes file, English: `ReleaseNotes/<version>-en-US.txt`, used for both platforms (the app ships
-English only; `prepare` gives the English text to every locale of the listing and names any other
-locale, which Jean decides whether to translate). Plain text: a one-line lead, then short `- ` lines;
+One notes file per locale from the second release on: `ReleaseNotes/<version>-en-US.txt`, used for both platforms,
+and `ReleaseNotes/<version>-<locale>.txt` for fr-FR, de-DE, it, ar-SA and he (`prepare --notes <locale>=<file>`; Jean decides what to
+translate: a locale without a file gets the English text). Plain text: a one-line lead, then short `- ` lines;
 match the previous file's tone once there is one (`app-store status` shows the live notes). Say when an
-item concerns only iPhone/iPad or only the Mac. The listing has one locale, en-US.
+item concerns only iPhone/iPad or only the Mac. The listing has the locales of `AppStore/app-info.txt`.
 
 **The App Store page.** A repo that keeps its page texts in `AppStore/` (one description per locale, at
 most 4000 characters; `keywords.txt`, at most 100 bytes per locale; `app-info.txt` with the name and
 subtitle, at most 30 characters each) updates the English text and its translations when the range
 changes what a description promises, shows them with the notes, stages them with the notes commit (§5)
 and pushes them with `app-store metadata` in §6 — only when `AppStore/` changed, or `check` reports a
-locale missing something. Refuse any page file that still contains `TODO`. BChess's `AppStore/` holds
-only `screenshots.json` (the slides of `/app-store-screenshots`), no page texts: its description, keywords,
-name and subtitle live in App Store Connect and change through `app-store metadata` (§3 answer 3).
+locale missing something. Refuse any page file that still contains `TODO`. BChess's `AppStore/` holds the page
+in the Swiss four, in store order en-US, fr-FR, de-DE, it, ar-SA, he: `app-info.txt` (`locale|name|subtitle`, the name `BChess`
+everywhere), `keywords.txt` (`locale=k1,k2,…`, at most 100 bytes, checked with `LC_ALL=C awk '{ print length($0) -
+index($0, "=") }'`), `description-ios-<locale>.txt` and `description-mac-<locale>.txt` (the Mac text says document
+windows and the Game menu where the iOS one says the Games list and the More menu), and the five slides files
+(`screenshots*.json`, `locales` in store order, one headline per locale). The English texts are the page App Store Connect
+carried when they were copied (`app-store check` prints them); from then on `AppStore/` is the source and `metadata` pushes
+it. A new language is a new set of these files and a new `locales` entry in every slides file.
 
 **First release (1.0): no What's New.** App Store Connect shows no What's New for an app's first
-version and refuses one; skip §4 and §5 (no notes file, no notes commit) and, in §6, `prepare` (both
-1.0 versions already exist): run only `status`, the two `attach-build` and the two `check` lines. The description carries
-what the app does. From the second release on, the full flow applies.
+version and refuses one; skip the notes of §4 and §5 (no notes file, no notes commit) and, in §6, `prepare` (both
+1.0 versions already exist): run `status`, then the `metadata` block of §6 for each platform (the first release uploads the
+six locales' name, subtitle, keywords and description from `AppStore/`, which is the page; show Jean the files first), then
+the two `attach-build` and the two `check` lines. The description carries what the app does. From the second release on, the full flow applies.
 
 Show Jean every notes file in full, with the commit list it came from, and ask for a yes or his
 edits. Apply edits and show again until approved. **Do not commit before that.**
@@ -243,6 +249,14 @@ The notes commit lands after the candidate on `main`; the tag in §7 still goes 
 
 ```bash
 app-store status --app "BChess (iOS)"
+# The page, from AppStore/ (the first release, and later only when AppStore/ changed): per platform, every locale
+for p in ios mac; do   # ios -> --platform IOS, mac -> --platform MAC_OS
+  app-store metadata --app "BChess (iOS)" --platform <IOS|MAC_OS> --version <version> \
+      --add-locale fr-FR --add-locale de-DE --add-locale it --add-locale ar-SA --add-locale he \
+      --name <locale>=BChess (every locale of app-info.txt) \
+      --subtitle <locale>=<subtitle from app-info.txt> ... --keywords <locale>=<keywords from keywords.txt> ... \
+      --description <locale>=AppStore/description-$p-<locale>.txt   # en-US fr-FR de-DE it ar-SA he
+done
 app-store prepare --app "BChess (iOS)" --platform IOS --version <version> --notes-file <notes file> \
     [--notes <locale>=<notes file> ...]                      # one file per non-English locale
 app-store prepare --app "BChess (iOS)" --platform MAC_OS --version <version> --notes-file <notes file> \
@@ -260,7 +274,8 @@ for processing, or see "App Store eligible" in §2.
 its type (`app-store status` prints `releaseType=`). **On a first release skip `prepare`** (1.0, §4): both
 versions already exist, and `prepare` would set a What's New a first version cannot carry; fill the page
 with `app-store metadata`, `age-rating` and `screenshots` instead, then the two `attach-build` and the two
-`check` lines. A first version has no phased release.
+`check` lines (the `metadata` block above fills the page from `AppStore/`; the screenshots go up per locale with
+`/app-store-screenshots` §4). A first version has no phased release.
 
 The app ships on two platforms, so each has its own version of the same number. If App Store Connect
 refuses a step for one platform (What's New, the phased release), stop and report the error to Jean.

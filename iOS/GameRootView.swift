@@ -40,7 +40,7 @@ struct ExportMenu: View {
         Menu {
             ShareLink(item: GameExport(shell: shell, file: file, format: .pgn), preview: SharePreview(file.title)) {
                 Label {
-                    Text("PGN")
+                    Text(verbatim: "PGN")
                     Text("For other chess apps")
                 } icon: {
                     Image(systemName: "doc.text")
@@ -48,7 +48,7 @@ struct ExportMenu: View {
             }
             ShareLink(item: GameExport(shell: shell, file: file, format: .bchess), preview: SharePreview(file.title)) {
                 Label {
-                    Text("BChess")
+                    Text(verbatim: "BChess")
                     Text("Keeps the players and the board side")
                 } icon: {
                     Image(systemName: "crown")
@@ -311,9 +311,9 @@ struct GamesList: View {
         Task {
             do {
                 let urls = try await shell.exportAll(to: folder, as: format)
-                exported = "\(urls.count) \(urls.count == 1 ? "game" : "games") exported to “\(folder.lastPathComponent)”"
+                exported = String(localized: GameText.exported(count: urls.count, folder: folder.lastPathComponent))
             } catch {
-                actionError = "Couldn't export the games. \(error.localizedDescription)"
+                actionError = String(localized: GameText.exportFailed(error))
             }
         }
     }
@@ -323,7 +323,7 @@ struct GamesList: View {
             do {
                 try shell.delete(file)
             } catch {
-                actionError = "Couldn't delete this game. \(error.localizedDescription)"
+                actionError = String(localized: GameText.deleteFailed(error))
             }
         }
     }
@@ -357,7 +357,8 @@ struct GamesList: View {
                 }
                 Spacer(minLength: 0)
                 if isOpen {
-                    Text("OPEN")
+                    Text("Open")
+                        .textCase(.uppercase)
                         .font(.caption2.weight(.bold))
                         .padding(.horizontal, 8)
                         .padding(.vertical, 3)
@@ -390,6 +391,7 @@ struct GamesList: View {
                         }
                     } header: {
                         Text(section.group.title)
+                            .textCase(.uppercase)
                             .font(.caption.weight(.semibold))
                             .foregroundStyle(Walnut.textSecondary)
                     }
