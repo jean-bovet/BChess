@@ -37,9 +37,10 @@ struct GalleryManifestEntry: Encodable {
     let platform: String
     /// Why the card has no images on this pass (nil: it has); the page shows it, `--check` accepts the gap.
     var skipped: String?
-    /// The scenario's `documentCanvas` and `drawsNothing`, written only when set (`--check` reads them).
+    /// The scenario's `documentCanvas`, `drawsNothing` and `imagery`, written only when set (`--check` reads them).
     var documentCanvas: Bool?
     var drawsNothing: Bool?
+    var imagery: Bool?
 }
 
 extension GalleryScenarios {

@@ -534,6 +534,25 @@ document_canvas() {   # a card dark in both appearances by design: the pair is j
     cd "$ROOT" || return; rm -rf "$T"
 }
 
+imagery() {   # full-bleed imagery that does not darken: the luminance rules are waived, the byte-identical rule is not
+    page_setup
+    cd "$TREE" || return
+    fake_run "$T/run" "alpha:" "map:"
+    png "$T/run/map.png" 102; png "$T/run/map.dark.png" 101
+    $PAGE --import "$T/run" > "$T/out.log" 2>&1
+    $PAGE --check > "$T/check.log" 2>&1; local status=$?
+    expect imagery "without the flag a map as dark in light as in dark fails" [ "$status" != 0 ]
+    expect imagery "and is named" grep -q "dark render in the light slot: iphone/map.png" "$T/check.log"
+    flag previews/data/manifest.json map imagery true
+    $PAGE --check > "$T/check.log" 2>&1; status=$?
+    expect imagery "with the flag the pair passes" [ "$status" = 0 ]
+    expect imagery "it counts every card" grep -q "CHECK OK \[en\]: 2 cards" "$T/check.log"
+    cp previews/iphone/map.png previews/iphone/map.dark.png
+    $PAGE --check > "$T/check.log" 2>&1; status=$?
+    expect imagery "a dark image byte-identical to the light one still fails" grep -q "dark identical to light: map" "$T/check.log"
+    cd "$ROOT" || return; rm -rf "$T"
+}
+
 draws_nothing() {   # a blank image (one colour everywhere) fails unless the scenario draws nothing by design
     page_setup
     cd "$TREE" || return
@@ -569,6 +588,11 @@ forced_appearance() {   # .preferredColorScheme or \.locale in the scenario file
     printf '%s\n' '    AnyView(Text("x").environment(\.locale, Locale(identifier: "fr")))' >> "$file"
     $PAGE --check > "$T/check.log" 2>&1; status=$?
     expect forced_appearance "a forced locale fails too" grep -q "forced appearance or locale: GalleryScenarios.swift:$((lines + 3))" "$T/check.log"
+    printf '%s\n' '    AnyView(Text("x").environment(\.locale, Locale(identifier: "en_US")))   // gallery: allowed, a 12-hour clock' >> "$file"
+    printf '%s\n' '    AnyView(Text("x").preferredColorScheme(.dark))   // gallery: allowed, never for an appearance' >> "$file"
+    $PAGE --check > "$T/check.log" 2>&1
+    expect forced_appearance "a locale on a gallery: allowed line passes" bash -c '! grep -q "GalleryScenarios.swift:$1\$" "$0"' "$T/check.log" "$((lines + 4))"
+    expect forced_appearance "an appearance on such a line still fails" grep -q "forced appearance or locale: GalleryScenarios.swift:$((lines + 5))" "$T/check.log"
     cd "$ROOT" || return; rm -rf "$T"
 }
 
@@ -764,7 +788,7 @@ PY
 ALL="fallback_run fallback_keep_booted fallback_borrowed fallback_test_fails
 pool_run pool_options pool_acquire_fails pool_build_fails pool_test_fails pool_check_fails
 pool_signalled_int_acquire pool_signalled_int_build pool_signalled_int_test pool_signalled_term_test pool_signalled_hup_build
-pool_languages pool_duo pool_ipad unknown_device simulator_udid fallback_udid layout preserve skipped document_canvas draws_nothing forced_appearance coexist lang_import
+pool_languages pool_duo pool_ipad unknown_device simulator_udid fallback_udid layout preserve skipped document_canvas imagery draws_nothing forced_appearance coexist lang_import
 mac_run mac_only mac_languages mac_test_fails mac_no_file layout_mac"
 for c in ${@:-$ALL}; do
     if declare -F "$c" > /dev/null; then "$c"; else echo "FAIL unknown case: $c"; FAILED=1; fi

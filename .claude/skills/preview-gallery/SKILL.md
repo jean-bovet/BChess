@@ -94,6 +94,7 @@ Adopted (APP-5): the app has no `#Preview` and no `#if DEBUG` preview code.
 ```
 scripts/snapshot-gallery.sh                     # every scenario; the simulator goes back to the pool
 scripts/snapshot-gallery.sh --only "settings,list" # a subset: comma-separated substrings of names or slugs
+scripts/snapshot-gallery.sh --device ipad       # the iPad pass -> previews/ipad/
 scripts/snapshot-gallery.sh --device duo        # the iPhone Duo: outer display and fixed-size inner poses -> previews/duo/
 scripts/snapshot-gallery.sh --no-open           # do not open the page (agents, scripted runs)
 ```
@@ -146,8 +147,8 @@ scripts/snapshot-gallery.sh --no-open           # do not open the page (agents, 
   shutdown, `--keep-booted`/`--shutdown`, a borrowed simulator left running. The Duo pass: a `duo` lease, the page in
   `previews/duo/`, an unknown `--device`, `SIMULATOR_UDID`, `caffeinate`, and the real page script on fake manifests
   (the folder layout, the migration of a flat gallery, both galleries surviving each other's import, a `skipped`
-  card, a `documentCanvas` pair, a blank render with and without `drawsNothing`, a forced appearance or locale in
-  the scenario file).
+  card, a `documentCanvas` pair, an `imagery` pair, a blank render with and without `drawsNothing`, a forced
+  appearance or locale in the scenario file, a `// gallery: allowed` locale).
 - DerivedData: `BCHESS_SNAPSHOT_DD`, default `~/Library/Developer/Xcode/DerivedData/BChess-snapshots` (one folder
   for every checkout; a plan passes its own). No SPM packages, so no package flags.
 - Measured (APP-5, 3 scenarios): cold (empty DerivedData, shut-down simulator) boot 39 s, build 61 s, test 59 s,
@@ -164,7 +165,10 @@ One entry in the scenario list, and nothing in the app:
   an optional **settle** wait for a screen that loads or animates, and a builder that returns the view, seeding
   a store first when it needs one.
 - **Never force an appearance or a language** (`.preferredColorScheme`, `.environment(\.locale, …)`): the light
-  and dark passes and `-testLanguage` set them. A state that only existed as a "dark" variant is a plain scenario.
+  and dark passes and `-testLanguage` set them; `--check` scans the scenario files for both. The one admissible
+  exception is a locale forced for its region, not its language (`en_US` to show a 12-hour clock): the line
+  carries `// gallery: allowed, <why>` and `--check` lets that line through (a `.preferredColorScheme` never).
+  A state that only existed as a "dark" variant is a plain scenario.
   Dynamic Type variants are fine, as their own scenarios.
 - **Hermetic data.** A fresh in-memory store per scenario. The network is a stub that answers from committed
   fixtures (real API responses, their times shifted to now so screens look live) or fails with a given error,
@@ -181,8 +185,11 @@ One entry in the scenario list, and nothing in the app:
   by design sets `drawsNothing: true` (otherwise `--check` fails a blank render). A card a pass cannot render
   honestly is **skipped, never captured badly**: the test prints `gallery: skipped <slug>: <why>`, the manifest
   lists it with a `skipped` reason, the page shows "not rendered on this pass", and `--check` accepts the missing
-  pair for that reason only. BChess's manifest carries all three: `skipped` (the Duo pass), and the scenario
-  fields `documentCanvas` and `drawsNothing`, which no card sets yet.
+  pair for that reason only. Full-bleed imagery under chrome (a satellite map) does not darken in the dark
+  appearance at all, so it cannot meet the pair rule either: such a card sets `imagery: true`, which waives the
+  luminance rules for that pair (the byte-identical rule still applies). Measured: a map card at 0.401 light,
+  0.399 dark. BChess's manifest carries all four: `skipped` (the Duo pass), and the scenario fields
+  `documentCanvas`, `drawsNothing` and `imagery`, which no card sets yet.
 - `scripts/preview-gallery.py --coverage` lists view types no scenario names (informational: most are parts
   of other screens).
 
@@ -272,9 +279,10 @@ has fifty of them.
 `--check` rebuilds the page from the PNGs on disk and fails on: a scenario of the manifest missing either
 image, a stray PNG no scenario expects (in any folder, or in the wrong platform's folder), a duplicate slug, a light image that is dark or a dark one that is light
 (mean luminance against a threshold; a `documentCanvas` scenario is judged as a pair instead, the dark image's
-mean luminance at least 0.05 below the light one's), a dark image byte-identical to its light one, a blank image
+mean luminance at least 0.05 below the light one's; an `imagery` scenario is not judged for luminance), a dark image byte-identical to its light one, a blank image
 (one colour everywhere) unless its scenario sets `drawsNothing`, an image that cannot be decoded, and
-`.preferredColorScheme` or `\.locale` anywhere in the scenario file (its `//` comments aside). An `--only` run replaces only its own images; the check still covers every scenario. The gallery is
+`.preferredColorScheme` or `\.locale` anywhere in the scenario file (its `//` comments aside, and a `\.locale` on a
+line carrying `// gallery: allowed, <why>`). An `--only` run replaces only its own images; the check still covers every scenario. The gallery is
 done only when `--check` passes.
 
 ## Converting a repo (from `#Preview`s)

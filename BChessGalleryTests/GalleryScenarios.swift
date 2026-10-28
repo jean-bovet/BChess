@@ -84,6 +84,9 @@ struct GalleryScenario {
     var documentCanvas = false
     /// The screen draws nothing by design: `--check` accepts its blank images (otherwise a blank render fails).
     var drawsNothing = false
+    /// Full-bleed imagery under chrome that does not darken in dark (a satellite map): `--check` waives the luminance
+    /// rules for the pair (the dark image byte-identical to the light one still fails).
+    var imagery = false
     /// Throws when a fixture cannot be set up, which fails the render.
     let build: @MainActor () throws -> AnyView
 
