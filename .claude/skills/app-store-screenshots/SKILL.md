@@ -38,9 +38,9 @@ The slides' captures in each language (run right before rendering, one per devic
 `/preview-gallery` is a superset, so a language run for review serves too):
 
 ```sh
-scripts/snapshot-gallery.sh --no-open --only "game-screen-engine-on,new-game-club,variations-arrows-and-cards,games-list-four-games" --lang fr,de,it,he,ar
+scripts/snapshot-gallery.sh --no-open --only "game-screen-engine-on,new-game-club,games-list-four-games" --lang fr,de,it,he,ar
 scripts/snapshot-gallery.sh --no-open --device ipad --only "game-screen-engine-on,new-game-club,games-list-four-games,game-screen-wide" --lang fr,de,it,he,ar
-scripts/snapshot-gallery.sh --no-open --device duo --only "game-screen-engine-on,new-game-club,variations-arrows-and-cards,games-list-four-games,duo-inner-landscape-game-screen,duo-inner-landscape-variations" --lang fr,de,it,he,ar
+scripts/snapshot-gallery.sh --no-open --device duo --only "game-screen-engine-on,new-game-club,games-list-four-games,duo-inner-landscape-game-screen" --lang fr,de,it,he,ar
 scripts/snapshot-mac.sh --no-open --lang fr,de,it,he,ar
 ```
 
