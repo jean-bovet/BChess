@@ -81,9 +81,9 @@ as a `%@` argument formatted in code (Western digits). `BChessMacGalleryTests/Lo
 per language in the hosted app. After adding or changing strings, sync the catalog headless and translate the new keys:
 
 ```sh
-~/GitHub/maestro/bin/catalog-sync              # builds both apps, adds new keys, marks unused ones stale
-~/GitHub/maestro/bin/catalog-sync --delete-stale
-~/GitHub/maestro/bin/catalog-sync --check --skip-build   # "catalog unchanged" before committing
+catalog-sync              # builds both apps, adds new keys, marks unused ones stale
+catalog-sync --delete-stale
+catalog-sync --check --skip-build   # "catalog unchanged" before committing
 ```
 
 `xcodegen generate` after a new language (`knownRegions` follows the catalog).
