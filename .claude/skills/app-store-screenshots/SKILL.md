@@ -134,6 +134,6 @@ app-store-screenshots --config AppStore/search-results.json
 - The output (`.build/`) and the captures are not committed; the slides file is.
 
 The slides tell: the game screen with the engine readout on (hero, and again in dark), the five computer strengths of the
-New Game sheet, the variation arrows and cards, and the Games list. The captures are 2x
+New Game sheet, and the Games list (no variations slide: the app never creates variations by play, so it would mislead). The captures are 2x
 (804 x 1748 px, the hosting iPhone's screen at 2x); `launch-empty-library` carries the real navigation and bottom bars,
 the other game cards mount the game screen without the shell.

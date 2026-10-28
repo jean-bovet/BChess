@@ -45,25 +45,6 @@
       }
     },
     {
-      "id": "variations",
-      "background": "radial-gradient(120% 80% at 70% 85%, #6b8f71 0%, #2f4f3a 45%, #0d1a12 100%)",
-      "phones": [
-        {
-          "capture": "variations-arrows-and-cards",
-          "style": "left:207px; top:690px; transform: perspective(5200px) rotateX(12deg) rotateY(-14deg) rotateZ(4deg) scale(.74);",
-          "device": "duo-outer"
-        }
-      ],
-      "text": {
-        "en-US": [
-          {
-            "title": "Every move,\nevery variation",
-            "sub": "Where the game branches, tap an arrow or a line. The move list keeps variations and comments."
-          }
-        ]
-      }
-    },
-    {
       "id": "games",
       "background": "radial-gradient(120% 80% at 60% 85%, #5b7fa6 0%, #24405e 45%, #0a1420 100%)",
       "phones": [
