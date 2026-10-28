@@ -155,7 +155,7 @@ matters).
   description with PLAY / UNDERSTAND sections; `app-store check --app "BChess (iOS)"` prints them read-only), but no
   copy of that text lives in the repo yet: step 5 brings it into the `AppStore/` files, so the translations start
   from the text the page carries, and `/release` keeps the two in step from then on.
-- **`catalog-sync`** (`~/GitHub/maestro/bin/catalog-sync`) syncs a catalog headless from a build with
+- **`catalog-sync`** (on PATH) syncs a catalog headless from a build with
   `SWIFT_EMIT_LOC_STRINGS=YES`, needs the repo's `repos.yaml` entry to carry `catalog_project` and `catalogs`
   (`<path>@<target>+<target>`; `catalog_destinations: [<target>=macOS]` for the Mac target; the inline-list parser
   strips items, so target names with spaces and parentheses are fine) — BChess's entry (`repos.yaml:83-88`) has
