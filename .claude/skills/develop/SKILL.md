@@ -1,6 +1,6 @@
 ---
 name: develop
-description: The standard way a feature or fix is built in BChess — plan it in a worktree with a planning subagent, one Codex review of the plan, get Jean's go, implement in a Sonnet subagent, one Codex review of the code, and hand back a green branch. Use for any change that touches the engine, the bridge, the game model or app logic — "add X", "fix Y", "implement planning/Z.md" — unless the user says to skip the process. Not for docs-only edits or UI-only view tweaks.
+description: The standard way a feature or fix is built in BChess — plan it in a worktree with a planning subagent, one Codex review of the plan (the plan goes ahead on its own when the review found no blocker and nothing is left open for Jean), implement in Sonnet subagents, one Codex review of the code, and hand back a green, pushed branch. Use for any change that touches the engine, the bridge, the game model or app logic — "add X", "fix Y", "implement planning/Z.md" — unless the user says to skip the process. Not for docs-only edits or UI-only view tweaks.
 argument-hint: <what to build, or planning/<ID>.md> [--no-worktree] [--plan-only] [--execute]
 allowed-tools: Read, Glob, Grep, Bash, Agent, SendMessage, AskUserQuestion, EnterWorktree, ExitWorktree
 ---
@@ -14,9 +14,10 @@ Jean's three standing requirements:
    parent. Aim at simplicity and correctness, not over-engineering. Check whether other parts of
    the code already implement part of the solution. Ask Jean when unsure. Default is **one** review
    round.
-2. **Execute in a subagent** launched with `model: "sonnet"`, so file reads, build logs and test
-   output never land in the main context. Then one Codex review of the result. The implementer does
-   not review its own work. Fix what the reviewer finds.
+2. **Execute in a subagent** launched with `model: "sonnet"`, one per plan step, so file reads,
+   build logs and test output never land in the main context and no implementer grows past a step's
+   worth of context. Then one Codex review of the result. The implementer does not review its own
+   work. Fix what the reviewer finds.
 3. **Always work in a worktree** unless told otherwise.
 
 Flags: `--no-worktree` (only when Jean said so), `--plan-only` (stop after phase 3),
@@ -32,7 +33,9 @@ Flags: `--no-worktree` (only when Jean said so), `--plan-only` (stop after phase
 - **Docs-only paths:** `planning/`, `AGENTS.md`, a skill.
 - **String Catalog:** a change to user-facing strings syncs `Shared/Localizable.xcstrings` (one catalog for both apps)
   headless with `catalog-sync` (the commands in `AGENTS.md` § Languages) instead of an Xcode GUI build: `--delete-stale`,
-  then the translations in every language of the catalog, and `--check --skip-build` must print "catalog unchanged".
+  then the translations in every language of the catalog (the Xcode MCP `StringCatalogEdit`, with the worktree's project
+  open in Xcode, not the main checkout's), then `catalog-sync --skip-build` once (it re-sorts the keys the editor wrote),
+  and `--check --skip-build` must print "catalog unchanged"; commit the catalog with the step.
   `LocalizationCatalogTests` goes red on a missing translation. A screen's translations are read with
   `scripts/snapshot-gallery.sh --only "<slugs>" --lang fr,de,it` (and `scripts/snapshot-mac.sh --lang …`; the review set is in
   `/preview-gallery`): a language run has no page and no check, and never a full gallery.
@@ -72,7 +75,8 @@ rationale, or nothing.
 ## Gates (run in the worktree)
 
 Two tiers. **Step gates** run after each plan step and each fix round: the build, the warnings check
-and the unit tests, plus the preview gallery only when the step changes what a screen looks like.
+and the unit tests, plus the preview gallery only when the step changes what a screen looks like — and
+then only the scenarios that step changed (`--only`); the final gate renders every scenario.
 Step gates never run the UI tests, not even for a step that touches what they drive (navigation,
 titles, accessibility identifiers, launch fixtures): they are slow, and the final gate catches what
 they would. A brief that asks a step gate or a fix round for them is overruled: they wait for the
@@ -99,7 +103,10 @@ uncommitted tracked changes or untracked files that are not ignored).
   for a generic destination (`xcodebuild build-for-testing`) and runs them with `test-without-building`
   on the leased simulator: a `build` followed by a `test` compiles twice (two destinations), and the
   lease is held only while tests run. Any later run on the same tree (another test plan, a rerun)
-  reuses those products.
+  reuses those products. An app-hosted test target (a test bundle that runs inside the app, on the Mac
+  too) follows the same rule: `build-for-testing` once per step, every rerun and red proof through
+  `test-without-building -only-testing:<Target>/<Class>`; a plain `xcodebuild test` re-links, re-signs
+  and relaunches the host app for every single run.
 - **One build at a time per build folder.** Use the repo's scripts or build wrapper when it has them
   (never call `xcodebuild` around them); otherwise `buildlock --folder <dd> -- xcodebuild …`. The host's
   build slots are shared with other sessions: wait for one, never kill another build.
@@ -109,14 +116,23 @@ uncommitted tracked changes or untracked files that are not ignored).
   boot, shut down or touch a simulator by hand. One `-destination` per run and
   `-parallel-testing-enabled NO -collect-test-diagnostics never` on every simulator test run (without the second flag a failing test, so every red proof, makes xcodebuild collect a sysdiagnose-like simulator report for up to 10 minutes; the gates read the log, never that report. To debug a failure nobody can explain, rerun that one test without it). A repo whose scripts still boot their own
   simulator follows the global agreement's rule for those.
+- **Wait in slices.** A subagent's prompt cache lives five minutes (the parent's, one hour). Inside a
+  subagent, no blocking call runs longer than four minutes: a build, a test run, the gallery or a Codex
+  round starts in the background with its output in a log, and the agent checks that log every four
+  minutes at most (a `Monitor` until-loop with that timeout, or a background command looked at on that
+  cadence), reading the summary lines only. One wait that outlives the cache re-writes the agent's whole
+  context at cache-write price; measured over five days, such re-writes were two thirds of everything
+  subagents wrote to the cache (the token-usage notes of 2026-10-28, next to the tools the global working
+  agreement names).
 - **Reading results.** Read the **exit status** and the summary line of every command; an empty grep
   is clean only if the command succeeded. The number of tests run is part of the result: zero is red,
   and a count that shrinks needs an explanation (a conditionally disabled test counts as skipped).
 - **Red proof.** A regression test is proven red without its fix before it goes green: commit the
   fix first, revert only the fix's lines, run the test and see it fail, restore with
   `git checkout -- <file>` (never a hand-written inverse), then confirm `git status` is clean and grep
-  the tree for any temporary marker. A red-proof run builds incrementally in the step gates' `<dd>` and
-  runs only the test class concerned (`xcodebuild test -only-testing:<Target>/<Class>`), never the whole
+  the tree for any temporary marker. A red-proof run builds incrementally in the step gates' `<dd>`
+  (`build-for-testing`) and runs only the test class concerned (`xcodebuild test-without-building
+  -only-testing:<Target>/<Class>`, e.g. `-only-testing:BChessMacGalleryTests/<Class>` on the Mac line), never the whole
   suite: the step and final gates run the rest. No version bump during feature work.
 - **Warnings.** Fix every warning the branch touches or reveals, including ones that predate it.
   Deprecations are fixed, never silenced (`@available`, `#warning`, suppression flags); if the fix
@@ -135,14 +151,16 @@ tests) live in `BChessTests/`. `xcodegen generate` committed with any `project.y
 hand-edit `BChess.xcodeproj`.
 
 **Test gate:** all of these pass, each read by exit status **and** summary line. Each runs under
-`buildlock` on its own DerivedData folder. The mac line also holds the hosted app's container lock (the outer `buildlock`, no slot): the scheme's `BChessMacGalleryTests` run inside the real Mac app, on its sandbox container, so two worktrees never run the host at once; it opens the app's untitled game window for the seconds the tests take. The step gate runs the first two lines (the unit tests in
-`BChessTests` and the UCI build). The final gate adds the last three: the iOS scheme's tests are the UI
+`buildlock` on its own DerivedData folder. The Mac test line (the second) also holds the hosted app's container lock (the outer `buildlock`, no slot): the scheme's `BChessMacGalleryTests` run inside the real Mac app, on its sandbox container, so two worktrees never run the host at once; it opens the app's untitled game window for the seconds the tests take. The Mac scheme builds its tests once (`build-for-testing`), then runs them with `test-without-building`
+(no build slot: it compiles nothing), so a rerun never re-links, re-signs and relaunches the host for nothing. The step gate runs the first three lines (the unit tests in
+`BChessTests` with the hosted `BChessMacGalleryTests`, and the UCI build). The final gate adds the last three: the iOS scheme's tests are the UI
 tests (`BChessUITests`) and the gallery tests, built once for the generic simulator, then run on a
 simulator leased from the pool for that run and given back right after it, also when it fails (run the
 last three lines in one shell):
 
 ```
-buildlock --folder ~/Library/Containers/ch.arizona-software.BChess --no-slot -- buildlock --folder <dd>/dd-mac -- xcodebuild test -scheme "BChess (macOS)" -destination 'platform=macOS' -derivedDataPath <dd>/dd-mac
+buildlock --folder <dd>/dd-mac -- xcodebuild build-for-testing -scheme "BChess (macOS)" -destination 'platform=macOS' -derivedDataPath <dd>/dd-mac
+buildlock --folder ~/Library/Containers/ch.arizona-software.BChess --no-slot -- buildlock --folder <dd>/dd-mac --no-slot -- xcodebuild test-without-building -scheme "BChess (macOS)" -destination 'platform=macOS' -derivedDataPath <dd>/dd-mac
 buildlock --folder <dd>/dd-uci -- xcodebuild -scheme BChessUCI -destination 'platform=macOS' -derivedDataPath <dd>/dd-uci build
 buildlock --folder <dd>/dd-ios -- xcodebuild build-for-testing -scheme "BChess (iOS)" -destination 'generic/platform=iOS Simulator' -derivedDataPath <dd>/dd-ios
 udid=$(simpool acquire --spec iphone --pid $$); trap 'simpool release "$udid" --app ch.arizona-software.BChess' EXIT
@@ -275,20 +293,35 @@ sections and the closing `substantive:` line. Nothing else counts. Every Codex r
 5. **Long results get truncated in delivery**: read the result FILE, never the message; if only a
    message exists, ask for the remainder from the last line you saw.
 
-Fold each finding in: **accept** (edit the plan, bump "revision N" in its header with a one-line
-changelog) or **reject** (write the rationale into the plan, so the next round does not re-raise it).
-Then apply the Codex policy. When it says stop, present Jean with the plan, the revision history and
-the rejected findings, and get a **go / adjust / stop** decision (`AskUserQuestion`). `--plan-only`
-ends here.
+Fold each finding in: **accept** (edit the plan in place — the lines the finding changes, never a
+rewrite of the file: a rewritten plan costs its whole length in output tokens every round — and bump
+"revision N" in its header with a one-line changelog) or **reject** (write the rationale into the
+plan, so the next round does not re-raise it).
+Then apply the Codex policy. When it says stop, the plan **goes ahead on its own** when all three
+hold: the last round found no blocker, the plan's "decision left open for Jean" is empty, and it
+touches none of the plan risks in Context. Say so in one line (plan path, revision, rounds run) and
+start phase 4. Otherwise present Jean with the plan, the revision history and the rejected findings,
+and get a **go / adjust / stop** decision (`AskUserQuestion`). `--plan-only` ends here either way.
 
 ## Phase 4 — A Sonnet implementation subagent
 
 The main context stays clean: it reads plan text, subagent reports and `git diff --stat`, never build
-logs or the diff body. Spawn once and keep the agent alive for the fix rounds; the parent never
-implements.
+logs or the diff body. **One implementer per plan step**: spawn it with the plan path, the step number
+and `git log main..HEAD --oneline`, so its context starts from the plan and the commits, not from the
+previous step's build logs; it lives for that step and the fix rounds that concern it, then the next
+step gets a fresh one. A plan of one step keeps one implementer throughout. The parent never
+implements. (Measured over five days: implementers that lived for a whole plan ran 400 to 640 calls at
+235k tokens of context each, the largest single cost of a `/develop` run.)
+
+Before spawning, when the repo's gates host tests inside the app (an app-hosted test target or a Mac
+gallery), run the repo's running-app check. If the app is running — Jean's own Xcode debug run
+included — tell Jean and wait for him to quit it; never kill it. Found at the first hosted gate instead,
+it costs the implementer the wait and Jean the surprise. Here: the mac line's `BChessMacGalleryTests`
+and `scripts/snapshot-mac.sh` run inside the real Mac app, so `pgrep -f 'BChess.app/Contents/MacOS/BChess'`
+must print nothing.
 
 ```
-Agent(model: "sonnet", name: "<id-slug>-impl", prompt: …)
+Agent(model: "sonnet", name: "<id-slug>-impl-<step>", prompt: …)
 ```
 
 The prompt carries: the **absolute worktree path** (every command runs there — state it twice), the
@@ -308,8 +341,9 @@ invariant is most at risk, what is more complex than its job requires, what is d
 whether every new entity or field reaches its screen through the production read path. Do not
 attach the whole design doc. Same `codex exec` command and the same "did it run" protocol.
 
-Send each accepted finding to the **same** subagent with `SendMessage`. Rejected findings get a
-one-line rationale in the final report, not silence. After every fix round run the step gate plus the
+Send each accepted finding with `SendMessage` to the implementer of the step it concerns while that
+one is alive; otherwise spawn a fresh implementer with the finding, the plan and the commit. Rejected
+findings get a one-line rationale in the final report, not silence. After every fix round run the step gate plus the
 class from § Gates for the changes since G. Apply the Codex policy.
 
 ## Phase 6 — Hand back (landing is Jean's call)
@@ -319,8 +353,9 @@ once on the tree handed back (commit G), or the class from § Gates that the las
 plus a report: G's commit, each gate class applied, what shipped (commits),
 plan revisions and review rounds with what each changed, findings rejected and why, gates run (the
 test summary lines, the warnings check, and each conditional gate — which ran and which did not),
-and what is owed (the owed checks in Context). **When Jean
-says land, the feature lands as ONE squashed commit through a pull request** — `main` requires pull
+and what is owed (the owed checks in Context). Before the report, push the branch to origin
+(`git push -u origin <id-slug>`, the global working agreement's branch rule; never `main`). Landing
+stays Jean's call. **When Jean says land, the feature lands as ONE squashed commit through a pull request** — `main` requires pull
 requests (a GitHub rule): never push `main`.
 
 1. `git fetch && git rebase origin/main` in the worktree, then classify the tree against G (§ Gates):
@@ -351,7 +386,10 @@ requests (a GitHub rule): never push `main`.
 - Reviewing with the same vendor that planned and implemented when Codex works.
 - Planning inline in the parent — the planning subagent's reads must not stay in the main context.
 - Reading the implementation diff or a build log into the main context.
-- Spawning a fresh implementer for each fix round instead of messaging the one that built it.
+- Spawning a fresh implementer for a fix round of the step just built instead of messaging the one
+  that built it — or keeping one implementer alive across every step of a long plan.
+- A blocking wait longer than four minutes inside a subagent: its prompt cache expires at five.
+- Rewriting a plan file to fold in a finding instead of editing the lines concerned.
 - Restating the working agreement in the implementer prompt.
 - Bumping the version or landing without being asked.
 - Broad Codex prompts: they make Codex read much of the repo and run commands, and often stall past 30

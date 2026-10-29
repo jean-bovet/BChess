@@ -25,11 +25,13 @@ platform folder), and the check ignores them.
 a duplicate slug, a light image that is dark or a dark image that is light (mean luminance against 0.45,
 scripts/preview-luminance.swift), a dark image byte-identical to its light one, a blank image (one colour
 everywhere), an image that cannot be decoded, and a forced appearance or locale in a scenario file (its
-`//` comments aside). Three manifest flags, written by the snapshot test from the scenario, make the check honest:
+`//` comments aside; a `\.locale` on a line carrying `// gallery: allowed, <why>` passes: a locale forced for its
+region, not its language). Four manifest flags, written by the snapshot test from the scenario, make the check honest:
 `documentCanvas: true` (a card dark in both appearances by design: the pair is judged instead of each image, the
-dark image's mean luminance at least 0.05 below the light one's), `drawsNothing: true` (a screen that draws nothing
-by design: its blank images pass) and `skipped: "<why>"` (a card the pass could not render honestly: no images
-expected, the page says why).
+dark image's mean luminance at least 0.05 below the light one's), `imagery: true` (full-bleed imagery that does not
+darken in dark: the luminance rules are waived for the pair, the byte-identical rule still applies),
+`drawsNothing: true` (a screen that draws nothing by design: its blank images pass) and `skipped: "<why>"` (a card
+the pass could not render honestly: no images expected, the page says why).
 """
 import argparse, glob, html, json, os, re, shutil, struct, subprocess, sys
 
@@ -239,8 +241,8 @@ def do_check():
             continue
         if spread == 0 and not entry.get('drawsNothing'):
             problems.append(f'blank render (one colour everywhere): {name}')
-        if entry.get('documentCanvas'):
-            continue   # dark by design in both appearances: the pair is judged below
+        if entry.get('documentCanvas') or entry.get('imagery'):
+            continue   # dark by design in both appearances (the pair is judged below), or imagery: no luminance rule
         if (value < LUMINANCE_THRESHOLD) != is_dark_slot:
             shown = 'dark' if value < LUMINANCE_THRESHOLD else 'light'
             problems.append(f'{shown} render in the {"dark" if is_dark_slot else "light"} slot: {name} (luminance {value:.6f})')
@@ -258,7 +260,9 @@ def do_check():
             continue
         with open(path, encoding='utf-8') as handle:
             for number, line in enumerate(handle, 1):
-                if re.search(r'\.preferredColorScheme|\\\.locale', line.split('//', 1)[0]):
+                code = line.split('//', 1)[0]
+                allowed = '// gallery: allowed' in line   # a locale forced for its region (en_US: a 12-hour clock)
+                if re.search(r'\.preferredColorScheme', code) or (re.search(r'\\\.locale', code) and not allowed):
                     problems.append(f'forced appearance or locale: {os.path.basename(path)}:{number}')
     if problems:
         print(f'CHECK FAILED [en] ({len(problems)}):')

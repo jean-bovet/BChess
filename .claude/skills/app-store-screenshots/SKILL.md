@@ -100,10 +100,11 @@ After the upload, `app-store check --version <v> --families <families>` must rep
 ## The slides file (`AppStore/screenshots.json`)
 
 - `displayType`, `width`, `height`: the App Store set it renders (iPhone 6.9": `APP_IPHONE_67`, 1320 x 2868).
-- `locales`: the store languages, in store order.
+- `locales`: the store languages, in store order. A right-to-left locale (`ar-SA`, `he`) is laid out right to left by the renderer; its pitfalls (keyword bytes, the pair's order in the storefront) are in `docs/right-to-left.md`, next to the tools the global working agreement names.
 - `slides`: in display order. Each has an `id`, a CSS `background`, `phones` (a `capture` and a CSS `style` that places
   and tilts it: `left`, `top`, `transform: perspective(...) rotateX/Y/Z(...) scale(...)`) and `text`: per locale, one
-  `{ "title", "sub" }` per panel; `\n` breaks the title.
+  `{ "title", "sub" }` per panel; `\n` breaks the title. A right-to-left locale (`he`, `ar-SA`) is laid out right to
+  left by the renderer; write its headlines as plain text, no direction marks.
 - Captures in the app's own languages: a capture `X` (or `dir/X`) shows as `<locale>/X` or `<language>/X` (`dir/fr/X`)
   in the locale that has one; a locale without one shows the English capture. The gallery itself stays English: render
   only the slides' captures in each other store language, right before rendering the slides (`scripts/snapshot-gallery.sh
@@ -144,6 +145,9 @@ app-store-screenshots --config AppStore/search-results.json
 - Upload: `app-store creative --placement header|search|both FILE` (`both` = the universal image) puts it in the app's
   asset library (reused when the same file is already there); with `--version <v>` (an editable version) it is also
   placed on every locale, replacing the previous one. It goes through App Review with that version.
+- A localized image (one whose phone shows each locale's capture, or that carries text) is rendered per locale and
+  uploaded one call per locale, `app-store creative --placement <p> --version <v> --locale <l> FILE`; a text-less
+  image is one upload for every locale. Uploads happen in `/release` §6, after Jean approved the renders.
 
 ## Rules
 
