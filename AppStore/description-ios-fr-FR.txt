@@ -10,3 +10,5 @@ COMPRENDRE
 - Le bouton Moteur indique qui est mieux placé, l’évaluation et la meilleure suite, y compris quand c’est à vous de jouer.
 - La liste complète des coups en notation standard : à un geste sur iPhone, à côté de l’échiquier sur iPad en mode paysage et sur Mac.
 - Avancez et reculez dans la partie.
+
+Open source : tout le code source est sur GitHub, à l’adresse https://github.com/jean-bovet/BChess

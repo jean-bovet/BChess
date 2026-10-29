@@ -11,3 +11,5 @@ VERSTEHEN
 - „Engine anzeigen“ in der Symbolleiste und im Menü „Partie“ zeigt, wer besser steht, die Bewertung und die beste Zugfolge, auch wenn Sie selbst am Zug sind.
 - Die vollständige Zugliste in Standardnotation, neben dem Brett.
 - Gehen Sie mit den Pfeiltasten in der Partie Zug für Zug vor und zurück.
+
+Open Source: Der vollständige Quellcode liegt auf GitHub unter https://github.com/jean-bovet/BChess

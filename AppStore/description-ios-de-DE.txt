@@ -10,3 +10,5 @@ VERSTEHEN
 - Die Taste „Engine“ zeigt, wer besser steht, die Bewertung und die beste Zugfolge, auch wenn Sie selbst am Zug sind.
 - Die vollständige Zugliste in Standardnotation: auf dem iPhone mit einem Tipp erreichbar, auf dem iPad im Querformat und auf dem Mac neben dem Brett.
 - Gehen Sie in der Partie Zug für Zug vor und zurück.
+
+Open Source: Der vollständige Quellcode liegt auf GitHub unter https://github.com/jean-bovet/BChess

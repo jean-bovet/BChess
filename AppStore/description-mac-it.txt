@@ -11,3 +11,5 @@ CAPISCI
 - Mostra motore, nella barra degli strumenti e nel menu Partita, indica chi sta meglio, la valutazione e la linea migliore, anche quando tocca a te.
 - L’elenco completo delle mosse in notazione standard, accanto alla scacchiera.
 - Vai avanti e indietro nella partita con i tasti freccia.
+
+Open source: tutto il codice sorgente è su GitHub all’indirizzo https://github.com/jean-bovet/BChess
