@@ -10,3 +10,5 @@ UNDERSTAND
 - The Engine button shows who stands better, the evaluation and the best line, including on your own turn.
 - The full move list in standard notation: one tap away on iPhone, beside the board on iPad in landscape and on the Mac.
 - Step back and forward through the game.
+
+Open source: the full source code is on GitHub at https://github.com/jean-bovet/BChess

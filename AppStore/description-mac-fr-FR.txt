@@ -11,3 +11,5 @@ COMPRENDRE
 - Afficher le moteur, dans la barre d’outils et le menu Partie, indique qui est mieux placé, l’évaluation et la meilleure suite, y compris quand c’est à vous de jouer.
 - La liste complète des coups en notation standard, à côté de l’échiquier.
 - Avancez et reculez dans la partie avec les touches fléchées.
+
+Open source : tout le code source est sur GitHub, à l’adresse https://github.com/jean-bovet/BChess

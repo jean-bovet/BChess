@@ -10,3 +10,5 @@ CAPISCI
 - Il pulsante Motore mostra chi sta meglio, la valutazione e la linea migliore, anche quando tocca a te.
 - L’elenco completo delle mosse in notazione standard: a un tocco su iPhone, accanto alla scacchiera su iPad in orizzontale e su Mac.
 - Vai avanti e indietro nella partita.
+
+Open source: tutto il codice sorgente è su GitHub all’indirizzo https://github.com/jean-bovet/BChess

@@ -11,3 +11,5 @@ UNDERSTAND
 - Show Engine, in the toolbar and the Game menu, shows who stands better, the evaluation and the best line, including on your own turn.
 - The full move list in standard notation, beside the board.
 - Step back and forward through the game with the arrow keys.
+
+Open source: the full source code is on GitHub at https://github.com/jean-bovet/BChess
