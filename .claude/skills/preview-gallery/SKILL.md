@@ -295,8 +295,8 @@ platform's folder, or of a skipped scenario), a duplicate slug, a light image th
 (mean luminance against a threshold; a `documentCanvas` scenario is judged as a pair instead, the dark image's
 mean luminance at least 0.05 below the light one's; an `imagery` scenario is not judged for luminance), a dark image byte-identical to its light one, a blank image
 (one colour everywhere) unless its scenario sets `drawsNothing`, an image that cannot be decoded or is not at the
-render scale of its scenario's size (2x; 3x for the Duo's inner poses; not yet checked by BChess's
-`preview-gallery.py`), and
+render scale of its scenario's size (2x; 3x for the Duo's inner poses, flagged `duoInner` in the manifest, and for
+every card of the Duo pass), and
 `.preferredColorScheme` or `\.locale` anywhere in the scenario file (its `//` comments aside, and a `\.locale` on a
 line carrying `// gallery: allowed, <why>`). An `--only` run replaces only its own images; the check still covers every
 scenario. The `--lang` folders are not checked and never reach the page. The gallery is
