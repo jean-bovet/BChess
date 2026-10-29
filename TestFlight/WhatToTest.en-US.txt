@@ -1,5 +1,7 @@
-- iPhone Duo: on the inner display the game screen now keeps the board on one side of the hinge and the move list, status and engine card on the other, in every pose. Half-folded on a table (hinge horizontal), the board stays on the upper half and the controls on the flat half. Other iPhones, iPad and Mac are unchanged.
+- BChess now speaks French, German, Italian, Hebrew and Arabic, following the device language (or the app's language in Settings). In Hebrew and Arabic the menus, sheets and lists read right to left, while the board, the move list and the chess notation stay left to right.
 
-- iPhone and iPad: the Games list's Import and Export buttons now show symbols (download and share) and sit in the standard positions; Cancel and Done on the sheets follow the system layout.
+- Mac: launching the app opens a new game right away instead of the Open panel, in a larger window with the move list beside the board.
 
-Please verify: on an iPhone Duo, open and fold the device during a game and check that the board never sits across the hinge; on any iPhone or iPad, import and export a game from the Games list.
+- Mac, iPad in landscape and the iPhone Duo inner display: the board column is now exactly as wide as the board, with no empty gap between the board and the move list.
+
+Please verify: switch the device (or the app) to French, German, Italian, Hebrew or Arabic and play a few moves, checking that the board and the notation never flip in Hebrew and Arabic; on the Mac, quit and relaunch to see the new game window.
