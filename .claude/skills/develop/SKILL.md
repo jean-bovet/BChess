@@ -116,6 +116,15 @@ uncommitted tracked changes or untracked files that are not ignored).
   boot, shut down or touch a simulator by hand. One `-destination` per run and
   `-parallel-testing-enabled NO -collect-test-diagnostics never` on every simulator test run (without the second flag a failing test, so every red proof, makes xcodebuild collect a sysdiagnose-like simulator report for up to 10 minutes; the gates read the log, never that report. To debug a failure nobody can explain, rerun that one test without it). A repo whose scripts still boot their own
   simulator follows the global agreement's rule for those.
+- **Keep the Mac awake.** A gate script that runs simulators or long builds re-executes itself once under
+  `caffeinate -is` (a guard variable such as `<REPO>_CAFFEINATED` so it happens once; `"$@"` and the exit status
+  kept; no re-exec, one notice line, when `caffeinate` is missing). Where the gate is a list of commands rather
+  than a script, each long command runs as `caffeinate -is <command>` (`caffeinate -is buildlock --folder <dd> --
+  xcodebuild test …`). xcodebuild's own "running tests" assertion is
+  only `PreventUserIdleSystemSleep`, which lets a Mac in Maintenance Sleep / DarkWake drop off mid-run: a night gate
+  then stalls for minutes at a time inside XCTest steps and fails with "Timed out while synthesizing event"
+  (measured 2026-10-30: 2 h 45 min instead of 42 min, every gap matching `pmset -g log`). A gate script that
+  re-executes itself has script tests for the re-exec, argument boundaries, the missing tool and signals.
 - **Wait in slices.** A subagent's prompt cache lives five minutes (the parent's, one hour). Inside a
   subagent, no blocking call runs longer than four minutes: a build, a test run, the gallery or a Codex
   round starts in the background with its output in a log, and the agent checks that log every four
@@ -155,7 +164,7 @@ tests) live in `BChessTests/`. `xcodegen generate` committed with any `project.y
 hand-edit `BChess.xcodeproj`.
 
 **Test gate:** all of these pass, each read by exit status **and** summary line. Each runs under
-`buildlock` on its own DerivedData folder. The Mac test line (the second) also holds the hosted app's container lock (the outer `buildlock`, no slot): the scheme's `BChessMacGalleryTests` run inside the real Mac app, on its sandbox container, so two worktrees never run the host at once; it opens the app's untitled game window for the seconds the tests take. The Mac scheme builds its tests once (`build-for-testing`), then runs them with `test-without-building`
+`caffeinate -is` (the Mac stays awake) and `buildlock` on its own DerivedData folder. The Mac test line (the second) also holds the hosted app's container lock (the outer `buildlock`, no slot): the scheme's `BChessMacGalleryTests` run inside the real Mac app, on its sandbox container, so two worktrees never run the host at once; it opens the app's untitled game window for the seconds the tests take. The Mac scheme builds its tests once (`build-for-testing`), then runs them with `test-without-building`
 (no build slot: it compiles nothing), so a rerun never re-links, re-signs and relaunches the host for nothing. The step gate runs the first three lines (the unit tests in
 `BChessTests` with the hosted `BChessMacGalleryTests`, and the UCI build). The final gate adds the last three: the iOS scheme's tests are the UI
 tests (`BChessUITests`) and the gallery tests, built once for the generic simulator, then run on a
@@ -163,12 +172,12 @@ simulator leased from the pool for that run and given back right after it, also 
 last three lines in one shell):
 
 ```
-buildlock --folder <dd>/dd-mac -- xcodebuild build-for-testing -scheme "BChess (macOS)" -destination 'platform=macOS' -derivedDataPath <dd>/dd-mac
-buildlock --folder ~/Library/Containers/ch.arizona-software.BChess --no-slot -- buildlock --folder <dd>/dd-mac --no-slot -- xcodebuild test-without-building -scheme "BChess (macOS)" -destination 'platform=macOS' -derivedDataPath <dd>/dd-mac
-buildlock --folder <dd>/dd-uci -- xcodebuild -scheme BChessUCI -destination 'platform=macOS' -derivedDataPath <dd>/dd-uci build
-buildlock --folder <dd>/dd-ios -- xcodebuild build-for-testing -scheme "BChess (iOS)" -destination 'generic/platform=iOS Simulator' -derivedDataPath <dd>/dd-ios
+caffeinate -is buildlock --folder <dd>/dd-mac -- xcodebuild build-for-testing -scheme "BChess (macOS)" -destination 'platform=macOS' -derivedDataPath <dd>/dd-mac
+caffeinate -is buildlock --folder ~/Library/Containers/ch.arizona-software.BChess --no-slot -- buildlock --folder <dd>/dd-mac --no-slot -- xcodebuild test-without-building -scheme "BChess (macOS)" -destination 'platform=macOS' -derivedDataPath <dd>/dd-mac
+caffeinate -is buildlock --folder <dd>/dd-uci -- xcodebuild -scheme BChessUCI -destination 'platform=macOS' -derivedDataPath <dd>/dd-uci build
+caffeinate -is buildlock --folder <dd>/dd-ios -- xcodebuild build-for-testing -scheme "BChess (iOS)" -destination 'generic/platform=iOS Simulator' -derivedDataPath <dd>/dd-ios
 udid=$(simpool acquire --spec iphone --pid $$); trap 'simpool release "$udid" --app ch.arizona-software.BChess' EXIT
-buildlock --folder <dd>/dd-ios -- xcodebuild test-without-building -scheme "BChess (iOS)" -destination "id=$udid" -parallel-testing-enabled NO -collect-test-diagnostics never -derivedDataPath <dd>/dd-ios
+caffeinate -is buildlock --folder <dd>/dd-ios -- xcodebuild test-without-building -scheme "BChess (iOS)" -destination "id=$udid" -parallel-testing-enabled NO -collect-test-diagnostics never -derivedDataPath <dd>/dd-ios
 ```
 
 `** TEST FAILED **`, `** BUILD FAILED **`, a Swift Testing line `✘`, or any `error:` is red. The
@@ -180,13 +189,13 @@ count is printed by the suite) — zero executed is red, never green.
 and `gtest-all.cc` are exempt).
 
 ```
-buildlock --folder <dd>/build-ios -- xcodebuild -target "BChess (iOS)" -sdk iphonesimulator -configuration Debug SYMROOT=<dd>/build-ios OBJROOT=<dd>/obj-ios COMPILER_INDEX_STORE_ENABLE=NO build 2>&1 | grep -E '^/.*(warning|error):|^(warning|error):' | grep -v -e ONLY_ACTIVE_ARCH -e /Dependencies/ -e gtest-all
-buildlock --folder <dd>/build-mac -- xcodebuild -target "BChess (macOS)" -configuration Debug SYMROOT=<dd>/build-mac OBJROOT=<dd>/obj-mac COMPILER_INDEX_STORE_ENABLE=NO build 2>&1 | grep -E '^/.*(warning|error):|^(warning|error):' | grep -v -e ONLY_ACTIVE_ARCH -e /Dependencies/ -e gtest-all
-buildlock --folder <dd>/build-gt -- xcodebuild -target BChessGalleryTests -sdk iphonesimulator -configuration Debug SYMROOT=<dd>/build-gt OBJROOT=<dd>/obj-gt COMPILER_INDEX_STORE_ENABLE=NO build 2>&1 | grep -E '^/.*(warning|error):|^(warning|error):' | grep -v -e ONLY_ACTIVE_ARCH -e /Dependencies/ -e gtest-all
+caffeinate -is buildlock --folder <dd>/build-ios -- xcodebuild -target "BChess (iOS)" -sdk iphonesimulator -configuration Debug SYMROOT=<dd>/build-ios OBJROOT=<dd>/obj-ios COMPILER_INDEX_STORE_ENABLE=NO build 2>&1 | grep -E '^/.*(warning|error):|^(warning|error):' | grep -v -e ONLY_ACTIVE_ARCH -e /Dependencies/ -e gtest-all
+caffeinate -is buildlock --folder <dd>/build-mac -- xcodebuild -target "BChess (macOS)" -configuration Debug SYMROOT=<dd>/build-mac OBJROOT=<dd>/obj-mac COMPILER_INDEX_STORE_ENABLE=NO build 2>&1 | grep -E '^/.*(warning|error):|^(warning|error):' | grep -v -e ONLY_ACTIVE_ARCH -e /Dependencies/ -e gtest-all
+caffeinate -is buildlock --folder <dd>/build-gt -- xcodebuild -target BChessGalleryTests -sdk iphonesimulator -configuration Debug SYMROOT=<dd>/build-gt OBJROOT=<dd>/obj-gt COMPILER_INDEX_STORE_ENABLE=NO build 2>&1 | grep -E '^/.*(warning|error):|^(warning|error):' | grep -v -e ONLY_ACTIVE_ARCH -e /Dependencies/ -e gtest-all
 ```
 
 The first two build only the app targets, so the third compiles the gallery tests (and builds their host app). A fourth line does the
-same for the Mac gallery tests on the macOS SDK: `buildlock --folder <dd>/build-mgt -- xcodebuild -target BChessMacGalleryTests -configuration Debug
+same for the Mac gallery tests on the macOS SDK: `caffeinate -is buildlock --folder <dd>/build-mgt -- xcodebuild -target BChessMacGalleryTests -configuration Debug
 SYMROOT=<dd>/build-mgt OBJROOT=<dd>/obj-mgt COMPILER_INDEX_STORE_ENABLE=NO build 2>&1 | grep …` (the same filter).
 
 **Gallery gate** (`/preview-gallery`): every screen has a scenario in `BChessGalleryTests/GalleryScenarios.swift`
@@ -197,7 +206,8 @@ it leases nothing and runs the hosted app under the container lock), plus `--dev
 screen with an inner-display scenario (the group "iPhone Duo · inner display") or a layout that changes at
 regular width. Green is the line `CHECK OK [en]: <n> cards, light and dark complete and correctly lit`, and the
 new or changed cards read in both appearances with the Read tool, as `/preview-gallery` says. The script leases
-and locks itself (never wrap it in `simpool` or `buildlock`), writes under `previews/` (gitignored) and uses its
+and locks itself and keeps the Mac awake (`caffeinate -dims -w $$`, as `snapshot-mac.sh` does; never wrap it in
+`simpool` or `buildlock`), writes under `previews/` (gitignored) and uses its
 own DerivedData (`BCHESS_SNAPSHOT_DD`, default `~/Library/Developer/Xcode/DerivedData/BChess-snapshots`).
 
 ## Deploy (only when Jean asks)
