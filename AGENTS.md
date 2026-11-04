@@ -67,6 +67,9 @@ its own "BChess Agent" simulator).
 isolation (`@MainActor` / `nonisolated` / `@Sendable`). Match the surrounding style. Commit when
 asked.
 
+**Third-party material.** A new asset, font, sound or copied code gets a line in `docs/licensing.md`, and in
+`Shared/ThirdPartyNotices.txt` when it ships. No code copied from GPL engines.
+
 ## Languages
 
 English (source), French, German and Italian (the Swiss four), plus Hebrew (`he`) and Arabic (`ar`; store `ar-SA`), both

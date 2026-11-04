@@ -137,6 +137,8 @@ targets:
       - path: BChess/UCI/FENgineInfo+Extension.swift
       - path: BChess/Openings.pgn
         buildPhase: resources
+      - path: Shared/ThirdPartyNotices.txt
+        buildPhase: resources
     dependencies:
       # Built next to the test bundle, for the UCI subprocess test only
       - target: BChessUCI

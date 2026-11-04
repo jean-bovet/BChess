@@ -461,6 +461,10 @@ enum GalleryScenarios {
         AnyView(NavigationStack { SettingsView() })
     }
 
+    static let about = GalleryScenario(name: "About", group: "Settings") {
+        AnyView(NavigationStack { AboutView() })
+    }
+
     // Walnut
     static let walnutPalette = GalleryScenario(name: "Walnut · Palette", group: "Walnut") {
         AnyView(VStack(alignment: .leading, spacing: 12) {
@@ -498,7 +502,7 @@ enum GalleryScenarios {
         moveStripStart, moveStripMiddle, moveStripWithVariations,
         moveListShortGame, moveListVariationsAndComments, moveListMixedScriptComments, moveListCard,
         gamesListFourGames, gamesListSmallPhone, launchEmptyLibrary, newGameClub, newGameFriend, newGameMaximum, newGamePlayers,
-        settings,
+        settings, about,
         walnutPalette,
     ]
 

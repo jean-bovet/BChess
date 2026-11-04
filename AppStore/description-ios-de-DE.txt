@@ -12,3 +12,5 @@ VERSTEHEN
 - Gehen Sie in der Partie Zug für Zug vor und zurück.
 
 Open Source: Der vollständige Quellcode liegt auf GitHub unter https://github.com/jean-bovet/BChess
+
+Danksagung: Schachfiguren von Colin M.L. Burnett (Wikimedia Commons), BSD-Lizenz. Die Zuggenerierung verwendet magicmoves von Pradyumna Kannan. Die vollständigen Hinweise stehen in der App unter „Über BChess“.

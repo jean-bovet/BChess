@@ -98,4 +98,23 @@ final class BChessUITests: XCTestCase {
         XCTAssertEqual(app.textFields["new-game-first-name"].value as? String, "Ann")
         XCTAssertEqual(app.textFields["new-game-second-name"].value as? String, "Ben")
     }
+
+    /// Settings ▸ About BChess on the iPhone: the production path to the notices of the shipped app.
+    @MainActor
+    func testSettingsAboutShowsTheNotices() throws {
+        let app = XCUIApplication()
+        app.launchArguments = ["-uiTestingFreshLibrary"]
+        app.launch()
+
+        app.buttons["More"].tap()
+        app.buttons["Settings"].tap()
+        let row = app.buttons["settings-about"]
+        XCTAssertTrue(row.waitForExistence(timeout: 10))
+        row.tap()
+        let notices = app.descendants(matching: .any)["about-notices"]
+        XCTAssertTrue(notices.waitForExistence(timeout: 10))
+        let text = (notices.value as? String ?? "") + notices.label
+        XCTAssertTrue(text.contains("Colin M.L. Burnett"), "the notices lack the pieces credit")
+        XCTAssertTrue(text.contains("Pradyumna Kannan"), "the notices lack the magicmoves credit")
+    }
 }

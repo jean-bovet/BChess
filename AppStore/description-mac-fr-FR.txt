@@ -13,3 +13,5 @@ COMPRENDRE
 - Avancez et reculez dans la partie avec les touches fléchées.
 
 Open source : tout le code source est sur GitHub, à l’adresse https://github.com/jean-bovet/BChess
+
+Crédits : pièces d’échecs de Colin M.L. Burnett (Wikimedia Commons), licence BSD. La génération des coups utilise magicmoves de Pradyumna Kannan. Les mentions complètes sont dans l’app, sous À propos de BChess.

@@ -115,6 +115,7 @@
 		66587379C3F13DDE7AD23729 /* MacRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDA854E6780F9E005D7278EB /* MacRenderer.swift */; };
 		670721415A71F2EA7C283D3C /* UnitTestHelper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 20FCADEB3C5F59400CF1FB32 /* UnitTestHelper.cpp */; };
 		687625833AC8552DF1728B21 /* MovesTests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9BA0B234E3F267394AD43C1F /* MovesTests.cpp */; };
+		6978C1EA370ACDA9AD110DD8 /* ThirdPartyNoticesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A2AD96C85FF2AC198617B8C /* ThirdPartyNoticesTests.swift */; };
 		6A5E612D961C12FD349DC387 /* ChessState.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 431412F9A9BFFBA835CA9E74 /* ChessState.cpp */; };
 		6A96FF8DF5A31F87130A5EC0 /* NavigationButtons.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8C415E73123152AF470ECCC /* NavigationButtons.swift */; };
 		6B674CF5A48A3FEBD21CF92D /* ChessBoardHash.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A4315B0E7D14507709F7ADAF /* ChessBoardHash.cpp */; };
@@ -124,6 +125,7 @@
 		7043C353E57249FDC0E195C8 /* Verdict.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D97E9AA4F42DF8EB4998533 /* Verdict.swift */; };
 		711EDFA58D44E8361F66E3D4 /* DocumentWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9B7275C706589BBD3FEFC54 /* DocumentWindow.swift */; };
 		71E4AD54E9B9C238936E2B39 /* Openings.pgn in Resources */ = {isa = PBXBuildFile; fileRef = C570D7A63E563DBD04ACAF7F /* Openings.pgn */; };
+		722DE5748A248B4287F1C8D3 /* ThirdPartyNotices.txt in Resources */ = {isa = PBXBuildFile; fileRef = 2CE86688AD3238F5B5380D0E /* ThirdPartyNotices.txt */; };
 		72DF4DC03FB95E2418FAA6BC /* LocalizationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0F0726139BFE4EB04CF1890 /* LocalizationTests.swift */; };
 		7353378B36AA7E740A1988C3 /* GameSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C69641E8C4D121F719476CA /* GameSection.swift */; };
 		73A49D1EE51DE8367CA99323 /* SelectionModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2D17161DA74B911FD109203 /* SelectionModifier.swift */; };
@@ -162,6 +164,7 @@
 		91AA170EE9AC7E889118BF35 /* MoveList.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5706678E59692AD6397F2D59 /* MoveList.cpp */; };
 		94B6E727CA5FD6A67363E621 /* GameCommands.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDE9AAD79C243579D8F245B4 /* GameCommands.swift */; };
 		9518620E43D9B847CED8488E /* FEngineUtility.mm in Sources */ = {isa = PBXBuildFile; fileRef = CE782615578B3D7B3C451A64 /* FEngineUtility.mm */; };
+		9583A7CEC618CD7733813C9B /* ThirdPartyNotices.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AB60B4877DF6AA79F6A89FC /* ThirdPartyNotices.swift */; };
 		964A24461F1D8C58BED4431A /* magicmoves.c in Sources */ = {isa = PBXBuildFile; fileRef = D11C33D8BBE6428E42241039 /* magicmoves.c */; };
 		964E68698D0402C887D6283B /* FFEN.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F7BCF98F9720337F7D257AFA /* FFEN.cpp */; };
 		969BE07E432518AF03D52AE0 /* LocalizationCatalogTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CF5F3370A086D7BEC23D1CF /* LocalizationCatalogTests.swift */; };
@@ -200,10 +203,12 @@
 		B7F67B65AD67362E48C53620 /* GameShell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4664882CCC95A474A5F6075D /* GameShell.swift */; };
 		B8B0B9F88CA78B8C3104CE6B /* FoldSplit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D3FB5FF0F6743B683718D1E /* FoldSplit.swift */; };
 		B9B7926079711D8B1249A497 /* BoardColumn.swift in Sources */ = {isa = PBXBuildFile; fileRef = C09D3D7AA4C592422F3276B1 /* BoardColumn.swift */; };
+		BAFA9735A3D9D9723C85900D /* AboutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 428E8BB72092254ED8FD959A /* AboutView.swift */; };
 		BBD13F9F43C3D22C7B81C5D2 /* MacGalleryScenarioTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D317C81B07786A63151563A /* MacGalleryScenarioTests.swift */; };
 		BC3252F10593360ED02A17E6 /* PiecesFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = B06D783FF88F314CC998FEC5 /* PiecesFactory.swift */; };
 		BE677D8292959DBF4EFD1935 /* ChessOpenings.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 94916DB48E273E8C193F571F /* ChessOpenings.cpp */; };
 		C1A1CE815B0234952BBD3C71 /* FEngineUtility.mm in Sources */ = {isa = PBXBuildFile; fileRef = CE782615578B3D7B3C451A64 /* FEngineUtility.mm */; };
+		C2918567CE7E0B6032F6D5D4 /* ThirdPartyNotices.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AB60B4877DF6AA79F6A89FC /* ThirdPartyNotices.swift */; };
 		C293D409E40492B5B24BCB8A /* MacSnapshotGalleryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8200E00B9423B85AD84AE55 /* MacSnapshotGalleryTests.swift */; };
 		C59A2AA362E0BCAF379CA111 /* ChessGame.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1798BECBBBED258BED2E2CA1 /* ChessGame.cpp */; };
 		C6AB2504F416C6620DD490E0 /* LastMoveModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8893A6A3EDE392ADA62194CC /* LastMoveModifier.swift */; };
@@ -235,12 +240,16 @@
 		DCD4B97AB91741A82C30825A /* ChessBoardHash.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A4315B0E7D14507709F7ADAF /* ChessBoardHash.cpp */; };
 		DCDECDF4563125B4DF500148 /* BoardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C80EAED5A93B886115810B84 /* BoardView.swift */; };
 		DD330AEC7A92C3C162B81FE8 /* PlayerRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9B1A5521CFB1D9556C1ADC8 /* PlayerRow.swift */; };
+		DDC0C65FC02D8326350C227F /* ThirdPartyNotices.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AB60B4877DF6AA79F6A89FC /* ThirdPartyNotices.swift */; };
 		DEB6092A962AA1CC588840C1 /* VariationChoicesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB75FBE1292ED6EA9705DDE9 /* VariationChoicesTests.swift */; };
 		DEDE9BADCE58E2E7B101D4C0 /* ChessBoard.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AE369A268D78EE76D0D84F80 /* ChessBoard.cpp */; };
 		DF2CCAD477BD63192BE669E2 /* FEngineMoveNode.mm in Sources */ = {isa = PBXBuildFile; fileRef = 67B30EF56BB2ADE44B075F8F /* FEngineMoveNode.mm */; };
 		E02D34F54D320E2F5EDA02B7 /* StatusLine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 165CC2E716C38E0D22CAE062 /* StatusLine.swift */; };
+		E0376F3D07DA269AEDCD99CA /* AboutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 428E8BB72092254ED8FD959A /* AboutView.swift */; };
 		E2375AA2D60123A58309DFB6 /* FEngineGame.mm in Sources */ = {isa = PBXBuildFile; fileRef = D05BA0CF62011F29A83BC02B /* FEngineGame.mm */; };
+		E553BC00867605F656474B75 /* ThirdPartyNotices.txt in Resources */ = {isa = PBXBuildFile; fileRef = 2CE86688AD3238F5B5380D0E /* ThirdPartyNotices.txt */; };
 		E6799604808B3886E3B8FFB8 /* Walnut.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1BD58D3FF9A1D7CD2C2CAAFB /* Walnut.swift */; };
+		E7D411A534E32FFCA8D66D40 /* ThirdPartyNotices.txt in Resources */ = {isa = PBXBuildFile; fileRef = 2CE86688AD3238F5B5380D0E /* ThirdPartyNotices.txt */; };
 		E82472307660320279C501A7 /* Arrow.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEC6B2A69F9EAD135A9433ED /* Arrow.swift */; };
 		EA570E8F0D08DF0F3154968C /* Variation.swift in Sources */ = {isa = PBXBuildFile; fileRef = F14DD2B61B0DFA99631A8621 /* Variation.swift */; };
 		EAB4A88DCE96E3F283CAD532 /* GameSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 449B35D4D73E3A74D24EEC1D /* GameSession.swift */; };
@@ -326,6 +335,7 @@
 		280A9084A6C57B4D90C7FD95 /* ChessEngineTests.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ChessEngineTests.cpp; sourceTree = "<group>"; };
 		2AD84B737192936DAA406CD7 /* StateTests.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = StateTests.cpp; sourceTree = "<group>"; };
 		2B7C82FBD58A56EEA69F8536 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		2CE86688AD3238F5B5380D0E /* ThirdPartyNotices.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = ThirdPartyNotices.txt; sourceTree = "<group>"; };
 		2E720E71C38BC9C943E23A2A /* FEngineMove.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = FEngineMove.mm; sourceTree = "<group>"; };
 		30FFD068B173D4656B5A8E33 /* CheckTests.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = CheckTests.cpp; sourceTree = "<group>"; };
 		3407557ECA0071262CA4733D /* FEngineMove.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FEngineMove.h; sourceTree = "<group>"; };
@@ -336,6 +346,7 @@
 		3A18B566B43232E369485F4D /* Pasteboard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Pasteboard.swift; sourceTree = "<group>"; };
 		3E689B1557F57FDACA81FAE8 /* FUtility.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = FUtility.hpp; sourceTree = "<group>"; };
 		3F0CD3AD321BEA14E5A8D141 /* MoveStrip.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoveStrip.swift; sourceTree = "<group>"; };
+		428E8BB72092254ED8FD959A /* AboutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutView.swift; sourceTree = "<group>"; };
 		431412F9A9BFFBA835CA9E74 /* ChessState.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ChessState.cpp; sourceTree = "<group>"; };
 		449B35D4D73E3A74D24EEC1D /* GameSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameSession.swift; sourceTree = "<group>"; };
 		44F34E9EA5805AF04B66FEC7 /* GameRootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameRootView.swift; sourceTree = "<group>"; };
@@ -377,7 +388,9 @@
 		8239FD746C93352706B1C6FE /* FEngineMoveNode+Private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "FEngineMoveNode+Private.h"; sourceTree = "<group>"; };
 		84BFF85A25C57146CAF30E10 /* FEngineUtility.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FEngineUtility.h; sourceTree = "<group>"; };
 		8893A6A3EDE392ADA62194CC /* LastMoveModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LastMoveModifier.swift; sourceTree = "<group>"; };
+		8A2AD96C85FF2AC198617B8C /* ThirdPartyNoticesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThirdPartyNoticesTests.swift; sourceTree = "<group>"; };
 		8A73C37996CF31F3FA756B29 /* GameText.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameText.swift; sourceTree = "<group>"; };
+		8AB60B4877DF6AA79F6A89FC /* ThirdPartyNotices.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThirdPartyNotices.swift; sourceTree = "<group>"; };
 		8ADF2094CD31705EF2946A03 /* FEngineGame.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FEngineGame.h; sourceTree = "<group>"; };
 		8C6915D78CC3894D8A1EDCFB /* GalleryScenarios.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GalleryScenarios.swift; sourceTree = "<group>"; };
 		8CF09EA88A74DC29E1AAB9BD /* TranspositionTable.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = TranspositionTable.hpp; sourceTree = "<group>"; };
@@ -472,7 +485,7 @@
 		FECF3456A6E4C0D9547AC353 /* GameHistory.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = GameHistory.cpp; sourceTree = "<group>"; };
 		FEEA804C177D0F7528A254ED /* ChessState.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = ChessState.hpp; sourceTree = "<group>"; };
 		FFBE02E6B7A75B593B086B33 /* BChessUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BChessUITests.swift; sourceTree = "<group>"; };
-		"TEMP_3226A1A8-CC54-4989-BA72-791D7ABE14E5" /* Signing.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Signing.xcconfig; sourceTree = "<group>"; };
+		"TEMP_10821CF0-D529-4E6E-AE2A-30CC2E5C228D" /* Signing.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Signing.xcconfig; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -532,6 +545,7 @@
 				B06D783FF88F314CC998FEC5 /* PiecesFactory.swift */,
 				59A200AAC989529DF8466777 /* PrivacyInfo.xcprivacy */,
 				C986E8C85A8DD1C80E51BAB7 /* SettingsView.swift */,
+				2CE86688AD3238F5B5380D0E /* ThirdPartyNotices.txt */,
 				83A9530C8ED85F1B497D126E /* Bridge */,
 				35AFF10F2132CA3979C057A3 /* Engine */,
 				8EF1061AD1EE8ABFA0EAD8DC /* Model */,
@@ -613,6 +627,7 @@
 				78235E48247B716B7C0058B1 /* SearchLimitsTests.swift */,
 				0B2AC2A814C4BFFB74353457 /* SEETests.cpp */,
 				2AD84B737192936DAA406CD7 /* StateTests.cpp */,
+				8A2AD96C85FF2AC198617B8C /* ThirdPartyNoticesTests.swift */,
 				97EF7CE821EEB5AA4C3A36BF /* TranspositionTableTests.cpp */,
 				04A09D1A221F0D289C106E21 /* UCICommandTests.swift */,
 				9CE26D46FB2EB6963C3B70EE /* UCIProcessTests.swift */,
@@ -699,6 +714,7 @@
 				C21D5E42AEF6323A7436DF25 /* Promotion.swift */,
 				712C86DA78A185AE24966EF1 /* Selection.swift */,
 				E62F53FB8737C917EACA573D /* Square.swift */,
+				8AB60B4877DF6AA79F6A89FC /* ThirdPartyNotices.swift */,
 				F14DD2B61B0DFA99631A8621 /* Variation.swift */,
 				9D97E9AA4F42DF8EB4998533 /* Verdict.swift */,
 			);
@@ -761,6 +777,7 @@
 		D64522CC7869D435823EF2DC /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				428E8BB72092254ED8FD959A /* AboutView.swift */,
 				AEC6B2A69F9EAD135A9433ED /* Arrow.swift */,
 				C09D3D7AA4C592422F3276B1 /* BoardColumn.swift */,
 				C80EAED5A93B886115810B84 /* BoardView.swift */,
@@ -809,12 +826,12 @@
 			path = Helper;
 			sourceTree = "<group>";
 		};
-		"TEMP_D49AD50A-4383-479A-9BB2-210250364806" /* hebrew-and-arabic-right-to-left */ = {
+		"TEMP_711371BB-A929-4BC4-95BC-156AC0F561B3" /* legal-1-piece-artwork */ = {
 			isa = PBXGroup;
 			children = (
-				"TEMP_3226A1A8-CC54-4989-BA72-791D7ABE14E5" /* Signing.xcconfig */,
+				"TEMP_10821CF0-D529-4E6E-AE2A-30CC2E5C228D" /* Signing.xcconfig */,
 			);
-			path = "hebrew-and-arabic-right-to-left";
+			path = "legal-1-piece-artwork";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -1015,6 +1032,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				71E4AD54E9B9C238936E2B39 /* Openings.pgn in Resources */,
+				E7D411A534E32FFCA8D66D40 /* ThirdPartyNotices.txt in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1026,6 +1044,7 @@
 				31F7819EEB1AC76B5966EA9B /* Localizable.xcstrings in Resources */,
 				84D9FEE4B48FD84A2A86C946 /* Openings.pgn in Resources */,
 				D3562D0C2C019B5490579748 /* PrivacyInfo.xcprivacy in Resources */,
+				E553BC00867605F656474B75 /* ThirdPartyNotices.txt in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1037,6 +1056,7 @@
 				06393FBB7107B7AE6DC4FFE5 /* Localizable.xcstrings in Resources */,
 				3A9574F98C571558D09A671F /* Openings.pgn in Resources */,
 				FF090C79385002E249665F06 /* PrivacyInfo.xcprivacy in Resources */,
+				722DE5748A248B4287F1C8D3 /* ThirdPartyNotices.txt in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1047,6 +1067,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E0376F3D07DA269AEDCD99CA /* AboutView.swift in Sources */,
 				6C4CD06F3DECD0D8EC87E4C7 /* AppSettings.swift in Sources */,
 				E82472307660320279C501A7 /* Arrow.swift in Sources */,
 				04AA9D1F6F5B25621FBDDAC2 /* BChessUIApp.swift in Sources */,
@@ -1106,6 +1127,7 @@
 				4970DCEF72BD80A9CA8156B9 /* Square.swift in Sources */,
 				8CFD2DC7D5930C0738CD3794 /* SquareView.swift in Sources */,
 				7EFEEB77B6D369B5756D15A2 /* StatusLine.swift in Sources */,
+				9583A7CEC618CD7733813C9B /* ThirdPartyNotices.swift in Sources */,
 				2BB1B9AEADF0979C105D77BC /* Variation.swift in Sources */,
 				B41FE1EDC76F30A0313E8D66 /* VariationSelectionView.swift in Sources */,
 				D61A90FB148150C06D903C04 /* Verdict.swift in Sources */,
@@ -1190,6 +1212,8 @@
 				F0015AE7C1448AD40B679077 /* Square.swift in Sources */,
 				51597C0234CFC27A93176646 /* StateTests.cpp in Sources */,
 				9AC10D64359B02B9DE926458 /* TestSupport.swift in Sources */,
+				DDC0C65FC02D8326350C227F /* ThirdPartyNotices.swift in Sources */,
+				6978C1EA370ACDA9AD110DD8 /* ThirdPartyNoticesTests.swift in Sources */,
 				AE4F33FC19A22D77CB2D3117 /* TranspositionTableTests.cpp in Sources */,
 				FA1FB12A80F60CB81B9E451D /* UCI.swift in Sources */,
 				89B0AEECAAE198D5521D5480 /* UCICommandTests.swift in Sources */,
@@ -1208,6 +1232,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BAFA9735A3D9D9723C85900D /* AboutView.swift in Sources */,
 				80122EE7DED5431C694D88BE /* AppSettings.swift in Sources */,
 				4406B4C05FB4EC9B01CC1C90 /* Arrow.swift in Sources */,
 				1426B85E993D7B40855AC4F7 /* BChessUIApp.swift in Sources */,
@@ -1266,6 +1291,7 @@
 				F896E8030CD4C8943A93B4BE /* Square.swift in Sources */,
 				1A301637DD3721FF826D82C9 /* SquareView.swift in Sources */,
 				E02D34F54D320E2F5EDA02B7 /* StatusLine.swift in Sources */,
+				C2918567CE7E0B6032F6D5D4 /* ThirdPartyNotices.swift in Sources */,
 				A7AB1E23A4C9B895CF215660 /* Variation.swift in Sources */,
 				32BB425A448B3B372DCA707D /* VariationSelectionView.swift in Sources */,
 				7043C353E57249FDC0E195C8 /* Verdict.swift in Sources */,
@@ -1632,7 +1658,7 @@
 		};
 		E7C507022C63CE4AB3B5B467 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = "TEMP_3226A1A8-CC54-4989-BA72-791D7ABE14E5" /* Signing.xcconfig */;
+			baseConfigurationReference = "TEMP_10821CF0-D529-4E6E-AE2A-30CC2E5C228D" /* Signing.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ANALYZER_NONNULL = YES;
@@ -1708,7 +1734,7 @@
 		};
 		ECE2B603E0677805EDE48B09 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = "TEMP_3226A1A8-CC54-4989-BA72-791D7ABE14E5" /* Signing.xcconfig */;
+			baseConfigurationReference = "TEMP_10821CF0-D529-4E6E-AE2A-30CC2E5C228D" /* Signing.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ANALYZER_NONNULL = YES;
