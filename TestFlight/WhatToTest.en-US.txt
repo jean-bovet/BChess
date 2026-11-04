@@ -1,7 +1,7 @@
-- BChess now speaks French, German, Italian, Hebrew and Arabic, following the device language (or the app's language in Settings). In Hebrew and Arabic the menus, sheets and lists read right to left, while the board, the move list and the chess notation stay left to right.
+- New chess pieces across the board, the move list, promotion and the New Game sheet.
 
-- Mac: launching the app opens a new game right away instead of the Open panel, in a larger window with the move list beside the board.
+- New app icon: a carved knight on a wooden board, with dark and tinted versions on iPhone and iPad.
 
-- Mac, iPad in landscape and the iPhone Duo inner display: the board column is now exactly as wide as the board, with no empty gap between the board and the move list.
+- New About screen with the version, credits and licenses. iPhone and iPad: More > Settings > About BChess. Mac: BChess menu > About BChess.
 
-Please verify: switch the device (or the app) to French, German, Italian, Hebrew or Arabic and play a few moves, checking that the board and the notation never flip in Hebrew and Arabic; on the Mac, quit and relaunch to see the new game window.
+Please verify: the pieces are easy to read on both square colors in light and dark, the new icon appears on the Home Screen and in the Dock, and the About screen opens and scrolls to the end of the licenses.
