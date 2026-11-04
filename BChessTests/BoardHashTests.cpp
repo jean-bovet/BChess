@@ -16,6 +16,16 @@
 #include "FPGN.hpp"
 #include "ChessMoveGenerator.hpp"
 
+// The Zobrist keys come from a fixed seed, so the start position's hash is a constant. If the key generator
+// ever changes, this fails: search behaviour and the opening book's hashes depend on these exact keys.
+TEST(BoardHash, StartPositionHashIsPinned) {
+    ChessEngine::initialize();
+    
+    ChessBoard board;
+    
+    ASSERT_EQ(ChessBoardHash::hash(board), 0x3a5198d36f16b2afULL);
+}
+
 TEST(BoardHash, MoveChangesTheHash) {
     ChessEngine::initialize();
     

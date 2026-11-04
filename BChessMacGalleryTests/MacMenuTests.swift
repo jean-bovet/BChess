@@ -62,4 +62,57 @@ struct MacMenuTests {
             #expect(!editShown.contains(key), "\"\(key)\" is still English in the Edit menu")
         }
     }
+
+    // MARK: About
+
+    private func aboutWindows() -> [NSWindow] {
+        let title = Self.title("About BChess")
+        return NSApp.windows.filter { $0.title == title && $0.isVisible }
+    }
+
+    private func waitFor(_ condition: () -> Bool) async -> Bool {
+        for _ in 0..<100 {
+            if condition() { return true }
+            try? await Task.sleep(for: .milliseconds(50))
+        }
+        return condition()
+    }
+
+    /// The Mac path: the app menu's item, `GameCommands`, the `Window` scene hosting `AboutView`; one window however often fired.
+    @Test(.timeLimit(.minutes(1)))
+    func aboutItemOpensOneWindowHostingAboutView() async throws {
+        let main = try #require(NSApp.mainMenu, "the app has no main menu")
+        let title = Self.title("About BChess")
+        let holders = main.items.compactMap(\.submenu).filter { $0.items.contains { $0.title == title } }
+        #expect(holders.count == 1, "\"\(title)\" is in \(holders.count) menus")
+        let appMenu = try #require(holders.first)
+        let windowMenu = try #require(NSApp.windowsMenu, "no Window menu")
+        #expect(!windowMenu.items.contains { $0.title == title })
+        let index = try #require(appMenu.items.firstIndex { $0.title == title })
+
+        appMenu.performActionForItem(at: index)
+        let opened = await waitFor { !aboutWindows().isEmpty }
+        #expect(opened, "the About window did not open")
+        appMenu.performActionForItem(at: index)
+        try? await Task.sleep(for: .milliseconds(300))
+        let windows = aboutWindows()
+        #expect(windows.count == 1)
+
+        let window = try #require(windows.first)
+        defer { window.close() }
+        // The window hosts the production AboutView (SwiftUI exposes no text to accessibility in the hosted, unfocused
+        // app, so the notices are covered by ThirdPartyNoticesTests and the About gallery scenarios)
+        let hosted = [window.contentView.map { String(reflecting: type(of: $0)) },
+                      window.contentViewController.map { String(reflecting: type(of: $0)) }].compactMap { $0 }
+        #expect(hosted.contains { $0.contains("AboutView") }, "the window hosts \(hosted)")
+    }
+
+    /// The production loader reads the notices from the real app bundle (the unit tests read a copy bundled in their own target).
+    @Test func appBundleCarriesTheNotices() {
+        let text = ThirdPartyNotices.text
+        #expect(text.contains("Colin M.L. Burnett"))
+        #expect(text.contains("Pradyumna Kannan"))
+        #expect(text.contains("EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."))
+        #expect(text.contains("3. This notice may not be removed or altered from any source distribution."))
+    }
 }

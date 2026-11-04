@@ -96,9 +96,13 @@ Each change was planned, reviewed by Codex and implemented following the `/devel
   145 app and UCI tests.
 
 ## Attributions
-- [Magic Move-Bitboard Generation in Computer Chess, Pradyumna Kannan](http://pradu.us/old/Nov27_2008/Buzz/research/magic/Bitboards.pdf)
-- [Magic Move-Bitboard Generation Source Code](https://essays.jwatzman.org/essays/chess-move-generation-with-magic-bitboards.html)
-- [Chess Evaluation](https://chessprogramming.wikispaces.com/Evaluation)
+The full notices ship in the app (Settings, then About BChess on iPhone and iPad; the BChess menu on the Mac) and in
+[`Shared/ThirdPartyNotices.txt`](Shared/ThirdPartyNotices.txt). The record of every third-party item is [`docs/licensing.md`](docs/licensing.md).
+- Chess pieces: Colin M.L. Burnett (Wikimedia Commons user Cburnett), used under the BSD license; sources and license in [`Art/pieces/`](Art/pieces/LICENSE.txt)
+- App icon: the same knight, over wood veneers from [Poly Haven](https://polyhaven.com) (CC0), rendered by `scripts/render-icon.swift`; sources in [`Art/icon/`](Art/icon/SOURCES.txt)
+- Move generation: magicmoves by Pradyumna Kannan, 2007 ([Magic Move-Bitboard Generation in Computer Chess](http://pradu.us/old/Nov27_2008/Buzz/research/magic/Bitboards.pdf), [source code article](https://essays.jwatzman.org/essays/chess-move-generation-with-magic-bitboards.html))
+- Random numbers: xorshift64*, Sebastiano Vigna, 2014, public domain
+- Piece-square tables: Simplified Evaluation Function by Tomasz Michniewski ([Chess Evaluation](https://chessprogramming.wikispaces.com/Evaluation))
 
 ## What remains to be done
 

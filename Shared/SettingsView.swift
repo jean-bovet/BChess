@@ -38,6 +38,27 @@ struct SettingsView: View {
                 .padding(.horizontal, 14)
                 .padding(.vertical, 10)
             }
+            #if os(iOS)
+            WalnutSection("About") {
+                NavigationLink {
+                    AboutView()
+                } label: {
+                    HStack {
+                        WalnutRowLabel("About BChess", "Version, credits and licenses")
+                        Spacer()
+                        Image(systemName: "chevron.forward")
+                            .font(.footnote.weight(.semibold))
+                            .foregroundStyle(Walnut.textSecondary)
+                            .accessibilityHidden(true)
+                    }
+                    .padding(.horizontal, 14)
+                    .padding(.vertical, 10)
+                    .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .accessibilityIdentifier("settings-about")
+            }
+            #endif
         }
         .padding(16)
     }

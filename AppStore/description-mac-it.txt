@@ -13,3 +13,5 @@ CAPISCI
 - Vai avanti e indietro nella partita con i tasti freccia.
 
 Open source: tutto il codice sorgente è su GitHub all’indirizzo https://github.com/jean-bovet/BChess
+
+Riconoscimenti: pezzi degli scacchi di Colin M.L. Burnett (Wikimedia Commons), licenza BSD. La generazione delle mosse usa magicmoves di Pradyumna Kannan. Le note complete sono nell’app, in Informazioni su BChess.

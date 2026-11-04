@@ -13,3 +13,5 @@ UNDERSTAND
 - Step back and forward through the game with the arrow keys.
 
 Open source: the full source code is on GitHub at https://github.com/jean-bovet/BChess
+
+Credits: chess pieces by Colin M.L. Burnett (Wikimedia Commons), BSD license. Move generation uses magicmoves by Pradyumna Kannan. The full notices are in the app, under About BChess.

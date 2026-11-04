@@ -53,6 +53,14 @@ struct BChessUIApp: App {
             SettingsView()
                 .appTheme()
         }
+        // After the DocumentGroup, so a new game still opens at launch
+        Window("About BChess", id: "about") {
+            AboutView()
+                .appTheme()
+        }
+        .commandsRemoved()
+        .windowResizability(.contentSize)
+        .restorationBehavior(.disabled)
         #else
         WindowGroup {
             GameRootView(library: library)

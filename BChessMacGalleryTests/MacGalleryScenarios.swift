@@ -145,11 +145,17 @@ enum MacGalleryScenarios {
         AnyView(SettingsView().navigationTitle("Settings"))
     }
 
+    static let aboutWindow = MacGalleryScenario(
+        name: "About window", group: group, size: .frame(CGSize(width: 460, height: 592)), title: String(localized: "About BChess")
+    ) {
+        AnyView(AboutView().navigationTitle("About BChess"))
+    }
+
     /// In the order of the page.
     static let all: [MacGalleryScenario] = [
         documentWindowEngineOn, documentWindowVariations,
         documentWindowNewGameSheet, documentWindowNewGameSheetFriend, documentWindowNewGameSheetMaximum,
-        settingsWindow,
+        settingsWindow, aboutWindow,
     ]
 
     /// The scenarios whose name or slug contains one of the comma-separated, case-insensitive patterns;

@@ -1,0 +1,47 @@
+BChess includes the following third-party material.
+
+CHESS PIECES
+Artwork by Colin M.L. Burnett (Wikimedia Commons user Cburnett), 2006, with later technical corrections
+by the Wikimedia Commons contributors Antonsusi, TomFryers, Apathor, Cyco130, Smasongarrison and Edemaine.
+Source: Wikimedia Commons, https://commons.wikimedia.org/wiki/File:Chess_klt45.svg and its eleven companions.
+Converted from SVG to PDF for BChess. Offered by the author under several licenses;
+BChess uses the BSD license:
+
+Copyright © The author
+
+Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
+
+1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
+3. Neither the name of The author nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE AUTHOR AND CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+APP ICON
+The knight in the app icon is derived from the same Cburnett chess piece art as the pieces (Chess_ndt45.svg),
+under the same BSD license, reproduced above. The wood of the icon's board is photographed veneer from Poly Haven
+(https://polyhaven.com), okoume_veneer and teak_veneer, by Jenelle van Heerden, dedicated to the public domain under CC0
+(https://polyhaven.com/license).
+
+MOVE GENERATION
+magicmoves, Copyright (C) 2007 Pradyumna Kannan.
+
+This code is provided 'as-is', without any expressed or implied warranty.
+In no event will the authors be held liable for any damages arising from
+the use of this code. Permission is granted to anyone to use this
+code for any purpose, including commercial applications, and to alter
+it and redistribute it freely, subject to the following restrictions:
+
+1. The origin of this code must not be misrepresented; you must not
+claim that you wrote the original code. If you use this code in a
+product, an acknowledgment in the product documentation would be
+appreciated but is not required.
+
+2. Altered source versions must be plainly marked as such, and must not be
+misrepresented as being the original code.
+
+3. This notice may not be removed or altered from any source distribution.
+
+ALSO USED, WITH THANKS
+xorshift64* random number generator: Sebastiano Vigna, 2014, dedicated to the public domain.
+Piece-square tables: Simplified Evaluation Function by Tomasz Michniewski.

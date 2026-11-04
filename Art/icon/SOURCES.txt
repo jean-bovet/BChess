@@ -1,0 +1,20 @@
+App icon sources. scripts/render-icon.swift builds every PNG of Shared/Assets.xcassets/AppIcon.appiconset from these
+files and Art/pieces/Chess_ndt45.svg, and checks each against the SHA-1 below.
+
+okoume_veneer.jpg  light squares
+  Poly Haven, "Okoume Veneer", by Jenelle van Heerden, Diffuse, 2k, jpg
+  https://polyhaven.com/a/okoume_veneer
+  https://dl.polyhaven.org/file/ph-assets/Textures/jpg/2k/okoume_veneer/okoume_veneer_diff_2k.jpg
+  2157184 bytes, MD5 60b7630a6a0588ff7766b6709218efba (as the Poly Haven API lists it), SHA-1 985e78b7ef27af48c0285216c415d893a693fe9a
+
+teak_veneer.jpg  dark squares
+  Poly Haven, "Teak Veneer", by Jenelle van Heerden, Diffuse, 2k, jpg
+  https://polyhaven.com/a/teak_veneer
+  https://dl.polyhaven.org/file/ph-assets/Textures/jpg/2k/teak_veneer/teak_veneer_diff_2k.jpg
+  2547317 bytes, MD5 e9e8bbaff47d03a1199e7560b7e3ed71 (as the Poly Haven API lists it), SHA-1 0d8a1c8f5419140fd39435abb772b1b771eb9f44
+
+Both are CC0 (public domain dedication); terms at https://polyhaven.com/license. Checked against the Poly Haven API
+(api.polyhaven.com/files/<asset>) on 2026-11-04: the files are the current Diffuse 2k jpg of each asset.
+The knight is Art/pieces/Chess_ndt45.svg (Cburnett, BSD; see Art/pieces/LICENSE.txt).
+
+Rebuild:  swiftc -O scripts/render-icon.swift -o /tmp/render-icon && /tmp/render-icon

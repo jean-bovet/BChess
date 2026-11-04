@@ -17,6 +17,7 @@ struct GameCommands: Commands {
     @FocusedValue(\.gameSession) private var session
     @FocusedValue(\.showPlayers) private var showPlayers
     @AppStorage("showEngine") private var showEngine = false
+    @Environment(\.openWindow) private var openWindow
 
     /// A text field is being edited: the standard editing actions go to it.
     private var isEditingText: Bool {
@@ -83,6 +84,12 @@ struct GameCommands: Commands {
             Toggle("Practice Openings", isOn: Binding(get: { session?.mode.value == .train },
                                                       set: { _ in withAnimation { session?.toggleTrain() } }))
                 .disabled(session == nil)
+        }
+
+        CommandGroup(replacing: .appInfo) {
+            Button("About BChess") {
+                openWindow(id: "about")
+            }
         }
 
         CommandGroup(replacing: .pasteboard) {
