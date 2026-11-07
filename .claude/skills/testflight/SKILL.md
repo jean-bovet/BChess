@@ -53,7 +53,7 @@ Facts this skill relies on:
 ```bash
 git rev-parse --abbrev-ref HEAD                      # must be main (or a resume, §2)
 git status --porcelain --untracked-files=all         # must be empty
-git fetch origin main testflight
+git fetch origin main testflight --tags              # tags pushed from elsewhere, for §4
 git rev-list --count main..origin/main               # must be 0 (main not behind)
 git merge-base --is-ancestor origin/testflight main  # must succeed
 gh pr list --state open --json number,headRefName --jq '.[] | select(.headRefName | startswith("testflight-"))'
@@ -95,8 +95,10 @@ or the iOS target, apply it.
 
 **CloudKit Production.** TestFlight builds sync against Production, which is deployed by hand in
 the CloudKit Console. When the check above finds a schema change (or cannot rule one out), ask
-Jean with `AskUserQuestion` whether the Production deploy is done; on anything but yes, stop. A
-build that reaches a device before its schema is the one failure this skill must never automate.
+Jean with `AskUserQuestion` whether the Production deploy is done; on anything but yes, stop. Where
+the repo can query the Production schema through the CloudKit API (`xcrun cktool export-schema`),
+verify it there rather than asking for a yes or no. A build that reaches a device before its
+schema is the one failure this skill must never automate.
 
 Ask the version question of §4 now, in one `AskUserQuestion` call, unless `$ARGUMENTS` gave it.
 

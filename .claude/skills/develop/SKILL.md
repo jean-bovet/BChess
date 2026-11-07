@@ -35,7 +35,7 @@ Flags: `--no-worktree` (only when Jean said so), `--plan-only` (stop after phase
   headless with `catalog-sync` (the commands in `AGENTS.md` § Languages) instead of an Xcode GUI build: `--delete-stale`,
   then the translations in every language of the catalog (the Xcode MCP `StringCatalogEdit`, with the worktree's project
   open in Xcode, not the main checkout's), then `catalog-sync --skip-build` once (it re-sorts the keys the editor wrote),
-  and `--check --skip-build` must print "catalog unchanged"; commit the catalog with the step.
+  and `--check --skip-build` must print "catalog unchanged"; commit the catalog with the step. catalog-sync builds into its own private folder and takes no `buildlock` slot, but it is still a build: never run it alongside another one.
   `LocalizationCatalogTests` goes red on a missing translation. A screen's translations are read with
   `scripts/snapshot-gallery.sh --only "<slugs>" --lang fr,de,it` (and `scripts/snapshot-mac.sh --lang …`; the review set is in
   `/preview-gallery`): a language run has no page and no check, and never a full gallery.
@@ -65,6 +65,11 @@ missed a real bug, a simpler design that meets the same goal, or:
 
 file-format compatibility, a thread-safety hole.
 
+**Implementation phase: a second round only for a blocker.** Should-fix, simpler and already-exists
+findings are fixed and pass the step gate without another round; when round 1 found a blocker, round 2
+reviews only the fix's diff. (A second round on should-fix fixes cost Departure #41 a whole second final
+gate, about 45 minutes.)
+
 A third round only if a blocker is still open. Hard cap of **three rounds per phase**. A substitute
 review counts as a round. Always report how many rounds ran, who ran each, and what each changed. A
 round that finds nothing is a good result, not a reason to run another.
@@ -75,13 +80,14 @@ rationale, or nothing.
 ## Gates (run in the worktree)
 
 Two tiers. **Step gates** run after each plan step and each fix round: the build, the warnings check
-and the unit tests, plus the preview gallery only when the step changes what a screen looks like — and
-then only the scenarios that step changed (`--only`); the final gate renders every scenario.
+and the unit tests, never the preview gallery: a step that adds or changes scenarios only checks that they compile, and the
+final gate renders every scenario once.
 Step gates never run the UI tests, not even for a step that touches what they drive (navigation,
 titles, accessibility identifiers, launch fixtures): they are slow, and the final gate catches what
 they would. A brief that asks a step gate or a fix round for them is overruled: they wait for the
 final gate. The **final gate** runs **once per plan**, on the tree handed back: every gate
-below in full, the UI tests included, plus the full gallery when the plan touched UI. Step gates never replace it. After it
+below in full, the UI tests included, plus the full gallery when the plan touched UI. Step gates never replace it. It starts only once phase 5's last review round and its fixes are
+committed, never while a round may still change the code. After it
 passed on a commit G, every later tree (a fix round, the rebase, the squash commit) is classified
 by what changed since G and reruns only what its class requires, not the final gate again:
 
@@ -116,15 +122,17 @@ uncommitted tracked changes or untracked files that are not ignored).
   boot, shut down or touch a simulator by hand. One `-destination` per run and
   `-parallel-testing-enabled NO -collect-test-diagnostics never` on every simulator test run (without the second flag a failing test, so every red proof, makes xcodebuild collect a sysdiagnose-like simulator report for up to 10 minutes; the gates read the log, never that report. To debug a failure nobody can explain, rerun that one test without it). A repo whose scripts still boot their own
   simulator follows the global agreement's rule for those.
-- **Keep the Mac awake.** A gate script that runs simulators or long builds re-executes itself once under
-  `caffeinate -is` (a guard variable such as `<REPO>_CAFFEINATED` so it happens once; `"$@"` and the exit status
-  kept; no re-exec, one notice line, when `caffeinate` is missing). Where the gate is a list of commands rather
-  than a script, each long command runs as `caffeinate -is <command>` (`caffeinate -is buildlock --folder <dd> --
-  xcodebuild test …`). xcodebuild's own "running tests" assertion is
-  only `PreventUserIdleSystemSleep`, which lets a Mac in Maintenance Sleep / DarkWake drop off mid-run: a night gate
-  then stalls for minutes at a time inside XCTest steps and fails with "Timed out while synthesizing event"
-  (measured 2026-10-30: 2 h 45 min instead of 42 min, every gap matching `pmset -g log`). A gate script that
-  re-executes itself has script tests for the re-exec, argument boundaries, the missing tool and signals.
+- **Keep the Mac awake.** Every long gate run holds a *system* sleep assertion (`caffeinate -s`; `-i` alone is
+  not enough). A gate script does it itself, in either form: it re-executes itself once under `caffeinate -is`
+  (a guard variable such as `<REPO>_CAFFEINATED` so it happens once; `"$@"` and the exit status kept; no re-exec,
+  one notice line, when `caffeinate` is missing), or it starts `caffeinate -dims -w $$` in the background for its
+  own lifetime. Where the gate is a list of commands rather than a script, or a script that does neither, each long
+  command runs as `caffeinate -is <command>` (`caffeinate -is buildlock --folder <dd> -- xcodebuild test …`).
+  xcodebuild's own "running tests" assertion is only `PreventUserIdleSystemSleep`, which lets a Mac in Maintenance
+  Sleep / DarkWake drop off mid-run: a night gate then stalls for minutes at a time inside XCTest steps and fails
+  with "Timed out while synthesizing event" (measured 2026-10-30: 2 h 45 min instead of 42 min, every gap matching
+  `pmset -g log`). A script that re-executes itself has script tests for the re-exec, argument boundaries, the
+  missing tool and signals.
 - **Wait in slices.** A subagent's prompt cache lives five minutes (the parent's, one hour). Inside a
   subagent, no blocking call runs longer than four minutes: a build, a test run, the gallery or a Codex
   round starts in the background with its output in a log, and the agent checks that log every four
@@ -136,6 +144,8 @@ uncommitted tracked changes or untracked files that are not ignored).
 - **Reading results.** Read the **exit status** and the summary line of every command; an empty grep
   is clean only if the command succeeded. The number of tests run is part of the result: zero is red,
   and a count that shrinks needs an explanation (a conditionally disabled test counts as skipped).
+  A gate that refuses to run (Mac UI tests on a locked screen, say) is reported as not run, an owed
+  check, never as green.
 - **Red proof.** A regression test is proven red without its fix before it goes green: commit the
   fix first, revert only the fix's lines, run the test and see it fail, restore with
   `git checkout -- <file>` (never a hand-written inverse), then confirm `git status` is clean and grep
@@ -199,8 +209,8 @@ same for the Mac gallery tests on the macOS SDK: `caffeinate -is buildlock --fol
 SYMROOT=<dd>/build-mgt OBJROOT=<dd>/obj-mgt COMPILER_INDEX_STORE_ENABLE=NO build 2>&1 | grep …` (the same filter).
 
 **Gallery gate** (`/preview-gallery`): every screen has a scenario in `BChessGalleryTests/GalleryScenarios.swift`
-(`AGENTS.md`), rendered by `scripts/snapshot-gallery.sh`. A step gate that changes what a screen looks like runs
-`scripts/snapshot-gallery.sh --no-open --only "<the screens it touched>"`; the final gate of a plan that touched
+(`AGENTS.md`), rendered by `scripts/snapshot-gallery.sh`. A step gate never renders it (a step that adds or changes
+scenarios only checks that they compile); the final gate of a plan that touched
 UI runs the full gallery, `scripts/snapshot-gallery.sh --no-open`, plus `scripts/snapshot-mac.sh --no-open` when the plan touched a Mac screen (green: `CHECK OK [en]: 6 cards, light and dark complete and correctly lit`;
 it leases nothing and runs the hosted app under the container lock), plus `--device duo` when the plan touched a
 screen with an inner-display scenario (the group "iPhone Duo · inner display") or a layout that changes at
@@ -357,8 +367,8 @@ attach the whole design doc. Same `codex exec` command and the same "did it run"
 
 Send each accepted finding with `SendMessage` to the implementer of the step it concerns while that
 one is alive; otherwise spawn a fresh implementer with the finding, the plan and the commit. Rejected
-findings get a one-line rationale in the final report, not silence. After every fix round run the step gate plus the
-class from § Gates for the changes since G. Apply the Codex policy.
+findings get a one-line rationale in the final report, not silence. After every fix round run the step gate (plus the
+class from § Gates for the changes since G, once G exists). Apply the Codex policy.
 
 ## Phase 6 — Hand back (landing is Jean's call)
 
@@ -377,12 +387,14 @@ requests (a GitHub rule): never push `main`.
 2. In the worktree, `git switch -c <id-slug>-pr origin/main`, `git merge --squash <id-slug>`, then ONE
    `git commit` whose subject is the plan id and a sentence and whose body carries the branch's commit
    subjects (`git log origin/main..<id-slug> --format='- %s'`), each regression test's red proof in one
-   line, every gate's summary line, the plan revisions and review rounds, the plan's index-row text, and
-   the attribution trailer. The same commit sets the plan's index row to "Implemented on main <date>".
+   line, every gate's summary line, the plan revisions and review rounds, the plan's index-row text,
+   the issue line (see the global working agreement: `Closes #N` when
+   nothing is left, otherwise `Refs #N` and a comment on the issue naming what is owed), and the attribution trailer. The same commit sets the plan's index row to "Implemented on main <date>".
    Write the message before deleting anything.
 3. On `<id-slug>-pr`, classify against G again (a squash of the same tree is `none`) and run what the
    class requires, then `git push -u origin <id-slug>-pr` and
-   `gh pr create --base main` with the commit message as title and body. Jean merges the PR on GitHub;
+   `gh pr create --base main` with the commit message as title and body (the
+   issue line included). Jean merges the PR on GitHub;
    never merge it yourself unless Jean says so.
 4. After the merge: `git pull --ff-only` in the main checkout, remove the worktree, `git worktree prune`,
    `git branch -D` both branches (`-D`, because git never sees a squashed branch as merged), and
@@ -406,6 +418,8 @@ requests (a GitHub rule): never push `main`.
 - Rewriting a plan file to fold in a finding instead of editing the lines concerned.
 - Restating the working agreement in the implementer prompt.
 - Bumping the version or landing without being asked.
+- Calling `xcodebuild` without `buildlock`, or creating, booting or shutting down a simulator instead of
+  leasing one from `simpool`.
 - Broad Codex prompts: they make Codex read much of the repo and run commands, and often stall past 30
   minutes. Every review prompt names the exact plan section and the few source files (with line ranges) to
   read, says "read only these; no other commands, no builds or tests", and caps each section at a few

@@ -31,16 +31,39 @@ Refresh the captures first when the UI changed since the last gallery run: the s
 name (`"capture": "<slug>"` or `"<slug>.dark"`). A slide that needs a screen state the gallery does not have gets a
 new gallery scenario (the `/preview-gallery` rules), never a hand-made capture. When the store pages show the app in
 each language, re-render the slides' captures in those languages too (`--only` and `--lang`, see the slides file
-below): stale localized captures show an older UI than the English one. A localized capture that is missing falls
-back to English silently: before rendering, list every slide capture missing from each language folder.
+below): stale localized captures show an older UI than the English one.
+
+Build the `--only` list from the slides files, never by hand: every phone's `capture`, from the pass's slides files, with
+any `.dark` suffix stripped (`--only` matches scenario slugs; a run renders light and dark):
+
+```sh
+only() { python3 -c "import json,sys;print(','.join(sorted({p['capture'].removesuffix('.dark') for f in sys.argv[1:] for s in json.load(open(f))['slides'] for p in s['phones']})))" "$@"; }
+```
+
+Pre-render check: a missing localized capture falls back to English silently, so list every slide capture, as written
+(`.dark` included), missing in English or in any language folder (each pass's captures folder, English at its root); any output stops the render:
+
+```sh
+python3 -c "
+import json,os
+for f,c in [('AppStore/screenshots.json','previews/iphone'),('AppStore/screenshots-ipad.json','previews/ipad/ipad'),
+              ('AppStore/screenshots-duo-inner.json','previews/duo/duo-inner'),('AppStore/screenshots-duo-outer.json','previews/duo/iphone'),
+              ('AppStore/screenshots-mac.json','previews/mac/mac')]:
+    for s in json.load(open(f))['slides']:
+        for p in s['phones']:
+            d,_,b=p['capture'].rpartition('/')
+            for l in ('','fr','de','it','he','ar'):
+                x=os.path.join(c,d,l,b+'.png')
+                if not os.path.exists(x): print('missing',x)"
+```
 
 The slides' captures in each language (run right before rendering, one per device pass; the review set of
 `/preview-gallery` is a superset, so a language run for review serves too):
 
 ```sh
-scripts/snapshot-gallery.sh --no-open --only "game-screen-engine-on,new-game-club,games-list-four-games" --lang fr,de,it,he,ar
-scripts/snapshot-gallery.sh --no-open --device ipad --only "game-screen-engine-on,new-game-club,games-list-four-games,game-screen-wide" --lang fr,de,it,he,ar
-scripts/snapshot-gallery.sh --no-open --device duo --only "game-screen-engine-on,new-game-club,games-list-four-games,duo-inner-landscape-game-screen" --lang fr,de,it,he,ar
+scripts/snapshot-gallery.sh --no-open --only "$(only AppStore/screenshots.json)" --lang fr,de,it,he,ar
+scripts/snapshot-gallery.sh --no-open --device ipad --only "$(only AppStore/screenshots-ipad.json)" --lang fr,de,it,he,ar
+scripts/snapshot-gallery.sh --no-open --device duo --only "$(only AppStore/screenshots-duo-inner.json AppStore/screenshots-duo-outer.json)" --lang fr,de,it,he,ar
 scripts/snapshot-mac.sh --no-open --lang fr,de,it,he,ar
 ```
 
@@ -86,12 +109,24 @@ together, PNG without alpha at 2853 x 2007 / 2007 x 2853 / 1398 x 2034 / 2034 x 
 placements and reuses an image the library already holds, so a rerun with the same files only redoes the order:
 
 ```sh
-app-store screenshots --app "BChess (iOS)" --version <v> --locale en-US --display-class IPHONE_DUO \
-  .build/app-store-screenshots-duo-inner/en-US/*.png .build/app-store-screenshots-duo-outer/en-US/*.png
+app-store screenshots --app "BChess (iOS)" --version <v> --locale <locale> --display-class IPHONE_DUO \
+  .build/app-store-screenshots-duo-inner/<locale>/*.png .build/app-store-screenshots-duo-outer/<locale>/*.png
 ```
 
 `app-store check` then lists them as `IPHONE_DUO: <n> (asset library)`. Sizes, badge and the April 2027 deadline:
 `docs/iphone-duo.md`, next to the tools the global working agreement names.
+
+App Preview videos are not rendered here. A repo that makes them has its own preview generator (a script in the repo, if it
+has one); upload what it produces, once Jean approved it, beside the screenshots: one call per locale, or `--locale all`
+for the same videos on every locale. It replaces the locale's set for that preview type and waits until App Store Connect
+has processed the videos:
+
+```sh
+app-store previews --app "BChess (iOS)" --version <v> --locale <locale>|all --preview-type IPHONE_67 FILE...
+```
+
+At most 3 videos of 15-30 seconds per set (`IPHONE_67` is the 6.9-inch, 886 x 1920); `--frame` sets the poster frame and
+`--remove-preview-type` deletes an outdated set. `check` lists each locale's videos as `App Preview videos`.
 
 After the upload, `app-store check --version <v> --families <families>` must report 0 problems: here
 `app-store check --app "BChess (iOS)" --platform IOS --version <v> --families iphone,ipad` (and `--platform MAC_OS
@@ -155,6 +190,8 @@ app-store-screenshots --config AppStore/search-results.json
   is not. Keep the tilt moderate so the UI stays readable.
 - Headlines in every store language, written in the tone of that language's store description (formal or informal
   address as it does). Keep claims to what the description already says.
+- A new or changed headline in a language Jean does not read gets checked against Apple's glossary and a blind
+  back-translation; record the result in the repo's translation-check review file.
 - No Apple product artwork in the repo: the phone is drawn in CSS by the renderer.
 - The output (`.build/`) and the captures are not committed; the slides file is.
 
