@@ -123,18 +123,22 @@ tag (it shipped); otherwise keep it, so every TestFlight build until `/release` 
 
 ## 5. Test gate
 
-The full run: every `/develop` test-gate suite (no `-only-testing`), in this checkout, on a fresh build folder (run the iOS lines in one shell,
-so the trap gives the simulator back also on failure):
+The full run: every `/develop` test-gate suite (no `-only-testing`), in this checkout, on a fresh build folder, with
+the same command shape as `/develop`'s test gate: `caffeinate -is`, `buildlock` on each build folder, the Mac test line
+under the hosted app's container lock, tests built once (`build-for-testing`) and run with `test-without-building` (run
+the iOS lines in one shell, so the trap gives the simulator back also on failure):
 
 ```bash
 dd=$(mktemp -d)
-buildlock --folder "$dd/dd-mac" -- xcodebuild test -scheme "BChess (macOS)" -destination 'platform=macOS' -derivedDataPath "$dd/dd-mac"
-buildlock --folder "$dd/dd-uci" -- xcodebuild -scheme BChessUCI -destination 'platform=macOS' -derivedDataPath "$dd/dd-uci" build
+caffeinate -is buildlock --folder "$dd/dd-mac" -- xcodebuild build-for-testing -scheme "BChess (macOS)" -destination 'platform=macOS' -derivedDataPath "$dd/dd-mac"
+caffeinate -is buildlock --folder ~/Library/Containers/ch.arizona-software.BChess --no-slot -- buildlock --folder "$dd/dd-mac" --no-slot -- xcodebuild test-without-building -scheme "BChess (macOS)" -destination 'platform=macOS' -derivedDataPath "$dd/dd-mac"
+caffeinate -is buildlock --folder "$dd/dd-uci" -- xcodebuild -scheme BChessUCI -destination 'platform=macOS' -derivedDataPath "$dd/dd-uci" build
+caffeinate -is buildlock --folder "$dd/dd-ios" -- xcodebuild build-for-testing -scheme "BChess (iOS)" -destination 'generic/platform=iOS Simulator' -derivedDataPath "$dd/dd-ios"
 udid=$(simpool acquire --spec iphone --pid $$); trap 'simpool release "$udid" --app ch.arizona-software.BChess' EXIT
-buildlock --folder "$dd/dd-ios" -- xcodebuild test -scheme "BChess (iOS)" -destination "id=$udid" -parallel-testing-enabled NO -derivedDataPath "$dd/dd-ios"
+caffeinate -is buildlock --folder "$dd/dd-ios" -- xcodebuild test-without-building -scheme "BChess (iOS)" -destination "id=$udid" -parallel-testing-enabled NO -collect-test-diagnostics never -derivedDataPath "$dd/dd-ios"
 ```
 
-Each must end with `** TEST SUCCEEDED **` (`** BUILD SUCCEEDED **` for BChessUCI); a Swift Testing
+Each test line must end with `** TEST EXECUTE SUCCEEDED **` (`** TEST BUILD SUCCEEDED **` for the `build-for-testing` lines, `** BUILD SUCCEEDED **` for BChessUCI); a Swift Testing
 `✘` or any `error:` is red, and the engine GoogleTest cases must all have run (zero is red).
 
 Then the full gallery (each script leases, locks and keeps the Mac awake itself):
