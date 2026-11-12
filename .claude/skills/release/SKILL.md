@@ -13,12 +13,11 @@ allowed-tools: Read, Edit, Write, Bash, AskUserQuestion
   the Mac (`BChess (macOS)`, platform `MAC_OS`, family `mac`). They share one App Store record, but
   App Store Connect keeps **one version per platform**: every `app-store` step below runs once for
   `--platform IOS` and once for `--platform MAC_OS`, and Jean submits each platform's version.
-- **Never released yet.** Version 1.0 exists on both platforms in App Store Connect
-  (PREPARE_FOR_SUBMISSION), with an empty page: the first `/release` is the app's first App Store
-  submission (see "First release" in §2b and §4).
+- **1.0 has shipped** on both platforms (tag `v1.0`, 2026-11-04): every release from here on is a
+  later version with the full flow (What's New, notes commit, `prepare`).
 - The App Store setup lives in App Store Connect only; this repo has no release document. The App
   Store page's URLs: support `https://jean-bovet.ch/bchess/`, privacy policy
-  `https://jean-bovet.ch/bchess/privacy/` — the first `/release` sets them with
+  `https://jean-bovet.ch/bchess/privacy/` — 1.0 set them; should `check` find one missing, set it with
   `app-store metadata --app "BChess (iOS)" --version <v> --support-url https://jean-bovet.ch/bchess/ --privacy-url https://jean-bovet.ch/bchess/privacy/`
   instead of asking.
 - The privacy manifest is `Shared/PrivacyInfo.xcprivacy`, bundled by both apps: UserDefaults
@@ -76,8 +75,8 @@ The marketing version is `MARKETING_VERSION` in `project.yml` (both Info.plists 
 git show <candidate>:project.yml | grep MARKETING_VERSION
 ```
 
-It must match the App Store version being prepared (`app-store status`; 1.0 on both platforms until
-the first release) and, once there is a live version, be above it.
+It must match the App Store version being prepared (`app-store status`) and be above the live version
+(1.0 or later).
 
 Read the candidate's version, then:
 
@@ -88,9 +87,8 @@ git log --format='%h %s' <last-tag>..<candidate>      # what the App Store has n
 ```
 
 On a **first release** there is normally no `v*` tag yet: `describe` fails, and the range is the whole
-history up to the candidate (`git log <candidate>`); it is not empty. Here `describe` finds `v0.1`
-(2021), which marks no App Store release: for 1.0 the range is `v0.1..<candidate>`, and it only
-informs the description (§3), not What's New (§4).
+history up to the candidate (`git log <candidate>`); it is not empty. BChess's first release was 1.0
+(`v1.0`): `describe` now finds that tag or a later one, never the older `v0.1`.
 
 - **Tag on the candidate**: this version is already released. Report `app-store status` and stop.
 - **Tag on another commit**: the candidate's version has shipped before; `/testflight` must bump
@@ -167,10 +165,8 @@ Two things the checkers do not read, judged by hand (rules and sizes in `docs/ip
   uploaded with `app-store screenshots --display-class IPHONE_DUO` (both sets' files in one call per locale, the
   inner display's slides then the outer's: that skill, §4), never by hand.
 
-**First release.** The 1.0 page starts empty, so the first audit lists the whole page as problems:
-copyright, description, support and privacy policy URLs, screenshots for iPhone, iPad and Mac, the
-age rating questionnaire and the App Review contact: all of them are fixed with the page tools below
-before going on. BChess collects nothing and makes no network access (invariant I5): its App Privacy
+A first release's page starts empty, so its audit lists the whole page as problems; BChess's was 1.0,
+and that page now exists, so a problem here is a real regression. BChess collects nothing and makes no network access (invariant I5): its App Privacy
 label is "Data Not Collected", and the privacy policy says so.
 
 If either checker exits non-zero, or a `CHECK` shows something false, **stop**: list each problem
@@ -220,11 +216,8 @@ windows and the Game menu where the iOS one says the Games list and the More men
 carried when they were copied (`app-store check` prints them); from then on `AppStore/` is the source and `metadata` pushes
 it. A new language is a new set of these files and a new `locales` entry in every slides file.
 
-**First release (1.0): no What's New.** App Store Connect shows no What's New for an app's first
-version and refuses one; skip the notes of §4 and §5 (no notes file, no notes commit) and, in §6, `prepare` (both
-1.0 versions already exist): run `status`, then the `metadata` block of §6 for each platform (the first release uploads the
-six locales' name, subtitle, keywords and description from `AppStore/`, which is the page; show Jean the files first), then
-the two `attach-build` and the two `check` lines. The description carries what the app does. From the second release on, the full flow applies.
+App Store Connect refuses a What's New on an app's first version; 1.0 was BChess's, so every release now
+writes the notes above.
 
 Show Jean every notes file in full, with the commit list it came from, and ask for a yes or his
 edits. Apply edits and show again until approved. **Do not commit before that.**
@@ -255,7 +248,7 @@ The notes commit lands after the candidate on `main`; the tag in §7 still goes 
 
 ```bash
 app-store status --app "BChess (iOS)"
-# The page, from AppStore/ (the first release, and later only when AppStore/ changed): per platform, every locale
+# The page, from AppStore/ (only when AppStore/ changed, or check reports a locale missing something): per platform, every locale
 for p in ios mac; do   # ios -> --platform IOS, mac -> --platform MAC_OS
   app-store metadata --app "BChess (iOS)" --platform <IOS|MAC_OS> --version <version> \
       --add-locale fr-FR --add-locale de-DE --add-locale it --add-locale ar-SA --add-locale he \
@@ -277,15 +270,16 @@ app-store check --app "BChess (iOS)" --platform MAC_OS --version <version> --fam
 for processing, or see "App Store eligible" in §2.
 
 `prepare --release-type` sets the type only when it creates the version; one that already existed keeps
-its type (`app-store status` prints `releaseType=`). **On a first release skip `prepare`** (1.0, §4): both
-versions already exist, and `prepare` would set a What's New a first version cannot carry; fill the page
-with `app-store metadata`, `age-rating` and `screenshots` instead, then the two `attach-build` and the two
-`check` lines (the `metadata` block above fills the page from `AppStore/`; the screenshots go up per locale with
-`/app-store-screenshots` §4). A first version has no phased release.
+its type (`app-store status` prints `releaseType=`). A first release skips `prepare` and fills the page with
+`app-store metadata`, `age-rating` and `screenshots` instead; BChess's (1.0) is behind it, so `prepare` always runs.
 
 **Screenshots: you upload them, Jean only approves.** When §3 or §2b says screenshots need updating, render
 every set, show Jean all the renders in one go, and once he approves, upload them yourself with
-`app-store screenshots` (the Duo sets as §2b says); Jean never uploads by hand.
+`app-store screenshots` (the Duo sets as §2b says); Jean never uploads by hand. Here: the iPhone set through
+`/app-store-screenshots` §4, the others with `app-store screenshots --app "BChess (iOS)"` (`--platform IOS`:
+`APP_IPHONE_67` or `APP_IPHONE_69`, and `APP_IPAD_PRO_3GEN_129`; `--platform MAC_OS`: `APP_DESKTOP`); the two Duo
+sets together with `app-store screenshots --display-class IPHONE_DUO`, both sets' files in one call per locale, the
+inner display's slides then the outer's (`/app-store-screenshots` §4).
 
 When the repo has a product page header or search results image (`/app-store-screenshots`; BChess has none
 yet), upload it here, once Jean approved the renders: `app-store creative --app "BChess (iOS)" --placement <p>
@@ -298,12 +292,6 @@ Then list Jean's manual steps:
 
 - confirm the App Privacy label matches the build (the API cannot read it);
 - submit version `<version>` for review, each platform separately (the `IOS` and the `MAC_OS` version);
-
-- screenshots retaken (§3 answer 2): the iPhone set through `/app-store-screenshots` §4, the others with
-  `app-store screenshots --app "BChess (iOS)"` (`--platform IOS`: `APP_IPHONE_67` or `APP_IPHONE_69`, and
-  `APP_IPAD_PRO_3GEN_129`; `--platform MAC_OS`: `APP_DESKTOP`) or in App Store Connect; the two Duo sets together with
-  `app-store screenshots --display-class IPHONE_DUO`, both sets' files in one call per locale, the inner display's
-  slides then the outer's (`/app-store-screenshots` §4);
 - the privacy policy changed (§3 answer 4): the privacy policy page, and the App Privacy label in
   App Store Connect.
 
@@ -329,6 +317,6 @@ No release branch.
 ## 8. Report
 
 - the version, the candidate's sha and build number, the range that shipped, the tag;
-- the notes commit and its pull request (none for 1.0);
+- the notes commit and its pull request;
 - the manual steps still open in App Store Connect, if any;
 - that the next `/testflight` bumps the version.

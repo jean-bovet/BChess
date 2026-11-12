@@ -39,6 +39,12 @@ Flags: `--no-worktree` (only when Jean said so), `--plan-only` (stop after phase
   `LocalizationCatalogTests` goes red on a missing translation. A screen's translations are read with
   `scripts/snapshot-gallery.sh --only "<slugs>" --lang fr,de,it` (and `scripts/snapshot-mac.sh --lang …`; the review set is in
   `/preview-gallery`): a language run has no page and no check, and never a full gallery.
+- **Right to left:** the catalog carries Hebrew and Arabic, so a change to the board, the notation, a number shown
+  to the user or anything that mirrors runs through `AGENTS.md` § Languages, "Right to left" (Western digits for notation, the
+  minus sign and the notation isolates, what never mirrors): the screens it touches are rendered with
+  `scripts/snapshot-gallery.sh --only "<slugs>" --lang he,ar` (and `scripts/snapshot-mac.sh --lang he,ar` for a Mac
+  screen), the board region compared with the English capture, and `LocaleIndependenceTests`/`MacMenuTests` run
+  with `TEST_RUNNER_BCHESS_EXPECT_LANGUAGE`/`_REGION` set (the commands are in `/preview-gallery`).
 - **Plan risks to cover:** file-format compatibility, what needs a real device.
 - **Owed checks:** a run on a real device, a visual check.
 
