@@ -123,7 +123,7 @@ tag (it shipped); otherwise keep it, so every TestFlight build until `/release` 
 
 ## 5. Test gate
 
-The `/develop` test gate, in this checkout, on a fresh build folder (run the iOS lines in one shell,
+The full run: every `/develop` test-gate suite (no `-only-testing`), in this checkout, on a fresh build folder (run the iOS lines in one shell,
 so the trap gives the simulator back also on failure):
 
 ```bash
@@ -136,6 +136,22 @@ buildlock --folder "$dd/dd-ios" -- xcodebuild test -scheme "BChess (iOS)" -desti
 
 Each must end with `** TEST SUCCEEDED **` (`** BUILD SUCCEEDED **` for BChessUCI); a Swift Testing
 `✘` or any `error:` is red, and the engine GoogleTest cases must all have run (zero is red).
+
+Then the full gallery (each script leases, locks and keeps the Mac awake itself):
+
+```bash
+scripts/snapshot-gallery.sh --no-open
+scripts/snapshot-gallery.sh --device duo --no-open
+scripts/snapshot-mac.sh --no-open
+```
+
+Each must end with its `CHECK OK [en]: …` line; the gallery pages are not shown unless Jean asks. BChess has no
+coverage command.
+
+This is the only full run: `/develop` lands plans on the quick tier plus the touched UI tests. On a red run, rerun
+only the failing line or test (`-only-testing:<Target>/<Class>[/<test>]`, or the gallery script with `--only`);
+bisect across the plans landed since the last TestFlight build (their squash commits) only when the cause is not
+obvious. The fix goes through `/develop`, then this gate reruns.
 
 Stop on failure. Never gate on an Xcode Cloud run here (see "How a build reaches TestFlight").
 

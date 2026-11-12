@@ -17,7 +17,7 @@ The scenario list is one source, ships nothing in the app, and a test run on one
 every screen at about one second each. Spot checks use `--only`, not the canvas.
 
 **When it runs.** `/develop`'s step gates never render the gallery: a step that adds or changes scenarios only
-checks that they compile. Its final gate renders every scenario once. Spot checks outside `/develop` may still use `--only`.
+checks that they compile. Its landing gate shows Jean the scenarios a change of look touches; `/testflight` renders every scenario. Spot checks outside `/develop` may still use `--only`.
 
 BChess (`BChess.xcodeproj`, scheme "BChess (iOS)"). The gallery lives in the app-hosted unit-test target
 `BChessGalleryTests`: `GalleryScenarios.swift` (the scenario list and the `Fixture` PGN constants),
