@@ -53,7 +53,7 @@ Facts this skill relies on:
 ```bash
 git rev-parse --abbrev-ref HEAD                      # must be main (or a resume, §2)
 git status --porcelain --untracked-files=all         # must be empty
-git fetch origin main testflight
+git fetch origin main testflight --tags              # tags pushed from elsewhere, for §4
 git rev-list --count main..origin/main               # must be 0 (main not behind)
 git merge-base --is-ancestor origin/testflight main  # must succeed
 gh pr list --state open --json number,headRefName --jq '.[] | select(.headRefName | startswith("testflight-"))'
@@ -95,8 +95,10 @@ or the iOS target, apply it.
 
 **CloudKit Production.** TestFlight builds sync against Production, which is deployed by hand in
 the CloudKit Console. When the check above finds a schema change (or cannot rule one out), ask
-Jean with `AskUserQuestion` whether the Production deploy is done; on anything but yes, stop. A
-build that reaches a device before its schema is the one failure this skill must never automate.
+Jean with `AskUserQuestion` whether the Production deploy is done; on anything but yes, stop. Where
+the repo can query the Production schema through the CloudKit API (`xcrun cktool export-schema`),
+verify it there rather than asking for a yes or no. A build that reaches a device before its
+schema is the one failure this skill must never automate.
 
 Ask the version question of §4 now, in one `AskUserQuestion` call, unless `$ARGUMENTS` gave it.
 
@@ -121,19 +123,39 @@ tag (it shipped); otherwise keep it, so every TestFlight build until `/release` 
 
 ## 5. Test gate
 
-The `/develop` test gate, in this checkout, on a fresh build folder (run the iOS lines in one shell,
-so the trap gives the simulator back also on failure):
+The full run: every `/develop` test-gate suite (no `-only-testing`), in this checkout, on a fresh build folder, with
+the same command shape as `/develop`'s test gate: `caffeinate -is`, `buildlock` on each build folder, the Mac test line
+under the hosted app's container lock, tests built once (`build-for-testing`) and run with `test-without-building` (run
+the iOS lines in one shell, so the trap gives the simulator back also on failure):
 
 ```bash
 dd=$(mktemp -d)
-buildlock --folder "$dd/dd-mac" -- xcodebuild test -scheme "BChess (macOS)" -destination 'platform=macOS' -derivedDataPath "$dd/dd-mac"
-buildlock --folder "$dd/dd-uci" -- xcodebuild -scheme BChessUCI -destination 'platform=macOS' -derivedDataPath "$dd/dd-uci" build
+caffeinate -is buildlock --folder "$dd/dd-mac" -- xcodebuild build-for-testing -scheme "BChess (macOS)" -destination 'platform=macOS' -derivedDataPath "$dd/dd-mac"
+caffeinate -is buildlock --folder ~/Library/Containers/ch.arizona-software.BChess --no-slot -- buildlock --folder "$dd/dd-mac" --no-slot -- xcodebuild test-without-building -scheme "BChess (macOS)" -destination 'platform=macOS' -derivedDataPath "$dd/dd-mac"
+caffeinate -is buildlock --folder "$dd/dd-uci" -- xcodebuild -scheme BChessUCI -destination 'platform=macOS' -derivedDataPath "$dd/dd-uci" build
+caffeinate -is buildlock --folder "$dd/dd-ios" -- xcodebuild build-for-testing -scheme "BChess (iOS)" -destination 'generic/platform=iOS Simulator' -derivedDataPath "$dd/dd-ios"
 udid=$(simpool acquire --spec iphone --pid $$); trap 'simpool release "$udid" --app ch.arizona-software.BChess' EXIT
-buildlock --folder "$dd/dd-ios" -- xcodebuild test -scheme "BChess (iOS)" -destination "id=$udid" -parallel-testing-enabled NO -derivedDataPath "$dd/dd-ios"
+caffeinate -is buildlock --folder "$dd/dd-ios" -- xcodebuild test-without-building -scheme "BChess (iOS)" -destination "id=$udid" -parallel-testing-enabled NO -collect-test-diagnostics never -derivedDataPath "$dd/dd-ios"
 ```
 
-Each must end with `** TEST SUCCEEDED **` (`** BUILD SUCCEEDED **` for BChessUCI); a Swift Testing
+Each test line must end with `** TEST EXECUTE SUCCEEDED **` (`** TEST BUILD SUCCEEDED **` for the `build-for-testing` lines, `** BUILD SUCCEEDED **` for BChessUCI); a Swift Testing
 `✘` or any `error:` is red, and the engine GoogleTest cases must all have run (zero is red).
+
+Then the full gallery (each script leases, locks and keeps the Mac awake itself):
+
+```bash
+scripts/snapshot-gallery.sh --no-open
+scripts/snapshot-gallery.sh --device duo --no-open
+scripts/snapshot-mac.sh --no-open
+```
+
+Each must end with its `CHECK OK [en]: …` line; the gallery pages are not shown unless Jean asks. BChess has no
+coverage command.
+
+This is the only full run: `/develop` lands plans on the quick tier plus the touched UI tests. On a red run, rerun
+only the failing line or test (`-only-testing:<Target>/<Class>[/<test>]`, or the gallery script with `--only`);
+bisect across the plans landed since the last TestFlight build (their squash commits) only when the cause is not
+obvious. The fix goes through `/develop`, then this gate reruns.
 
 Stop on failure. Never gate on an Xcode Cloud run here (see "How a build reaches TestFlight").
 

@@ -16,6 +16,9 @@ and is rendered by Xcode's canvas, the heaviest way to look at a screen (Xcode p
 The scenario list is one source, ships nothing in the app, and a test run on one headless simulator renders
 every screen at about one second each. Spot checks use `--only`, not the canvas.
 
+**When it runs.** `/develop`'s step gates never render the gallery: a step that adds or changes scenarios only
+checks that they compile. Its landing gate shows Jean the scenarios a change of look touches; `/testflight` renders every scenario. Spot checks outside `/develop` may still use `--only`.
+
 BChess (`BChess.xcodeproj`, scheme "BChess (iOS)"). The gallery lives in the app-hosted unit-test target
 `BChessGalleryTests`: `GalleryScenarios.swift` (the scenario list and the `Fixture` PGN constants),
 `SnapshotGalleryTests.swift` (the render), `GalleryScenarioTests.swift` (the list's own tests, which parse every
@@ -102,8 +105,13 @@ scripts/snapshot-gallery.sh --device duo        # the iPhone Duo: outer display 
 scripts/snapshot-gallery.sh --no-open           # do not open the page (agents, scripted runs)
 ```
 
-- **Done = `CHECK OK [en]: <n> cards, light and dark complete and correctly lit`**. Then read the new or changed
+- **Done = `CHECK OK [en]: <n> cards, light and dark complete and correctly lit`** (then `; <k> skipped: <slugs>`
+  when a pass skipped some). Then read the new or changed
   PNGs in both appearances (see Report). `simpool status` shows nothing leased by the run.
+- **A fresh checkout needs one full run first**: `--check` covers every scenario, so an `--only` run fails until a
+  full gallery exists.
+- **One gallery run at a time per repo**: a script that can be run from several worktrees takes a lock in the
+  shared git directory (`lockf`, say), so two of them never render at once.
 - Costs measured on a proven repo (24 GB Mac, iOS 27 simulator): booting the simulator about **6 GB** of RAM;
   a run on a booted one about **0.25 GB**; build tools under 0.3 GB. Warm run: about 1 s per scenario plus a
   fixed 20–25 s (xcodebuild installs and launches the host app), so ~50 scenarios take 1.5–2.5 min and
@@ -171,7 +179,8 @@ One entry in the scenario list, and nothing in the app:
   and dark passes and `-testLanguage` set them; `--check` scans the scenario files for both. The one admissible
   exception is a locale forced for its region, not its language (`en_US` to show a 12-hour clock): the line
   carries `// gallery: allowed, <why>` and `--check` lets that line through (a `.preferredColorScheme` never).
-  A state that only existed as a "dark" variant is a plain scenario.
+  A state that only existed as a "dark" variant is a plain scenario. A subview drawn on its own dark panel may use
+  `.environment(\.colorScheme, .dark)` as its palette: that is the view's design, not a forced appearance.
   Dynamic Type variants are fine, as their own scenarios.
 - **Hermetic data.** A fresh in-memory store per scenario. The network is a stub that answers from committed
   fixtures (real API responses, their times shifted to now so screens look live) or fails with a given error,
@@ -191,9 +200,11 @@ One entry in the scenario list, and nothing in the app:
   render it; BChess computes it per pass in `GalleryScenario.skipReason(duoPass:ipadPass:)`), the page shows "not rendered on this pass", and `--check` accepts the missing
   pair for that reason only. Full-bleed imagery under chrome (a satellite map) does not darken in the dark
   appearance at all, so it cannot meet the pair rule either: such a card sets `imagery: true`, which waives the
-  luminance rules for that pair (the byte-identical rule still applies). Measured: a map card at 0.401 light,
+  luminance rules for that pair, and only those (the byte-identical and blank rules still apply). Measured: a map card at 0.401 light,
   0.399 dark. BChess's manifest carries all four: `skipped` (the Duo pass), and the scenario fields
   `documentCanvas`, `drawsNothing` and `imagery`, which no card sets yet.
+- **Dark-only entries.** A platform with no light appearance (a Watch) may mark its entries dark-only: one
+  `<slug>.dark.png`, no light slot and no pair rules, but the luminance rule still applies.
 - `scripts/preview-gallery.py --coverage` lists view types no scenario names (informational: most are parts
   of other screens).
 
@@ -280,6 +291,9 @@ One entry in the scenario list, and nothing in the app:
    simulator after the other). Another language only as the `--lang` runs above (store captures, review runs with
    the review set), never a language gallery page.
 
+7. **Repo variants** are repo facts: a repo whose gallery is organised by language rather than platform
+   (per-language pages and checks) records that in its own copy.
+
 ## Looking at a gallery as an agent
 
 Read the contact sheet, not the PNGs: `contact-sheet previews/iphone -o <scratch>/iphone.png` (one sheet
@@ -293,11 +307,11 @@ has fifty of them.
 image (unless its entry is `skipped` with a reason), a stray PNG no scenario expects (in any folder, in the wrong
 platform's folder, or of a skipped scenario), a duplicate slug, a light image that is dark or a dark one that is light
 (mean luminance against a threshold; a `documentCanvas` scenario is judged as a pair instead, the dark image's
-mean luminance at least 0.05 below the light one's; an `imagery` scenario is not judged for luminance), a dark image byte-identical to its light one, a blank image
+mean luminance at least 0.05 below the light one's; an `imagery` scenario is not judged for luminance), a dark image byte-identical to its light one, a light/dark pair whose images differ in pixel size, a blank image
 (one colour everywhere) unless its scenario sets `drawsNothing`, an image that cannot be decoded or is not at the
 render scale of its scenario's size (2x; 3x for the Duo's inner poses, flagged `duoInner` in the manifest, and for
 every card of the Duo pass), and
-`.preferredColorScheme` or `\.locale` anywhere in the scenario file (its `//` comments aside, and a `\.locale` on a
+`.preferredColorScheme` or `\.locale` anywhere in the scenario file (its `//` and `/* */` comments aside, and a `\.locale` on a
 line carrying `// gallery: allowed, <why>`). An `--only` run replaces only its own images; the check still covers every
 scenario. The `--lang` folders are not checked and never reach the page. The gallery is
 done only when `--check` passes.
