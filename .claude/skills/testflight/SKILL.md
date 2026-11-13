@@ -215,6 +215,10 @@ Show Jean every notes file in full, with the commit list it came from, and ask
 (`AskUserQuestion`) for a yes or his edits. Apply edits and show again until approved. **Do not
 commit before that.**
 
+The question names everything his yes starts, since nothing asks again after it: for BChess, the
+push of the `testflight-…` branch with its pull request (§7) and the push of `testflight` (§8)
+that starts the archive (no tag, no companion deploy).
+
 ## 7. Commit on a branch and open the pull request
 
 Stage only the files this skill changed — never `git add -A` — and end the commit message with

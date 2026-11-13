@@ -138,7 +138,7 @@ Each prints `PROBLEM`, `CHECK` and `ok` lines. What they cover, and what to judg
 
 | Area | Watch for |
 |---|---|
-| Privacy manifest | Required-reason APIs (UserDefaults, file timestamps, boot time, disk space, keyboards) used without `PrivacyInfo.xcprivacy` declaring them: ITMS-91053, rejected |
+| Privacy manifest | Required-reason APIs (UserDefaults, file timestamps, boot time, disk space, keyboards) used without `PrivacyInfo.xcprivacy` declaring them: ITMS-91053, rejected. An app with extensions declares each one in the manifest of every bundle that compiles it (shared sources count for each) |
 | Export compliance | No `ITSAppUsesNonExemptEncryption`: every build waits on "Missing Compliance" |
 | Description, keywords, promotional text | Still true of this build: an old description promising removed features (guideline 2.3), a retired domain, an old device ("iPod touch") |
 | Screenshots | A set at the required size for **every** device family the build supports, in every store locale (a newly added iPad needs iPad screenshots); old sets that show an outdated UI |
@@ -202,6 +202,12 @@ translate: a locale without a file gets the English text). Plain text: a one-lin
 match the previous file's tone once there is one (`app-store status` shows the live notes). Say when an
 item concerns only iPhone/iPad or only the Mac. The listing has the locales of `AppStore/app-info.txt`.
 
+**Every locale of the page.** One notes file per locale the App Store page carries; no locale falls back to
+the English notes unless the repo says so (BChess above: Jean decides which locales are translated). Every locale
+but English is written, not machine-literal: the app's own strings where it speaks that language, the page's
+description elsewhere. Locales Jean doesn't read get the repo's translation checks (Apple's glossary, a blind
+back-translation).
+
 **The App Store page.** A repo that keeps its page texts in `AppStore/` (one description per locale, at
 most 4000 characters; `keywords.txt`, at most 100 bytes per locale; `app-info.txt` with the name and
 subtitle, at most 30 characters each) updates the English text and its translations when the range
@@ -257,7 +263,7 @@ for p in ios mac; do   # ios -> --platform IOS, mac -> --platform MAC_OS
       --description <locale>=AppStore/description-$p-<locale>.txt   # en-US fr-FR de-DE it ar-SA he
 done
 app-store prepare --app "BChess (iOS)" --platform IOS --version <version> --notes-file <notes file> \
-    [--notes <locale>=<notes file> ...]                      # one file per non-English locale
+    [--notes <locale>=<notes file> ...]                      # one per non-English page locale (§4)
 app-store prepare --app "BChess (iOS)" --platform MAC_OS --version <version> --notes-file <notes file> \
     [--notes <locale>=<notes file> ...]
 app-store attach-build --app "BChess (iOS)" --platform IOS --version <version> --build <build>      # the candidate's, from §2
@@ -273,9 +279,11 @@ for processing, or see "App Store eligible" in §2.
 its type (`app-store status` prints `releaseType=`). A first release skips `prepare` and fills the page with
 `app-store metadata`, `age-rating` and `screenshots` instead; BChess's (1.0) is behind it, so `prepare` always runs.
 
-**Screenshots: you upload them, Jean only approves.** When §3 or §2b says screenshots need updating, render
-every set, show Jean all the renders in one go, and once he approves, upload them yourself with
-`app-store screenshots` (the Duo sets as §2b says); Jean never uploads by hand. Here: the iPhone set through
+**Screenshots: you upload them, Jean only approves.** When §3 or §2b says screenshots need updating, or `check`
+lists a device family with no set (an `IPHONE_DUO` set missing counts), render every set, show Jean all the renders
+in one go, and once he approves, upload them yourself with `app-store screenshots` (the Duo sets as §2b says), for
+every locale the page carries (en-US, fr-FR, de-DE, it, ar-SA, he): none falls back to the English set unless the
+repo says so. Jean never uploads by hand. Run `check` again afterwards, until every family has its set. Here: the iPhone set through
 `/app-store-screenshots` §4, the others with `app-store screenshots --app "BChess (iOS)"` (`--platform IOS`:
 `APP_IPHONE_67` or `APP_IPHONE_69`, and `APP_IPAD_PRO_3GEN_129`; `--platform MAC_OS`: `APP_DESKTOP`); the two Duo
 sets together with `app-store screenshots --display-class IPHONE_DUO`, both sets' files in one call per locale, the
