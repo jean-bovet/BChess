@@ -197,13 +197,12 @@ notice, written from their side: no ticket ids, internal names, file names or "f
 emoji (App Store Connect rejects some); at most 4000 characters per locale.
 
 One notes file per locale from the second release on: `ReleaseNotes/<version>-en-US.txt`, used for both platforms,
-and `ReleaseNotes/<version>-<locale>.txt` for fr-FR, de-DE, it, ar-SA and he (`prepare --notes <locale>=<file>`; Jean decides what to
-translate: a locale without a file gets the English text). Plain text: a one-line lead, then short `- ` lines;
+and `ReleaseNotes/<version>-<locale>.txt` for fr-FR, de-DE, it, ar-SA and he (`prepare --notes <locale>=<file>`), all six on every release. Plain text: a one-line lead, then short `- ` lines;
 match the previous file's tone once there is one (`app-store status` shows the live notes). Say when an
 item concerns only iPhone/iPad or only the Mac. The listing has the locales of `AppStore/app-info.txt`.
 
 **Every locale of the page.** One notes file per locale the App Store page carries; no locale falls back to
-the English notes unless the repo says so (BChess above: Jean decides which locales are translated). Every locale
+the English notes. Every locale
 but English is written, not machine-literal: the app's own strings where it speaks that language, the page's
 description elsewhere. Locales Jean doesn't read get the repo's translation checks (Apple's glossary, a blind
 back-translation).
@@ -263,9 +262,9 @@ for p in ios mac; do   # ios -> --platform IOS, mac -> --platform MAC_OS
       --description <locale>=AppStore/description-$p-<locale>.txt   # en-US fr-FR de-DE it ar-SA he
 done
 app-store prepare --app "BChess (iOS)" --platform IOS --version <version> --notes-file <notes file> \
-    [--notes <locale>=<notes file> ...]                      # one per non-English page locale (§4)
+    --notes fr-FR=<file> --notes de-DE=<file> --notes it=<file> --notes ar-SA=<file> --notes he=<file>   # every page locale (§4)
 app-store prepare --app "BChess (iOS)" --platform MAC_OS --version <version> --notes-file <notes file> \
-    [--notes <locale>=<notes file> ...]
+    --notes fr-FR=<file> --notes de-DE=<file> --notes it=<file> --notes ar-SA=<file> --notes he=<file>
 app-store attach-build --app "BChess (iOS)" --platform IOS --version <version> --build <build>      # the candidate's, from §2
 app-store attach-build --app "BChess (iOS)" --platform MAC_OS --version <version> --build <build>
 app-store check --app "BChess (iOS)" --platform IOS --version <version> --families iphone,ipad     # must report 0 problems and "build <build> attached"
