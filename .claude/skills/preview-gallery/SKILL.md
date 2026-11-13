@@ -205,9 +205,8 @@ One entry in the scenario list, and nothing in the app:
   `documentCanvas`, `drawsNothing` and `imagery`, which no card sets yet.
 - **Dark-only entries.** A platform with no light appearance (a Watch) may mark its entries dark-only: one
   `<slug>.dark.png`, no light slot and no pair rules, but the luminance rule still applies.
-- `scripts/preview-gallery.py --coverage` lists view types no scenario names (informational: most are parts
-  of other screens). Not yet in this repo's script: the `--coverage-views` rename and `--coverage XCRESULT` (the
-  test run's app coverage on the page).
+- `scripts/preview-gallery.py --coverage-views` lists view types no scenario names (informational, prints only: most
+  are parts of other screens). `--coverage XCRESULT` adds the test run's app coverage to the page.
 
 ## What a repo needs
 
@@ -222,11 +221,9 @@ One entry in the scenario list, and nothing in the app:
    `<slug>.dark.png`, releases the window, and writes `manifest.json` (name, group, slug, size, and the window in
    points and the capture scale (`points`, `scale`) of **every** scenario) so the page script never parses Swift.
    A scenario fails when its window's settled size differs from the requested one (BChess: the `#require` after
-   `settle` in `SnapshotGalleryTests`). Not yet in BChess's scripts: `points` and `scale` in the manifest (its
-   manifest has `size`; the page script derives the scale itself). It swaps the host app's own shared loader for the stub too.
+   `settle` in `SnapshotGalleryTests`). It swaps the host app's own shared loader for the stub too.
 3. **`scripts/preview-gallery.py`**: `--import DIR [--partial]` (replace the gallery, or only the files of an
-   `--only` run), `--check`, `--coverage` (the reference's `--coverage-views`; `--coverage XCRESULT` not yet in this
-   repo's script); with `scripts/preview-luminance.swift` for the lit check.
+   `--only` run), `--check`, `--coverage-views`, `--coverage XCRESULT`; with `scripts/preview-luminance.swift` for the lit check.
    **Output layout**: only the page at the top of the output folder, everything else in subfolders:
    ```
    previews/
@@ -322,9 +319,8 @@ platform's folder, or of a skipped scenario), a duplicate slug, a light image th
 (mean luminance against a threshold; a `documentCanvas` scenario is judged as a pair instead, the dark image's
 mean luminance at least 0.05 below the light one's; an `imagery` scenario is not judged for luminance), a dark image byte-identical to its light one, a light/dark pair whose images differ in pixel size, a blank image
 (one colour everywhere) unless its scenario sets `drawsNothing`, an image that cannot be decoded or is not at the
-render scale of its scenario's size (2x; 3x for the Duo's inner poses, flagged `duoInner` in the manifest, and for
-every card of the Duo pass; the reference reads it from the entry's `points` x `scale` and fails an entry without
-them — not yet in BChess's script), and
+render scale of its scenario's size (the entry's `points` x `scale`: 2x; 3x for the Duo's inner poses and every card of
+the Duo pass; an entry without them fails), and
 `.preferredColorScheme` or `\.locale` anywhere in the scenario file (its `//` and `/* */` comments aside, and a `\.locale` on a
 line carrying `// gallery: allowed, <why>`). An `--only` run replaces only its own images; the check still covers every
 scenario. The `--lang` folders are not checked and never reach the page. The gallery is

@@ -61,18 +61,27 @@ extension GallerySuites {
             }
 
             // The manifest always lists every scenario, so a partial run still knows the whole gallery.
-            let manifest = GalleryScenarios.all.map {
-                GalleryManifestEntry(name: $0.name, group: $0.group, slug: $0.slug,
-                              size: "\(Int($0.size.points(screen: screen).width))x\(Int($0.size.points(screen: screen).height))",
-                              platform: $0.size.platform(ipadPass: Self.ipadPass),
-                              skipped: $0.skipReason(duoPass: Self.duoPass, ipadPass: Self.ipadPass),
-                              documentCanvas: $0.documentCanvas ? true : nil, drawsNothing: $0.drawsNothing ? true : nil,
-                              imagery: $0.imagery ? true : nil, duoInner: $0.size.isDuoInner ? true : nil)
-            }
+            let manifest = Self.manifestEntries(screen: screen)
             let encoder = JSONEncoder()
             encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
             try encoder.encode(manifest).write(to: directory.appendingPathComponent("manifest.json"))
             print("gallery: \(rendered) scenario(s)")
+        }
+
+        /// One entry per scenario, skipped ones included: the window in points and the scale it is (or would be) captured at,
+        /// the same two calls `renderImage` makes.
+        static func manifestEntries(screen: CGSize) -> [GalleryManifestEntry] {
+            GalleryScenarios.all.map {
+                let points = $0.size.points(screen: screen)
+                return GalleryManifestEntry(name: $0.name, group: $0.group, slug: $0.slug,
+                                            size: "\(Int(points.width))x\(Int(points.height))",
+                                            points: [Double(points.width), Double(points.height)],
+                                            scale: Double($0.size.scale(duoPass: duoPass)),
+                                            platform: $0.size.platform(ipadPass: ipadPass),
+                                            skipped: $0.skipReason(duoPass: duoPass, ipadPass: ipadPass),
+                                            documentCanvas: $0.documentCanvas ? true : nil, drawsNothing: $0.drawsNothing ? true : nil,
+                                            imagery: $0.imagery ? true : nil)
+            }
         }
 
         @Test("the Duo pass needs the folded outer display",

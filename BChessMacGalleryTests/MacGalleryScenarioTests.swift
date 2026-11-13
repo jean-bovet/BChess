@@ -97,6 +97,8 @@ extension MacGallerySuites {
             // (a frame that is not what a probe would measure, so only the captured one can produce this string)
             let rendered = try Self.manifest(rendered: [settings.slug: CGSize(width: 1234, height: 567)])
             #expect(rendered[settings.slug]?["size"] as? String == "1234x567")
+            #expect(rendered[settings.slug]?["points"] as? [Double] == [1234, 567])
+            #expect(rendered[settings.slug]?["scale"] as? Double == 2)
             #expect(rendered[MacGalleryScenarios.documentWindowEngineOn.slug]?["size"] as? String == "1440x900")
             // An unrendered one (a partial run): measured on a probe window, the same frame
             let measured = try Self.manifest(rendered: [:])
@@ -107,6 +109,20 @@ extension MacGallerySuites {
             }
             #expect(measured.count == MacGalleryScenarios.all.count)
             #expect(measured.values.allSatisfy { $0["platform"] as? String == "mac" })
+            #expect(measured.values.allSatisfy { $0["scale"] as? Double == 2 })
+            for entry in measured.values {
+                let points = try #require(entry["points"] as? [Double], "\(entry["slug"] ?? "?")")
+                #expect(entry["size"] as? String == "\(Int(points[0]))x\(Int(points[1]))", "\(entry["slug"] ?? "?")")
+            }
+        }
+
+        @Test("the manifest writes a fractional window frame as points, unrounded, at the capture scale")
+        func manifestKeepsFractionalPoints() throws {
+            let slug = MacGalleryScenarios.settingsWindow.slug
+            let entry = try #require(Self.manifest(rendered: [slug: CGSize(width: 45.25, height: 38)])[slug])
+            #expect(entry["points"] as? [Double] == [45.25, 38])
+            #expect(entry["scale"] as? Double == Double(MacRenderer.scale))
+            #expect(entry["size"] as? String == "45x38")
         }
 
         private static func sizeString(_ size: CGSize) -> String {

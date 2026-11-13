@@ -34,6 +34,10 @@ struct GalleryManifestEntry: Encodable {
     let slug: String
     /// The window size in points, "WxH".
     let size: String
+    /// The window `[width, height]` in points, as captured.
+    let points: [Double]
+    /// The capture scale: the PNG is `points` x `scale` pixels (`--check` reads both).
+    let scale: Double
     let platform: String
     /// Why the card has no images on this pass (nil: it has); the page shows it, `--check` accepts the gap.
     var skipped: String?
@@ -41,8 +45,6 @@ struct GalleryManifestEntry: Encodable {
     var documentCanvas: Bool?
     var drawsNothing: Bool?
     var imagery: Bool?
-    /// True for the Duo's inner-display sizes, captured at 3x on every pass (`--check` expects that scale).
-    var duoInner: Bool?
 }
 
 extension GalleryScenarios {

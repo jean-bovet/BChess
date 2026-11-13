@@ -7,7 +7,19 @@ previews/index.html, one card per scenario with light and dark side by side, gro
     scripts/preview-gallery.py --import DIR [--partial]   # replace the gallery (--partial: only DIR's files)
     scripts/preview-gallery.py --import DIR --lang fr     # a language run: its PNGs into <platform>/fr/, nothing else
     scripts/preview-gallery.py --check                    # every scenario complete and correctly lit
-    scripts/preview-gallery.py --coverage                 # view types no scenario names (informational)
+    scripts/preview-gallery.py --coverage-views           # view types no scenario names (informational, prints only)
+    scripts/preview-gallery.py --coverage XCRESULT        # the test run's app coverage: data/coverage.json and the page
+
+`--coverage` reads a result bundle the caller made with a normal test run (the gallery runs use -enableCodeCoverage NO).
+The cheapest run with app code is the Mac scheme:
+
+    caffeinate -is buildlock --folder <dd> -- xcodebuild test -scheme "BChess (macOS)" -destination 'platform=macOS' \\
+        -derivedDataPath <dd> -enableCodeCoverage YES -resultBundlePath <dd>/app-coverage.xcresult
+    PREVIEW_GALLERY_OUT=previews/mac scripts/preview-gallery.py --coverage <dd>/app-coverage.xcresult
+
+It takes the `BChess.app` target of `xcrun xccov view --report --json`, writes {covered, executable, measured, files}
+(files least covered first, paths relative to the repo) and adds an "App coverage" section and a nav link to the page.
+A bundle xccov cannot read, or without a `BChess.app` target: a message on stderr, exit 2, coverage.json untouched.
 
 The gallery folder is previews/, or $PREVIEW_GALLERY_OUT (the Duo pass uses previews/duo, the iPad pass previews/ipad). Its layout: only
 index.html at the top, the images in <platform>/ (the manifest entry's `platform`, default iphone; an image the
@@ -24,8 +36,8 @@ platform folder), and the check ignores them.
 --check rebuilds the page, then fails on: a scenario missing either image, a stray PNG no scenario expects,
 a duplicate slug, a light image that is dark or a dark image that is light (mean luminance against 0.45,
 scripts/preview-luminance.swift), a dark image byte-identical to its light one, a blank image (one colour
-everywhere), an image that cannot be decoded, an image not at its scenario's render scale (its manifest size at 2x;
-3x for a `duoInner` size, the Duo's inner poses, and for every card of the Duo pass, the previews/duo gallery), and a forced appearance or locale in a scenario file (its
+everywhere), an image that cannot be decoded, an image not at its scenario's render size (the entry's `points` x `scale`, rounded half away from zero
+as the Mac capture does; an entry without valid `points` and `scale`, skipped ones included, fails), and a forced appearance or locale in a scenario file (its
 `//` comments aside; a `\.locale` on a line carrying `// gallery: allowed, <why>` passes: a locale forced for its
 region, not its language). Four manifest flags, written by the snapshot test from the scenario, make the check honest:
 `documentCanvas: true` (a card dark in both appearances by design: the pair is judged instead of each image, the
@@ -34,7 +46,7 @@ darken in dark: the luminance rules are waived for the pair, the byte-identical 
 `drawsNothing: true` (a screen that draws nothing by design: its blank images pass) and `skipped: "<why>"` (a card
 the pass could not render honestly: no images expected, the page says why).
 """
-import argparse, glob, html, json, os, re, shutil, struct, subprocess, sys
+import argparse, glob, math, html, json, os, re, shutil, struct, subprocess, sys, time
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OUT = os.path.join(REPO, os.environ.get('PREVIEW_GALLERY_OUT') or 'previews')
@@ -48,7 +60,6 @@ SCENARIO_FILES = [os.path.join(REPO, folder, name) for folder, name in (
 LUMINANCE_THRESHOLD = 0.45
 CANVAS_CONTRAST = 0.05   # documentCanvas: how much darker (mean luminance) the dark image must be than the light one
 PHONE_ASPECT = 402 / 874
-RENDER_SCALE, DUO_SCALE = 2, 3   # the capture scale; the Duo's displays are 3x (the inner poses on every pass)
 PASS_LABELS = {'duo': 'iPhone Duo', 'ipad': 'iPad', 'mac': 'Mac'}   # the gallery folder's name -> the device the page says
 
 
@@ -172,10 +183,25 @@ def size_ratio(entry):
         return 0
 
 
-def render_scale(entry):
-    """The scale the snapshot test captures a scenario at (GalleryScenarios' `scale(duoPass:)`)."""
-    duo = entry.get('duoInner') or platform_of(entry) == 'duo-inner' or os.path.basename(os.path.normpath(OUT)) == 'duo'
-    return DUO_SCALE if duo else RENDER_SCALE
+def round_half_away(value):
+    """Swift's `.rounded()` for a positive float: exact, where floor(value + 0.5) is off for 0.49999999999999994."""
+    base = math.floor(value)
+    return base + 1 if value - base >= 0.5 else base
+
+
+def render_size(entry):
+    """The pixel size the snapshot test captured a scenario at, from the entry's `points` x `scale`, or None when either is
+    missing or not a finite positive number. Rounded half away from zero (Swift's `.rounded()`), never Python's round()."""
+    points, scale = entry.get('points'), entry.get('scale')
+
+    def positive(value):
+        return isinstance(value, (int, float)) and not isinstance(value, bool) and math.isfinite(value) and value > 0
+    if not (isinstance(points, list) and len(points) == 2 and all(positive(n) for n in points) and positive(scale)):
+        return None
+    try:
+        return tuple(round_half_away(n * scale) for n in points)
+    except (OverflowError, ValueError):
+        return None
 
 
 def png_size(path):
@@ -185,6 +211,30 @@ def png_size(path):
     if len(header) < 24 or header[:8] != b'\x89PNG\r\n\x1a\n' or header[12:16] != b'IHDR':
         return None
     return struct.unpack('>II', header[16:24])
+
+
+def percent(covered, executable):
+    return f'{100 * covered / executable:.1f}%' if executable else '-'
+
+
+def read_app_coverage():
+    """data/coverage.json when it holds an app coverage (has `executable`); None for no file, an unreadable one or the
+    old {views, notRendered} shape."""
+    path = os.path.join(DATA, 'coverage.json')
+    try:
+        with open(path, encoding='utf-8') as handle:
+            data = json.load(handle)
+    except (OSError, ValueError):
+        return None
+    return data if isinstance(data, dict) and 'executable' in data and isinstance(data.get('files'), list) else None
+
+
+def coverage_section(coverage):
+    rows = ''.join(f'<tr><td>{html.escape(f["path"])}</td><td>{f["covered"]}/{f["executable"]}</td>'
+                   f'<td>{percent(f["covered"], f["executable"])}</td></tr>' for f in coverage['files'])
+    return (f'<section id="coverage"><h2>App coverage</h2><p class="meta">{percent(coverage["covered"], coverage["executable"])} '
+            f'· {coverage["covered"]} of {coverage["executable"]} lines · measured {html.escape(str(coverage.get("measured", "")))}</p>'
+            f'<table class="cov"><thead><tr><th>File</th><th>Lines</th><th>Covered</th></tr></thead><tbody>{rows}</tbody></table></section>')
 
 
 def build_page(manifest):
@@ -215,6 +265,10 @@ def build_page(manifest):
         sections.append(f'<section id="{section_id}"><h2>{html.escape(title)}</h2><div class="row">'
                         f'{"".join(figure(e) for e in entries)}</div></section>')
         links.append(f'<a href="#{section_id}">{html.escape(title)}</a>')
+    coverage = read_app_coverage()
+    if coverage:
+        sections.append(coverage_section(coverage))
+        links.append('<a href="#coverage">Coverage</a>')
     os.makedirs(OUT, exist_ok=True)
     with open(os.path.join(OUT, 'index.html'), 'w', encoding='utf-8') as handle:
         handle.write(page(manifest, ''.join(sections), ''.join(links)))
@@ -237,26 +291,25 @@ def do_check():
     for name in sorted(on_disk - expected):
         problems.append(f'stray image (no scenario): {name}')
     for e in manifest:
+        s = e['slug']
+        render = render_size(e)
+        if render is None:
+            problems.append(f'no render size in the manifest (points, scale): {platform_of(e)}/{s}')
         if e.get('skipped'):
             continue
-        s = e['slug']
         light = os.path.join(OUT, platform_of(e), s + '.png')
         dark = os.path.join(OUT, platform_of(e), s + '.dark.png')
         if os.path.isfile(light) and os.path.isfile(dark):
             with open(light, 'rb') as a, open(dark, 'rb') as b:
                 if a.read() == b.read():
                     problems.append(f'dark identical to light: {s}')
-        try:
-            width, height = (int(n) for n in e['size'].split('x'))
-        except (KeyError, ValueError):
-            problems.append(f'unreadable size in the manifest: {s}')
+        if render is None:
             continue
-        scale = render_scale(e)
         for path in (light, dark):
             size = png_size(path) if os.path.isfile(path) else None
-            if size and size != (width * scale, height * scale):
+            if size and size != render:
                 problems.append(f'wrong render scale: {platform_of(e)}/{os.path.basename(path)} is {size[0]}x{size[1]} px, '
-                                f'not {e["size"]} at {scale}x ({width * scale}x{height * scale})')
+                                f'not {e["points"][0]:g}x{e["points"][1]:g} pt at {e["scale"]:g}x ({render[0]}x{render[1]})')
     luminance, error = luminances(manifest)
     if error:
         problems.append('luminance helper failed: ' + error)
@@ -300,8 +353,8 @@ def do_check():
     print(f'CHECK OK [en]: {len(manifest)} cards, light and dark complete and correctly lit')
 
 
-def do_coverage():
-    """View types under Shared/, iOS/ and macOS/ that no scenario file names (informational)."""
+def do_coverage_views():
+    """View types under Shared/, iOS/ and macOS/ that no scenario file names (informational, prints only)."""
     views = set()
     for folder in ('Shared', 'iOS', 'macOS'):
         for path in glob.glob(os.path.join(REPO, folder, '**', '*.swift'), recursive=True):
@@ -316,9 +369,40 @@ def do_coverage():
     print(f'{len(views) - len(missing)} of {len(views)} view types appear in a scenario; not rendered:')
     for view in missing:
         print('  ' + view)
+
+
+def do_coverage(xcresult):
+    """The app target's coverage of a test run's result bundle into data/coverage.json, then the page."""
+    def fail(message):
+        print(f'coverage: {message}', file=sys.stderr)
+        sys.exit(2)
+    try:
+        result = subprocess.run(['xcrun', 'xccov', 'view', '--report', '--json', xcresult], capture_output=True, text=True)
+    except OSError as error:
+        fail(f'cannot run xcrun xccov for {xcresult}: {error}')
+    if result.returncode != 0:
+        fail(f'xccov cannot read {xcresult}: {result.stderr.strip()[:200]}')
+    try:
+        targets = json.loads(result.stdout)['targets']
+        target = next((t for t in targets if t.get('name') == 'BChess.app'), None)
+        if target is None:
+            fail(f'{xcresult} has no BChess.app target')
+        files = [{'path': os.path.relpath(f['path'], REPO), 'covered': int(f['coveredLines']), 'executable': int(f['executableLines'])}
+                 for f in target['files']]
+        report = {'covered': int(target['coveredLines']), 'executable': int(target['executableLines'])}
+    except (ValueError, KeyError, TypeError):
+        fail(f'xccov printed a report for {xcresult} this script cannot read')
+    # least covered first; a file with no executable lines counts as fully covered, so it goes last
+    files.sort(key=lambda f: (f['covered'] / f['executable'] if f['executable'] else 1.0, f['path']))
+    report['measured'] = time.strftime('%Y-%m-%d %H:%M', time.localtime(os.path.getmtime(xcresult)))
+    report['files'] = files
     os.makedirs(DATA, exist_ok=True)
     with open(os.path.join(DATA, 'coverage.json'), 'w', encoding='utf-8') as handle:
-        json.dump({'views': len(views), 'notRendered': missing}, handle, indent=2)
+        json.dump(report, handle, indent=2)
+    print(f'app coverage {percent(report["covered"], report["executable"])} ({report["covered"]} of {report["executable"]} lines, '
+          f'{len(files)} files) into {os.path.relpath(DATA, REPO)}/coverage.json')
+    if os.path.isfile(MANIFEST):
+        build_page(load_manifest())
 
 
 def page(cards, sections_html, links_html):
@@ -353,6 +437,9 @@ nav {{ display:flex; flex-wrap:wrap; gap:8px; margin-bottom:28px; }}
 nav a {{ color:var(--ink); text-decoration:none; background:var(--card); border:1px solid var(--line); border-radius:20px; padding:7px 12px; }}
 nav a:hover, nav a:focus-visible {{ border-color:var(--accent); color:var(--accent-ink); }}
 section {{ scroll-margin-top:20px; }}
+table.cov {{ border-collapse:collapse; background:var(--card); border:1px solid var(--line); }}
+table.cov th, table.cov td {{ text-align:left; padding:6px 12px; border-bottom:1px solid var(--line); font-variant-numeric:tabular-nums; }}
+table.cov th {{ color:var(--muted); font-weight:600; }}
 .row {{ display:flex; flex-wrap:wrap; gap:16px; }}
 figure {{ margin:0; width:calc(310px * var(--r, 1) + 10px); }}
 figcaption {{ padding:0 4px 8px; font-weight:600; }}
@@ -406,7 +493,8 @@ def main():
     parser.add_argument('--partial', action='store_true', help='with --import: keep previews/ and replace only the files in DIR')
     parser.add_argument('--lang', metavar='LANG', help='with --import: a language run (fr, de, it, he, ar): copy the PNGs into <platform>/LANG/')
     parser.add_argument('--check', action='store_true', help='rebuild the page and check; exit 1 on any problem')
-    parser.add_argument('--coverage', action='store_true', help='list the view types no scenario names')
+    parser.add_argument('--coverage-views', action='store_true', help='list the view types no scenario names')
+    parser.add_argument('--coverage', metavar='XCRESULT', help="add the app coverage of a test run's result bundle to the page")
     opts = parser.parse_args()
     if opts.lang and not opts.source:
         parser.error('--lang goes with --import')
@@ -421,9 +509,11 @@ def main():
         build_page(load_manifest())
     if opts.check:
         do_check()
+    if opts.coverage_views:
+        do_coverage_views()
     if opts.coverage:
-        do_coverage()
-    if not (opts.source or opts.check or opts.coverage):
+        do_coverage(opts.coverage)
+    if not (opts.source or opts.check or opts.coverage_views or opts.coverage):
         parser.print_help()
 
 
