@@ -206,7 +206,8 @@ One entry in the scenario list, and nothing in the app:
 - **Dark-only entries.** A platform with no light appearance (a Watch) may mark its entries dark-only: one
   `<slug>.dark.png`, no light slot and no pair rules, but the luminance rule still applies.
 - `scripts/preview-gallery.py --coverage` lists view types no scenario names (informational: most are parts
-  of other screens).
+  of other screens). Not yet in this repo's script: the `--coverage-views` rename and `--coverage XCRESULT` (the
+  test run's app coverage on the page).
 
 ## What a repo needs
 
@@ -218,10 +219,14 @@ One entry in the scenario list, and nothing in the app:
    Cloud skip it. It filters by the optional `ONLY` variable, renders each scenario in a `UIHostingController`
    inside a `UIWindow` on the app's scene at a fixed size, once with a light and once with a dark
    `overrideUserInterfaceStyle`, waits for `settle`, draws with `drawHierarchy` at 2x, writes `<slug>.png` and
-   `<slug>.dark.png`, releases the window, and writes `manifest.json` (name, group, slug, size of **every**
-   scenario) so the page script never parses Swift. It swaps the host app's own shared loader for the stub too.
+   `<slug>.dark.png`, releases the window, and writes `manifest.json` (name, group, slug, size, and the window in
+   points and the capture scale (`points`, `scale`) of **every** scenario) so the page script never parses Swift.
+   A scenario fails when its window's settled size differs from the requested one (BChess: the `#require` after
+   `settle` in `SnapshotGalleryTests`). Not yet in BChess's scripts: `points` and `scale` in the manifest (its
+   manifest has `size`; the page script derives the scale itself). It swaps the host app's own shared loader for the stub too.
 3. **`scripts/preview-gallery.py`**: `--import DIR [--partial]` (replace the gallery, or only the files of an
-   `--only` run), `--check`, `--coverage`; with `scripts/preview-luminance.swift` for the lit check.
+   `--only` run), `--check`, `--coverage` (the reference's `--coverage-views`; `--coverage XCRESULT` not yet in this
+   repo's script); with `scripts/preview-luminance.swift` for the lit check.
    **Output layout**: only the page at the top of the output folder, everything else in subfolders:
    ```
    previews/
@@ -238,6 +243,8 @@ One entry in the scenario list, and nothing in the app:
    command first moves what is still at the top, resumably, then rebuilds the page), and `snapshot-gallery.sh`
    reads `data/manifest.json` with a fallback to the old path. Proven in one repo's conversion; BChess's script
    carries the migration (its lifecycle tests cover it).
+   **A public repo** (BChess is one): the manifest and the page hold no absolute path, and the PNGs are written
+   without metadata.
 4. **`scripts/snapshot-gallery.sh`**:
    - The simulator from the machine-wide pool: `SIMULATOR_UDID` if the caller passes one (never released),
      else `simpool acquire --spec iphone --pid $$` (then `ipad`, `duo`, one device after the other), and
@@ -260,9 +267,15 @@ One entry in the scenario list, and nothing in the app:
    - Import, `--check`, open the page (`--no-open` skips that: agents, scripted runs), print the timings (boot,
      build, test, total). It keeps the Mac awake for the run (`caffeinate -dims -w $$`, released when the script
      exits): a run during which the Mac slept took three times as long.
+   - **Lifecycle tests**: `scripts/test_snapshot_gallery.sh` runs the script against stubs of `simpool`,
+     `buildlock`, `xcodebuild` and `xcrun`, with PATH limited to the stubs and the system directories (no real
+     pool, build slot or simulator), and proves the lease is released on success, on a failed acquire, build,
+     test or check, and on a signal at each stage. It also proves each `--check` rule on tiny PNGs and a scratch
+     scenario file (BChess's coverage: "Run" above).
    - Optional, when the hosted app shares state with the real one (a container, iCloud, defaults): build the gallery
-     hosts under their own bundle id (a `.gallery` suffix through a build setting that is empty in every other
-     build, no iCloud entitlement), so a run never touches the real app's data and the real app may stay open.
+     hosts under their own bundle id (a `.gallery` suffix through a bundle-id-suffix build setting the gallery's
+     xcodebuilds override, the app's other configurations keeping their own value, such as `.debug` in Debug; no
+     iCloud entitlement), so a run never touches the real app's data and the real app may stay open.
      BChess does not (its Mac gallery runs in the real app's container, under the container lock: run it with BChess
      closed).
 5. **A Mac target**: an app-hosted macOS test renders each scenario with no simulator, **off screen**: a real
@@ -310,7 +323,8 @@ platform's folder, or of a skipped scenario), a duplicate slug, a light image th
 mean luminance at least 0.05 below the light one's; an `imagery` scenario is not judged for luminance), a dark image byte-identical to its light one, a light/dark pair whose images differ in pixel size, a blank image
 (one colour everywhere) unless its scenario sets `drawsNothing`, an image that cannot be decoded or is not at the
 render scale of its scenario's size (2x; 3x for the Duo's inner poses, flagged `duoInner` in the manifest, and for
-every card of the Duo pass), and
+every card of the Duo pass; the reference reads it from the entry's `points` x `scale` and fails an entry without
+them — not yet in BChess's script), and
 `.preferredColorScheme` or `\.locale` anywhere in the scenario file (its `//` and `/* */` comments aside, and a `\.locale` on a
 line carrying `// gallery: allowed, <why>`). An `--only` run replaces only its own images; the check still covers every
 scenario. The `--lang` folders are not checked and never reach the page. The gallery is

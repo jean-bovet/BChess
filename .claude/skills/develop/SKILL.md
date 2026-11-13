@@ -120,10 +120,14 @@ full run spans few plans.
   `test-without-building -only-testing:<Target>/<Class>`; a plain `xcodebuild test` re-links, re-signs
   and relaunches the host app for every single run.
 - **One build at a time per build folder.** Use the repo's scripts or build wrapper when it has them
-  (never call `xcodebuild` around them); otherwise `buildlock --folder <dd> -- xcodebuild …`. The host's
+  (never call `xcodebuild` around them); otherwise `buildlock --folder <dd> -- xcodebuild …`. A `test-without-building` run takes the
+  folder's lock but no build slot: `buildlock --folder <dd> --no-slot -- xcodebuild test-without-building …`.
+  An app-hosted Mac test run also holds `buildlock --folder ~/Library/Containers/<bundle id> --no-slot`, so
+  two worktrees never host the real app (its sandbox container) at once (BChess: the Mac test line of the Test gate). The host's
   build slots are shared with other sessions: wait for one, never kill another build.
 - **Simulators** (the global working agreement): lease one from the machine-wide pool for each gate run
-  (`simpool acquire`, or the repo's scripts do it) and release it when the run ends, also when it fails.
+  (`simpool acquire`, or the repo's scripts do it) and release it when the run ends, also when it fails:
+  `trap 'simpool release "$udid" --app ch.arizona-software.BChess' EXIT`, so the next holder doesn't inherit the running app.
   Don't hold a lease across gates: the pool normally keeps a released simulator booted for the next gate. Never
   boot, shut down or touch a simulator by hand. One `-destination` per run and
   `-parallel-testing-enabled NO -collect-test-diagnostics never` on every simulator test run (without the second flag a failing test, so every red proof, makes xcodebuild collect a sysdiagnose-like simulator report for up to 10 minutes; the gates read the log, never that report. To debug a failure nobody can explain, rerun that one test without it). A repo whose scripts still boot their own
@@ -195,7 +199,7 @@ caffeinate -is buildlock --folder ~/Library/Containers/ch.arizona-software.BChes
 caffeinate -is buildlock --folder <dd>/dd-uci -- xcodebuild -scheme BChessUCI -destination 'platform=macOS' -derivedDataPath <dd>/dd-uci build
 caffeinate -is buildlock --folder <dd>/dd-ios -- xcodebuild build-for-testing -scheme "BChess (iOS)" -destination 'generic/platform=iOS Simulator' -derivedDataPath <dd>/dd-ios
 udid=$(simpool acquire --spec iphone --pid $$); trap 'simpool release "$udid" --app ch.arizona-software.BChess' EXIT
-caffeinate -is buildlock --folder <dd>/dd-ios -- xcodebuild test-without-building -scheme "BChess (iOS)" -destination "id=$udid" -parallel-testing-enabled NO -collect-test-diagnostics never -derivedDataPath <dd>/dd-ios
+caffeinate -is buildlock --folder <dd>/dd-ios --no-slot -- xcodebuild test-without-building -scheme "BChess (iOS)" -destination "id=$udid" -parallel-testing-enabled NO -collect-test-diagnostics never -derivedDataPath <dd>/dd-ios
 ```
 
 `** TEST FAILED **`, `** BUILD FAILED **`, a Swift Testing line `✘`, or any `error:` is red. The
@@ -433,5 +437,6 @@ requests (a GitHub rule): never push `main`.
   minutes. Every review prompt names the exact plan section and the few source files (with line ranges) to
   read, says "read only these; no other commands, no builds or tests", and caps each section at a few
   one-line findings with a severity. A review not back within about 15 minutes is stopped and rerun
-  narrower; a large diff is reviewed per commit (`git diff <sha>^ <sha>`), not in one `main...HEAD` pass.
+  narrower; a large diff is reviewed one commit at a time (`git diff <sha>^ <sha>`, or `codex exec review --commit
+  <sha>`), not in one `main...HEAD` pass.
 - Counting a test run where the GoogleTest suite executed zero cases as green.
