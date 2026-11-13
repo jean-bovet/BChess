@@ -24,8 +24,8 @@ platform folder), and the check ignores them.
 --check rebuilds the page, then fails on: a scenario missing either image, a stray PNG no scenario expects,
 a duplicate slug, a light image that is dark or a dark image that is light (mean luminance against 0.45,
 scripts/preview-luminance.swift), a dark image byte-identical to its light one, a blank image (one colour
-everywhere), an image that cannot be decoded, an image not at its scenario's render scale (its manifest size at 2x;
-3x for a `duoInner` size, the Duo's inner poses, and for every card of the Duo pass, the previews/duo gallery), and a forced appearance or locale in a scenario file (its
+everywhere), an image that cannot be decoded, an image not at its scenario's render size (the entry's `points` x `scale`, rounded half away from zero
+as the Mac capture does; an entry without valid `points` and `scale`, skipped ones included, fails), and a forced appearance or locale in a scenario file (its
 `//` comments aside; a `\.locale` on a line carrying `// gallery: allowed, <why>` passes: a locale forced for its
 region, not its language). Four manifest flags, written by the snapshot test from the scenario, make the check honest:
 `documentCanvas: true` (a card dark in both appearances by design: the pair is judged instead of each image, the
@@ -34,7 +34,7 @@ darken in dark: the luminance rules are waived for the pair, the byte-identical 
 `drawsNothing: true` (a screen that draws nothing by design: its blank images pass) and `skipped: "<why>"` (a card
 the pass could not render honestly: no images expected, the page says why).
 """
-import argparse, glob, html, json, os, re, shutil, struct, subprocess, sys
+import argparse, glob, math, html, json, os, re, shutil, struct, subprocess, sys
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OUT = os.path.join(REPO, os.environ.get('PREVIEW_GALLERY_OUT') or 'previews')
@@ -48,7 +48,6 @@ SCENARIO_FILES = [os.path.join(REPO, folder, name) for folder, name in (
 LUMINANCE_THRESHOLD = 0.45
 CANVAS_CONTRAST = 0.05   # documentCanvas: how much darker (mean luminance) the dark image must be than the light one
 PHONE_ASPECT = 402 / 874
-RENDER_SCALE, DUO_SCALE = 2, 3   # the capture scale; the Duo's displays are 3x (the inner poses on every pass)
 PASS_LABELS = {'duo': 'iPhone Duo', 'ipad': 'iPad', 'mac': 'Mac'}   # the gallery folder's name -> the device the page says
 
 
@@ -172,10 +171,19 @@ def size_ratio(entry):
         return 0
 
 
-def render_scale(entry):
-    """The scale the snapshot test captures a scenario at (GalleryScenarios' `scale(duoPass:)`)."""
-    duo = entry.get('duoInner') or platform_of(entry) == 'duo-inner' or os.path.basename(os.path.normpath(OUT)) == 'duo'
-    return DUO_SCALE if duo else RENDER_SCALE
+def render_size(entry):
+    """The pixel size the snapshot test captured a scenario at, from the entry's `points` x `scale`, or None when either is
+    missing or not a finite positive number. Rounded half away from zero (Swift's `.rounded()`), never Python's round()."""
+    points, scale = entry.get('points'), entry.get('scale')
+
+    def positive(value):
+        return isinstance(value, (int, float)) and not isinstance(value, bool) and math.isfinite(value) and value > 0
+    if not (isinstance(points, list) and len(points) == 2 and all(positive(n) for n in points) and positive(scale)):
+        return None
+    try:
+        return tuple(math.floor(n * scale + 0.5) for n in points)
+    except (OverflowError, ValueError):
+        return None
 
 
 def png_size(path):
@@ -237,26 +245,25 @@ def do_check():
     for name in sorted(on_disk - expected):
         problems.append(f'stray image (no scenario): {name}')
     for e in manifest:
+        s = e['slug']
+        render = render_size(e)
+        if render is None:
+            problems.append(f'no render size in the manifest (points, scale): {platform_of(e)}/{s}')
         if e.get('skipped'):
             continue
-        s = e['slug']
         light = os.path.join(OUT, platform_of(e), s + '.png')
         dark = os.path.join(OUT, platform_of(e), s + '.dark.png')
         if os.path.isfile(light) and os.path.isfile(dark):
             with open(light, 'rb') as a, open(dark, 'rb') as b:
                 if a.read() == b.read():
                     problems.append(f'dark identical to light: {s}')
-        try:
-            width, height = (int(n) for n in e['size'].split('x'))
-        except (KeyError, ValueError):
-            problems.append(f'unreadable size in the manifest: {s}')
+        if render is None:
             continue
-        scale = render_scale(e)
         for path in (light, dark):
             size = png_size(path) if os.path.isfile(path) else None
-            if size and size != (width * scale, height * scale):
+            if size and size != render:
                 problems.append(f'wrong render scale: {platform_of(e)}/{os.path.basename(path)} is {size[0]}x{size[1]} px, '
-                                f'not {e["size"]} at {scale}x ({width * scale}x{height * scale})')
+                                f'not {e["points"][0]:g}x{e["points"][1]:g} pt at {e["scale"]:g}x ({render[0]}x{render[1]})')
     luminance, error = luminances(manifest)
     if error:
         problems.append('luminance helper failed: ' + error)

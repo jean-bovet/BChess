@@ -402,13 +402,13 @@ page_setup() {   # a scratch tree with the real page script, the luminance helpe
 
 fake_run() {   # $1 = directory, $2... = "slug:platform" (platform empty: none in the manifest entry); a light and a dark PNG each
     # (12 x 12 px: a 6x6 pt card at 2x; at 3x a 4x4 pt one, for duo-inner and for every card when $FAKE_DUO_PASS is set)
-    local dir="$1" entry slug platform size json="" sep=""; shift
+    local dir="$1" entry slug platform points scale json="" sep=""; shift
     mkdir -p "$dir"
     for entry in "$@"; do
         slug="${entry%%:*}"; platform="${entry#*:}"
-        if [ -n "${FAKE_DUO_PASS:-}" ] || [ "$platform" = duo-inner ]; then size=4x4; else size=6x6; fi
+        if [ -n "${FAKE_DUO_PASS:-}" ] || [ "$platform" = duo-inner ]; then points="[4,4]" scale=3; else points="[6,6]" scale=2; fi
         png "$dir/$slug.png" 240; png "$dir/$slug.dark.png" 20
-        json="$json$sep{\"name\":\"$slug\",\"group\":\"G\",\"slug\":\"$slug\",\"size\":\"$size\"${platform:+,\"platform\":\"$platform\"}}"; sep=","
+        json="$json$sep{\"name\":\"$slug\",\"group\":\"G\",\"slug\":\"$slug\",\"size\":\"${points:1:1}x${points:3:1}\",\"points\":$points,\"scale\":$scale${platform:+,\"platform\":\"$platform\"}}"; sep=","
     done
     echo "[$json]" > "$dir/manifest.json"
 }
@@ -479,7 +479,7 @@ skipped() {   # a card the pass could not render honestly: in the manifest with 
 import json, sys
 path = sys.argv[1]
 manifest = json.load(open(path))
-manifest.append({"name": "beta", "group": "G", "slug": "beta", "size": "678x466", "platform": "iphone", "skipped": "the Duo cannot mount it"})
+manifest.append({"name": "beta", "group": "G", "slug": "beta", "size": "678x466", "points": [678, 466], "scale": 2, "platform": "iphone", "skipped": "the Duo cannot mount it"})
 json.dump(manifest, open(path, "w"))
 PY
     $PAGE --import "$T/run" > "$T/out.log" 2>&1
@@ -557,31 +557,88 @@ imagery() {   # full-bleed imagery that does not darken: the luminance rules are
     cd "$ROOT" || return; rm -rf "$T"
 }
 
-render_scale() {   # an image not at its scenario's render scale fails: 2x; 3x for the Duo's inner sizes and the Duo pass
+render_scale() {   # an image not at its entry's points x scale fails; the scale is read, never guessed from flags or folders
     page_setup
     cd "$TREE" || return
-    fake_run "$T/run" "alpha:" "inner:duo-inner" "ipad-inner:ipad"
-    flag "$T/run/manifest.json" ipad-inner size '"4x4"'   # a Duo inner pose on the iPad pass: platform ipad, 12 x 12 px
+    fake_run "$T/run" "alpha:" "ipad-inner:ipad"
+    flag "$T/run/manifest.json" alpha points '[6,6]'
+    flag "$T/run/manifest.json" alpha scale 3   # a 6x6 pt card captured at 3x: 18 x 18 px
+    png "$T/run/alpha.png" 240 "" 18 18; png "$T/run/alpha.dark.png" 20 "" 18 18
+    flag "$T/run/manifest.json" ipad-inner points '[4,4]'   # a Duo inner pose on the iPad pass: platform ipad, 12 x 12 px at 3x
+    flag "$T/run/manifest.json" ipad-inner scale 3
     $PAGE --import "$T/run" > "$T/out.log" 2>&1
     $PAGE --check > "$T/check.log" 2>&1; local status=$?
-    expect render_scale "without duoInner an iPad-pass inner pose is expected at 2x" [ "$status" != 0 ]
-    expect render_scale "and is named" grep -q "wrong render scale: ipad/ipad-inner.png is 12x12 px, not 4x4 at 2x (8x8)" "$T/check.log"
-    flag previews/data/manifest.json ipad-inner duoInner true
+    expect render_scale "a 6x6 pt card at scale 3 with 18x18 images passes, and an inner pose with no duoInner flag" [ "$status" = 0 ]
+    expect render_scale "it counts every card" grep -q "CHECK OK \[en\]: 2 cards" "$T/check.log"
+    png previews/iphone/alpha.dark.png 20 "" 18 18
+    flag previews/data/manifest.json alpha scale 2   # now a 6x6 pt card at 2x with an 18x18 dark image
+    png previews/iphone/alpha.png 240 "" 12 12
     $PAGE --check > "$T/check.log" 2>&1; status=$?
-    expect render_scale "with duoInner it is at 3x: every card passes" [ "$status" = 0 ]
-    expect render_scale "it counts every card" grep -q "CHECK OK \[en\]: 3 cards" "$T/check.log"
-    png previews/iphone/alpha.dark.png 20 "" 18 18   # a 6x6 pt card captured at 3x on the iPhone pass
-    $PAGE --check > "$T/check.log" 2>&1; status=$?
-    expect render_scale "a 2x card captured at 3x fails" [ "$status" != 0 ]
-    expect render_scale "and the image, its size and the scale are named" grep -q "wrong render scale: iphone/alpha.dark.png is 18x18 px, not 6x6 at 2x (12x12)" "$T/check.log"
+    expect render_scale "a light/dark pair of different sizes fails" [ "$status" != 0 ]
+    expect render_scale "the dark image, its size, the points and the scale are named" grep -q "wrong render scale: iphone/alpha.dark.png is 18x18 px, not 6x6 pt at 2x (12x12)" "$T/check.log"
     png previews/iphone/alpha.dark.png 20
-    png previews/duo-inner/inner.png 240 "" 8 8   # a Duo inner pose at 2x
+    png previews/ipad/ipad-inner.png 240 "" 8 8   # a Duo inner pose at 2x
     $PAGE --check > "$T/check.log" 2>&1; status=$?
-    expect render_scale "a Duo inner pose at 2x fails" grep -q "wrong render scale: duo-inner/inner.png is 8x8 px, not 4x4 at 3x (12x12)" "$T/check.log"
-    fake_run "$T/duo" "alpha:"   # a 6x6 pt card at 2x, imported as the Duo pass
+    expect render_scale "a Duo inner pose at 2x fails" grep -q "wrong render scale: ipad/ipad-inner.png is 8x8 px, not 4x4 pt at 3x (12x12)" "$T/check.log"
+    fake_run "$T/duo" "alpha:"   # entries at scale 2 and 12x12 px, imported as the Duo gallery: no folder-name guess
     PREVIEW_GALLERY_OUT=previews/duo $PAGE --import "$T/duo" > "$T/out.log" 2>&1
     PREVIEW_GALLERY_OUT=previews/duo $PAGE --check > "$T/check.log" 2>&1; status=$?
-    expect render_scale "the Duo pass expects every card at 3x" grep -q "wrong render scale: iphone/alpha.png is 12x12 px, not 6x6 at 3x (18x18)" "$T/check.log"
+    expect render_scale "the previews/duo folder name forces no scale" [ "$status" = 0 ]
+    cd "$ROOT" || return; rm -rf "$T"
+}
+
+render_size_missing() {   # an entry without a valid points and scale fails the check, named, skipped cards too
+    page_setup
+    cd "$TREE" || return
+    fake_run "$T/run" "alpha:" "beta:"
+    python3 - "$T/run/manifest.json" <<'PY'
+import json, sys
+path = sys.argv[1]
+manifest = json.load(open(path))
+manifest.append({"name": "gamma", "group": "G", "slug": "gamma", "size": "6x6", "platform": "iphone", "skipped": "no pair"})
+json.dump(manifest, open(path, "w"))
+PY
+    $PAGE --import "$T/run" > "$T/out.log" 2>&1
+    $PAGE --check > "$T/check.log" 2>&1; local status=$?
+    expect render_size_missing "an entry without points and scale (a skipped one) fails" [ "$status" != 0 ]
+    expect render_size_missing "and is named" grep -q "no render size in the manifest (points, scale): iphone/gamma" "$T/check.log"
+    flag previews/data/manifest.json gamma points '[6,6]'; flag previews/data/manifest.json gamma scale 2
+    $PAGE --check > "$T/check.log" 2>&1; status=$?
+    expect render_size_missing "with points and scale the skipped entry passes" grep -q "CHECK OK \[en\]: 3 cards" "$T/check.log"
+    local key bad
+    for case in 'points|' 'scale|' 'scale|true' 'scale|0' 'scale|-2' 'scale|NaN' 'scale|Infinity' 'scale|"2"' 'points|[6]' 'points|[6, 0]' 'points|[-6, 6]' \
+                'points|[true, 6]' 'points|[6, NaN]' 'points|[1e309, 6]' 'points|[6, 6, 6]' 'points|"6x6"' 'points|null'; do
+        key="${case%%|*}"; bad="${case#*|}"
+        flag previews/data/manifest.json alpha "$key" "$bad"
+        $PAGE --check > "$T/check.log" 2>&1; status=$?
+        expect render_size_missing "$key ${bad:-removed} fails" [ "$status" != 0 ]
+        expect render_size_missing "$key ${bad:-removed} is named" grep -q "no render size in the manifest (points, scale): iphone/alpha" "$T/check.log"
+        flag previews/data/manifest.json alpha points '[6,6]'; flag previews/data/manifest.json alpha scale 2
+    done
+    $PAGE --check > "$T/check.log" 2>&1; status=$?
+    expect render_size_missing "restored, the check is green" grep -q "CHECK OK \[en\]: 3 cards" "$T/check.log"
+    cd "$ROOT" || return; rm -rf "$T"
+}
+
+mac_fraction() {   # the Mac window is not whole points: 45.25 x 2 = 90.5 px rounds half away from zero, to 91 (not Python's 90)
+    page_setup
+    cd "$TREE" || return
+    fake_run "$T/run" "doc:mac"
+    flag "$T/run/manifest.json" doc points '[45.25,38]'
+    png "$T/run/doc.png" 240 "" 91 76; png "$T/run/doc.dark.png" 20 "" 91 76
+    export PREVIEW_GALLERY_OUT=previews/mac
+    $PAGE --import "$T/run" > "$T/out.log" 2>&1
+    $PAGE --check > "$T/check.log" 2>&1; local status=$?
+    expect mac_fraction "45.25 x 2 pt at 91 px passes" [ "$status" = 0 ]
+    png previews/mac/mac/doc.png 240 "" 90 76; png previews/mac/mac/doc.dark.png 20 "" 90 76
+    $PAGE --check > "$T/check.log" 2>&1; status=$?
+    expect mac_fraction "at 90 px it fails" [ "$status" != 0 ]
+    expect mac_fraction "and names the expected 91" grep -q "wrong render scale: mac/doc.png is 90x76 px, not 45.25x38 pt at 2x (91x76)" "$T/check.log"
+    flag previews/mac/data/manifest.json doc points '[45.5,38]'
+    png previews/mac/mac/doc.png 240 "" 91 76; png previews/mac/mac/doc.dark.png 20 "" 91 76
+    $PAGE --check > "$T/check.log" 2>&1; status=$?
+    expect mac_fraction "45.5 x 2 pt at 91 px passes" [ "$status" = 0 ]
+    unset PREVIEW_GALLERY_OUT
     cd "$ROOT" || return; rm -rf "$T"
 }
 
@@ -662,7 +719,7 @@ lang_import() {   # --import DIR --lang fr: the run's PNGs into <platform>/fr/, 
     # Distinct bytes per language: an import that overwrote the English images (or wrote French over them) would show
     png "$T/fr/alpha.png" 200; png "$T/fr/alpha.dark.png" 60; png "$T/fr/beta.png" 210; png "$T/fr/beta.dark.png" 50
     cp previews/iphone/alpha.png "$T/alpha.en.png"; cp previews/iphone/alpha.dark.png "$T/alpha.en.dark.png"; cp previews/duo-inner/beta.png "$T/beta.en.png"
-    echo '[{"name":"alpha","group":"G","slug":"alpha","size":"402x874"},{"name":"beta","group":"G","slug":"beta","size":"402x874","platform":"duo-inner"}]' > "$T/fr/manifest.json"
+    echo '[{"name":"alpha","group":"G","slug":"alpha","size":"402x874","points":[402,874],"scale":2},{"name":"beta","group":"G","slug":"beta","size":"402x874","points":[402,874],"scale":3,"platform":"duo-inner"}]' > "$T/fr/manifest.json"
     $PAGE --import "$T/fr" --lang fr > "$T/lang.log" 2>&1; local status=$?
     expect lang_import "exits zero" [ "$status" = 0 ]
     expect lang_import "the images are in <platform>/fr/" test -f previews/iphone/fr/alpha.png -a -f previews/iphone/fr/alpha.dark.png -a -f previews/duo-inner/fr/beta.png -a -f previews/duo-inner/fr/beta.dark.png
@@ -706,7 +763,7 @@ esac
 if [ "${STUB_MAC_FILES:-}" != none ]; then
     echo "mac-gallery-file alpha.png $(cat "$STUB_PNG_LIGHT")"
     echo "mac-gallery-file alpha.dark.png $(cat "$STUB_PNG_DARK")"
-    echo "mac-gallery-file manifest.json $(echo '[{"name":"alpha","group":"G","slug":"alpha","size":"6x6","platform":"mac"},{"name":"beta","group":"G","slug":"beta","size":"6x6","platform":"mac"}]' | base64 | tr -d '\n')"
+    echo "mac-gallery-file manifest.json $(echo '[{"name":"alpha","group":"G","slug":"alpha","size":"6x6","points":[6,6],"scale":2,"platform":"mac"},{"name":"beta","group":"G","slug":"beta","size":"6x6","points":[6,6],"scale":2,"platform":"mac"}]' | base64 | tr -d '\n')"
 fi
 echo "gallery: 1 scenario(s)"
 exit 0
@@ -802,6 +859,8 @@ path = sys.argv[1]
 manifest = json.load(open(path))
 for entry in manifest:
     entry["size"] = "144x90" if entry["slug"] == "doc" else "46x38"   # a tenth of the windows: the same ratios
+    entry["points"] = [144, 90] if entry["slug"] == "doc" else [46, 38]
+    entry["scale"] = 2
 json.dump(manifest, open(path, "w"))
 PY
     png "$T/run/doc.png" 240 "" 288 180; png "$T/run/doc.dark.png" 20 "" 288 180   # at 2x
@@ -822,7 +881,7 @@ PY
 ALL="fallback_run fallback_keep_booted fallback_borrowed fallback_test_fails
 pool_run pool_options pool_acquire_fails pool_build_fails pool_test_fails pool_check_fails
 pool_signalled_int_acquire pool_signalled_int_build pool_signalled_int_test pool_signalled_term_test pool_signalled_hup_build
-pool_languages pool_duo pool_ipad unknown_device simulator_udid fallback_udid layout preserve skipped document_canvas imagery render_scale draws_nothing forced_appearance coexist lang_import
+pool_languages pool_duo pool_ipad unknown_device simulator_udid fallback_udid layout preserve skipped document_canvas imagery render_scale render_size_missing mac_fraction draws_nothing forced_appearance coexist lang_import
 mac_run mac_only mac_languages mac_test_fails mac_no_file layout_mac"
 for c in ${@:-$ALL}; do
     if declare -F "$c" > /dev/null; then "$c"; else echo "FAIL unknown case: $c"; FAILED=1; fi

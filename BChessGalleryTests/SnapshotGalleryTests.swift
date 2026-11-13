@@ -80,7 +80,7 @@ extension GallerySuites {
                                             platform: $0.size.platform(ipadPass: ipadPass),
                                             skipped: $0.skipReason(duoPass: duoPass, ipadPass: ipadPass),
                                             documentCanvas: $0.documentCanvas ? true : nil, drawsNothing: $0.drawsNothing ? true : nil,
-                                            imagery: $0.imagery ? true : nil, duoInner: $0.size.isDuoInner ? true : nil)
+                                            imagery: $0.imagery ? true : nil)
             }
         }
 
