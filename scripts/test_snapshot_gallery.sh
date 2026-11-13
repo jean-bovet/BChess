@@ -638,6 +638,12 @@ mac_fraction() {   # the Mac window is not whole points: 45.25 x 2 = 90.5 px rou
     png previews/mac/mac/doc.png 240 "" 91 76; png previews/mac/mac/doc.dark.png 20 "" 91 76
     $PAGE --check > "$T/check.log" 2>&1; status=$?
     expect mac_fraction "45.5 x 2 pt at 91 px passes" [ "$status" = 0 ]
+    # 0.49999999999999994 x 1 is just under half: Swift's .rounded() gives 0, floor(v + 0.5) would give 1
+    flag previews/mac/data/manifest.json doc points '[0.49999999999999994,38]'; flag previews/mac/data/manifest.json doc scale 1
+    png previews/mac/mac/doc.png 240 "" 1 38; png previews/mac/mac/doc.dark.png 20 "" 1 38
+    $PAGE --check > "$T/check.log" 2>&1; status=$?
+    expect mac_fraction "a hair under half a pixel rounds down: 1 px fails" [ "$status" != 0 ]
+    expect mac_fraction "and names the expected 0" grep -q "(0x38)" "$T/check.log"
     unset PREVIEW_GALLERY_OUT
     cd "$ROOT" || return; rm -rf "$T"
 }
@@ -662,7 +668,7 @@ coverage_stub() {   # a stub xcrun first on PATH: `xccov view --report --json <b
     mkdir -p "$T/bin"
     cat > "$T/bin/xcrun" <<STUB
 #!/bin/bash
-[ "\$1 \$2 \$3 \$4" = "xccov view --report --json" ] || exit 99
+[ "\$1 \$2 \$3 \$4 \$5" = "xccov view --report --json $T/app.xcresult" ] || exit 99
 case "\${STUB_XCCOV:-ok}" in
     fail) echo "Error: not a result bundle" >&2; exit 1 ;;
     nobundle) echo '{"targets":[{"name":"BChessTests.xctest","coveredLines":5,"executableLines":10,"files":[]}]}' ;;

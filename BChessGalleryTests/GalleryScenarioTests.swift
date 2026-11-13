@@ -23,7 +23,9 @@ extension GallerySuites {
                 let points = scenario.size.points(screen: screen)
                 #expect(entry.slug == scenario.slug)
                 #expect(entry.points == [Double(points.width), Double(points.height)], "\(scenario.slug)")
-                #expect(entry.scale == (scenario.size.isDuoInner ? 3 : 2), "\(scenario.slug)")
+                // The Duo pass captures everything at the display's 3x; otherwise only the Duo inner poses are 3x
+                let expectedScale: Double = SnapshotGalleryTests.duoPass || scenario.size.isDuoInner ? 3 : 2
+                #expect(entry.scale == expectedScale, "\(scenario.slug)")
                 #expect(entry.size == "\(Int(points.width))x\(Int(points.height))", "\(scenario.slug)")
             }
         }

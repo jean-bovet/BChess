@@ -116,6 +116,15 @@ extension MacGallerySuites {
             }
         }
 
+        @Test("the manifest writes a fractional window frame as points, unrounded, at the capture scale")
+        func manifestKeepsFractionalPoints() throws {
+            let slug = MacGalleryScenarios.settingsWindow.slug
+            let entry = try #require(Self.manifest(rendered: [slug: CGSize(width: 45.25, height: 38)])[slug])
+            #expect(entry["points"] as? [Double] == [45.25, 38])
+            #expect(entry["scale"] as? Double == Double(MacRenderer.scale))
+            #expect(entry["size"] as? String == "45x38")
+        }
+
         private static func sizeString(_ size: CGSize) -> String {
             "\(Int(size.width))x\(Int(size.height))"
         }

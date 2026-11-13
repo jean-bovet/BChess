@@ -183,6 +183,12 @@ def size_ratio(entry):
         return 0
 
 
+def round_half_away(value):
+    """Swift's `.rounded()` for a positive float: exact, where floor(value + 0.5) is off for 0.49999999999999994."""
+    base = math.floor(value)
+    return base + 1 if value - base >= 0.5 else base
+
+
 def render_size(entry):
     """The pixel size the snapshot test captured a scenario at, from the entry's `points` x `scale`, or None when either is
     missing or not a finite positive number. Rounded half away from zero (Swift's `.rounded()`), never Python's round()."""
@@ -193,7 +199,7 @@ def render_size(entry):
     if not (isinstance(points, list) and len(points) == 2 and all(positive(n) for n in points) and positive(scale)):
         return None
     try:
-        return tuple(math.floor(n * scale + 0.5) for n in points)
+        return tuple(round_half_away(n * scale) for n in points)
     except (OverflowError, ValueError):
         return None
 
