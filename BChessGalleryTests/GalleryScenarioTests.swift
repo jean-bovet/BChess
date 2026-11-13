@@ -14,6 +14,20 @@ extension GallerySuites {
     /// The scenario list feeds the gallery renderer (`SnapshotGalleryTests`).
     @MainActor @Suite struct GalleryScenarioTests {
 
+        @Test("the manifest records every scenario's window in points and its capture scale")
+        func manifestRecordsPointsAndScale() {
+            let screen = CGSize(width: 402, height: 874)
+            let entries = SnapshotGalleryTests.manifestEntries(screen: screen)
+            #expect(entries.count == GalleryScenarios.all.count)
+            for (scenario, entry) in zip(GalleryScenarios.all, entries) {
+                let points = scenario.size.points(screen: screen)
+                #expect(entry.slug == scenario.slug)
+                #expect(entry.points == [Double(points.width), Double(points.height)], "\(scenario.slug)")
+                #expect(entry.scale == (scenario.size.isDuoInner ? 3 : 2), "\(scenario.slug)")
+                #expect(entry.size == "\(Int(points.width))x\(Int(points.height))", "\(scenario.slug)")
+            }
+        }
+
         @Test("every scenario has a non-empty name and group and a unique slug")
         func everyScenarioHasANameAGroupAndAUniqueSlug() {
             var seen = Set<String>()

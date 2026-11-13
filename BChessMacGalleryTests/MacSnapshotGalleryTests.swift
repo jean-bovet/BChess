@@ -49,7 +49,9 @@ extension MacGallerySuites {
             let entries = try MacGalleryScenarios.all.map { scenario in
                 let size = try rendered[scenario.slug] ?? scenario.size.points(for: scenario.view())
                 return GalleryManifestEntry(name: scenario.name, group: scenario.group, slug: scenario.slug,
-                                            size: "\(Int(size.width))x\(Int(size.height))", platform: "mac")
+                                            size: "\(Int(size.width))x\(Int(size.height))",
+                                            points: [Double(size.width), Double(size.height)],
+                                            scale: Double(MacRenderer.scale), platform: "mac")
             }
             let encoder = JSONEncoder()
             encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
