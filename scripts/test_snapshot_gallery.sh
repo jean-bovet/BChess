@@ -642,6 +642,88 @@ mac_fraction() {   # the Mac window is not whole points: 45.25 x 2 = 90.5 px rou
     cd "$ROOT" || return; rm -rf "$T"
 }
 
+coverage_views() {   # --coverage-views lists the view types no scenario names, prints only; --coverage needs a bundle
+    page_setup
+    mkdir -p "$TREE/Shared"
+    printf 'import SwiftUI\nstruct Lonely: View {\n}\n' > "$TREE/Shared/Lonely.swift"
+    cd "$TREE" || return
+    fake_run "$T/run" "alpha:"
+    $PAGE --import "$T/run" > "$T/out.log" 2>&1
+    $PAGE --coverage-views > "$T/cov.log" 2>&1; local status=$?
+    expect coverage_views "--coverage-views exits zero" [ "$status" = 0 ]
+    expect coverage_views "it names the view no scenario shows" grep -q "^  Lonely$" "$T/cov.log"
+    expect coverage_views "it writes no coverage.json" test ! -e previews/data/coverage.json
+    $PAGE --coverage > "$T/cov.log" 2>&1; status=$?
+    expect coverage_views "--coverage without a bundle exits 2" [ "$status" = 2 ]
+    cd "$ROOT" || return; rm -rf "$T"
+}
+
+coverage_stub() {   # a stub xcrun first on PATH: `xccov view --report --json <bundle>` answers per $STUB_XCCOV (ok | nobundle | fail)
+    mkdir -p "$T/bin"
+    cat > "$T/bin/xcrun" <<STUB
+#!/bin/bash
+[ "\$1 \$2 \$3 \$4" = "xccov view --report --json" ] || exit 99
+case "\${STUB_XCCOV:-ok}" in
+    fail) echo "Error: not a result bundle" >&2; exit 1 ;;
+    nobundle) echo '{"targets":[{"name":"BChessTests.xctest","coveredLines":5,"executableLines":10,"files":[]}]}' ;;
+    *) cat <<JSON
+{"targets":[
+ {"name":"BChessTests.xctest","coveredLines":5,"executableLines":10,"files":[]},
+ {"name":"BChess.app","coveredLines":60,"executableLines":90,"files":[
+  {"path":"$TREE/Shared/Board.swift","coveredLines":40,"executableLines":50},
+  {"path":"$TREE/Shared/Empty.swift","coveredLines":0,"executableLines":0},
+  {"path":"$TREE/Shared/Game.swift","coveredLines":20,"executableLines":40}]}]}
+JSON
+    ;;
+esac
+STUB
+    chmod +x "$T/bin/xcrun"
+    export PATH="$T/bin:$ORIG_PATH"
+}
+
+coverage_app() {   # --coverage XCRESULT: the app target's totals and files in data/coverage.json and on the page
+    page_setup
+    coverage_stub
+    cd "$TREE" || return
+    fake_run "$T/run" "alpha:"
+    $PAGE --import "$T/run" > "$T/out.log" 2>&1
+    mkdir "$T/app.xcresult"; touch -t 202611131015 "$T/app.xcresult"
+    $PAGE --coverage "$T/app.xcresult" > "$T/cov.log" 2>&1; local status=$?
+    local json=previews/data/coverage.json
+    expect coverage_app "exits zero" [ "$status" = 0 ]
+    expect coverage_app "totals are the app target's" python3 -c 'import json,sys; d=json.load(open(sys.argv[1])); sys.exit(not (d["covered"], d["executable"]) == (60, 90))' "$json"
+    expect coverage_app "files least covered first, paths relative" python3 -c 'import json,sys; d=json.load(open(sys.argv[1])); sys.exit(not [f["path"] for f in d["files"]] == ["Shared/Game.swift", "Shared/Board.swift", "Shared/Empty.swift"])' "$json"
+    expect coverage_app "measured is the bundle date" python3 -c 'import json,sys; sys.exit(not json.load(open(sys.argv[1]))["measured"] == "2026-11-13 10:15")' "$json"
+    expect coverage_app "the page has the section" grep -q 'id="coverage"' previews/index.html
+    expect coverage_app "the page shows the percent" grep -q "66.7%" previews/index.html
+    expect coverage_app "the page has a nav link" grep -q 'href="#coverage"' previews/index.html
+    expect coverage_app "the page shows the bundle date" grep -q "2026-11-13 10:15" previews/index.html
+    expect coverage_app "file rows: path, count, percent, least covered first" python3 -c 'import re,sys
+h=open(sys.argv[1]).read()
+rows=["Shared/Game.swift</td><td>20/40</td><td>50.0%", "Shared/Board.swift</td><td>40/50</td><td>80.0%", "Shared/Empty.swift</td><td>0/0</td>"]
+pos=[h.find(r) for r in rows]
+sys.exit(not (min(pos) >= 0 and pos == sorted(pos)))' previews/index.html
+    expect coverage_app "no scratch path leaks into the page" bash -c '! grep -q "$0" previews/index.html' "$TREE"
+    cp "$json" "$T/before.json"
+    STUB_XCCOV=nobundle $PAGE --coverage "$T/app.xcresult" > "$T/cov.log" 2>&1; status=$?
+    expect coverage_app "no BChess.app target: exit 2" [ "$status" = 2 ]
+    expect coverage_app "a message on stderr" grep -q "BChess.app" "$T/cov.log"
+    expect coverage_app "coverage.json unchanged (no target)" cmp -s "$json" "$T/before.json"
+    STUB_XCCOV=fail $PAGE --coverage "$T/app.xcresult" > "$T/cov.log" 2>&1; status=$?
+    expect coverage_app "xccov failing: exit 2" [ "$status" = 2 ]
+    expect coverage_app "the message names the bundle" grep -q "app.xcresult" "$T/cov.log"
+    expect coverage_app "coverage.json unchanged (xccov failed)" cmp -s "$json" "$T/before.json"
+    echo '{"views": 3, "notRendered": []}' > "$json"
+    $PAGE --check > "$T/check.log" 2>&1
+    expect coverage_app "an old-shape file adds no section" bash -c '! grep -q "id=\"coverage\"" previews/index.html'
+    expect coverage_app "and no nav link" bash -c '! grep -q "href=\"#coverage\"" previews/index.html'
+    cp "$T/before.json" "$json"
+    $PAGE --import "$T/run" > "$T/out.log" 2>&1
+    $PAGE --check > "$T/check.log" 2>&1
+    expect coverage_app "a later full import keeps the section" grep -q 'id="coverage"' previews/index.html
+    cd "$ROOT" || return; rm -rf "$T"
+}
+
 draws_nothing() {   # a blank image (one colour everywhere) fails unless the scenario draws nothing by design
     page_setup
     cd "$TREE" || return
@@ -881,7 +963,7 @@ PY
 ALL="fallback_run fallback_keep_booted fallback_borrowed fallback_test_fails
 pool_run pool_options pool_acquire_fails pool_build_fails pool_test_fails pool_check_fails
 pool_signalled_int_acquire pool_signalled_int_build pool_signalled_int_test pool_signalled_term_test pool_signalled_hup_build
-pool_languages pool_duo pool_ipad unknown_device simulator_udid fallback_udid layout preserve skipped document_canvas imagery render_scale render_size_missing mac_fraction draws_nothing forced_appearance coexist lang_import
+pool_languages pool_duo pool_ipad unknown_device simulator_udid fallback_udid layout preserve skipped document_canvas imagery render_scale render_size_missing mac_fraction coverage_views coverage_app draws_nothing forced_appearance coexist lang_import
 mac_run mac_only mac_languages mac_test_fails mac_no_file layout_mac"
 for c in ${@:-$ALL}; do
     if declare -F "$c" > /dev/null; then "$c"; else echo "FAIL unknown case: $c"; FAILED=1; fi
