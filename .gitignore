@@ -19,3 +19,6 @@ Signing.local.xcconfig
 
 # App Store screenshots renders (app-store-screenshots)
 .build/
+
+DerivedData/
+*.local.xcconfig
