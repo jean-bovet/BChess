@@ -1,6 +1,6 @@
 ---
 name: preview-gallery
-description: Render every screen of the BChess iPhone app in light and dark with one snapshot-test run (scripts/snapshot-gallery.sh) and open the preview gallery, one card per scenario with light and dark side by side. The app has no #Preview: the scenario list in the test target is the only source. Use when Jean asks to see the screens, to check a branch visually, to look at one screen after a change, or to regenerate the preview gallery.
+description: "show me the screens", "check this branch visually", "regenerate the gallery": render every BChess iPhone screen light and dark with scripts/snapshot-gallery.sh and open the preview gallery.
 argument-hint: [--only pattern]
 allowed-tools: Read, Glob, Grep, Bash
 ---
@@ -11,10 +11,8 @@ allowed-tools: Read, Glob, Grep, Bash
 renders them all, light and dark, into PNGs that `scripts/preview-gallery.py` assembles into one HTML page
 (gitignored, regenerated on demand): one card per scenario, light on the left, dark on the right.
 
-Why this and nothing else: a `#Preview` duplicates the scenario, needs a pairing check to stay in step with it,
-and is rendered by Xcode's canvas, the heaviest way to look at a screen (Xcode plus a preview host per file).
-The scenario list is one source, ships nothing in the app, and a test run on one headless simulator renders
-every screen at about one second each. Spot checks use `--only`, not the canvas.
+The scenario list is the one source: no `#Preview`, nothing shipped in the app. Spot checks use `--only`, never
+Xcode's canvas.
 
 **When it runs.** `/develop`'s step gates never render the gallery: a step that adds or changes scenarios only
 checks that they compile. Its landing gate shows Jean the scenarios a change of look touches; `/testflight` renders every scenario. Spot checks outside `/develop` may still use `--only`.
@@ -123,12 +121,6 @@ scripts/snapshot-gallery.sh --no-open           # do not open the page (agents, 
   simulator (no lease is held while it waits), waits a bounded time (10 min, say), then exits 75 naming the holder,
   and releases it **last**, after the lease and any simulator settings it changed are restored (not yet in
   BChess's scripts).
-- Costs measured on a proven repo (24 GB Mac, iOS 27 simulator): booting the simulator about **6 GB** of RAM;
-  a run on a booted one about **0.25 GB**; build tools under 0.3 GB. Warm run: about 1 s per scenario plus a
-  fixed 20–25 s (xcodebuild installs and launches the host app), so ~50 scenarios take 1.5–2.5 min and
-  `--only` one scenario about 25 s. From a shut-down simulator add 1–3 min (a fresh boot keeps iOS busy). The
-  pool normally keeps a released simulator warm for the next run (within the host's budget) and shuts it
-  down after 30 idle minutes.
 - **iPhone Duo** (`--device duo`, pool spec `duo`, iOS 27.1): `simctl` cannot fold or unfold a simulator (Xcode 27.1),
   so it stays folded. The phone-sized scenarios render on the outer display (466 x 678 pt, compact width, the status
   bar on the side); the script asserts that size before labelling the captures. The inner display's poses are
@@ -212,8 +204,7 @@ One entry in the scenario list, and nothing in the app:
   render it; BChess computes it per pass in `GalleryScenario.skipReason(duoPass:ipadPass:)`), the page shows "not rendered on this pass", and `--check` accepts the missing
   pair for that reason only. Full-bleed imagery under chrome (a satellite map) does not darken in the dark
   appearance at all, so it cannot meet the pair rule either: such a card sets `imagery: true`, which waives the
-  luminance rules for that pair, and only those (the byte-identical and blank rules still apply). Measured: a map card at 0.401 light,
-  0.399 dark. BChess's manifest carries all four: `skipped` (the Duo pass), and the scenario fields
+  luminance rules for that pair, and only those (the byte-identical and blank rules still apply). BChess's manifest carries all four: `skipped` (the Duo pass), and the scenario fields
   `documentCanvas`, `drawsNothing` and `imagery`, which no card sets yet.
 - **Dark-only entries.** A platform with no light appearance (a Watch) may mark its entries dark-only: one
   `<slug>.dark.png`, no light slot and no pair rules, but the luminance rule still applies.
@@ -253,21 +244,20 @@ One entry in the scenario list, and nothing in the app:
    the PNGs of every folder but `data/` and names files by their relative path (`ipad/x.dark.png`). The
    luminance helper prints `<folder>/<file>`. A repo moving from a flat gallery migrates it in the script (every
    command first moves what is still at the top, resumably, then rebuilds the page), and `snapshot-gallery.sh`
-   reads `data/manifest.json` with a fallback to the old path. Proven in one repo's conversion; BChess's script
+   reads `data/manifest.json` with a fallback to the old path. BChess's script
    carries the migration (its lifecycle tests cover it).
    **A public repo** (BChess is one): the manifest and the page hold no absolute path, and the PNGs are written
    without metadata.
 4. **`scripts/snapshot-gallery.sh`**:
-   - The simulator from the machine-wide pool: `SIMULATOR_UDID` if the caller passes one (never released),
-     else `simpool acquire --spec iphone --pid $$` (then `ipad`, `duo`, one device after the other), and
-     `simpool release` in the exit trap. Every `xcodebuild` runs under `buildlock --folder <DerivedData>`.
-     Never boots or shuts down a simulator itself.
+   - The simulator and builds per the global rules (`simpool`, `buildlock --folder <DerivedData>`):
+     `SIMULATOR_UDID` if the caller passes one (never released), else `simpool acquire --spec iphone --pid $$`
+     (then `ipad`, `duo`, one device after the other), and `simpool release` in the exit trap.
    - A repo that may run without the pool (a public repo, a fresh clone): when `simpool` is not on PATH, its
      own agent simulator (created if missing, booted with `simctl boot`, no Simulator.app window) under the
      old rule: `xcrun simctl list devices booted` first, wait (up to 10 min) for another one, never touch one
      it did not boot, a `trap` shuts down the one it booted. A private repo requires the pool.
    - Persistent DerivedData; `-skipPackageUpdates -disableAutomaticPackageResolution` once the packages are
-     resolved (otherwise every run resolves remote packages: 75 s measured).
+     resolved (otherwise every run resolves remote packages).
    - `build-for-testing` once, then one `test-without-building -only-testing:<snapshot class>
      -parallel-testing-enabled NO -enableCodeCoverage NO -testLanguage en -testRegion US`.
    - The variables go in **xcodebuild's environment** as `TEST_RUNNER_<NAME>=… xcodebuild …`; written as
@@ -278,7 +268,7 @@ One entry in the scenario list, and nothing in the app:
      holds the folder but not a host build slot.
    - Import, `--check`, open the page (`--no-open` skips that: agents, scripted runs), print the timings (boot,
      build, test, total). It keeps the Mac awake for the run (`caffeinate -dims -w $$`, released when the script
-     exits): a run during which the Mac slept took three times as long. `caffeinate` does not forward signals to a
+     exits). `caffeinate` does not forward signals to a
      command it runs: use `-w $$`, or re-exec the script under it and test the signal path.
    - **Boundary line**: the gallery test prints its isolation and network counters (`gallery: boundaries …`,
      `network: …`); the script fails the run when the line is missing or a counter is not zero, so the report's
@@ -325,10 +315,8 @@ One entry in the scenario list, and nothing in the app:
 
 ## Looking at a gallery as an agent
 
-Read the contact sheet, not the PNGs: `contact-sheet previews/iphone -o <scratch>/iphone.png` (one sheet
-per platform folder, light and dark side by side, labelled) and look at that; open a single PNG only to
-check one detail. Every image read stays in the context for the rest of the session, and a gallery pass
-has fifty of them.
+A contact sheet per platform folder, per the global rules: `contact-sheet previews/iphone -o
+<scratch>/iphone.png` (light and dark side by side, labelled); a single PNG only to check one detail.
 
 ## The gate: `--check`
 
@@ -360,7 +348,7 @@ A planned change (`/develop`), in three gated steps:
 3. This skill's repo facts and the repo's `AGENTS.md` (replace any "every view needs a `#Preview`" rule with
    "every screen needs a scenario"). Gate: Jean reviews the gallery.
 
-Gotchas met on the first conversion: xcodebuild can stay alive after a failed test (stop the process it
+Gotchas: xcodebuild can stay alive after a failed test (stop the process it
 started, never one it did not); a view hard-wired to a shared singleton cannot use a private store (see Shared
 singletons); old fixtures may be in a format the parser no longer reads.
 

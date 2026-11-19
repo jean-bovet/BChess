@@ -1,6 +1,8 @@
 ---
 name: app-icon
-description: Create or refine a layered Apple Icon Composer app icon from a reference image or existing light icon, with dark, tinted, and clear appearance previews. Use for Apple app icon and appearance work, not ordinary image editing or unrelated icon systems.
+description: "app icon", "dark icon", "tinted icon", "Icon Composer": create or refine a layered Apple .icon from a reference image or the light icon, with dark, tinted and clear previews. Not for ordinary image editing.
+argument-hint: [reference image or what to change]
+allowed-tools: Read, Write, Edit, Glob, Grep, Bash
 ---
 
 # /app-icon — reference-faithful layered Apple icons

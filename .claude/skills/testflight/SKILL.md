@@ -1,6 +1,6 @@
 ---
 name: testflight
-description: Ship main to TestFlight through Xcode Cloud — the BChess iPhone/iPad app and the Mac App Store app, for the internal testers. Use when the user asks for a TestFlight build, to ship or push to TestFlight, or to send a build to testers. A public App Store release is `/release`, not this skill.
+description: "testflight", "TestFlight build", "send to testers": ship main to TestFlight through Xcode Cloud (BChess iPhone/iPad and Mac App Store apps, internal testers). An App Store release is `/release`.
 argument-hint: "[version, e.g. 1.0 — optional; asked when omitted]"
 allowed-tools: Read, Edit, Write, Bash, AskUserQuestion
 ---
@@ -43,7 +43,7 @@ Facts this skill relies on:
 - It ends when `testflight` is pushed (§10). Processing, the build report and the expiry reminder
   are Jean's to ask for later (§11); never wait on Xcode Cloud after the push.
 - **The `testflight` run is the cloud check.** Never read or wait for a `main` run before the push:
-  to save compute hours (one monthly pool for every app),
+  to save compute hours (the global rules),
   `main` need not build in Xcode Cloud at all. The run the push starts tests and archives the
   commit that goes out; whether it succeeded is the §11 build report.
 - Stop on the first failure, say which step failed and why, and leave the rest undone. Never fake
@@ -208,13 +208,10 @@ the rest from the tester's side:
 
 - What they can do or will notice, not what was implemented. No ticket ids, no file names, no
   internal type names, no "fix for #…".
-- Plain text, at most 4000 characters per file, no emoji (App Store Connect rejected a 🔒 as
-  "invalid characters"; `•`, `« »` and accented letters pass).
+- Plain text, at most 4000 characters per file, no emoji (`•`, `« »` and accented letters pass).
 - The What to Test file is **replaced** every build, not appended; its history is its `git log`.
-- Contact addresses (the global working agreement's contacts): an address testers see — in What to
-  Test, or as the TestFlight feedback email — is the `public` one; the `apple-review` address goes
-  only in the Beta App Review contact. No retired domain (the global working agreement's list) in
-  any link.
+- Email addresses and links follow the global rules: testers see only the public address (What to
+  Test, the feedback email), and no link uses a retired domain.
 - If nothing in the range is visible to a tester, write one line saying so (e.g. "No visible
   changes: build and stability work.") rather than leaving the file stale or empty.
 
@@ -305,9 +302,7 @@ next `/testflight` or `/release`.
 ## 11. Later, only when Jean asks
 
 **Build report** — did the `testflight` branch succeed. Read the finished run — every action,
-not only the archive — with the
-`xcode-cloud` tool (its path is in the global working agreement; it loads its own credentials,
-never open or source them):
+not only the archive — with the `xcode-cloud` tool (the global rules):
 
 ```bash
 xcode-cloud builds "BChess (iOS)" --limit 3        # find the run the push started
