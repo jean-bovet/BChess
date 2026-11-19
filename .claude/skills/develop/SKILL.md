@@ -54,7 +54,7 @@ Do not paste the working agreement into prompts — point at the file. This skil
 
 **Skip Codex** for work that is not `/develop` work:
 
-UI-only view tweaks and docs-only edits.
+UI-only view tweaks, String Catalog translations, and docs-only edits.
 
 **The reviewer is always a different vendor from the planner and implementer**: Codex
 (`codex exec`, below).
@@ -118,7 +118,10 @@ full run spans few plans.
   reuses those products. An app-hosted test target (a test bundle that runs inside the app, on the Mac
   too) follows the same rule: `build-for-testing` once per step, every rerun and red proof through
   `test-without-building -only-testing:<Target>/<Class>`; a plain `xcodebuild test` re-links, re-signs
-  and relaunches the host app for every single run.
+  and relaunches the host app for every single run. **A scheme with several test plans** names the gate's
+  plan on both commands (`-testPlan <Plan>`): without it `build-for-testing` builds every plan, a later
+  plan's build of the same host app can leave it without the gate's test bundle, and
+  `test-without-building` fails with "Failed to create a bundle instance" before any test runs.
 - **One build at a time per build folder.** Use the repo's scripts or build wrapper when it has them
   (never call `xcodebuild` around them); otherwise `buildlock --folder <dd> -- xcodebuild …`. A `test-without-building` run takes the
   folder's lock but no build slot: `buildlock --folder <dd> --no-slot -- xcodebuild test-without-building …`.
@@ -154,6 +157,8 @@ full run spans few plans.
 - **Reading results.** Read the **exit status** and the summary line of every command; an empty grep
   is clean only if the command succeeded. The number of tests run is part of the result: zero is red,
   and a count that shrinks needs an explanation (a conditionally disabled test counts as skipped).
+  Swift Testing app tests run through xcodebuild print `Executed 0 tests, with 0 failures`, which means
+  nothing: read `Test run with N tests in M suites passed`. Only XCTest bundles print a real `Executed N tests`.
   A gate that refuses to run (Mac UI tests on a locked screen, say) is reported as not run, an owed
   check, never as green.
 - **Red proof.** A regression test is proven red without its fix before it goes green: commit the
@@ -162,7 +167,9 @@ full run spans few plans.
   the tree for any temporary marker. A red-proof run builds incrementally in the step gates' `<dd>`
   (`build-for-testing`) and runs only the test class concerned (`xcodebuild test-without-building
   -only-testing:<Target>/<Class>`, e.g. `-only-testing:BChessMacGalleryTests/<Class>` on the Mac line), never the whole
-  suite: the step and landing gates run the rest. No version bump during feature work.
+  suite: the step and landing gates run the rest. Build once applies to every Xcode test target; plain
+  `xcodebuild test -only-testing:…` only where the platform does not allow building once; a Swift package
+  runs `swift test --filter <Class>`. No version bump during feature work.
 - **Warnings.** Fix every warning the branch touches or reveals, including ones that predate it.
   Deprecations are fixed, never silenced (`@available`, `#warning`, suppression flags); if the fix
   conflicts with a documented decision, update that decision's comment. A build-only warnings check uses
