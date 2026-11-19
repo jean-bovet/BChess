@@ -1,6 +1,6 @@
 ---
 name: release
-description: Publish the BChess build testers already have on TestFlight to the App Store — the iPhone/iPad app and the Mac App Store app, one App Store record. Use when Jean says "release", "App Store", "submit BChess", "ship to the public". Sending a build to TestFlight is `/testflight`, not this skill.
+description: "release", "App Store", "submit BChess", "ship to the public": publish the build testers have on TestFlight to the App Store (iPhone/iPad and Mac, one record). A TestFlight build is `/testflight`.
 allowed-tools: Read, Edit, Write, Bash, AskUserQuestion
 ---
 
@@ -36,18 +36,13 @@ allowed-tools: Read, Edit, Write, Bash, AskUserQuestion
   skill tags it. Fixing a rejected or broken candidate is therefore another `/testflight` at the same
   version, then `/release` again.
 - The `app-store` tool creates the App Store version, sets What's New on every locale, configures
-  the phased release and attaches the candidate's build (`attach-build`). It and the `release-check`
-  tool (§2b) live where the global working agreement says, and load their own credentials; never
-  open or source them. Submitting for review is Jean's, in App Store Connect.
+  the phased release and attaches the candidate's build (`attach-build`), per the global rules on
+  the App Store tools. Submitting for review is Jean's, in App Store Connect.
 - Three hard stops: the readiness audit (§2b) when it finds a problem, the notes review (§4) and App
   Review (§6). Never continue past one without an explicit answer from Jean.
-- **Retired domains** (the global working agreement's list, e.g. arizona-software.ch → jean-bovet.ch)
-  must appear nowhere: not in shipped files, not in any App Store URL, description or notes. Both
-  checkers in §2b flag them; new pages go on the replacement domain. (The bundle ID
+- **Retired domains and email addresses** follow the global rules, everywhere: shipped files, every
+  App Store URL, description and notes. Both checkers in §2b flag them. (The bundle ID
   `ch.arizona-software.BChess` cannot change and is not a link.)
-- **Email addresses** (the global working agreement's contacts): the `apple-review` address only in
-  the App Review contact; the `public` one everywhere public or external — support and privacy pages,
-  the description, in-app text. Both checkers flag the Apple-only address where it doesn't belong.
 - It runs in the main conversation — no subagent. Stop on the first failure, say which step failed
   and why, and leave the rest undone. Never fake a check that is Jean's to make.
 
@@ -146,7 +141,7 @@ Each prints `PROBLEM`, `CHECK` and `ok` lines. What they cover, and what to judg
 | URLs | Support and marketing URLs on every locale, a privacy policy URL (required), all `https` and returning 200, none on a retired domain |
 | Copyright | Current year |
 | Age rating | Questions Apple added since the last release left unanswered block submission |
-| Email addresses | App Review contact = the `apple-review` address; support pages, description and in-app text use the `public` one |
+| Email addresses | As the global rules place them: the Apple-only address in the App Review contact only |
 | App Review details | Contact still current; "sign-in required" off unless there is a login; notes that explain every permission (`NS…UsageDescription`) and any hidden or hard-to-reach feature |
 | App Privacy label | Not readable through the API: compare it with what the build collects (permissions, SDKs, network use); an app last updated before 2020 may have none |
 | Features removed since the live version | What's New (§4) must say so; the description must not still promise them |
