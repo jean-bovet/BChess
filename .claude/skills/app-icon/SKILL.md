@@ -33,7 +33,7 @@ For AI work, use available native image generation and inspect every result. Do 
 
 ## Build the document
 
-Read [references/manifest.md](references/manifest.md) when preparing inputs. Write a per-icon manifest that describes back-to-front layer order, masks or prepared image paths, appearance colors, and material treatment. Keep it with a project-relative source image or prepared layers so the build is portable. The bundled helper uses Python's standard library and ImageMagick:
+Read [references/manifest.md](references/manifest.md) when preparing inputs. Write a per-icon manifest that describes back-to-front layer order, masks or prepared image paths, appearance colors, and material treatment. Keep it with a project-relative source image or prepared layers so the build is portable. Design sources (inputs, manifests, work files) live in a folder the app target does not sync, so they never ship in the bundle. The bundled helper uses Python's standard library and ImageMagick:
 
 ```sh
 python3 <skill-dir>/scripts/build_icon.py --manifest icon-inputs/layers.json --output icon-output/AppIcon.icon
@@ -44,13 +44,13 @@ Output directories must be new. Iterate in sibling directories instead of overwr
 
 For clean shapes, use native material effects and let Composer handle background, blur, highlights, and masking. For a close match to artwork with intrinsic glow, retaining that glow and using `material: fidelity` is a deliberate compromise: it suppresses added blur, specular highlights, shadows, and translucency that can cause double outlines. Offer the reference-faithful result first when matching is the user's priority.
 
-Set default and dark appearances deliberately; the helper's configurable shadow compression is a starting point, not a universal palette. Tinted layers must be neutral grayscale with readable tonal hierarchy. Adjust grayscale contrast or provide explicit mono artwork if conversion loses the subject. No rounded canvas corners belong in source layers.
+Set default and dark appearances deliberately; the helper's configurable shadow compression is a starting point, not a universal palette. Dark must stay visible on a dark Home Screen: no near-black subject or background. Every appearance PNG comes from the layer pipeline: never hand-paint one; change the script or manifest and regenerate. Tinted layers must be neutral grayscale with readable tonal hierarchy. Adjust grayscale contrast or provide explicit mono artwork if conversion loses the subject. No rounded canvas corners belong in source layers.
 
 ## Render and review
 
 Discover `ictool` from selected Xcode or a standalone Icon Composer installation. Its flags and the programmatic `icon.json` schema can change; the helper uses a format verified with Xcode 27. Inspect installed help and validate by rendering, rather than claiming JSON construction alone proves compatibility. If rendering fails, diagnose a missing tool, sandbox restriction, or metadata format once, then correct the specific issue or report the blocker. Do not substitute a flattened preview and call it Apple's rendering.
 
-Render Default, Dark, TintedLight, TintedDark, ClearLight, and ClearDark. Inspect the contact sheet and default/dark at useful sizes. Check fidelity, alpha edges, order, tinted contrast, cropping, and doubled highlights. Apple applies the final mask, so preview exports have rounded corners even though artwork layers do not. Re-render after visual or metadata changes. State which platform was checked; don't imply real-device or App Store validation.
+Render Default, Dark, TintedLight, TintedDark, ClearLight, and ClearDark. Inspect the contact sheet and default/dark at useful sizes, Dark also on a dark background. Check fidelity, alpha edges, order, tinted contrast, cropping, and doubled highlights. Apple applies the final mask, so preview exports have rounded corners even though artwork layers do not. Re-render after visual or metadata changes. State which platform was checked; don't imply real-device or App Store validation.
 
 Deliver the `.icon` package, previews, inputs, and repeatable manifest/commands. If integrating is requested, add the document to the correct Xcode target and set its App Icon name to the document basename. A matching `.icon` supersedes the legacy asset catalog; Xcode creates older-OS fallbacks from it. Preserve an existing icon until the replacement is reviewed. Cleanup only explicitly requested or known temporary outputs, and retain the current build's dependencies.
 

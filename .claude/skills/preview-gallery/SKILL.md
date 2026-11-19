@@ -28,9 +28,9 @@ images in `previews/iphone/` and `previews/duo-inner/`, the manifest in `preview
 Game, iPhone Duo · inner display, Board, Engine, Moves, Games list, Settings, Walnut (48 cards); the Mac pass has its own page with the group Mac (6 cards). The
 approved visual spec is the Walnut design canvas (`planning/README.md`, UI-WALNUT row).
 
-**The gallery is English** (`-testLanguage en -testRegion US`), whatever languages the app ships: the page, the
+**English only, in every repo** (`-testLanguage en -testRegion US`), whatever languages the app ships: the page, the
 `--check` and `CHECK OK [en]` never change, and the gallery never gets a full language pass. Two exceptions share one
-`--lang` option, always with `--only` (the Mac script aside, below), with no page and no `--check`: the **App Store
+`--lang` option, always with `--only` (BChess's Mac script aside, below), with no page and no `--check`: the **App Store
 screenshots** (the slides' captures per store language, used by `/app-store-screenshots`) and **review runs**, on
 request only, never part of the gate. The catalog tests check that every string is translated; a review run
 checks that a translation **fits** (truncation, overflow) and, under Hebrew and Arabic, that a screen reads right to
@@ -39,8 +39,9 @@ left. So both gallery scripts (`snapshot-gallery.sh`, `snapshot-mac.sh`) take `-
 `<gallery>/<platform>/<lang>/` (`previews/iphone/fr/`, `previews/duo/duo-inner/fr/`, `previews/ipad/ipad/fr/`,
 `previews/mac/mac/fr/`), which is where `/app-store-screenshots` looks for a localized capture, and the page script
 prints `imported N image(s) [fr] into previews/<platform>/fr/`. **Never a full gallery in another language**: the iPhone,
-iPad and Duo scripts refuse `--lang` for a language but English without `--only`; the Mac gallery is six windows and
-renders them all. No scenario forces a language (the language comes from `xcodebuild`).
+iPad and Duo scripts refuse `--lang` for a language but English without `--only`. **BChess's exception (a repo fact,
+decided by Jean):** `scripts/snapshot-mac.sh --lang` renders every Mac card without `--only`, because the Mac gallery
+is only six windows; it is still a language run (no page, no check), never a language gallery page. No scenario forces a language (the language comes from `xcodebuild`).
 
 **The review set** is what a language run renders, one list for the store slides' captures and for the screens whose
 words or direction the catalog changes (slugs, passed to `--only` as a comma-separated list):
@@ -95,6 +96,12 @@ renders the Mac windows (6 cards, group "Mac") off screen into `previews/mac/`.
 
 Adopted (APP-5): the app has no `#Preview` and no `#if DEBUG` preview code.
 
+Not yet in this repo's scripts (owed; never claim them in a report): no one-run-at-a-time gallery lock (two
+worktrees can render at once: run one gallery at a time by hand); the done line has no skipped part (skipped cards
+are the test's `gallery: skipped <slug>: <why>` lines) and no count of cards kept after a partial import (only
+`imported N image(s)`); the gallery tests print no `gallery: boundaries …` line, and `network: none (I5)` is a fixed
+line, not a counter the run gates on.
+
 ## Run: `scripts/snapshot-gallery.sh`
 
 ```
@@ -105,13 +112,17 @@ scripts/snapshot-gallery.sh --device duo        # the iPhone Duo: outer display 
 scripts/snapshot-gallery.sh --no-open           # do not open the page (agents, scripted runs)
 ```
 
-- **Done = `CHECK OK [en]: <n> cards, light and dark complete and correctly lit`** (then `; <k> skipped: <slugs>`
-  when a pass skipped some). Then read the new or changed
-  PNGs in both appearances (see Report). `simpool status` shows nothing leased by the run.
+- **Done = `CHECK OK [en]: <n> cards, light and dark complete and correctly lit`**, then each skipped card as
+  `<slug> skipped: <why>`, and after a partial import how many cards it rendered and how many were kept from earlier
+  imports (BChess's script prints only the `CHECK OK` line and `imported N image(s)`: see the status above). Then
+  read the new or changed PNGs in both appearances (see Report). `simpool status` shows nothing leased by the run.
 - **A fresh checkout needs one full run first**: `--check` covers every scenario, so an `--only` run fails until a
   full gallery exists.
 - **One gallery run at a time per repo**: a script that can be run from several worktrees takes a lock in the
-  shared git directory (`lockf`, say), so two of them never render at once.
+  shared git directory (`lockf`, say), so two of them never render at once. It takes the lock **before** leasing a
+  simulator (no lease is held while it waits), waits a bounded time (10 min, say), then exits 75 naming the holder,
+  and releases it **last**, after the lease and any simulator settings it changed are restored (not yet in
+  BChess's scripts).
 - Costs measured on a proven repo (24 GB Mac, iOS 27 simulator): booting the simulator about **6 GB** of RAM;
   a run on a booted one about **0.25 GB**; build tools under 0.3 GB. Warm run: about 1 s per scenario plus a
   fixed 20–25 s (xcodebuild installs and launches the host app), so ~50 scenarios take 1.5–2.5 min and
@@ -178,13 +189,14 @@ One entry in the scenario list, and nothing in the app:
 - **Never force an appearance or a language** (`.preferredColorScheme`, `.environment(\.locale, …)`): the light
   and dark passes and `-testLanguage` set them; `--check` scans the scenario files for both. The one admissible
   exception is a locale forced for its region, not its language (`en_US` to show a 12-hour clock): the line
-  carries `// gallery: allowed, <why>` and `--check` lets that line through (a `.preferredColorScheme` never).
+  carries `// gallery: allowed, <why>` and `--check` lets that line through. The marker excuses a `\.locale` line only, never `.preferredColorScheme`,
+  and only on the same line; the check reads it before stripping the line's comment.
   A state that only existed as a "dark" variant is a plain scenario. A subview drawn on its own dark panel may use
   `.environment(\.colorScheme, .dark)` as its palette: that is the view's design, not a forced appearance.
   Dynamic Type variants are fine, as their own scenarios.
 - **Hermetic data.** A fresh in-memory store per scenario. The network is a stub that answers from committed
   fixtures (real API responses, their times shifted to now so screens look live) or fails with a given error,
-  and counts its calls; the test prints the count. No scenario reaches a real API (quotas, rate limits,
+  and counts its calls; the test prints the count (see the boundary line below). No scenario reaches a real API (quotas, rate limits,
   changing data). A fixed location and clock-relative data instead of real ones.
 - **Shared singletons.** If a view is wired to a shared instance (a `.shared` actor or store), its scenario
   uses that instance through the same stub, resets it first, and is flagged so it renders **after** the
@@ -206,7 +218,10 @@ One entry in the scenario list, and nothing in the app:
 - **Dark-only entries.** A platform with no light appearance (a Watch) may mark its entries dark-only: one
   `<slug>.dark.png`, no light slot and no pair rules, but the luminance rule still applies.
 - `scripts/preview-gallery.py --coverage-views` lists view types no scenario names (informational, prints only: most
-  are parts of other screens). `--coverage XCRESULT` adds the test run's app coverage to the page.
+  are parts of other screens). `--coverage XCRESULT` adds the test run's app coverage to the page. It validates the
+  result bundle (`xcrun xccov`) before touching the gallery folder and exits 2 on failure (a bundle without a
+  `BChess.app` target too), leaving the folder as it was. The bundle comes from a hosted test run by hand with
+  `-enableCodeCoverage YES -resultBundlePath …`; the gallery script never collects coverage itself.
 
 ## What a repo needs
 
@@ -263,7 +278,11 @@ One entry in the scenario list, and nothing in the app:
      holds the folder but not a host build slot.
    - Import, `--check`, open the page (`--no-open` skips that: agents, scripted runs), print the timings (boot,
      build, test, total). It keeps the Mac awake for the run (`caffeinate -dims -w $$`, released when the script
-     exits): a run during which the Mac slept took three times as long.
+     exits): a run during which the Mac slept took three times as long. `caffeinate` does not forward signals to a
+     command it runs: use `-w $$`, or re-exec the script under it and test the signal path.
+   - **Boundary line**: the gallery test prints its isolation and network counters (`gallery: boundaries …`,
+     `network: …`); the script fails the run when the line is missing or a counter is not zero, so the report's
+     network-call count is a gate, not a note (not yet in BChess's scripts: see the status above).
    - **Lifecycle tests**: `scripts/test_snapshot_gallery.sh` runs the script against stubs of `simpool`,
      `buildlock`, `xcodebuild` and `xcrun`, with PATH limited to the stubs and the system directories (no real
      pool, build slot or simulator), and proves the lease is released on success, on a failed acquire, build,
@@ -322,7 +341,7 @@ mean luminance at least 0.05 below the light one's; an `imagery` scenario is not
 render scale of its scenario's size (the entry's `points` x `scale`: 2x; 3x for the Duo's inner poses and every card of
 the Duo pass; an entry without them fails), and
 `.preferredColorScheme` or `\.locale` anywhere in the scenario file (its `//` and `/* */` comments aside, and a `\.locale` on a
-line carrying `// gallery: allowed, <why>`). An `--only` run replaces only its own images; the check still covers every
+line carrying `// gallery: allowed, <why>` on the same line, the marker read before the comment is stripped). An `--only` run replaces only its own images; the check still covers every
 scenario. The `--lang` folders are not checked and never reach the page. The gallery is
 done only when `--check` passes.
 

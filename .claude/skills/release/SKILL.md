@@ -275,8 +275,15 @@ app-store check --app "BChess (iOS)" --platform MAC_OS --version <version> --fam
 for processing, or see "App Store eligible" in §2.
 
 `prepare --release-type` sets the type only when it creates the version; one that already existed keeps
-its type (`app-store status` prints `releaseType=`). A first release skips `prepare` and fills the page with
+its type (`app-store status` prints `releaseType=`), and no subcommand changes it: a wrong type is
+Jean's manual step in App Store Connect (App Store Version Release), listed below and verified with
+`status` before the §8 report. A first release skips `prepare` and fills the page with
 `app-store metadata`, `age-rating` and `screenshots` instead; BChess's (1.0) is behind it, so `prepare` always runs.
+
+**A new page locale** is added with `app-store metadata --add-locale <l> --name <l>=BChess` (each new locale
+needs its name), then `prepare` runs again so it gets its What's New (above, `metadata` runs before `prepare`
+for that reason). `--add-locale` does nothing for a locale the version already has, so the same commands serve
+every release.
 
 **Screenshots: you upload them, Jean only approves.** When §3 or §2b says screenshots need updating, or `check`
 lists a device family with no set (an `IPHONE_DUO` set missing counts), render every set, show Jean all the renders
@@ -299,6 +306,7 @@ Then list Jean's manual steps:
 
 - confirm the App Privacy label matches the build (the API cannot read it);
 - submit version `<version>` for review, each platform separately (the `IOS` and the `MAC_OS` version);
+- switch the release type when `app-store status` shows the wrong `releaseType=` (above);
 - the privacy policy changed (§3 answer 4): the privacy policy page, and the App Privacy label in
   App Store Connect.
 

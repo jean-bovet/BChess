@@ -88,6 +88,8 @@ answer:
   Keep its version and notes, skip §4–§6, and continue at §7 **after its commit**: the commit already
   exists, so never run `git add` or `git commit` again; push the branch (a no-op if already pushed),
   open the pull request if it is missing, run the companion deploy when the repo has one (§7), then §8.
+  Every §3 check (here the "No CloudKit" check) runs again first: a resume never rests on the earlier
+  run's checks.
 - **Nothing new** if the range is empty: say "nothing new since the last build (`<sha>`)" and stop,
   unless Jean asks for a §11 step for that build (then do only that). If he
   explicitly wants the same commit rebuilt, make no empty commit: the `xcode-cloud` tool's
@@ -126,10 +128,21 @@ read the entitlements files the Release configuration uses instead and stop only
 defaults to Production). An `aps-environment` of `development` in a file shared with Debug is
 expected before the standard (the export switches it): no stop. Report the standard as owed.
 
-No CloudKit: neither app has an iCloud entitlement (`macOS/macOS.entitlements` holds only the
-sandbox and user-selected files; the iOS target has none) and the app has no network access
-(invariant I5), so neither check above applies and §10 has no CloudKit line. If an iCloud
-entitlement ever appears in `project.yml` or an entitlements file, both apply from that run on.
+**No CloudKit is a check, not a statement.** Neither app has an iCloud entitlement
+(`macOS/macOS.entitlements` holds only the sandbox and user-selected files; the iOS target has none)
+and the app has no network access (invariant I5), so neither check above applies. But every run,
+first runs and resumes included, confirms it on the tree of the commit to ship (not a range: no
+`origin/testflight` needed):
+
+```bash
+git ls-tree -r --name-only <commit> | grep -i '\.entitlements$'      # exactly macOS/macOS.entitlements
+git grep -h CODE_SIGN_ENTITLEMENTS <commit> -- project.yml BChess.xcodeproj   # only macOS/macOS.entitlements
+git grep -i -E 'icloud|cloudkit|ubiquity' <commit> -- '*.entitlements' project.yml BChess.xcodeproj Signing.xcconfig   # empty
+```
+
+Any other entitlements file or entitlements setting, or any hit of the last command: stop and tell
+Jean this section must be rewritten for CloudKit (the Production schema check, the Release
+environment check and the CloudKit environments standard) before a build.
 
 ## 4. Version
 
@@ -163,7 +176,7 @@ caffeinate -is buildlock --folder ~/Library/Containers/ch.arizona-software.BChes
 caffeinate -is buildlock --folder "$dd/dd-uci" -- xcodebuild -scheme BChessUCI -destination 'platform=macOS' -derivedDataPath "$dd/dd-uci" build
 caffeinate -is buildlock --folder "$dd/dd-ios" -- xcodebuild build-for-testing -scheme "BChess (iOS)" -destination 'generic/platform=iOS Simulator' -derivedDataPath "$dd/dd-ios"
 udid=$(simpool acquire --spec iphone --pid $$); trap 'simpool release "$udid" --app ch.arizona-software.BChess' EXIT
-caffeinate -is buildlock --folder "$dd/dd-ios" -- xcodebuild test-without-building -scheme "BChess (iOS)" -destination "id=$udid" -parallel-testing-enabled NO -collect-test-diagnostics never -derivedDataPath "$dd/dd-ios"
+caffeinate -is buildlock --folder "$dd/dd-ios" --no-slot -- xcodebuild test-without-building -scheme "BChess (iOS)" -destination "id=$udid" -parallel-testing-enabled NO -collect-test-diagnostics never -derivedDataPath "$dd/dd-ios"
 ```
 
 Each test line must end with `** TEST EXECUTE SUCCEEDED **` (`** TEST BUILD SUCCEEDED **` for the `build-for-testing` lines, `** BUILD SUCCEEDED **` for BChessUCI); a Swift Testing
@@ -280,7 +293,8 @@ background watcher, no "still running" check-ins. Report right away:
 - on a first run, that all of `main` went out and that this push created the `testflight` branch;
 - when the app syncs through CloudKit, the §3 check of the Production schema: the commit checked,
   how (an export, or Jean's yes) and the result, and the Release environment check (or that the
-  CloudKit environments standard is still owed) — none for BChess today (§3);
+  CloudKit environments standard is still owed) — none for BChess today; instead, that the §3
+  "No CloudKit" check passed on the commit that went out;
 - the companion deploy, when there is one: what is live after it (none for BChess);
 - that the build is checked only once that run finishes: its tests and archive are the check;
 - how to ask for §11 later ("report Xcode Cloud build <n>", "remind me about <App>'s expiry").
