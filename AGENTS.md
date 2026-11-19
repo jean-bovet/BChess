@@ -1,18 +1,62 @@
 # AGENTS.md — working agreement for BChess
 
-Process: `.claude/skills/develop/`. Plans: `planning/`.
-
 Open-source chess app: a C++ bitboard engine with a SwiftUI front end for iOS and macOS, plus a
-UCI command-line tool.
+UCI command-line tool. Process: `.claude/skills/develop/`. Plans: `planning/`.
 
-**Layout.** `Shared/Engine/` — the C++ engine (portable C++, no Apple frameworks).
-`Shared/Bridge/` — Objective-C++ wrapper (`FEngine*`) that Swift sees through the bridging header.
-`Shared/` — SwiftUI views and game model compiled by both apps. `iOS/` and `macOS/` — per-platform
-shells and Info.plists. `BChess/` — the `BChessUCI` command-line tool. `BChessTests/` — engine
-tests (GoogleTest cases plus Swift tests). `BChessGalleryTests/` — the iOS-hosted gallery: the scenarios and the snapshot test.
-`Dependencies/gtest` is vendored; do not edit.
-`project.yml` — XcodeGen; never hand-edit `BChess.xcodeproj` (edit the spec, `xcodegen generate`,
-commit both).
+## Layout
+
+- `Shared/Engine/` — the C++ engine (portable C++, no Apple frameworks).
+- `Shared/Bridge/` — Objective-C++ wrapper (`FEngine*`) that Swift sees through the bridging header.
+- `Shared/` — SwiftUI views and game model compiled by both apps. `iOS/` and `macOS/` — per-platform
+  shells and Info.plists.
+- `BChess/` — the `BChessUCI` command-line tool.
+- `BChessTests/` — engine tests (GoogleTest cases plus Swift tests). `BChessGalleryTests/` — the iOS-hosted gallery:
+  the scenarios and the snapshot test. `BChessMacGalleryTests/` — the Mac gallery scenarios and hosted Mac tests.
+- `Dependencies/gtest` is vendored.
+- `project.yml` — XcodeGen spec for `BChess.xcodeproj`.
+- Docs: `docs/elo.md` (measuring BChess's Elo, `scripts/elo-match.sh`), `docs/licensing.md` (third-party material).
+
+**Stack.** SwiftUI, Swift 6 language mode, Observation (`@Observable`), Swift Testing for new
+tests. iOS 18 / macOS 15 minimum, built and tested with the current Xcode against the iOS 26 /
+macOS 26 SDKs.
+
+## Build and test
+
+**Done when.** The test and warning gates in `/develop` are green, including every engine
+GoogleTest case actually executed. The test gate, as `/develop` runs it (`<dd>` is the gate's build folder; run the
+last three lines in one shell):
+
+```sh
+caffeinate -is buildlock --folder <dd>/dd-mac -- xcodebuild build-for-testing -scheme "BChess (macOS)" -destination 'platform=macOS' -derivedDataPath <dd>/dd-mac
+caffeinate -is buildlock --folder ~/Library/Containers/ch.arizona-software.BChess --no-slot -- buildlock --folder <dd>/dd-mac --no-slot -- xcodebuild test-without-building -scheme "BChess (macOS)" -destination 'platform=macOS' -derivedDataPath <dd>/dd-mac
+caffeinate -is buildlock --folder <dd>/dd-uci -- xcodebuild -scheme BChessUCI -destination 'platform=macOS' -derivedDataPath <dd>/dd-uci build
+caffeinate -is buildlock --folder <dd>/dd-ios -- xcodebuild build-for-testing -scheme "BChess (iOS)" -destination 'generic/platform=iOS Simulator' -derivedDataPath <dd>/dd-ios
+udid=$(simpool acquire --spec iphone --pid $$); trap 'simpool release "$udid" --app ch.arizona-software.BChess' EXIT
+caffeinate -is buildlock --folder <dd>/dd-ios --no-slot -- xcodebuild test-without-building -scheme "BChess (iOS)" -destination "id=$udid" -parallel-testing-enabled NO -collect-test-diagnostics never -derivedDataPath <dd>/dd-ios
+```
+
+The warnings gate and the gallery gate are in `/develop`.
+
+**Builds and simulators.** Every local `xcodebuild` runs under `buildlock --folder <its DerivedData> -- xcodebuild …`;
+iOS simulator tests run on a simulator leased with `simpool acquire --spec iphone --pid $$` and given back with
+`simpool release <udid>` (also on failure), with `-parallel-testing-enabled NO` and one `-destination`. Never create,
+boot or shut down a simulator by hand. `scripts/snapshot-gallery.sh` and `scripts/elo-match.sh` do this themselves
+(never wrap them); without `simpool`/`buildlock` on PATH they fall back to plain `xcodebuild` (and, for the gallery,
+its own "BChess Agent" simulator).
+
+**Gallery.** `/preview-gallery` renders the scenarios on iOS (`scripts/snapshot-gallery.sh`, and `--device duo` for the
+iPhone Duo pass; lifecycle tests `scripts/test_snapshot_gallery.sh`); `scripts/snapshot-mac.sh` renders the Mac
+scenarios off screen.
+
+**String Catalog.** After adding or changing strings, sync the catalog headless and translate the new keys:
+
+```sh
+catalog-sync              # builds both apps, adds new keys, marks unused ones stale
+catalog-sync --delete-stale
+catalog-sync --check --skip-build   # "catalog unchanged" before committing
+```
+
+## Conventions
 
 **Invariants.** A violation is always wrong:
 
@@ -34,10 +78,6 @@ commit both).
   A new required-reason API use (UserDefaults, file timestamps, boot time, disk space, keyboards) is
   declared in `Shared/PrivacyInfo.xcprivacy`, which both apps bundle.
 
-**Stack.** SwiftUI, Swift 6 language mode, Observation (`@Observable`), Swift Testing for new
-tests. iOS 18 / macOS 15 minimum, built and tested with the current Xcode against the iOS 26 /
-macOS 26 SDKs.
-
 **How work is done.** Engine, bridge, model and app-logic changes go through `/develop` even
 without the slash command. Docs-only changes (`planning/`, `AGENTS.md`, a skill) may land on
 `main`. `main` requires pull requests (a GitHub rule): push a branch and open a PR, never push
@@ -46,50 +86,36 @@ in a `general-purpose` subagent with `model` omitted, implementation and fix rou
 launched with `model: "sonnet"`, and reviews in Codex (a fresh read-only `model: "opus"` subagent
 when Codex is unavailable). The parent never implements.
 
-**Done when.** The test and warning gates in `/develop` are green, including every engine
-GoogleTest case actually executed.
+**Project.** Never hand-edit `BChess.xcodeproj`: edit `project.yml`, `xcodegen generate`, commit both.
 
 **Tests.** New logic: a failing Swift Testing test first. Views are exempt from unit tests; **every screen needs
 a scenario** in `BChessGalleryTests/GalleryScenarios.swift`, and the app has no `#Preview` and no preview code.
-A screen whose layout changes at regular width gets an inner-display scenario ("iPhone Duo · inner display"). `/preview-gallery` renders the scenarios on iOS (`scripts/snapshot-gallery.sh`, and `--device duo` for the iPhone Duo pass; lifecycle tests `scripts/test_snapshot_gallery.sh`). A Mac screen gets a scenario in `BChessMacGalleryTests/MacGalleryScenarios.swift`, rendered off screen by `scripts/snapshot-mac.sh`.
-A scenario never forces an appearance or a language. A thread-safety fix gets a test that would fail (or hang) without it.
-
-**Builds and simulators.** Every local `xcodebuild` runs under `buildlock --folder <its DerivedData> -- xcodebuild …`;
-iOS simulator tests run on a simulator leased with `simpool acquire --spec iphone --pid $$` and given back with
-`simpool release <udid>` (also on failure), with `-parallel-testing-enabled NO` and one `-destination`. Never create,
-boot or shut down a simulator by hand. `scripts/snapshot-gallery.sh` and `scripts/elo-match.sh` do this themselves
-(never wrap them); without `simpool`/`buildlock` on PATH they fall back to plain `xcodebuild` (and, for the gallery,
-its own "BChess Agent" simulator).
+A screen whose layout changes at regular width gets an inner-display scenario ("iPhone Duo · inner display"). A Mac
+screen gets a scenario in `BChessMacGalleryTests/MacGalleryScenarios.swift`. A scenario never forces an appearance or a
+language. A thread-safety fix gets a test that would fail (or hang) without it.
 
 **Swift Testing rules.** `#require` for preconditions without which the rest of the test is meaningless; `#expect` for the checks themselves. `#expect(throws: SpecificError.self)` (or a specific value), never a bare `throws`; use the returned error when inspecting it. `.timeLimit` takes whole minutes only. A `confirmation()` must outlive the async work it confirms — await that work inside its closure. Exit tests (`#expect(processExitsWith:)`) cover `precondition` / `fatalError` paths. Verification helpers take `sourceLocation: SourceLocation = #_sourceLocation` so failures point at the caller. `withKnownIssue` for a known failure (it fails once the issue stops reproducing), never a disabled test. `@Suite(.serialized)` serializes **every** test in the suite (not only parameterized ones); a suite touching process-wide state needs it — never remove it as dead code.
 
-**Conventions.** English UI strings, code, identifiers and comments. New Swift code states
+**Code.** English UI strings, code, identifiers and comments. New Swift code states
 isolation (`@MainActor` / `nonisolated` / `@Sendable`). Match the surrounding style. Commit when
 asked.
 
 **Third-party material.** A new asset, font, sound or copied code gets a line in `docs/licensing.md`, and in
 `Shared/ThirdPartyNotices.txt` when it ships. No code copied from GPL engines.
 
-## Languages
+### Languages
 
 English (source), French, German and Italian (the Swiss four), plus Hebrew (`he`) and Arabic (`ar`; store `ar-SA`), both
 right to left. The App Store page has the same six (`AppStore/`, store codes en-US, fr-FR, de-DE, it, ar-SA, he). Every
-user-facing string goes in
-`Shared/Localizable.xcstrings` (one catalog for both apps) with all its translations; `LocalizationCatalogTests` fails on a
-key that misses one, on a stale key, and on a number or a direction isolate in a key. View literals (`Text("…")`, `Button`,
-`Label`) are extracted by themselves; a word built in the model is a `LocalizedStringResource` (a leaf) or a
-`String(localized:)` sentence with `%@` arguments, never a concatenation (`Shared/Model/GameText.swift`). Chess notation
-(SAN, PGN, FEN, move labels, coordinates, the score, the depth) is never translated and is shown with `Text(verbatim:)` or
-as a `%@` argument formatted in code (Western digits). `BChessMacGalleryTests/LocalizationTests.swift` resolves the leaves
-per language in the hosted app. After adding or changing strings, sync the catalog headless and translate the new keys:
-
-```sh
-catalog-sync              # builds both apps, adds new keys, marks unused ones stale
-catalog-sync --delete-stale
-catalog-sync --check --skip-build   # "catalog unchanged" before committing
-```
-
-`xcodegen generate` after a new language (`knownRegions` follows the catalog).
+user-facing string goes in `Shared/Localizable.xcstrings` (one catalog for both apps) with all its translations;
+`LocalizationCatalogTests` fails on a key that misses one, on a stale key, and on a number or a direction isolate in a
+key. View literals (`Text("…")`, `Button`, `Label`) are extracted by themselves; a word built in the model is a
+`LocalizedStringResource` (a leaf) or a `String(localized:)` sentence with `%@` arguments, never a concatenation
+(`Shared/Model/GameText.swift`). Chess notation (SAN, PGN, FEN, move labels, coordinates, the score, the depth) is never
+translated and is shown with `Text(verbatim:)` or as a `%@` argument formatted in code (Western digits).
+`BChessMacGalleryTests/LocalizationTests.swift` resolves the leaves per language in the hosted app. After adding or
+changing strings, run `catalog-sync` (Build and test). `xcodegen generate` after a new language (`knownRegions` follows
+the catalog).
 
 **Right to left.** The board never mirrors (the a-file on the left, rank 1 at the bottom for White, the evaluation bar on its
 left): every board component pins itself with `neverMirrored()`, and `ContentView` pins the whole board. The move strip and
@@ -101,3 +127,12 @@ the node count, the speed and the dates follow the locale. The check is `scripts
 set>" --lang he,ar` (and `--device ipad`, `--device duo`, `scripts/snapshot-mac.sh --lang he,ar`), the board region compared
 with the English capture (`magick compare -metric RMSE`, 0), and `LocaleIndependenceTests`/`MacMenuTests` run with
 `TEST_RUNNER_BCHESS_EXPECT_LANGUAGE`/`_REGION` set (the `/preview-gallery` skill has the commands).
+
+## Release
+
+`/testflight` sends a build to testers; `/release` publishes to the App Store.
+
+## Don't touch
+
+- `Dependencies/gtest` is vendored; do not edit.
+- `BChess.xcodeproj` by hand (edit `project.yml`).
