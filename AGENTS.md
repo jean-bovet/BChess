@@ -83,8 +83,8 @@ without the slash command. Docs-only changes (`planning/`, `AGENTS.md`, a skill)
 `main`. `main` requires pull requests (a GitHub rule): push a branch and open a PR, never push
 `main`. Landing is Jean's call. No version bumps during feature work. On Claude Code, planning runs
 in a `general-purpose` subagent with `model` omitted, implementation and fix rounds in a subagent
-launched with `model: "sonnet"`, and reviews in Codex (a fresh read-only `model: "opus"` subagent
-when Codex is unavailable). The parent never implements.
+launched with `model: "sonnet"`, and reviews through `peer-review` (Codex, else Cursor; a fresh
+read-only `model: "opus"` subagent when it exits 3). The parent never implements.
 
 **Project.** Never hand-edit `BChess.xcodeproj`: edit `project.yml`, `xcodegen generate`, commit both.
 
