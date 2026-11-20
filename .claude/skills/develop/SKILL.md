@@ -48,14 +48,15 @@ Do not paste the working agreement into prompts — point at the file. This skil
 
 UI-only view tweaks, String Catalog translations, and docs-only edits.
 
-**The reviewer is always a different vendor from the planner and implementer**: Codex
-(`codex exec`, [`codex-review.md`](codex-review.md)).
+**The reviewer is always a different vendor from the planner and implementer**: `peer-review`
+([`codex-review.md`](codex-review.md)) runs Codex, or Cursor's GPT or Composer when Codex is out of
+credit or failing. Report each round with the result file's `reviewer:` line.
 
-**When Codex is unavailable** (usage limit, missing CLI, failed after one restart): do not skip the
-review and do not wait for Jean. Spawn a fresh read-only subagent with `model: "opus"` that saw
-neither the plan draft nor the diff being written, and give it the same prompt. Never resume the
-planner or the implementer for a review, and never review in the parent. Report it as
-"substitute review (Codex unavailable: <reason>)".
+**When `peer-review` exits 3** (no outside reviewer could review): do not skip the review and do not
+wait for Jean. Spawn a fresh read-only subagent with `model: "opus"` that saw neither the plan draft
+nor the diff being written, and give it the same prompt. Never resume the planner or the implementer
+for a review, and never review in the parent. Report it as "substitute review (peer-review exit 3:
+<the reasons it printed>)".
 
 **Default: one Codex round per phase** (plan, then implementation). A second round runs only when
 the first found a substantive issue — behaviour, correctness, an invariant, a test that would have
@@ -215,11 +216,11 @@ pull requests (a GitHub rule), so never push `main`.
 
 - Writing the plan before the Explore pass — the plan reinvents a helper that exists.
 - Asking Jean things the working agreement or design doc answers, or asking five times instead of once.
-- Letting Codex see your reasoning before it forms its own.
+- Letting the reviewer see your reasoning before it forms its own.
 - Attaching the whole design doc to a review prompt — the invariants plus the section in play are enough.
 - Running a second review round because the first found a typo.
 - Reviewing a plan or implementation with the same agent that wrote it, or in the parent.
-- Reviewing with the same vendor that planned and implemented when Codex works.
+- Reviewing with the same vendor that planned and implemented before `peer-review` exits 3.
 - Planning inline in the parent — the planning subagent's reads must not stay in the main context.
 - Reading the implementation diff or a build log into the main context.
 - Spawning a fresh implementer for a fix round of the step just built instead of messaging the one
@@ -227,5 +228,5 @@ pull requests (a GitHub rule), so never push `main`.
 - Rewriting a plan file to fold in a finding instead of editing the lines concerned.
 - Restating the working agreement in the implementer prompt.
 - Bumping the version or landing without being asked.
-- Broad Codex prompts (`codex-review.md`).
+- Broad review prompts (`codex-review.md`).
 - Counting a test run where the GoogleTest suite executed zero cases as green.
