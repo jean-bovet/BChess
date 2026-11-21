@@ -1,6 +1,6 @@
 # APP-13 — Game screen layout: captures on their own line, a strip that never clips, each fact once (#61)
 
-Status: plan r1 (2026-11-21). Issue #61 (TestFlight feedback, iPhone, iOS 27.2). Not in scope: #62 (a prominent
+Status: plan r2 (2026-11-21; r2: plan review round 1 — the one-move fallback takes the offered width, a thinking card, 13–15 captures, the Mac floor). Issue #61 (TestFlight feedback, iPhone, iOS 27.2). Not in scope: #62 (a prominent
 end-of-game message that stays while browsing); this plan leaves the status line as the one slot #62 takes over.
 
 ## Problem, with evidence
@@ -94,8 +94,9 @@ Replace the `ScrollViewReader` + `ScrollView` with a `ViewThatFits(in: .horizont
 `recentMoves(current:count: n)` for n = 8, 7, …, 1 (the existing function already numbers the first token of any
 suffix, "11…Nf6", `Game.swift:108-114`): SwiftUI picks the longest that fits whole beside the Moves button. The last
 token is always the current move, so it is always fully visible, and no move is cut at the leading edge. The last
-candidate (one move) is the fallback when even that does not fit (accessibility text sizes), with
-`.minimumScaleFactor(0.7)` on it. `recentMoves`' default `count` stays 6 for no other caller (it has none); the
+candidate (one move) is the fallback when even that does not fit (accessibility text sizes): unlike the others it is
+**not** `fixedSize()`, has `.lineLimit(1)` and `.minimumScaleFactor(0.5)`, so it takes the width offered beside the
+Moves button and its text shrinks to fit rather than being clipped (review r1 blocker). `recentMoves`' default `count` stays 6 for no other caller (it has none); the
 strip passes its counts. The `.leftToRight` pin and the Moves button are untouched. Up to eight on a wide portrait
 (Duo flat, 669 pt) lets the move area grow where there is room.
 
@@ -146,10 +147,13 @@ down by half of today's empty third. The tabletop branch keeps its top alignment
 
 - New fixtures in `GalleryFixtures.swift` (each parsed by `everyPGNFixtureParses`, its counts checked in
   `fixtureSessionsHoldTheirPositions`): `manyCaptures` — a legal game where **each** side has captured at least ten
-  pieces, two humans with long given names ("Jeanne Blanchard" / "Nikolai Weissmann") so the names are the
+  pieces and at least one side has captured 13–15 (past the twelve-piece overlap threshold, up to the fifteen maximum),
+two humans with long given names ("Jeanne Blanchard" / "Nikolai Weissmann") so the names are the
   ones that used to truncate; `longCheckmate` — a game of 60+ moves ending in checkmate, so the strip shows high move
   numbers and the status line the game end with no "Last:".
-- iPhone: **"Game screen · Many captures"** (new), **"Game screen · Long game"** (new, `longCheckmate` at its end),
+- iPhone: **"Game screen · Many captures"** (new, also at the narrowest supported phone width),
+  **"Game screen · Computer thinking"** (new: a real `GameSession` against the computer with `isThinking` set through
+  the production path, so `PlayerRow.detail` shows "Black · thinking…"), **"Game screen · Long game"** (new, `longCheckmate` at its end),
   **"Game screen · Tall"** (re-rendered: centred block), **"Player row · Captures"** (switched to `manyCaptures`),
   **"Move strip · Long game"** (new: `longCheckmate` on a castling move in the middle, the current move whole at the
   trailing edge); **"Status line · Your move"** removed (it would render an empty line), **"Status line · Checkmate"**
@@ -157,7 +161,8 @@ down by half of today's empty third. The tabletop branch keeps its top alignment
 - iPad (`.ipadLandscape`): **"Game screen · Wide · Many captures"** (new).
 - iPhone Duo inner display: **"Duo inner · Portrait · Many captures"** (new, flat pose, the tall layout at 669 pt
   with the 8-move strip) and **"Duo inner · Landscape · Long game"** (new, the wide layout at the hinge).
-- Mac (`MacGalleryScenarios.swift`): **"Document window · Many captures"** (new, `manyCaptures`, 1440 × 900) and
+- Mac (`MacGalleryScenarios.swift`): **"Document window · Many captures"** (new, `manyCaptures`, at the 740 pt window floor — the
+budget the floor comment claims — and at 1440 × 900) and
   **"Document window · Checkmate"** (new, `longCheckmate`: the status line without "Last:").
 - he/ar: the new and changed cards with `--lang he,ar` (iPhone, `--device ipad`, `--device duo`,
   `scripts/snapshot-mac.sh --lang he,ar`), board region compared with English (`magick compare -metric RMSE`, 0); the
@@ -185,8 +190,8 @@ change), the warnings gate, and the gallery gate: `scripts/snapshot-gallery.sh -
 
 ## Risks and rollout
 
-- **`ViewThatFits` and buttons:** it measures ideal sizes; the candidates must be `fixedSize()` `HStack`s so a
-  candidate never reports a compressed width. Accessibility text sizes fall to one move — checked in the gallery at
+- **`ViewThatFits` and buttons:** it measures ideal sizes; the candidates except the last must be `fixedSize()`
+  `HStack`s so a candidate never reports a compressed width; the last takes the offered width and scales down. Accessibility text sizes fall to one move — checked in the gallery at
   one accessibility size (the oracle helper already takes `textSize`).
 - **Smaller board on the Mac and iPad** (≈ 48 pt): the price of the reserved capture lines. If Jean finds it too much,
   the capture line can collapse when both sides have no capture (D3 (b) without the jump in most games).
