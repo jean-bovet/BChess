@@ -80,6 +80,16 @@ extension GalleryScenarios {
         static let yourMove = "1. e4 e5 2. Nf3 *"
         /// Fool's mate variant: black checkmates.
         static let checkmate = "1. f3 e5 2. g4 Qh4# *"
+        /// Scholar's mate: white checkmates.
+        static let whiteMates = "1. e4 e5 2. Bc4 Nc6 3. Qh5 Nf6 4. Qxf7# *"
+        /// Loyd's ten-move stalemate: a draw.
+        static let stalemate = "1. e3 a5 2. Qh5 Ra6 3. Qxa5 h5 4. h4 Rah6 5. Qxc7 f6 6. Qxd7+ Kf7 7. Qxb7 Qd3 8. Qxb8 Qh7 9. Qxc8 Kg6 10. Qe6 *"
+        /// King and knight against king, reached by a capture: a draw by insufficient material.
+        static let insufficientMaterial = "[SetUp \"1\"]\n[FEN \"4k3/8/8/3n4/8/2N5/8/4K3 w - - 0 1\"]\n\n1. Nxd5 *"
+        /// Half-move clock 99 and one quiet move: a draw by the fifty-move rule.
+        static let fiftyMoves = "[SetUp \"1\"]\n[FEN \"4k3/8/8/8/8/8/R7/4K3 w - - 99 80\"]\n\n1. Ra3 *"
+        /// A declared result with no mate on the board: black wins.
+        static let declaredBlackWins = "1. e4 e5 2. Nf3 Nc6 0-1"
         /// One alternative to 1... e5, for the arrows and cards.
         static let arrowsAndCards = "1. e4 e5 (1... c5) 2. Nf3 Nc6 *"
         static let moveStripMiddle = "1. e4 e5 2. Nf3 Nc6 3. Bb5 a6 4. Ba4 Nf6 *"
@@ -100,7 +110,8 @@ extension GalleryScenarios {
             + "10. Rxe6 Rb8 11. Nh3 d4 12. b3 Kd7 13. e4 Ke8 14. f4 Rd8 15. exd8=R+ Kf7 16. Rxg8 b5 17. Bxb5 c5 18. g4 a4 "
             + "19. bxa4 c4 20. Bxc4 d3 21. cxd3 Kxg8 22. Re8+ (22. Re7+) *"
 
-        static let allPGNs = [ruyLopez, empty, openingE4E5, captures, yourMove, checkmate, arrowsAndCards,
+        static let allPGNs = [ruyLopez, empty, openingE4E5, captures, yourMove, checkmate, whiteMates, stalemate,
+                              insufficientMaterial, fiftyMoves, declaredBlackWins, arrowsAndCards,
                               moveStripMiddle, moveStripVariations, shortGame, commented, mixedScript, card, worstRow, middlegame]
     }
 }

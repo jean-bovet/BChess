@@ -97,6 +97,20 @@ enum MacGalleryScenarios {
         documentWindow(pgn: GalleryScenarios.Fixture.commented, white: .human, black: .human)
     }
 
+    static let documentWindowWhiteWins = MacGalleryScenario(
+        name: "Document window · White wins", group: group, size: windowFrame,
+        title: GameText.title(white: .human, black: .human)
+    ) {
+        documentWindow(pgn: GalleryScenarios.Fixture.whiteMates, white: .human, black: .human)
+    }
+
+    static let documentWindowDraw = MacGalleryScenario(
+        name: "Document window · Draw", group: group, size: windowFrame,
+        title: GameText.title(white: .human, black: .human)
+    ) {
+        documentWindow(pgn: GalleryScenarios.Fixture.stalemate, white: .human, black: .human)
+    }
+
     /// The seeded choices of the three sheet scenarios.
     static let clubChoice = NewGame()
     static let friendChoice: NewGame = {
@@ -153,7 +167,7 @@ enum MacGalleryScenarios {
 
     /// In the order of the page.
     static let all: [MacGalleryScenario] = [
-        documentWindowEngineOn, documentWindowVariations,
+        documentWindowEngineOn, documentWindowVariations, documentWindowWhiteWins, documentWindowDraw,
         documentWindowNewGameSheet, documentWindowNewGameSheetFriend, documentWindowNewGameSheetMaximum,
         settingsWindow, aboutWindow,
     ]

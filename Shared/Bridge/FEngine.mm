@@ -306,14 +306,31 @@ struct FEngineCore: ChessEngine {
     return engine.canPlay();
 }
 
-- (GameEnd)gameEnd {
-    switch (engine.gameEnd()) {
+static GameEnd bridged(ChessEngine::GameEnd end) {
+    switch (end) {
         case ChessEngine::GameEnd::none: return GameEndNone;
         case ChessEngine::GameEnd::checkmate: return GameEndCheckmate;
         case ChessEngine::GameEnd::stalemate: return GameEndStalemate;
         case ChessEngine::GameEnd::repetition: return GameEndRepetition;
+        case ChessEngine::GameEnd::fiftyMoves: return GameEndFiftyMoves;
+        case ChessEngine::GameEnd::deadPosition: return GameEndDeadPosition;
         case ChessEngine::GameEnd::finished: return GameEndFinished;
     }
+}
+
+- (GameEnd)gameEnd {
+    return bridged(engine.gameEnd());
+}
+
+- (GameEnd)lineEnd:(GameOutcome *)outcome {
+    auto result = engine.lineResult();
+    switch (result.outcome) {
+        case ChessGame::Outcome::in_progress: *outcome = GameOutcomeInProgress; break;
+        case ChessGame::Outcome::white_wins: *outcome = GameOutcomeWhiteWins; break;
+        case ChessGame::Outcome::black_wins: *outcome = GameOutcomeBlackWins; break;
+        case ChessGame::Outcome::draw: *outcome = GameOutcomeDraw; break;
+    }
+    return bridged(result.end);
 }
 
 - (FEngineInfo*)infoFor:(ChessEvaluation)info game:(const ChessGame &)game {

@@ -31,7 +31,17 @@ typedef NS_CLOSED_ENUM(NSInteger, GameEnd){
     GameEndCheckmate,
     GameEndStalemate,
     GameEndRepetition,
-    GameEndFinished
+    GameEndFinished,
+    GameEndFiftyMoves,
+    GameEndDeadPosition
+};
+
+/** Who won the game, or in_progress while it has no result. */
+typedef NS_CLOSED_ENUM(NSInteger, GameOutcome){
+    GameOutcomeInProgress = 0,
+    GameOutcomeWhiteWins,
+    GameOutcomeBlackWins,
+    GameOutcomeDraw
 };
 
 /** How strongly the engine plays. Maximum is the full search; the others choose a move among the best of a
@@ -111,6 +121,10 @@ typedef NS_CLOSED_ENUM(NSInteger, EngineStrength){
 - (BOOL)canPlay;
 
 @property (nonatomic, readonly) GameEnd gameEnd;
+
+/** How the current line ends, whichever position is on screen: the reason (`GameEndNone` when the line has no
+ end) and, through `outcome`, who won. Reading it does not change the game. */
+- (GameEnd)lineEnd:(GameOutcome *_Nonnull)outcome;
 
 - (void)analyze:(FEngineSearchCallback _Nonnull)callback;
 

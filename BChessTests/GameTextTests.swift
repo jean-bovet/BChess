@@ -82,14 +82,31 @@ struct GameTextTests {
         #expect(status(.analyze, last: "8. c3") == "Analyzing. Moves are not saved.")
     }
 
+    @Test func resultTitles() {
+        #expect(String(localized: GameText.resultTitle(GameResult(winner: .white, reason: .checkmate))) == "White wins")
+        #expect(String(localized: GameText.resultTitle(GameResult(winner: .black, reason: .finished))) == "Black wins")
+        #expect(String(localized: GameText.resultTitle(GameResult(winner: .draw, reason: .stalemate))) == "Draw")
+    }
+
+    @Test func resultReasons() {
+        let reasons: [(GameEnd, String?)] = [
+            (.checkmate, "Checkmate"), (.stalemate, "Stalemate"), (.repetition, "Threefold repetition"),
+            (.fiftyMoves, "Fifty-move rule"), (.deadPosition, "Insufficient material"),
+            (.finished, nil), (.none, nil),
+        ]
+        for (end, expected) in reasons {
+            #expect(GameText.resultReason(end).map { String(localized: $0) } == expected)
+        }
+    }
+
     @Test func statusForGameEnds() {
-        // The side to move is the one that is mated
-        #expect(status(end: .checkmate, whiteToMove: false) == "Checkmate. White wins.")
-        #expect(status(end: .checkmate, whiteToMove: true) == "Checkmate. Black wins.")
-        #expect(status(end: .stalemate) == "Stalemate.")
-        #expect(status(end: .repetition) == "Draw by repetition.")
-        #expect(status(end: .finished) == "Game over.")
-        #expect(status(end: .checkmate, whiteToMove: false, last: "2\u{2026}Qh4") == "Checkmate. White wins. Last: \u{2066}2\u{2026}Qh4\u{2069}")
+        // A position that cannot be played, in the middle of an imported line: the reason and the last move
+        #expect(status(end: .repetition) == "Threefold repetition")
+        #expect(status(end: .fiftyMoves) == "Fifty-move rule")
+        #expect(status(end: .deadPosition, last: "5. Nf3") == "Insufficient material Last: \u{2066}5. Nf3\u{2069}")
+        #expect(status(end: .checkmate, whiteToMove: false, last: "2\u{2026}Qh4") == "Checkmate Last: \u{2066}2\u{2026}Qh4\u{2069}")
+        // A declared result has no reason of its own: the status says whose move it is
+        #expect(status(end: .finished) == "Your move.")
     }
 
     @Test func statusWhileThinking() {

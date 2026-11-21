@@ -129,6 +129,92 @@ TEST_F(ChessEngineTests, GameEndRepetition) {
     ASSERT_EQ(ChessEngine::GameEnd::repetition, engine.gameEnd());
 }
 
+TEST_F(ChessEngineTests, GameEndFiftyMoves) {
+    ChessEngine engine;
+    ASSERT_TRUE(engine.setFEN("4k3/8/8/8/8/8/R7/4K3 w - - 99 80"));
+    ASSERT_EQ(ChessEngine::GameEnd::none, engine.gameEnd());
+    ASSERT_TRUE(engine.game().move("a2a3"));
+    ASSERT_EQ(ChessEngine::GameEnd::fiftyMoves, engine.gameEnd());
+    ASSERT_FALSE(engine.canPlay());
+}
+
+TEST_F(ChessEngineTests, GameEndDeadPosition) {
+    ChessEngine engine;
+    // Knight against knight is not dead; after the capture, a lone knight cannot mate
+    ASSERT_TRUE(engine.setFEN("4k3/8/8/3n4/8/2N5/8/4K3 w - - 0 1"));
+    ASSERT_EQ(ChessEngine::GameEnd::none, engine.gameEnd());
+    ASSERT_TRUE(engine.game().move("c3d5"));
+    ASSERT_EQ(ChessEngine::GameEnd::deadPosition, engine.gameEnd());
+    ASSERT_FALSE(engine.canPlay());
+}
+
+TEST_F(ChessEngineTests, LineResultAtTheEnd) {
+    ChessEngine e1;
+    ASSERT_TRUE(e1.setPGN("1. f3 e5 2. g4 Qh4#"));
+    auto result = e1.lineResult();
+    ASSERT_EQ(ChessEngine::GameEnd::checkmate, result.end);
+    ASSERT_EQ(ChessGame::Outcome::black_wins, result.outcome);
+    
+    ChessEngine e2;
+    ASSERT_TRUE(e2.setPGN("1. e4 e5 2. Bc4 Nc6 3. Qh5 Nf6 4. Qxf7# *"));
+    result = e2.lineResult();
+    ASSERT_EQ(ChessEngine::GameEnd::checkmate, result.end);
+    ASSERT_EQ(ChessGame::Outcome::white_wins, result.outcome);
+    
+    ChessEngine e3;
+    ASSERT_TRUE(e3.setFEN("7k/5Q2/6K1/8/8/8/8/8 b - - 0 1"));
+    result = e3.lineResult();
+    ASSERT_EQ(ChessEngine::GameEnd::stalemate, result.end);
+    ASSERT_EQ(ChessGame::Outcome::draw, result.outcome);
+    
+    ChessEngine e4;
+    ASSERT_TRUE(e4.setPGN("1. e4 e5 0-1"));
+    result = e4.lineResult();
+    ASSERT_EQ(ChessEngine::GameEnd::finished, result.end);
+    ASSERT_EQ(ChessGame::Outcome::black_wins, result.outcome);
+    
+    ChessEngine e5;
+    ASSERT_TRUE(e5.setPGN("1. e4 e5 *"));
+    result = e5.lineResult();
+    ASSERT_EQ(ChessEngine::GameEnd::none, result.end);
+    ASSERT_EQ(ChessGame::Outcome::in_progress, result.outcome);
+}
+
+TEST_F(ChessEngineTests, LineResultWhileBrowsing) {
+    ChessEngine engine;
+    ASSERT_TRUE(engine.setPGN("1. f3 e5 2. g4 Qh4#"));
+    engine.game().moveTo(ChessGame::Direction::backward, 0);
+    ASSERT_EQ(ChessEngine::GameEnd::none, engine.gameEnd());
+    auto result = engine.lineResult();
+    ASSERT_EQ(ChessEngine::GameEnd::checkmate, result.end);
+    ASSERT_EQ(ChessGame::Outcome::black_wins, result.outcome);
+    // Reading the result leaves the cursor where it was
+    ASSERT_EQ(3, engine.game().getNumberOfMoves());
+    ASSERT_EQ(ChessEngine::GameEnd::none, engine.gameEnd());
+    
+    engine.game().moveTo(ChessGame::Direction::start, 0);
+    ASSERT_EQ(ChessEngine::GameEnd::checkmate, engine.lineResult().end);
+    ASSERT_EQ(0, engine.game().getNumberOfMoves());
+}
+
+// Reading the result of a line browsed from its end must not touch the live game's repetition history
+TEST_F(ChessEngineTests, LineResultKeepsTheLiveHistory) {
+    ChessEngine engine;
+    ASSERT_TRUE(engine.setPGN("1. Nf3 Nf6 2. Ng1 Ng8 3. Nf3 Nf6 4. Ng1 Ng8 5. Nf3 Nf6 1/2-1/2"));
+    engine.game().moveTo(ChessGame::Direction::backward, 0);
+    ASSERT_EQ(ChessEngine::GameEnd::repetition, engine.gameEnd());
+    
+    auto live = engine.game().history;
+    auto before = *live;
+    ASSERT_FALSE(before.empty());
+    auto result = engine.lineResult();
+    ASSERT_EQ(ChessEngine::GameEnd::repetition, result.end);
+    ASSERT_EQ(ChessGame::Outcome::draw, result.outcome);
+    ASSERT_EQ(live, engine.game().history);
+    ASSERT_EQ(before, *engine.game().history);
+    ASSERT_EQ(ChessEngine::GameEnd::repetition, engine.gameEnd());
+}
+
 TEST_F(ChessEngineTests, GameEndDeclaredResult) {
     ChessEngine engine;
     ASSERT_TRUE(engine.setPGN("1. e4 1-0"));

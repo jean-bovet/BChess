@@ -226,8 +226,44 @@ enum GalleryScenarios {
     static let statusLineYourMove = GalleryScenario(name: "Status line · Your move", group: "Game") {
         AnyView(StatusLine(session: GameSession(state: GameState(pgn: Fixture.yourMove))))
     }
-    static let statusLineCheckmate = GalleryScenario(name: "Status line · Checkmate", group: "Game") {
-        AnyView(StatusLine(session: GameSession(state: GameState(pgn: Fixture.checkmate, white: .human, black: .human))))
+    /// Two humans on a finished game, so no search starts; the result banner takes the status line's slot.
+    static func finishedSession(_ pgn: String, mode: GameMode = GameMode()) -> GameSession {
+        GameSession(state: GameState(pgn: pgn, white: .human, black: .human), mode: mode)
+    }
+    static let gameScreenWhiteWins = GalleryScenario(name: "Game screen · White wins", group: "Game") {
+        AnyView(ContentView(session: finishedSession(Fixture.whiteMates)))
+    }
+    static let gameScreenBlackWins = GalleryScenario(name: "Game screen · Black wins", group: "Game") {
+        AnyView(ContentView(session: finishedSession(Fixture.checkmate)))
+    }
+    static let gameScreenDraw = GalleryScenario(name: "Game screen · Draw", group: "Game") {
+        AnyView(ContentView(session: finishedSession(Fixture.stalemate)))
+    }
+    /// Fool's mate, two moves back: the banner still shows the line's result, the status line says whose move it is.
+    static let gameScreenResultWhileBrowsing = GalleryScenario(name: "Game screen · Result while browsing", group: "Game") {
+        let session = finishedSession(Fixture.checkmate)
+        session.move(to: .backward)
+        session.move(to: .backward)
+        return AnyView(ContentView(session: session))
+    }
+    static let gameScreenAnalyzeCheckmate = GalleryScenario(name: "Game screen · Analyze · Checkmate", group: "Game") {
+        AnyView(ContentView(session: finishedSession(Fixture.checkmate, mode: GameMode(value: .analyze))))
+    }
+    static let gameScreenInsufficientMaterial = GalleryScenario(name: "Game screen · Insufficient material", group: "Game") {
+        AnyView(ContentView(session: finishedSession(Fixture.insufficientMaterial)))
+    }
+    static let gameScreenFiftyMoves = GalleryScenario(name: "Game screen · Fifty-move rule", group: "Game") {
+        AnyView(ContentView(session: finishedSession(Fixture.fiftyMoves)))
+    }
+    static let gameScreenDeclaredResult = GalleryScenario(name: "Game screen · Declared result", group: "Game") {
+        AnyView(ContentView(session: finishedSession(Fixture.declaredBlackWins)))
+    }
+    static let gameScreenWideWhiteWins = GalleryScenario(name: "Game screen · Wide · White wins", group: "Game", size: .ipadLandscape) {
+        AnyView(ContentView(session: finishedSession(Fixture.whiteMates))
+            .frame(width: 1180, height: 820))
+    }
+    static let resultBannerDraw = GalleryScenario(name: "Result banner · Draw", group: "Game") {
+        AnyView(ResultBanner(result: GameResult(winner: .draw, reason: .stalemate)).padding())
     }
     static let navigationButtons = GalleryScenario(name: "Navigation buttons", group: "Game") {
         AnyView(HStack {
@@ -293,6 +329,13 @@ enum GalleryScenarios {
     }
     static let duoPortraitTabletopVariations = GalleryScenario(name: "Duo inner · Portrait · Tabletop · Variations", group: groupDuo, size: .duoInnerPortrait) {
         gameScreen(variationsSession(), fold: duoPortraitTabletop)
+    }
+
+    static let duoLandscapeResult = GalleryScenario(name: "Duo inner · Landscape · Result", group: groupDuo, size: .duoInnerLandscape) {
+        gameScreen(finishedSession(Fixture.whiteMates), fold: duoLandscapeHinge)
+    }
+    static let duoPortraitTabletopResult = GalleryScenario(name: "Duo inner · Portrait · Tabletop · Result", group: groupDuo, size: .duoInnerPortrait) {
+        gameScreen(finishedSession(Fixture.whiteMates), fold: duoPortraitTabletop)
     }
 
     // Board
@@ -487,12 +530,15 @@ enum GalleryScenarios {
 
     /// In the order of the page: the groups, and the cards of each group.
     static let all: [GalleryScenario] = [
-        gameScreenTall, gameScreenWide, gameScreenAnalyze, gameScreenEngineOn, gameScreenTrain, gameScreenRotated,
+        gameScreenTall, gameScreenWide, gameScreenAnalyze,
+        gameScreenWhiteWins, gameScreenBlackWins, gameScreenDraw, gameScreenResultWhileBrowsing, gameScreenAnalyzeCheckmate,
+        gameScreenInsufficientMaterial, gameScreenFiftyMoves, gameScreenDeclaredResult, gameScreenWideWhiteWins, resultBannerDraw, gameScreenEngineOn, gameScreenTrain, gameScreenRotated,
         playerRowToMove, playerRowCaptures,
-        statusLineYourMove, statusLineCheckmate,
+        statusLineYourMove,
         navigationButtons,
         duoLandscapeGame, duoLandscapeFlatOpen, duoLandscapeVariations, duoLandscapeShell,
-        duoPortraitGame, duoPortraitTabletopCard, duoPortraitTabletopVariations,
+        duoLandscapeResult,
+        duoPortraitGame, duoPortraitTabletopCard, duoPortraitTabletopVariations, duoPortraitTabletopResult,
         boardWhiteAtTheBottom, boardLabelsRotated,
         piecesWhiteAtTheBottom, piecesRotated,
         promotionDropsFromTheTop, promotionRisesFromTheBottom,

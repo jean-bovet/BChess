@@ -141,11 +141,28 @@ struct ContentView: View {
         #endif
     }
 
+    /// The status line's slot: the result banner once the line has ended, and the status line unless it would only
+    /// repeat the banner (at the line's end in play mode; analyze and train keep their mode notice, and browsing an
+    /// earlier position says whose move it is there).
+    @ViewBuilder
+    private var statusArea: some View {
+        if let result = session.result {
+            VStack(alignment: .leading, spacing: 6) {
+                ResultBanner(result: result)
+                if !session.isAtLineEnd || session.mode.value != .play {
+                    StatusLine(session: session)
+                }
+            }
+        } else {
+            StatusLine(session: session)
+        }
+    }
+
     /// The sidebar's content; the wide layout only.
     private var sidebar: some View {
         VStack(alignment: .leading, spacing: 12) {
             MoveListView(session: session, card: true)
-            StatusLine(session: session)
+            statusArea
                 .padding(.horizontal, 4)
             engine(wide: true)
         }
@@ -190,12 +207,12 @@ struct ContentView: View {
                 // Tabletop: the whole extent above the fold is the board column's, so the rest starts after the fold
                 boardColumn
                     .frame(height: primary, alignment: .top)
-                StatusLine(session: session)
+                statusArea
                     .padding(.horizontal, 2)
                     .padding(.top, gap - spacing)
             } else {
                 boardColumn
-                StatusLine(session: session)
+                statusArea
                     .padding(.horizontal, 2)
             }
             engine(wide: false)

@@ -157,11 +157,19 @@ public:
         checkmate,
         stalemate,
         repetition,
-        finished // a declared result at the end of the line
+        fiftyMoves,   // fifty moves without a capture or a pawn move
+        deadPosition, // neither side can checkmate (insufficient material)
+        finished      // a declared result at the end of the line
     };
     
-    GameEnd gameEnd() {
-        auto & g = game();
+    // How the current line ends, whichever position is on screen.
+    struct LineResult {
+        GameEnd end;
+        ChessGame::Outcome outcome;
+    };
+    
+    // Why nothing can be played in the position of `g` (at its cursor), or none.
+    static GameEnd gameEnd(ChessGame & g) {
         if (ChessMoveGenerator::generateMoves(g.board).count == 0) {
             return g.board.isCheck(g.board.color) ? GameEnd::checkmate : GameEnd::stalemate;
         }
@@ -169,10 +177,52 @@ public:
         if (ChessEvaluater::isDraw(g.board, g.history)) {
             return GameEnd::repetition;
         }
+        if (ChessEvaluater::isFiftyMoveDraw(g.board)) {
+            return GameEnd::fiftyMoves;
+        }
+        if (ChessEvaluater::isDeadPosition(g.board)) {
+            return GameEnd::deadPosition;
+        }
         if (g.getNumberOfMoves() < g.getLineLength() || g.outcome == ChessGame::Outcome::in_progress) {
             return GameEnd::none;
         }
         return GameEnd::finished;
+    }
+    
+    GameEnd gameEnd() {
+        return gameEnd(game());
+    }
+    
+    // How the last position of the current line ends (the path the cursor walks), not the position at the
+    // cursor: it stays the same while the user browses the line.
+    LineResult lineResult() {
+        auto & g = game();
+        if (g.getNumberOfMoves() == g.getLineLength()) {
+            return result(gameEnd(g), g);
+        }
+        // Replay a copy to the end of the line. The copy needs its own history: `history` is shared and
+        // replayMoves() clears it, which would wipe the live game's repetition history.
+        ChessGame copy = g;
+        copy.history = NEW_HISTORY;
+        copy.moveTo(ChessGame::Direction::end, 0);
+        return result(gameEnd(copy), copy);
+    }
+    
+    static LineResult result(GameEnd end, ChessGame & g) {
+        switch (end) {
+            case GameEnd::none:
+                return { end, ChessGame::Outcome::in_progress };
+            case GameEnd::checkmate:
+                // The side to move is the one that is mated
+                return { end, g.board.color == WHITE ? ChessGame::Outcome::black_wins : ChessGame::Outcome::white_wins };
+            case GameEnd::finished:
+                return { end, g.outcome };
+            case GameEnd::stalemate:
+            case GameEnd::repetition:
+            case GameEnd::fiftyMoves:
+            case GameEnd::deadPosition:
+                return { end, ChessGame::Outcome::draw };
+        }
     }
     
     // Whether a move can be played from the current position.

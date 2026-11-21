@@ -54,6 +54,19 @@ private func play(_ session: GameSession, _ from: String, _ to: String) {
     session.playHuman(move)
 }
 
+/// The PGN of a game that starts from this position and plays these moves.
+private func pgnAfter(fen: String, playing moves: [String]) -> String {
+    let engine = FEngine()
+    engine.setFEN(fen)
+    for move in moves {
+        #expect(engine.move(uci: move))
+    }
+    return engine.pgnAllGames()
+}
+
+private let loyd = "1. e3 a5 2. Qh5 Ra6 3. Qxa5 h5 4. h4 Rah6 5. Qxc7 f6 6. Qxd7+ Kf7 7. Qxb7 Qd3 8. Qxb8 Qh7 9. Qxc8 Kg6 10. Qe6 *"
+private let foolsMate = "1. f3 e5 2. g4 Qh4# *"
+
 /// Counts the moves that the engine's search pushes, through the test hook: proof that a search runs.
 private final class SearchProbe: @unchecked Sendable {
     private let condition = NSCondition()
@@ -200,6 +213,124 @@ struct GameSessionTests {
         try await Task.sleep(for: .milliseconds(500))
         #expect(session.fen == position)
         #expect(session.lastMove == nil)
+    }
+
+    // MARK: How the line ends
+
+    @MainActor
+    @Test(arguments: [
+        ("1. e4 e5 2. Bc4 Nc6 3. Qh5 Nf6 4. Qxf7# *", GameResult(winner: .white, reason: .checkmate)),
+        (foolsMate, GameResult(winner: .black, reason: .checkmate)),
+        (loyd, GameResult(winner: .draw, reason: .stalemate)),
+        ("1. Nf3 Nf6 2. Ng1 Ng8 3. Nf3 Nf6 4. Ng1 Ng8 *", GameResult(winner: .draw, reason: .repetition)),
+        (pgnAfter(fen: "4k3/8/8/8/8/8/R7/4K3 w - - 99 80", playing: ["a2a3"]),
+         GameResult(winner: .draw, reason: .fiftyMoves)),
+        (pgnAfter(fen: "4k3/8/8/3n4/8/2N5/8/4K3 w - - 0 1", playing: ["c3d5"]),
+         GameResult(winner: .draw, reason: .deadPosition)),
+        ("1. e4 e5 1-0", GameResult(winner: .white, reason: .finished)),
+        ("1. e4 e5 0-1", GameResult(winner: .black, reason: .finished)),
+        ("1. e4 e5 1/2-1/2", GameResult(winner: .draw, reason: .finished)),
+    ])
+    func resultForEachEnd(pgn: String, expected: GameResult) {
+        #expect(GameSession(state: GameState(pgn: pgn, white: .human, black: .human)).result == expected)
+    }
+
+    @MainActor
+    @Test func anUnfinishedGameHasNoResult() {
+        #expect(GameSession(state: twoHumans).result == nil)
+        #expect(GameSession(state: GameState(pgn: "1. e4 e5 2. Nf3 *", white: .human, black: .human)).result == nil)
+    }
+
+    @MainActor
+    @Test func resultStaysWhileBrowsing() {
+        let session = GameSession(state: GameState(pgn: foolsMate, white: .human, black: .human))
+        let expected = GameResult(winner: .black, reason: .checkmate)
+        #expect(session.isAtLineEnd)
+        #expect(session.result == expected)
+
+        session.move(to: .backward)
+        #expect(session.gameEnd == .none)
+        #expect(!session.isAtLineEnd)
+        #expect(session.result == expected)
+
+        session.move(to: .start)
+        #expect(!session.isAtLineEnd)
+        #expect(session.result == expected)
+    }
+
+    @MainActor
+    @Test func aVariationHasItsOwnResult() {
+        let session = GameSession(state: GameState(pgn: foolsMate, white: .human, black: .human))
+        session.move(to: .backward)
+        play(session, "d7", "d6")
+        #expect(session.result == nil)
+        #expect(session.isAtLineEnd)
+    }
+
+    @MainActor
+    @Test func choosingAVariationShowsItsResult() {
+        let session = GameSession(state: GameState(pgn: "1. f3 e5 2. g4 Qh4# (2... Nc6) *", white: .human, black: .human))
+        session.move(to: .start)
+        for _ in 0..<3 {
+            session.move(to: .forward) // 1. f3 e5 2. g4: the only moves
+        }
+        session.move(to: .forward) // Qh4 or Nc6
+        #expect(session.variations.show)
+        session.chooseVariation(1)
+        #expect(session.result == nil)
+
+        session.move(to: .backward)
+        session.move(to: .forward)
+        #expect(session.variations.show)
+        session.chooseVariation(0)
+        #expect(session.result == GameResult(winner: .black, reason: .checkmate))
+    }
+
+    @MainActor
+    @Test func readingTheResultKeepsTheRepetitionHistory() {
+        // The game continues past a threefold repetition; browse back to the repeated position
+        let session = GameSession(state: GameState(pgn: "1. Nf3 Nf6 2. Ng1 Ng8 3. Nf3 Nf6 4. Ng1 Ng8 5. e4 e5 *",
+                                                   white: .human, black: .human))
+        session.move(to: .backward)
+        session.move(to: .backward)
+        #expect(session.gameEnd == .repetition)
+        #expect(!session.isAtLineEnd)
+        #expect(session.result == nil)
+        // No navigation in between: a read that wiped the live history would show here
+        #expect(session.gameEnd == .repetition)
+    }
+
+    @MainActor
+    @Test func computerDoesNotPlayInADeadPosition() async throws {
+        let state = GameState(pgn: pgnAfter(fen: "4k3/8/8/3n4/8/2N5/8/4K3 w - - 0 1", playing: ["c3d5"]),
+                              white: .human, black: computerBlack)
+        let session = GameSession(state: state)
+        #expect(session.gameEnd == .deadPosition)
+        try await expectNoSearch(session)
+    }
+
+    @MainActor
+    @Test func computerDoesNotPlayAfterFiftyMoves() async throws {
+        let state = GameState(pgn: pgnAfter(fen: "4k3/8/8/8/8/8/R7/4K3 w - - 99 80", playing: ["a2a3"]),
+                              white: .human, black: computerBlack)
+        let session = GameSession(state: state)
+        #expect(session.gameEnd == .fiftyMoves)
+        try await expectNoSearch(session)
+    }
+
+    /// The computer to move asks for a move: no search starts (the probe sees no checkpoint), nothing is thinking and
+    /// the position is untouched.
+    @MainActor
+    private func expectNoSearch(_ session: GameSession, sourceLocation: SourceLocation = #_sourceLocation) async throws {
+        defer { session.cancelSearch() }
+        let probe = SearchProbe(session.engine)
+        let position = session.fen
+        session.requestEngineMoveIfNeeded()
+        #expect(!session.isThinking, sourceLocation: sourceLocation)
+        try await Task.sleep(for: .milliseconds(500))
+        #expect(probe.count == 0, "a search started", sourceLocation: sourceLocation)
+        #expect(session.fen == position, sourceLocation: sourceLocation)
+        #expect(session.lastMove == nil, sourceLocation: sourceLocation)
     }
 
     @Test func searchResultWithoutMoveIsIgnored() throws {

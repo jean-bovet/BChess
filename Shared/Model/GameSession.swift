@@ -191,6 +191,29 @@ final class GameSession {
         return engine.gameEnd
     }
 
+    /// How the current line ends, whatever position is on screen; nil while it is still being played.
+    var result: GameResult? {
+        _ = revision
+        var outcome = GameOutcome.inProgress
+        let reason = engine.lineEnd(&outcome)
+        guard reason != .none else {
+            return nil
+        }
+        let winner: GameResult.Winner
+        switch outcome {
+        case .whiteWins: winner = .white
+        case .blackWins: winner = .black
+        case .draw, .inProgress: winner = .draw
+        @unknown default: winner = .draw
+        }
+        return GameResult(winner: winner, reason: reason)
+    }
+
+    /// Whether the position on screen is the line's last one.
+    var isAtLineEnd: Bool {
+        !canMove(to: .forward)
+    }
+
     var currentMoveUUID: UInt {
         _ = revision
         return engine.currentMoveNodeUUID
