@@ -1,6 +1,6 @@
 # APP-13 — Game screen layout: captures on their own line, a strip that never clips, each fact once (#61)
 
-Status: plan r2 (2026-11-21; r2: plan review round 1 — the one-move fallback takes the offered width, a thinking card, 13–15 captures, the Mac floor). Issue #61 (TestFlight feedback, iPhone, iOS 27.2). Not in scope: #62 (a prominent
+Status: plan r3 (2026-11-21; r3: plan review round 2 — a proven width budget for the one-move fallback; r2: plan review round 1 — the one-move fallback takes the offered width, a thinking card, 13–15 captures, the Mac floor). Issue #61 (TestFlight feedback, iPhone, iOS 27.2). Not in scope: #62 (a prominent
 end-of-game message that stays while browsing); this plan leaves the status line as the one slot #62 takes over.
 
 ## Problem, with evidence
@@ -96,7 +96,12 @@ suffix, "11…Nf6", `Game.swift:108-114`): SwiftUI picks the longest that fits w
 token is always the current move, so it is always fully visible, and no move is cut at the leading edge. The last
 candidate (one move) is the fallback when even that does not fit (accessibility text sizes): unlike the others it is
 **not** `fixedSize()`, has `.lineLimit(1)` and `.minimumScaleFactor(0.5)`, so it takes the width offered beside the
-Moves button and its text shrinks to fit rather than being clipped (review r1 blocker). `recentMoves`' default `count` stays 6 for no other caller (it has none); the
+Moves button and its text shrinks to fit rather than being clipped (review r1 blocker). Width budget (review r2
+blocker): the last two candidates show the Moves button as its icon only (same action, same accessibility label), and
+the strip caps Dynamic Type with `.dynamicTypeSize(...DynamicTypeSize.accessibility2)`, so the longest current move
+(`"67… exd8=Q+"`-sized, about eleven characters) at the 0.5 floor fits beside the icon on the narrowest phone (320 pt
+minus the margins). Proven by a gallery card, not by arithmetic alone: **"Move strip · Largest text"** renders the
+longest-SAN position at `.accessibility5` on the narrowest phone, and the current move must be whole. `recentMoves`' default `count` stays 6 for no other caller (it has none); the
 strip passes its counts. The `.leftToRight` pin and the Moves button are untouched. Up to eight on a wide portrait
 (Duo flat, 669 pt) lets the move area grow where there is room.
 
