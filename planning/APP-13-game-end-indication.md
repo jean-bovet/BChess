@@ -1,6 +1,6 @@
 # APP-13 — A clear indication when a game is won or drawn
 
-Revision 3 (2026-11-21; r2: Jean's decisions D1–D5 recorded, all as recommended; r3: Codex round 1 folded in — history test, analyze notice, variation and 0-1 tests, he/ar filter, one bridge accessor). Issue #62 (TestFlight feedback, iPhone). Related, not in scope: #61 (layout and duplicate
+Revision 4 (2026-11-21; r2: Jean's decisions D1–D5 recorded, all as recommended; r3: Codex round 1 folded in — history test, analyze notice, variation and 0-1 tests, he/ar filter, one bridge accessor; r4: Codex round 2 folded in — variation test offers the choices first, gallery cards for the new draw reasons and a declared result). Plan reviews: round 1 codex (6 findings, all accepted), round 2 codex (2 findings, accepted); no blockers. Issue #62 (TestFlight feedback, iPhone). Related, not in scope: #61 (layout and duplicate
 information on the game screen).
 
 ## Problem, with evidence
@@ -147,7 +147,9 @@ Swift Testing, `BChessTests/GameSessionTests.swift` (production path: `GameSessi
    .none`, `isAtLineEnd == false`.
 3. `aVariationHasItsOwnResult`: fool's mate, back one move, play another legal move → `result == nil`.
    `choosingAVariationShowsItsResult`: `1. f3 e5 2. g4 Qh4# (2... Nc6) *` back to the branch, then
-   `GameSession.chooseVariation(1)` → `result == nil`; back again, `chooseVariation(0)` → black wins, checkmate.
+   `move(to: .forward)` to offer the choices (`chooseVariation` honours the index only while `variations.show` is
+   true), `GameSession.chooseVariation(1)` → `result == nil`; back again, `move(to: .forward)`,
+   `chooseVariation(0)` → black wins, checkmate.
 4. `readingTheResultKeepsTheRepetitionHistory`: an imported game that continues past a threefold repetition,
    browsed to the repeated position (`gameEnd == .repetition`), then `result` read with no navigation in between →
    `gameEnd` is still `.repetition` (navigation would call `replayMoves` and repair a corrupted history, so the
@@ -166,10 +168,14 @@ same `shared_ptr`). `FEngineTests.swift`: `lineResultCrossesTheBridge`.
 
 Gallery (views are exempt from unit tests; every screen gets a scenario). Fixtures in `GalleryFixtures.swift` (added
 to `allPGNs`, parse-checked by `GalleryScenarioTests`, which also asserts each one's `result`): `whiteMates`
-(scholar's mate), `checkmate` (existing, black mates), `stalemate` (Loyd).
+(scholar's mate), `checkmate` (existing, black mates), `stalemate` (Loyd), `insufficientMaterial` (a `[FEN]` PGN,
+K+N v K reached by a capture, the shape `GameSessionTests`' `pgn(fen:)` writes), `fiftyMoves` (a `[FEN]` PGN with
+half-move clock 99 and one quiet move), `declaredBlackWins` (`1. e4 e5 2. Nf3 Nc6 0-1`).
 - iOS, `GalleryScenarios.swift`: "Game screen · White wins" and "Game screen · Black wins" (phone, tall),
   "Game screen · Draw" (stalemate), "Game screen · Result while browsing" (fool's mate, two moves back),
   "Game screen · Analyze · Checkmate" (analyze mode at the mate: banner and the mode notice),
+  "Game screen · Insufficient material", "Game screen · Fifty-move rule" and "Game screen · Declared result" (the
+  0-1 game: the title-only banner), each through `GameSession.result` → `ResultBanner` on the phone,
   "Game screen · Wide · White wins" (`.ipadLandscape`), "Duo inner · Landscape · Result" (`.duoInnerLandscape`,
   the wide layout), "Duo inner · Portrait · Tabletop · Result" (the tabletop branch); "Result banner · Draw" alone.
   `statusLineCheckmate` is removed (the status line no longer says it).
