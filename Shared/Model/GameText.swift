@@ -88,6 +88,28 @@ enum GameText {
         isWhite ? "\(number). \(san)" : "\(number)\u{2026}\(san)"
     }
 
+    /// "White wins", "Black wins", "Draw": the colour, not the player's name.
+    static func resultTitle(_ result: GameResult) -> LocalizedStringResource {
+        switch result.winner {
+        case .white: "White wins"
+        case .black: "Black wins"
+        case .draw: "Draw"
+        }
+    }
+
+    /// Why the game ended; nil for a declared result (`.finished`, which has no reason of its own) and for `.none`.
+    static func resultReason(_ end: GameEnd) -> LocalizedStringResource? {
+        switch end {
+        case .checkmate: "Checkmate"
+        case .stalemate: "Stalemate"
+        case .repetition: "Threefold repetition"
+        case .fiftyMoves: "Fifty-move rule"
+        case .deadPosition: "Insufficient material"
+        case .finished, .none: nil
+        @unknown default: nil
+        }
+    }
+
     static func status(mode: GameMode.Value, isThinking: Bool, gameEnd: GameEnd,
                        white: GamePlayer, black: GamePlayer, isWhiteToMove: Bool, lastMove: String?) -> String {
         switch mode {
@@ -100,17 +122,10 @@ enum GameText {
         }
 
         let text: String
-        switch gameEnd {
-        case .checkmate:
-            // The side to move is the one that is mated
-            text = isWhiteToMove ? String(localized: "Checkmate. Black wins.") : String(localized: "Checkmate. White wins.")
-        case .stalemate:
-            text = String(localized: "Stalemate.")
-        case .repetition:
-            text = String(localized: "Draw by repetition.")
-        case .finished:
-            text = String(localized: "Game over.")
-        case .none:
+        if let reason = resultReason(gameEnd) {
+            // A position that cannot be played, in the middle of a line (the banner says the result at the line's end)
+            text = String(localized: reason)
+        } else {
             let player = isWhiteToMove ? white : black
             let opponent = isWhiteToMove ? black : white
             let name = Self.name(of: player, isWhite: isWhiteToMove, opponent: opponent)

@@ -112,6 +112,22 @@ extension GallerySuites {
             #expect(!captures.capturedPieces(white: false).isEmpty)
         }
 
+        @Test("the result fixtures end the way their cards claim")
+        func resultFixturesHoldTheirResults() {
+            typealias Fixture = GalleryScenarios.Fixture
+            let expected: [(String, GameResult)] = [
+                (Fixture.whiteMates, GameResult(winner: .white, reason: .checkmate)),
+                (Fixture.checkmate, GameResult(winner: .black, reason: .checkmate)),
+                (Fixture.stalemate, GameResult(winner: .draw, reason: .stalemate)),
+                (Fixture.insufficientMaterial, GameResult(winner: .draw, reason: .deadPosition)),
+                (Fixture.fiftyMoves, GameResult(winner: .draw, reason: .fiftyMoves)),
+                (Fixture.declaredBlackWins, GameResult(winner: .black, reason: .finished)),
+            ]
+            for (pgn, result) in expected {
+                #expect(GalleryScenarios.finishedSession(pgn).result == result, "\(pgn)")
+            }
+        }
+
         @Test("every scenario has a platform, and the inner sizes are the duo-inner ones")
         func everyScenarioHasAPlatform() {
             for scenario in GalleryScenarios.all {

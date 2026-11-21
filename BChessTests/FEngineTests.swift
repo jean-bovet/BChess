@@ -93,6 +93,47 @@ struct FEngineTests {
         #expect(!engine.canPlay())
     }
 
+    @Test func lineResultCrossesTheBridge() {
+        var engine = FEngine()
+        var outcome = GameOutcome.draw
+        #expect(engine.lineEnd(&outcome) == .none)
+        #expect(outcome == .inProgress)
+
+        engine.setPGN("1. f3 e5 2. g4 Qh4#")
+        #expect(engine.lineEnd(&outcome) == .checkmate)
+        #expect(outcome == .blackWins)
+
+        // Browsing back leaves the position without a game end, not the line
+        engine.move(to: .backward, variation: 0)
+        #expect(engine.gameEnd == .none)
+        #expect(engine.lineEnd(&outcome) == .checkmate)
+        #expect(outcome == .blackWins)
+
+        engine = FEngine()
+        engine.setPGN("1. e4 e5 2. Bc4 Nc6 3. Qh5 Nf6 4. Qxf7# *")
+        #expect(engine.lineEnd(&outcome) == .checkmate)
+        #expect(outcome == .whiteWins)
+
+        engine.setFEN("7k/5Q2/6K1/8/8/8/8/8 b - - 0 1")
+        #expect(engine.lineEnd(&outcome) == .stalemate)
+        #expect(outcome == .draw)
+
+        engine.setFEN("4k3/8/8/8/8/8/R7/4K3 w - - 99 80")
+        #expect(engine.move(uci: "a2a3"))
+        #expect(engine.gameEnd == .fiftyMoves)
+        #expect(engine.lineEnd(&outcome) == .fiftyMoves)
+        #expect(outcome == .draw)
+
+        engine.setFEN("4k3/8/8/3n4/8/2N5/8/4K3 w - - 0 1")
+        #expect(engine.move(uci: "c3d5"))
+        #expect(engine.lineEnd(&outcome) == .deadPosition)
+        #expect(outcome == .draw)
+
+        engine.setPGN("1. e4 e5 1/2-1/2")
+        #expect(engine.lineEnd(&outcome) == .finished)
+        #expect(outcome == .draw)
+    }
+
     @Test func moveUCIPlaysSpecialMoves() {
         // A promotion to a knight, not a pawn on the last rank
         let promotion = FEngine()

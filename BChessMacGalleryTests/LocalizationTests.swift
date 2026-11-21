@@ -56,6 +56,21 @@ struct LocalizationTests {
     }
 
     @Test(arguments: languages)
+    func gameResults(_ language: String) throws {
+        let titles: [(GameResult.Winner, String)] = [(.white, "White wins"), (.black, "Black wins"), (.draw, "Draw")]
+        for (winner, key) in titles {
+            try check(GameText.resultTitle(GameResult(winner: winner, reason: .checkmate)), is: key, language)
+        }
+        let reasons: [(GameEnd, String)] = [
+            (.checkmate, "Checkmate"), (.stalemate, "Stalemate"), (.repetition, "Threefold repetition"),
+            (.fiftyMoves, "Fifty-move rule"), (.deadPosition, "Insufficient material"),
+        ]
+        for (end, key) in reasons {
+            try check(try #require(GameText.resultReason(end)), is: key, language)
+        }
+    }
+
+    @Test(arguments: languages)
     func opponentRows(_ language: String) throws {
         let names: [(NewGame.Opponent, String)] = [
             (.friend, "A friend"), (.beginner, "Beginner"), (.casual, "Casual"), (.club, "Club"), (.strong, "Strong"), (.maximum, "Maximum"),

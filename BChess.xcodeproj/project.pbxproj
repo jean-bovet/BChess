@@ -106,6 +106,8 @@
 		58DCA4660C044FF537754AB7 /* Selection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 712C86DA78A185AE24966EF1 /* Selection.swift */; };
 		59377159D3138D6FC7F6BD47 /* ChessState.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 431412F9A9BFFBA835CA9E74 /* ChessState.cpp */; };
 		5A6CF278BC154F8A1E27A2B2 /* FullMove.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB066BF62484862642882974 /* FullMove.swift */; };
+		5A7161CA3CBEE538D1866EEC /* ResultBanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AD118AB678BDE8260679097 /* ResultBanner.swift */; };
+		5C989CCBD13915462F11EC3D /* GameResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE6ED6C69FC6E9F502C5D763 /* GameResult.swift */; };
 		5CBB19E2DF8919BA71A1F599 /* NewGame.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52F1C97D6F9F534EA5F862F2 /* NewGame.swift */; };
 		5D565D127C2378C90B54FB84 /* GameState.swift in Sources */ = {isa = PBXBuildFile; fileRef = E918E82CA52FD5A787214464 /* GameState.swift */; };
 		5EDC8B79DD21EB0B4931007B /* FEngineUtility.mm in Sources */ = {isa = PBXBuildFile; fileRef = CE782615578B3D7B3C451A64 /* FEngineUtility.mm */; };
@@ -168,6 +170,7 @@
 		964A24461F1D8C58BED4431A /* magicmoves.c in Sources */ = {isa = PBXBuildFile; fileRef = D11C33D8BBE6428E42241039 /* magicmoves.c */; };
 		964E68698D0402C887D6283B /* FFEN.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F7BCF98F9720337F7D257AFA /* FFEN.cpp */; };
 		969BE07E432518AF03D52AE0 /* LocalizationCatalogTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CF5F3370A086D7BEC23D1CF /* LocalizationCatalogTests.swift */; };
+		97650FB88D6A80B608C9CB72 /* GameResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE6ED6C69FC6E9F502C5D763 /* GameResult.swift */; };
 		993EDA19151F3900365CC340 /* CheckTests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 30FFD068B173D4656B5A8E33 /* CheckTests.cpp */; };
 		9AC10D64359B02B9DE926458 /* TestSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 558E41B761768D6665905A72 /* TestSupport.swift */; };
 		9C64B7FFF6BEB786AA7946F7 /* FEngineGame.mm in Sources */ = {isa = PBXBuildFile; fileRef = D05BA0CF62011F29A83BC02B /* FEngineGame.mm */; };
@@ -208,6 +211,7 @@
 		BC3252F10593360ED02A17E6 /* PiecesFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = B06D783FF88F314CC998FEC5 /* PiecesFactory.swift */; };
 		BE677D8292959DBF4EFD1935 /* ChessOpenings.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 94916DB48E273E8C193F571F /* ChessOpenings.cpp */; };
 		C1A1CE815B0234952BBD3C71 /* FEngineUtility.mm in Sources */ = {isa = PBXBuildFile; fileRef = CE782615578B3D7B3C451A64 /* FEngineUtility.mm */; };
+		C28800E30C3C78B8C722E246 /* GameResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE6ED6C69FC6E9F502C5D763 /* GameResult.swift */; };
 		C2918567CE7E0B6032F6D5D4 /* ThirdPartyNotices.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AB60B4877DF6AA79F6A89FC /* ThirdPartyNotices.swift */; };
 		C293D409E40492B5B24BCB8A /* MacSnapshotGalleryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8200E00B9423B85AD84AE55 /* MacSnapshotGalleryTests.swift */; };
 		C59A2AA362E0BCAF379CA111 /* ChessGame.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1798BECBBBED258BED2E2CA1 /* ChessGame.cpp */; };
@@ -215,6 +219,7 @@
 		C77F47BEF2A3B59916E914C0 /* PiecesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7041B69703399B00EABB120 /* PiecesView.swift */; };
 		C8785E495E8F8380C1CE0F82 /* MoveStrip.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F0CD3AD321BEA14E5A8D141 /* MoveStrip.swift */; };
 		CA7950C7A1E8D98F00DE9E82 /* FEngineMoveNode.mm in Sources */ = {isa = PBXBuildFile; fileRef = 67B30EF56BB2ADE44B075F8F /* FEngineMoveNode.mm */; };
+		CB5FB0A3A7BAD68479405A27 /* ResultBanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AD118AB678BDE8260679097 /* ResultBanner.swift */; };
 		CB6A99B05281BBABEC5EBE6A /* FPGN.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5F871687B9D9A0D848DEFFFE /* FPGN.cpp */; };
 		CC197AF6A5A175F902CC5F85 /* EngineGoogleTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A78AB8B57782EC7CB61D27F1 /* EngineGoogleTests.swift */; };
 		CC4F4D1AB7BE8020AFD7C1A5 /* MoveList.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5706678E59692AD6397F2D59 /* MoveList.cpp */; };
@@ -311,6 +316,7 @@
 		02349FE00E1E4BF129C077AB /* BestMoveTests.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = BestMoveTests.cpp; sourceTree = "<group>"; };
 		0318AE9A862AD390FF9642EF /* ChessDocument.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChessDocument.swift; sourceTree = "<group>"; };
 		04A09D1A221F0D289C106E21 /* UCICommandTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UCICommandTests.swift; sourceTree = "<group>"; };
+		0AD118AB678BDE8260679097 /* ResultBanner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResultBanner.swift; sourceTree = "<group>"; };
 		0B2AC2A814C4BFFB74353457 /* SEETests.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = SEETests.cpp; sourceTree = "<group>"; };
 		0B577EAF48E8C3EB2900E80C /* BChessMacGalleryTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BChessMacGalleryTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		0C3AF2DF91FF284FE10C1A44 /* BChessUCI */ = {isa = PBXFileReference; includeInIndex = 0; path = BChessUCI; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -438,6 +444,7 @@
 		B6DAF02F87837948771A4958 /* GameTextTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameTextTests.swift; sourceTree = "<group>"; };
 		BAC64B5B0C55E00286BBAD36 /* Game.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Game.swift; sourceTree = "<group>"; };
 		BDE9AAD79C243579D8F245B4 /* GameCommands.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameCommands.swift; sourceTree = "<group>"; };
+		BE6ED6C69FC6E9F502C5D763 /* GameResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameResult.swift; sourceTree = "<group>"; };
 		BE9B55D22F2C1D0A3ED7D1BD /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		C006F43EBABA2EA45058D0CE /* GameSectionsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameSectionsTests.swift; sourceTree = "<group>"; };
 		C07C992D860E1AF283E82845 /* HandicapTests.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = HandicapTests.cpp; sourceTree = "<group>"; };
@@ -485,7 +492,7 @@
 		FECF3456A6E4C0D9547AC353 /* GameHistory.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = GameHistory.cpp; sourceTree = "<group>"; };
 		FEEA804C177D0F7528A254ED /* ChessState.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = ChessState.hpp; sourceTree = "<group>"; };
 		FFBE02E6B7A75B593B086B33 /* BChessUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BChessUITests.swift; sourceTree = "<group>"; };
-		"TEMP_10821CF0-D529-4E6E-AE2A-30CC2E5C228D" /* Signing.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Signing.xcconfig; sourceTree = "<group>"; };
+		"TEMP_73A7CA84-7877-4CF7-B888-C5336DB8F26E" /* Signing.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Signing.xcconfig; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -703,6 +710,7 @@
 				263BC1CB948C6E46692149DA /* AppSettings.swift */,
 				1D3FB5FF0F6743B683718D1E /* FoldSplit.swift */,
 				71E5EEE6D0B10E5AD9440A65 /* GameLibrary.swift */,
+				BE6ED6C69FC6E9F502C5D763 /* GameResult.swift */,
 				7C69641E8C4D121F719476CA /* GameSection.swift */,
 				449B35D4D73E3A74D24EEC1D /* GameSession.swift */,
 				4664882CCC95A474A5F6075D /* GameShell.swift */,
@@ -794,6 +802,7 @@
 				A7041B69703399B00EABB120 /* PiecesView.swift */,
 				E9B1A5521CFB1D9556C1ADC8 /* PlayerRow.swift */,
 				81D206FD51B7D4574C66BE3B /* PromotionView.swift */,
+				0AD118AB678BDE8260679097 /* ResultBanner.swift */,
 				C2D17161DA74B911FD109203 /* SelectionModifier.swift */,
 				FDBE14AD20196EBDEB22043A /* SquareView.swift */,
 				165CC2E716C38E0D22CAE062 /* StatusLine.swift */,
@@ -826,12 +835,12 @@
 			path = Helper;
 			sourceTree = "<group>";
 		};
-		"TEMP_711371BB-A929-4BC4-95BC-156AC0F561B3" /* legal-1-piece-artwork */ = {
+		"TEMP_02571A84-A47E-4691-9839-9C1182A2479D" /* clear-indication-when-a-game-is-won-checkmate-or */ = {
 			isa = PBXGroup;
 			children = (
-				"TEMP_10821CF0-D529-4E6E-AE2A-30CC2E5C228D" /* Signing.xcconfig */,
+				"TEMP_73A7CA84-7877-4CF7-B888-C5336DB8F26E" /* Signing.xcconfig */,
 			);
-			path = "legal-1-piece-artwork";
+			path = "clear-indication-when-a-game-is-won-checkmate-or";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -1100,6 +1109,7 @@
 				94B6E727CA5FD6A67363E621 /* GameCommands.swift in Sources */,
 				869984D8E6A87C1A78CA51A8 /* GameHistory.cpp in Sources */,
 				B0E4E012D654827521A7A06E /* GameLibrary.swift in Sources */,
+				C28800E30C3C78B8C722E246 /* GameResult.swift in Sources */,
 				6509A1B57FA393D96E2E7B88 /* GameSection.swift in Sources */,
 				580FFD27B1F8E2EC4AD8D143 /* GameSession.swift in Sources */,
 				D569F2B9CA8B580B6BBB22EC /* GameShell.swift in Sources */,
@@ -1121,6 +1131,7 @@
 				275C5182800600AB054701FE /* Position.swift in Sources */,
 				7E9A93B4262B71304C137BE9 /* Promotion.swift in Sources */,
 				2181B8B9D24093453CC60B94 /* PromotionView.swift in Sources */,
+				5A7161CA3CBEE538D1866EEC /* ResultBanner.swift in Sources */,
 				58DCA4660C044FF537754AB7 /* Selection.swift in Sources */,
 				73A49D1EE51DE8367CA99323 /* SelectionModifier.swift in Sources */,
 				FC95C56DDCA1C7588D9B911B /* SettingsView.swift in Sources */,
@@ -1176,6 +1187,7 @@
 				176FA56E22CEA206AD493097 /* GameHistory.cpp in Sources */,
 				3C81E8B219E11075BEDDDBBB /* GameLibrary.swift in Sources */,
 				B0146C12C9A064FFFC00A821 /* GameLibraryTests.swift in Sources */,
+				97650FB88D6A80B608C9CB72 /* GameResult.swift in Sources */,
 				7353378B36AA7E740A1988C3 /* GameSection.swift in Sources */,
 				D93F854A5F255836CE1D9228 /* GameSectionsTests.swift in Sources */,
 				ADBD16343AF39DF6A793E289 /* GameSession.swift in Sources */,
@@ -1263,6 +1275,7 @@
 				AF94D65987FCCDE94933F813 /* Game.swift in Sources */,
 				465254AFEEF7A4F592EDE8B8 /* GameHistory.cpp in Sources */,
 				9F47CDB1A6B0BC4FFD6F3377 /* GameLibrary.swift in Sources */,
+				5C989CCBD13915462F11EC3D /* GameResult.swift in Sources */,
 				1BDE624ED61A0203F3089B28 /* GameRootView.swift in Sources */,
 				8A50F9D6047F55AAA7641322 /* GameSection.swift in Sources */,
 				EAB4A88DCE96E3F283CAD532 /* GameSession.swift in Sources */,
@@ -1285,6 +1298,7 @@
 				14E16E9E72529BF731B49DAB /* Position.swift in Sources */,
 				21771589D669A08650041550 /* Promotion.swift in Sources */,
 				8E93751260FDF488AA388F2F /* PromotionView.swift in Sources */,
+				CB5FB0A3A7BAD68479405A27 /* ResultBanner.swift in Sources */,
 				7B445929EE7F0B52FCDAF886 /* Selection.swift in Sources */,
 				AA9CEB41DA74BF76D9747044 /* SelectionModifier.swift in Sources */,
 				894F4AF87419939C628038FC /* SettingsView.swift in Sources */,
@@ -1658,7 +1672,7 @@
 		};
 		E7C507022C63CE4AB3B5B467 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = "TEMP_10821CF0-D529-4E6E-AE2A-30CC2E5C228D" /* Signing.xcconfig */;
+			baseConfigurationReference = "TEMP_73A7CA84-7877-4CF7-B888-C5336DB8F26E" /* Signing.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ANALYZER_NONNULL = YES;
@@ -1734,7 +1748,7 @@
 		};
 		ECE2B603E0677805EDE48B09 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = "TEMP_10821CF0-D529-4E6E-AE2A-30CC2E5C228D" /* Signing.xcconfig */;
+			baseConfigurationReference = "TEMP_73A7CA84-7877-4CF7-B888-C5336DB8F26E" /* Signing.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ANALYZER_NONNULL = YES;

@@ -1085,6 +1085,40 @@
         }
       }
     },
+    "Black wins" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les Noirs gagnent"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Schwarz gewinnt"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vince il Nero"
+          }
+        },
+        "he" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "שחור מנצח"
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "الأسود يفوز"
+          }
+        }
+      }
+    },
     "Board" : {
       "localizations" : {
         "fr" : {
@@ -1221,70 +1255,36 @@
         }
       }
     },
-    "Checkmate. Black wins." : {
+    "Checkmate" : {
       "localizations" : {
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Échec et mat. Les Noirs gagnent."
+            "value" : "Échec et mat"
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Schachmatt. Schwarz gewinnt."
+            "value" : "Schachmatt"
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Scacco matto. Vince il Nero."
+            "value" : "Scacco matto"
           }
         },
         "he" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "מט. שחור מנצח."
+            "value" : "מט"
           }
         },
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "كش مات. فاز الأسود."
-          }
-        }
-      }
-    },
-    "Checkmate. White wins." : {
-      "localizations" : {
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Échec et mat. Les Blancs gagnent."
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Schachmatt. Weiss gewinnt."
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Scacco matto. Vince il Bianco."
-          }
-        },
-        "he" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "מט. לבן מנצח."
-          }
-        },
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "كش مات. فاز الأبيض."
+            "value" : "كش مات"
           }
         }
       }
@@ -1873,36 +1873,36 @@
         }
       }
     },
-    "Draw by repetition." : {
+    "Draw" : {
       "localizations" : {
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Nulle par répétition."
+            "value" : "Match nul"
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Remis durch Stellungswiederholung."
+            "value" : "Remis"
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Patta per ripetizione."
+            "value" : "Patta"
           }
         },
         "he" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "תיקו בחזרה על עמדה."
+            "value" : "תיקו"
           }
         },
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "تعادل بالتكرار."
+            "value" : "تعادل"
           }
         }
       }
@@ -2107,6 +2107,40 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "تصدير"
+          }
+        }
+      }
+    },
+    "Fifty-move rule" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Règle des cinquante coups"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fünfzig-Züge-Regel"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Regola delle cinquanta mosse"
+          }
+        },
+        "he" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "כלל חמישים המהלכים"
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "قاعدة الخمسين نقلة"
           }
         }
       }
@@ -2417,40 +2451,6 @@
         }
       }
     },
-    "Game over." : {
-      "localizations" : {
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Partie terminée."
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Partie beendet."
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Partita terminata."
-          }
-        },
-        "he" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "המשחק הסתיים."
-          }
-        },
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "انتهت اللعبة."
-          }
-        }
-      }
-    },
     "Games" : {
       "localizations" : {
         "fr" : {
@@ -2583,6 +2583,40 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "استيراد"
+          }
+        }
+      }
+    },
+    "Insufficient material" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Matériel insuffisant"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ungenügendes Material"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Materiale insufficiente"
+          }
+        },
+        "he" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "חומר לא מספיק"
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "مادة غير كافية"
           }
         }
       }
@@ -4083,36 +4117,36 @@
         }
       }
     },
-    "Stalemate." : {
+    "Stalemate" : {
       "localizations" : {
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Pat."
+            "value" : "Pat"
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Patt."
+            "value" : "Patt"
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Stallo."
+            "value" : "Stallo"
           }
         },
         "he" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "פט."
+            "value" : "פט"
           }
         },
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "تعادل بالجمود."
+            "value" : "خنق"
           }
         }
       }
@@ -4559,6 +4593,40 @@
         }
       }
     },
+    "Threefold repetition" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Triple répétition"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dreifache Stellungswiederholung"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Triplice ripetizione"
+          }
+        },
+        "he" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "חזרה משולשת"
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تكرار ثلاثي"
+          }
+        }
+      }
+    },
     "Tints the two squares of the move just played" : {
       "localizations" : {
         "fr" : {
@@ -4895,6 +4963,40 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "الأبيض رابح"
+          }
+        }
+      }
+    },
+    "White wins" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les Blancs gagnent"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Weiss gewinnt"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vince il Bianco"
+          }
+        },
+        "he" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "לבן מנצח"
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "الأبيض يفوز"
           }
         }
       }
