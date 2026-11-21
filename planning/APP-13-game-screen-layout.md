@@ -197,6 +197,8 @@ change), the warnings gate, and the gallery gate: `scripts/snapshot-gallery.sh -
 
 ## Decision left open for Jean
 
+None. Jean decided on 2026-11-21, taking the recommended option (a) for each of D1–D4 below.
+
 - **D1 — Where the turn lives.** (a) Beside the name only, the accented "White · your move", the computer's
   "Black · thinking…" (recommended); (b) in the status line only ("Your move." / "Casual Player is thinking…"), the
   rows keep the accent but lose "· your move"; (c) both, as today, but the status line drops "Last:" only.
