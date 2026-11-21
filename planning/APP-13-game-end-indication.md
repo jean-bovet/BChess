@@ -1,6 +1,6 @@
 # APP-13 — A clear indication when a game is won or drawn
 
-Revision 2 (2026-11-21; r2: Jean's decisions D1–D5 recorded, all as recommended). Issue #62 (TestFlight feedback, iPhone). Related, not in scope: #61 (layout and duplicate
+Revision 3 (2026-11-21; r2: Jean's decisions D1–D5 recorded, all as recommended; r3: Codex round 1 folded in — history test, analyze notice, variation and 0-1 tests, he/ar filter, one bridge accessor). Issue #62 (TestFlight feedback, iPhone). Related, not in scope: #61 (layout and duplicate
 information on the game screen).
 
 ## Problem, with evidence
@@ -61,9 +61,9 @@ No search code changes (`MinMaxSearch` keeps its own draw rules; the root is sti
 
 `Shared/Bridge/FEngine.h/.mm`: `GameEndFiftyMoves`, `GameEndDeadPosition` in the existing `NS_CLOSED_ENUM GameEnd`
 (and the `gameEnd` switch); a new `NS_CLOSED_ENUM GameOutcome { GameOutcomeInProgress, GameOutcomeWhiteWins,
-GameOutcomeBlackWins, GameOutcomeDraw }`; two readonly properties `lineEnd` (`GameEnd`) and `lineOutcome`
-(`GameOutcome`), both from one `engine.lineResult()` call each (cheap: a copy and a replay of one line, only off the
-line's end).
+GameOutcomeBlackWins, GameOutcomeDraw }`; one accessor `- (GameEnd)lineEnd:(GameOutcome *)outcome` returning
+both from a single `engine.lineResult()` call, so one `GameSession.result` read copies and replays the line once
+(and only off the line's end).
 
 ### 3. Model
 
@@ -71,7 +71,7 @@ line's end).
 
 ```swift
 /// How the current line ends, whatever position is on screen; nil while it is still being played.
-var result: GameResult? { _ = revision; … engine.lineEnd / engine.lineOutcome … }
+var result: GameResult? { _ = revision; … engine.lineEnd(&outcome) … }
 /// Whether the position on screen is the line's last one.
 var isAtLineEnd: Bool { !canMove(to: .forward) }   // the existing navigation check, `GameSession.swift:163`
 ```
@@ -115,7 +115,9 @@ Placement in `ContentView` (`Shared/Views/ContentView.swift`), the status line's
   `session.result != nil`;
 - wide (`sidebar`, `:145-152`, iPad, Duo inner landscape, Mac): the same, above the engine.
 - `StatusLine` stays beside the banner only while browsing an earlier position (`!session.isAtLineEnd`): it then
-  says whose move it is there; at the line's end it is hidden (the move strip already highlights the last move).
+  says whose move it is there; at the line's end it is hidden in play mode (the move strip already highlights the
+  last move). In analyze and train mode it stays, so "Analyzing. Moves are not saved." / "Practicing openings."
+  (`GameText.status`'s mode notices) are never hidden by the banner.
 - The banner shows in every mode (play, analyze, train): the line's result does not depend on the mode.
 
 No change to `PlayerRow` (D1 option B would add one), no alert (D4).
@@ -139,12 +141,18 @@ Swift Testing, `BChessTests/GameSessionTests.swift` (production path: `GameSessi
    checkmate; fool's mate (`Fixture.checkmate`) → black wins, checkmate; Loyd's ten-move stalemate → draw, stalemate;
    a repetition PGN (the one `noAnalysisWhenTheGameIsOver` uses) → draw, repetition; a FEN with half-move clock 99
    and one quiet move → draw, fiftyMoves; K+N v K FEN after a capture → draw, deadPosition; `1. e4 e5 1-0` → white
-   wins, finished; `1. e4 e5 1/2-1/2` → draw, finished; an unfinished game → nil.
+   wins, finished; `1. e4 e5 0-1` → black wins, finished (the declared outcome, not a mate, decides the winner);
+   `1. e4 e5 1/2-1/2` → draw, finished; an unfinished game → nil.
 2. `resultStaysWhileBrowsing`: fool's mate, `move(to: .backward)` and `.start` → `result` unchanged, `gameEnd ==
    .none`, `isAtLineEnd == false`.
 3. `aVariationHasItsOwnResult`: fool's mate, back one move, play another legal move → `result == nil`.
-4. `readingTheResultKeepsTheRepetitionHistory`: a game one move short of a threefold repetition, browse back, read
-   `result`, browse forward, play the repeating move → `gameEnd == .repetition` (fails if the copy shared the history).
+   `choosingAVariationShowsItsResult`: `1. f3 e5 2. g4 Qh4# (2... Nc6) *` back to the branch, then
+   `GameSession.chooseVariation(1)` → `result == nil`; back again, `chooseVariation(0)` → black wins, checkmate.
+4. `readingTheResultKeepsTheRepetitionHistory`: an imported game that continues past a threefold repetition,
+   browsed to the repeated position (`gameEnd == .repetition`), then `result` read with no navigation in between →
+   `gameEnd` is still `.repetition` (navigation would call `replayMoves` and repair a corrupted history, so the
+   check must come straight after the read). The engine-level guard is the GoogleTest `LineResultKeepsTheLiveHistory`
+   below.
 5. `computerDoesNotPlayInADeadPosition` and `…AfterFiftyMoves`: a computer to move in each → no move requested
    (like `drawnPositionNeverPlaysAMove`, `:192`).
 
@@ -152,19 +160,24 @@ Swift Testing, `BChessTests/GameSessionTests.swift` (production path: `GameSessi
 (`:85-93`) rewritten for the new mid-line statuses.
 
 GoogleTest, `BChessTests/ChessEngineTests.cpp` (beside `GameEndCheckmate`, `:110-130`): `GameEndFiftyMoves`,
-`GameEndDeadPosition`, `LineResultAtTheEnd`, `LineResultWhileBrowsing`. `FEngineTests.swift`: `lineResultCrossesTheBridge`.
+`GameEndDeadPosition`, `LineResultAtTheEnd`, `LineResultWhileBrowsing`, `LineResultKeepsTheLiveHistory` (browse
+back, copy `*game().history`, call `lineResult()`, compare the live history with the copy: equal, and still the
+same `shared_ptr`). `FEngineTests.swift`: `lineResultCrossesTheBridge`.
 
 Gallery (views are exempt from unit tests; every screen gets a scenario). Fixtures in `GalleryFixtures.swift` (added
 to `allPGNs`, parse-checked by `GalleryScenarioTests`, which also asserts each one's `result`): `whiteMates`
 (scholar's mate), `checkmate` (existing, black mates), `stalemate` (Loyd).
 - iOS, `GalleryScenarios.swift`: "Game screen · White wins" and "Game screen · Black wins" (phone, tall),
   "Game screen · Draw" (stalemate), "Game screen · Result while browsing" (fool's mate, two moves back),
+  "Game screen · Analyze · Checkmate" (analyze mode at the mate: banner and the mode notice),
   "Game screen · Wide · White wins" (`.ipadLandscape`), "Duo inner · Landscape · Result" (`.duoInnerLandscape`,
   the wide layout), "Duo inner · Portrait · Tabletop · Result" (the tabletop branch); "Result banner · Draw" alone.
   `statusLineCheckmate` is removed (the status line no longer says it).
 - Mac, `MacGalleryScenarios.swift`: "Document window · White wins" and "Document window · Draw".
 - Light and dark are automatic. Right to left: `scripts/snapshot-gallery.sh --only "Game screen · White wins|Game
-  screen · Black wins|Game screen · Draw|Result banner" --lang he,ar` (plus `--device ipad`, `--device duo`), and
+  screen · Black wins|Game screen · Draw|Game screen · Analyze · Checkmate|Result banner" --lang he,ar`, then
+  `--device ipad --only "Game screen · Wide · White wins" --lang he,ar` and `--device duo --only "Duo inner ·
+  Landscape · Result|Duo inner · Portrait · Tabletop · Result" --lang he,ar` (the changed wide and tabletop layouts), and
   `scripts/snapshot-mac.sh --lang he,ar`; the board region compared with the English capture (`magick compare
   -metric RMSE`, 0), as AGENTS.md's Right to left section says.
 
@@ -196,8 +209,8 @@ catalog check.
 
 ## Steps
 
-1. **Engine and bridge** — `GameEnd.fiftyMoves`/`.deadPosition`, `ChessEngine::lineResult()`, the bridge enum and
-   properties; GoogleTests and `lineResultCrossesTheBridge` first.
+1. **Engine and bridge** — `GameEnd.fiftyMoves`/`.deadPosition`, `ChessEngine::lineResult()`, the bridge enum and the one
+   accessor; GoogleTests and `lineResultCrossesTheBridge` first.
 2. **Model** — `GameResult`, `GameSession.result`/`isAtLineEnd`, `GameText.resultTitle`/`resultReason`, the trimmed
    `status`; Swift tests 1–5 and the GameText tests first; strings in the catalog in all six languages
    (`catalog-sync`, stale keys deleted), `LocalizationExpectations`.
