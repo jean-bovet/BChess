@@ -106,9 +106,9 @@ enum MacGalleryScenarios {
         documentWindow(pgn: GalleryScenarios.Fixture.manyCaptures, white: GalleryScenarios.longNamedWhite, black: GalleryScenarios.longNamedBlack)
     }
 
-    /// The same window at its 740 x 500 floor (`DocumentWindow`): the widest capture line beside the move list.
+    /// The same window at its floor: 740 x 552, the 740 x 500 content minimum (`DocumentWindow`) plus the title bar and toolbar. The widest capture line beside the move list.
     static let documentWindowManyCapturesFloor = MacGalleryScenario(
-        name: "Document window · Many captures · Window floor", group: group, size: .frame(CGSize(width: 740, height: 500)),
+        name: "Document window · Many captures · Window floor", group: group, size: .frame(CGSize(width: 740, height: 552)),
         title: manyCapturesTitle
     ) {
         documentWindow(pgn: GalleryScenarios.Fixture.manyCaptures, white: GalleryScenarios.longNamedWhite, black: GalleryScenarios.longNamedBlack)
