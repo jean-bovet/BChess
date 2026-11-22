@@ -23,6 +23,9 @@ enum GallerySize: Equatable {
     case phone
     /// 375 x 667.
     case smallPhone
+    /// The hosting scene's screen transposed (874 x 402 on the pool's iPhone 17 Pro, 678 x 466 on the Duo pass), compact /
+    /// compact: an iPhone held sideways. The scene itself stays portrait (APP-8 revision 5's design).
+    case phoneLandscape
     /// 320 x 744, compact width: the narrowest window the tall layout meets (an iPad's Slide Over, or one third of a Split
     /// View on an iPad mini in landscape). Tall enough for the tall layout to be chosen, whatever the rows' floor.
     case narrow
@@ -38,6 +41,7 @@ enum GallerySize: Equatable {
         switch self {
         case .phone: return screen
         case .smallPhone: return CGSize(width: 375, height: 667)
+        case .phoneLandscape: return CGSize(width: screen.height, height: screen.width)
         case .narrow: return CGSize(width: 320, height: 744)
         case .ipadLandscape: return CGSize(width: 1180, height: 820)
         case .duoInnerLandscape: return CGSize(width: 951, height: 669)
@@ -49,6 +53,7 @@ enum GallerySize: Equatable {
     var sizeClasses: (horizontal: UIUserInterfaceSizeClass, vertical: UIUserInterfaceSizeClass)? {
         switch self {
         case .phone, .smallPhone, .narrow: return nil
+        case .phoneLandscape: return (.compact, .compact)
         case .ipadLandscape, .duoInnerLandscape, .duoInnerPortrait: return (.regular, .regular)
         }
     }
@@ -99,6 +104,9 @@ struct GalleryScenario {
     func skipReason(duoPass: Bool, ipadPass: Bool = false) -> String? {
         if duoPass && usesSystemBars && size.isDuoInner {
             return "the folded Duo places the system bars against its own 466 x 678 screen, not the 951 x 669 window"
+        }
+        if duoPass && size == .phoneLandscape {
+            return "the folded Duo clamps a window transposed from its 466 x 678 screen back to the screen's own size"
         }
         if ipadPass && usesSystemBars && size.isDuoInner {
             return "the iPad places the system bars against its own 1032 x 1376 screen, not the Duo's inner window"
@@ -185,20 +193,30 @@ enum GalleryScenarios {
         return AnyView(GameRootView(library: GameLibrary(directory: directory, defaults: defaults), foldRegions: fold.map { [$0] }))
     }
 
+    /// The production shell on a library whose one game is a friend game (the navigation and bottom bars are gone).
+    static func friendShell(faceToFace: Bool = true) throws -> AnyView {
+        let directory = FileManager.default.temporaryDirectory.appendingPathComponent("Gallery-\(UUID().uuidString)", isDirectory: true)
+        try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+        let library = GameLibrary(directory: directory, defaults: defaults)
+        _ = try library.create(GameState(pgn: Fixture.openingE4E5, white: .human, black: .human, faceToFace: faceToFace), baseName: "Anna vs Jean")
+        library.reload()
+        return AnyView(GameRootView(library: library))
+    }
+
     // MARK: Scenarios
 
     private static func boardFrame(_ state: GameState? = nil) -> some View {
         let session = state.map { GameSession(state: $0) } ?? GameSession()
-        return BoardFrame(session: session) {
-            BoardView(session: session)
+        return BoardFrame(rotated: session.gameState.rotated) {
+            BoardView(session: session, rotated: session.gameState.rotated)
         }
         .padding()
     }
 
     private static func piecesOnBoard(_ session: GameSession) -> some View {
         ZStack {
-            BoardView(session: session)
-            PiecesView(session: session)
+            BoardView(session: session, rotated: session.gameState.rotated)
+            PiecesView(session: session, rotated: session.gameState.rotated, acceptsMoves: true)
         }
     }
 
@@ -368,6 +386,15 @@ enum GalleryScenarios {
         AnyView(ContentView(session: session, foldRegions: fold.map { [$0] }).ignoresSafeArea())
     }
 
+    /// A friend game (two boards), the bar's menu a real button since a closed menu draws only its label.
+    static func friendSession(_ pgn: String, rotated: Bool = false) -> GameSession {
+        GameSession(state: GameState(pgn: pgn, rotated: rotated, white: .human, black: .human, faceToFace: true))
+    }
+
+    static func friendScreen(_ session: GameSession, fold: FoldRegion? = nil) -> AnyView {
+        AnyView(ContentView(session: session, foldRegions: fold.map { [$0] }, menuItems: { Button("New Game") {} }).ignoresSafeArea())
+    }
+
     static let duoLandscapeGame = GalleryScenario(name: "Duo inner · Landscape · Game screen", group: groupDuo, size: .duoInnerLandscape) {
         gameScreen(humanToMoveSession(), fold: duoLandscapeHinge)
     }
@@ -398,6 +425,72 @@ enum GalleryScenarios {
         gameScreen(variationsSession(), fold: duoPortraitTabletop)
     }
 
+    static let duoPortraitFaceToFace = GalleryScenario(name: "Duo inner · Portrait · Face to face", group: groupDuo, size: .duoInnerPortrait) {
+        friendScreen(friendSession(Fixture.middlegame), fold: duoPortraitFlat)
+    }
+
+    static let duoLandscapeFaceToFace = GalleryScenario(name: "Duo inner · Landscape · Face to face", group: groupDuo, size: .duoInnerLandscape) {
+        friendScreen(friendSession(Fixture.middlegame), fold: duoLandscapeHinge)
+    }
+
+    // Face to face: two boards, one per player
+    static let groupFaceToFace = "Face to face"
+    static let faceToFaceStart = GalleryScenario(name: "Face to face · Start", group: groupFaceToFace) {
+        friendScreen(friendSession(Fixture.empty))
+    }
+    static let faceToFaceBlackAtTheBottom = GalleryScenario(name: "Face to face · Black at the bottom", group: groupFaceToFace) {
+        friendScreen(friendSession(Fixture.empty, rotated: true))
+    }
+    static let faceToFaceMidGame = GalleryScenario(name: "Face to face · Mid-game", group: groupFaceToFace) {
+        let session = friendSession(Fixture.middlegame)
+        // The knight on f3: its moves are marked on both boards
+        session.select(rank: 2, file: 5)
+        return friendScreen(session)
+    }
+    static let faceToFacePromotion = GalleryScenario(name: "Face to face · Promotion on the top board", group: groupFaceToFace) {
+        let session = friendSession(Fixture.blackPromotes)
+        session.select(rank: 1, file: 0)
+        guard let move = session.selection.possibleMove(0, 0) else {
+            fatalError("the fixture has no promotion on a1")
+        }
+        session.beginPromotion(move)
+        precondition(session.pendingPromotion != nil, "the promotion did not start")
+        return friendScreen(session)
+    }
+    static let faceToFaceCheckmate = GalleryScenario(name: "Face to face · Checkmate", group: groupFaceToFace) {
+        friendScreen(friendSession(Fixture.checkmate))
+    }
+    static let faceToFaceLargestText = GalleryScenario(name: "Face to face · Small iPhone · Largest text", group: groupFaceToFace, size: .smallPhone) {
+        AnyView(friendScreen(friendSession(Fixture.worstRow)).dynamicTypeSize(.accessibility3))
+    }
+    static let faceToFaceIPadLandscape = GalleryScenario(name: "Face to face · iPad landscape", group: groupFaceToFace, size: .ipadLandscape) {
+        friendScreen(friendSession(Fixture.middlegame))
+    }
+    static let faceToFacePhoneLandscape = GalleryScenario(name: "Face to face · iPhone landscape", group: groupFaceToFace, size: .phoneLandscape) {
+        friendScreen(friendSession(Fixture.middlegame))
+    }
+    /// A long name and a draw with the longest reason, on the smallest iPhone at the half's text cap: the result is not cut
+    /// (the captures give way, then the name truncates).
+    static let faceToFaceLongNameDraw = GalleryScenario(name: "Face to face · Long name · Draw", group: groupFaceToFace, size: .smallPhone) {
+        let state = GameState(pgn: Fixture.insufficientMaterial,
+                              white: GamePlayer(name: "Alexandria Montgomery-Hartwell", computer: false, level: 0),
+                              black: GamePlayer(name: "Bartholomew Featherstonehaugh", computer: false, level: 0),
+                              faceToFace: true)
+        return AnyView(friendScreen(GameSession(state: state)).dynamicTypeSize(.xxxLarge))
+    }
+    /// A finished game browsed two moves back: each half shows the result and the turn of the position on screen.
+    static let faceToFaceResultWhileBrowsing = GalleryScenario(name: "Face to face · Result while browsing", group: groupFaceToFace) {
+        let session = friendSession(Fixture.checkmate)
+        session.move(to: .backward)
+        session.move(to: .backward)
+        return friendScreen(session)
+    }
+    static let faceToFaceShell = GalleryScenario(name: "Face to face · Shell", group: groupFaceToFace, settle: .seconds(1), usesSystemBars: true) {
+        try friendShell()
+    }
+    static let faceToFaceSwitchedOff = GalleryScenario(name: "Face to face · Two boards off", group: groupFaceToFace, settle: .seconds(1), usesSystemBars: true) {
+        try friendShell(faceToFace: false)
+    }
     static let duoLandscapeResult = GalleryScenario(name: "Duo inner · Landscape · Result", group: groupDuo, size: .duoInnerLandscape) {
         gameScreen(finishedSession(Fixture.whiteMates), fold: duoLandscapeHinge)
     }
@@ -420,7 +513,7 @@ enum GalleryScenarios {
     }
     static let promotionDropsFromTheTop = GalleryScenario(name: "Promotion · Drops from the top", group: "Board") {
         AnyView(ZStack {
-            BoardView(session: GameSession())
+            BoardView(session: GameSession(), rotated: false)
             PromotionView(promotion: Promotion(move: FEngineMove(), isWhite: true),
                           squareSize: 44, screenFile: 6, screenRow: 0) { _ in }
         }
@@ -428,7 +521,7 @@ enum GalleryScenarios {
     }
     static let promotionRisesFromTheBottom = GalleryScenario(name: "Promotion · Rises from the bottom", group: "Board") {
         AnyView(ZStack {
-            BoardView(session: GameSession())
+            BoardView(session: GameSession(), rotated: false)
             PromotionView(promotion: Promotion(move: FEngineMove(), isWhite: false),
                           squareSize: 44, screenFile: 2, screenRow: 7) { _ in }
         }
@@ -438,9 +531,9 @@ enum GalleryScenarios {
         let session = variationsSession()
         return AnyView(VStack {
             ZStack {
-                BoardView(session: session)
-                PiecesView(session: session)
-                VariationSelectionView(session: session)
+                BoardView(session: session, rotated: session.gameState.rotated)
+                PiecesView(session: session, rotated: session.gameState.rotated, acceptsMoves: true)
+                VariationSelectionView(session: session, rotated: session.gameState.rotated)
             }
             .frame(width: 330, height: 330)
             VariationCards(session: session)
@@ -618,8 +711,11 @@ enum GalleryScenarios {
         statusLineAnalyze,
         navigationButtons,
         duoLandscapeGame, duoLandscapeFlatOpen, duoLandscapeVariations, duoLandscapeShell,
-        duoLandscapeLongGame, duoLandscapeResult,
+        duoLandscapeFaceToFace, duoLandscapeLongGame, duoLandscapeResult,
         duoPortraitGame, duoPortraitManyCaptures, duoPortraitTabletopCard, duoPortraitTabletopVariations, duoPortraitTabletopResult,
+        duoPortraitFaceToFace,
+        faceToFaceStart, faceToFaceBlackAtTheBottom, faceToFaceMidGame, faceToFacePromotion, faceToFaceCheckmate,
+        faceToFaceLargestText, faceToFaceLongNameDraw, faceToFaceResultWhileBrowsing, faceToFaceIPadLandscape, faceToFacePhoneLandscape, faceToFaceShell, faceToFaceSwitchedOff,
         boardWhiteAtTheBottom, boardLabelsRotated,
         piecesWhiteAtTheBottom, piecesRotated,
         promotionDropsFromTheTop, promotionRisesFromTheBottom,

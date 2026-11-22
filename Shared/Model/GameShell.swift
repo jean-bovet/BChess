@@ -91,7 +91,8 @@ final class GameShell {
         guard canLeaveCurrent(discardingUnsavedChanges) else {
             return false
         }
-        let state = GameState(pgn: "*", rotated: rotated, white: white, black: black)
+        let state = GameState(pgn: "*", rotated: rotated, white: white, black: black,
+                              faceToFace: !white.computer && !black.computer)
         install(try library.create(state), state: state)
         return true
     }

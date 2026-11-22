@@ -360,6 +360,91 @@ struct GameSessionTests {
         #expect(session.lastMove == nil)
     }
 
+    @Test func playersSwitchTurnsTwoBoardsOnAndOff() {
+        let session = GameSession(state: GameState(pgn: "*", white: .human, black: computerBlack))
+        #expect(!session.gameState.faceToFace)
+        session.setPlayers(white: .human, black: .human)
+        #expect(session.gameState.faceToFace)
+        session.setPlayers(white: .human, black: computerBlack)
+        #expect(!session.gameState.faceToFace)
+    }
+
+    @Test func setFaceToFaceSwitchesTheBoards() {
+        let session = GameSession(state: GameState(pgn: "*", white: .human, black: .human))
+        #expect(!FaceToFace.isOn(session.gameState))
+        session.setFaceToFace(true)
+        #expect(FaceToFace.isOn(session.gameState))
+        session.setFaceToFace(false)
+        #expect(!FaceToFace.isOn(session.gameState))
+    }
+
+    @Test func setFaceToFaceIgnoresAComputerGame() {
+        let session = GameSession(state: GameState(pgn: "*", white: .human, black: computerBlack))
+        let token = session.positionID
+        session.setFaceToFace(true)
+        #expect(!session.gameState.faceToFace)
+        #expect(session.positionID == token)
+    }
+
+    /// A call that changes nothing must not cancel a pending promotion or restart the analysis.
+    @Test func setFaceToFaceWithTheSameValueDoesNothing() {
+        let session = GameSession(state: GameState(pgn: "*", white: .human, black: .human, faceToFace: true))
+        let token = session.positionID
+        session.setFaceToFace(true)
+        #expect(session.positionID == token)
+        session.setFaceToFace(false)
+        #expect(session.positionID > token)
+        let off = session.positionID
+        session.setFaceToFace(false)
+        #expect(session.positionID == off)
+    }
+
+    /// An imported two-human game at a middle position keeps its position, game, move and PGN through both switches.
+    @Test func switchingKeepsAnImportedGameInPlace() {
+        let text = "[Event \"A\"]\n\n1. e4 e5 2. Nf3 Nc6 3. Bb5 a6 *\n\n[Event \"B\"]\n\n1. d4 d5 2. c4 e6 3. Nc3 Nf6 *"
+        let session = GameSession(state: GameState(pgn: text, white: .human, black: .human))
+        session.selectGame(1)
+        session.move(to: .backward)
+        session.move(to: .backward)
+        let fen = session.fen
+        let game = session.currentGameIndex
+        let move = session.currentMoveUUID
+        let current = session.pgnCurrentGame
+        let pgn = session.gameState.pgn
+
+        session.setFaceToFace(true)
+        #expect(session.gameState.faceToFace)
+        session.setFaceToFace(false)
+        #expect(!session.gameState.faceToFace)
+        #expect(session.fen == fen)
+        #expect(session.currentGameIndex == game)
+        #expect(session.currentMoveUUID == move)
+        #expect(session.pgnCurrentGame == current)
+        #expect(session.gameState.pgn == pgn)
+    }
+
+    @Test func pasteKeepsTheSingleBoard() {
+        let session = GameSession(state: GameState(pgn: "*", white: .human, black: .human, faceToFace: true))
+        #expect(session.paste("1. d4 d5 *"))
+        #expect(!session.gameState.faceToFace)
+    }
+
+    @Test func undoInAFriendGameGivesTheMoveBack() {
+        let session = GameSession(state: GameState(pgn: "*", white: .human, black: .human, faceToFace: true))
+        play(session, "e2", "e4")
+        #expect(!FaceToFace.acceptsMoves(bottomIsWhite: true, isWhiteToMove: session.isWhiteToMove))
+        session.move(to: .backward)
+        #expect(session.isWhiteToMove)
+        #expect(!session.canMove(to: .backward))
+        #expect(FaceToFace.acceptsMoves(bottomIsWhite: true, isWhiteToMove: session.isWhiteToMove))
+
+        // The engine does not keep the undone last move as a variation: a different move replaces it
+        play(session, "d2", "d4")
+        #expect(halfMoves(session) == 1)
+        #expect(session.fen == fen(after: [("d2", "d4")]))
+        #expect(!session.variations.show)
+    }
+
     @Test func pasteFEN() {
         let session = GameSession(state: twoHumans)
         #expect(session.paste(middlegame))
@@ -456,6 +541,7 @@ struct GameSessionTests {
         expectBump("selectMove") { session.selectMove(uuid: uuid) }
         expectBump("selectGame") { session.selectGame(0) }
         expectBump("setPlayers") { session.setPlayers(white: .human, black: .human) }
+        expectBump("setFaceToFace") { session.setFaceToFace(false) }
         expectBump("paste") { _ = session.paste("1. d4 *") }
         expectBump("toggleAnalyze") { session.toggleAnalyze() }
         expectBump("toggleAnalyze back") { session.toggleAnalyze() }
@@ -588,6 +674,35 @@ struct GameSessionTests {
         // Not a book move: a real search with a depth
         #expect((session.info?.depth ?? 0) > 0)
         #expect(session.fen == startFEN)
+        #expect(halfMoves(session) == 0)
+    }
+
+    @Test func friendSwitchStopsTheAnalysis() async throws {
+        let session = GameSession(state: GameState(pgn: "*", white: .human, black: computerBlack))
+        defer { session.cancelSearch() }
+        session.showsEngine = FaceToFace.showsEngine(setting: true, state: session.gameState, hasTwoBoards: true)
+        #expect(session.isAnalyzing)
+        #expect(await waitUntil { session.info != nil })
+        let stale = session.info
+        let analysisToken = session.analysisID
+        let searchToken = session.positionID
+
+        session.setPlayers(white: .human, black: .human)
+        session.showsEngine = FaceToFace.showsEngine(setting: true, state: session.gameState, hasTwoBoards: true)
+        #expect(!session.showsEngine)
+        #expect(!session.isAnalyzing)
+        #expect(session.info == nil)
+
+        // A callback of the analysis that was running arrives late, carrying its token: nothing lands (I2)
+        let fen = session.fen
+        let stale1 = try #require(stale)
+        session.analysisDidUpdate(stale1, completed: false, token: analysisToken)
+        session.analysisDidUpdate(stale1, completed: true, token: analysisToken)
+        session.searchDidUpdate(stale1, completed: false, token: searchToken)
+        session.searchDidUpdate(stale1, completed: true, token: searchToken)
+        #expect(session.info == nil)
+        #expect(!session.isAnalyzing)
+        #expect(session.fen == fen)
         #expect(halfMoves(session) == 0)
     }
 

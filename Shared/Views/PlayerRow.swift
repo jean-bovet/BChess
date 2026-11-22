@@ -14,26 +14,10 @@ struct PlayerRow: View {
     let session: GameSession
     let isWhite: Bool
 
-    private var player: GamePlayer {
-        isWhite ? session.gameState.white : session.gameState.black
-    }
-
-    private var opponent: GamePlayer {
-        isWhite ? session.gameState.black : session.gameState.white
-    }
-
-    private var toMove: Bool {
-        session.isWhiteToMove == isWhite && session.gameEnd == .none
-    }
-
-    private var name: String {
-        GameText.name(of: player, isWhite: isWhite, opponent: opponent)
-    }
-
-    private var detail: String {
-        GameText.sideDetail(of: player, isWhite: isWhite, opponent: opponent, toMove: toMove,
-                            isThinking: session.isThinking)
-    }
+    private var facts: PlayerRowFacts { PlayerRowFacts(session: session, isWhite: isWhite) }
+    private var toMove: Bool { facts.toMove }
+    private var name: String { facts.name }
+    private var detail: String { facts.detail }
 
     @Environment(\.colorScheme) private var colorScheme
     @ScaledMetric(relativeTo: .headline) private var nameSize: CGFloat = 18
@@ -196,5 +180,35 @@ struct CaptureLine: Layout {
                 subview.place(at: CGPoint(x: leading, y: bounds.midY), anchor: .leading, proposal: .unspecified)
             }
         }
+    }
+}
+
+/// What every player row says about one side, whichever layout draws it (`PlayerRow`, `HalfPlayerRow`): who it is,
+/// whether it is to move in the position on screen, and its detail.
+@MainActor struct PlayerRowFacts {
+
+    let session: GameSession
+    let isWhite: Bool
+
+    var player: GamePlayer {
+        isWhite ? session.gameState.white : session.gameState.black
+    }
+
+    var opponent: GamePlayer {
+        isWhite ? session.gameState.black : session.gameState.white
+    }
+
+    var toMove: Bool {
+        session.isWhiteToMove == isWhite && session.gameEnd == .none
+    }
+
+    var name: String {
+        GameText.name(of: player, isWhite: isWhite, opponent: opponent)
+    }
+
+    /// The colour with what the player is doing (whose move it is, the computer's thinking).
+    var detail: String {
+        GameText.sideDetail(of: player, isWhite: isWhite, opponent: opponent, toMove: toMove,
+                            isThinking: session.isThinking)
     }
 }

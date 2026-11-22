@@ -11,7 +11,12 @@ import SwiftUI
 struct PiecesView: View {
     
     let session: GameSession
-    
+    /// True when Black is at the bottom of this board.
+    let rotated: Bool
+    /// False on the half of a face-to-face screen whose player is not on move: its pieces take no taps (the half hides itself
+    /// from accessibility) and the promotion picker never shows on it (the picker belongs to the player on move).
+    let acceptsMoves: Bool
+
 
     func processTap(_ rank: Int, _ file: Int) {
         if let move = session.selection.possibleMove(rank, file) {
@@ -47,7 +52,6 @@ struct PiecesView: View {
             let squareSize: CGFloat = minSize / CGFloat(numberOfSquares)
             let xOffset: CGFloat = (geometry.size.width - minSize) / 2
             let yOffset: CGFloat = (geometry.size.height - minSize) / 2
-            let rotated = session.gameState.rotated
             let b: [Square] = board(withPieces: session.pieces)
             ForEach(b) { square in
                 let x = CGFloat(square.position.file.actual(rotated: rotated)) * squareSize + xOffset
@@ -60,9 +64,9 @@ struct PiecesView: View {
                         processTap(square.position.rank, square.position.file)
                     }
                     .accessibilityElement()
-                    .accessibilityIdentifier(squareIdentifier(square.position))
+                    .accessibilityIdentifier(acceptsMoves ? squareIdentifier(square.position) : "inactive-" + squareIdentifier(square.position))
                     .accessibilityValue(square.piece.map { String($0.name.prefix(1)) } ?? "empty")
-                    .accessibilityAddTraits(.isButton)
+                    .accessibilityAddTraits(session.selection.selected(rank: square.position.rank, file: square.position.file) ? [.isButton, .isSelected] : .isButton)
             }
         }
         .onAppear() {
@@ -71,10 +75,9 @@ struct PiecesView: View {
             session.startIfNeeded()
         }
         .overlay {
-            if let pending = session.pendingPromotion {
+            if acceptsMoves, let pending = session.pendingPromotion {
                 GeometryReader { geometry in
                     let side = min(geometry.size.width, geometry.size.height)
-                    let rotated = session.gameState.rotated
                     PromotionView(promotion: pending,
                                   squareSize: side / CGFloat(numberOfSquares),
                                   screenFile: Promotion.screenFile(file: Int(pending.move.toFile), rotated: rotated),
@@ -90,6 +93,7 @@ struct PiecesView: View {
                 }
             }
         }
+        .allowsHitTesting(acceptsMoves)
         .neverMirrored()
     }
 }

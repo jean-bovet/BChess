@@ -174,6 +174,42 @@ struct GameShellTests {
         #expect(date == old)
     }
 
+    @Test func createGameAgainstAFriendSetsTheFlag() throws {
+        let fixture = try LibraryFixture()
+        defer { fixture.cleanUp() }
+        let (shell, library) = try makeShell(fixture, games: [("a.pgn", "*")])
+
+        #expect(try shell.createGame(white: .human, black: .human))
+        #expect(shell.session.gameState.faceToFace)
+        #expect(try library.open(shell.current).faceToFace)
+
+        #expect(try shell.createGame(white: .human, black: .computer(.club)))
+        #expect(!shell.session.gameState.faceToFace)
+        #expect(try !library.open(shell.current).faceToFace)
+    }
+
+    @Test func twoBoardsChoiceSurvivesSaveAndReopen() throws {
+        let fixture = try LibraryFixture()
+        defer { fixture.cleanUp() }
+        // A two-human game on the single board, in a .bchess file (a plain .pgn file keeps no players and no flag)
+        let json = try GameState(pgn: "1. e4 e5 *", white: .human, black: .human).data(for: .bchessGame)
+        try fixture.write(String(decoding: json, as: UTF8.self), as: "a.bchess", modified: Date(timeIntervalSinceNow: -10))
+        let library = fixture.makeLibrary()
+        library.lastOpenedName = "a.bchess"
+        let shell = try GameShell(library: library)
+        #expect(!shell.session.gameState.faceToFace)
+
+        shell.session.setFaceToFace(true)
+        #expect(shell.save())
+        #expect(try library.open(shell.current).faceToFace)
+        #expect(try GameShell(library: library).session.gameState.faceToFace)
+
+        shell.session.setFaceToFace(false)
+        #expect(shell.save())
+        #expect(try !library.open(shell.current).faceToFace)
+        #expect(try !GameShell(library: library).session.gameState.faceToFace)
+    }
+
     @Test func createGameKeepsTheOrientation() throws {
         let fixture = try LibraryFixture()
         defer { fixture.cleanUp() }

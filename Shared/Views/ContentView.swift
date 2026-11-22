@@ -11,22 +11,29 @@ import SwiftUI
 /// The game screen: the board between the two players, the status of the game and, when it is on, the
 /// engine's opinion. Tall (iPhone) it ends with the last moves; wide (Mac, iPad landscape) it puts the
 /// moves, the status and the engine in a sidebar. The shells around it add the title, the menus and the sheets.
-struct ContentView: View {
+struct ContentView<MenuItems: View>: View {
     let session: GameSession
+
+    /// The items of the "More" menu in the face-to-face bar (iOS): the shell's, since the navigation bar is hidden there.
+    private let menuItems: MenuItems
 
     /// A test-only source of the fold's regions (the gallery's fixed windows carry none). Nil in the app, which
     /// asks the display; only the source is replaced, never the layout that reads it.
     let foldRegionsOverride: [FoldRegion]?
 
-    init(session: GameSession, foldRegions: [FoldRegion]? = nil) {
+    init(session: GameSession, foldRegions: [FoldRegion]? = nil, @ViewBuilder menuItems: () -> MenuItems) {
         self.session = session
         self.foldRegionsOverride = foldRegions
+        self.menuItems = menuItems()
     }
 
-    @AppStorage("showEngine") private var showEngine = false
+    @AppStorage("showEngine") private var showEngineSetting = false
     @AppStorage("showEngineStatistics") private var showStatistics = false
 
     @State private var showAllMoves = false
+
+    /// The screen's layout direction: the side-by-side layout pins itself left to right and gives it back to each half.
+    @Environment(\.layoutDirection) private var layoutDirection
 
     #if os(iOS)
     /// What the layout reads from its container: the size of the content (inside the padding) and the fold's
@@ -66,6 +73,11 @@ struct ContentView: View {
         #endif
     }
 
+    /// The engine readout as shown: the setting, except in a friend game on a platform with two boards.
+    private var showEngine: Bool {
+        FaceToFace.showsEngine(setting: showEngineSetting, state: session.gameState, hasTwoBoards: FaceToFace.platformHasTwoBoards)
+    }
+
     private var topIsWhite: Bool {
         session.gameState.rotated
     }
@@ -78,22 +90,22 @@ struct ContentView: View {
         }
     }
 
-    private var board: some View {
-        BoardFrame(session: session, ring: ring) {
+    private func board(rotated: Bool, acceptsMoves: Bool = true, engineBar: Bool = true) -> some View {
+        BoardFrame(rotated: rotated, ring: ring) {
             ZStack {
-                BoardView(session: session)
-                PiecesView(session: session)
-                VariationSelectionView(session: session)
+                BoardView(session: session, rotated: rotated)
+                PiecesView(session: session, rotated: rotated, acceptsMoves: acceptsMoves)
+                VariationSelectionView(session: session, rotated: rotated)
             }
         }
         .accessibilityElement(children: .contain)
-        .accessibilityIdentifier("board")
+        .accessibilityIdentifier(acceptsMoves ? "board" : "board-inactive")
         .accessibilityValue(session.fen)
         // The evaluation bar stands left of the board, as tall as its frame. Its place depends only on
         // the setting, so stepping through the moves, which clears the verdict, never moves the board.
-        .padding(.leading, boardLeading)
+        .padding(.leading, engineBar ? boardLeading : 0)
         .overlay(alignment: .leading) {
-            if showEngine {
+            if showEngine && engineBar {
                 EvaluationBar(verdict: EngineView.verdict(of: session), rotated: session.gameState.rotated)
             }
         }
@@ -111,7 +123,7 @@ struct ContentView: View {
     /// layout's `BoardColumn` sizes the column from the board.
     @ViewBuilder private var boardRows: some View {
         PlayerRow(session: session, isWhite: topIsWhite)
-        board
+        board(rotated: session.gameState.rotated)
             .layoutValue(key: BoardColumn.IsBoard.self, value: true)
         PlayerRow(session: session, isWhite: !topIsWhite)
         VariationCards(session: session)
@@ -225,32 +237,169 @@ struct ContentView: View {
         }
     }
 
+    #if os(iOS)
+    /// The tap target of the bar's buttons.
+    private static var tapSize: CGFloat { 44 }
+
+    /// The visible height of the bar between the two boards: thinner than its buttons' tap targets, which overlap the
+    /// halves' edges (the bar is above them).
+    private static var barHeight: CGFloat { 28 }
+
+    /// The space between a half's board and the bar.
+    private static var barClearance: CGFloat { 4 }
+
+    /// One player's half: the board with this player at the bottom and their own row (the opponent's row is on the other
+    /// half, facing the opponent; the result replaces the row's detail).
+    /// Only the half whose player is on move takes taps and is seen by accessibility, so the `square-…` and `board`
+    /// identifiers stay unique and move to the other board after each move.
+    private func half(near: Bool) -> some View {
+        let bottomIsWhite = FaceToFace.bottomIsWhite(near: near, rotated: session.gameState.rotated)
+        let accepts = FaceToFace.acceptsMoves(bottomIsWhite: bottomIsWhite, isWhiteToMove: session.isWhiteToMove)
+        return BoardColumn(leading: 0, spacing: 2, centersBoard: true) {
+            board(rotated: !bottomIsWhite, acceptsMoves: accepts, engineBar: false)
+                .layoutValue(key: BoardColumn.IsBoard.self, value: true)
+            HalfPlayerRow(session: session, isWhite: bottomIsWhite)
+                .modifier(ScaledHeight(base: 32, relativeTo: .headline))
+        }
+        // VoiceOver skips the half that cannot move; XCUITest still lists a hidden element (not hittable), so the
+        // half's own identifiers differ too (`board-inactive`, `inactive-square-…`) and the live ones stay unique
+        .accessibilityHidden(!accepts)
+        .dynamicTypeSize(...Self.faceToFaceTextLimit)
+    }
+
+    /// The largest text size a half follows: two boards share the screen, and larger sizes leave a small iPhone's boards
+    /// too little room (`GalleryScenarioTests.faceToFaceColumnsStayInTheirHalves` holds boards of 100 pt at this size).
+    static var faceToFaceTextLimit: DynamicTypeSize { .xxxLarge }
+
+    /// The half in its slot, turned for the player who sits there: 0 near, 180 far (tall).
+    private func slot(near: Bool) -> some View {
+        half(near: near)
+            .rotationEffect(.degrees(FaceToFace.turn(near: near, wide: false)))
+            // The column hugs the bar; what the board cannot use is left at the screen's edge
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: near ? .top : .bottom)
+            .padding(near ? .top : .bottom, Self.barClearance)
+    }
+
+    /// The half in a side-by-side slot, turned a quarter toward its player: laid out in the slot's transposed size
+    /// (so its width is the slot's height), turned, and framed back to the slot. Each half gets the screen's layout
+    /// direction back, so its rows mirror as chrome does though the arrangement itself is pinned left to right.
+    private func turnedSlot(near: Bool) -> some View {
+        GeometryReader { proxy in
+            half(near: near)
+                .environment(\.layoutDirection, layoutDirection)
+                .frame(width: proxy.size.height, height: proxy.size.width)
+                .rotationEffect(.degrees(FaceToFace.turn(near: near, wide: true)))
+                .frame(width: proxy.size.width, height: proxy.size.height)
+        }
+        .padding(near ? .trailing : .leading, Self.barClearance)
+    }
+
+    /// Undo steps back one move, as Back does (a different move afterwards replaces the undone one); More is the shell's menu.
+    private var undoButton: some View {
+        Button {
+            withAnimation { session.move(to: .backward) }
+        } label: {
+            Label("Undo", systemImage: "arrow.uturn.backward")
+                .labelStyle(.iconOnly)
+                .font(.system(size: 22))
+                .frame(width: Self.tapSize, height: Self.tapSize)
+        }
+        .disabled(!session.canMove(to: .backward))
+    }
+
+    private var moreButton: some View {
+        Menu {
+            menuItems
+        } label: {
+            Label("More", systemImage: "ellipsis.circle")
+                .labelStyle(.iconOnly)
+                .font(.system(size: 22))
+                .frame(width: Self.tapSize, height: Self.tapSize)
+        }
+    }
+
+    /// The bar is thin (its buttons' tap targets overflow it), and at least as tall as the fold's gap, so neither half reaches the hinge.
+    private func bar(gap: CGFloat) -> some View {
+        HStack {
+            undoButton
+            Spacer(minLength: 0)
+            moreButton
+        }
+        .frame(height: max(Self.barHeight, gap))
+        .zIndex(1)
+    }
+
+    /// The bar between side-by-side halves: Undo at the top, More at the bottom.
+    /// As wide as its buttons, and at least as wide as the fold's gap.
+    private func verticalBar(gap: CGFloat) -> some View {
+        VStack {
+            undoButton
+            Spacer(minLength: 0)
+            moreButton
+        }
+        .frame(width: max(Self.tapSize, gap))
+    }
+
+    /// Two boards against a friend: tall, the far half turned to face the far player and the bar between the halves;
+    /// wide, the first player's half on the left and the other's on the right, each turned toward its own short end.
+    /// With a fold inside, the first half ends before it and the bar stands over the fold; otherwise the halves
+    /// are equal.
+    @ViewBuilder private func faceToFaceLayout(_ placement: Placement?) -> some View {
+        if placement?.isWide ?? false {
+            HStack(spacing: 0) {
+                if let primary = placement?.split.primary, let gap = placement?.split.gap {
+                    turnedSlot(near: true)
+                        .frame(width: primary)
+                    verticalBar(gap: gap)
+                    turnedSlot(near: false)
+                } else {
+                    turnedSlot(near: true)
+                    verticalBar(gap: 0)
+                    turnedSlot(near: false)
+                }
+            }
+            // The first player's half is on the left in every language
+            .environment(\.layoutDirection, .leftToRight)
+        } else {
+            VStack(spacing: 0) {
+                if let primary = placement?.split.primary, let gap = placement?.split.gap {
+                    slot(near: false)
+                        .frame(height: primary)
+                    bar(gap: gap)
+                    slot(near: true)
+                } else {
+                    slot(near: false)
+                    bar(gap: 0)
+                    slot(near: true)
+                }
+            }
+        }
+    }
+    #endif
+
     private var content: some View {
         let placement = placement
         return Group {
+            #if os(iOS)
+            if FaceToFace.isOn(session.gameState) {
+                faceToFaceLayout(placement)
+            } else if placement?.isWide ?? true {
+                wideLayout(placement)
+            } else {
+                tallLayout(placement)
+            }
+            #else
             // The Mac has no placement and is always wide
             if placement?.isWide ?? true {
                 wideLayout(placement)
             } else {
                 tallLayout(placement)
             }
+            #endif
         }
         .padding(placement?.insets ?? EdgeInsets())
     }
 
-    #if os(iOS)
-    /// The fold's regions in the content's coordinates: the test hook when set, else the display's division region.
-    private nonisolated static func foldRegions(_ proxy: GeometryProxy, override: [FoldRegion]?) -> [FoldRegion] {
-        if let override {
-            return override
-        }
-        if #available(iOS 27.1, *) {
-            return proxy.reservedRegions(kind: .division, options: .includeInactive)
-                .map { FoldRegion(frame: $0.frame, isActive: $0.isActive) }
-        }
-        return []
-    }
-    #endif
 
     /// The content, on iOS drawn over a clear base that takes exactly the space the container offers: the layout is
     /// chosen from that space, never from the size the content asks for. (Measured on the content itself, the first
@@ -261,7 +410,7 @@ struct ContentView: View {
         Color.clear
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .onGeometryChange(for: FoldGeometry.self) { [override = foldRegionsOverride] proxy in
-                FoldGeometry(size: proxy.size, regions: Self.foldRegions(proxy, override: override))
+                FoldGeometry(size: proxy.size, regions: foldRegions(proxy, override: override))
             } action: { geometry in
                 self.geometry = geometry
             }
@@ -281,6 +430,7 @@ struct ContentView: View {
         measuredContent
         .padding()
         .background(Walnut.background.ignoresSafeArea())
+        // The effective value: Players switching a computer game to "A friend" stops the analysis in the same screen
         .onChange(of: showEngine, initial: true) { _, shown in
             session.showsEngine = shown
         }
@@ -306,9 +456,47 @@ struct ContentView: View {
 }
 
 #if os(iOS)
+/// The fold's regions in the content's coordinates: the test hook when set, else the display's division region.
+/// A free function: a generic view's `Self` is not `Sendable`, and the geometry closure is.
+private nonisolated func foldRegions(_ proxy: GeometryProxy, override: [FoldRegion]?) -> [FoldRegion] {
+    if let override {
+        return override
+    }
+    if #available(iOS 27.1, *) {
+        return proxy.reservedRegions(kind: .division, options: .includeInactive)
+            .map { FoldRegion(frame: $0.frame, isActive: $0.isActive) }
+    }
+    return []
+}
+#endif
+
+#if os(iOS)
+/// A height that follows the text size but not the script: the rows and the status of a half take the same room in
+/// every language, so the board gets the same square (right to left included) and measured equals placed.
+private struct ScaledHeight: ViewModifier {
+    @ScaledMetric private var height: CGFloat
+    private let alignment: Alignment
+
+    init(base: CGFloat, relativeTo style: Font.TextStyle, alignment: Alignment = .center) {
+        _height = ScaledMetric(wrappedValue: base, relativeTo: style)
+        self.alignment = alignment
+    }
+
+    func body(content: Content) -> some View {
+        content.frame(height: height, alignment: alignment)
+    }
+}
+
 /// The measure the layout is chosen from, as one value so it publishes once per change.
 private struct FoldGeometry: Equatable {
     var size: CGSize
     var regions: [FoldRegion]
 }
 #endif
+
+extension ContentView where MenuItems == EmptyView {
+    /// The Mac, and every screen that has no bar menu.
+    init(session: GameSession, foldRegions: [FoldRegion]? = nil) {
+        self.init(session: session, foldRegions: foldRegions) { EmptyView() }
+    }
+}

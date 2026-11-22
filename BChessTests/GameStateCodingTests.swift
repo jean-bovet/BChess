@@ -15,6 +15,27 @@ struct GameStateCodingTests {
     private let legacyWithoutPlayers = #"{"pgn":"1. e4 e5 *","rotated":true}"#
     private let legacyWithPlayers = #"{"pgn":"1. e4 e5 *","rotated":false,"white":{"name":"Ann","computer":false,"level":1},"black":{"name":"Bot","computer":true,"level":3}}"#
 
+    @Test func oldFileWithoutFaceToFaceOpensSingleBoard() throws {
+        let old = try GameState(data: Data(legacyWithPlayers.utf8), contentType: .json)
+        #expect(!old.faceToFace)
+        let bare = try GameState(data: Data(legacyWithoutPlayers.utf8), contentType: .json)
+        #expect(!bare.faceToFace)
+    }
+
+    @Test func faceToFaceRoundTrips() throws {
+        for flag in [true, false] {
+            let state = GameState(pgn: "*", white: .human, black: .human, faceToFace: flag)
+            let data = try state.data(for: .bchessGame)
+            #expect(try GameState(data: data, contentType: .bchessGame).faceToFace == flag)
+        }
+    }
+
+    @Test func pgnOpensSingleBoard() throws {
+        let state = try GameState(data: Data("1. e4 e5 *".utf8), contentType: .pgn)
+        #expect(state.white == .human && state.black == .human)
+        #expect(!state.faceToFace)
+    }
+
     @Test func decodesLegacyJSON() throws {
         let bare = try GameState(data: Data(legacyWithoutPlayers.utf8), contentType: .json)
         #expect(bare.pgn == "1. e4 e5 *")
@@ -37,7 +58,7 @@ struct GameStateCodingTests {
         #expect(full.black.thinkingTime == 0)
 
         func black(level: Int) throws -> GamePlayer {
-            let json = #"{"pgn":"*","rotated":false,"white":{"name":"","computer":false,"level":0},"black":{"name":"","computer":true,"level":\#(level)}}"#
+            let json = #"{"faceToFace":false,"pgn":"*","rotated":false,"white":{"name":"","computer":false,"level":0},"black":{"name":"","computer":true,"level":\#(level)}}"#
             return try GameState(data: Data(json.utf8), contentType: .json).black
         }
         #expect(try black(level: 9).strength == .club)
@@ -75,7 +96,7 @@ struct GameStateCodingTests {
         #expect(try GameState(data: data, contentType: .json) == state)
 
         let object = try #require(JSONSerialization.jsonObject(with: data) as? [String: Any])
-        #expect(Set(object.keys) == ["pgn", "rotated", "white", "black"])
+        #expect(Set(object.keys) == ["pgn", "rotated", "white", "black", "faceToFace"])
     }
 
     @Test func bchessAndJSONShareTheFormat() throws {
@@ -103,16 +124,16 @@ struct GameStateCodingTests {
     @Test func namedPlayersWriteTheSameBytes() throws {
         let ann = GameState(pgn: "*", white: GamePlayer(name: "Ann", computer: false, level: 0), black: .computer(.club))
         #expect(try ann.data(for: .bchessGame) == Data(
-            #"{"black":{"computer":true,"level":2,"name":""},"pgn":"*","rotated":false,"white":{"computer":false,"level":0,"name":"Ann"}}"#.utf8))
+            #"{"black":{"computer":true,"level":2,"name":""},"faceToFace":false,"pgn":"*","rotated":false,"white":{"computer":false,"level":0,"name":"Ann"}}"#.utf8))
 
         let scripts = GameState(pgn: "*", rotated: true, white: GamePlayer(name: "דני", computer: false, level: 0),
                                 black: .computer(.maximum, thinkingTime: 30))
         #expect(try scripts.data(for: .json) == Data(
-            "{\"black\":{\"computer\":true,\"level\":6,\"name\":\"\"},\"pgn\":\"*\",\"rotated\":true,\"white\":{\"computer\":false,\"level\":0,\"name\":\"דני\"}}".utf8))
+            "{\"black\":{\"computer\":true,\"level\":6,\"name\":\"\"},\"faceToFace\":false,\"pgn\":\"*\",\"rotated\":true,\"white\":{\"computer\":false,\"level\":0,\"name\":\"דני\"}}".utf8))
 
         let arabic = GameState(pgn: "*", white: GamePlayer(name: "سامي", computer: false, level: 0), black: .computer(.maximum))
         #expect(try arabic.data(for: .bchessGame) == Data(
-            "{\"black\":{\"computer\":true,\"level\":5,\"name\":\"\"},\"pgn\":\"*\",\"rotated\":false,\"white\":{\"computer\":false,\"level\":0,\"name\":\"سامي\"}}".utf8))
+            "{\"black\":{\"computer\":true,\"level\":5,\"name\":\"\"},\"faceToFace\":false,\"pgn\":\"*\",\"rotated\":false,\"white\":{\"computer\":false,\"level\":0,\"name\":\"سامي\"}}".utf8))
     }
 
     /// The PGN, the SAN names, the move labels and the FEN of a short game, against literals.

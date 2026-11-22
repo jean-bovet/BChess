@@ -121,6 +121,17 @@ enum GameText {
         }
     }
 
+    /// The result on one line, for a face-to-face half whose row has room for no banner: "White wins · Checkmate", or
+    /// just "Draw" for a declared draw (a declared result has no reason of its own).
+    static func resultDetail(_ result: GameResult) -> String {
+        let title = String(localized: resultTitle(result))
+        guard let reason = resultReason(result.reason) else {
+            return title
+        }
+        let why = String(localized: reason)
+        return String(localized: "\(title) \u{00B7} \(why)")
+    }
+
     /// The one sentence the game screen's status line adds to the player rows (whose turn it is, and the computer
     /// thinking), the move strip and the board (the last move): what the mode is, or why this position cannot be played
     /// (a position in the middle of an imported line; the result banner says how the line ends). `nil` while a game is
