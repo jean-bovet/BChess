@@ -115,6 +115,9 @@ extension GalleryScenarios {
             + "10. Rxe6 Rb8 11. Nh3 d4 12. b3 Kd7 13. e4 Ke8 14. f4 Rd8 15. exd8=R+ Kf7 16. Rxg8 b5 17. Bxb5 c5 18. g4 a4 "
             + "19. bxa4 c4 20. Bxc4 d3 21. cxd3 Kxg8 22. Re8+ (22. Re7+) *"
 
+        /// Black to move with a pawn on a2 that promotes on a1 (White at the bottom): the picker shows on the top board only.
+        static let blackPromotes = "[SetUp \"1\"]\n[FEN \"4k3/8/8/8/8/8/p6K/8 b - - 0 1\"]\n\n*"
+
         /// Both sides have captured at least ten pieces: white twelve, black thirteen (past the twelve-piece overlap of the
         /// capture line, under the fifteen maximum). A legal 49-move game, black to have just captured.
         static let manyCaptures = "1. g4 c6 2. Nc3 h5 3. f4 h4 4. e3 c5 5. f5 g6 6. fxg6 fxg6 7. Na4 Na6 8. Nxc5 Nxc5 9. Kf2 Bg7 "
@@ -148,6 +151,6 @@ extension GalleryScenarios {
         static let allPGNs = [ruyLopez, empty, openingE4E5, captures, yourMove, checkmate, whiteMates, stalemate,
                               insufficientMaterial, fiftyMoves, declaredBlackWins, arrowsAndCards,
                               moveStripMiddle, moveStripVariations, shortGame, commented, mixedScript, card, worstRow, middlegame,
-                              manyCaptures, longCheckmate, blackPromotion, blackPromotionPlain]
+                              manyCaptures, longCheckmate, blackPromotion, blackPromotionPlain, blackPromotes]
     }
 }

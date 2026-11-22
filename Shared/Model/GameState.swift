@@ -97,18 +97,22 @@ struct GameState: Codable, Equatable, Sendable {
     var rotated: Bool
     var white: GamePlayer
     var black: GamePlayer
+    /// Set only by a New Game or Players choice of "A friend": the iOS game screen shows two boards (APP-15).
+    /// PGN has no place for it, so a game opened from a PGN has it off.
+    var faceToFace: Bool
 
     static let newGame = GameState(pgn: "*")
 
-    init(pgn: String, rotated: Bool = false, white: GamePlayer = .defaultWhite, black: GamePlayer = .defaultBlack) {
+    init(pgn: String, rotated: Bool = false, white: GamePlayer = .defaultWhite, black: GamePlayer = .defaultBlack, faceToFace: Bool = false) {
         self.pgn = pgn
         self.rotated = rotated
         self.white = white
         self.black = black
+        self.faceToFace = faceToFace
     }
 
     private enum CodingKeys: String, CodingKey {
-        case pgn, rotated, white, black
+        case pgn, rotated, white, black, faceToFace
     }
 
     init(from decoder: Decoder) throws {
@@ -118,6 +122,7 @@ struct GameState: Codable, Equatable, Sendable {
         // Optional for backwards compatibility
         white = try container.decodeIfPresent(GamePlayer.self, forKey: .white) ?? .defaultWhite
         black = try container.decodeIfPresent(GamePlayer.self, forKey: .black) ?? .defaultBlack
+        faceToFace = try container.decodeIfPresent(Bool.self, forKey: .faceToFace) ?? false
     }
 
     func encode(to encoder: Encoder) throws {
@@ -126,6 +131,7 @@ struct GameState: Codable, Equatable, Sendable {
         try container.encode(rotated, forKey: .rotated)
         try container.encode(white, forKey: .white)
         try container.encode(black, forKey: .black)
+        try container.encode(faceToFace, forKey: .faceToFace)
     }
 
     // MARK: Codec

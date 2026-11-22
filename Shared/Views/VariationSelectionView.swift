@@ -13,6 +13,8 @@ import SwiftUI
 struct VariationSelectionView: View {
     
     let session: GameSession
+    /// True when Black is at the bottom of this board.
+    let rotated: Bool
 
     var body: some View {
         if session.variations.show {
@@ -21,7 +23,6 @@ struct VariationSelectionView: View {
                 let squareSize: CGFloat = minSize / CGFloat(numberOfSquares)
                 let xOffset: CGFloat = (geometry.size.width - minSize) / 2 + squareSize / 2
                 let yOffset: CGFloat = (geometry.size.height - minSize) / 2 + squareSize / 2
-                let rotated = session.gameState.rotated
                 
                 // The main line goes last, so that it stays on top where arrows cross
                 ForEach(session.variations.choices.reversed()) { v in

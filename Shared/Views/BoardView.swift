@@ -21,6 +21,8 @@ extension View {
 struct BoardView: View {
     
     let session: GameSession
+    /// True when Black is at the bottom of this board.
+    let rotated: Bool
 
     func backgroundColor(rank: Int, file: Int) -> Color {
         if rank % 2 == 0 {
@@ -35,8 +37,8 @@ struct BoardView: View {
             ForEach((0...7).reversed(), id: \.self) { rank in
                 HStack(spacing: 0) {
                     ForEach(0...7, id: \.self) { file in
-                        let r = rank.actual(rotated: session.gameState.rotated)
-                        let f = file.actual(rotated: session.gameState.rotated)
+                        let r = rank.actual(rotated: rotated)
+                        let f = file.actual(rotated: rotated)
                         Rectangle()
                             .fill(backgroundColor(rank: r, file: f))
                             .modifier(LastMoveModifier(rank: r, file:f, session: session))
@@ -53,7 +55,8 @@ struct BoardView: View {
 /// The walnut frame around the board: rounded, with a soft shadow, and the coordinates drawn in it.
 /// The content is laid out in the square inside the frame. A ring around the frame shows the mode.
 struct BoardFrame<Content: View>: View {
-    let session: GameSession
+    /// True when Black is at the bottom of this board (the coordinates follow it).
+    let rotated: Bool
     /// Yellow for analyze, green for train: the ring around the frame.
     var ring: Color?
     @ViewBuilder let content: Content
@@ -71,7 +74,7 @@ struct BoardFrame<Content: View>: View {
                             RoundedRectangle(cornerRadius: 10).strokeBorder(ring, lineWidth: 3).padding(-3)
                         }
                     }
-                LabelsView(session: session)
+                LabelsView(rotated: rotated)
                 content
                     .padding(thickness)
             }

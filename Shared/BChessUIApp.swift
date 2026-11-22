@@ -11,6 +11,8 @@ import SwiftUI
 @main
 struct BChessUIApp: App {
     #if os(iOS)
+    /// Answers the orientations the open game allows (landscape only face to face on an iPhone).
+    @UIApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
     private let library: GameLibrary
 
     init() {

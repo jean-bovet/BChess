@@ -4,6 +4,16 @@ import Testing
 import UIKit
 @testable import BChess
 
+/// Polls a main-actor condition for up to ten seconds (the mounted-screen tests wait for the production observation).
+@MainActor private func wait(_ condition: () -> Bool) async -> Bool {
+    let deadline = ContinuousClock.now + .seconds(10)
+    while ContinuousClock.now < deadline {
+        if condition() { return true }
+        try? await Task.sleep(for: .milliseconds(50))
+    }
+    return condition()
+}
+
 /// Both gallery suites in one serialized parent: the fixtures write the scratch defaults that the snapshot
 /// test reads through every @AppStorage while it awaits each settle, so no other test may run beside it.
 @MainActor @Suite(.serialized)
@@ -244,8 +254,8 @@ extension GallerySuites {
                 #expect(scenario.skipReason(duoPass: false) == nil, "\(scenario.name)")
             }
             let skipped = GalleryScenarios.all.filter { $0.skipReason(duoPass: true) != nil }.map(\.slug)
-            #expect(skipped == ["duo-inner-landscape-shell"])
-            #expect(GalleryScenarios.all.filter { $0.usesSystemBars }.map(\.slug) == ["duo-inner-landscape-shell", "launch-empty-library"])
+            #expect(skipped == ["duo-inner-landscape-shell", "face-to-face-iphone-landscape"])
+            #expect(GalleryScenarios.all.filter { $0.usesSystemBars }.map(\.slug) == ["duo-inner-landscape-shell", "face-to-face-shell", "face-to-face-two-boards-off", "launch-empty-library"])
         }
 
         // MARK: Pixel oracles (the production layout through the production render)
@@ -730,6 +740,252 @@ extension GallerySuites {
                 #expect(box(Walnut.frame, style, in: capture, region: beyond) == nil)
                 #expect(box(Walnut.card, style, in: capture, region: beyond) == nil)
             }
+        }
+
+        // MARK: Face to face
+
+        /// A friend game captured as both face-to-face oracles do: the worst row (the longest capture strips) unless a session is given.
+        private func faceToFaceCapture(size: GallerySize, textSize: DynamicTypeSize?, style: UIUserInterfaceStyle, fold: FoldRegion? = nil,
+                                       session: GameSession = GalleryScenarios.friendSession(GalleryScenarios.Fixture.worstRow),
+                                       direction: LayoutDirection? = nil) async throws -> (capture: UIImage, window: CGSize) {
+            let window = size.points(screen: try SnapshotGalleryTests.screenSize())
+            var screen = GalleryScenarios.friendScreen(session, fold: fold)
+            if let textSize {
+                screen = AnyView(screen.dynamicTypeSize(textSize))
+            }
+            if let direction {
+                screen = AnyView(screen.environment(\.layoutDirection, direction))
+            }
+            let capture = try await SnapshotGalleryTests.render(AnyView(screen.defaultAppStorage(GalleryScenarios.defaults)), size: window,
+                                                                sizeClasses: size.sizeClasses, scale: 3, style: style)
+            return (capture, window)
+        }
+
+        /// The rectangle without `cut` (up to four pieces).
+        private func rect(_ rect: CGRect, without cut: CGRect) -> [CGRect] {
+            let hole = rect.intersection(cut)
+            guard !hole.isNull else { return [rect] }
+            return [CGRect(x: rect.minX, y: rect.minY, width: rect.width, height: hole.minY - rect.minY),
+                    CGRect(x: rect.minX, y: hole.maxY, width: rect.width, height: rect.maxY - hole.maxY),
+                    CGRect(x: rect.minX, y: hole.minY, width: hole.minX - rect.minX, height: hole.height),
+                    CGRect(x: hole.maxX, y: hole.minY, width: rect.maxX - hole.maxX, height: hole.height)]
+                .filter { $0.width > 0 && $0.height > 0 }
+        }
+
+        /// What both orientations hold: the bar's strip (`strip`, across the window, its buttons at the two ends) is empty
+        /// but for its two 44 pt buttons; each half's board stands in its own half, clear of the strip and of the padding,
+        /// at least 100 pt wide; nothing is drawn past the padding. `wide`: the halves are left and right of a vertical strip.
+        private func expectHalvesInTheirOwn(_ capture: UIImage, window: CGSize, wide: Bool, strip: CGRect, style: UIUserInterfaceStyle,
+                                            label: String, sourceLocation: SourceLocation = #_sourceLocation) throws -> [CGRect] {
+            let background = GalleryPixels.resolved(Walnut.background, style: style)
+            let button: CGFloat = 44
+            let buttons = wide
+                ? [CGRect(x: strip.midX - button / 2, y: 16, width: button, height: button),
+                   CGRect(x: strip.midX - button / 2, y: window.height - 16 - button, width: button, height: button)]
+                : [CGRect(x: 16, y: strip.midY - button / 2, width: button, height: button),
+                   CGRect(x: window.width - 16 - button, y: strip.midY - button / 2, width: button, height: button)]
+            var pieces = [strip]
+            for cut in buttons {
+                pieces = pieces.flatMap { rect($0, without: cut) }
+            }
+            for piece in pieces {
+                #expect(GalleryPixels.differing(from: background, in: capture, region: piece).count == 0,
+                        "\(label): something is drawn in the bar's strip at \(piece)", sourceLocation: sourceLocation)
+            }
+
+            // The two halves, each with its board and its player's row; the strip is between them
+            let halves = wide
+                ? [CGRect(x: 0, y: 0, width: strip.minX, height: window.height),
+                   CGRect(x: strip.maxX, y: 0, width: window.width - strip.maxX, height: window.height)]
+                : [CGRect(x: 0, y: 0, width: window.width, height: strip.minY),
+                   CGRect(x: 0, y: strip.maxY, width: window.width, height: window.height - strip.maxY)]
+            var boards = [CGRect]()
+            for (index, half) in halves.enumerated() {
+                let board = try #require(box(Walnut.frame, style, in: capture, region: half), "\(label): no board in half \(index)", sourceLocation: sourceLocation)
+                #expect(half.insetBy(dx: wide ? 0 : 16 - 0.5, dy: wide ? 16 - 0.5 : 0).contains(board),
+                        "\(label): the board \(board) leaves its half \(half)", sourceLocation: sourceLocation)
+                #expect(board.minX >= 16 - 0.5 && board.maxX <= window.width - 16 + 0.5 && board.minY >= 16 - 0.5
+                        && board.maxY <= window.height - 16 + 0.5, "\(label): the board \(board) reaches the padding", sourceLocation: sourceLocation)
+                #expect(board.width >= 100, "\(label): the board is only \(board.width) pt wide", sourceLocation: sourceLocation)
+                boards.append(board)
+                // The whole column: a half holds only its own player's row, beside the board on the side away from the bar
+                // (the opponent's row is on the other half), and no status line
+                let before = wide ? CGRect(x: half.minX, y: 0, width: board.minX - half.minX, height: window.height)
+                                  : CGRect(x: 0, y: half.minY, width: window.width, height: board.minY - half.minY)
+                let after = wide ? CGRect(x: board.maxX, y: 0, width: half.maxX - board.maxX, height: window.height)
+                                 : CGRect(x: 0, y: board.maxY, width: window.width, height: half.maxY - board.maxY)
+                let counts = [before, after].map { GalleryPixels.differing(from: background, in: capture, region: $0).count }
+                if wide {
+                    #expect(counts.contains { $0 > 100 }, "\(label): the row of half \(index) is not beside its board (\(counts))", sourceLocation: sourceLocation)
+                } else {
+                    let away = index == 0 ? counts[0] : counts[1]
+                    #expect(away > 100, "\(label): the row of half \(index) is not on the side of the board away from the bar (\(counts))", sourceLocation: sourceLocation)
+                }
+            }
+            let edges = [CGRect(x: 0, y: 0, width: 15.5, height: window.height),
+                         CGRect(x: window.width - 15.5, y: 0, width: 15.5, height: window.height),
+                         CGRect(x: 0, y: 0, width: window.width, height: 15.5),
+                         CGRect(x: 0, y: window.height - 15.5, width: window.width, height: 15.5)]
+            for edge in edges {
+                #expect(GalleryPixels.differing(from: background, in: capture, region: edge).count == 0, "\(label): drawn past the padding at \(edge)", sourceLocation: sourceLocation)
+            }
+            return boards
+        }
+
+        @Test("each half's whole column (board and its own row) lies inside its half: nothing under the bar, nothing past the window",
+              arguments: [GallerySize.smallPhone, GallerySize.phone],
+              [nil, DynamicTypeSize.xxxLarge, DynamicTypeSize.accessibility3])
+        func faceToFaceColumnsStayInTheirHalves(size: GallerySize, textSize: DynamicTypeSize?) async throws {
+            // The requested sizes are the limit and the largest size, which the half clamps to the limit
+            #expect(ContentView<EmptyView>.faceToFaceTextLimit == .xxxLarge)
+            for style in styles {
+                let (capture, window) = try await faceToFaceCapture(size: size, textSize: textSize, style: style)
+                let label = "\(Int(window.width)), \(style.rawValue), \(textSize.map { "\($0)" } ?? "default text")"
+                let strip = CGRect(x: 0, y: window.height / 2 - 14, width: window.width, height: 28)
+                _ = try expectHalvesInTheirOwn(capture, window: window, wide: false, strip: strip, style: style, label: label)
+            }
+        }
+
+        @Test("side by side, each half's whole column lies inside its half: nothing under the bar, nothing past the window",
+              arguments: [GallerySize.phoneLandscape, GallerySize.ipadLandscape],
+              [nil, DynamicTypeSize.xxxLarge, DynamicTypeSize.accessibility3])
+        func faceToFaceLandscapeColumnsStayInTheirHalves(size: GallerySize, textSize: DynamicTypeSize?) async throws {
+            for style in styles {
+                let (capture, window) = try await faceToFaceCapture(size: size, textSize: textSize, style: style)
+                let label = "\(Int(window.width))x\(Int(window.height)), \(style.rawValue), \(textSize.map { "\($0)" } ?? "default text")"
+                let strip = CGRect(x: window.width / 2 - 22, y: 0, width: 44, height: window.height)
+                _ = try expectHalvesInTheirOwn(capture, window: window, wide: true, strip: strip, style: style, label: label)
+            }
+        }
+
+        @Test("on the Duo's inner display neither half reaches the hinge, tall or side by side",
+              arguments: [GallerySize.duoInnerPortrait, GallerySize.duoInnerLandscape])
+        func faceToFaceHalvesClearTheHinge(size: GallerySize) async throws {
+            let wide = size == .duoInnerLandscape
+            let hinge = wide ? GalleryScenarios.duoLandscapeHinge : GalleryScenarios.duoPortraitTabletop
+            for style in styles {
+                let (capture, window) = try await faceToFaceCapture(size: size, textSize: nil, style: style, fold: hinge)
+                let label = "\(size), \(style.rawValue)"
+                // The region is in content coordinates, 16 pt inside the window; each side keeps a 12 pt gutter, and the
+                // bar fills the gap, so the halves start after the gutter
+                let frame = hinge.frame.offsetBy(dx: 16, dy: 16)
+                let strip = wide ? CGRect(x: frame.minX - 12, y: 0, width: frame.width + 24, height: window.height)
+                                 : CGRect(x: 0, y: frame.minY - 12, width: window.width, height: frame.height + 24)
+                let boards = try expectHalvesInTheirOwn(capture, window: window, wide: wide, strip: strip, style: style, label: label)
+                for (index, board) in boards.enumerated() {
+                    let hingeBand = wide ? CGRect(x: frame.minX, y: 0, width: frame.width, height: window.height)
+                                         : CGRect(x: 0, y: frame.minY, width: window.width, height: frame.height)
+                    #expect(!board.intersects(hingeBand), "\(label): the board \(index) \(board) is on the hinge \(hingeBand)")
+                }
+                // Not a pixel of either half's column on the hinge outside the two buttons (they stand on it by design)
+                let background = GalleryPixels.resolved(Walnut.background, style: style)
+                let band = wide ? CGRect(x: frame.minX, y: 16 + 44, width: frame.width, height: window.height - 2 * (16 + 44))
+                                : CGRect(x: 16 + 44, y: frame.minY, width: window.width - 2 * (16 + 44), height: frame.height)
+                #expect(GalleryPixels.differing(from: background, in: capture, region: band).count == 0, "\(label): something is on the hinge")
+            }
+        }
+
+        @Test("the first player's half is the left one in every language: the promotion picker of the player on move, Black, shows on the right",
+              arguments: [GallerySize.phoneLandscape, GallerySize.ipadLandscape], [LayoutDirection.leftToRight, LayoutDirection.rightToLeft])
+        func firstPlayersHalfIsOnTheLeft(size: GallerySize, direction: LayoutDirection) async throws {
+            // Black promotes, so Black is on move and only Black's half (the second player's, the right one) shows the picker;
+            // were the arrangement mirrored by the language, the picker would show on the left
+            func session() throws -> GameSession {
+                let session = GalleryScenarios.friendSession(GalleryScenarios.Fixture.blackPromotes)
+                session.select(rank: 1, file: 0)
+                session.beginPromotion(try #require(session.selection.possibleMove(0, 0)))
+                try #require(session.pendingPromotion != nil)
+                return session
+            }
+            for style in styles {
+                let (capture, window) = try await faceToFaceCapture(size: size, textSize: nil, style: style, session: try session(), direction: direction)
+                let label = "\(Int(window.width))x\(Int(window.height)), \(style.rawValue), \(direction)"
+                let left = box(Walnut.pillBackground, style, in: capture, region: CGRect(x: 0, y: 0, width: window.width / 2, height: window.height))
+                let right = box(Walnut.pillBackground, style, in: capture, region: CGRect(x: window.width / 2, y: 0, width: window.width / 2, height: window.height))
+                #expect(left == nil, "\(label): the picker is on the left half (\(String(describing: left)))")
+                #expect(right != nil, "\(label): the picker is not on the right half")
+            }
+        }
+
+        @Test("an iPhone allows landscape exactly while a friend game is open, an iPad always; the app delegate answers the open game's mask")
+        func appDelegateAnswersTheMaskOfTheOpenGame() {
+            let friend = GameState(pgn: GalleryScenarios.Fixture.empty, white: .human, black: .human, faceToFace: true)
+            let computer = GameState(pgn: GalleryScenarios.Fixture.empty, white: .human, black: .computer(.club))
+            let delegate = AppDelegate()
+            func answer() -> UIInterfaceOrientationMask {
+                delegate.application(.shared, supportedInterfaceOrientationsFor: nil)
+            }
+            OrientationLock.update(for: friend, isPad: false)
+            #expect(answer().contains(.landscapeLeft) && answer().contains(.landscapeRight))
+            #expect(!answer().contains(.portraitUpsideDown))
+            OrientationLock.update(for: computer, isPad: false)
+            #expect(answer() == .portrait)
+            OrientationLock.update(for: computer, isPad: true)
+            #expect(answer() == .all)
+            OrientationLock.update(for: computer, isPad: false)
+        }
+
+        @Test("a mounted game screen stops its analysis when the players become friends")
+        func mountedScreenStopsAnalysisWhenPlayersBecomeFriends() async throws {
+            let session = GameSession(state: GameState(pgn: GalleryScenarios.Fixture.empty, white: .human, black: .computer(.maximum, thinkingTime: 5)))
+            defer { session.cancelSearch() }
+            let mounted = try SnapshotGalleryTests.mount(AnyView(ContentView(session: session).defaultAppStorage(GalleryScenarios.engineOnDefaults)),
+                                                         size: CGSize(width: 402, height: 874), style: .light)
+            defer { mounted.close() }
+
+            #expect(await wait { session.isAnalyzing }, "the screen with the engine on analyzes the position")
+            #expect(await wait { session.info != nil }, "the analysis reports")
+            let stale = try #require(session.info)
+            let analysisToken = session.analysisID
+            let searchToken = session.positionID
+
+            // The production observation (`ContentView.onChange` of the effective setting), not a hand assignment
+            session.setPlayers(white: .human, black: .human)
+            #expect(await wait { !session.isAnalyzing }, "the analysis stops in the same screen")
+            #expect(session.info == nil)
+
+            // A late callback of the analysis and of the search that were running, with their tokens, lands nowhere (I2)
+            let fen = session.fen
+            session.analysisDidUpdate(stale, completed: false, token: analysisToken)
+            session.analysisDidUpdate(stale, completed: true, token: analysisToken)
+            session.searchDidUpdate(stale, completed: false, token: searchToken)
+            session.searchDidUpdate(stale, completed: true, token: searchToken)
+            #expect(session.info == nil)
+            #expect(!session.isAnalyzing)
+            #expect(session.fen == fen)
+        }
+
+        @Test("a mounted game screen stops its analysis on two boards and restarts it on the single board")
+        func mountedScreenFollowsTheTwoBoardsToggle() async throws {
+            let session = GameSession(state: GameState(pgn: GalleryScenarios.Fixture.empty, white: .human, black: .human))
+            defer { session.cancelSearch() }
+            let mounted = try SnapshotGalleryTests.mount(AnyView(ContentView(session: session).defaultAppStorage(GalleryScenarios.engineOnDefaults)),
+                                                         size: CGSize(width: 402, height: 874), style: .light)
+            defer { mounted.close() }
+
+            #expect(await wait { session.isAnalyzing }, "the single board with the engine on analyzes")
+            #expect(await wait { session.info != nil }, "the analysis reports")
+            let stale = try #require(session.info)
+            let analysisToken = session.analysisID
+
+            // The production observation (`ContentView.onChange` of `showEngine`), not a hand assignment
+            session.setFaceToFace(true)
+            #expect(await wait { !session.isAnalyzing }, "two boards stop the analysis")
+            #expect(session.info == nil)
+            #expect(!session.isAnalyzing)
+
+            session.setFaceToFace(false)
+            #expect(await wait { session.isAnalyzing }, "the single board analyzes again")
+            // No suspension from here to the checks: the readout and the running flag are the new analysis's. The old
+            // analysis's late callbacks (its token) must land nowhere, a stale completion included.
+            let readout = session.info
+            let running = session.isAnalyzing
+            session.analysisDidUpdate(stale, completed: false, token: analysisToken)
+            session.analysisDidUpdate(stale, completed: true, token: analysisToken)
+            #expect(session.info === readout, "a callback with the old token is rejected")
+            #expect(session.isAnalyzing == running, "a stale completion does not end the new analysis")
+            #expect(await wait { session.info != nil }, "the restarted analysis reports")
+            #expect(session.analysisID > analysisToken)
         }
     }
 }

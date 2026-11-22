@@ -124,12 +124,26 @@ extension GallerySuites {
                                     scale: scenario.size.scale(duoPass: duoPass), style: style, settle: scenario.settle)
         }
 
-        /// The primitive: any view in a window of `size` (with the size classes forced on the window and the host),
-        /// captured at `scale`. The oracle tests call it with ad-hoc views and sizes.
-        static func render(_ view: AnyView, name: String = "view", size: CGSize,
-                           sizeClasses: (horizontal: UIUserInterfaceSizeClass, vertical: UIUserInterfaceSizeClass)? = nil,
-                           scale: CGFloat = 2, style: UIUserInterfaceStyle,
-                           settle: Duration = .milliseconds(400)) async throws -> UIImage {
+        /// A view in a window of `size` that stays on screen until `close()`: the primitive of `render`, and what a test
+        /// that drives the mounted screen (not a picture of it) holds on to.
+        @MainActor final class Mounted {
+            let window: UIWindow
+            let host: UIHostingController<AnyView>
+
+            fileprivate init(window: UIWindow, host: UIHostingController<AnyView>) {
+                self.window = window
+                self.host = host
+            }
+
+            func close() {
+                window.isHidden = true
+                window.rootViewController = nil
+            }
+        }
+
+        static func mount(_ view: AnyView, size: CGSize,
+                          sizeClasses: (horizontal: UIUserInterfaceSizeClass, vertical: UIUserInterfaceSizeClass)? = nil,
+                          style: UIUserInterfaceStyle) throws -> Mounted {
             let host = UIHostingController(rootView: view)
             host.overrideUserInterfaceStyle = style
             host.view.backgroundColor = .systemBackground
@@ -144,13 +158,22 @@ extension GallerySuites {
                 host.traitOverrides.verticalSizeClass = sizeClasses.vertical
             }
             window.rootViewController = host
-            defer {
-                window.isHidden = true
-                window.rootViewController = nil
-            }
             window.makeKeyAndVisible()
             host.view.frame = window.bounds
             host.view.layoutIfNeeded()
+            return Mounted(window: window, host: host)
+        }
+
+        /// The primitive: any view in a window of `size` (with the size classes forced on the window and the host),
+        /// captured at `scale`. The oracle tests call it with ad-hoc views and sizes.
+        static func render(_ view: AnyView, name: String = "view", size: CGSize,
+                           sizeClasses: (horizontal: UIUserInterfaceSizeClass, vertical: UIUserInterfaceSizeClass)? = nil,
+                           scale: CGFloat = 2, style: UIUserInterfaceStyle,
+                           settle: Duration = .milliseconds(400)) async throws -> UIImage {
+            let mounted = try mount(view, size: size, sizeClasses: sizeClasses, style: style)
+            defer { mounted.close() }
+            let host = mounted.host
+            let window = mounted.window
             // Let onAppear / task / List layout settle.
             try await Task.sleep(for: settle)
             host.view.layoutIfNeeded()

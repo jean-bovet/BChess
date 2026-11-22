@@ -109,6 +109,13 @@ struct GameTextTests {
         #expect(String(localized: GameText.resultTitle(GameResult(winner: .draw, reason: .stalemate))) == "Draw")
     }
 
+    @Test func resultDetailIsOneLine() {
+        #expect(GameText.resultDetail(GameResult(winner: .white, reason: .checkmate)) == "White wins \u{00B7} Checkmate")
+        #expect(GameText.resultDetail(GameResult(winner: .draw, reason: .repetition)) == "Draw \u{00B7} Threefold repetition")
+        // A declared result has no reason of its own
+        #expect(GameText.resultDetail(GameResult(winner: .black, reason: .finished)) == "Black wins")
+    }
+
     @Test func resultReasons() {
         let reasons: [(GameEnd, String?)] = [
             (.checkmate, "Checkmate"), (.stalemate, "Stalemate"), (.repetition, "Threefold repetition"),

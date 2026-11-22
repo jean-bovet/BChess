@@ -392,10 +392,22 @@ final class GameSession {
         var state = gameState
         state.white = white
         state.black = black
+        state.faceToFace = !white.computer && !black.computer
         if let rotated {
             state.rotated = rotated
         }
         gameState = state
+        invalidate()
+    }
+
+    /// The two boards on or off (iOS; a players-and-mode change like `setPlayers`). Ignored unless both players are
+    /// human, and when the value does not change: a redundant call must not cancel a pending promotion, drop a
+    /// search or restart the analysis.
+    func setFaceToFace(_ on: Bool) {
+        guard FaceToFace.canSwitch(gameState), gameState.faceToFace != on else {
+            return
+        }
+        gameState.faceToFace = on
         invalidate()
     }
 
@@ -412,6 +424,7 @@ final class GameSession {
         }
         clearSelection()
         variations = Variations()
+        gameState.faceToFace = false
         contentDidChange()
         return true
     }

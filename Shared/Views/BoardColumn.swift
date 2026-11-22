@@ -18,16 +18,20 @@ struct BoardColumn: Layout {
     /// is that much wider than its square, and so is the column.
     var leading: CGFloat
     var spacing: CGFloat = 10
+    /// The column takes the whole width it is proposed and the board stands in the middle of it (the rows around their own
+    /// width), so the board's place does not depend on the rows' text, whatever the script (a face-to-face half).
+    var centersBoard = false
     /// Marks the board among the subviews; the others are rows.
     struct IsBoard: LayoutValueKey { static let defaultValue = false }
 
     func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) -> CGSize {
-        let fit = Self.fit(proposal, subviews, leading: leading, spacing: spacing)
-        return CGSize(width: fit.width, height: fit.side + fit.rows)
+        let fit = Self.fit(proposal, subviews, leading: leading, spacing: spacing, ignoresRowWidths: centersBoard)
+        let width = centersBoard ? (proposal.width.flatMap { $0.isFinite ? max($0, fit.width) : nil } ?? fit.width) : fit.width
+        return CGSize(width: width, height: fit.side + fit.rows)
     }
 
     func placeSubviews(in bounds: CGRect, proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) {
-        let fit = Self.fit(proposal, subviews, leading: leading, spacing: spacing)
+        let fit = Self.fit(proposal, subviews, leading: leading, spacing: spacing, ignoresRowWidths: centersBoard)
         var y = bounds.minY
         for (index, subview) in subviews.enumerated() {
             let size = subview[IsBoard.self]
@@ -36,7 +40,8 @@ struct BoardColumn: Layout {
             if size == .zero {
                 continue
             }
-            subview.place(at: CGPoint(x: bounds.minX, y: y), anchor: .topLeading,
+            let x = centersBoard ? bounds.minX + (bounds.width - size.width) / 2 : bounds.minX
+            subview.place(at: CGPoint(x: x, y: y), anchor: .topLeading,
                           proposal: ProposedViewSize(size))
             y += size.height + spacing
         }
@@ -55,7 +60,8 @@ struct BoardColumn: Layout {
     /// is not a limit: the other one decides, and with neither the board is its own ideal size.
     /// A nil or infinite dimension is no limit; the finite one decides, and with no finite dimension the board is
     /// its ideal size (a `Layout` never reports an infinite size, so `(∞, ∞)` gets the ideal, as `fixedSize` would).
-    private nonisolated static func fit(_ proposal: ProposedViewSize, _ subviews: Subviews, leading: CGFloat, spacing: CGFloat) -> Fit {
+    private nonisolated static func fit(_ proposal: ProposedViewSize, _ subviews: Subviews, leading: CGFloat, spacing: CGFloat,
+                                           ignoresRowWidths: Bool) -> Fit {
         let board = subviews.first { $0[IsBoard.self] }
         let finiteWidth = proposal.width.flatMap { $0.isFinite ? $0 : nil }
         let finiteHeight = proposal.height.flatMap { $0.isFinite ? $0 : nil }
@@ -93,7 +99,9 @@ struct BoardColumn: Layout {
         var width = limit
         while true {
             let measured = rows(at: width)
-            let side = max(0, min(limit - leading, room - measured.total))
+            let exact = max(0, min(limit - leading, room - measured.total))
+            // A centred board has a whole-point side, so its squares fall on the same pixels whatever the script
+            let side = ignoresRowWidths ? (exact + 0.01).rounded(.down) : exact
             let narrower = max(side + leading, rowsMin)
             // Rows measured at a narrower width can only take more lines, so the width only shrinks and, the
             // heights taking finitely many values, the loop ends

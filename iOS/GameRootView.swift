@@ -127,10 +127,16 @@ private struct GameView: View {
 
     var body: some View {
         NavigationStack {
-            ContentView(session: shell.session, foldRegions: foldRegions)
+            ContentView(session: shell.session, foldRegions: foldRegions, menuItems: {
+                // The navigation and bottom bars are hidden in a friend game: the bar between the boards carries the menu
+                Button("Games", systemImage: "list.bullet") { showGames = true }
+                moreMenuItems
+            })
             .id(shell.current.url)
             .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(Walnut.background, for: .navigationBar, .bottomBar)
+            // A friend game has two boards and their bar: no title, no Games button, no Back and Forward, no engine
+            .toolbar(FaceToFace.isOn(shell.session.gameState) ? .hidden : .automatic, for: .navigationBar, .bottomBar)
             .toolbar {
                 ToolbarItem(placement: .navigation) {
                     Button { showGames = true } label: {
@@ -169,6 +175,10 @@ private struct GameView: View {
         }
         .onChange(of: shell.session.gameState) {
             shell.save()
+        }
+        // An iPhone turns sideways only in a friend game; the mask follows the open game
+        .onChange(of: FaceToFace.isOn(shell.session.gameState), initial: true) {
+            OrientationLock.update(for: shell.session.gameState, isPad: UIDevice.current.userInterfaceIdiom == .pad)
         }
         .onChange(of: scenePhase) { _, phase in
             if phase == .background {
@@ -238,21 +248,30 @@ private struct GameView: View {
 
     private var moreMenu: some View {
         Menu {
-            Button("New Game", systemImage: "plus.circle") { playersSheet = .newGame }
-            Button("Players", systemImage: "person.2") { playersSheet = .players }
-            Button("Flip Board", systemImage: "arrow.triangle.2.circlepath.circle") { shell.session.rotate() }
-            ExportMenu(shell: shell, file: shell.current)
-            Button("Settings", systemImage: "gearshape") { showSettings = true }
-            Divider()
-            Button("Copy Position", systemImage: "doc.on.doc") { Pasteboard.set(shell.session.fen) }
-            Button("Copy Game", systemImage: "doc.on.doc") { Pasteboard.set(shell.session.pgnCurrentGame) }
-            Button("Paste Game or Position", systemImage: "arrow.down.circle") {
-                if let text = Pasteboard.string {
-                    _ = shell.session.paste(text)
-                }
-            }
+            moreMenuItems
         } label: {
             Label("More", systemImage: "ellipsis.circle")
+        }
+    }
+
+    @ViewBuilder private var moreMenuItems: some View {
+        Button("New Game", systemImage: "plus.circle") { playersSheet = .newGame }
+        Button("Players", systemImage: "person.2") { playersSheet = .players }
+        Button("Flip Board", systemImage: "arrow.triangle.2.circlepath.circle") { shell.session.rotate() }
+        if FaceToFace.canSwitch(shell.session.gameState) {
+            Toggle("Two Boards", systemImage: "rectangle.split.1x2", isOn: Binding(
+                get: { FaceToFace.isOn(shell.session.gameState) },
+                set: { shell.session.setFaceToFace($0) }))
+        }
+        ExportMenu(shell: shell, file: shell.current)
+        Button("Settings", systemImage: "gearshape") { showSettings = true }
+        Divider()
+        Button("Copy Position", systemImage: "doc.on.doc") { Pasteboard.set(shell.session.fen) }
+        Button("Copy Game", systemImage: "doc.on.doc") { Pasteboard.set(shell.session.pgnCurrentGame) }
+        Button("Paste Game or Position", systemImage: "arrow.down.circle") {
+            if let text = Pasteboard.string {
+                _ = shell.session.paste(text)
+            }
         }
     }
 
