@@ -81,9 +81,8 @@ struct LocaleIndependenceTests {
     /// A translation reached the composed sentences: under another language the status is not the English one.
     @Test func statusIsNotEnglish() throws {
         try #require(expectedLanguage != "en")
-        let status = GameText.status(mode: .play, isThinking: false, gameEnd: .none, white: .human, black: .defaultBlack,
-                                     isWhiteToMove: true, lastMove: nil)
-        #expect(status != "Your move.")
+        let status = try #require(GameText.status(mode: .play, gameEnd: .checkmate))
+        #expect(status != "Checkmate")
         #expect(GameText.title(white: .human, black: .defaultBlack) != "You vs Club Player")
     }
 

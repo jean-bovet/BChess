@@ -67,9 +67,21 @@ PNG only to check one detail): truncated or overflowing text, a string that wrap
 catalog, never the layout. The English gallery is unchanged by all this.
 
 **Right to left (`he`, `ar`).** Read the captures against `AGENTS.md` § Languages: the board region of every board capture
-must be pixel-identical to the English one (`magick compare -metric RMSE -crop 640x640+110+250 +repage previews/iphone/<slug>.png
-previews/iphone/he/<slug>.png null:` prints 0 on the game screens; a scenario that lays out the board differently needs its
-own crop), the evaluation bar stays left of the board, the move strip and list rows read left to right, the chrome mirrors.
+must be pixel-identical to the English one. Since APP-14 centres the board block on the iPhone, its place depends on the card
+(captures, variation cards, the engine readout), so the crop is read per card from the English capture: the board frame's box,
+inset 6 px (the frame is `rgb(70,51,36)` light, `rgb(46,32,23)` dark; the opening drops text strokes and the rounded corners):
+
+```
+magick previews/iphone/<slug>.png -depth 8 -fuzz 3% -fill "rgb(255,0,255)" -opaque "rgb(70,51,36)" -fill black +opaque "rgb(255,0,255)" \
+  -morphology Open Square:12 -fuzz 0 -format "%@\n" info:          # WxH+X+Y of the frame, e.g. 738x738+33+463 (iPhone tall card, 804 px wide)
+magick compare -metric RMSE -crop <W-12>x<H-12>+<X+6>+<Y+6> +repage previews/iphone/<slug>.png previews/iphone/he/<slug>.png null:
+```
+
+(the iPhone tall cards come to `726x726+39+469`, 0 for he and ar; the same command on `previews/ipad/ipad/` and on the Duo's
+`previews/duo/iphone/` and `previews/duo/duo-inner/`; detect on the light capture, and use the dark colour for a `.dark` card).
+The wide layout puts the board column on the trailing side in he and ar (the chrome mirrors, the board's content does not):
+crop the English box and the Hebrew or Arabic one at `x' = width - x - W`. A card with variation cards shows a hint that wraps
+by language, so its block height, and the board, may differ by a line; compare those by eye. Also: the evaluation bar stays left of the board, the move strip and list rows read left to right, the chrome mirrors.
 The process-locale tests run beside the captures, once per language, with the variables set on the command line:
 
 ```

@@ -177,4 +177,27 @@ struct MoveRowsTests {
         #expect(!tokens.contains(.move("1\u{2026}e5", uuid: tree[1].uuid)))
         #expect(!tokens.contains(.move("e5", uuid: tree[1].uuid)))
     }
+
+    /// The strip asks for 8, 7 ... 1 moves: every suffix ends on the current move and, when it starts on a Black move,
+    /// numbers that first token "11\u{2026}Nf6" so no strip opens on a bare Black move.
+    @Test(arguments: 1...8)
+    func recentMovesNumberTheFirstTokenOfAnySuffix(count: Int) {
+        let (game, engine) = rebuilt(pgn: "1. e4 e5 2. Nf3 Nc6 3. Bb5 a6 4. Ba4 Nf6 5. O-O Be7 6. Re1 b5 7. Bb3 d6 8. c3 O-O "
+            + "9. h3 Na5 10. Bc2 c5 11. d4 Qc7 *")
+        let tree = engine.moveNodesTree()
+        // Ply index 20 is 11. d4; 21 is 11...Qc7. A White and a Black current move, so suffixes start on both colours
+        for last in [20, 21] {
+            let tokens = game.recentMoves(current: tree[last].uuid, count: count)
+            #expect(tokens.count == count)
+            let firstPly = last - count + 1
+            // A White move is always numbered ("11. d4"); a Black one only when it opens the suffix ("11\u{2026}Nf6")
+            let expected = (firstPly...last).map { ply in
+                let name = tree[ply].name
+                let number = ply / 2 + 1
+                return MoveToken.move(ply % 2 == 0 ? "\(number). \(name)" : (ply == firstPly ? "\(number)\u{2026}\(name)" : name),
+                                      uuid: tree[ply].uuid)
+            }
+            #expect(tokens == expected)
+        }
+    }
 }
