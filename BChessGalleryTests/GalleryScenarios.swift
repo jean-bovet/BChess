@@ -23,6 +23,9 @@ enum GallerySize: Equatable {
     case phone
     /// 375 x 667.
     case smallPhone
+    /// 320 x 744, compact width: the narrowest window the tall layout meets (an iPad's Slide Over, or one third of a Split
+    /// View on an iPad mini in landscape). Tall enough for the tall layout to be chosen, whatever the rows' floor.
+    case narrow
     /// 1180 x 820, regular / regular.
     case ipadLandscape
     /// The Duo's inner display in landscape, 951 x 669, regular / regular, the hinge vertical.
@@ -35,6 +38,7 @@ enum GallerySize: Equatable {
         switch self {
         case .phone: return screen
         case .smallPhone: return CGSize(width: 375, height: 667)
+        case .narrow: return CGSize(width: 320, height: 744)
         case .ipadLandscape: return CGSize(width: 1180, height: 820)
         case .duoInnerLandscape: return CGSize(width: 951, height: 669)
         case .duoInnerPortrait: return CGSize(width: 669, height: 951)
@@ -44,7 +48,7 @@ enum GallerySize: Equatable {
     /// The size classes forced on the window and the host; nil keeps the scene's own.
     var sizeClasses: (horizontal: UIUserInterfaceSizeClass, vertical: UIUserInterfaceSizeClass)? {
         switch self {
-        case .phone, .smallPhone: return nil
+        case .phone, .smallPhone, .narrow: return nil
         case .ipadLandscape, .duoInnerLandscape, .duoInnerPortrait: return (.regular, .regular)
         }
     }
@@ -134,6 +138,19 @@ enum GalleryScenarios {
         GameSession(state: GameState(pgn: Fixture.ruyLopez))
     }
 
+    /// Human against a Maximum computer on Black's move, the reply pending: `isThinking` is set by the human's move and the
+    /// move animation never completes (the session's own `animate` seam), so `requestEngineMoveIfNeeded` never runs: no search
+    /// starts, nothing outlives the card and nothing can land on the position.
+    static func computerThinkingSession() -> GameSession {
+        let session = GameSession(state: GameState(pgn: Fixture.middlegame, white: .human, black: .computer(.maximum, thinkingTime: 10)))
+        session.animate = { change, _ in change() }
+        session.select(rank: 1, file: 0)
+        if let move = session.selection.possibleMove(2, 0) {
+            session.playHuman(move)
+        }
+        return session
+    }
+
     /// A library of a few games from fixed times of day. It never touches the real defaults.
     /// A filesystem error throws, so it fails the scenario instead of photographing an empty card.
     static func gamesShell() throws -> GameShell {
@@ -211,6 +228,11 @@ enum GalleryScenarios {
     static let gameScreenRotated = GalleryScenario(name: "Game screen · Rotated", group: "Game") {
         AnyView(ContentView(session: GameSession(state: GameState(pgn: Fixture.empty, rotated: true))))
     }
+    /// The computer's turn, through the production path: the session asks for its reply and `isThinking` is set by it, so
+    /// the computer's row reads "Black \u{00B7} thinking\u{2026}" (Maximum with a 10 s search, so the search is still on at the capture).
+    static let gameScreenComputerThinking = GalleryScenario(name: "Game screen · Computer thinking", group: "Game") {
+        AnyView(ContentView(session: computerThinkingSession()))
+    }
     static let playerRowToMove = GalleryScenario(name: "Player row · To move", group: "Game") {
         AnyView(VStack(alignment: .leading) {
             PlayerRow(session: GameSession(state: GameState(pgn: Fixture.openingE4E5, white: .human, black: .human)), isWhite: false)
@@ -219,12 +241,31 @@ enum GalleryScenarios {
     }
     static let playerRowCaptures = GalleryScenario(name: "Player row · Captures", group: "Game") {
         AnyView(VStack(alignment: .leading) {
-            PlayerRow(session: GameSession(state: GameState(pgn: Fixture.captures)), isWhite: false)
-            PlayerRow(session: GameSession(state: GameState(pgn: Fixture.captures)), isWhite: true)
+            PlayerRow(session: manyCapturesSession(), isWhite: false)
+            PlayerRow(session: manyCapturesSession(), isWhite: true)
         })
     }
-    static let statusLineYourMove = GalleryScenario(name: "Status line · Your move", group: "Game") {
-        AnyView(StatusLine(session: GameSession(state: GameState(pgn: Fixture.yourMove))))
+    static let gameScreenManyCaptures = GalleryScenario(name: "Game screen · Many captures", group: "Game") {
+        AnyView(ContentView(session: manyCapturesSession()))
+    }
+    /// The narrowest phone the gallery has: the capture line of thirteen pieces beside long names.
+    static let gameScreenManyCapturesSmallPhone = GalleryScenario(name: "Game screen · Many captures · Small iPhone", group: "Game", size: .smallPhone) {
+        AnyView(ContentView(session: manyCapturesSession()))
+    }
+    /// The narrowest window (320 pt): fifteen white captures with the material points on the capture line.
+    static let gameScreenNarrowWorstRow = GalleryScenario(name: "Game screen · Narrow · Worst row", group: "Game", size: .narrow) {
+        gameScreen(worstRowSession(), fold: nil)
+    }
+    static let gameScreenWideManyCaptures = GalleryScenario(name: "Game screen · Wide · Many captures", group: "Game", size: .ipadLandscape) {
+        AnyView(ContentView(session: manyCapturesSession())
+            .frame(width: 1180, height: 820))
+    }
+    /// The long checkmate game at its end: high move numbers in the strip, the game end alone in the status line.
+    static let gameScreenLongGame = GalleryScenario(name: "Game screen · Long game", group: "Game") {
+        AnyView(ContentView(session: longCheckmateSession()))
+    }
+    static let statusLineAnalyze = GalleryScenario(name: "Status line · Analyze", group: "Game") {
+        AnyView(StatusLine(session: GameSession(state: GameState(pgn: Fixture.yourMove), mode: GameMode(value: .analyze))))
     }
     /// Two humans on a finished game, so no search starts; the result banner takes the status line's slot.
     static func finishedSession(_ pgn: String, mode: GameMode = GameMode()) -> GameSession {
@@ -289,6 +330,26 @@ enum GalleryScenarios {
         return session
     }
 
+    /// Two humans with long names on the many-captures game (white twelve captures, black thirteen), at its end.
+    static func manyCapturesSession() -> GameSession {
+        GameSession(state: GameState(pgn: Fixture.manyCaptures, white: longNamedWhite, black: longNamedBlack))
+    }
+
+    /// Two humans on the long checkmate game: at its end, or, with `atPly`, on that zero-based ply (39 is Black's
+    /// castling on move 20, 92 White's `hxg8=Q` on move 47), selected through `selectMove(uuid:)`.
+    static func longCheckmateSession(atPly ply: Int? = nil) -> GameSession {
+        let session = GameSession(state: GameState(pgn: Fixture.longCheckmate, white: .human, black: .human))
+        if let ply {
+            session.selectMove(uuid: session.game.path(to: session.currentMoveUUID)[ply].uuid)
+        }
+        return session
+    }
+
+    /// Two humans on the black-promotion game, at its end: the current move is `10\u{2026}exd1=Q+`.
+    static func blackPromotionSession(pgn: String = Fixture.blackPromotion) -> GameSession {
+        GameSession(state: GameState(pgn: pgn, white: .human, black: .human))
+    }
+
     /// Two humans on the worst-row game, on the position before its last move: fifteen white captures and the
     /// variation cards offered.
     static func worstRowSession() -> GameSession {
@@ -323,6 +384,12 @@ enum GalleryScenarios {
     }
     static let duoPortraitGame = GalleryScenario(name: "Duo inner · Portrait · Game screen", group: groupDuo, size: .duoInnerPortrait) {
         gameScreen(humanToMoveSession(), fold: duoPortraitFlat)
+    }
+    static let duoPortraitManyCaptures = GalleryScenario(name: "Duo inner · Portrait · Many captures", group: groupDuo, size: .duoInnerPortrait) {
+        gameScreen(manyCapturesSession(), fold: duoPortraitFlat)
+    }
+    static let duoLandscapeLongGame = GalleryScenario(name: "Duo inner · Landscape · Long game", group: groupDuo, size: .duoInnerLandscape) {
+        gameScreen(longCheckmateSession(), fold: duoLandscapeHinge)
     }
     static let duoPortraitTabletopCard = GalleryScenario(name: "Duo inner · Portrait · Tabletop", group: groupDuo, size: .duoInnerPortrait) {
         gameScreen(humanToMoveSession(), fold: duoPortraitTabletop)
@@ -452,6 +519,20 @@ enum GalleryScenarios {
         AnyView(MoveStrip(session: GameSession(state: GameState(pgn: Fixture.moveStripVariations)), showAll: {})
             .padding())
     }
+    /// On Black's castling on move 20 of the long game: the current move whole at the trailing edge, a high move number
+    /// on the first token.
+    static let moveStripLongGame = GalleryScenario(name: "Move strip · Long game", group: "Moves") {
+        AnyView(MoveStrip(session: longCheckmateSession(atPly: 39), showAll: {})
+            .padding())
+    }
+    /// The width budget's proof: the longest current-move label (a Black promotion with capture and check, move 10) at the
+    /// largest accessibility size, in the narrowest window the gallery has, with a variation on the page. The strip caps
+    /// the size itself (`.accessibility2`), so the move is whole.
+    static let moveStripLargestText = GalleryScenario(name: "Move strip · Largest text", group: "Moves", size: .narrow) {
+        AnyView(MoveStrip(session: blackPromotionSession(), showAll: {})
+            .padding()
+            .dynamicTypeSize(.accessibility5))
+    }
     static let moveListShortGame = GalleryScenario(name: "Move list · Short game", group: "Moves") {
         AnyView(MoveListView(session: GameSession(state: GameState(pgn: Fixture.shortGame))))
     }
@@ -530,22 +611,22 @@ enum GalleryScenarios {
 
     /// In the order of the page: the groups, and the cards of each group.
     static let all: [GalleryScenario] = [
-        gameScreenTall, gameScreenWide, gameScreenAnalyze,
+        gameScreenTall, gameScreenWide, gameScreenAnalyze, gameScreenEngineOn, gameScreenTrain, gameScreenRotated, gameScreenComputerThinking,
         gameScreenWhiteWins, gameScreenBlackWins, gameScreenDraw, gameScreenResultWhileBrowsing, gameScreenAnalyzeCheckmate,
-        gameScreenInsufficientMaterial, gameScreenFiftyMoves, gameScreenDeclaredResult, gameScreenWideWhiteWins, resultBannerDraw, gameScreenEngineOn, gameScreenTrain, gameScreenRotated,
-        playerRowToMove, playerRowCaptures,
-        statusLineYourMove,
+        gameScreenInsufficientMaterial, gameScreenFiftyMoves, gameScreenDeclaredResult, gameScreenWideWhiteWins, resultBannerDraw,
+        playerRowToMove, playerRowCaptures, gameScreenManyCaptures, gameScreenManyCapturesSmallPhone, gameScreenNarrowWorstRow, gameScreenWideManyCaptures, gameScreenLongGame,
+        statusLineAnalyze,
         navigationButtons,
         duoLandscapeGame, duoLandscapeFlatOpen, duoLandscapeVariations, duoLandscapeShell,
-        duoLandscapeResult,
-        duoPortraitGame, duoPortraitTabletopCard, duoPortraitTabletopVariations, duoPortraitTabletopResult,
+        duoLandscapeLongGame, duoLandscapeResult,
+        duoPortraitGame, duoPortraitManyCaptures, duoPortraitTabletopCard, duoPortraitTabletopVariations, duoPortraitTabletopResult,
         boardWhiteAtTheBottom, boardLabelsRotated,
         piecesWhiteAtTheBottom, piecesRotated,
         promotionDropsFromTheTop, promotionRisesFromTheBottom,
         variationsArrowsAndCards,
         arrow,
         engineEqual, engineSlightlyBetter, engineMate, engineAnalyzing, engineStatistics, engineLongLine, engineWide, engineEvaluationBars,
-        moveStripStart, moveStripMiddle, moveStripWithVariations,
+        moveStripStart, moveStripMiddle, moveStripWithVariations, moveStripLongGame, moveStripLargestText,
         moveListShortGame, moveListVariationsAndComments, moveListMixedScriptComments, moveListCard,
         gamesListFourGames, gamesListSmallPhone, launchEmptyLibrary, newGameClub, newGameFriend, newGameMaximum, newGamePlayers,
         settings, about,

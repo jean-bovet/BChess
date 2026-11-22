@@ -17,10 +17,17 @@ struct EngineView: View {
     /// The wide layout (iPad, a wide Mac window): more room around the lines, and the best line may wrap.
     var wide = false
 
+    /// One footnote line of Latin text (15.67 pt at the default size) and one subheadline line (18 pt): fixed heights, because
+    /// the same lines in Arabic are 2 pt taller each, which would make the card, and so the centred board block, depend on
+    /// the language.
+    @ScaledMetric(relativeTo: .footnote) private var footnoteLine: CGFloat = 15.67
+    @ScaledMetric(relativeTo: .subheadline) private var subheadlineLine: CGFloat = 18
+
     private func scoreChip(_ score: String) -> some View {
         Text(score)
             .font(.footnote.weight(.bold))
             .monospacedDigit()
+            .frame(height: footnoteLine)
             .padding(.horizontal, 7)
             .padding(.vertical, 2)
             .foregroundStyle(Walnut.scoreChipText)
@@ -35,6 +42,7 @@ struct EngineView: View {
             .font(.footnote)
             .lineLimit(wide ? 2 : 1)
             .truncationMode(.tail)
+            .frame(height: wide ? nil : footnoteLine)
             .opacity(line.isEmpty ? 0 : 1)
     }
 
@@ -48,6 +56,7 @@ struct EngineView: View {
                         .font(.subheadline.weight(.semibold))
                         .foregroundStyle(Walnut.textPrimary)
                         .lineLimit(1)
+                        .frame(height: subheadlineLine)
                 }
             } else {
                 // As tall as a verdict, so the cards below stay in place while it is awaited
@@ -56,6 +65,7 @@ struct EngineView: View {
                     Text("Analyzing\u{2026}")
                         .font(.subheadline)
                         .foregroundStyle(Walnut.textSecondary)
+                        .frame(height: subheadlineLine)
                 }
             }
             bestLine
@@ -72,6 +82,7 @@ struct EngineView: View {
         .walnutCard()
         .accessibilityElement(children: .combine)
         .accessibilityIdentifier("engine-readout")
+        .probeFrame("engine-readout")
     }
 
     /// The verdict on the session's position, or nil while it awaits the search or the game is over.

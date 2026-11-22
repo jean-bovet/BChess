@@ -24,7 +24,7 @@ extension MacGallerySuites {
                 #expect(!scenario.slug.isEmpty, "\(scenario.name)")
                 #expect(seen.insert(scenario.slug).inserted, "duplicate slug \(scenario.slug)")
             }
-            #expect(MacGalleryScenarios.all.count == 9)
+            #expect(MacGalleryScenarios.all.count == 12)
         }
 
         @Test("the ONLY filter matches names or slugs, comma-separated, case-insensitive; empty means all")

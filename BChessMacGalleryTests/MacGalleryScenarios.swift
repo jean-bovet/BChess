@@ -97,6 +97,30 @@ enum MacGalleryScenarios {
         documentWindow(pgn: GalleryScenarios.Fixture.commented, white: .human, black: .human)
     }
 
+    /// The many-captures game of two long-named humans: its capture lines are the widest the window has to hold.
+    private static let manyCapturesTitle = GameText.title(white: GalleryScenarios.longNamedWhite, black: GalleryScenarios.longNamedBlack)
+
+    static let documentWindowManyCaptures = MacGalleryScenario(
+        name: "Document window · Many captures", group: group, size: windowFrame, title: manyCapturesTitle
+    ) {
+        documentWindow(pgn: GalleryScenarios.Fixture.manyCaptures, white: GalleryScenarios.longNamedWhite, black: GalleryScenarios.longNamedBlack)
+    }
+
+    /// The same window at its 740 x 500 floor (`DocumentWindow`): the widest capture line beside the move list.
+    static let documentWindowManyCapturesFloor = MacGalleryScenario(
+        name: "Document window · Many captures · Window floor", group: group, size: .frame(CGSize(width: 740, height: 500)),
+        title: manyCapturesTitle
+    ) {
+        documentWindow(pgn: GalleryScenarios.Fixture.manyCaptures, white: GalleryScenarios.longNamedWhite, black: GalleryScenarios.longNamedBlack)
+    }
+
+    /// The long checkmate game: the result banner says the game end.
+    static let documentWindowCheckmate = MacGalleryScenario(
+        name: "Document window · Checkmate", group: group, size: windowFrame, title: GameText.title(white: .human, black: .human)
+    ) {
+        documentWindow(pgn: GalleryScenarios.Fixture.longCheckmate, white: .human, black: .human)
+    }
+
     static let documentWindowWhiteWins = MacGalleryScenario(
         name: "Document window · White wins", group: group, size: windowFrame,
         title: GameText.title(white: .human, black: .human)
@@ -167,7 +191,8 @@ enum MacGalleryScenarios {
 
     /// In the order of the page.
     static let all: [MacGalleryScenario] = [
-        documentWindowEngineOn, documentWindowVariations, documentWindowWhiteWins, documentWindowDraw,
+        documentWindowEngineOn, documentWindowVariations, documentWindowManyCaptures, documentWindowManyCapturesFloor,
+        documentWindowCheckmate, documentWindowWhiteWins, documentWindowDraw,
         documentWindowNewGameSheet, documentWindowNewGameSheetFriend, documentWindowNewGameSheetMaximum,
         settingsWindow, aboutWindow,
     ]

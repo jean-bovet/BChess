@@ -121,12 +121,14 @@ struct ContentView: View {
         VStack(alignment: .leading, spacing: 10) {
             boardRows
         }
+        .probeFrame("tall-column")
     }
 
     private var wideBoardColumn: some View {
         BoardColumn(leading: boardLeading) {
             boardRows
         }
+        .probeFrame("column")
     }
 
     /// The engine readout, in the sidebar's form when the layout is wide.
@@ -211,6 +213,8 @@ struct ContentView: View {
                     .padding(.horizontal, 2)
                     .padding(.top, gap - spacing)
             } else {
+                // Centres the block in the free height; the tabletop above stays at the top
+                Spacer(minLength: 0)
                 boardColumn
                 statusArea
                     .padding(.horizontal, 2)
@@ -248,17 +252,33 @@ struct ContentView: View {
     }
     #endif
 
-    var body: some View {
-        content
+    /// The content, on iOS drawn over a clear base that takes exactly the space the container offers: the layout is
+    /// chosen from that space, never from the size the content asks for. (Measured on the content itself, the first
+    /// pass, before any measure, drew the wide layout, whose minimum width is wider than a phone; the frame then
+    /// reported that width, the layout stayed wide, and a phone in dark mode showed the move list beside the board.)
+    @ViewBuilder private var measuredContent: some View {
         #if os(iOS)
-        // Fills the space inside the padding, so its size and the regions are in one coordinate space
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .onGeometryChange(for: FoldGeometry.self) { [override = foldRegionsOverride] proxy in
-            FoldGeometry(size: proxy.size, regions: Self.foldRegions(proxy, override: override))
-        } action: { geometry in
-            self.geometry = geometry
-        }
+        Color.clear
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .onGeometryChange(for: FoldGeometry.self) { [override = foldRegionsOverride] proxy in
+                FoldGeometry(size: proxy.size, regions: Self.foldRegions(proxy, override: override))
+            } action: { geometry in
+                self.geometry = geometry
+            }
+            // Nothing is drawn before the first measure: no layout is guessed
+            .overlay {
+                if geometry != nil {
+                    content
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                }
+            }
+        #else
+        content
         #endif
+    }
+
+    var body: some View {
+        measuredContent
         .padding()
         .background(Walnut.background.ignoresSafeArea())
         .onChange(of: showEngine, initial: true) { _, shown in

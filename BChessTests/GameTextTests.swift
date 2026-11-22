@@ -43,25 +43,50 @@ struct GameTextTests {
         #expect(GameText.name(of: player, isWhite: false, opponent: human) == name)
         #expect(GameText.title(white: human, black: player) == "You vs \(name)")
         #expect(GameText.title(white: player, black: human) == "\(name) vs You")
-        #expect(status(thinking: true, black: player, whiteToMove: false) == "\(name) is thinking\u{2026}")
-        #expect(GameText.sideDetail(of: player, isWhite: false, opponent: human, toMove: true) == "Black" + suffix)
-        #expect(GameText.sideDetail(of: player, isWhite: true, opponent: human, toMove: false) == "White" + suffix)
+        #expect(GameText.sideDetail(of: player, isWhite: false, opponent: human, toMove: true, isThinking: false) == "Black" + suffix)
+        #expect(GameText.sideDetail(of: player, isWhite: true, opponent: human, toMove: false, isThinking: false) == "White" + suffix)
         // A given name wins, and then the level appears nowhere else, so the detail keeps it (D1)
         let ann = GamePlayer(name: "Ann", computer: true, level: level)
         #expect(GameText.name(of: ann, isWhite: false, opponent: human) == "Ann")
-        let annDetail = GameText.sideDetail(of: ann, isWhite: false, opponent: human, toMove: true)
+        let annDetail = GameText.sideDetail(of: ann, isWhite: false, opponent: human, toMove: true, isThinking: false)
         #expect(annDetail == (suffix.isEmpty ? "Black \u{00B7} \(String(localized: ann.strength.displayName))" : "Black" + suffix))
         // A blank name is no name: the same trimming as `name(of:)`
         let blank = GamePlayer(name: "   ", computer: true, level: level)
         #expect(GameText.name(of: blank, isWhite: false, opponent: human) == name)
-        #expect(GameText.sideDetail(of: blank, isWhite: false, opponent: human, toMove: true) == "Black" + suffix)
+        #expect(GameText.sideDetail(of: blank, isWhite: false, opponent: human, toMove: true, isThinking: false) == "Black" + suffix)
     }
 
     @Test func sideDetails() {
-        #expect(GameText.sideDetail(of: human, isWhite: true, opponent: computer, toMove: true) == "White \u{00B7} your move")
-        #expect(GameText.sideDetail(of: human, isWhite: false, opponent: human, toMove: true) == "Black \u{00B7} to move")
-        #expect(GameText.sideDetail(of: human, isWhite: false, opponent: computer, toMove: false) == "Black")
-        #expect(GameText.sideDetail(of: computer, isWhite: false, opponent: human, toMove: true) == "Black")
+        #expect(GameText.sideDetail(of: human, isWhite: true, opponent: computer, toMove: true, isThinking: false) == "White \u{00B7} your move")
+        #expect(GameText.sideDetail(of: human, isWhite: false, opponent: computer, toMove: false, isThinking: false) == "Black")
+        #expect(GameText.sideDetail(of: computer, isWhite: false, opponent: human, toMove: true, isThinking: false) == "Black")
+    }
+
+    /// D6: a human with no name is named by its colour, so the detail never says the colour again.
+    @Test func unnamedHumanDetailDoesNotRepeatTheColour() {
+        #expect(GameText.name(of: human, isWhite: false, opponent: human) == "Black")
+        #expect(GameText.sideDetail(of: human, isWhite: false, opponent: human, toMove: true, isThinking: false) == "to move")
+        #expect(GameText.sideDetail(of: human, isWhite: true, opponent: human, toMove: false, isThinking: false) == "")
+        // A named human keeps the colour: the name does not say it
+        let ann = GamePlayer(name: "Ann", computer: false, level: 0)
+        #expect(GameText.sideDetail(of: ann, isWhite: false, opponent: human, toMove: true, isThinking: false) == "Black \u{00B7} to move")
+        #expect(GameText.sideDetail(of: ann, isWhite: false, opponent: human, toMove: false, isThinking: false) == "Black")
+    }
+
+    /// The computer thinking moves from the status line into its row: "Black \u{00B7} thinking\u{2026}".
+    @Test func sideDetailsWhileThinking() {
+        #expect(GameText.sideDetail(of: computer, isWhite: false, opponent: human, toMove: true, isThinking: true) == "Black \u{00B7} thinking\u{2026}")
+        let maximum = GamePlayer(name: "", computer: true, level: 5)
+        #expect(GameText.sideDetail(of: maximum, isWhite: false, opponent: human, toMove: true, isThinking: true) == "Black \u{00B7} thinking\u{2026}")
+        #expect(GameText.sideDetail(of: maximum, isWhite: false, opponent: human, toMove: true, isThinking: false) == "Black \u{00B7} 10 s")
+        let ann = GamePlayer(name: "Ann", computer: true, level: 1)
+        #expect(GameText.sideDetail(of: ann, isWhite: false, opponent: human, toMove: true, isThinking: true) == "Black \u{00B7} thinking\u{2026}")
+        // Thinking, but not its move (the flag follows the position): the usual detail
+        #expect(GameText.sideDetail(of: computer, isWhite: false, opponent: human, toMove: false, isThinking: true) == "Black")
+        #expect(GameText.sideDetail(of: maximum, isWhite: false, opponent: human, toMove: false, isThinking: true) == "Black \u{00B7} 10 s")
+        // A human is never "thinking"
+        #expect(GameText.sideDetail(of: human, isWhite: true, opponent: computer, toMove: true, isThinking: true) == "White \u{00B7} your move")
+        #expect(GameText.sideDetail(of: human, isWhite: false, opponent: human, toMove: true, isThinking: true) == "to move")
     }
 
     @Test func moveLabels() {
@@ -69,17 +94,13 @@ struct GameTextTests {
         #expect(GameText.moveLabel(number: 8, isWhite: false, san: "O-O") == "8\u{2026}O-O")
     }
 
-    private func status(_ mode: GameMode.Value = .play, thinking: Bool = false, end: GameEnd = .none,
-                        white: GamePlayer = human, black: GamePlayer = computer,
-                        whiteToMove: Bool = true, last: String? = nil) -> String {
-        GameText.status(mode: mode, isThinking: thinking, gameEnd: end, white: white, black: black,
-                        isWhiteToMove: whiteToMove, lastMove: last)
+    private func status(_ mode: GameMode.Value = .play, end: GameEnd = .none) -> String? {
+        GameText.status(mode: mode, gameEnd: end)
     }
 
     @Test func statusForModes() {
         #expect(status(.analyze) == "Analyzing. Moves are not saved.")
         #expect(status(.train) == "Practicing openings.")
-        #expect(status(.analyze, last: "8. c3") == "Analyzing. Moves are not saved.")
     }
 
     @Test func resultTitles() {
@@ -100,38 +121,20 @@ struct GameTextTests {
     }
 
     @Test func statusForGameEnds() {
-        // A position that cannot be played, in the middle of an imported line: the reason and the last move
+        // A position that cannot be played, in the middle of an imported line: the reason alone (the banner says the result)
         #expect(status(end: .repetition) == "Threefold repetition")
         #expect(status(end: .fiftyMoves) == "Fifty-move rule")
-        #expect(status(end: .deadPosition, last: "5. Nf3") == "Insufficient material Last: \u{2066}5. Nf3\u{2069}")
-        #expect(status(end: .checkmate, whiteToMove: false, last: "2\u{2026}Qh4") == "Checkmate Last: \u{2066}2\u{2026}Qh4\u{2069}")
-        // A declared result has no reason of its own: the status says whose move it is
-        #expect(status(end: .finished) == "Your move.")
+        #expect(status(end: .deadPosition) == "Insufficient material")
+        #expect(status(end: .checkmate) == "Checkmate")
+        #expect(status(end: .stalemate) == "Stalemate")
+        // A declared result has no reason of its own
+        #expect(status(end: .finished) == nil)
     }
 
-    @Test func statusWhileThinking() {
-        #expect(status(thinking: true, whiteToMove: false) == "Club Player is thinking\u{2026}")
-        let ann = GamePlayer(name: "Ann", computer: true, level: 1)
-        #expect(status(thinking: true, black: ann, whiteToMove: false) == "Ann is thinking\u{2026}")
-    }
-
-    @Test func statusForTheMoveToPlay() {
-        #expect(status() == "Your move.")
-        #expect(status(white: computer, black: human, whiteToMove: false) == "Your move.")
-        #expect(status(white: human, black: human) == "White to move.")
-        #expect(status(white: human, black: human, whiteToMove: false) == "Black to move.")
-        let ann = GamePlayer(name: "Ann", computer: false, level: 0)
-        #expect(status(white: ann, black: computer) == "Ann to move.")
-        // A computer's turn that is not being played (after going back)
-        #expect(status(whiteToMove: false) == "Club Player to move.")
-    }
-
-    /// A human who typed "You" as a name is not "you": the sentence follows the structure, never the text.
-    @Test func aPlayerNamedYouIsNotYou() {
-        let you = GamePlayer(name: "You", computer: false, level: 0)
-        let friend = GamePlayer(name: "Ben", computer: false, level: 0)
-        #expect(status(white: you, black: friend) == "You to move.")
-        #expect(status(white: you, black: computer) == "You to move.")
+    /// During play the player rows say whose move it is (and the computer thinking), the strip and the board the last
+    /// move: the status line has nothing to add.
+    @Test func statusIsNilDuringPlay() {
+        #expect(status() == nil)
     }
 
     /// The notation reads left to right inside a right-to-left sentence: an isolate, never a layout pin (which does not set
@@ -139,12 +142,5 @@ struct GameTextTests {
     @Test func notationIsALeftToRightIsolate() {
         #expect(GameText.notation("8\u{2026}O-O") == "\u{2066}8\u{2026}O-O\u{2069}")
         #expect(GameText.notation("") == "\u{2066}\u{2069}")
-        #expect(status(last: "8. c3").hasSuffix("8. c3\u{2069}"))
-    }
-
-    @Test func statusWithTheLastMove() {
-        #expect(status(last: "8. c3") == "Your move. Last: \u{2066}8. c3\u{2069}")
-        #expect(status(whiteToMove: false, last: "8\u{2026}O-O") == "Club Player to move. Last: \u{2066}8\u{2026}O-O\u{2069}")
-        #expect(status(thinking: true, whiteToMove: false, last: "8. c3") == "Club Player is thinking\u{2026} Last: \u{2066}8. c3\u{2069}")
     }
 }

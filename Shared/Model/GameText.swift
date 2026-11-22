@@ -28,7 +28,7 @@ enum GameText {
     }
 
     /// Whether the player is the person at the device: no name of its own, against a computer. The one condition
-    /// behind "You" in a name and "Your move." in the status line.
+    /// behind "You" in a name ("your move" in a player row's detail follows `opponent.computer` instead).
     private static func isYou(_ player: GamePlayer, opponent: GamePlayer) -> Bool {
         !player.computer && givenName(of: player) == nil && opponent.computer
     }
@@ -59,13 +59,19 @@ enum GameText {
         return String(localized: "\(whiteName) vs \(blackName)")
     }
 
-    /// The colour with what the player is doing, for the line under a player's name: "White \u{00B7} your move" for a
+    /// The colour with what the player is doing, beside a player's name (nothing but "to move", or nothing, where the name is the colour): "White \u{00B7} your move" for a
     /// human against a computer, the bare colour for a human waiting and for a computer whose name already says its
     /// level ("Casual Player"). It adds the level only where the name does not: "Black \u{00B7} 10 s" at Maximum (the thinking
-    /// time is not in "Full Engine") and "Black \u{00B7} Club" for a computer with a name of its own.
-    static func sideDetail(of player: GamePlayer, isWhite: Bool, opponent: GamePlayer, toMove: Bool) -> String {
+    /// time is not in "Full Engine") and "Black \u{00B7} Club" for a computer with a name of its own. A computer to move
+    /// that is searching reads "Black \u{00B7} thinking\u{2026}" whatever its level: the status line no longer says it.
+    static func sideDetail(of player: GamePlayer, isWhite: Bool, opponent: GamePlayer, toMove: Bool,
+                           isThinking: Bool) -> String {
         let colorName = String(localized: color(isWhite: isWhite))
         if player.computer {
+            if toMove && isThinking {
+                let thinking = String(localized: "thinking\u{2026}")
+                return String(localized: "\(colorName) \u{00B7} \(thinking)")
+            }
             if player.strength == .maximum {
                 let time = String(localized: seconds(Int(player.thinkingTime)))
                 return String(localized: "\(colorName) \u{00B7} \(time)")
@@ -76,10 +82,15 @@ enum GameText {
             let level = String(localized: player.strength.displayName)
             return String(localized: "\(colorName) \u{00B7} \(level)")
         }
+        // A human with no name of its own, against a human, is named by its colour: the detail says it only once
+        let nameIsColour = givenName(of: player) == nil && !opponent.computer
         guard toMove else {
-            return colorName
+            return nameIsColour ? "" : colorName
         }
         let doing = opponent.computer ? String(localized: "your move") : String(localized: "to move")
+        if nameIsColour {
+            return doing
+        }
         return String(localized: "\(colorName) \u{00B7} \(doing)")
     }
 
@@ -110,8 +121,11 @@ enum GameText {
         }
     }
 
-    static func status(mode: GameMode.Value, isThinking: Bool, gameEnd: GameEnd,
-                       white: GamePlayer, black: GamePlayer, isWhiteToMove: Bool, lastMove: String?) -> String {
+    /// The one sentence the game screen's status line adds to the player rows (whose turn it is, and the computer
+    /// thinking), the move strip and the board (the last move): what the mode is, or why this position cannot be played
+    /// (a position in the middle of an imported line; the result banner says how the line ends). `nil` while a game is
+    /// being played.
+    static func status(mode: GameMode.Value, gameEnd: GameEnd) -> String? {
         switch mode {
         case .analyze:
             return String(localized: "Analyzing. Moves are not saved.")
@@ -121,26 +135,10 @@ enum GameText {
             break
         }
 
-        let text: String
-        if let reason = resultReason(gameEnd) {
-            // A position that cannot be played, in the middle of a line (the banner says the result at the line's end)
-            text = String(localized: reason)
-        } else {
-            let player = isWhiteToMove ? white : black
-            let opponent = isWhiteToMove ? black : white
-            let name = Self.name(of: player, isWhite: isWhiteToMove, opponent: opponent)
-            if isThinking {
-                text = String(localized: "\(name) is thinking\u{2026}")
-            } else if isYou(player, opponent: opponent) {
-                text = String(localized: "Your move.")
-            } else {
-                text = String(localized: "\(name) to move.")
-            }
+        guard let reason = resultReason(gameEnd) else {
+            return nil
         }
-        guard let lastMove else {
-            return text
-        }
-        return String(localized: "\(text) Last: \(notation(lastMove))")
+        return String(localized: reason)
     }
 
     // MARK: Alerts of the games list
