@@ -477,8 +477,9 @@ extension GallerySuites {
                         try await Task.sleep(for: .milliseconds(400))
                     }
                     #expect(box.frames["column"] == nil, "\(label): the wide layout was drawn (frames \(box.frames.keys.sorted()))")
-                    let column = try #require(box.frames["tall-column"], "\(label): the tall layout was not chosen (frames \(box.frames.keys.sorted()))")
-                    #expect(column.minX >= 15.5 && column.maxX <= size.width - 15.5, "\(label): the column is \(column)")
+                    let column = box.frames["tall-column"]
+                    #expect(column != nil, "\(label): the tall layout was not chosen (frames \(box.frames.keys.sorted()))")
+                    #expect(column.map { $0.minX >= 15.5 && $0.maxX <= size.width - 15.5 } == true, "\(label): the column is \(String(describing: column))")
                 }
             }
         }
