@@ -7,9 +7,9 @@ import XCTest
 
 final class BChessUITests: XCTestCase {
 
-    override func setUpWithError() throws {
+    override func setUp() async throws {
         continueAfterFailure = false
-        XCUIDevice.shared.orientation = .portrait
+        await MainActor.run { XCUIDevice.shared.orientation = .portrait }
     }
 
     @MainActor
@@ -46,10 +46,56 @@ final class BChessUITests: XCTestCase {
         XCTAssertTrue(app.descendants(matching: .any)["engine-readout"].waitForExistence(timeout: 10))
     }
 
+    /// The frame of an element once two reads 0.25 s apart agree (a scroll or a sheet still moving would give a stale one).
+    @MainActor
+    private func settledFrame(_ element: XCUIElement) -> CGRect {
+        var frame = element.frame
+        for _ in 0..<12 {
+            Thread.sleep(forTimeInterval: 0.25)
+            let next = element.frame
+            if next == frame { return frame }
+            frame = next
+        }
+        XCTFail("\(element) never settled: \(frame)")
+        return frame
+    }
+
+    /// Scrolls the New Game sheet until the field lies between the sheet's bar and the Start bar. On the iPad's short
+    /// sheet the Start bar covers the lower fields, and a tap on a covered point lands on Start. Frames decide, since
+    /// `isHittable` accepts a half-covered field (measured: the first name, half under the bar, was hittable; the fully
+    /// covered second name was not). Only slow upward drags, from the content's left margin.
+    @MainActor
+    private func scrollClear(_ field: XCUIElement, in app: XCUIApplication) {
+        let top = settledFrame(app.buttons["Cancel"]).maxY
+        let start = settledFrame(app.buttons["new-game-start"])
+        let bottom = start.minY - 8
+        func isClear() -> Bool {
+            let frame = settledFrame(field)
+            return frame.minY >= top && frame.maxY <= bottom
+        }
+        for _ in 0..<5 {
+            if isClear() { return }
+            let frame = field.frame
+            if frame.minY < top { break }
+            let fromY = start.minY - 24
+            let toY = max(top + 12, fromY - (frame.maxY - bottom + 12))
+            let x = start.minX - 8
+            let origin = app.coordinate(withNormalizedOffset: .zero)
+            origin.withOffset(CGVector(dx: x, dy: fromY))
+                .press(forDuration: 0.1, thenDragTo: origin.withOffset(CGVector(dx: x, dy: toY)), withVelocity: .slow, thenHoldForDuration: 0.5)
+        }
+        if isClear() { return }
+        XCTFail("\(field.identifier) cannot be scrolled clear of the Start bar: field \(field.frame), Cancel bottom \(top), Start \(start)")
+    }
+
     /// Replaces what a text field holds.
     @MainActor
-    private func replaceText(in field: XCUIElement, with text: String) {
+    private func replaceText(in field: XCUIElement, with text: String, app: XCUIApplication) {
+        scrollClear(field, in: app)
+        let name = field.identifier
         field.tap()
+        // A tap that reached the Start bar closes the sheet; the wait observes the whole dismissal
+        XCTAssertFalse(app.buttons["new-game-start"].waitForNonExistence(timeout: 2), "the tap on \(name) closed the sheet")
         if let current = field.value as? String, !current.isEmpty, current != field.placeholderValue {
             field.typeText(String(repeating: XCUIKeyboardKey.delete.rawValue, count: current.count))
         }
@@ -77,7 +123,7 @@ final class BChessUITests: XCTestCase {
         app.buttons["new-game-opponent-maximum"].tap()
         app.buttons["30 s"].tap()
         app.buttons["Black"].tap()
-        replaceText(in: app.textFields["new-game-first-name"], with: "Ann")
+        replaceText(in: app.textFields["new-game-first-name"], with: "Ann", app: app)
         app.buttons["new-game-start"].tap()
         XCTAssertTrue(app.descendants(matching: .any)["board"].waitForExistence(timeout: 10))
 
@@ -89,8 +135,8 @@ final class BChessUITests: XCTestCase {
 
         // A friend game: each name field keeps its own name
         app.buttons["new-game-opponent-friend"].tap()
-        replaceText(in: app.textFields["new-game-first-name"], with: "Ann")
-        replaceText(in: app.textFields["new-game-second-name"], with: "Ben")
+        replaceText(in: app.textFields["new-game-first-name"], with: "Ann", app: app)
+        replaceText(in: app.textFields["new-game-second-name"], with: "Ben", app: app)
         app.buttons["new-game-start"].tap()
         XCTAssertTrue(app.descendants(matching: .any)["board"].waitForExistence(timeout: 10))
 
