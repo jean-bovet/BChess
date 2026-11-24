@@ -63,7 +63,7 @@ the measurement: with v1.0's measuring put back into main (APP-14's smaller rows
 
 ## Design
 
-No production change. Add the regression test that covers what APP-14's does not: the bars, the reported game, 430 x 932 and
+No production change. Add the regression test that covers what APP-14's does not: the bars, a many-captures game, 430 x 932 and
 the turn from a sideways friend game. It reuses `FrameBox`, `FrameProbeKey` and `SnapshotGalleryTests.mount`.
 
 1. **Regression test for the reported screen**, `BChessGalleryTests/GalleryScenarioTests.swift`, beside
@@ -88,7 +88,7 @@ No pure logic to unit test: the fault is SwiftUI measuring a view, so the test h
 each mounted three ways: upright; sideways on one board, then resized upright (isolates the turn); sideways with two
 boards, then `setFaceToFace(false)` and resized upright (neither `column` nor `tall-column` shows before the toggle).
 `ContentView` sits in a `NavigationStack` with an inline title, a principal item and a bottom-bar item. Expects: no
-`column` frame; a `tall-column` frame within 15.5 pt of the window's sides.
+`column` frame; a `tall-column` frame at least 15.5 pt inside the window's sides.
 
 **Red proof, observed on the prototype** (a 15-capture game, without the single-board turn) by putting v1.0's measuring back (`content.frame(...).onGeometryChange` in place of the clear base):
 `Test run with 1 test in 2 suites failed after 10.667 seconds with 12 issues`, e.g.
@@ -99,9 +99,9 @@ boards, then `setFaceToFace(false)` and resized upright (neither `column` nor `t
 ```
 
 **The committed test** (the existing 12 to 13-capture `manyCapturesSession()` fixture, every mount reports) under the same
-mutation: `Test run with 1 test in 2 suites failed after 16.170 seconds with 18 issues`. Only 375 x 667 goes red, in all
-six combinations (upright, one-board turn and two-board turn, light and dark; three issues each: `column == nil`,
-`column != nil` and the column's sides). 430 x 932 and 402 x 874 stay green under the mutation with this fixture,
+mutation: `Test run with 1 test in 2 suites failed after 16.103 seconds with 12 issues`. Only 375 x 667 goes red, in all
+six combinations (upright, one-board turn and two-board turn, light and dark; two issues each: `column == nil` and
+the tall column's sides). 430 x 932 and 402 x 874 stay green under the mutation with this fixture,
 because main's rows are smaller (APP-14). 430 x 932 and 402 x 874 are proven red at `v1.0` by the probe above, 402 x 874
 also by the 15-capture prototype. The existing `manyCapturesKeepTheTallLayoutOnEveryPhoneWidth` is also red under the
 mutation of the prototype (2 issues). On main the new test passes.
