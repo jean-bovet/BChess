@@ -1,6 +1,6 @@
 # APP-17 — The New Game UI test on the iPad
 
-Revision 3 (2026-11-25; r3, round 2: also measure after the first field's focus, settle before the sheet-open assertion; r2, review round 1: the measurements and the overlay mutation gate the diagnosis, both drag endpoints clamped, the software-keyboard claim narrowed). GitHub issue #65. Test code only: one helper in `BChessUITests/BChessUITests.swift`.
+Revision 3 (2026-11-25; r3, round 2: also measure after the first field's focus, settle before the sheet-open assertion; r2, review round 1: the measurements and the overlay mutation gate the diagnosis, both drag endpoints clamped, the software-keyboard claim narrowed). Implemented (commits 8eed40b, 2d2644d on the branch). Measured: the second field lies wholly under the Start bar and one slow drag clears it, so the app is right. After the code review, the sheet-open check is `waitForNonExistence(timeout: 2)` on Start (no private focus KVC). Software keyboard: not run. GitHub issue #65. Test code only: one helper in `BChessUITests/BChessUITests.swift`.
 
 ## 1. Problem, with evidence
 `testNewGameRemembersTheChoice` fails on the iPad (iPad Pro 13-inch (M5), iOS 27.0, `main` at e6e14fb), passes on the iPhone.
