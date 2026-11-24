@@ -435,6 +435,54 @@ extension GallerySuites {
             }
         }
 
+        @Test("under the bars, a phone gets the tall layout: upright, or turned upright from sideways on one or two boards", arguments: [
+            CGSize(width: 430, height: 932), CGSize(width: 402, height: 874), CGSize(width: 375, height: 667)])
+        func phoneUnderTheBarsIsTallUprightAndAfterTurning(size: CGSize) async throws {
+            let sideways = CGSize(width: size.height, height: size.width)
+            // (the window it starts in, whether the game starts on two boards)
+            for (start, twoBoards) in [(size, false), (sideways, false), (sideways, true)] {
+                for style in styles {
+                    let label = "\(start) to \(size), \(twoBoards ? "two boards" : "one board"), \(style.rawValue)"
+                    let box = FrameBox()
+                    let session = GalleryScenarios.manyCapturesSession(rotated: true, faceToFace: twoBoards)
+                    let screen = NavigationStack {
+                        ContentView(session: session)
+                            .navigationBarTitleDisplayMode(.inline)
+                            .toolbar {
+                                ToolbarItem(placement: .principal) { Text(verbatim: "White vs Black") }
+                                ToolbarItem(placement: .bottomBar) { Button(action: {}) { Text(verbatim: "Engine") } }
+                            }
+                    }
+                    .defaultAppStorage(GalleryScenarios.defaults)
+                    .overlayPreferenceValue(FrameProbeKey.self) { anchors in
+                        GeometryReader { proxy in
+                            let frames = anchors.mapValues { proxy[$0] }
+                            Color.clear.onChange(of: frames, initial: true) { _, new in box.frames = new }
+                        }
+                    }
+                    let mounted = try SnapshotGalleryTests.mount(AnyView(screen), size: start, style: style)
+                    defer { mounted.close() }
+                    try await Task.sleep(for: .milliseconds(400))
+                    if start != size {
+                        if twoBoards {
+                            #expect(box.frames["column"] == nil && box.frames["tall-column"] == nil, "\(label): not two boards (frames \(box.frames.keys.sorted()))")
+                            session.setFaceToFace(false)
+                            try await Task.sleep(for: .milliseconds(200))
+                        } else {
+                            #expect(box.frames["column"] != nil, "\(label): the turn did not start wide (frames \(box.frames.keys.sorted()))")
+                        }
+                        mounted.window.frame = CGRect(origin: .zero, size: size)
+                        mounted.host.view.frame = mounted.window.bounds
+                        mounted.host.view.layoutIfNeeded()
+                        try await Task.sleep(for: .milliseconds(400))
+                    }
+                    #expect(box.frames["column"] == nil, "\(label): the wide layout was drawn (frames \(box.frames.keys.sorted()))")
+                    let column = try #require(box.frames["tall-column"], "\(label): the tall layout was not chosen (frames \(box.frames.keys.sorted()))")
+                    #expect(column.minX >= 15.5 && column.maxX <= size.width - 15.5, "\(label): the column is \(column)")
+                }
+            }
+        }
+
         @Test("the status slot and the move strip are as tall in every language as in English, so the centred block never moves")
         func blockHeightsDoNotDependOnTheLanguage() async throws {
             // Measured in English at the default text size: the Arabic line is 2 pt (status) and 1.3 pt (strip) taller

@@ -349,8 +349,10 @@ enum GalleryScenarios {
     }
 
     /// Two humans with long names on the many-captures game (white twelve captures, black thirteen), at its end.
-    static func manyCapturesSession() -> GameSession {
-        GameSession(state: GameState(pgn: Fixture.manyCaptures, white: longNamedWhite, black: longNamedBlack))
+    /// `rotated` turns the board to Black's side; `faceToFace` (two humans) puts one board in front of each player.
+    static func manyCapturesSession(rotated: Bool = false, faceToFace: Bool = false) -> GameSession {
+        GameSession(state: GameState(pgn: Fixture.manyCaptures, rotated: rotated, white: longNamedWhite, black: longNamedBlack,
+                                     faceToFace: faceToFace))
     }
 
     /// Two humans on the long checkmate game: at its end, or, with `atPly`, on that zero-based ply (39 is Black's
