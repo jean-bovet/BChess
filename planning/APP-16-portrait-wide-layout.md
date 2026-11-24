@@ -1,6 +1,6 @@
 # APP-16: the wide layout on an upright iPhone (issue #68)
 
-**Status: proposed, 2026-11-25 (r1).** The bug is in the build testers have, 1.0 (21) = tag `v1.0`, and is **already
+**Status: accepted, 2026-11-25 (r2: existing fixture, a single-board turn, the full gate after review round 1).** The bug is in the build testers have, 1.0 (21) = tag `v1.0`, and is **already
 fixed on main** by APP-14 (`7faaf86`, #64, "step 5: the layout is chosen from the offered space"). This plan adds
 tests only. No production code changes.
 
@@ -67,11 +67,13 @@ No production change. Add the regression test that covers what APP-14's does not
 the turn from a sideways friend game. It reuses `FrameBox`, `FrameProbeKey` and `SnapshotGalleryTests.mount`.
 
 1. **Regression test for the reported screen**, `BChessGalleryTests/GalleryScenarioTests.swift`, beside
-   `manyCapturesKeepTheTallLayoutOnEveryPhoneWidth`, and its PGN in `GalleryScenarios.Fixture` (so it also joins
-   `allPGNs`, and `every PGN fixture parses` covers it).
+   `manyCapturesKeepTheTallLayoutOnEveryPhoneWidth`, on the existing `GalleryScenarios.manyCapturesSession()` fixture
+   (no new PGN). One parameterized test; the session is made two-human where the turn needs it.
 
 ## Alternatives rejected
 
+- Adding the cases to `manyCapturesKeepTheTallLayoutOnEveryPhoneWidth`: its shared `layout` helper mounts one fixed size
+  without bars; the turn needs its own mount.
 - `frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, ...)` around the content: also cures the overflow report, but the
   first pass still draws a guessed layout. Main's version already does both; rewriting it gains nothing.
 - Deciding by size class instead of width > height: would change iPad and Duo (`area.width > area.height`), out of scope.
@@ -82,17 +84,13 @@ the turn from a sideways friend game. It reuses `FrameBox`, `FrameProbeKey` and 
 
 No pure logic to unit test: the fault is SwiftUI measuring a view, so the test hosts the screen.
 
-`phoneUnderTheBarsIsTallUprightAndAfterTurning(size:)`, arguments 430 x 932, 402 x 874, 375 x 667; each in both `styles`, each
-mounted (a) upright and (b) sideways with `faceToFace: true`, then `setFaceToFace(false)` and the window and host resized
-upright (neither `column` nor `tall-column` shows before the toggle). `ContentView` sits in a `NavigationStack` with an inline
-title, a principal item and a bottom-bar item. Expects: 15 captures by White; no `column` frame; a `tall-column` frame
-within 15.5 pt of the window's sides. The PGN (all legal, 126 plies):
+`phoneUnderTheBarsIsTallUprightAndAfterTurning(size:)`, arguments 430 x 932, 402 x 874, 375 x 667; each in both `styles`,
+each mounted three ways: upright; sideways on one board, then resized upright (isolates the turn); sideways with two
+boards, then `setFaceToFace(false)` and resized upright (neither `column` nor `tall-column` shows before the toggle).
+`ContentView` sits in a `NavigationStack` with an inline title, a principal item and a bottom-bar item. Expects: no
+`column` frame; a `tall-column` frame within 15.5 pt of the window's sides.
 
-```
-1. h4 g5 2. hxg5 e6 3. Rxh7 Qxg5 4. Rxf7 Qxg2 5. Rxd7 Qxg1 6. Rxc7 Qxf2+ 7. Kxf2 Rh3 8. Rxc8+ Kd7 9. Rxb8 Rxb8 10. Bxh3 Bg7 11. Bxe6+ Kxe6 12. c3 Bxc3 13. dxc3 b6 14. Qe1 a5 15. b3 Rc8 16. Bb2 Rxc3 17. Qxc3 Kd5 18. Qxa5+ bxa5 19. Nd2 Ne7 20. Kf1 Kd6 21. a3 a4 22. bxa4 Kc6 23. Ke1 Kd7 24. Bg7 Kd6 25. Nf3 Kc5 26. Bh6 Nc6 27. Ra2 Na7 28. Ng5 Nb5 29. axb5 Kxb5 30. Nh7 Ka6 31. Kf1 Kb5 32. Bf8 Ka6 33. e3 Kb6 34. a4 Kc7 35. Ra1 Kb8 36. Rd1 Ka8 37. a5 Ka7 38. Rd5 Kb7 39. Rf5 Kc8 40. Rf2 Kc7 41. Rf6 Kb7 42. Ng5 Ka8 43. Rd6 Kb8 44. Kg1 Ka8 45. Be7 Ka7 46. Nh3 Ka8 47. Rd4 Kb8 48. Bc5 Ka8 49. Kf1 Kb8 50. Ba7+ Kxa7 51. Ke1 Ka6 52. Kd1 Kxa5 53. Ng1 Kb6 54. Rf4 Kb5 55. Kd2 Ka6 56. Kd3 Kb5 57. Nf3 Ka6 58. Rf6+ Kb5 59. Ke4 Kc5 60. Ng5 Kb4 61. Ke5 Kc3 62. Rc6+ Kd3 63. Rc8 Kxe3 *
-```
-
-**Red proof, observed** by putting v1.0's measuring back (`content.frame(...).onGeometryChange` in place of the clear base):
+**Red proof, observed on the prototype** (a 15-capture game, without the single-board turn) by putting v1.0's measuring back (`content.frame(...).onGeometryChange` in place of the clear base):
 `Test run with 1 test in 2 suites failed after 10.667 seconds with 12 issues`, e.g.
 
 ```
@@ -105,9 +103,8 @@ at `v1.0` only (by the probe above); it stays as the reported size. The existing
 `manyCapturesKeepTheTallLayoutOnEveryPhoneWidth` is also red under the mutation (2 issues, l.432 and 433). On main the new
 test passed in 10.034 s.
 
-**Landing gate:** `BChessGalleryTests` on the iPhone pool simulator; no UI suite (none is touched) and no warnings. The gallery
-does not change (no view changes), so no new captures; before closing, look at the existing cards the issue names: iPhone
-upright, friend game upright and sideways, iPad, Duo and Mac.
+**Landing gate:** the Mac and engine tests, the UCI build, `BChessGalleryTests` on the iPhone pool simulator, the four
+warnings lines of the develop gates. No UI test is touched and no view changes, so no new captures.
 
 ## Invariants
 
@@ -125,9 +122,8 @@ upright, friend game upright and sideways, iPad, Duo and Mac.
 
 ## Decision left open for Jean
 
-- **D1.** Add the test (recommended) or close #68 on APP-14's test and the device check alone.
-- **D2.** Send a TestFlight build soon: the only way testers lose the bug. Not part of this plan (`/testflight`).
+None: the test is added. The TestFlight build that brings the fix to testers is separate (`/testflight`).
 
 ## Steps
 
-1. **Regression test** — the PGN fixture and `phoneUnderTheBarsIsTallUprightAndAfterTurning`, red proof as above
+1. **Regression test** — `phoneUnderTheBarsIsTallUprightAndAfterTurning`, red proof as above
