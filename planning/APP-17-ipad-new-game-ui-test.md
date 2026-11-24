@@ -1,6 +1,6 @@
 # APP-17 — The New Game UI test on the iPad
 
-Revision 2 (2026-11-24; r2, review round 1: the measurements and the overlay mutation gate the diagnosis, both drag endpoints clamped, the software-keyboard claim narrowed). GitHub issue #65. Test code only: one helper in `BChessUITests/BChessUITests.swift`.
+Revision 3 (2026-11-25; r3, round 2: also measure after the first field's focus, settle before the sheet-open assertion; r2, review round 1: the measurements and the overlay mutation gate the diagnosis, both drag endpoints clamped, the software-keyboard claim narrowed). GitHub issue #65. Test code only: one helper in `BChessUITests/BChessUITests.swift`.
 
 ## 1. Problem, with evidence
 `testNewGameRemembersTheChoice` fails on the iPad (iPad Pro 13-inch (M5), iOS 27.0, `main` at e6e14fb), passes on the iPhone.
@@ -33,7 +33,7 @@ scroll helper exists in `BChessUITests`. It works from frames, since `isHittable
   never on Start. Only upward drags: they cannot start the sheet's interactive dismiss or `scrollDismissesKeyboard(.interactively)`.
 - At most 5 drags. Then `XCTAssertTrue(clear, "<identifier> cannot be scrolled clear of the Start bar: <frames>")`. A
   rubber-banded field settles back and fails. A field above Cancel fails at once (no downward drag).
-- After the tap, `replaceText` asserts the Start button still exists ("the tap closed the sheet"), before reading the value.
+- After the tap, `replaceText` waits for a dismissal to have had time to finish (a bounded wait for the field's keyboard focus, `hasKeyboardFocus`, or settled frames), then asserts the Start button still exists ("the tap closed the sheet"), before reading the value.
 
 **The diagnosis is settled only by measurement:** test plan 2 and 3 run before the fix is kept; without both, stop and report.
 
@@ -52,7 +52,8 @@ is wrong. Stop and report; change neither the app nor the assertion.
 
 ## 4. Test plan
 1. **Red (have it):** the test on `ipad` at e6e14fb, section 1. Red proof again: commit, remove only the `scrollClear` call, run on `ipad`, see it fail at the "closed the sheet" assertion, restore with `git checkout --`.
-2. **Hypothesis proof:** in a temporary run, print settled frames of both fields, Start and Cancel and `isHittable`, before and after one drag on `ipad`; report them. Nothing of it is committed.
+2. **Hypothesis proof:** in a temporary run, print settled frames of both fields, Start and Cancel and `isHittable`, before and after one drag on `ipad`, and also after the first
+   field is focused and immediately before the second is tapped; report them. Nothing of it is committed.
 3. **Strictness proof (temporary app edit, reverted):** replace `.safeAreaInset` with a bottom `.overlay`; the helper must fail with the "cannot be scrolled clear" message on `ipad`. `git status` clean after.
 4. **Green:** the test on `iphone` and `ipad`, three runs each, hardware keyboard; then once on `ipad` with the software keyboard up if the leased simulator can show it without changing its settings, otherwise reported as not run.
 5. **Landing gate** (fresh `<dd>`, `gates.md`): the Mac build and test lines, the UCI build, the warnings gate **plus** a line for the `BChessUITests` target (the third line's form, own `SYMROOT`/`OBJROOT`; the stock lines do not compile it), iOS `build-for-testing`, `-only-testing:BChessUITests/BChessUITests/testNewGameRemembersTheChoice` on `iphone` and `ipad`.
