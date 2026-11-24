@@ -98,12 +98,15 @@ boards, then `setFaceToFace(false)` and resized upright (neither `column` nor `t
 ... recorded an issue with 1 argument size → (375.0, 667.0) at GalleryScenarioTests.swift:518:21: Expectation failed: column != nil
 ```
 
-430 x 932 stays green under that mutation: APP-14 already made the rows shorter (642 < 698). So the 430 pt case is proven red
-at `v1.0` only (by the probe above); it stays as the reported size. The existing
-`manyCapturesKeepTheTallLayoutOnEveryPhoneWidth` is also red under the mutation (2 issues, l.432 and 433). On main the new
-test passed in 10.034 s.
+**The committed test** (the existing 12 to 13-capture `manyCapturesSession()` fixture, every mount reports) under the same
+mutation: `Test run with 1 test in 2 suites failed after 16.170 seconds with 18 issues`. Only 375 x 667 goes red, in all
+six combinations (upright, one-board turn and two-board turn, light and dark; three issues each: `column == nil`,
+`column != nil` and the column's sides). 430 x 932 and 402 x 874 stay green under the mutation with this fixture,
+because main's rows are smaller (APP-14). 430 x 932 and 402 x 874 are proven red at `v1.0` by the probe above, 402 x 874
+also by the 15-capture prototype. The existing `manyCapturesKeepTheTallLayoutOnEveryPhoneWidth` is also red under the
+mutation of the prototype (2 issues). On main the new test passes.
 
-**Landing gate:** the Mac and engine tests, the UCI build, `BChessGalleryTests` on the iPhone pool simulator, the four
+**Landing gate:** the Mac and engine tests, the UCI build, the whole "BChess (iOS)" scheme on the iPhone pool simulator (`BChessGalleryTests` and the UI tests), the four
 warnings lines of the develop gates. No UI test is touched and no view changes, so no new captures.
 
 ## Invariants
