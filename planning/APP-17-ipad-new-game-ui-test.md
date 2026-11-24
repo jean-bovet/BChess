@@ -1,6 +1,6 @@
-# APP-16 — The New Game UI test on the iPad
+# APP-17 — The New Game UI test on the iPad
 
-Revision 1 (2026-11-24). GitHub issue #65. Test code only: one helper in `BChessUITests/BChessUITests.swift`.
+Revision 2 (2026-11-24; r2, review round 1: the measurements and the overlay mutation gate the diagnosis, both drag endpoints clamped, the software-keyboard claim narrowed). GitHub issue #65. Test code only: one helper in `BChessUITests/BChessUITests.swift`.
 
 ## 1. Problem, with evidence
 `testNewGameRemembersTheChoice` fails on the iPad (iPad Pro 13-inch (M5), iOS 27.0, `main` at e6e14fb), passes on the iPhone.
@@ -23,16 +23,19 @@ A `scrollClear(_ field:, in app:)` helper, called first by `replaceText` (which 
 scroll helper exists in `BChessUITests`. It works from frames, since `isHittable` is what appears unreliable here:
 
 - **Clear** = `field.frame` lies wholly between `app.buttons["Cancel"].frame.maxY` (the sheet's bar) and
-  `app.buttons["new-game-start"].frame.minY - 8` (the Start bar's vertical padding). With a software keyboard the inset
-  rises with it, so the same rule holds.
+  `app.buttons["new-game-start"].frame.minY - 8` (the Start bar's vertical padding). The rule is proven with the hardware
+  keyboard only (what the pool simulators use); the software-keyboard geometry is run if possible, else an owed check.
 - Each read first waits until two successive frames agree (0.25 s apart, at most 3 s; never settling is a failure).
-- Not clear at the bottom: drag up by the missing distance plus 12 pt (capped to the visible height), with
+- Not clear at the bottom: drag up by the missing distance plus 12 pt, with both endpoints clamped inside the scrolling
+  area (12 pt below Cancel, 24 pt above the Start bar), with
   `press(forDuration:thenDragTo:withVelocity:thenHoldForDuration:)` at a slow speed and a hold, so there is no fling.
   The start point is in the content's 16 pt margin, `x = start.frame.minX - 8`, 24 pt above the bar: no button or field under it,
   never on Start. Only upward drags: they cannot start the sheet's interactive dismiss or `scrollDismissesKeyboard(.interactively)`.
 - At most 5 drags. Then `XCTAssertTrue(clear, "<identifier> cannot be scrolled clear of the Start bar: <frames>")`. A
   rubber-banded field settles back and fails. A field above Cancel fails at once (no downward drag).
 - After the tap, `replaceText` asserts the Start button still exists ("the tap closed the sheet"), before reading the value.
+
+**The diagnosis is settled only by measurement:** test plan 2 and 3 run before the fix is kept; without both, stop and report.
 
 **Strict enough?** Yes for this class of bug: content that cannot scroll clear, a missing inset, or a sheet that closes
 on the tap all fail with their own message; typing and the remembered "Ben" prove the field took focus. It does not assert
