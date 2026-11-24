@@ -7,9 +7,9 @@ import XCTest
 
 final class BChessUITests: XCTestCase {
 
-    override func setUpWithError() throws {
+    override func setUp() async throws {
         continueAfterFailure = false
-        XCUIDevice.shared.orientation = .portrait
+        await MainActor.run { XCUIDevice.shared.orientation = .portrait }
     }
 
     @MainActor
@@ -62,15 +62,20 @@ final class BChessUITests: XCTestCase {
 
     /// Scrolls the New Game sheet until the field lies between the sheet's bar and the Start bar. On the iPad's short
     /// sheet the Start bar covers the lower fields, and a tap on a covered point lands on Start. Frames decide, since
-    /// `isHittable` reports covered fields as hittable. Only slow upward drags, from the content's left margin.
+    /// `isHittable` accepts a half-covered field (measured: the first name, half under the bar, was hittable; the fully
+    /// covered second name was not). Only slow upward drags, from the content's left margin.
     @MainActor
     private func scrollClear(_ field: XCUIElement, in app: XCUIApplication) {
         let top = settledFrame(app.buttons["Cancel"]).maxY
         let start = settledFrame(app.buttons["new-game-start"])
         let bottom = start.minY - 8
-        for _ in 0...5 {
+        func isClear() -> Bool {
             let frame = settledFrame(field)
-            if frame.minY >= top, frame.maxY <= bottom { return }
+            return frame.minY >= top && frame.maxY <= bottom
+        }
+        for _ in 0..<5 {
+            if isClear() { return }
+            let frame = field.frame
             if frame.minY < top { break }
             let fromY = start.minY - 24
             let toY = max(top + 12, fromY - (frame.maxY - bottom + 12))
@@ -79,6 +84,7 @@ final class BChessUITests: XCTestCase {
             origin.withOffset(CGVector(dx: x, dy: fromY))
                 .press(forDuration: 0.1, thenDragTo: origin.withOffset(CGVector(dx: x, dy: toY)), withVelocity: .slow, thenHoldForDuration: 0.5)
         }
+        if isClear() { return }
         XCTFail("\(field.identifier) cannot be scrolled clear of the Start bar: field \(field.frame), Cancel bottom \(top), Start \(start)")
     }
 
@@ -88,12 +94,8 @@ final class BChessUITests: XCTestCase {
         scrollClear(field, in: app)
         let name = field.identifier
         field.tap()
-        // A tap that reached the Start bar closes the sheet: let it finish, then say so
-        let deadline = Date().addingTimeInterval(3)
-        while app.buttons["new-game-start"].exists, field.value(forKey: "hasKeyboardFocus") as? Bool != true, Date() < deadline {
-            Thread.sleep(forTimeInterval: 0.25)
-        }
-        XCTAssertTrue(app.buttons["new-game-start"].exists, "the tap on \(name) closed the sheet")
+        // A tap that reached the Start bar closes the sheet; the wait observes the whole dismissal
+        XCTAssertFalse(app.buttons["new-game-start"].waitForNonExistence(timeout: 2), "the tap on \(name) closed the sheet")
         if let current = field.value as? String, !current.isEmpty, current != field.placeholderValue {
             field.typeText(String(repeating: XCUIKeyboardKey.delete.rawValue, count: current.count))
         }
