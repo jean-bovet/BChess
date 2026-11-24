@@ -478,8 +478,8 @@ extension GallerySuites {
                     }
                     #expect(box.frames["column"] == nil, "\(label): the wide layout was drawn (frames \(box.frames.keys.sorted()))")
                     let column = box.frames["tall-column"]
-                    #expect(column != nil, "\(label): the tall layout was not chosen (frames \(box.frames.keys.sorted()))")
-                    #expect(column.map { $0.minX >= 15.5 && $0.maxX <= size.width - 15.5 } == true, "\(label): the column is \(String(describing: column))")
+                    #expect(column.map { $0.minX >= 15.5 && $0.maxX <= size.width - 15.5 } == true,
+                            "\(label): the tall column is \(String(describing: column)) (frames \(box.frames.keys.sorted()))")
                 }
             }
         }
