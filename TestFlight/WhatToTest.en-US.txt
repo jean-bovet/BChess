@@ -1,7 +1,13 @@
-- New chess pieces across the board, the move list, promotion and the New Game sheet.
+- Play a friend on two boards (iPhone and iPad): a game against "A friend" now shows one board facing each player, stacked in portrait and side by side in landscape. Only the board of the player to move takes taps. On iPhone, landscape works only in these games.
 
-- New app icon: a carved knight on a wooden board, with dark and tinted versions on iPhone and iPad.
+- More > Two Boards switches any game between two people from two boards to a single board and back (iPhone and iPad).
 
-- New About screen with the version, credits and licenses. iPhone and iPad: More > Settings > About BChess. Mac: BChess menu > About BChess.
+- A finished game now says clearly who won, or that it is a draw and why. The result stays visible while you browse the moves.
 
-Please verify: the pieces are easy to read on both square colors in light and dark, the new icon appears on the Home Screen and in the Dock, and the About screen opens and scrolls to the end of the licenses.
+- The fifty-move rule and insufficient material now end the game as a draw.
+
+- New game screen layout: captured pieces have their own line under each name, the last moves are never cut off, and whose turn it is appears once. On iPhone the board sits lower.
+
+- Fixed: on an upright iPhone, the game screen could show the wide layout, cut off on both sides.
+
+Please verify: a whole game against a friend on two boards, turning the device and switching Two Boards off and on; the result at the end of a game and while browsing its moves; and, on an upright iPhone, that a long finished game with many captures is not cut off after you quit and reopen the app.
